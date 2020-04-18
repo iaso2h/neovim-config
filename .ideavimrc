@@ -1,0 +1,63 @@
+" set relativenumber
+set timeoutlen=500
+set hls
+set si
+set shiftwidth=4
+set clipboard=unnamed
+set lazyredraw " Make Macro faster
+set gdefaul
+let mapleader = '\<Space>'
+
+" -----------IdeaVim featured-plugin
+set easymotion
+set surround
+set commentary
+set ReplaceWithRegister
+set argtextobj
+set textobj-entire
+set multiple-cursors
+set easymotion
+" -----------
+" Visual block mode
+nnoremap <A-v> <C-v>
+" Quit insert mode
+inoremap jj <Esc>
+" Pageup & Pagedown
+map <A-d> <C-f>
+map <A-s> <C-b>
+" Exit insert mode inoremap jj <Esc>
+" ----------Putting and Yanking
+" Yankfrom above and below
+nnoremap yk kyyp
+nnoremap yj jyyP
+" Reaming cursor position after putting
+nnoremap p mzp`z
+nnoremap P mzP`z
+nmap gp "0p
+nmap gP "0P
+nnoremap <Space>n :nohls<CR>
+" Convert \ to /
+nnoremap g/ :s/\\/\//<CR>
+" Add space before and after
+nnoremap <Space>k mzO<Esc>`zh
+nnoremap <Space>j mzo<Esc>`z
+nnoremap <Space>h i<Space><Esc>l
+nnoremap <Space>l a<Space><Esc>h
+nmap <Space>i i<Space><Esc>i
+" -----------PyCharm IDE action------------
+map L :action <A-a><CR>
+map H :action <C-A-a><CR>
+" Close ative tab
+map <C-w>c :action CloseContent<CR>
+" View
+map <C-w>h :action SplitHorizontally<CR>
+map <C-w>o :action CloseAllEditorsButActive<CR>
+map <C-l> :action NextTab<CR>
+map <C-h> :action PreviousTab<CR>
+" go to block end
+nnoremap gO :action EditorCodeBlockStart<CR>
+nnoremap go :action EditorCodeBlockEnd<CR>
+" Selection code block
+nmap vai go:action EditorCodeBlockStartWithSelection<CR>
+nmap vii go:action EditorCodeBlockStartWithSelection<CR><Down>
+" BUG in vii

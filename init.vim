@@ -1,6 +1,6 @@
 " Language
-let $LANG = 'en_US'
 if !exists('g:vscode')
+    let $LANG = 'en_US'
     set langmenu=en_US
     let $lang='en_us.utf-8'
     let g:input_toggle = 0
@@ -20,21 +20,20 @@ if !exists('g:vscode')
         endif
     endfunction
 
-    set timeoutlen=500
     autocmd InsertLeave * call Fcitx2en()
     autocmd InsertEnter * call Fcitx2zh()
 endif
+set timeoutlen=500
 
 " ------------------- Plugin--------------------
-" call plug#begin(stdpath('config') . './plugged')
-call plug#begin('~/.vim/plugged')
+call plug#begin(stdpath('config') . './plugged')
+" call plug#begin('~/.vim/plugged')
 if !exists('g:vscode')
     Plug 'joshdick/onedark.vim'
     Plug 'arcticicestudio/nord-vim'
     Plug 'preservim/nerdtree'
     Plug 'vim-airline/vim-airline-themes'
     Plug 'vim-airline/vim-airline'
-    Plug 'tpope/vim-commentary'
     Plug 'mhinz/vim-startify'
     Plug 'Yggdroot/indentLine'
     Plug 'easymotion/vim-easymotion'
@@ -45,6 +44,7 @@ if !exists('g:vscode')
     Plug 'gabebw/vim-github-link-opener'
     Plug 'jeffkreeftmeijer/vim-numbertoggle'
     Plug 'mbbill/undotree'
+    Plug 'tpope/vim-commentary'
     " Plug 'sheerun/vim-polyglot'   " Language packs for Vim
     " Plug 'pechorin/any-jump.vim'
     " Plug 'terryma/vim-multiple-cursors'
@@ -148,31 +148,36 @@ call expand_region#custom_text_objects({
 let g:easymotion_smartcase = 1
 
 " -----------basic settings--------------
-set undofile " Combine with undotree plugin
-set noswapfile " Diable annoying swap file notification
-set nowritebackup
-set number relativenumber
-set tabstop=4
-set lazyredraw " Make Macro faster
-set autoindent " Preserve current indent on new lines
-set cindent " set C style indent
-set expandtab " Convert all tabs typed to spaces
-set softtabstop=4 " Indentation levels every four columns
-set shiftwidth=4 " Indent/outdent by four columns
-set shiftround " Indent/outdent to nearest tabstop
-set langmenu=en
-set scrolloff=5
-set ignorecase " g flag on search
-set shortmess+=c " don't give ins-completion-menu messages.
+
+if !exists ('g:vscode')
+    set undofile " Combine with undotree plugin
+    set noswapfile " Diable annoying swap file notification
+    set nowritebackup
+    set number relativenumber
+    set tabstop=4
+    set autoindent " Preserve current indent on new lines
+    set cindent " set C style indent
+    set expandtab " Convert all tabs typed to spaces
+    set softtabstop=4 " Indentation levels every four columns
+    set shiftwidth=4 " Indent/outdent by four columns
+    set shiftround " Indent/outdent to nearest tabstop
+
+    set scrolloff=5
+    set ai
+    set si
+    set ignorecase " g flag on search
+    set shortmess+=c " don't give ins-completion-menu messages.
+    set smartcase
+    set lbr
+    set langmenu=en
+    set hidden
+    set updatetime=300
+endif
 set inccommand=nosplit " live substitution
-set smartcase
 set gdefault
-set lbr
-set ai
-set si
-set hidden
+set lazyredraw " Make Macro faster
+set gdefault
 set clipboard=unnamed
-set updatetime=300
 hi MatchParen ctermbg=blue guibg=lightblue guifg=white ctermfg=white
 
 " ---------------Keybindings---------------
@@ -187,8 +192,8 @@ if !exists ('g:vscode')
 
     map <silent> <C-u>e :UndotreeToggle<CR>
 
-    noremap <A-d> <pagedown>
     noremap <A-s> <pageup>
+    noremap <A-d> <pagedown>
 
     noremap <A-f> :Autoformat<CR>
     " Join line
@@ -220,6 +225,11 @@ if !exists ('g:vscode')
     " folding
     nnoremap <silent> <Leader>f @=(foldlevel('.') ? 'za' : '\<Space>')<CR>
     vnoremap <Leader>f zf
+    " Mimic the VSCode move line up/down behavior
+    nnoremap <silent> <A-j> :m .+1<CR>==
+    nnoremap <silent> <A-k> :m .-2<CR>==
+    inoremap <silent> <A-j> <esc>:m .+1<CR>==gi
+    inoremap <silent> <A-k> <esc>:m .-2<CR>==gi
     " ------------------Coc
     inoremap <silent><expr> <TAB>
                 \ pumvisible() ? "\<C-n>" :
@@ -320,19 +330,21 @@ if exists ('g:vscode')
     xmap gc  <plug>VSCodeCommentary
     omap gc  <plug>VSCodeCommentary
     nmap gc  <plug>VSCodeCommentary
-    nmap gcc <plug>VSCodeCommentaryline
+    " nmap gcc <plug>VSCodeCommentaryline<CR>
     " Show hints
     nnoremap gh <Cmd>call VSCodeCall('editor.action.showHover')<CR>
-    nnoremap J <Cmd>call VSCodeNotify('workbench.action.quickOpenNavigatePreviousInEditorPicker')<CR>
-    nnoremap K <Cmd>call VSCodeNotify('workbench.action.quickOpenNavigateNextInEditorPicker')<CR>
+    nnoremap gcc <Cmd>call VSCodeCall('editor.action.commentLine')<CR>
+    nnoremap J <Cmd>call VSCodeCall('workbench.action.quickOpenNavigatePreviousInEditorPicker')<CR>
+    nnoremap K <Cmd>call VSCodeCall('workbench.action.quickOpenNavigateNextInEditorPicker')<CR>
 endif
 " --------------VS Code--------------
-
 " Quit insert or repalce mode
 inoremap jj <esc>
 " " Disable highlightsearch or exit visualmode
 " function! Xnohls()
-"     if mode() == "\<C-V>"
+    " if mode() == "\<C-V>"
+        "
+"     "
 "         execute "normal \<Esc>"
 "     elseif mode() == "v"
 "         execute "normal \<Esc>"
@@ -353,15 +365,18 @@ map gr <plug>(operator-replace)
 map L <plug>(expand_region_expand)
 map H <plug>(expand_region_shrink)
 " Put content from registers 0
-nnoremap gp "0p
-nnoremap gP "0P
-" Mimic the VSCode move line up/down behavior
-nnoremap <silent> <A-j> :m .+1<CR>==
-nnoremap <silent> <A-k> :m .-2<CR>==
-inoremap <silent> <A-j> <esc>:m .+1<CR>==gi
-inoremap <silent> <A-k> <esc>:m .-2<CR>==gi
-vnoremap <silent> <A-j> :m '>+1<CR>gv=gv
-vnoremap <silent> <A-k> :m '<-2<CR>gv=gv
+nmap gp "0p
+nmap gP "0P
+" Remain the cursor position when putting
+nnoremap p mzp`z
+nnoremap P mzP`z
 " Better jumping
 nnoremap g; g;zz
 nnoremap g, g,zz
+" Convert \ into /
+nnoremap g/ :s/\\/\//<CR>
+" Yankfrom above and below
+nnoremap yk kyyp
+nnoremap yj jyyP
+" Visual block mode
+nmap <A-v> <C-v>
