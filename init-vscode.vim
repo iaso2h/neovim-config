@@ -174,6 +174,7 @@ if !exists ('g:vscode')
     set updatetime=300
 endif
 set inccommand=nosplit " live substitution
+set gdefault
 set lazyredraw " Make Macro faster
 set gdefault
 set clipboard=unnamed
@@ -364,8 +365,8 @@ map gr <plug>(operator-replace)
 map L <plug>(expand_region_expand)
 map H <plug>(expand_region_shrink)
 " Put content from registers 0
-nnoremap gp "0p
-nnoremap gP "0P
+nmap gp "0p
+nmap gP "0P
 " Remain the cursor position when putting
 nnoremap p mzp`z
 nnoremap P mzP`z
@@ -377,7 +378,3 @@ nnoremap g/ :s/\\/\//<CR>
 " Yankfrom above and below
 nnoremap yk kyyp
 nnoremap yj jyyP
-" Visual block mode
-nmap <A-v> <C-v>
-" Quick seperating line
-nmap gs jO<Esc>65a-<Esc>gccj

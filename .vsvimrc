@@ -12,9 +12,6 @@ imap jj <Esc>
 
 nmap <A-v> <C-v>
 
-" Reaming cursor position after putting
-nnoremap p mzp`z
-nnoremap P mzP`z
 " Putting from register 0
 nmap gp "0p
 nmap gP "0P

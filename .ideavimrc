@@ -3,9 +3,11 @@ set timeoutlen=500
 set hls
 set si
 set shiftwidth=4
+set inccommand=nosplit " live substitution
 set clipboard=unnamed
 set lazyredraw " Make Macro faster
-set gdefaul
+set incsearch
+set gdefault
 let mapleader = '\<Space>'
 
 " -----------IdeaVim featured-plugin
@@ -31,10 +33,11 @@ map <A-s> <C-b>
 nnoremap yk kyyp
 nnoremap yj jyyP
 " Reaming cursor position after putting
+" TODO: what's the difference between noremap and map
 nnoremap p mzp`z
 nnoremap P mzP`z
-nmap gp "0p
-nmap gP "0P
+nnoremap gp "0p
+nnoremap gP "0P
 nnoremap <Space>n :nohls<CR>
 " Convert \ to /
 nnoremap g/ :s/\\/\//<CR>
@@ -48,9 +51,10 @@ nmap <Space>i i<Space><Esc>i
 map L :action <A-a><CR>
 map H :action <C-A-a><CR>
 " Close ative tab
+map <C-w>q :action CloseContent<CR>
 map <C-w>c :action CloseContent<CR>
+map <C-w>a :action CloseAllEditors<CR>
 " View
-map <C-w>h :action SplitHorizontally<CR>
 map <C-w>o :action CloseAllEditorsButActive<CR>
 map <C-l> :action NextTab<CR>
 map <C-h> :action PreviousTab<CR>
@@ -61,3 +65,9 @@ nnoremap go :action EditorCodeBlockEnd<CR>
 nmap vai go:action EditorCodeBlockStartWithSelection<CR>
 nmap vii go:action EditorCodeBlockStartWithSelection<CR><Down>
 " BUG in vii
+" Quick seperating line
+nmap gs jO<Esc>65a-<Esc>gccj
+" Join line
+nnoremap <C-j> mzgJ`z
+" Find usage
+nnoremap gD :action FindUsages<CR>
