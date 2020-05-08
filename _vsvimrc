@@ -1,0 +1,221 @@
+" set hls
+set incsearch 
+set smartcase
+set clipboard=unnamed
+set timeoutlen=500
+set autoindent
+set expandtab
+" --------------------- Key Binding ---------------------------
+
+inoremap jj <Esc>
+
+
+" ------------Surrouding start------------------
+" Surround delete bindings
+nnoremap ds( vi(dvhp
+nnoremap ds) vi(dvhp
+nnoremap ds[ vi[dvhp
+nnoremap ds] vi[dvhp
+nnoremap ds{ vi{dvhp
+nnoremap ds} vi{dvhp
+nnoremap ds< vi<dvhp
+nnoremap ds> vi<dvhp
+nnoremap ds" vi"dvhp
+nnoremap ds' vi'dvhp
+
+" Surround change bindings
+
+" "
+nnoremap cs"' vi"oh<Esc>msvi"l<Esc>cl'<Esc>`scl'<Esc>
+nnoremap cs"( vi"<Esc>ls)<Esc>gvo<Esc>hs(<Esc>gvo<Esc>
+nmap cs") cs"(
+nnoremap cs"[ vi"<Esc>ls]<Esc>gvo<Esc>hs[<Esc>gvo<Esc>
+nmap cs"] cs"[
+nnoremap cs"{ vi"<Esc>ls}<Esc>gvo<Esc>hs{<Esc>gvo<Esc>
+nmap cs"} cs"{
+nnoremap cs"< vi"<Esc>ls><Esc>gvo<Esc>hs<<Esc>gvo<Esc>
+nmap cs"> cs"<
+
+" '
+nnoremap cs'" vi'oh<Esc>msvi'l<Esc>cl"<Esc>`scl"<Esc>
+nnoremap cs'( vi'<Esc>ls)<Esc>gvo<Esc>hs(<Esc>gvo<Esc>
+nmap cs') cs'(
+nnoremap cs'[ vi'<Esc>ls]<Esc>gvo<Esc>hs[<Esc>gvo<Esc>
+nmap cs'] cs'[
+nnoremap cs'{ vi'<Esc>ls}<Esc>gvo<Esc>hs{<Esc>gvo<Esc>
+nmap cs'} cs'{
+nnoremap cs'< vi'<Esc>ls><Esc>gvo<Esc>hs<<Esc>gvo<Esc>
+nmap cs"> cs"<
+
+" (
+nnoremap cs(' vi(<Esc>ls'<Esc>gvo<Esc>hs'<Esc>gvo<Esc>
+nnoremap cs(" vi(<Esc>ls"<Esc>gvo<Esc>hs"<Esc>gvo<Esc>
+nnoremap cs([ vi(<Esc>ls]<Esc>gvo<Esc>hs[<Esc>gvo<Esc>
+nmap cs(] cs([
+nnoremap cs({ vi(<Esc>ls}<Esc>gvo<Esc>hs{<Esc>gvo<Esc>
+nmap cs(} cs({
+nnoremap cs(< vi(<Esc>ls><Esc>gvo<Esc>hs<<Esc>gvo<Esc>
+nmap cs(> cs(<
+
+nmap cs)' cs('
+nmap cs)" cs("
+nmap cs)[ cs([
+nmap cs)] cs([
+nmap cs){ cs({
+nmap cs)} cs({
+nmap cs)< cs(<
+nmap cs)> cs(<
+
+" [
+nnoremap cs[' vi[<Esc>ls'<Esc>gvo<Esc>hs'<Esc>gvo<Esc>
+nnoremap cs[" vi[<Esc>ls"<Esc>gvo<Esc>hs"<Esc>gvo<Esc>
+nnoremap cs[( vi[<Esc>ls)<Esc>gvo<Esc>hs(<Esc>gvo<Esc>
+nmap cs[) cs[(
+nnoremap cs[{ vi[<Esc>ls}<Esc>gvo<Esc>hs{<Esc>gvo<Esc>
+nmap cs[} cs[{
+nnoremap cs[< vi[<Esc>ls><Esc>gvo<Esc>hs<<Esc>gvo<Esc>
+nmap cs[> cs[<
+
+nmap cs]' cs['
+nmap cs]" cs["
+nmap cs]( cs[(
+nmap cs]) cs[(
+nmap cs]{ cs[{
+nmap cs]} cs[{
+nmap cs]< cs[<
+nmap cs]> cs[<
+
+" {
+nnoremap cs{' vi{<Esc>ls'<Esc>gvo<Esc>hs'<Esc>gvo<Esc>
+nnoremap cs{" vi{<Esc>ls"<Esc>gvo<Esc>hs"<Esc>gvo<Esc>
+nnoremap cs{( vi{<Esc>ls)<Esc>gvo<Esc>hs(<Esc>gvo<Esc>
+nmap cs{) cs{(
+nnoremap cs{[ vi{<Esc>ls]<Esc>gvo<Esc>hs[<Esc>gvo<Esc>
+nmap cs{] cs{[
+nnoremap cs{< vi{<Esc>ls><Esc>gvo<Esc>hs<<Esc>gvo<Esc>
+nmap cs{> cs{<
+
+nmap cs}' cs{'
+nmap cs}" cs{"
+nmap cs}( cs{(
+nmap cs}) cs{(
+nmap cs}[ cs{[
+nmap cs}] cs{[
+nmap cs}< cs{<
+nmap cs}> cs{<
+
+" <
+nnoremap cs<' vi<<Esc>ls'<Esc>gvo<Esc>hs'<Esc>gvo<Esc>
+nnoremap cs<" vi<<Esc>ls"<Esc>gvo<Esc>hs"<Esc>gvo<Esc>
+nnoremap cs<( vi<<Esc>ls)<Esc>gvo<Esc>hs(<Esc>gvo<Esc>
+nmap cs<) cs<(
+nnoremap cs<[ vi<<Esc>ls]<Esc>gvo<Esc>hs[<Esc>gvo<Esc>
+nmap cs<] cs<[
+nnoremap cs<{ vi<<Esc}ls><Esc>gvo<Esc>hs{<Esc>gvo<Esc>
+nmap cs>{ cs<{
+
+nmap cs>' cs<'
+nmap cs>" cs<"
+nmap cs>( cs<(
+nmap cs>) cs<(
+nmap cs>[ cs<[
+nmap cs>] cs<[
+nmap cs>{ cs<{
+nmap cs>} cs<{
+
+" Surround visual selected text
+vnoremap S" c"<C-r>""<Esc>
+vnoremap S' c"<C-r>"'<Esc>
+vnoremap S) c(<C-r>")<Esc>
+vnoremap S] c[<C-r>"]<Esc>
+vnoremap S} c{<C-r>"}<Esc>
+vnoremap S> c<lt><C-r>"><Esc>
+vnoremap S* c/*<C-r>"*/<Esc>
+"vnoremap St c<lt>div><CR><C-r>"<Esc>
+" Surround in div tag and edit tag
+vnoremap St c<lt>div><CR><C-r>"<Esc>`<lt>lcw
+" ------------Surrouding end------------------
+
+" Brace
+nnoremap <C-m> :vsc Edit.GotoBrace<CR>
+
+" Line
+noremap <A-j> :vsc Edit.MoveSelectedLinesDown<CR>
+noremap <A-S-j> :vsc Edit.Duplicate<CR>
+noremap <A-k> :vsc Edit.MoveSelectedLinesUp<CR>
+nnoremap <A-S-k> :vsc Edit.Duplicate<CR>:vsc Edit.MoveSelectedLinesUp<CR>
+vnoremap <A-S-k> dmzu`zPgv
+
+" No highligh search
+nnoremap <Space>h :nohls<CR>
+
+" Quick info
+noremap K :vsc Edit.QuickInfo<CR>
+
+" Acejump
+noremap <Space>j :vsc Tools.InvokeAceJumpCommand<CR>
+
+" Putting from register0
+nnoremap gp "0p
+nnoremap gP "0P
+
+" Yankfrom above and below
+nnoremap yk kyyp
+nnoremap yj jyyP
+
+" Add space before and after
+nnoremap <Space>l a<Space><Esc>h
+nnoremap <Space>i i<Space><Esc>i
+
+" Convert \ to /
+nnoremap g/ :s/\\/\//<CR>
+
+" Join line
+nnoremap <C-j> mzgJ`z
+
+" Navigation
+nnoremap <C-O> :vsc View.NavigateBackward<CR>
+nnoremap <C-I> :vsc View.NavigateForward<CR>
+nnoremap <C-L> :vsc Window.NextDocumentWindow<CR>
+nnoremap <C-H> :vsc Window.PreviousDocumentWindow<CR>
+
+" Selection identation
+nnoremap vai :vsc Edit.ExpandSelectiontoContainingBlock<CR>
+nnoremap vii :vsc Edit.ExpandSelectiontoContainingBlock<CR>
+
+" Expand region
+nnoremap L :vsc ReSharper.ReSharper_ExtenSelection<CR>
+nnoremap H :vsc ReSharper.ReSharper_ShrinkSelection<CR>
+
+" Jump to block start&end
+nnoremap gM :vsc EditorContextMenus.Navigate.GoToContainingBlock<CR>
+" nmnoreap gm :vsc Edit.ExpandSelectiontoContainingBlock<CR>oo
+
+" Goto def
+nnoremap gD :vsc Edit.GoToDefinition<CR>
+nnoremap <Space>D :vsc Edit.PeekDefinition<CR>
+nnoremap gd :vsc Edit.GoToDeclaration<CR>
+nnoremap <Space>d :vsc Edit.GoToDeclaration<CR>
+
+" Goto issue
+nnoremap gh :vsc Edit.GoToNextIssueinFile<CR>
+nnoremap gH :vsc Edit.GoToPreviousIssueinFile<CR>
+
+" Goto method
+nnoremap <C-S-j> :vsc Edit.NextMethod<CR>
+nnoremap <C-S-k> :vsc Edit.PreviousMethod<CR>
+
+" Toggle comment
+noremap gcc :vsc Edit.ToggleComment<CR>
+vnoremap gc :vsc Edit.ToggleComment<CR>
+
+" Replace
+nnoremap griw "zdiwp
+nnoremap graw "zdawp
+nnoremap gri( "zdi(p
+nnoremap gra( "zda(p
+nnoremap gri) "zdi)p
+nnoremap gra) "zda)p
+nnoremap grr "zddP
+nnoremap gr$ "zd$p
+vnoremap gr "zdp

@@ -191,20 +191,24 @@ if !exists ('g:vscode')
 
     map <silent> <C-u>e :UndotreeToggle<CR>
 
-    noremap <A-s> <pageup>
+    noremap <A-e> <pageup>
     noremap <A-d> <pagedown>
 
     noremap <A-f> :Autoformat<CR>
     " Join line
     nnoremap <C-j> mzgJ`z
 
-    map <A-;> <plug>(easymotion-s)
+    map <Space>j <plug>(easymotion-s)
+
     " Shift-Tab to outdent
     inoremap <S-Tab> <C-d>
+
     " Jump to match
     noremap <C-m> %
+
     " Split horizontally
     noremap <slient> <C-w>h <C-w>s
+
     " Buffer
     noremap <silent> <Leader>p :bp<CR>
     noremap <silent> <Leader>n :bn<CR>
@@ -358,26 +362,37 @@ inoremap jj <esc>
 " map <leader>h call Xnohls()
 
 noremap <silent> <Leader>h :noh<CR>
+
 " Repalce text-object with content from registers
 map gr <plug>(operator-replace)
+
 " Region expand/shrink
 map L <plug>(expand_region_expand)
 map H <plug>(expand_region_shrink)
+
 " Put content from registers 0
 nnoremap gp "0p
 nnoremap gP "0P
+
 " Remain the cursor position when putting
 nnoremap p mzp`z
 nnoremap P mzP`z
+
 " Better jumping
 nnoremap g; g;zz
 nnoremap g, g,zz
+
 " Convert \ into /
 nnoremap g/ :s/\\/\//<CR>
+
 " Yankfrom above and below
 nnoremap yk kyyp
 nnoremap yj jyyP
-" Visual block mode
-nmap <A-v> <C-v>
+
 " Quick seperating line
 nmap gs jO<Esc>65a-<Esc>gccj
+
+" Add space before and after
+" nnoremap <Leader>h i<Space><Esc>l
+nnoremap <Leader>l a<Space><Esc>h
+nnoremap <Leader>i i<Space><Esc>i

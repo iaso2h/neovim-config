@@ -6,26 +6,23 @@ set shiftwidth=4
 set clipboard=unnamed
 set lazyredraw " Make Macro faster
 set gdefaul
+" --------------------- Key Binding ---------------------------
+" first thing first
 let mapleader = '\<Space>'
 
 imap jj <Esc>
-
-nmap <A-v> <C-v>
 
 " Putting from register 0
 nmap gp "0p
 nmap gP "0P
 
-nmap <leader>n :nohls<CR>
+nmap <leader>h :nohls<CR>
 
 " Yankfrom above and below
 nnoremap yk kyyp
 nnoremap yj jyyP
 
 " Add space before and after
-nmap <Leader>k mzO<Esc>`zh
-nmap <Leader>j mzo<Esc>`z
-nmap <Leader>h i<Space><Esc>l
+" nmap <Leader>h i<Space><Esc>l
 nmap <Leader>l a<Space><Esc>h
-
 nmap <Leader>i i<Space><Esc>i
