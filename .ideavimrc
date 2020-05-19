@@ -19,6 +19,7 @@ set argtextobj
 set textobj-entire
 set multiple-cursors
 set easymotion
+set ideajoin
 let g:EasyMotion_override_acejump = 0
 let g:EasyMotion_do_mapping = 0
 " -----------
@@ -36,8 +37,6 @@ map <A-e> <C-b>
 nnoremap yk kyyp
 nnoremap yj jyyP
 " TODO: what's the difference between noremap and map
-nnoremap p mzp`z
-nnoremap P mzP`z
 nnoremap gp "0p
 nnoremap gP "0P
 
@@ -51,14 +50,14 @@ nnoremap g/ :s/\\/\//<CR>
 nnoremap <Space>l a<Space><Esc>h
 nmap <Space>i i<Space><Esc>i
 
-" Join line
-nnoremap <C-j> mzgJ`z
-
 " Mimicking VS Code copy line upward
+
 nnoremap  <A-S-k> mz"*yygp`z
+vnoremap <A-S-k> ymzO<Esc>[Pmx`zkddkV`x
 
 " Quick seperating line
 nmap gs jO<Esc>65a-<Esc>gccj
+
 " -----------PyCharm IDE action------------
 map L :action <A-a><CR>
 map H :action <C-A-a><CR>
@@ -91,14 +90,133 @@ nnoremap <Space>n :action GotoNextElementUnderCaretUsage<CR>
 nnoremap <Space>N :action GotoPrevElementUnderCaretUsage<CR>
 " Goto
 nnoremap gD :action GotoImplementation<CR>
+
 " Easymotion
 nmap <Space>j <Plug>(easymotion-s)
 nmap <Space>J <Plug>(acejump-linemarks)
+
 " Error
 nnoremap gh :action GotoNextError<CR>
 nnoremap gH :action GotoPreviousError<CR>
+
 " Menu
 nnoremap <Space><Space> :action ToggleDistractionFreeMode<CR>
 nnoremap <Space>e :action ShowFilePath<CR>
 nnoremap <Space>r :action RefactoringMenu<CR>
 nnoremap <Space>a :action NewElement<CR>
+
+" Evaluation
+noremap ge :action EvaluateExpression<CR>
+
+" -----------Enhanced replace surround
+" ------Surround delete bindings
+nnoremap ds( vi(dvhp
+nnoremap ds) vi(dvhp
+nnoremap ds[ vi[dvhp
+nnoremap ds] vi[dvhp
+nnoremap ds{ vi{dvhp
+nnoremap ds} vi{dvhp
+nnoremap ds< vi<dvhp
+nnoremap ds> vi<dvhp
+nnoremap ds" vi"dvhp
+nnoremap ds' vi'dvhp
+
+" ------Surround change bindings
+
+" "
+nnoremap cs"' vi"oh<Esc>msvi"l<Esc>cl'<Esc>`scl'<Esc>
+nnoremap cs"( vi"<Esc>ls)<Esc>gvo<Esc>hs(<Esc>gvo<Esc>
+nmap cs") cs"(
+nnoremap cs"[ vi"<Esc>ls]<Esc>gvo<Esc>hs[<Esc>gvo<Esc>
+nmap cs"] cs"[
+nnoremap cs"{ vi"<Esc>ls}<Esc>gvo<Esc>hs{<Esc>gvo<Esc>
+nmap cs"} cs"{
+nnoremap cs"< vi"<Esc>ls><Esc>gvo<Esc>hs<<Esc>gvo<Esc>
+nmap cs"> cs"<
+
+" '
+nnoremap cs'" vi'oh<Esc>msvi'l<Esc>cl"<Esc>`scl"<Esc>
+nnoremap cs'( vi'<Esc>ls)<Esc>gvo<Esc>hs(<Esc>gvo<Esc>
+nmap cs') cs'(
+nnoremap cs'[ vi'<Esc>ls]<Esc>gvo<Esc>hs[<Esc>gvo<Esc>
+nmap cs'] cs'[
+nnoremap cs'{ vi'<Esc>ls}<Esc>gvo<Esc>hs{<Esc>gvo<Esc>
+nmap cs'} cs'{
+nnoremap cs'< vi'<Esc>ls><Esc>gvo<Esc>hs<<Esc>gvo<Esc>
+nmap cs"> cs"<
+
+" (
+nnoremap cs(' vi(<Esc>ls'<Esc>gvo<Esc>hs'<Esc>gvo<Esc>
+nnoremap cs(" vi(<Esc>ls"<Esc>gvo<Esc>hs"<Esc>gvo<Esc>
+nnoremap cs([ vi(<Esc>ls]<Esc>gvo<Esc>hs[<Esc>gvo<Esc>
+nmap cs(] cs([
+nnoremap cs({ vi(<Esc>ls}<Esc>gvo<Esc>hs{<Esc>gvo<Esc>
+nmap cs(} cs({
+nnoremap cs(< vi(<Esc>ls><Esc>gvo<Esc>hs<<Esc>gvo<Esc>
+nmap cs(> cs(<
+
+nmap cs)' cs('
+nmap cs)" cs("
+nmap cs)[ cs([
+nmap cs)] cs([
+nmap cs){ cs({
+nmap cs)} cs({
+nmap cs)< cs(<
+nmap cs)> cs(<
+
+" [
+nnoremap cs[' vi[<Esc>ls'<Esc>gvo<Esc>hs'<Esc>gvo<Esc>
+nnoremap cs[" vi[<Esc>ls"<Esc>gvo<Esc>hs"<Esc>gvo<Esc>
+nnoremap cs[( vi[<Esc>ls)<Esc>gvo<Esc>hs(<Esc>gvo<Esc>
+nmap cs[) cs[(
+nnoremap cs[{ vi[<Esc>ls}<Esc>gvo<Esc>hs{<Esc>gvo<Esc>
+nmap cs[} cs[{
+nnoremap cs[< vi[<Esc>ls><Esc>gvo<Esc>hs<<Esc>gvo<Esc>
+nmap cs[> cs[<
+
+nmap cs]' cs['
+nmap cs]" cs["
+nmap cs]( cs[(
+nmap cs]) cs[(
+nmap cs]{ cs[{
+nmap cs]} cs[{
+nmap cs]< cs[<
+nmap cs]> cs[<
+
+" {
+nnoremap cs{' vi{<Esc>ls'<Esc>gvo<Esc>hs'<Esc>gvo<Esc>
+nnoremap cs{" vi{<Esc>ls"<Esc>gvo<Esc>hs"<Esc>gvo<Esc>
+nnoremap cs{( vi{<Esc>ls)<Esc>gvo<Esc>hs(<Esc>gvo<Esc>
+nmap cs{) cs{(
+nnoremap cs{[ vi{<Esc>ls]<Esc>gvo<Esc>hs[<Esc>gvo<Esc>
+nmap cs{] cs{[
+nnoremap cs{< vi{<Esc>ls><Esc>gvo<Esc>hs<<Esc>gvo<Esc>
+nmap cs{> cs{<
+
+nmap cs}' cs{'
+nmap cs}" cs{"
+nmap cs}( cs{(
+nmap cs}) cs{(
+nmap cs}[ cs{[
+nmap cs}] cs{[
+nmap cs}< cs{<
+nmap cs}> cs{<
+
+" <
+nnoremap cs<' vi<<Esc>ls'<Esc>gvo<Esc>hs'<Esc>gvo<Esc>
+nnoremap cs<" vi<<Esc>ls"<Esc>gvo<Esc>hs"<Esc>gvo<Esc>
+nnoremap cs<( vi<<Esc>ls)<Esc>gvo<Esc>hs(<Esc>gvo<Esc>
+nmap cs<) cs<(
+nnoremap cs<[ vi<<Esc>ls]<Esc>gvo<Esc>hs[<Esc>gvo<Esc>
+nmap cs<] cs<[
+nnoremap cs<{ vi<<Esc}ls><Esc>gvo<Esc>hs{<Esc>gvo<Esc>
+nmap cs>{ cs<{
+
+nmap cs>' cs<'
+nmap cs>" cs<"
+nmap cs>( cs<(
+nmap cs>) cs<(
+nmap cs>[ cs<[
+nmap cs>] cs<[
+nmap cs>{ cs<{
+nmap cs>} cs<{
