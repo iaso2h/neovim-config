@@ -1,76 +1,30 @@
 {
-    "languageserver": {
-        "clangd": {
-            "command": "clangd",
-            "rootPatterns": ["compile_flags.txt", "compile_commands.json"],
-            "filetypes": ["c", "cpp", "objc", "objcpp"]
-        }
+    "codeLens.enable": true,
+    "coc.preferences.extensionUpdateCheck": "daily",
+    "coc.preferences.formatOnType": true,
+    "coc.preferences.formatOnSaveFiletypes": [
+        "python",
+        "markdown",
+        "json",
+        "jsonc"
+    ],
+    "coc.source.around.firstMatch": false,
+    "coc.source.file.ignoreHidden": false,
+    "clangd.semanticHighlighting": true,
+    "clangd.arguments": [
+        "--background-index"
+    ],
+    "diagnostic.format": "%message [%source]",
+    "diagnostic.virtualText": true,
+    "diagnostic.checkCurrentLine": true,
+    "diagnostic.separateRelatedInformationAsDiagnostics": true,
+    "markdownlint.config": {
+        "default": true,
+        "line-length": false
     },
-    "python": {
-        "command": "python",
-        "args": [
-            "-mpyls",
-            "-vv",
-            "--log-file",
-            "/tmp/lsp_python.log"
-        ],
-        "trace.server": "verbose",
-        "filetypes": [
-            "python"
-        ],
-        "settings": {
-            "pyls": {
-                "enable": true,
-                "trace": {
-                    "server": "verbose"
-                },
-                "commandPath": "",
-                "configurationSources": [
-                    "pycodestyle"
-                ],
-                "plugins": {
-                    "jedi_completion": {
-                        "enabled": true
-                    },
-                    "jedi_hover": {
-                        "enabled": true
-                    },
-                    "jedi_references": {
-                        "enabled": true
-                    },
-                    "jedi_signature_help": {
-                        "enabled": true
-                    },
-                    "jedi_symbols": {
-                        "enabled": true,
-                        "all_scopes": true
-                    },
-                    "mccabe": {
-                        "enabled": true,
-                        "threshold": 15
-                    },
-                    "preload": {
-                        "enabled": true
-                    },
-                    "pycodestyle": {
-                        "enabled": true
-                    },
-                    "pydocstyle": {
-                        "enabled": false,
-                        "match": "(?!test_).*\\.py",
-                        "matchDir": "[^\\.].*"
-                    },
-                    "pyflakes": {
-                        "enabled": true
-                    },
-                    "rope_completion": {
-                        "enabled": true
-                    },
-                    "yapf": {
-                        "enabled": true
-                    }
-                }
-            }
-        }
-    }
+    "signature.target": "echo",
+    "suggest.timeout": 5000,
+    "suggest.asciiCharactersOnly": true,
+    "python.formatting.provider": "autopep8",
+    "python.formatting.autopep8Path": "/data/data/com.termux/files/usr/bin/autopep8"
 }
