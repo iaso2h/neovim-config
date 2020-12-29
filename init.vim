@@ -22,7 +22,7 @@ endfunction
 autocmd InsertLeave * call Fcitx2en()
 autocmd InsertEnter * call Fcitx2zh()
 
-" ------------------- Plugin--------------------
+" Plug-in list {{
 call plug#begin(stdpath('config') . './plugged')
 " call plug#begin('~/.vim/plugged')
 if !exists('g:vscode')
@@ -34,8 +34,6 @@ if !exists('g:vscode')
     Plug 'mhinz/vim-startify'
     Plug 'Yggdroot/indentLine'
     Plug 'easymotion/vim-easymotion'
-    Plug 'Shougo/neosnippet.vim' " Snippet engine
-    Plug 'Shougo/neosnippet-snippets' " Snippets
     Plug 'luochen1990/rainbow'
     Plug 'gabebw/vim-github-link-opener'
     Plug 'jeffkreeftmeijer/vim-numbertoggle'
@@ -52,6 +50,7 @@ Plug 'vim-utils/vim-all' " Vim-all
 Plug 'inkarkat/vim-ReplaceWithRegister' " Replace text from register
 Plug 'terryma/vim-expand-region' " Expand region
 call plug#end()
+" }} Plug-in list
 
 " Plug-in settings {{
 "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
@@ -131,90 +130,95 @@ call expand_region#custom_text_objects({
 " }} Plug-in settings
 
 " Basic settings {{
-set undofile " Combine with undotree plugin
+set ai
+set autoindent " Preserve current indent on new lines
+set cindent " set C style indent
+set clipboard=unnamed
+set cmdheight=1 "Give more space for displaying messages
+set expandtab " Convert all tabs typed to spaces
+set fileencoding=utf-8
+set gdefault
+set hidden
+set ignorecase " g flag on search
+set inccommand=nosplit " live substitution
+set langmenu=en
+set lazyredraw " Make Macro faster
+set lbr
 set nobackup
 set noswapfile " Diable annoying swap file notification
 set nowritebackup
 set number relativenumber
-set tabstop=4
-set autoindent " Preserve current indent on new lines
-set fileencoding=utf-8
-set cindent " set C style indent
-set expandtab " Convert all tabs typed to spaces
-set softtabstop=4 " Indentation levels every four columns
-set shiftwidth=4 " Indent/outdent by four columns
-set shiftround " Indent/outdent to nearest tabstop
 set scrolloff=5
-set ai
-set si
-set ignorecase " g flag on search
+set shiftround " Indent/outdent to nearest tabstop
+set shiftwidth=4 " Indent/outdent by four columns
 set shortmess+=c " don't give ins-completion-menu messages.
+set si
 set smartcase
-set lbr
-set langmenu=en
-set hidden
+set softtabstop=4 " Indentation levels every four columns
+set tabstop=4
 set timeoutlen=500
+set undofile " Combine with undotree plugin
 set updatetime=300
-set inccommand=nosplit " live substitution
-set lazyredraw " Make Macro faster
-set gdefault
-set clipboard=unnamed
+let mapleader = "\<Space>" " First thing first
 hi MatchParen ctermbg=blue guibg=lightblue guifg=white ctermfg=white
 " }} Basic settings
 
-" Commands {{
-:command Myvimedit :e ~/.config/nvim/init.vim
-:command Myvimsrc :source ~/.config/nvim/init.vim
-" }} Commands
-
-" Keybindings {{
-let mapleader = "\<Space>" " First thing first
-map <C-z> <NOP>
-
-" Plug-in {
-" NERDTree
-map <silent> <C-e>e :NERDTreeToggle<CR>
-map <silent> <C-e>f :NERDTreeFind<CR>
-" UndotreeToggle
-map <silent> <C-u>e :UndotreeToggle<CR>
-" Startify
-map <silent> <C-s> :Startify<CR>
-" Easymotion
-map <Space>j <plug>(easymotion-s)
-" Repalce text-object with content from registers
-nmap gr <plug>(operator-replace)
-" Region expand/shrink
-map L <plug>(expand_region_expand)
-map H <plug>(expand_region_shrink)
-" } Plug-in 
-
-" Coc-nvim {
+" Coc-nvim settings {{
+" Coc-extensions
+let g:coc_global_extensions = [
+            \'coc-json',
+            \'coc-markdownlint',
+            \'coc-marketplace',
+            \'coc-nextword',
+            \'coc-pairs',
+            \'coc-pyright',
+            \'coc-snippets',
+            \'coc-spell-checker',
+            \]
+" Snippet
+let g:coc_snippet_next= "<tab>"
+" Add (Neo)Vim's native statusline support.
+" NOTE: Please see `:h coc-status` for integrations with external plugins that
+" provide custom statusline: lightline.vim, vim-airline.
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 "  Disable coc-spell-checker first.time enter a buffer
 autocmd BufEnter <silent> :CocCommand cSpell.enableForWorkspace<CR>
-
+" Completion navigation
 inoremap <silent><expr> <TAB>
             \ pumvisible() ? "\<C-n>" :
             \ <SID>check_back_space() ? "\<TAB>" :
             \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
+inoremap <silent><expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 function! s:check_back_space() abort
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
-" Use <c-space> to trigger completion.
+" Trigger completion
 inoremap <silent><expr> <C-space> coc#refresh()
 " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
-" Coc only does snippet and additional edit on confirm.
-inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+" Navigate through dianostics list
+nmap <silent> g[ <Plug>(coc-diagnostic-prev)
+nmap <silent> g] <Plug>(coc-diagnostic-next)
+" Show all diagnostics.
+nnoremap <silent> <leader>d  :<C-u>CocList diagnostics<cr>
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
 " Show Document
-nnoremap <silent> <C-q> :call <SID>show_documentation()<CR>
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
 function! s:show_documentation()
-    if (index(['vim','help'], &filetype) >= 0)
-        execute 'h '.expand('<cword>')
-    else
-        call CocAction('doHover')
-    endif
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  elseif (coc#rpc#ready())
+    call CocActionAsync('doHover')
+  else
+    execute '!' . &keywordprg . " " . expand('<cword>')
+  endif
 endfunction
 " Highlight the symbol and its references when holding the cursor.
 autocmd CursorHold * silent call CocActionAsync('highlight')
@@ -222,6 +226,7 @@ autocmd CursorHold * silent call CocActionAsync('highlight')
 nmap <leader>k call CocActionAsync("highlight")
 " Symbol renaming.
 nmap <leader>r <Plug>(coc-rename)
+nmap <leader>R <Plug>(coc-refactor)
 " Formatting selected code.
 xmap <A-f> <Plug>(coc-format-selected)
 nmap <A-f> <Plug>(coc-format-selected)
@@ -234,58 +239,87 @@ augroup mygroup
     autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
-" Applying codeAction to the selected region.
+" Applying codeAction to the selected [[region]].
 " Example: `<leader>aap` for current paragraph
 xmap <leader>a  <Plug>(coc-codeaction-selected)
 nmap <leader>a  <Plug>(coc-codeaction-selected)
-
-" Remap keys for applying codeAction to the current line.
-nmap <A-CR> <Plug>(coc-codeaction)
-nmap <leader>ca <Plug>(coc-codeaction)
+" Remap keys for applying codeAction to the current buffer.
+nmap <leader>ae <Plug>(coc-codeaction)
 " Apply AutoFix to problem on the current line.
-nmap <leader>cf  <Plug>(coc-fix-current)
-xmap af <Plug>(coc-funcobj-a)
+nmap <leader>f  <Plug>(coc-fix-current)
+" Map function and class text objects
+" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
+xmap if <Plug>(coc-funcobj-i)
 omap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
 omap af <Plug>(coc-funcobj-a)
-
+xmap ic <Plug>(coc-classobj-i)
+omap ic <Plug>(coc-classobj-i)
+xmap ac <Plug>(coc-classobj-a)
+omap ac <Plug>(coc-classobj-a)
+" Remap <C-f> and <C-b> for scroll float windows/popups.
+if has('nvim-0.4.0') || has('patch-8.2.0750')
+  nnoremap <silent><nowait><expr> <A-D> coc#float#has_scroll() ? coc#float#scroll(1) : "\<A-D>"
+  nnoremap <silent><nowait><expr> <A-S> coc#float#has_scroll() ? coc#float#scroll(0) : "\<A-S>"
+  inoremap <silent><nowait><expr> <A-D> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+  inoremap <silent><nowait><expr> <A-S> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+  vnoremap <silent><nowait><expr> <A-D> coc#float#has_scroll() ? coc#float#scroll(1) : "\<A-D>"
+  vnoremap <silent><nowait><expr> <A-S> coc#float#has_scroll() ? coc#float#scroll(0) : "\<A-S>"
+endif
 " Use <TAB> for selections ranges.
 " NOTE: Requires 'textDocument/selectionRange' support from the language server.
 " coc-tsserver, coc-python are the examples of servers that support it.
-nmap <silent> <TAB> <Plug>(coc-range-select)
-xmap <silent> <TAB> <Plug>(coc-range-select)
+nmap <silent> <leader>S <Plug>(coc-range-select)
+xmap <silent> <leader>S <Plug>(coc-range-select)
 
-" Add `:Format` command to format current buffer.
-command! -nargs=0 Format :call CocAction('format')
-" Add `:Fold` command to fold current buffer.
-command! -nargs=? Fold :call     CocAction('fold', <f-args>)
-" Add `:OR` command for organize imports of the current buffer.
-command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
-" Add (Neo)Vim's native statusline support.
-" NOTE: Please see `:h coc-status` for integrations with external plugins that
-" provide custom statusline: lightline.vim, vim-airline.
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-
-" Mappings using CoCList:
-" Show all diagnostics.
-nnoremap <silent> <leader>d  :<C-u>CocList diagnostics<cr>
+" Mappings for CoCList:
 " Manage extensions.
-nnoremap <silent> <A-c>e  :<C-u>CocList extensions<cr>
+nnoremap <silent><nowait> <A-c>e  :<C-u>CocList extensions<cr>
 " Show commands.
-nnoremap <silent> <A-c>c  :<C-u>CocList commands<cr>
+nnoremap <silent><nowait> <A-c>c  :<C-u>CocList commands<cr>
 " Find symbol of current document.
-nnoremap <silent> <leader>o  :<C-u>CocList outline<cr>
+nnoremap <silent><nowait> <leader>o  :<C-u>CocList outline<cr>
 " Search workspace symbols.
-nnoremap <silent> <A-c>s  :<C-u>CocList -I symbols<cr>
+nnoremap <silent><nowait> <A-c>s  :<C-u>CocList -I symbols<cr>
 " Do default action for next item.
-nnoremap <silent> <A-c>j  :<C-u>CocNext<CR>
+nnoremap <silent><nowait> <A-c>j  :<C-u>CocNext<CR>
 " Do default action for previous item.
-nnoremap <silent> <A-c>k  :<C-u>CocPrev<CR>
+nnoremap <silent><nowait> <A-c>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
-nnoremap <silent> <A-c>p  :<C-u>CocListResume<CR>
+nnoremap <silent><nowait> <A-c>p  :<C-u>CocListResume<CR>
 
 " Toggle Coc Spell-checker
 map <silent> <leader>s :CocCommand cSpell.toggleEnableSpellChecker<CR>
-" } Coc-nvim
+" } Coc-nvim settings
+" Commands {{
+command! -nargs=0 Myvimesrc :source ~/.config/nvim/init.vim
+command! -nargs=0 Myvimedit :e ~/.config/nvim/init.vim
+" Add `:Format` command to format current buffer.
+command! -nargs=0 Format :call CocAction('format')
+" Add `:OR` command for organize imports of the current buffer.
+command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+" }} Commands
+
+" Keybindings {{
+map <C-z> <NOP>
+
+" Plug-in Keybindings{
+" NERDTree
+map <silent> <C-e>e :NERDTreeToggle<CR>
+map <silent> <C-e>f :NERDTreeFind<CR>
+" UndotreeToggle
+map <silent> <C-u>e :UndotreeToggle<CR>
+" Startify
+map <silent> <C-s> :Startify<CR>
+" Easymotion
+map <Space>j <plug>(easymotion-s)
+" Replace text-object with content from registers
+nmap gr <plug>(operator-replace)
+" Region expand/shrink
+map L <plug>(expand_region_expand)
+map H <plug>(expand_region_shrink)
+" } Plug-in Keybindings
+
 
 " Highlight json comment
 autocmd FileType json syntax match Comment +\/\/.\+$+
@@ -297,10 +331,10 @@ nnoremap <C-j> mzgJ`z
 " Shift-Tab to outdent
 inoremap <S-Tab> <C-d>
 " Split horizontally
-noremap <slient> <C-w>h <C-w>s
+noremap <silent> <C-w>h <C-w>s
 " Buffer
-map <silent> <Leader>p :bp<CR>
-map <silent> <Leader>n :bn<CR>
+map <silent> <C-h> :bp<CR>
+map <silent> <C-l> :bn<CR>
 map <silent> <Leader>f :b#<CR>
 map <silent> <Leader>1 :1b<CR>
 map <silent> <Leader>2 :2b<CR>
