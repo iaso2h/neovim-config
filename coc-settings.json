@@ -25,6 +25,6 @@
     "signature.target": "echo",
     "suggest.timeout": 5000,
     "suggest.asciiCharactersOnly": true,
-    "python.formatting.provider": "autopep8",
-    "python.formatting.autopep8Path": "/data/data/com.termux/files/usr/bin/autopep8"
+    "python.formatting.provider": "black",
+    "python.formatting.blackPath": "/home/iaso2h/.local/bin/black"
 }

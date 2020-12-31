@@ -25,30 +25,28 @@ autocmd InsertEnter * call Fcitx2zh()
 " Plug-in list {{
 call plug#begin(stdpath('config') . './plugged')
 " call plug#begin('~/.vim/plugged')
-if !exists('g:vscode')
-    Plug 'joshdick/onedark.vim'
-    Plug 'arcticicestudio/nord-vim'
-    Plug 'preservim/nerdtree'
-    Plug 'vim-airline/vim-airline-themes'
-    Plug 'vim-airline/vim-airline'
-    Plug 'mhinz/vim-startify'
-    Plug 'Yggdroot/indentLine'
-    Plug 'easymotion/vim-easymotion'
-    Plug 'luochen1990/rainbow'
-    Plug 'gabebw/vim-github-link-opener'
-    Plug 'jeffkreeftmeijer/vim-numbertoggle'
-    Plug 'mbbill/undotree'
-    Plug 'tpope/vim-commentary'
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
-endif
+Plug 'joshdick/onedark.vim'
+Plug 'arcticicestudio/nord-vim'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'mhinz/vim-startify'
+Plug 'preservim/nerdtree'
+Plug 'mbbill/undotree'
+Plug 'Yggdroot/indentLine'
+Plug 'luochen1990/rainbow'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
+Plug 'jeffkreeftmeijer/vim-numbertoggle'
+Plug 'easymotion/vim-easymotion'
+Plug 'tpope/vim-surround'
+Plug 'lfv89/vim-interestingwords'
+Plug 'tpope/vim-commentary'
+Plug 'inkarkat/vim-ReplaceWithRegister'
+Plug 'terryma/vim-expand-region'
 
-Plug 'tpope/vim-surround' " Vim-surround
-Plug 'michaeljsmith/vim-indent-object' " Vim-indent-object
-Plug 'vim-utils/vim-line' " Vim-innerline
-Plug 'vim-utils/vim-all' " Vim-all
-Plug 'inkarkat/vim-ReplaceWithRegister' " Replace text from register
-Plug 'terryma/vim-expand-region' " Expand region
+Plug 'michaeljsmith/vim-indent-object'
+Plug 'vim-utils/vim-line'
+Plug 'vim-utils/vim-all'
 call plug#end()
 " }} Plug-in list
 
@@ -69,27 +67,32 @@ if (empty($TMUX))
     endif
 endif
 
-" Easymotion configuration
-let g:EasyMotion_smartcase = 1
-
 " Theme {
+" Nord
 colorscheme nord
 let g:airline_theme='nord'
-let g:nord_cursor_line_number_background = 1
+" let g:nord_cursor_line_number_background = 1
 let g:nord_uniform_status_lines = 1
 let g:nord_italic = 1
 let g:nord_underline = 1
 let g:nord_italic_comments = 1
-
-" Theme configuration
+" One dark
+let g:onedark_terminal_italics = 1
 if (has("autocmd") && !has("gui_running"))
     augroup colorset
         autocmd!
-        let s:white = { "gui": "#ABB2BF", "cterm": "145", "cterm16" : "7" }
-        autocmd ColorScheme * call onedark#set_highlight("Normal", { "fg": s:white })
+        let s:test_white = { "gui": "#FFFFFF", "cterm": "145", "cterm16" : "7" }
+        let s:test_black = { "gui": "#000000", "cterm": "145", "cterm16" : "7" }
+        autocmd ColorScheme * call onedark#set_highlight("Cursor", { "fg": s:test_white, "bg": s:test_black })
     augroup END
 endif
 colorscheme onedark
+" Custom
+hi TermCursor guifg=white guibg=black
+hi CursorLine guibg=#3E4452
+hi Visual guibg=#5F6972
+hi MatchParen guibg=DarkYellow guifg=black " ctermbg=blue ctermfg=white
+" Airline
 " let g:airline_theme='cobalt2'
 let g:airline#extensions#syntastic#enabled = 1
 let g:airline#extensions#branch#enabled = 1
@@ -97,7 +100,7 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tagbar#enabled = 1
 let g:airline_skip_empty_sections = 1
 let g:airline#extensions#virtualenv#enabled = 1
-
+" Rainbow
 let g:rainbow_active = 1
 let g:rainbow_conf = {
             \ 'guifgs': ['Gold', 'DarkOrchid3', 'RoyalBlue3'],
@@ -119,6 +122,8 @@ hi StartifyBracket ctermfg=240
 hi StartifyPath    ctermfg=245
 hi StartifyNumber  ctermfg=215
 hi StartifySlash   ctermfg=240
+" Easymotion configuration
+let g:EasyMotion_smartcase = 1
 " Expand region configuration
 call expand_region#custom_text_objects({
             \ 'a]' :1,
@@ -127,6 +132,9 @@ call expand_region#custom_text_objects({
             \ 'aB' :1,
             \ 'ai' :0,
             \ })
+" Interesting words
+let g:interestingWordsGUIColors = ['#8CCBEA', '#A4E57E', '#FFDB72', '#FF7272', '#FFB3FF', '#9999FF']
+
 " }} Plug-in settings
 
 " Basic settings {{
@@ -134,7 +142,8 @@ set ai
 set autoindent " Preserve current indent on new lines
 set cindent " set C style indent
 set clipboard=unnamed
-set cmdheight=1 "Give more space for displaying messages
+set cmdheight=2 "Give more space for displaying messages
+set cursorline " Highlight line in which cursor is located
 set expandtab " Convert all tabs typed to spaces
 set fileencoding=utf-8
 set gdefault
@@ -160,7 +169,7 @@ set timeoutlen=500
 set undofile " Combine with undotree plugin
 set updatetime=300
 let mapleader = "\<Space>" " First thing first
-hi MatchParen ctermbg=blue guibg=lightblue guifg=white ctermfg=white
+let g:python3_host_prog = "/usr/bin/python3"
 " }} Basic settings
 
 " Coc-nvim settings {{
@@ -181,8 +190,6 @@ let g:coc_snippet_next= "<tab>"
 " NOTE: Please see `:h coc-status` for integrations with external plugins that
 " provide custom statusline: lightline.vim, vim-airline.
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-"  Disable coc-spell-checker first.time enter a buffer
-autocmd BufEnter <silent> :CocCommand cSpell.enableForWorkspace<CR>
 " Completion navigation
 inoremap <silent><expr> <TAB>
             \ pumvisible() ? "\<C-n>" :
@@ -259,12 +266,12 @@ xmap ac <Plug>(coc-classobj-a)
 omap ac <Plug>(coc-classobj-a)
 " Remap <C-f> and <C-b> for scroll float windows/popups.
 if has('nvim-0.4.0') || has('patch-8.2.0750')
-  nnoremap <silent><nowait><expr> <A-D> coc#float#has_scroll() ? coc#float#scroll(1) : "\<A-D>"
-  nnoremap <silent><nowait><expr> <A-S> coc#float#has_scroll() ? coc#float#scroll(0) : "\<A-S>"
-  inoremap <silent><nowait><expr> <A-D> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
-  inoremap <silent><nowait><expr> <A-S> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
-  vnoremap <silent><nowait><expr> <A-D> coc#float#has_scroll() ? coc#float#scroll(1) : "\<A-D>"
-  vnoremap <silent><nowait><expr> <A-S> coc#float#has_scroll() ? coc#float#scroll(0) : "\<A-S>"
+  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<CR>" : "\<Right>"
+  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<CR>" : "\<Left>"
+  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
 endif
 " Use <TAB> for selections ranges.
 " NOTE: Requires 'textDocument/selectionRange' support from the language server.
@@ -280,24 +287,28 @@ nnoremap <silent><nowait> <A-c>c  :<C-u>CocList commands<cr>
 " Find symbol of current document.
 nnoremap <silent><nowait> <leader>o  :<C-u>CocList outline<cr>
 " Search workspace symbols.
-nnoremap <silent><nowait> <A-c>s  :<C-u>CocList -I symbols<cr>
+nnoremap <silent><nowait> <leader>s  :<C-u>CocList -I symbols<cr>
 " Do default action for next item.
 nnoremap <silent><nowait> <A-c>j  :<C-u>CocNext<CR>
 " Do default action for previous item.
 nnoremap <silent><nowait> <A-c>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent><nowait> <A-c>p  :<C-u>CocListResume<CR>
+" }} Coc-nvim settings
 
-" Toggle Coc Spell-checker
-map <silent> <leader>s :CocCommand cSpell.toggleEnableSpellChecker<CR>
-" } Coc-nvim settings
 " Commands {{
+" Disable coc-spell-checker first.time enter a buffer
+autocmd BufEnter <silent> :CocCommand cSpell.disableForWorkspace<CR>
+autocmd BufNewFile,BufReadPost *.md setfiletype markdown
+
 command! -nargs=0 Myvimesrc :source ~/.config/nvim/init.vim
 command! -nargs=0 Myvimedit :e ~/.config/nvim/init.vim
 " Add `:Format` command to format current buffer.
 command! -nargs=0 Format :call CocAction('format')
 " Add `:OR` command for organize imports of the current buffer.
-command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+command! -nargs=0 OR   :call CocAction('runCommand', 'editor.action.organizeImport')
+" Toggle Coc Spell-checker
+command! -nargs=0 Spell   :CocCommand cSpell.toggleEnableSpellChecker
 " }} Commands
 
 " Keybindings {{
@@ -335,6 +346,7 @@ noremap <silent> <C-w>h <C-w>s
 " Buffer
 map <silent> <C-h> :bp<CR>
 map <silent> <C-l> :bn<CR>
+map <silent> <C-w>o :w <bar> %bd <bar> e# <bar> bd# <CR> " Close other buffers except for current editting one
 map <silent> <Leader>f :b#<CR>
 map <silent> <Leader>1 :1b<CR>
 map <silent> <Leader>2 :2b<CR>
@@ -354,6 +366,8 @@ vnoremap <Leader>f zf
 " Mimic the VSCode move line up/down behavior
 nnoremap <silent> <A-j> :m .+1<CR>==
 nnoremap <silent> <A-k> :m .-2<CR>==
+xnoremap <silent> <A-j> :m .+1<CR>==
+xnoremap <silent> <A-k> :m .-2<CR>==
 inoremap <silent> <A-j> <esc>:m .+1<CR>==gi
 inoremap <silent> <A-k> <esc>:m .-2<CR>==gi
 " Quit insert or repalce mode
@@ -369,6 +383,9 @@ nnoremap P mzP`z
 " Better jumping
 nnoremap ; ;zz
 nnoremap , ,zz
+" Changelist jumping
+nnoremap <A-o> g;
+nnoremap <A-i> g,
 " Convert \ into /
 nnoremap g/ :s/\\/\//<CR>
 " Yank from above and below
