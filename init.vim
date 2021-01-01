@@ -1,7 +1,4 @@
 " Language
-let $LANG = 'en_US'
-set langmenu=en_US
-let $lang='en_us.utf-8'
 let g:input_toggle = 0
 function! Fcitx2en()
     let s:input_status = system("fcitx-remote")
@@ -24,7 +21,6 @@ autocmd InsertEnter * call Fcitx2zh()
 
 " Plug-in list {{
 call plug#begin(stdpath('config') . './plugged')
-" call plug#begin('~/.vim/plugged')
 Plug 'joshdick/onedark.vim'
 Plug 'arcticicestudio/nord-vim'
 Plug 'vim-airline/vim-airline'
@@ -51,14 +47,11 @@ call plug#end()
 " }} Plug-in list
 
 " Plug-in settings {{
+
 "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
 "(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
 if (empty($TMUX))
-    "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
-    if (has("nvim"))
-        let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-    endif
     " For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
     " Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
     " <https://github.com/neovim/neovim/wiki/Following-HEAD#20160511>
@@ -139,13 +132,11 @@ let g:interestingWordsGUIColors = ['#8CCBEA', '#A4E57E', '#FFDB72', '#FF7272', '
 
 " Basic settings {{
 set ai
-set autoindent " Preserve current indent on new lines
 set cindent " set C style indent
 set clipboard=unnamed
 set cmdheight=2 "Give more space for displaying messages
 set cursorline " Highlight line in which cursor is located
 set expandtab " Convert all tabs typed to spaces
-set fileencoding=utf-8
 set gdefault
 set hidden
 set ignorecase " g flag on search
@@ -169,7 +160,17 @@ set timeoutlen=500
 set undofile " Combine with undotree plugin
 set updatetime=300
 let mapleader = "\<Space>" " First thing first
-let g:python3_host_prog = "/usr/bin/python3"
+
+if has('win32')
+    let s = substitute(system('python -c "import sys; print(sys.executable)"'), '\n\+$', '', 'g')
+    let g:python3_host_prog = strtrans(s)
+    " let s = substitute(system('where.exe node'), '\n\+$', '', 'g')
+    " let g:coc_node_path = "D:/nvm/v14.15.0/node.exe"
+    " let g:coc_node_path = strtrans(s)
+elseif has('unix')
+    let s = substitute(system('python3 -c "import sys; print(sys.executable)"'), '\n\+$', '', 'g')
+    let g:python3_host_prog = strtrans(s)
+endif
 " }} Basic settings
 
 " Coc-nvim settings {{
@@ -214,7 +215,7 @@ nnoremap <silent> <leader>d  :<C-u>CocList diagnostics<cr>
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
+nmap <silent> gR <Plug>(coc-references)
 " Show Document
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
@@ -297,12 +298,13 @@ nnoremap <silent><nowait> <A-c>p  :<C-u>CocListResume<CR>
 " }} Coc-nvim settings
 
 " Commands {{
-" Disable coc-spell-checker first.time enter a buffer
 autocmd BufEnter <silent> :CocCommand cSpell.disableForWorkspace<CR>
-autocmd BufNewFile,BufReadPost *.md setfiletype markdown
-
-command! -nargs=0 Myvimesrc :source ~/.config/nvim/init.vim
-command! -nargs=0 Myvimedit :e ~/.config/nvim/init.vim
+autocmd BufEnter <silent> :lcd %:p:h<CR> " Autocwd
+autocmd BufNewFile,BufReadPost *.md <silent> setfiletype markdown
+" Vimrc
+command! -nargs=0 Myvimesrc :source $MYVIMRC
+command! -nargs=0 Myvimedit :vsplit $MYVIMRC
+command! -nargs=0 IDEAvimedit :vsplit ~/.ideavimrc
 " Add `:Format` command to format current buffer.
 command! -nargs=0 Format :call CocAction('format')
 " Add `:OR` command for organize imports of the current buffer.
@@ -312,14 +314,14 @@ command! -nargs=0 Spell   :CocCommand cSpell.toggleEnableSpellChecker
 " }} Commands
 
 " Keybindings {{
-map <C-z> <NOP>
+map <C-z> <Nop>
 
 " Plug-in Keybindings{
 " NERDTree
 map <silent> <C-e>e :NERDTreeToggle<CR>
 map <silent> <C-e>f :NERDTreeFind<CR>
 " UndotreeToggle
-map <silent> <C-u>e :UndotreeToggle<CR>
+map <silent> <C-u>:UndotreeToggle<CR>
 " Startify
 map <silent> <C-s> :Startify<CR>
 " Easymotion
@@ -331,9 +333,14 @@ map L <plug>(expand_region_expand)
 map H <plug>(expand_region_shrink)
 " } Plug-in Keybindings
 
-
 " Highlight json comment
 autocmd FileType json syntax match Comment +\/\/.\+$+
+" Quick seperating line
+autocmd FileType javascript nnoremap <buffer> gS iconsole.log("-".reapet(65))<Esc>o
+autocmd FileType python     nnoremap <buffer> gS iprint("-"*65)<Esc>o<CR>
+nmap gs jO<Esc>65a-<Esc>gccj
+" Show registers
+nnoremap <silent> Q :registers<CR>
 " Pageup/Pagedown
 noremap <A-e> <pageup>
 noremap <A-d> <pagedown>
@@ -341,8 +348,6 @@ noremap <A-d> <pagedown>
 nnoremap <C-j> mzgJ`z
 " Shift-Tab to outdent
 inoremap <S-Tab> <C-d>
-" Split horizontally
-noremap <silent> <C-w>h <C-w>s
 " Buffer
 map <silent> <C-h> :bp<CR>
 map <silent> <C-l> :bn<CR>
@@ -358,8 +363,6 @@ map <silent> <Leader>7 :7b<CR>
 map <silent> <Leader>8 :8b<CR>
 map <silent> <Leader>9 :9b<CR>
 map <silent> <Leader>0 :10b<CR>
-" Set working dir
-nnoremap <leader>. :lcd %:p:h<CR>
 " Folding
 nnoremap <silent> <Leader>f @=(foldlevel('.') ? 'za' : '\<Space>')<CR>
 vnoremap <Leader>f zf
@@ -391,6 +394,4 @@ nnoremap g/ :s/\\/\//<CR>
 " Yank from above and below
 nnoremap yk kyyp
 nnoremap yj jyyP
-" Quick seperating line
-nmap gs jO<Esc>65a-<Esc>gccj
 " }} Keybindings

@@ -1,4 +1,4 @@
-set hlsearch
+﻿set hlsearch
 set incsearch 
 set ignorecase
 set cursorline
@@ -155,7 +155,8 @@ nnoremap <Space>h :nohls<CR>
 
 
 " Quick info
-noremap K :vsc Edit.QuickInfo<CR>
+" noremap K :vsc Edit.QuickInfo<CR>
+noremap K :vsc ReSharper.ReSharper_QuickDoc<CR>
 
 " Acejump
 noremap <Space>j :vsc Tools.InvokeAceJumpCommand<CR>
@@ -189,13 +190,14 @@ noremap <Space>e :vsc File.OpenContainingFolder<CR>
 noremap <C-l> :vsc Window.NextTab<CR>
 noremap <C-h> :vsc Window.PreviousTab<CR>
 noremap <C-w>a :vsc Window.CloseAllDocuments<CR>
+noremap <C-w>q :vsc File.Close<CR>
 noremap <C-w>o :vsc File.CloseAllButThis<CR>
 noremap <C-w><C-l> :vsc Window.MovetoNextTabGroup<CR>
 noremap <C-w><C-h> :vsc Window.MovetoPreviousTabGroup<CR>
 
 " Select all
-nnoremap vae :vsc Edit.SelectAll<CR>
-nnoremap vie :vsc Edit.SelectAll<CR>
+nnoremap vae VGgg
+nnoremap vie VGgg
 
 " Expand region
 nmap L :vsc ReSharper.ReSharper_ExtendSelection<CR>
@@ -209,14 +211,13 @@ nmap vii :vsc Edit.ExpandSelectiontoContainingBlock<CR>
 nmap gM :vsc EditorContextMenus.Navigate.GoToContainingBlock<CR>
 nmap gm :vsc EditorContextMenus.Navigate.GoToContainingBlock<CR>
 
-" Goto recent files
-nnoremap <C-e> :vsc Edit.GoToRecentFile<CR>
-
 " Goto def
 nnoremap gD :vsc Edit.GoToDefinition<CR>
 nnoremap <Space>D :vsc Edit.PeekDefinition<CR>
 nnoremap gd :vsc Edit.GoToDeclaration<CR>
 " nnoremap <Space>d :vsc Edit.GoToDeclaration<CR>
+nnoremap gu :vsc ReSharper.ReSharper_HighlightFindUsages<CR>
+nnoremap gU :vsc ReSharper.ReSharper_FindUsages<CR>
 
 " Goto isue and error
 nnoremap gh :vsc View.NextError<CR>
@@ -229,7 +230,7 @@ nmap gs jO<Esc>65a-<Esc>gccj
 
 " Toggle comment
 noremap gcc :vsc Edit.ToggleComment<CR>
-vnoremap gc :vsc Edit.ToggleComment<CR>
+vnoremap gc :vsc Edit.ToggleComment<CR>:vscEdit.SelectionCancel<CR>
 
 " Replacement
 nnoremap griw "zdiw"0P

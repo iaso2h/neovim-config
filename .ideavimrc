@@ -8,7 +8,7 @@ set clipboard=unnamed
 set lazyredraw " Make Macro faster
 set incsearch
 set gdefault
-" let mapleader = '\<Space>'
+let mapleader = '\<SPACE>'
 
 " -----------IdeaVim featured-plugin
 set easymotion
@@ -22,201 +22,103 @@ set easymotion
 set ideajoin
 let g:EasyMotion_override_acejump = 0
 let g:EasyMotion_do_mapping = 0
-" -----------
+
+" -----------Built-in function remapping
 " Visual block mode
-nnoremap <A-v> <C-v>
+nmap <A-v> <C-v>
+
 " Quit insert mode
-inoremap jj <Esc>
+imap jj <Esc>
+
 " Pageup & Pagedown
 map <A-d> <C-f>
 map <A-e> <C-b>
-" Exit insert mode inoremap jj <Esc>
 
-" ----------Putting and Yanking
+" Toggle Highlight
+nmap <leader>h :nohls<CR>
+
+" ----------Enhanced mapping
+" Join without space
+nmap gj Jx
+
 " Yankfrom above and below
-nnoremap yk kyyp
-nnoremap yj jyyP
-" TODO: what's the difference between noremap and map
-nnoremap gp "0p
-nnoremap gP "0P
+nmap yk kyyp
+nmap yj jyyP
 
-nnoremap <Space>h :nohls<CR>
+" Paste register0
+nmap gp "0p
+nmap gP "0P
 
 " Convert \ to /
-nnoremap g/ :s/\\/\//<CR>
-
-" Add space before and after
-" nnoremap <Space>h i<Space><Esc>l
-nnoremap <Space>l a<Space><Esc>h
-nmap <Space>i i<Space><Esc>i
+nnoremap g/ '<,'>:s/\\/\//<CR>
 
 " Mimicking VS Code copy line upward
+nemap  <A-S-k> mz"*yygp`z
+vmap <A-S-k> ymzO<Esc>[Pmx`zkddkV`x
 
-nnoremap  <A-S-k> mz"*yygp`z
-vnoremap <A-S-k> ymzO<Esc>[Pmx`zkddkV`x
-
-" Quick seperating line
+" Quick separating line
 nmap gs jO<Esc>65a-<Esc>gccj
 
 " -----------PyCharm IDE action------------
-map L :action <A-a><CR>
-map H :action <C-A-a><CR>
+" Move line up/down
+map <A-k> :action MoveLineUp<CR>
+map <A-j> :action MoveLineDown<CR>
 
-" Close ative tab
+" Region Expand
+map L :action EditorSelectWord<CR>
+map H :action EditorUnSelectWord<CR>
+
+" View/Editor tab
+map <C-w>o :action CloseAllEditorsButActive<CR>
 map <C-w>q :action CloseContent<CR>
 map <C-w>c :action CloseContent<CR>
 map <C-w>a :action CloseAllEditors<CR>
-
-" View
-map <C-w>o :action CloseAllEditorsButActive<CR>
-map <C-w>w :action FocusEditor<CR>
 map <C-l> :action NextTab<CR>
 map <C-h> :action PreviousTab<CR>
 
+" View recent locations
+map <leader>o :action RecentLocations<CR>
+
+" Clone caret
+nmap <C-A-j> :action EditorCloneCaretBelow<CR>
+nmap <C-A-k> :action EditorCloneCaretAbove<CR>
+
+" Move"
+nmap <C-S-A-j> :action MoveStatementDown<CR>
+nmap <C-S-A-k> :action MoveStatementUp<CR>
+
 " go to block end
-nnoremap gM :action EditorCodeBlockStart<CR>
-nnoremap gm :action EditorCodeBlockEnd<CR>
+nmap gB :action EditorCodeBlockStart<CR>
+nmap gb :action EditorCodeBlockEnd<CR>
 
 " Selection code block
-nmap vai gm:action EditorCodeBlockStartWithSelection<CR>
-nmap vii gm:action EditorCodeBlockStartWithSelection<CR><Down>
+nmap vai :action EditorCodeBlockStart<CR>mz:action EditorCodeBlockEnd<CR>:action EditorCodeBlockStartWithSelection<CR>v`z
+nmap vii :action EditorCodeBlockStart<CR>mz:action EditorCodeBlockEnd<CR>:action EditorCodeBlockStartWithSelection<CR>v`zj
 " BUG in vii
 
-" Find usage
-nnoremap gU :action FindUsages<CR>
-nnoremap gu :action ShowUsages<CR>
-nnoremap <Space>u :action FindUsagesInFile<CR>
-nnoremap <Space>n :action GotoNextElementUnderCaretUsage<CR>
-nnoremap <Space>N :action GotoPrevElementUnderCaretUsage<CR>
-" Goto
-nnoremap gD :action GotoImplementation<CR>
+" Usages
+nmap gU :action FindUsages<CR>
+nmap gu :action ShowUsages<CR>
+nmap <leader>u :action HighlightUsagesInFile<CR>
+nmap <leader>n :action GotoNextElementUnderCaretUsage<CR>
+nmap <leader>N :action GotoPrevElementUnderCaretUsage<CR>
+
+" Definition
+nmap <leader>d :action QuickImplementations<CR>
+nmap gD :action GotoImplementation<CR>
 
 " Easymotion
-nmap <Space>j <Plug>(easymotion-s)
-nmap <Space>J <Plug>(acejump-linemarks)
+nmap <leader>j <Plug>(easymotion-s)
+nmap <leader>J <Plug>(acejump-linemarks)
 
 " Error
-nnoremap gh :action GotoNextError<CR>
-nnoremap gH :action GotoPreviousError<CR>
+nmap gh :action GotoNextError<CR>
+nmap gH :action GotoPreviousError<CR>
 
 " Menu
-nnoremap <Space><Space> :action ToggleDistractionFreeMode<CR>
-nnoremap <Space>e :action ShowFilePath<CR>
-nnoremap <Space>r :action RefactoringMenu<CR>
-nnoremap <Space>a :action NewElement<CR>
-
-" Evaluation
-noremap ge :action EvaluateExpression<CR>
-
-" -----------Enhanced replace surround
-" ------Surround delete bindings
-nnoremap ds( vi(dvhp
-nnoremap ds) vi(dvhp
-nnoremap ds[ vi[dvhp
-nnoremap ds] vi[dvhp
-nnoremap ds{ vi{dvhp
-nnoremap ds} vi{dvhp
-nnoremap ds< vi<dvhp
-nnoremap ds> vi<dvhp
-nnoremap ds" vi"dvhp
-nnoremap ds' vi'dvhp
-
-" ------Surround change bindings
-
-" "
-nnoremap cs"' vi"oh<Esc>msvi"l<Esc>cl'<Esc>`scl'<Esc>
-nnoremap cs"( vi"<Esc>ls)<Esc>gvo<Esc>hs(<Esc>gvo<Esc>
-nmap cs") cs"(
-nnoremap cs"[ vi"<Esc>ls]<Esc>gvo<Esc>hs[<Esc>gvo<Esc>
-nmap cs"] cs"[
-nnoremap cs"{ vi"<Esc>ls}<Esc>gvo<Esc>hs{<Esc>gvo<Esc>
-nmap cs"} cs"{
-nnoremap cs"< vi"<Esc>ls><Esc>gvo<Esc>hs<<Esc>gvo<Esc>
-nmap cs"> cs"<
-
-" '
-nnoremap cs'" vi'oh<Esc>msvi'l<Esc>cl"<Esc>`scl"<Esc>
-nnoremap cs'( vi'<Esc>ls)<Esc>gvo<Esc>hs(<Esc>gvo<Esc>
-nmap cs') cs'(
-nnoremap cs'[ vi'<Esc>ls]<Esc>gvo<Esc>hs[<Esc>gvo<Esc>
-nmap cs'] cs'[
-nnoremap cs'{ vi'<Esc>ls}<Esc>gvo<Esc>hs{<Esc>gvo<Esc>
-nmap cs'} cs'{
-nnoremap cs'< vi'<Esc>ls><Esc>gvo<Esc>hs<<Esc>gvo<Esc>
-nmap cs"> cs"<
-
-" (
-nnoremap cs(' vi(<Esc>ls'<Esc>gvo<Esc>hs'<Esc>gvo<Esc>
-nnoremap cs(" vi(<Esc>ls"<Esc>gvo<Esc>hs"<Esc>gvo<Esc>
-nnoremap cs([ vi(<Esc>ls]<Esc>gvo<Esc>hs[<Esc>gvo<Esc>
-nmap cs(] cs([
-nnoremap cs({ vi(<Esc>ls}<Esc>gvo<Esc>hs{<Esc>gvo<Esc>
-nmap cs(} cs({
-nnoremap cs(< vi(<Esc>ls><Esc>gvo<Esc>hs<<Esc>gvo<Esc>
-nmap cs(> cs(<
-
-nmap cs)' cs('
-nmap cs)" cs("
-nmap cs)[ cs([
-nmap cs)] cs([
-nmap cs){ cs({
-nmap cs)} cs({
-nmap cs)< cs(<
-nmap cs)> cs(<
-
-" [
-nnoremap cs[' vi[<Esc>ls'<Esc>gvo<Esc>hs'<Esc>gvo<Esc>
-nnoremap cs[" vi[<Esc>ls"<Esc>gvo<Esc>hs"<Esc>gvo<Esc>
-nnoremap cs[( vi[<Esc>ls)<Esc>gvo<Esc>hs(<Esc>gvo<Esc>
-nmap cs[) cs[(
-nnoremap cs[{ vi[<Esc>ls}<Esc>gvo<Esc>hs{<Esc>gvo<Esc>
-nmap cs[} cs[{
-nnoremap cs[< vi[<Esc>ls><Esc>gvo<Esc>hs<<Esc>gvo<Esc>
-nmap cs[> cs[<
-
-nmap cs]' cs['
-nmap cs]" cs["
-nmap cs]( cs[(
-nmap cs]) cs[(
-nmap cs]{ cs[{
-nmap cs]} cs[{
-nmap cs]< cs[<
-nmap cs]> cs[<
-
-" {
-nnoremap cs{' vi{<Esc>ls'<Esc>gvo<Esc>hs'<Esc>gvo<Esc>
-nnoremap cs{" vi{<Esc>ls"<Esc>gvo<Esc>hs"<Esc>gvo<Esc>
-nnoremap cs{( vi{<Esc>ls)<Esc>gvo<Esc>hs(<Esc>gvo<Esc>
-nmap cs{) cs{(
-nnoremap cs{[ vi{<Esc>ls]<Esc>gvo<Esc>hs[<Esc>gvo<Esc>
-nmap cs{] cs{[
-nnoremap cs{< vi{<Esc>ls><Esc>gvo<Esc>hs<<Esc>gvo<Esc>
-nmap cs{> cs{<
-
-nmap cs}' cs{'
-nmap cs}" cs{"
-nmap cs}( cs{(
-nmap cs}) cs{(
-nmap cs}[ cs{[
-nmap cs}] cs{[
-nmap cs}< cs{<
-nmap cs}> cs{<
-
-" <
-nnoremap cs<' vi<<Esc>ls'<Esc>gvo<Esc>hs'<Esc>gvo<Esc>
-nnoremap cs<" vi<<Esc>ls"<Esc>gvo<Esc>hs"<Esc>gvo<Esc>
-nnoremap cs<( vi<<Esc>ls)<Esc>gvo<Esc>hs(<Esc>gvo<Esc>
-nmap cs<) cs<(
-nnoremap cs<[ vi<<Esc>ls]<Esc>gvo<Esc>hs[<Esc>gvo<Esc>
-nmap cs<] cs<[
-nnoremap cs<{ vi<<Esc}ls><Esc>gvo<Esc>hs{<Esc>gvo<Esc>
-nmap cs>{ cs<{
-
-nmap cs>' cs<'
-nmap cs>" cs<"
-nmap cs>( cs<(
-nmap cs>) cs<(
-nmap cs>[ cs<[
-nmap cs>] cs<[
-nmap cs>{ cs<{
-nmap cs>} cs<{
+nmap <leader><leader> :action ToggleDistractionFreeMode<CR>
+nmap <leader>e :action ShowFilePath<CR>
+nmap <leader>s :action FileStructurePopup<CR>
+nmap <leader>r :action RefactoringMenu<CR>
+nmap <leader>a :action NewElement<CR>
+map ge :action EvaluateExpression<CR>
