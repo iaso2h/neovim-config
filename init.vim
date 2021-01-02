@@ -1,4 +1,4 @@
-" Plug-in list {{
+" Plug-in list {{{
 if has('win32')
     set runtimepath+=~/AppData/Local/nvim/dein/repos/github.com/Shougo/dein.vim
     if dein#load_state('~/AppData/Local/nvim/dein')
@@ -64,9 +64,9 @@ elseif has('unix')
     call plug#end()
 endif
 
-" }} Plug-in list
+" }}} Plug-in list
 
-" Basic settings {{
+" Basic settings {{{
 set ai
 set cindent " set C style indent
 set clipboard=unnamed
@@ -132,9 +132,9 @@ elseif has('unix')
     autocmd InsertLeave * call Fcitx2en()
     autocmd InsertEnter * call Fcitx2zh()
 endif
-" }} Basic settings
+" }}} Basic settings
 
-" Plug-in settings {{
+" Plug-in settings {{{
 
 " NERDTree
 let g:NERDTreeChDirMode=2
@@ -163,9 +163,9 @@ call expand_region#custom_text_objects({
 " Interesting words
 let g:interestingWordsGUIColors = ['#8CCBEA', '#A4E57E', '#FFDB72', '#FF7272', '#FFB3FF', '#9999FF']
 
-" }} Plug-in settings
+" }}} Plug-in settings
 
-" Coc-nvim settings {{
+" Coc-nvim settings {{{
 " Coc-extensions
 let g:coc_global_extensions = [
             \'coc-json',
@@ -244,9 +244,9 @@ augroup end
 xmap <leader>a  <Plug>(coc-codeaction-selected)
 nmap <leader>a  <Plug>(coc-codeaction-selected)
 " Remap keys for applying codeAction to the current buffer.
-nmap <leader>ae <Plug>(coc-codeaction)
+nmap <leader>ca <Plug>(coc-codeaction)
 " Apply AutoFix to problem on the current line.
-nmap <leader>f  <Plug>(coc-fix-current)
+nmap <leader>cf  <Plug>(coc-fix-current)
 " Map function and class text objects
 " NOTE: Requires 'textDocument.documentSymbol' support from the language server.
 xmap if <Plug>(coc-funcobj-i)
@@ -285,9 +285,9 @@ nnoremap <silent><nowait> <A-c>j  :<C-u>CocNext<CR>
 nnoremap <silent><nowait> <A-c>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent><nowait> <A-c>p  :<C-u>CocListResume<CR>
-" }} Coc-nvim settings
+" }}} Coc-nvim settings
 
-" Commands {{
+" Commands {{{
 augroup bufferenter
     autocmd!
     " autocmd BufEnter <silent> :sleep 20ms<CR>
@@ -322,11 +322,12 @@ augroup END
 
 augroup vimrc
     autocmd!
-    autocmd bufwritepost $MYVIMRC nested source $MYVIMRC | redraw! | AirlineRefresh | echo "Reload " . $MYVIMRC
+    autocmd bufwritepost $MYVIMRC nested source $MYVIMRC | redraw! | AirlineRefresh | echo "Reload: " . $MYVIMRC
+    autocmd FileType vim setlocal foldmethod=marker
+    autocmd FileType vim setlocal foldlevelstart=1
 augroup END
 
 " Vimrc
-command! -nargs=0 Myvimesrc :source $MYVIMRC
 command! -nargs=0 Myvimedit :vsplit $MYVIMRC
 command! -nargs=0 IDEAvimedit :vsplit ~/.ideavimrc
 " Dein
@@ -337,9 +338,9 @@ command! -nargs=0 Format :call CocAction('format')
 command! -nargs=0 OR   :call CocAction('runCommand', 'editor.action.organizeImport')
 " Toggle Coc Spell-checker
 command! -nargs=0 Spell   :CocCommand cSpell.toggleEnableSpellChecker
-" }} Commands
+" }}} Commands
 
-" Keybindings {{
+" Keybindings {{{
 
 " Plug-in Keybindings{
 " NERDTree
@@ -437,4 +438,4 @@ imap <left> <nop>
 map <right> <nop>
 xmap <right> <nop>
 imap <right> <nop>
-" }} Keybindings
+" }}} Keybindings
