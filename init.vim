@@ -1,105 +1,140 @@
-" Language
-let g:input_toggle = 0
-function! Fcitx2en()
-    let s:input_status = system("fcitx-remote")
-    if s:input_status == 2
-        let g:input_toggle = 1
-        let l:a = system("fcitx-remote -c")
-    endif
-endfunction
-
-function! Fcitx2zh()
-    let s:input_status = system("fcitx-remote")
-    if s:input_status != 2 && g:input_toggle == 1
-        let l:a = system("fcitx-remote -o")
-        let g:input_toggle = 0
-    endif
-endfunction
-
-autocmd InsertLeave * call Fcitx2en()
-autocmd InsertEnter * call Fcitx2zh()
-
 " Plug-in list {{
-call plug#begin(stdpath('config') . './plugged')
-Plug 'joshdick/onedark.vim'
-Plug 'arcticicestudio/nord-vim'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'mhinz/vim-startify'
-Plug 'preservim/nerdtree'
-Plug 'mbbill/undotree'
-Plug 'Yggdroot/indentLine'
-Plug 'luochen1990/rainbow'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+if has('win32')
+    set runtimepath+=~/AppData/Local/nvim/dein/repos/github.com/Shougo/dein.vim
+    if dein#load_state('~/AppData/Local/nvim/dein')
+        call dein#begin('~/AppData/Local\nvim\dein')
+        call dein#add('~/AppData/Local/nvim/dein/repos/github.com/Shougo/dein.vim')
+        call dein#add('Shougo/deoplete.nvim')
+        call dein#add('roxma/nvim-yarp')
+        call dein#add('roxma/vim-hug-neovim-rpc')
 
-Plug 'jeffkreeftmeijer/vim-numbertoggle'
-Plug 'easymotion/vim-easymotion'
-Plug 'tpope/vim-surround'
-Plug 'lfv89/vim-interestingwords'
-Plug 'tpope/vim-commentary'
-Plug 'inkarkat/vim-ReplaceWithRegister'
-Plug 'terryma/vim-expand-region'
+        call dein#add('neoclide/coc.nvim', {'merged': 0, 'rev': 'release'})
 
-Plug 'michaeljsmith/vim-indent-object'
-Plug 'vim-utils/vim-line'
-Plug 'vim-utils/vim-all'
-call plug#end()
+        call dein#add('joshdick/onedark.vim')
+        call dein#add('arcticicestudio/nord-vim')
+        call dein#add('vim-airline/vim-airline')
+        call dein#add('vim-airline/vim-airline-themes')
+        call dein#add('mhinz/vim-startify')
+        call dein#add('preservim/nerdtree')
+        call dein#add('mbbill/undotree')
+        call dein#add('Yggdroot/indentLine')
+        call dein#add('luochen1990/rainbow')
+
+        call dein#add('jeffkreeftmeijer/vim-numbertoggle')
+        call dein#add('easymotion/vim-easymotion')
+        call dein#add('tpope/vim-surround')
+        call dein#add('lfv89/vim-interestingwords')
+        call dein#add('tpope/vim-commentary')
+        call dein#add('inkarkat/vim-ReplaceWithRegister')
+        call dein#add('terryma/vim-expand-region')
+
+        call dein#add('michaeljsmith/vim-indent-object')
+        call dein#add('vim-utils/vim-line')
+        call dein#add('vim-utils/vim-all')
+        call dein#end()
+        call dein#save_state()
+    endif
+    filetype plugin indent on
+    syntax enable
+elseif has('unix')
+    call plug#begin(stdpath('config') . './plugged')
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+    Plug 'joshdick/onedark.vim'
+    Plug 'arcticicestudio/nord-vim'
+    Plug 'vim-airline/vim-airline'
+    Plug 'vim-airline/vim-airline-themes'
+    Plug 'mhinz/vim-startify'
+    Plug 'preservim/nerdtree'
+    Plug 'mbbill/undotree'
+    Plug 'Yggdroot/indentLine'
+    Plug 'luochen1990/rainbow'
+
+    Plug 'jeffkreeftmeijer/vim-numbertoggle'
+    Plug 'easymotion/vim-easymotion'
+    Plug 'tpope/vim-surround'
+    Plug 'lfv89/vim-interestingwords'
+    Plug 'tpope/vim-commentary'
+    Plug 'inkarkat/vim-ReplaceWithRegister'
+    Plug 'terryma/vim-expand-region'
+
+    Plug 'michaeljsmith/vim-indent-object'
+    Plug 'vim-utils/vim-line'
+    Plug 'vim-utils/vim-all'
+    call plug#end()
+endif
+
 " }} Plug-in list
 
+" Basic settings {{
+set ai
+set cindent " set C style indent
+set clipboard=unnamed
+set cmdheight=2 "Give more space for displaying messages
+set cursorline " Highlight line in which cursor is located
+set expandtab " Convert all tabs typed to spaces
+set gdefault
+set hidden
+set ignorecase
+set inccommand=nosplit " live substitution
+set langmenu=en
+set lazyredraw " Make Macro faster
+set lbr
+set mouse=a
+set nobackup
+set noswapfile " Diable annoying swap file notification
+set nowritebackup
+set number relativenumber
+set scrolloff=5
+set shiftround " Indent/outdent to nearest tabstop
+set shiftwidth=4 " Indent/outdent by four columns
+set shortmess+=c " don't give ins-completion-menu messages.
+set si
+set smartcase
+set softtabstop=4 " Indentation levels every four columns
+set tabstop=4
+set timeoutlen=500
+set undofile " Combine with undotree plugin
+set updatetime=300
+let mapleader = "\<Space>" " First thing first
+
+" Settings based on OS
+if has('win32')
+    " GUI settings
+    source ~/AppData/Local/nvim/gui.vim
+    " Python executable
+    let s = substitute(system('python -c "import sys; print(sys.executable)"'), '\n\+$', '', 'g')
+    let g:python3_host_prog = strtrans(s)
+elseif has('unix')
+    " GUI settings
+    source ~/.config/nvim/gui.vim
+    " Python executable
+    let s = substitute(system('which python3'), '\n\+$', '', 'g')
+    let g:python3_host_prog = strtrans(s)
+    " Linux input
+    let g:input_toggle = 0
+    function! Fcitx2en()
+        let s:input_status = system("fcitx-remote")
+        if s:input_status == 2
+            let g:input_toggle = 1
+            let l:a = system("fcitx-remote -c")
+        endif
+    endfunction
+
+    function! Fcitx2zh()
+        let s:input_status = system("fcitx-remote")
+        if s:input_status != 2 && g:input_toggle == 1
+            let l:a = system("fcitx-remote -o")
+            let g:input_toggle = 0
+        endif
+    endfunction
+
+    autocmd InsertLeave * call Fcitx2en()
+    autocmd InsertEnter * call Fcitx2zh()
+endif
+" }} Basic settings
+
 " Plug-in settings {{
-
-"Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
-"If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
-"(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
-if (empty($TMUX))
-    " For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
-    " Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
-    " <https://github.com/neovim/neovim/wiki/Following-HEAD#20160511>
-    if (has("termguicolors"))
-        set termguicolors
-    endif
-endif
-
-" Theme {
-" Nord
-colorscheme nord
-let g:airline_theme='nord'
-" let g:nord_cursor_line_number_background = 1
-let g:nord_uniform_status_lines = 1
-let g:nord_italic = 1
-let g:nord_underline = 1
-let g:nord_italic_comments = 1
-" One dark
-let g:onedark_terminal_italics = 1
-if (has("autocmd") && !has("gui_running"))
-    augroup colorset
-        autocmd!
-        let s:test_white = { "gui": "#FFFFFF", "cterm": "145", "cterm16" : "7" }
-        let s:test_black = { "gui": "#000000", "cterm": "145", "cterm16" : "7" }
-        autocmd ColorScheme * call onedark#set_highlight("Cursor", { "fg": s:test_white, "bg": s:test_black })
-    augroup END
-endif
-colorscheme onedark
-" Custom
-hi TermCursor guifg=white guibg=black
-hi CursorLine guibg=#3E4452
-hi Visual guibg=#5F6972
-hi MatchParen guibg=DarkYellow guifg=black " ctermbg=blue ctermfg=white
-" Airline
-" let g:airline_theme='cobalt2'
-let g:airline#extensions#syntastic#enabled = 1
-let g:airline#extensions#branch#enabled = 1
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tagbar#enabled = 1
-let g:airline_skip_empty_sections = 1
-let g:airline#extensions#virtualenv#enabled = 1
-" Rainbow
-let g:rainbow_active = 1
-let g:rainbow_conf = {
-            \ 'guifgs': ['Gold', 'DarkOrchid3', 'RoyalBlue3'],
-            \ 'ctermfgs': ['yellow', 'magenta', 'lightblue'],
-            \}
-" } Theme
 
 " NERDTree
 let g:NERDTreeChDirMode=2
@@ -129,49 +164,6 @@ call expand_region#custom_text_objects({
 let g:interestingWordsGUIColors = ['#8CCBEA', '#A4E57E', '#FFDB72', '#FF7272', '#FFB3FF', '#9999FF']
 
 " }} Plug-in settings
-
-" Basic settings {{
-set ai
-set cindent " set C style indent
-set clipboard=unnamed
-set cmdheight=2 "Give more space for displaying messages
-set cursorline " Highlight line in which cursor is located
-set expandtab " Convert all tabs typed to spaces
-set gdefault
-set hidden
-set ignorecase " g flag on search
-set inccommand=nosplit " live substitution
-set langmenu=en
-set lazyredraw " Make Macro faster
-set lbr
-set nobackup
-set noswapfile " Diable annoying swap file notification
-set nowritebackup
-set number relativenumber
-set scrolloff=5
-set shiftround " Indent/outdent to nearest tabstop
-set shiftwidth=4 " Indent/outdent by four columns
-set shortmess+=c " don't give ins-completion-menu messages.
-set si
-set smartcase
-set softtabstop=4 " Indentation levels every four columns
-set tabstop=4
-set timeoutlen=500
-set undofile " Combine with undotree plugin
-set updatetime=300
-let mapleader = "\<Space>" " First thing first
-
-if has('win32')
-    let s = substitute(system('python -c "import sys; print(sys.executable)"'), '\n\+$', '', 'g')
-    let g:python3_host_prog = strtrans(s)
-    " let s = substitute(system('where.exe node'), '\n\+$', '', 'g')
-    " let g:coc_node_path = "D:/nvm/v14.15.0/node.exe"
-    " let g:coc_node_path = strtrans(s)
-elseif has('unix')
-    let s = substitute(system('python3 -c "import sys; print(sys.executable)"'), '\n\+$', '', 'g')
-    let g:python3_host_prog = strtrans(s)
-endif
-" }} Basic settings
 
 " Coc-nvim settings {{
 " Coc-extensions
@@ -266,14 +258,12 @@ omap ic <Plug>(coc-classobj-i)
 xmap ac <Plug>(coc-classobj-a)
 omap ac <Plug>(coc-classobj-a)
 " Remap <C-f> and <C-b> for scroll float windows/popups.
-if has('nvim-0.4.0') || has('patch-8.2.0750')
-  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<CR>" : "\<Right>"
-  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<CR>" : "\<Left>"
-  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-endif
+nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<CR>" : "\<Right>"
+inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<CR>" : "\<Left>"
+xnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+xnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
 " Use <TAB> for selections ranges.
 " NOTE: Requires 'textDocument/selectionRange' support from the language server.
 " coc-tsserver, coc-python are the examples of servers that support it.
@@ -298,13 +288,49 @@ nnoremap <silent><nowait> <A-c>p  :<C-u>CocListResume<CR>
 " }} Coc-nvim settings
 
 " Commands {{
-autocmd BufEnter <silent> :CocCommand cSpell.disableForWorkspace<CR>
-autocmd BufEnter <silent> :lcd %:p:h<CR> " Autocwd
-autocmd BufNewFile,BufReadPost *.md <silent> setfiletype markdown
+augroup bufferenter
+    autocmd!
+    " autocmd BufEnter <silent> :sleep 20ms<CR>
+    " autocmd BufEnter <silent> :CocCommand cSpell.disableForWorkspace<CR>
+    autocmd BufEnter <silent> :lcd %:p:h<CR> " Autocwd
+    autocmd BufNewFile,BufReadPost *.md <silent> setfiletype markdown
+    " To always start editing C files at the first function:
+    " Highlight json comment
+augroup END 
+
+augroup fileextension
+    autocmd!
+    autocmd FileType json syntax match Comment +\/\/.\+$+
+    " Quick seperating line
+    autocmd FileType javascript nnoremap <buffer> gS iconsole.log("-".reapet(65))<Esc>o
+    autocmd FileType python     nnoremap <buffer> gS iprint("-"*65)<Esc>o<CR>
+    autocmd BufRead *.c,*.h	1;/^{
+augroup END
+nnoremap gs jO<Esc>65a-<Esc>gccj
+
+" Clear cmd line message
+function! s:empty_message(timer)
+  if mode() ==# 'n'
+    echo ''
+  endif
+endfunction
+
+augroup cmd_msg_cls
+    autocmd!
+    autocmd CmdlineLeave :  call timer_start(5000, funcref('s:empty_message'))
+augroup END
+
+augroup vimrc
+    autocmd!
+    autocmd bufwritepost $MYVIMRC nested source $MYVIMRC | redraw! | AirlineRefresh | echo "Reload " . $MYVIMRC
+augroup END
+
 " Vimrc
 command! -nargs=0 Myvimesrc :source $MYVIMRC
 command! -nargs=0 Myvimedit :vsplit $MYVIMRC
 command! -nargs=0 IDEAvimedit :vsplit ~/.ideavimrc
+" Dein
+command! -nargs=+ DEINClean :call map(dein#check_clean(), "delete(v:val, 'rf')")
 " Add `:Format` command to format current buffer.
 command! -nargs=0 Format :call CocAction('format')
 " Add `:OR` command for organize imports of the current buffer.
@@ -314,69 +340,57 @@ command! -nargs=0 Spell   :CocCommand cSpell.toggleEnableSpellChecker
 " }} Commands
 
 " Keybindings {{
-map <C-z> <Nop>
 
 " Plug-in Keybindings{
 " NERDTree
-map <silent> <C-e>e :NERDTreeToggle<CR>
-map <silent> <C-e>f :NERDTreeFind<CR>
+nmap <silent> <C-e>e :NERDTreeToggle<CR>
+imap <silent> <C-e>e <Esc>:execute "normal! NERDTreeToggle<CR>"
+nmap <silent> <C-e>f :NERDTreeFind<CR>
+imap <silent> <C-e>f <Esc>:execute "normal! NERDTreeFind<CR>"
 " UndotreeToggle
-map <silent> <C-u>:UndotreeToggle<CR>
+nmap <silent> <C-u> :UndotreeToggle<CR>
+imap <silent> <C-u> <Esc>:execute "normal! UndotreeToggle<CR>"
 " Startify
-map <silent> <C-s> :Startify<CR>
+nmap <silent> <C-s> :Startify<CR>
 " Easymotion
-map <Space>j <plug>(easymotion-s)
-" Replace text-object with content from registers
-nmap gr <plug>(operator-replace)
+nmap <leader>j <plug>(easymotion-s)
 " Region expand/shrink
-map L <plug>(expand_region_expand)
-map H <plug>(expand_region_shrink)
+nmap L <plug>(expand_region_expand)
+nmap H <plug>(expand_region_shrink)
 " } Plug-in Keybindings
 
-" Highlight json comment
-autocmd FileType json syntax match Comment +\/\/.\+$+
-" Quick seperating line
-autocmd FileType javascript nnoremap <buffer> gS iconsole.log("-".reapet(65))<Esc>o
-autocmd FileType python     nnoremap <buffer> gS iprint("-"*65)<Esc>o<CR>
-nmap gs jO<Esc>65a-<Esc>gccj
 " Show registers
 nnoremap <silent> Q :registers<CR>
+nnoremap <silent> M :messages<CR>
 " Pageup/Pagedown
-noremap <A-e> <pageup>
-noremap <A-d> <pagedown>
+nnoremap <A-e> <pageup>
+inoremap <A-e> <pageup>
+xnoremap <A-e> <pageup>
+nnoremap <A-d> <pagedown>
+inoremap <A-d> <pagedown>
+xnoremap <A-d> <pagedown>
 " Join line
 nnoremap <C-j> mzgJ`z
 " Shift-Tab to outdent
 inoremap <S-Tab> <C-d>
 " Buffer
-map <silent> <C-h> :bp<CR>
-map <silent> <C-l> :bn<CR>
-map <silent> <C-w>o :w <bar> %bd <bar> e# <bar> bd# <CR> " Close other buffers except for current editting one
-map <silent> <Leader>f :b#<CR>
-map <silent> <Leader>1 :1b<CR>
-map <silent> <Leader>2 :2b<CR>
-map <silent> <Leader>3 :3b<CR>
-map <silent> <Leader>4 :4b<CR>
-map <silent> <Leader>5 :5b<CR>
-map <silent> <Leader>6 :6b<CR>
-map <silent> <Leader>7 :7b<CR>
-map <silent> <Leader>8 :8b<CR>
-map <silent> <Leader>9 :9b<CR>
-map <silent> <Leader>0 :10b<CR>
+nnoremap <silent> <C-h> :bp<CR>
+nnoremap <silent> <C-l> :bn<CR>
+nnoremap <silent> <C-w>o :w <bar> %bd <bar> e# <bar> bd# <CR> " Close other buffers except for the current editting one
 " Folding
-nnoremap <silent> <Leader>f @=(foldlevel('.') ? 'za' : '\<Space>')<CR>
-vnoremap <Leader>f zf
+nnoremap <silent> <Leader>F @=(foldlevel('.') ? 'za' : '\<Space>')<CR>
+xnoremap <Leader>f zf
 " Mimic the VSCode move line up/down behavior
 nnoremap <silent> <A-j> :m .+1<CR>==
 nnoremap <silent> <A-k> :m .-2<CR>==
-xnoremap <silent> <A-j> :m .+1<CR>==
-xnoremap <silent> <A-k> :m .-2<CR>==
+xnoremap <silent> <A-j> :m '>+1<CR>gv=gv
+xnoremap <silent> <A-k> :m '<-2<CR>gv=gv
 inoremap <silent> <A-j> <esc>:m .+1<CR>==gi
 inoremap <silent> <A-k> <esc>:m .-2<CR>==gi
 " Quit insert or repalce mode
 inoremap jj <esc>
 " Disable highlight search
-noremap <silent> <Leader>h :noh<CR>
+nnoremap <silent> <Leader>h :noh<CR>
 " Put content from registers 0
 nnoremap gp "0p
 nnoremap gP "0P
@@ -390,8 +404,37 @@ nnoremap , ,zz
 nnoremap <A-o> g;
 nnoremap <A-i> g,
 " Convert \ into /
-nnoremap g/ :s/\\/\//<CR>
+nnoremap <silent> g/ :s/\\/\//<CR>:noh<CR>
 " Yank from above and below
 nnoremap yk kyyp
 nnoremap yj jyyP
+
+" Commandline mode
+cnoremap <A-w> <S-Right>
+cnoremap <A-b> <S-Left>
+cnoremap <A-h> <Left>
+cnoremap <A-l> <Right>
+cnoremap <A-k> <Up>
+cnoremap <A-j> <Down>
+cnoremap <A-d> <BS>
+cnoremap <A-4> <End>
+cnoremap <A-6> <Home>
+" cnoremap <C-t> <C-R>=expand("%:p:h") . "/" <CR>
+
+" Unmap
+nmap <C-z> <Nop>
+imap <C-z> <Nop>
+xmap <C-z> <Nop>
+map <up> <nop>
+xmap <up> <nop>
+imap <up> <nop>
+map <down> <nop>
+xmap <down> <nop>
+imap <down> <nop>
+map <left> <nop>
+xmap <left> <nop>
+imap <left> <nop>
+map <right> <nop>
+xmap <right> <nop>
+imap <right> <nop>
 " }} Keybindings

@@ -1,4 +1,5 @@
 {
+    "cSpell.enabled": false,
     "codeLens.enable": true,
     "coc.preferences.extensionUpdateCheck": "daily",
     "coc.preferences.formatOnType": true,

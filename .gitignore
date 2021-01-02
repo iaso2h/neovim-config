@@ -4,3 +4,4 @@ _vimrc.*
 /plugged/
 *.py
 /.idea/
+/dein/
