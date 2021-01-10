@@ -30,14 +30,13 @@ if has('win32')
 
         call dein#add('michaeljsmith/vim-indent-object')
         call dein#add('vim-utils/vim-line')
-        call dein#add('vim-utils/vim-all')
         call dein#end()
         call dein#save_state()
     endif
     filetype plugin indent on
     syntax enable
 elseif has('unix')
-    call plug#begin(stdpath('config') . './plugged')
+    call plug#begin(stdpath('config') . '/plugged')
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
     Plug 'joshdick/onedark.vim'
@@ -60,10 +59,8 @@ elseif has('unix')
 
     Plug 'michaeljsmith/vim-indent-object'
     Plug 'vim-utils/vim-line'
-    Plug 'vim-utils/vim-all'
     call plug#end()
 endif
-
 " }}} Plug-in list
 
 " Basic settings {{{
@@ -96,9 +93,10 @@ set undofile " Combine with undotree plugin
 set updatetime=300
 let mapleader = "\<Space>" " First thing first
 
-for dotvim in split(glob(expand(stdpath("config")) . "/iaso2h/**/*.vim"), "\n")
-    execute "source " dotvim
-    echom "Source: " . dotvim
+let s:allVimrcList = split(glob(expand(stdpath("config")) . "/runtimeConfig/*.vim"), "\n") 
+for vimrc in s:allVimrcList
+    execute "source " vimrc
+    echom "Source: " . vimrc
 endfor
 
 " Settings based on OS
@@ -134,7 +132,6 @@ endif
 " }}} Basic settings
 
 " Plug-in settings {{{
-
 " NERDTree
 let g:NERDTreeChDirMode=2
 let g:NERDTreeIgnore=['\.rbc$', '\~$', '\.pyc$', '\.db$', '\.sqlite$', '__pycache__']
@@ -159,6 +156,14 @@ call expand_region#custom_text_objects({
             \ 'aB' :1,
             \ 'ai' :0,
             \ })
+" Visual-multi
+let g:VM_maps = {}
+let g:VM_maps["Undo"] = 'u'
+let g:VM_maps["Redo"] = '<C-r>'
+let g:VM_maps['Find Under']  = '<C-d>'
+let g:VM_maps['Select All']  = '<M-n>'
+let g:VM_maps['Visual All']  = '<M-n>'
+let g:VM_maps['Skip Region'] = '<C-x>'
 " }}} Plug-in settings
 
 " Coc-nvim settings {{{
@@ -284,18 +289,15 @@ nnoremap <silent><nowait> <A-c>p :<C-u>CocListResume<CR>
 " }}} Coc-nvim settings
 
 " Commands {{{
-
 " Auto commands {
-augroup _filetype
+augroup _fileType
     autocmd!
     autocmd FileType json syntax match Comment +\/\/.\+$+
     " Quick seperating line
     autocmd FileType javascript nnoremap <buffer> gS iconsole.log("-".reapet(65))<Esc>o
     autocmd FileType python     nnoremap <buffer> gS iprint("-"*65)<Esc>o<CR>
-    " Markdown
-    autocmd BufNewFile,BufRead *.md <silent> setfiletype markdown
     " C language
-    autocmd BufRead *.c,*.h	1;/^{   "} Syntax fix
+    autocmd BufRead *.c,*.h	execute "1;/^{"
     " Vim
     autocmd FileType vim setlocal foldmethod=marker
     autocmd FileType vim setlocal foldlevelstart=1
@@ -310,19 +312,31 @@ augroup END
 nnoremap gs jO<Esc>65a-<Esc>gccj
 
 " Clear cmd line message
-function! s:empty_message(timer)
+function! s:emptyMessage(timer)
   if mode() ==# 'n'
     echo ''
   endif
 endfunction
-augroup cmd_msg_cls
-    autocmd!
-    autocmd CmdlineLeave :  call timer_start(5000, funcref('s:empty_message'))
-augroup END
+" augroup cmd_msg_cls
+"     autocmd!
+"     autocmd CmdlineLeave :  call timer_start(5000, funcref('s:empty_message'))
+" augroup END
 " Autoreload vimrc
-augroup vimrcedit
+function! s:myVimrcCheck(currentFile)
+    let l:pathEqual = 0
+    for vimrc in s:allVimrcList
+        if a:currentFile ==# vimrc
+            let l:pathEqual = 1
+        endif
+    endfor
+    if l:pathEqual
+        execut("source" . a:currentFile) | redraw! | AirlineRefresh | echom "Reload: " . a:currentFile
+    endif
+endfunction
+augroup vimrcReload
     autocmd!
     autocmd bufwritepost $MYVIMRC nested source $MYVIMRC | redraw! | AirlineRefresh | echom "Reload: " . $MYVIMRC
+    autocmd bufwritepost *.vim call <SID>myVimrcCheck(expand("%:p"))
 augroup END
 " } Auto commands
 
@@ -351,8 +365,6 @@ command! -nargs=0 Spell   :CocCommand cSpell.toggleEnableSpellChecker
 if has('win32')
     command! -nargs=? PS | terminal powershell
     command! -nargs=0 IDEAVimedit :vsplit ~/.ideavimrc
-elseif has('unix')
-    command! -nargs=? Fish | terminal fish
 endif
 command! -nargs=0 MyVimedit :vsplit $MYVIMRC
 command! -nargs=0 MyVimsrc :source $MYVIMRC
@@ -360,7 +372,6 @@ command! -nargs=0 MyVimsrc :source $MYVIMRC
 " }}} Commands
 
 " Keybindings {{{
-
 " Plug-in Keybindings{
 " NERDTree
 nmap <silent> <A-1> :NERDTreeToggle<CR>
@@ -371,10 +382,14 @@ imap <silent> <C-u> <Esc>:execute "normal! UndotreeToggle<CR>"
 " Startify
 nmap <silent> <C-s> :Startify<CR>
 " Easymotion
-nmap <leader>j <plug>(easymotion-s)
-" Region expand/shrink
-map <A-a> <plug>(expand_region_expand)
-map <C-A-a> <plug>(expand_region_shrink)
+nmap <leader>j <Plug>(easymotion-s)
+" Region Expand/Shrink
+map <A-a> <Plug>(expand_region_expand)
+map <C-A-a> <Plug>(expand_region_shrink)
+" Visual Multi-Cursor
+nmap <C-d> <Plug>(VM-Find-Under)
+nmap <C-A-k> <Plug>(VM-Add-Cursor-Up)
+nmap <C-A-j> <Plug>(VM-Add-Cursor-Down)
 " } Plug-in Keybindings
 
 " Add ; in end of line
