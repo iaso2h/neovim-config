@@ -6,7 +6,7 @@
     "coc.preferences.formatOnSaveFiletypes": [
         "python",
         "markdown",
-        "json",
+        //"json",
         "jsonc"
     ],
     "coc.source.around.firstMatch": false,

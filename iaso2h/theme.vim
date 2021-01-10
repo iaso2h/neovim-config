@@ -6,13 +6,17 @@ if (empty($TMUX))
         set termguicolors
     endif
 endif
+highlight Cursor ctermbg=yellow guifg=black guibg=yellow
 colorscheme nord
 let g:airline_theme='nord'
 " let g:nord_cursor_line_number_background = 1
 let g:nord_uniform_status_lines = 1
+let g:nord_bold_vertical_split_line = 1
+let g:nord_uniform_diff_background = 1
+" let g:nord_bold = 1
 let g:nord_italic = 1
-let g:nord_underline = 1
 let g:nord_italic_comments = 1
+let g:nord_underline = 1
 " One dark
 let g:onedark_terminal_italics = 1
 if (has("autocmd") && !has("gui_running"))
@@ -24,11 +28,22 @@ if (has("autocmd") && !has("gui_running"))
     augroup END
 endif
 colorscheme onedark
-" Custom
-hi TermCursor guifg=white guibg=black
-hi CursorLine guibg=#3E4452
-hi Visual guibg=#5F6972
-hi MatchParen guibg=DarkYellow guifg=black " ctermbg=blue ctermfg=white
+" Override highlight
+highlight TermCursor guifg=white guibg=black
+highlight CursorLine guibg=#303643
+highlight CursorColumn guibg=#424755
+highlight! link CocHighlightText CursorColumn
+highlight Visual guibg=#5F6972
+highlight MatchParen guibg=DarkYellow guifg=black "ctermbg=blue ctermfg=white
+highlight Cursor ctermbg=yellow guifg=black guibg=yellow
+" Custom highlight for :match
+highlight Myw term=bold guifg=white
+highlight Mywb term=bold guibg=white
+highlight Myg term=bold guifg=green
+highlight Myb term=bold guifg=blue
+highlight Myy term=bold guifg=yellow
+highlight Myr term=bold guifg=red
+highlight Mym term=bold guifg=magenta
 " Airline
 
 " let spc = ' '
