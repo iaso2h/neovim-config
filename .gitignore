@@ -1,5 +1,6 @@
 _vimrc.*
 /vim*
+/.vim/
 *~
 /plugged/
 *.py
