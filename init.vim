@@ -1,14 +1,14 @@
+let $configPath = expand(stdpath('config'))
 " Plug-in list {{{
-set runtimepath+=~/AppData/Local/nvim/dein/repos/github.com/Shougo/dein.vim
+let &runtimepath = &runtimepath . "," . expand("$configPath/dein/repos/github.com/Shougo/dein.vim")
 if has('win32')
-    if dein#load_state('~/AppData/Local/nvim/dein')
-        call dein#add('~/AppData/Local/nvim/dein/repos/github.com/Shougo/dein.vim')
-        call dein#begin('~/AppData/Local\nvim\dein')
+    if dein#load_state(expand("$configPath/dein"))
+        call dein#begin(expand("$configPath/dein"))
+        call dein#add(&runtimepath)
         call dein#add('Shougo/deoplete.nvim')
-        call dein#add('roxma/nvim-yarp')
-        call dein#add('roxma/vim-hug-neovim-rpc')
 
         call dein#add('neoclide/coc.nvim', {'merged': 0, 'rev': 'release'})
+        call dein#add('tmhedberg/SimpylFold')
 
         call dein#add('joshdick/onedark.vim')
         call dein#add('arcticicestudio/nord-vim')
@@ -19,6 +19,7 @@ if has('win32')
         call dein#add('mbbill/undotree')
         call dein#add('Yggdroot/indentLine')
         call dein#add('luochen1990/rainbow')
+        call dein#add('norcalli/nvim-colorizer.lua')
 
         call dein#add('jeffkreeftmeijer/vim-numbertoggle')
         call dein#add('easymotion/vim-easymotion')
@@ -27,9 +28,9 @@ if has('win32')
         call dein#add('tpope/vim-commentary')
         call dein#add('inkarkat/vim-ReplaceWithRegister')
         call dein#add('terryma/vim-expand-region')
-
         call dein#add('michaeljsmith/vim-indent-object')
         call dein#add('vim-utils/vim-line')
+
         call dein#end()
         call dein#save_state()
     endif
@@ -38,6 +39,7 @@ if has('win32')
 elseif has('unix')
     call plug#begin(stdpath('config') . '/plugged')
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    Plug 'tmhedberg/SimpylFold'
 
     Plug 'joshdick/onedark.vim'
     Plug 'arcticicestudio/nord-vim'
@@ -56,7 +58,6 @@ elseif has('unix')
     Plug 'tpope/vim-commentary'
     Plug 'inkarkat/vim-ReplaceWithRegister'
     Plug 'terryma/vim-expand-region'
-
     Plug 'michaeljsmith/vim-indent-object'
     Plug 'vim-utils/vim-line'
     call plug#end()
@@ -93,10 +94,10 @@ set undofile " Combine with undotree plugin
 set updatetime=300
 let mapleader = "\<Space>" " First thing first
 
-let s:allVimrcList = split(glob(expand(stdpath("config")) . "/runtimeConfig/*.vim"), "\n") 
-for vimrc in s:allVimrcList
-    execute "source " vimrc
-    echom "Source: " . vimrc
+let s:rcFiles = split(glob(expand("$configPath/runtimeConfig") . "/*.vim"), "\n")
+let s:configPathLength = len(expand($configPath)) + 1
+for rc in s:rcFiles
+    execute "runtime " . rc[s:configPathLength:]
 endfor
 
 " Settings based on OS
@@ -166,128 +167,6 @@ let g:VM_maps['Visual All']  = '<M-n>'
 let g:VM_maps['Skip Region'] = '<C-x>'
 " }}} Plug-in settings
 
-" Coc-nvim settings {{{
-" Coc-extensions
-let g:coc_global_extensions = [
-            \'coc-json',
-            \'coc-markdownlint',
-            \'coc-marketplace',
-            \'coc-nextword',
-            \'coc-pairs',
-            \'coc-pyright',
-            \'coc-snippets',
-            \'coc-spell-checker',
-            \'coc-vimlsp',
-            \]
-" Snippet
-let g:coc_snippet_next= "<tab>"
-" Add (Neo)Vim's native statusline support.
-" NOTE: Please see `:h coc-status` for integrations with external plugins that
-" provide custom statusline: lightline.vim, vim-airline.
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-" Completion navigation
-inoremap <silent><expr> <TAB>
-            \ pumvisible() ? "\<C-n>" :
-            \ <SID>check_back_space() ? "\<TAB>" :
-            \ coc#refresh()
-inoremap <silent><expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-function! s:check_back_space() abort
-    let col = col('.') - 1
-    return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-" Trigger completion
-inoremap <silent><expr> <C-space> coc#refresh()
-" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
-inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
-                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-" Navigate through dianostics list
-nmap <silent> g[ <Plug>(coc-diagnostic-prev)
-nmap <silent> g] <Plug>(coc-diagnostic-next)
-" Show all diagnostics.
-nnoremap <silent> <leader>d  :<C-u>CocList diagnostics<CR>
-" GoTo code navigation.
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gR <Plug>(coc-references)
-" Show Document
-nnoremap <silent> K :call <SID>show_documentation()<CR>
-function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  elseif (coc#rpc#ready())
-    call CocActionAsync('doHover')
-  else
-    execute '!' . &keywordprg . " " . expand('<cword>')
-  endif
-endfunction
-" Highlight the symbol and its references when holding the cursor.
-autocmd CursorHold * silent call CocActionAsync('highlight')
-" Highlight word under cursor
-nmap <leader>k call CocActionAsync("highlight")
-" Symbol renaming.
-nmap <leader>r <Plug>(coc-rename)
-nmap <leader>R <Plug>(coc-refactor)
-" Formatting selected code.
-xmap <A-f> <Plug>(coc-format-selected)
-nmap <A-f> <Plug>(coc-format-selected)
-
-augroup mygroup
-    autocmd!
-    " Setup formatexpr specified filetype(s).
-    autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-    " Update signature help on jump placeholder.
-    autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-augroup end
-
-" Applying codeAction to the selected [[region]].
-" Example: `<leader>aap` for current paragraph
-xmap <leader>a <Plug>(coc-codeaction-selected)
-nmap <leader>a <Plug>(coc-codeaction-selected)
-" Remap keys for applying codeAction to the current buffer.
-nmap <A-Enter> <Plug>(coc-codeaction)
-" Apply AutoFix to problem on the current line.
-nmap <A-S-Enter> <Plug>(coc-fix-current)
-" Map function and class text objects
-" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
-xmap if <Plug>(coc-funcobj-i)
-omap if <Plug>(coc-funcobj-i)
-xmap af <Plug>(coc-funcobj-a)
-omap af <Plug>(coc-funcobj-a)
-xmap ic <Plug>(coc-classobj-i)
-omap ic <Plug>(coc-classobj-i)
-xmap ac <Plug>(coc-classobj-a)
-omap ac <Plug>(coc-classobj-a)
-" Remap <C-f> and <C-b> for scroll float windows/popups.
-nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<CR>" : "\<Right>"
-inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<CR>" : "\<Left>"
-xnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-xnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-" Use <TAB> for selections ranges.
-" NOTE: Requires 'textDocument/selectionRange' support from the language server.
-" coc-tsserver, coc-python are the examples of servers that support it.
-nmap <silent> <leader>S <Plug>(coc-range-select)
-xmap <silent> <leader>S <Plug>(coc-range-select)
-
-" Mappings for CoCList:
-" Manage extensions.
-nnoremap <silent><nowait> <A-c>e :<C-u>CocList extensions<cr>
-" Show commands.
-nnoremap <silent><nowait> <A-c>c :<C-u>CocList commands<cr>
-" Find symbol of current document.
-nnoremap <silent><nowait> <A-s> :<C-u>CocList outline<cr>
-" Search workspace symbols.
-nnoremap <silent><nowait> <leader>s :<C-u>CocList -I symbols<cr>
-" Do default action for next item.
-nnoremap <silent><nowait> <A-c>j :<C-u>CocNext<CR>
-" Do default action for previous item.
-nnoremap <silent><nowait> <A-c>k :<C-u>CocPrev<CR>
-" Resume latest coc list.
-nnoremap <silent><nowait> <A-c>p :<C-u>CocListResume<CR>
-" }}} Coc-nvim settings
-
 " Commands {{{
 " Auto commands {
 augroup _fileType
@@ -307,6 +186,8 @@ augroup _fileType
     autocmd FileType qf setlocal number norelativenumber
     autocmd FileType qf map <buffer> <silent> <CR> :.cc<CR>:copen<CR>
     autocmd FileType qf map <buffer> <silent> q :q<CR>
+    " Terminal
+    autocmd TermOpen * startinsert
 augroup END
 
 nnoremap gs jO<Esc>65a-<Esc>gccj
@@ -324,13 +205,14 @@ endfunction
 " Autoreload vimrc
 function! s:myVimrcCheck(currentFile)
     let l:pathEqual = 0
-    for vimrc in s:allVimrcList
+    for vimrc in s:rcFiles
         if a:currentFile ==# vimrc
             let l:pathEqual = 1
+            break
         endif
     endfor
     if l:pathEqual
-        execut("source" . a:currentFile) | redraw! | AirlineRefresh | echom "Reload: " . a:currentFile
+        execut("source " . a:currentFile) | redraw! | AirlineRefresh | echom "Reload: " . a:currentFile
     endif
 endfunction
 augroup vimrcReload
@@ -361,9 +243,9 @@ command! -nargs=0 Format :call CocAction('format')
 command! -nargs=0 OR   :call CocActio('runCommand', 'editor.action.organizeImport')
 " Toggle Coc Spell-checker
 command! -nargs=0 Spell   :CocCommand cSpell.toggleEnableSpellChecker
-
+" Edit Vimrc
 if has('win32')
-    command! -nargs=? PS | terminal powershell
+    command! -nargs=0 PS | terminal powershell
     command! -nargs=0 IDEAVimedit :vsplit ~/.ideavimrc
 endif
 command! -nargs=0 MyVimedit :vsplit $MYVIMRC
@@ -392,6 +274,17 @@ nmap <C-A-k> <Plug>(VM-Add-Cursor-Up)
 nmap <C-A-j> <Plug>(VM-Add-Cursor-Down)
 " } Plug-in Keybindings
 
+function! s:myTerminal()
+    if has('win32')
+        execute "PS"
+    elseif has('unix')
+        execute "terminal"
+    endif
+endfunction
+" Bring up terminal
+nnoremap <silent> <C-`> :call <SID>myTerminal()<CR>
+" Clear messages
+nnoremap <silent> <A-`> :messages clear<CR>
 " Add ; in end of line
 nnoremap g; mzA;<Esc>`z
 " Ctrl-BS for ins
@@ -492,12 +385,12 @@ cnoremap <A-4> <End>
 cnoremap <A-6> <Home>
 
 " Unmap
-map <up> <nop>
-imap <up> <nop>
-map <down> <nop>
-imap <down> <nop>
-map <left> <nop>
-imap <left> <nop>
-map <right> <nop>
-imap <right> <nop>
+" map <up> <nop>
+" imap <up> <nop>
+" map <down> <nop>
+" imap <down> <nop>
+" map <left> <nop>
+" imap <left> <nop>
+" map <right> <nop>
+" imap <right> <nop>
 " }}} Keybindings

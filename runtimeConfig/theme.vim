@@ -6,7 +6,6 @@ if (empty($TMUX))
         set termguicolors
     endif
 endif
-highlight Cursor ctermbg=yellow guifg=black guibg=yellow
 colorscheme nord
 let g:airline_theme='nord'
 " let g:nord_cursor_line_number_background = 1
@@ -51,6 +50,10 @@ highlight Mym term=bold guifg=magenta
 " let g:airline_section_y = airline#section#create_right(['ffenc'])
 " let g:airline_section_error = airline#section#create(['ale_error_count', 'coc_error_count'])
 " let g:airline_section_warning = airline#section#create(['ale_warning_count', 'whitespace', 'coc_warning_count'])
+if !exists('g:GuiLoaded')
+    set guifont=更纱黑体\ Mono\ SC\ Nerd:h13
+endif
+" set guifont=JetBrainsMono\ Nerd\ Font\ Mono:h13
 let g:airline_section_c = '%<%F%m %#__accent_red#%{airline#util#wrap(airline#parts#readonly(),0)}%#__restore__#'
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#syntastic#enabled = 1
