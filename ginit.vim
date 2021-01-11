@@ -1,4 +1,5 @@
 " Guifont 更纱黑体 Mono SC Nerd:h13
-Guifont 更纱黑体 Mono SC Nerd:h13
-GuiPopupmenu 0
+Guifont 更纱黑体 Mono SC Nerd:h12
+GuiPopupmenu v:false
+GuiTabline v:false
 

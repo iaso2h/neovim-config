@@ -15,10 +15,6 @@ let g:coc_global_extensions = [
             \]
 " Snippet
 let g:coc_snippet_next= "<tab>"
-" Add (Neo)Vim's native statusline support.
-" NOTE: Please see `:h coc-status` for integrations with external plugins that
-" provide custom statusline: lightline.vim, vim-airline.
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 " Completion navigation
 inoremap <silent><expr> <TAB>
             \ pumvisible() ? "\<C-n>" :
@@ -113,7 +109,7 @@ nnoremap <silent><nowait> <A-c>c :<C-u>CocList commands<cr>
 " Find symbol of current document.
 nnoremap <silent><nowait> <A-s> :<C-u>CocList outline<cr>
 " Search workspace symbols.
-nnoremap <silent><nowait> <leader>s :<C-u>CocList -I symbols<cr>
+" nnoremap <silent><nowait> <leader>s :<C-u>CocList -I symbols<cr>
 " Do default action for next item.
 nnoremap <silent><nowait> <A-c>j :<C-u>CocNext<CR>
 " Do default action for previous item.

@@ -6,7 +6,7 @@ if (empty($TMUX))
         set termguicolors
     endif
 endif
-colorscheme nord
+" colorscheme nord
 let g:airline_theme='nord'
 " let g:nord_cursor_line_number_background = 1
 let g:nord_uniform_status_lines = 1
@@ -46,24 +46,32 @@ highlight Mym term=bold guifg=magenta
 " Airline
 
 " let spc = ' '
-" let g:airline_section_x = airline#section#create_right(['vista', 'gutentags', 'grepper', 'filetype'])
-" let g:airline_section_y = airline#section#create_right(['ffenc'])
-" let g:airline_section_error = airline#section#create(['ale_error_count', 'coc_error_count'])
-" let g:airline_section_warning = airline#section#create(['ale_warning_count', 'whitespace', 'coc_warning_count'])
 if !exists('g:GuiLoaded')
-    set guifont=更纱黑体\ Mono\ SC\ Nerd:h13
+    set guifont=更纱黑体\ Mono\ SC\ Nerd:h12
 endif
-" set guifont=JetBrainsMono\ Nerd\ Font\ Mono:h13
-let g:airline_section_c = '%<%F%m %#__accent_red#%{airline#util#wrap(airline#parts#readonly(),0)}%#__restore__#'
+" set guifont=JetBrainsMono\ Nerd\ Font\ Mono:h12
+" let g:airline_section_c = '%<%F%m %#__accent_red#%{airline#util#wrap(airline#parts#readonly(),0)}%#__restore__#'
+" Add (Neo)Vim's native statusline support.
+" NOTE: Please see `:h coc-status` for integrations with external plugins that
+" provide custom statusline: lightline.vim, vim-airline.
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+let g:airline_section_c = airline#section#create(['%f  ' , '%{get(b:,''coc_current_function'','''')}'])
 let g:airline_powerline_fonts = 1
-let g:airline#extensions#syntastic#enabled = 1
+let g:airline_extensions = ['coc', 'tabline', 'wordcount', 'virtualenv', 'branch', 'tagbar']
 let g:airline#extensions#branch#enabled = 1
+let g:airline_highlighting_cache = 1
+let airline#extensions#coc#stl_format_err = '%E{[%e(#%fe)]}'
+let airline#extensions#coc#stl_format_warn = '%W{[%w(#%fw)]}'
 let g:airline#extensions#wordcount#filetypes = ['all']
-let g:airline#extensions#tagbar#enabled = 1
-let g:airline#extensions#virtualenv#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 1
 let g:airline#extensions#tabline#show_tab_nr = 1
+let g:airline#extensions#tabline#switch_buffers_and_tabs = 1
+let g:airline#extensions#tabline#exclude_preview = 1
+let g:airline#extensions#tabline#tabnr_formatter = 'tabnr'
+let g:airline#extensions#tabline#formatter = 'jsformatter'
+let g:airline#extensions#tabline#tabs_label = ''
+let g:airline#extensions#tabline#buffers_label = '﬘'
 let g:airline#extensions#tabline#buffer_idx_mode = 1
 nmap <leader>1 <Plug>AirlineSelectTab1
 nmap <leader>2 <Plug>AirlineSelectTab2
@@ -75,6 +83,63 @@ nmap <leader>7 <Plug>AirlineSelectTab7
 nmap <leader>8 <Plug>AirlineSelectTab8
 nmap <leader>9 <Plug>AirlineSelectTab9
 nmap <leader>0 <Plug>AirlineSelectTab0
+
+function! StatusDiagnostic() abort
+    let info = get(b:, 'coc_diagnostic_info', {})
+    if empty(info) | return '' | endif
+    let msgs = []
+    if get(info, 'error', 0)
+        call add(msgs, ' ' . info['error'])
+    endif
+    if get(info, 'warning', 0)
+        call add(msgs, ' ' . info['warning'])
+    endif
+    if get(info, 'information', 0)
+        call add(msgs, ' ' . info['information'])
+    endif
+    if get(info, 'hint', 0)
+        call add(msgs, ' ' . info['hint'])
+    endif
+    " echo get(g:, 'coc_status', '')
+    return join(msgs, ' ')
+endfunction
+let g:airline_section_warning = airline#section#create_right(['%{StatusDiagnostic()}'])
+" let g:airline_section_warning = airline#section#create_right(['%{coc#status()}'])
+if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+endif
+
+" unicode symbols
+let g:airline_left_sep = '»'
+let g:airline_left_sep = '▶'
+let g:airline_right_sep = '«'
+let g:airline_right_sep = '◀'
+let g:airline_symbols.crypt = '🔒'
+let g:airline_symbols.linenr = '☰'
+let g:airline_symbols.linenr = '␊'
+let g:airline_symbols.linenr = '␤'
+let g:airline_symbols.linenr = '¶'
+let g:airline_symbols.maxlinenr = ''
+let g:airline_symbols.maxlinenr = '㏑'
+let g:airline_symbols.branch = '⎇'
+let g:airline_symbols.paste = 'ρ'
+let g:airline_symbols.paste = 'Þ'
+let g:airline_symbols.paste = '∥'
+let g:airline_symbols.spell = 'Ꞩ'
+let g:airline_symbols.notexists = 'Ɇ'
+let g:airline_symbols.whitespace = 'Ξ'
+
+" powerline symbols
+let g:airline_left_sep = ''
+let g:airline_left_alt_sep = ''
+let g:airline_right_sep = ''
+let g:airline_right_alt_sep = ''
+let g:airline_symbols.branch = ''
+let g:airline_symbols.readonly = ''
+let g:airline_symbols.linenr = '☰'
+let g:airline_symbols.maxlinenr = ''
+let g:airline_symbols.dirty='⚡'
+
 " Rainbow
 let g:rainbow_active = 1
 let g:rainbow_conf = {

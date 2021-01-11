@@ -14,12 +14,17 @@ if has('win32')
         call dein#add('arcticicestudio/nord-vim')
         call dein#add('vim-airline/vim-airline')
         call dein#add('vim-airline/vim-airline-themes')
+        call dein#add('luochen1990/rainbow')
+        call dein#add('norcalli/nvim-colorizer.lua')
         call dein#add('mhinz/vim-startify')
+        call dein#add('jmcantrell/vim-virtualenv')
+        call dein#add('lambdalisue/gina.vim')
+        call dein#add('liuchengxu/vista.vim')
+        call dein#add('junegunn/fzf', { 'merged': 0 })
+        call dein#add('junegunn/fzf.vim')
         call dein#add('preservim/nerdtree')
         call dein#add('mbbill/undotree')
         call dein#add('Yggdroot/indentLine')
-        call dein#add('luochen1990/rainbow')
-        call dein#add('norcalli/nvim-colorizer.lua')
 
         call dein#add('jeffkreeftmeijer/vim-numbertoggle')
         call dein#add('easymotion/vim-easymotion')
@@ -33,8 +38,8 @@ if has('win32')
 
         call dein#end()
         call dein#save_state()
+        filetype plugin indent on
     endif
-    filetype plugin indent on
     syntax enable
 elseif has('unix')
     call plug#begin(stdpath('config') . '/plugged')
@@ -45,12 +50,17 @@ elseif has('unix')
     Plug 'arcticicestudio/nord-vim'
     Plug 'vim-airline/vim-airline'
     Plug 'vim-airline/vim-airline-themes'
+    Plug 'luochen1990/rainbow'
+    Plug 'norcalli/nvim-colorizer.lua'
     Plug 'mhinz/vim-startify'
+    Plug 'jmcantrell/vim-virtualenv'
+    Plug 'lambdalisue/gina.vim'
+    Plug 'liuchengxu/vista.vim'
+    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+    Plug 'junegunn/fzf.vim'
     Plug 'preservim/nerdtree'
     Plug 'mbbill/undotree'
     Plug 'Yggdroot/indentLine'
-    Plug 'luochen1990/rainbow'
-    Plug 'norcalli/nvim-colorizer.lua'
 
     Plug 'jeffkreeftmeijer/vim-numbertoggle'
     Plug 'easymotion/vim-easymotion'
@@ -95,8 +105,8 @@ set undofile " Combine with undotree plugin
 set updatetime=300
 let mapleader = "\<Space>" " First thing first
 
-let s:rcFiles = split(glob(expand("$configPath/runtimeConfig") . "/*.vim"), "\n")
 let s:configPathLength = len(expand($configPath)) + 1
+let s:rcFiles = split(glob(expand("$configPath/runtimeConfig") . "/*.vim"), "\n")
 for rc in s:rcFiles
     execute "runtime " . rc[s:configPathLength:]
 endfor
@@ -166,6 +176,10 @@ let g:VM_maps['Find Under']  = '<C-d>'
 let g:VM_maps['Select All']  = '<M-n>'
 let g:VM_maps['Visual All']  = '<M-n>'
 let g:VM_maps['Skip Region'] = '<C-x>'
+" Vista
+let g:vista_default_executive = 'ctags'
+let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
+let g:vista#finders = ['fzf']
 " }}} Plug-in settings
 
 " Commands {{{
@@ -267,12 +281,14 @@ nmap <silent> <C-s> :Startify<CR>
 " Easymotion
 nmap <leader>j <Plug>(easymotion-s)
 " Region Expand/Shrink
-map <A-a> <Plug>(expand_region_expand)
 map <C-A-a> <Plug>(expand_region_shrink)
+map <A-a> <Plug>(expand_region_expand)
 " Visual Multi-Cursor
 nmap <C-d> <Plug>(VM-Find-Under)
 nmap <C-A-k> <Plug>(VM-Add-Cursor-Up)
 nmap <C-A-j> <Plug>(VM-Add-Cursor-Down)
+" Tagbbar
+nmap <leader>s :Vista!!<CR>
 " } Plug-in Keybindings
 
 function! s:myTerminal()
