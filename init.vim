@@ -50,6 +50,7 @@ elseif has('unix')
     Plug 'mbbill/undotree'
     Plug 'Yggdroot/indentLine'
     Plug 'luochen1990/rainbow'
+    Plug 'norcalli/nvim-colorizer.lua'
 
     Plug 'jeffkreeftmeijer/vim-numbertoggle'
     Plug 'easymotion/vim-easymotion'
