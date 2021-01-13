@@ -1,32 +1,34 @@
 let $configPath = expand(stdpath('config'))
-" Plug-in list {{{
-let &runtimepath = &runtimepath . "," . expand("$configPath/dein/repos/github.com/Shougo/dein.vim")
-if has('win32')
-    if dein#load_state(expand("$configPath/dein"))
-        call dein#begin(expand("$configPath/dein"))
-        call dein#add(&runtimepath)
-        call dein#add('Shougo/deoplete.nvim')
 
-        call dein#add('neoclide/coc.nvim', {'merged': 0, 'rev': 'release'})
-        call dein#add('tmhedberg/SimpylFold')
+" Plug-ins list {{{
+let &runtimepath = &runtimepath . "," . expand('$configPath/dein/dein.vim')
+echom &runtimepath
+if has('win32')
+    if !isdirectory(expand('$configPath/dein'))
+        execute "autocmd VimEnter * !git clone https://github.com/Shougo/dein.vim " . expand('$configPath/dein/dein.vim')
+        execute "autocmd VimEnter * !echo Require restarting Neovim"
+        finish
+    endif
+    if !isdirectory(expand('$configPath/dein/repos'))
+        echom "call dein#install()"
+        execute "messages"
+        finish
+    endif
+    if dein#load_state(expand('$configPath/dein'))
+        call dein#begin(expand('$configPath/dein'))
+        call dein#add('$configPath/dein/dein.vim')
+        call dein#add('Shougo/deoplete.nvim')
 
         call dein#add('joshdick/onedark.vim')
         call dein#add('arcticicestudio/nord-vim')
         call dein#add('vim-airline/vim-airline')
         call dein#add('vim-airline/vim-airline-themes')
         call dein#add('luochen1990/rainbow')
+        call dein#add('Yggdroot/indentLine')
         call dein#add('norcalli/nvim-colorizer.lua')
         call dein#add('mhinz/vim-startify')
-        call dein#add('jmcantrell/vim-virtualenv')
-        call dein#add('lambdalisue/gina.vim')
-        call dein#add('liuchengxu/vista.vim')
-        call dein#add('junegunn/fzf', { 'merged': 0 })
-        call dein#add('junegunn/fzf.vim')
-        call dein#add('preservim/nerdtree')
-        call dein#add('mbbill/undotree')
-        call dein#add('Yggdroot/indentLine')
 
-        call dein#add('jeffkreeftmeijer/vim-numbertoggle')
+        call dein#add('mbbill/undotree')
         call dein#add('easymotion/vim-easymotion')
         call dein#add('tpope/vim-surround')
         call dein#add('mg979/vim-visual-multi')
@@ -34,7 +36,16 @@ if has('win32')
         call dein#add('inkarkat/vim-ReplaceWithRegister')
         call dein#add('terryma/vim-expand-region')
         call dein#add('michaeljsmith/vim-indent-object')
-        call dein#add('vim-utils/vim-line')
+
+        call dein#add('neoclide/coc.nvim', {'merged': 0, 'rev': 'release'})
+        call dein#add('tmhedberg/SimpylFold')
+        call dein#add('jmcantrell/vim-virtualenv')
+
+        call dein#add('lambdalisue/gina.vim')
+        call dein#add('liuchengxu/vista.vim')
+        call dein#add('junegunn/fzf', { 'build': 'powershell.exe ./install.ps1', 'merged': 0 })
+        call dein#add('junegunn/fzf.vim', { 'depends': 'fzf' })
+        call dein#add('Yggdroot/LeaderF', { 'build': './install.bat' })
 
         call dein#end()
         call dein#save_state()
@@ -43,26 +54,16 @@ if has('win32')
     syntax enable
 elseif has('unix')
     call plug#begin(stdpath('config') . '/plugged')
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
-    Plug 'tmhedberg/SimpylFold'
-
     Plug 'joshdick/onedark.vim'
     Plug 'arcticicestudio/nord-vim'
     Plug 'vim-airline/vim-airline'
     Plug 'vim-airline/vim-airline-themes'
     Plug 'luochen1990/rainbow'
+    Plug 'Yggdroot/indentLine'
     Plug 'norcalli/nvim-colorizer.lua'
     Plug 'mhinz/vim-startify'
-    Plug 'jmcantrell/vim-virtualenv'
-    Plug 'lambdalisue/gina.vim'
-    Plug 'liuchengxu/vista.vim'
-    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-    Plug 'junegunn/fzf.vim'
-    Plug 'preservim/nerdtree'
-    Plug 'mbbill/undotree'
-    Plug 'Yggdroot/indentLine'
 
-    Plug 'jeffkreeftmeijer/vim-numbertoggle'
+    Plug 'mbbill/undotree'
     Plug 'easymotion/vim-easymotion'
     Plug 'tpope/vim-surround'
     Plug 'mg979/vim-visual-multi'
@@ -70,17 +71,27 @@ elseif has('unix')
     Plug 'inkarkat/vim-ReplaceWithRegister'
     Plug 'terryma/vim-expand-region'
     Plug 'michaeljsmith/vim-indent-object'
-    Plug 'vim-utils/vim-line'
+
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    Plug 'tmhedberg/SimpylFold'
+    Plug 'jmcantrell/vim-virtualenv'
+
+    Plug 'lambdalisue/gina.vim'
+    Plug 'liuchengxu/vista.vim'
+    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+    Plug 'junegunn/fzf.vim'
+    Plug 'Yggdroot/LeaderF', { 'do': ':LeaderfInstallCExtension' }
     call plug#end()
 endif
-" }}} Plug-in list
+" }}} Plug-ins list
+
 
 " Basic settings {{{
 set ai
 set cindent " set C style indent
 set clipboard=unnamed
-set cmdheight=2 "Give more space for displaying messages
 set cursorline
+set cmdheight=2 "Give more space for displaying messages
 set expandtab " Soft tab
 set gdefault
 set hidden
@@ -90,26 +101,35 @@ set langmenu=en
 set lazyredraw " Make Macro faster
 set mouse=a
 set nobackup
-set noswapfile " Diable annoying swap file notification
+set noswapfile
+set nostartofline
 set nowritebackup
-set number relativenumber
+set number
 set scrolloff=5
 set shiftround " Indent/outdent to nearest tabstop
 set shiftwidth=4 " Indent/outdent by four columns
 set shortmess+=c " don't give ins-completion-menu messages.
 set smartcase
 set softtabstop=4 " Indentation levels every four columns
+set splitbelow
+set splitright
+set switchbuf=vsplit
 set tabstop=4
 set timeoutlen=500
 set undofile " Combine with undotree plugin
 set updatetime=300
-let mapleader = "\<Space>" " First thing first
+set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite
 
-let s:configPathLength = len(expand($configPath)) + 1
+" Runtime EX commands {
 let s:rcFiles = split(glob(expand("$configPath/runtimeConfig") . "/*.vim"), "\n")
+let s:configPathLength = len(expand($configPath)) + 1
 for rc in s:rcFiles
-    execute "runtime " . rc[s:configPathLength:]
+    " exe "source " . rc
+    execute "runtime ./" . rc[s:configPathLength:]
+    echom "Load: " . rc
 endfor
+lua require'colorizer'.setup()
+" } Runtime Ex Commands
 
 " Settings based on OS
 if has('win32')
@@ -143,81 +163,79 @@ elseif has('unix')
 endif
 " }}} Basic settings
 
-" Plug-in settings {{{
-" NERDTree
-let g:NERDTreeChDirMode=2
-let g:NERDTreeIgnore=['\.rbc$', '\~$', '\.pyc$', '\.db$', '\.sqlite$', '__pycache__']
-let g:NERDTreeSortOrder=['^__\.py$', '\/$', '*', '\.swp$', '\.bak$', '\~$']
-let g:NERDTreeShowBookmarks=1
-let g:nerdtree_tabs_focus_on_files=1
-set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite
-" Startify
-hi StartifyHeader  ctermfg=111
-hi StartifyFooter  ctermfg=111
-hi StartifyBracket ctermfg=240
-hi StartifyPath    ctermfg=245
-hi StartifyNumber  ctermfg=215
-hi StartifySlash   ctermfg=240
-" Easymotion configuration
-let g:EasyMotion_smartcase = 1
-" Expand region configuration
+" Plug-ins settings  {{{
+" Expand_Region{
 call expand_region#custom_text_objects({
-            \ 'a]' :1,
-            \ 'ab' :1,
-            \ 'ii' :0,
-            \ 'aB' :1,
-            \ 'ai' :0,
-            \ })
-" Visual-multi
-let g:VM_maps = {}
-let g:VM_maps["Undo"] = 'u'
-let g:VM_maps["Redo"] = '<C-r>'
-let g:VM_maps['Find Under']  = '<C-d>'
-let g:VM_maps['Select All']  = '<M-n>'
-let g:VM_maps['Visual All']  = '<M-n>'
-let g:VM_maps['Skip Region'] = '<C-x>'
-" Vista
+        \ "\/\\n\\n\<CR>": 0,
+        \ 'a]' :1,
+        \ 'ab' :1,
+        \ 'aB' :1,
+        \ 'ii' :1,
+        \ 'ai' :1,
+        \ })
+" call expand_region#custom_text_objects('ruby', {
+"         \ 'im' :0,
+"         \ 'am' :0,
+"         \ })
+" }
+map <C-A-a> <Plug>(expand_region_shrink)
+map <A-a> <Plug>(expand_region_expand)
+" Vista {
 let g:vista_default_executive = 'ctags'
 let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
 let g:vista#finders = ['fzf']
-" }}} Plug-in settings
+" Base on Sarasa Nerd Mono SC
+let g:vista#renderer#icons = {
+            \   "variable": "\uF194",
+            \   }
+" } Vista
+" UndotreeToggle
+nmap <silent> <C-u> :UndotreeToggle<CR>
+" Vista
+nmap <leader>s :Vista!!<CR>
+" }}} Plug-ins settings
 
-" Commands {{{
-" Auto commands {
+" Auto commands {{{
+" fileType {
 augroup _fileType
     autocmd!
     autocmd FileType json syntax match Comment +\/\/.\+$+
     " Quick seperating line
     autocmd FileType javascript nnoremap <buffer> gS iconsole.log("-".reapet(65))<Esc>o
     autocmd FileType python     nnoremap <buffer> gS iprint("-"*65)<Esc>o<CR>
+    nnoremap gs jO<Esc>65a-<Esc>gccj
     " C language
     autocmd BufRead *.c,*.h	execute "1;/^{"
     " Vim
     autocmd FileType vim setlocal foldmethod=marker
     autocmd FileType vim setlocal foldlevelstart=1
-    " Help
-    autocmd FileType help map <buffer> <silent> q :q<CR>
     " Quickfix window
     autocmd FileType qf setlocal number norelativenumber
     autocmd FileType qf map <buffer> <silent> <CR> :.cc<CR>:copen<CR>
-    autocmd FileType qf map <buffer> <silent> q :q<CR>
     " Terminal
     autocmd TermOpen * startinsert
+    autocmd TermEnter * map <buffer> <C-q> <C-\><C-n>
 augroup END
 
-nnoremap gs jO<Esc>65a-<Esc>gccj
+augroup myWindow
+    autocmd!
+    autocmd FileType help if winnr('$') > 2 | wincmd K | else | wincmd L | endif
+augroup END
+" } fileType
 
-" Clear cmd line message
+" Clear cmd line message {
 function! s:emptyMessage(timer)
-  if mode() ==# 'n'
-    echo ''
-  endif
+    if mode() ==# 'n'
+        echo ''
+    endif
 endfunction
 " augroup cmd_msg_cls
 "     autocmd!
 "     autocmd CmdlineLeave :  call timer_start(5000, funcref('s:empty_message'))
 " augroup END
-" Autoreload vimrc
+" } Clear cmd line message
+
+" Autoreload vimrc {
 function! s:myVimrcCheck(currentFile)
     let l:pathEqual = 0
     for vimrc in s:rcFiles
@@ -227,7 +245,7 @@ function! s:myVimrcCheck(currentFile)
         endif
     endfor
     if l:pathEqual
-        execut("source " . a:currentFile) | redraw! | AirlineRefresh | echom "Reload: " . a:currentFile
+        execute("source " . a:currentFile) | redraw! | AirlineRefresh | echom "Reload: " . a:currentFile
     endif
 endfunction
 augroup vimrcReload
@@ -235,9 +253,10 @@ augroup vimrcReload
     autocmd bufwritepost $MYVIMRC nested source $MYVIMRC | redraw! | AirlineRefresh | echom "Reload: " . $MYVIMRC
     autocmd bufwritepost *.vim call <SID>myVimrcCheck(expand("%:p"))
 augroup END
-" } Auto commands
+" } Autoreload vimrc
+" }}} Auto commands
 
-" Custom commands {
+" Commands {{{
 " Open file in oldfile list
 command! -nargs=1 E :e #<<args>
 " Redir command line output to clipboard
@@ -265,53 +284,30 @@ if has('win32')
 endif
 command! -nargs=0 MyVimedit :vsplit $MYVIMRC
 command! -nargs=0 MyVimsrc :source $MYVIMRC
-" } Custom commands
 " }}} Commands
 
-" Keybindings {{{
-" Plug-in Keybindings{
-" NERDTree
-nmap <silent> <A-1> :NERDTreeToggle<CR>
-imap <silent> <A-1> <Esc><A-1>
-" UndotreeToggle
-nmap <silent> <C-u> :UndotreeToggle<CR>
-imap <silent> <C-u> <Esc>:execute "normal! UndotreeToggle<CR>"
-" Startify
-nmap <silent> <C-s> :Startify<CR>
-" Easymotion
-nmap <leader>j <Plug>(easymotion-s)
-" Region Expand/Shrink
-map <C-A-a> <Plug>(expand_region_shrink)
-map <A-a> <Plug>(expand_region_expand)
-" Visual Multi-Cursor
-nmap <C-d> <Plug>(VM-Find-Under)
-nmap <C-A-k> <Plug>(VM-Add-Cursor-Up)
-nmap <C-A-j> <Plug>(VM-Add-Cursor-Down)
-" Tagbbar
-nmap <leader>s :Vista!!<CR>
-" } Plug-in Keybindings
-
-function! s:myTerminal()
-    if has('win32')
-        execute "PS"
-    elseif has('unix')
-        execute "terminal"
-    endif
-endfunction
+" Key mapping {{{
+let mapleader = "\<Space>" " First thing first
 " Bring up terminal
-nnoremap <silent> <C-`> :call <SID>myTerminal()<CR>
+if has('win32') | exe "map <silent> <C-`> :PS<CR>" |
+            \elseif has('unix') | exe "map <silent> <C-`> :te<CR>" | endif
+" Trailing semicolon
+nmap <silent> g; <Plug>trailingSemicolon
 " Clear messages
 nnoremap <silent> <A-`> :messages clear<CR>
-" Add ; in end of line
-nnoremap g; mzA;<Esc>`z
+" Non-blank last character
+nnoremap g$ g_
 " Ctrl-BS for ins
 inoremap <C-BS> <C-\><C-o>db
+" Litter tweak
+nnoremap d^ d0
+map <C-s> :<c-u>w<CR>
+imap <C-s> <Esc><C-s>
 " Copy & Paste & Undo & Cut
 nnoremap <C-z> u
 xnoremap <C-z> <Esc>u
 inoremap <C-z> <Esc>ua
 
-nnoremap <C-x> dd
 xnoremap <C-x> d
 inoremap <C-x> <Esc>dda
 
@@ -326,8 +322,7 @@ inoremap <C-v> <C-r>*
 nnoremap <A-v> <C-q>
 " Goto matching brackets
 noremap <C-m> %
-" Show registers
-nnoremap <silent> Q :registers<CR>
+" Show messages
 nnoremap <silent> M :messages<CR>
 " Pageup/Pagedown
 noremap <A-e> <pageup>
@@ -338,17 +333,22 @@ inoremap <A-d> <pagedown>
 tnoremap <A-d> <pagedown>
 " Join line
 nnoremap <C-j> mzgJ`z
-" Shift-Tab to outdent
+" Shift-Tab to outdent for insert mode
 inoremap <S-Tab> <C-d>
 " Buffer & Window
 nnoremap <silent> <C-h> :bp<CR>
 nnoremap <silent> <C-l> :bn<CR>
-nnoremap <silent> <C-w>q :bd<CR>
-nnoremap <silent> <C-w>c :bd<CR>
+nnoremap Q <C-w>q
+nnoremap <silent> <C-w>v <C-w>v<C-w>w
+nnoremap <silent> <C-w>s <C-w>s
+nnoremap <silent> <C-w>V <C-w>v
+nnoremap <silent> <C-w>S <C-w>v
 nnoremap <silent> <C-w>o :w <bar> %bd <bar> e# <bar> bd# <CR> " Close other buffers except for the current editting one
 " Folding
-nnoremap <silent> <Leader>F @=(foldlevel('.') ? 'za' : '\<Space>')<CR>
+nnoremap <silent> <Leader><Space> @=(foldlevel('.') ? 'za' : '\<Space>')<CR>
 xnoremap <Leader>f zf
+nnoremap zo zR
+nnoremap zc zM
 " Mimic the VSCode move line up/down behavior
 nnoremap <silent> <A-j> :m .+1<CR>==
 nnoremap <silent> <A-k> :m .-2<CR>==
@@ -362,6 +362,7 @@ nnoremap <A-S-j> mz"*yygP`z
 inoremap jj <esc>
 " Disable highlight search
 nnoremap <silent> <Leader>h :noh<CR>
+xnoremap <silent> <Leader>h :<c-u><Esc>
 " Put content from registers 0
 nnoremap <leader>p "0p
 nnoremap <leader>P "0P
@@ -391,15 +392,15 @@ function! s:RemoveLastPathComponent()
     return l:result . l:cmdlineAfterCursor
 endfunction
 cnoremap <C-BS> <C-\>e(<SID>RemoveLastPathComponent())<CR>
-cnoremap <A-w> <S-Right>
-cnoremap <A-b> <S-Left>
 cnoremap <A-h> <Left>
 cnoremap <A-l> <Right>
+cnoremap <A-w> <S-Right>
+cnoremap <A-b> <S-Left>
 cnoremap <A-k> <Up>
 cnoremap <A-j> <Down>
-cnoremap <A-s> <BS>
-cnoremap <A-4> <End>
-cnoremap <A-6> <Home>
+cnoremap <A-d> <Del>
+cnoremap <A-e> <End>
+cnoremap <A-a> <Home>
 
 " Unmap
 " map <up> <nop>
@@ -410,4 +411,4 @@ cnoremap <A-6> <Home>
 " imap <left> <nop>
 " map <right> <nop>
 " imap <right> <nop>
-" }}} Keybindings
+"  Key mapping

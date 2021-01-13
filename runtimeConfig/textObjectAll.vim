@@ -25,15 +25,16 @@ endfunction
 let s:save_cpo = &cpo
 set cpo&vim
 
-onoremap <silent> <Plug>(textObjInsideAll) :<C-U>call <SID>inside()<CR>
+" onoremap <silent> <Plug>(textObjInsideAll) :<C-U>call <SID>inside()<CR>
+" omap <silent> ie <Plug>(textObjInsideAll)
 xnoremap <silent> <Plug>(textObjInsideAll) :<C-U>call <SID>inside()<CR>
-onoremap <silent> <Plug>(textObjectAroundAll) :<C-U>call <SID>around()<CR>
-xnoremap <silent> <Plug>(textObjectAroundAll) :<C-U>call <SID>around()<CR>
-
-omap <silent> ie <Plug>(textObjInsideAll)
 xmap <silent> ie <Plug>(textObjInsideAll)
-omap <silent> ae <Plug>(textObjectAroundAll)
+
+" onoremap <silent> <Plug>(textObjectAroundAll) :<C-U>call <SID>around()<CR>
+" omap <silent> ae <Plug>(textObjectAroundAll)
+xnoremap <silent> <Plug>(textObjectAroundAll) :<C-U>call <SID>around()<CR>
 xmap <silent> ae <Plug>(textObjectAroundAll)
+
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

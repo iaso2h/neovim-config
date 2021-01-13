@@ -1,9 +1,10 @@
-if exists('g:did_coc-loaded')
+if !get(g:, 'coc_start_at_startup', 1)
     finish
 endif
 
 let g:coc_global_extensions = [
             \'coc-json',
+            \'coc-explorer',
             \'coc-markdownlint',
             \'coc-marketplace',
             \'coc-nextword',
@@ -13,6 +14,7 @@ let g:coc_global_extensions = [
             \'coc-spell-checker',
             \'coc-vimlsp',
             \]
+            " \'coc-highlight',
 " Snippet
 let g:coc_snippet_next= "<tab>"
 " Completion navigation
@@ -53,8 +55,6 @@ function! s:show_documentation()
 endfunction
 " Highlight the symbol and its references when holding the cursor.
 autocmd CursorHold * silent call CocActionAsync('highlight')
-" Highlight word under cursor
-nmap <leader>k call CocActionAsync("highlight")
 " Symbol renaming.
 nmap <leader>r <Plug>(coc-rename)
 nmap <leader>R <Plug>(coc-refactor)
@@ -116,3 +116,44 @@ nnoremap <silent><nowait> <A-c>j :<C-u>CocNext<CR>
 nnoremap <silent><nowait> <A-c>k :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent><nowait> <A-c>p :<C-u>CocListResume<CR>
+" Explorer {{{
+let g:coc_explorer_global_presets = {
+\   'tab': {
+\     'position': 'tab',
+\     'quit-on-open': v:true,
+\   },
+\   'floating': {
+\     'position': 'floating',
+\     'open-action-strategy': 'sourceWindow',
+\   },
+\   'floatingTop': {
+\     'position': 'floating',
+\     'floating-position': 'center',
+\     'open-action-strategy': 'sourceWindow',
+\   },
+\   'floatingLeftside': {
+\     'position': 'floating',
+\     'floating-position': 'center',
+\     'floating-width': 50,
+\     'open-action-strategy': 'sourceWindow',
+\   },
+\   'floatingRightside': {
+\     'position': 'floating',
+\     'floating-position': 'center',
+\     'floating-width': 50,
+\     'open-action-strategy': 'sourceWindow',
+\   },
+\   'simplify': {
+\     'file-child-template': '[selection | clip | 1] [indent][icon | 1] [filename omitCenter 1]'
+\   },
+\   'buffer': {
+\     'sources': [{'name': 'buffer', 'expand': v:true}]
+\   },
+\ }
+" Use preset argument to open it
+nmap <leader><A-1> :CocCommand explorer --preset floating<CR>
+nmap <A-1> :CocCommand explorer<CR>
+
+" List all presets
+nmap <space>el :CocList explPresets
+"e}}}

@@ -6,6 +6,9 @@ if (empty($TMUX))
         set termguicolors
     endif
 endif
+" Indent line
+let g:indentLine_color_gui = '#313A42'
+let g:indentLine_char= '▏'
 " colorscheme nord
 let g:airline_theme='nord'
 " let g:nord_cursor_line_number_background = 1
@@ -14,8 +17,8 @@ let g:nord_bold_vertical_split_line = 1
 let g:nord_uniform_diff_background = 1
 " let g:nord_bold = 1
 let g:nord_italic = 1
-let g:nord_italic_comments = 1
 let g:nord_underline = 1
+let g:nord_italic_comments = 1
 " One dark
 let g:onedark_terminal_italics = 1
 if (has("autocmd") && !has("gui_running"))
@@ -27,15 +30,8 @@ if (has("autocmd") && !has("gui_running"))
     augroup END
 endif
 colorscheme onedark
-" Override highlight
-highlight TermCursor guifg=white guibg=black
-highlight CursorLine guibg=#303643
-highlight CursorColumn guibg=#424755
-highlight! link CocHighlightText CursorColumn
-highlight Visual guibg=#5F6972
-highlight MatchParen guibg=DarkYellow guifg=black "ctermbg=blue ctermfg=white
-highlight Cursor ctermbg=yellow guifg=black guibg=yellow
 " Custom highlight for :match
+highligh NordMain guifg=#88c0d0
 highlight Myw term=bold guifg=white
 highlight Mywb term=bold guibg=white
 highlight Myg term=bold guifg=green
@@ -43,13 +39,22 @@ highlight Myb term=bold guifg=blue
 highlight Myy term=bold guifg=yellow
 highlight Myr term=bold guifg=red
 highlight Mym term=bold guifg=magenta
+" Override highlight
+highlight! link Cursor NordMain 
+highlight TermCursor guifg=white guibg=black
+highlight CursorLine guibg=#303643
+highlight CursorColumn guibg=#424755
+highlight! link CocHighlightText CursorColumn
+highlight Visual guibg=#5F6972
+highlight MatchParen guibg=DarkYellow guifg=black "ctermbg=blue ctermfg=white
+highlight Cursor ctermbg=yellow guifg=black guibg=yellow
 " Airline
 
 " let spc = ' '
 if !exists('g:GuiLoaded')
-    set guifont=更纱黑体\ Mono\ SC\ Nerd:h12
+    set guifont=更纱黑体\ Mono\ SC\ Nerd:h13
 endif
-" set guifont=JetBrainsMono\ Nerd\ Font\ Mono:h12
+" set guifont=JetBrainsMono\ Nerd\ Font\ Mono:h13
 " let g:airline_section_c = '%<%F%m %#__accent_red#%{airline#util#wrap(airline#parts#readonly(),0)}%#__restore__#'
 " Add (Neo)Vim's native statusline support.
 " NOTE: Please see `:h coc-status` for integrations with external plugins that
@@ -57,21 +62,21 @@ endif
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 let g:airline_section_c = airline#section#create(['%f  ' , '%{get(b:,''coc_current_function'','''')}'])
 let g:airline_powerline_fonts = 1
-let g:airline_extensions = ['coc', 'tabline', 'wordcount', 'virtualenv', 'branch', 'tagbar']
+let g:airline_extensions = ['coc', 'tabline', 'wordcount', 'virtualenv', 'branch', 'fzf']
 let g:airline#extensions#branch#enabled = 1
 let g:airline_highlighting_cache = 1
 let airline#extensions#coc#stl_format_err = '%E{[%e(#%fe)]}'
 let airline#extensions#coc#stl_format_warn = '%W{[%w(#%fw)]}'
 let g:airline#extensions#wordcount#filetypes = ['all']
-let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 1
+let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_tab_nr = 1
 let g:airline#extensions#tabline#switch_buffers_and_tabs = 1
 let g:airline#extensions#tabline#exclude_preview = 1
 let g:airline#extensions#tabline#tabnr_formatter = 'tabnr'
 let g:airline#extensions#tabline#formatter = 'jsformatter'
-let g:airline#extensions#tabline#tabs_label = ''
-let g:airline#extensions#tabline#buffers_label = '﬘'
+let g:airline#extensions#tabline#tabs_label = ' '
+let g:airline#extensions#tabline#buffers_label = ' '
 let g:airline#extensions#tabline#buffer_idx_mode = 1
 nmap <leader>1 <Plug>AirlineSelectTab1
 nmap <leader>2 <Plug>AirlineSelectTab2
@@ -104,7 +109,6 @@ function! StatusDiagnostic() abort
     return join(msgs, ' ')
 endfunction
 let g:airline_section_warning = airline#section#create_right(['%{StatusDiagnostic()}'])
-" let g:airline_section_warning = airline#section#create_right(['%{coc#status()}'])
 if !exists('g:airline_symbols')
     let g:airline_symbols = {}
 endif

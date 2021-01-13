@@ -1,8 +1,13 @@
 {
     "cSpell.enabled": false,
     "codeLens.enable": true,
+    "coc.preferences.colorSupport": true,
     "coc.preferences.extensionUpdateCheck": "daily",
     "coc.preferences.formatOnType": true,
+    "highlight.document.enable": true,
+    "highlight.colors.enable": true,
+    "highlight.colorNames.enable": true,
+    "highlight.disableLanguages": [],
     "coc.preferences.formatOnSaveFiletypes": [
         "python",
         "markdown",
