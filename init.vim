@@ -2,7 +2,7 @@ let $configPath = expand(stdpath('config'))
 
 " Plug-ins list {{{
 let &runtimepath = &runtimepath . "," . expand('$configPath/dein/dein.vim')
-if has('win32')
+if has('unix')
 "     if !isdirectory(expand('$configPath/dein'))
 "         execute "autocmd VimEnter * !git clone https://github.com/Shougo/dein.vim " . expand('$configPath/dein/dein.vim')
 "         execute "autocmd VimEnter * !echo Require restarting Neovim"
@@ -80,6 +80,8 @@ if has('win32')
 
     Plug 'lambdalisue/gina.vim'
     Plug 'othree/eregex.vim'
+    Plug 'coot/CRDispatcher'
+    Plug 'coot/EnchantedVim'
     Plug 'liuchengxu/vista.vim'
     " Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     " Plug 'junegunn/fzf.vim'
@@ -372,12 +374,20 @@ runtime! utility/*.vim
 execute "luafile " . expand("$configPath/lua/plug-colorizer.lua")
 " Eregx
 nnoremap <leader>/ :call eregex#toggle()<CR>
+" Enchanted Vim
+let g:VeryMagic = 0
+" let g:VeryMagicSubstitute = 1  " (default is 0)
+" let g:VeryMagicGlobal = 1  " (default is 0)
+" let g:VeryMagicVimGrep = 1  " (default is 0)
+" let g:VeryMagicSearchArg = 1  " (default is 0, :edit +/{pattern}))
+" let g:VeryMagicFunction = 1  " (default is 0, :fun /{pattern})
+" let g:VeryMagicHelpgrep = 1  " (default is 0)
+" let g:VeryMagicRange = 1  " (default is 0, search patterns in command ranges)
+" let g:VeryMagicEscapeBackslashesInSearchArg = 1  " (default is 0, :edit +/{pattern}))
+" let g:SortEditArgs = 1  " (default is 0, see below)
 " Search visual selected
 xnoremap * :<C-u>execute "/" . VisualSelection()<CR>
 xnoremap # :<C-u>execute "?" . VisualSelection()<CR>
-" LeaderF :
-nnoremap <C-f> :Leaderf
-
 " Matchup {{{
 " let g:matchup_matchparen_deferred = 1
 " let g:matchup_matchparen_hi_surround_always = 1
