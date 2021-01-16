@@ -1,4 +1,3 @@
-_vimrc.*
 /vim*
 /.vim/
 *~
@@ -6,3 +5,5 @@ _vimrc.*
 *.py
 /.idea/
 /dein/
+.netrwhist
+

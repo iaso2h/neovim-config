@@ -1,4 +1,3 @@
-    
 function! s:isCurrentLineEmpty()
     return !len(getline('.'))
 endfunction

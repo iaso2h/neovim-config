@@ -4,10 +4,6 @@
     "coc.preferences.colorSupport": true,
     "coc.preferences.extensionUpdateCheck": "daily",
     "coc.preferences.formatOnType": true,
-    "highlight.document.enable": true,
-    "highlight.colors.enable": true,
-    "highlight.colorNames.enable": true,
-    "highlight.disableLanguages": [],
     "coc.preferences.formatOnSaveFiletypes": [
         "python",
         "markdown",
@@ -31,6 +27,15 @@
     "signature.target": "echo",
     "suggest.timeout": 5000,
     "suggest.asciiCharactersOnly": true,
+    "suggest.enablePreview": true,
+    "suggest.enablePreselect": true,
+    "vimlsp.trace.server": "verbose",
+    "vimlsp.indexes.projectRootPatterns": [
+        ".git",
+        ".vim",
+        "autoload",
+        "plugin"
+    ],
     "python.formatting.provider": "black",
     "python.formatting.blackPath": "/home/iaso2h/.local/bin/black"
 }

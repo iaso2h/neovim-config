@@ -6,14 +6,15 @@ if (empty($TMUX))
         set termguicolors
     endif
 endif
+
 " Indent line
 let g:indentLine_color_gui = '#313A42'
 let g:indentLine_char= '▏'
-" colorscheme nord
+colorscheme nord
 let g:airline_theme='nord'
 " let g:nord_cursor_line_number_background = 1
 let g:nord_uniform_status_lines = 1
-let g:nord_bold_vertical_split_line = 1
+let g:nord_bold_vertical_split_line = 0
 let g:nord_uniform_diff_background = 1
 " let g:nord_bold = 1
 let g:nord_italic = 1
@@ -40,14 +41,19 @@ highlight Myy term=bold guifg=yellow
 highlight Myr term=bold guifg=red
 highlight Mym term=bold guifg=magenta
 " Override highlight
-highlight! link Cursor NordMain 
-highlight TermCursor guifg=white guibg=black
 highlight CursorLine guibg=#303643
 highlight CursorColumn guibg=#424755
 highlight! link CocHighlightText CursorColumn
 highlight Visual guibg=#5F6972
-highlight MatchParen guibg=DarkYellow guifg=black "ctermbg=blue ctermfg=white
-highlight Cursor ctermbg=yellow guifg=black guibg=yellow
+highlight MatchParen guibg=#F04C04 guifg=black
+highlight MatchWord guifg=DarkTurquoise gui=italic
+" highlight MatchParen guibg=black guifg=white
+" highlight MatchWord gui=underline,italic
+highlight MatchBackground guibg=#21252B
+highlight! OffscreenPopup guibg=#21252B guifg=DarkTurquoise gui=italic,underline
+highlight TermCursor guifg=black guibg=yellow
+highlight Cursor guifg=black guibg=white
+set guicursor=n-v:block-NordMain,c-i-ci-ve:ver25,r-cr:hor25,o:hor50,a:blinkwait300-blinkoff150-blinkon200-Cursor,sm:block-blinkwait175-blinkoff150-blinkon175
 " Airline
 
 " let spc = ' '
@@ -147,7 +153,7 @@ let g:airline_symbols.dirty='⚡'
 " Rainbow
 let g:rainbow_active = 1
 let g:rainbow_conf = {
-            \ 'guifgs': ['Gold', 'DarkOrchid3', 'RoyalBlue3'],
+            \ 'guifgs': ['Gold', 'DarkOrchid3', 'RoyalBlue2'],
             \ 'ctermfgs': ['yellow', 'magenta', 'lightblue'],
             \}
 " } Theme

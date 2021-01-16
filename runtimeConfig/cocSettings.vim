@@ -2,7 +2,10 @@ if !get(g:, 'coc_start_at_startup', 1)
     finish
 endif
 
+" Extensions {{{
 let g:coc_global_extensions = [
+            \'coc-clangd',
+            \'coc-cmake',
             \'coc-json',
             \'coc-explorer',
             \'coc-markdownlint',
@@ -14,7 +17,35 @@ let g:coc_global_extensions = [
             \'coc-spell-checker',
             \'coc-vimlsp',
             \]
-            " \'coc-highlight',
+            " \'coc-highlight'
+" }}}
+
+" AutoCommad {{{
+augroup mygroup
+    autocmd!
+    " Setup formatexpr specified filetype(s).
+    autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+    " Update signature help on jump placeholder.
+    autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
+" }}}
+
+" Commands{{{
+" Add `:Format` command to format current buffer.
+command! -nargs=0 Format :call CocAction('format')
+" Add `:OR` command for organize imports of the current buffer.
+command! -nargs=0 OR   :call CocActio('runCommand', 'editor.action.organizeImport')
+" Toggle Coc Spell-checker
+command! -nargs=0 Spell   :CocCommand cSpell.toggleEnableSpellChecker
+" }}}
+
+" Document highlight
+let g:markdown_fenced_languages = [
+      \ 'vim',
+      \ 'help'
+      \]
 " Snippet
 let g:coc_snippet_next= "<tab>"
 " Completion navigation
@@ -44,8 +75,9 @@ nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gR <Plug>(coc-references)
 " Show Document
 nnoremap <silent> K :call <SID>show_documentation()<CR>
+nnoremap <silent> <C-q> :call <SID>show_documentation()<CR>
 function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
+  if (index(['help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
   elseif (coc#rpc#ready())
     call CocActionAsync('doHover')
@@ -53,8 +85,6 @@ function! s:show_documentation()
     execute '!' . &keywordprg . " " . expand('<cword>')
   endif
 endfunction
-" Highlight the symbol and its references when holding the cursor.
-autocmd CursorHold * silent call CocActionAsync('highlight')
 " Symbol renaming.
 nmap <leader>r <Plug>(coc-rename)
 nmap <leader>R <Plug>(coc-refactor)
@@ -62,13 +92,6 @@ nmap <leader>R <Plug>(coc-refactor)
 xmap <A-f> <Plug>(coc-format-selected)
 nmap <A-f> <Plug>(coc-format-selected)
 
-augroup mygroup
-    autocmd!
-    " Setup formatexpr specified filetype(s).
-    autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-    " Update signature help on jump placeholder.
-    autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-augroup end
 
 " Applying codeAction to the selected [[region]].
 " Example: `<leader>aap` for current paragraph
@@ -157,3 +180,4 @@ nmap <A-1> :CocCommand explorer<CR>
 " List all presets
 nmap <space>el :CocList explPresets
 "e}}}
+
