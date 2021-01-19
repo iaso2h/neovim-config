@@ -100,7 +100,7 @@ set cursorline
 set cmdheight=2 "Give more space for displaying messages
 set expandtab " Soft tab
 set gdefault
-set guicursor=n-v:block-NordMain,c-i-ci-ve:ver25,r-cr-o:hor25,a:blinkwait300-blinkoff150-blinkon200-NordMain,sm:block-blinkwait175-blinkoff150-blinkon175
+" set guicursor=n-v:block-NordMain,c-i-ci-ve:ver25,r-cr-o:hor25,a:blinkwait300-blinkoff150-blinkon200-NordMain,sm:block-blinkwait175-blinkoff150-blinkon175
 set hidden
 set ignorecase " ignorecase for / and ?, work with smartcase
 set inccommand=nosplit " live substitution
@@ -371,7 +371,7 @@ imap <right> <nop>
 runtime! runtimeConfig/*.vim
 runtime! utility/*.vim
 
-execute "luafile " . expand("$configPath/lua/plug-colorizer.lua")
+" execute "luafile " . expand("$configPath/lua/plug-colorizer.lua")
 " Eregx
 nnoremap <leader>/ :call eregex#toggle()<CR>
 " Enchanted Vim
