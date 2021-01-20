@@ -9,7 +9,7 @@ function! MultiBufInWin()
     endif
 endfunction
 
-function! VisualSelection()
+function! VisualSelection(returnType)
     if mode()=="v"
         let [line_start, column_start] = getpos("v")[1:2]
         let [line_end, column_end] = getpos(".")[1:2]
@@ -38,7 +38,10 @@ function! VisualSelection()
         let lines[-1] = lines[-1][: column_end - 1]
         let lines[ 0] = lines[ 0][column_start - 1:]
     endif
-
-    " return lines  "use this return if you want an array of text lines
-    return join(lines, "\n") "use this return instead if you need a text block
+    
+    if a:returnType ==# "list"
+        return lines
+    elseif a:returnType ==# "string"
+        return join(lines, "\n")
+    endif
 endfunction

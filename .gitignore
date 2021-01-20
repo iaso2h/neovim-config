@@ -1,7 +1,6 @@
 /vim*
 /.vim/
 *~
-/plugged/
 *.py
 /.idea/
 /dein/

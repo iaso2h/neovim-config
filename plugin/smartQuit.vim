@@ -9,19 +9,19 @@ function! s:SpanWin()
 endfunction
 
 function! s:SaveQuit()
-    let l:answer = confirm("Save modification?", ">>> &Yes\n&No", 1, "Question")
+    let l:answer = confirm("Save modification?", ">>> &Yes\n&No\n&Cancel", 1, "Question")
     if l:answer == 1
         execute "wq" 
-    else 
-        execute "q" 
+    elseif l:answer == 2  
+        execute "q!" 
     endif
 endfunction
 
 function! s:SaveUnload()
-    let l:answer = confirm("Save modification?", ">>> &Yes\n&No", 1, "Question")
+    let l:answer = confirm("Save modification?", ">>> &Yes\n&No\n&Cancel", 1, "Question")
     if l:answer == 1 
         execute "w | bd" 
-    else 
+    elseif l:answer == 2 
         execute "bd!" 
     endif
 endfunction
