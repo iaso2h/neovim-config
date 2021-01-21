@@ -1,0 +1,30 @@
+set relativenumber
+set timeoutlen=500
+set hls
+set si
+set shiftwidth=4
+set clipboard=unnamed
+set lazyredraw " Make Macro faster
+set gdefaul
+" --------------------- Key Binding ---------------------------
+" first thing first
+let mapleader = '\<Space>'
+vnoremp <Space> <NOP>
+noremap ge <NOP>
+
+imap jj <Esc>
+
+" Putting from register 0
+nmap gp "0p
+nmap gP "0P
+
+nmap <leader>h :nohls<CR>
+
+" Yankfrom above and below
+nnoremap yk kyyp
+nnoremap yj jyyP
+
+" Add space before and after
+" nmap <Leader>h i<Space><Esc>l
+nmap <Leader>l a<Space><Esc>h
+nmap <Leader>i i<Space><Esc>i
