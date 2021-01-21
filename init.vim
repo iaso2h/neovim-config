@@ -203,8 +203,11 @@ augroup _fileType
     autocmd FileType vim setlocal foldmethod=marker
     autocmd FileType vim xnoremap <buffer> <A-f> =
     autocmd FileType vim nmap <buffer> <A-f> <C-m>zvae=`z
+<<<<<<< HEAD
     autocmd FileType vim nmap <buffer> <silent> <A-S-q> :execute 'h ' . expand('<cword>')<cr>
     autocmd FileType vim xmap <silent> <A-S-q> :<c-u>execute 'h ' . VisualSelection("string")<cr>
+=======
+>>>>>>> a3b35b323e6e2f680dd1507fd654fb3278a65ddd
     " autocmd FileType vim setlocal foldlevelstart=1
     " Quickfix window
     autocmd FileType qf setlocal number norelativenumber
@@ -267,6 +270,7 @@ command! -nargs=0 MyVimsrc source $MYVIMRC
 
 " Key mapping {{{
 let mapleader = "\<Space>" " First thing first
+<<<<<<< HEAD
 " Paragraph & Block navigation
 noremap { {j
 noremap } }k
@@ -278,13 +282,24 @@ noremap <A-[> ][
 noremap H ^
 noremap L $
 " Force enter a linebreak for LSP popup
+=======
+" Force enter a linebreak for LSP
+>>>>>>> a3b35b323e6e2f680dd1507fd654fb3278a65ddd
 imap <C-cr> <esc>o
 " Regex very magic
 noremap / /\v
 noremap ? ?\v
+<<<<<<< HEAD
 " Trailing symbol
 nmap <silent> g; :call TrailingSemicolon()<cr>
 nmap <silent> g<cr> :call TrailingLinebreak()<cr>
+=======
+" Vim query under cursor
+nmap <silent> <A-q> :execute 'h ' . expand('<cword>')<cr>
+xmap <silent> <A-q> :<c-u>execute 'h ' . VisualSelection("string")<cr>
+" Trailing semicolon
+nmap <silent> g; <Plug>trailingSemicolon
+>>>>>>> a3b35b323e6e2f680dd1507fd654fb3278a65ddd
 " Messages
 nnoremap <silent> <A-`> :messages clear<cr>:call EmptyMessage()<cr>
 nnoremap <silent> <C-`> :messages<cr>
@@ -319,7 +334,11 @@ tnoremap <A-e> <pageup>
 noremap <A-d> <pagedown>
 tnoremap <A-d> <pagedown>
 " Macro
+<<<<<<< HEAD
 nnoremap <C-q> q
+=======
+nnoremap gq q
+>>>>>>> a3b35b323e6e2f680dd1507fd654fb3278a65ddd
 " Buffer & Window {{{
 " Smart quit
 map q <Plug>smartQuit

@@ -74,7 +74,11 @@ nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gR <Plug>(coc-references)
 " Show Document
 nnoremap <silent> K :call <SID>show_documentation()<CR>
+<<<<<<< HEAD
 nnoremap <silent> <A-q> :call <SID>show_documentation()<CR>
+=======
+nnoremap <silent> <C-q> :call <SID>show_documentation()<CR>
+>>>>>>> a3b35b323e6e2f680dd1507fd654fb3278a65ddd
 function! s:show_documentation()
     if (index(['help'], &filetype) >= 0)
         execute 'h '.expand('<cword>')

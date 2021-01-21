@@ -1,0 +1,124 @@
+" set relativenumber
+set timeoutlen=500
+set hls
+set si
+set shiftwidth=4
+set inccommand=nosplit " live substitution
+set clipboard=unnamed
+set lazyredraw " Make Macro faster
+set incsearch
+set gdefault
+let mapleader = '\<SPACE>'
+
+" -----------IdeaVim featured-plugin
+set easymotion
+set surround
+set commentary
+set ReplaceWithRegister
+set argtextobj
+set textobj-entire
+set multiple-cursors
+set easymotion
+set ideajoin
+let g:EasyMotion_override_acejump = 0
+let g:EasyMotion_do_mapping = 0
+
+" -----------Built-in function remapping
+" Visual block mode
+nmap <A-v> <C-v>
+
+" Quit insert mode
+imap jj <Esc>
+
+" Pageup & Pagedown
+map <A-d> <C-f>
+map <A-e> <C-b>
+
+" Toggle Highlight
+nmap <leader>h :nohls<CR>
+
+" ----------Enhanced mapping
+" Join without space
+nmap gj Jx
+
+" Yankfrom above and below
+nmap yk kyyp
+nmap yj jyyP
+
+" Paste register0
+nmap gp "0p
+nmap gP "0P
+
+" Convert \ to /
+nnoremap g/ '<,'>:s/\\/\//<CR>
+
+" Mimicking VS Code copy line upward
+nemap  <A-S-k> mz"*yygp`z
+vmap <A-S-k> ymzO<Esc>[Pmx`zkddkV`x
+
+" Quick separating line
+nmap gs jO<Esc>65a-<Esc>gccj
+
+" -----------PyCharm IDE action------------
+" Move line up/down
+map <A-k> :action MoveLineUp<CR>
+map <A-j> :action MoveLineDown<CR>
+
+" Region Expand
+map L :action EditorSelectWord<CR>
+map H :action EditorUnSelectWord<CR>
+
+" View/Editor tab
+map <C-w>o :action CloseAllEditorsButActive<CR>
+map <C-w>q :action CloseContent<CR>
+map <C-w>c :action CloseContent<CR>
+map <C-w>a :action CloseAllEditors<CR>
+map <C-l> :action NextTab<CR>
+map <C-h> :action PreviousTab<CR>
+
+" View recent locations
+map <leader>o :action RecentLocations<CR>
+
+" Clone caret
+nmap <C-A-j> :action EditorCloneCaretBelow<CR>
+nmap <C-A-k> :action EditorCloneCaretAbove<CR>
+
+" Move"
+nmap <C-S-A-j> :action MoveStatementDown<CR>
+nmap <C-S-A-k> :action MoveStatementUp<CR>
+
+" go to block end
+nmap gB :action EditorCodeBlockStart<CR>
+nmap gb :action EditorCodeBlockEnd<CR>
+
+" Selection code block
+nmap vai :action EditorCodeBlockStart<CR>mz:action EditorCodeBlockEnd<CR>:action EditorCodeBlockStartWithSelection<CR>v`z
+nmap vii :action EditorCodeBlockStart<CR>mz:action EditorCodeBlockEnd<CR>:action EditorCodeBlockStartWithSelection<CR>v`zj
+" BUG in vii
+
+" Usages
+nmap gU :action FindUsages<CR>
+nmap gu :action ShowUsages<CR>
+nmap <leader>u :action HighlightUsagesInFile<CR>
+nmap <leader>n :action GotoNextElementUnderCaretUsage<CR>
+nmap <leader>N :action GotoPrevElementUnderCaretUsage<CR>
+
+" Definition
+nmap <leader>d :action QuickImplementations<CR>
+nmap gD :action GotoImplementation<CR>
+
+" Easymotion
+nmap <leader>j <Plug>(easymotion-s)
+nmap <leader>J <Plug>(acejump-linemarks)
+
+" Error
+nmap gh :action GotoNextError<CR>
+nmap gH :action GotoPreviousError<CR>
+
+" Menu
+nmap <leader><leader> :action ToggleDistractionFreeMode<CR>
+nmap <leader>e :action ShowFilePath<CR>
+nmap <leader>s :action FileStructurePopup<CR>
+nmap <leader>r :action RefactoringMenu<CR>
+nmap <leader>a :action NewElement<CR>
+map ge :action EvaluateExpression<CR>
