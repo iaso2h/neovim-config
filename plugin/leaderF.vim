@@ -2,7 +2,7 @@
 " let g:Lf_DisableStl = 1 BUG
 let g:Lf_CacheDirectory          = expand('~/.nvimcache')
 let g:Lf_JumpToExistingWindow    = 0
-let g:Lf_IgnoreCurrentBufferName = 1
+let g:Lf_IgnoreCurrentBufferName = 1 " Bug
 let g:Lf_UseVersionControlTool   = 0 " Bug
 let g:Lf_FollowLinks             = 1
 let g:Lf_RootMarkers             = ['.git', '.hg', '.svn']
@@ -66,14 +66,14 @@ let g:Lf_PreviewResult             = {
 " }}} Window
 
 " Key mapping {{{
-"|leaderf-prompt|
+" Input mode
+let g:Lf_ShortcutB = ''
 let g:Lf_ShortcutF = '<C-e>'
+let g:Lf_DelimiterChar = ';'
+" nnoremap <silent> <C-e> :LeaderfFile<cr>
 nnoremap <leader>e :LeaderfFile .
 nnoremap <silent> <C-f>t :LeaderfBufTag<cr>
-let g:Lf_ShortcutB = ''
-let g:Lf_DelimiterChar = ';'
 cmap <C-c> <C-u>LeaderfCommand<cr>
-nnoremap <silent> <C-f>t :LeaderfBufTag<cr>
 nnoremap <silent> <C-f><C-t> :LeaderfBufTagAll<cr>
 nnoremap <silent> <C-f>f :LeaderfFunction<cr>
 nnoremap <silent> <C-f><C-f> :LeaderfFunctionAll<cr>
@@ -82,10 +82,15 @@ nnoremap <silent> <C-f>l :LeaderfLine<cr>
 nnoremap <silent> <C-f><C-l> :LeaderfLineAll<cr>
 nnoremap <silent> <C-f>q :LeaderfQuickFix<cr>
 nnoremap <silent> <C-f>r :LeaderfRgInteractive<cr>
+" Normal mode
 let g:Lf_CommandMap = {
             \'<C-X>': ['<C-S>'], 
+            \'<Up>': ['<C-K>'], 
+            \'<Down>': ['<C-J>'], 
             \'<C-]>': ['<C-V>'],
             \'<C-W>': ['<C-BS>'],
+            \'<C-J>': ['<C-n>'],
+            \'<C-K>': ['<C-p>'],
             \}
 let g:Lf_NormalMap = {
             \ "_":           [["<C-v>", "v"],

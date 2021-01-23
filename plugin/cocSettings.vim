@@ -48,11 +48,11 @@ let g:markdown_fenced_languages = [
 " Snippet
 let g:coc_snippet_next= "<tab>"
 " Completion navigation
-inoremap <silent><expr> <TAB>
-            \ pumvisible() ? "\<C-n>" :
-            \ <SID>check_back_space() ? "\<TAB>" :
-            \ coc#refresh()
-inoremap <silent><expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+" inoremap <silent><expr> <TAB>
+"             \ pumvisible() ? "\<C-n>" :
+"             \ <SID>check_back_space() ? "\<TAB>" :
+"             \ coc#refresh()
+" inoremap <silent><expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 function! s:check_back_space() abort
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~# '\s'
@@ -74,11 +74,8 @@ nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gR <Plug>(coc-references)
 " Show Document
 nnoremap <silent> K :call <SID>show_documentation()<CR>
-<<<<<<< HEAD
 nnoremap <silent> <A-q> :call <SID>show_documentation()<CR>
-=======
-nnoremap <silent> <C-q> :call <SID>show_documentation()<CR>
->>>>>>> a3b35b323e6e2f680dd1507fd654fb3278a65ddd
+" nnoremap <silent> <C-q> :call <SID>show_documentation()<CR>
 function! s:show_documentation()
     if (index(['help'], &filetype) >= 0)
         execute 'h '.expand('<cword>')

@@ -18,13 +18,14 @@ let g:VM_custom_remaps = {"<C-v>": "<C-r>", "s": "c"}
 let g:VM_custom_noremaps = {"==": "==", "<<": "<<", ">>": ">>"}
 function! VM_Start()
     imap <C-BS> <C-\><C-o>db
-    nmap q ,q
+    nmap S ys
+    " nmap q ,q
     nmap <leader>h <esc>
     
 endfunction
 
 function! VM_Exit()
-    map q <Plug>smartQuit
+    " map q <Plug>smartQuit
     nmap <silent> <leader>h :noh<cr>
 endfunction
 
@@ -35,7 +36,6 @@ augroup VmStartMapping
 augroup END
 
 let g:VM_maps = {}
-let g:VM_default_mappings = 0
 let g:VM_mouse_mappings = 1
 let g:VM_maps['Reselect Last']  = 'gm'
 let g:VM_maps['Find Under']      = '<C-d>'
@@ -43,7 +43,7 @@ let g:VM_maps['Visual Add']      = '<C-d>'
 let g:VM_maps["Select Cursor Down"] = ',j'
 let g:VM_maps["Select Cursor Up"]   = ',k'
 let g:VM_maps['Skip Region']     = '<C-k>'
-let g:VM_maps['Remove Region'] = ',q'
+let g:VM_maps['Remove Region'] = 'u'
 let g:VM_maps['Select All']      = ',<C-d>'
 let g:VM_maps['Visual All']      = ',<C-d>'
 

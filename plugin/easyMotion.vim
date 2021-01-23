@@ -11,6 +11,6 @@ augroup easyMotionGroup
     autocmd User EasyMotionPromptEnd   silent! CocEnable
 augroup END
 map <A-8> <Plug>(easymotion-prefix)
-map <leader>j <Plug>(easymotion-s)
-map <leader>J <Plug>(easymotion-sol-bd-jk)
+map <leader>f <Plug>(easymotion-s)
+map <leader>F <Plug>(easymotion-sol-bd-jk)
 " }}} easymotion/vim-easymotion

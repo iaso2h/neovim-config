@@ -35,13 +35,16 @@ function! s:ExtractSelection(modeType)
             let l:filePath = l:cwd . "/" . l:answer
         endif
         " Find folder
-        let l:folder = strcharpart(l:filePath, 0, l:slashPos + strlen(l:cwd) + 1)
-        call mkdir(l:folder, "p")
+        let l:absFolder = strcharpart(l:filePath, 0, l:slashPos + strlen(l:cwd) + 1)
+        call mkdir(l:absFolder, "p")
         try
             call writefile(l:selectedText, l:filePath, "s")
             echo " "
             echom "File created: " . l:filePath
-            return
+            " Delete selection code
+            let l:saveReg = @@
+            execute "normal! gvd"
+            let @@ = l:saveReg
         catch /.*/
             echo v:exception
             echo " "
@@ -51,19 +54,19 @@ function! s:ExtractSelection(modeType)
     else
         let l:selectedText = VisualSelection("list")
         try
-            call writefile(l:selectedText, l:answer, "s")
+        call writefile(l:selectedText, l:answer, "s")
             echo " "
             echom "File created: " . l:answer
-            return
+            " Delete selection code
+            let l:saveReg = @@
+            execute "normal! gvd"
+            let @@ = l:saveReg
         catch /.*/
             echo v:exception
             echo " "
             echom "Extraction failed"
         endtry
     endif
-    let l:saveReg = @@
-    execute "normal! gvd"
-    let @@ = l:saveReg
 endfunction
 
 command -range -nargs=0 ExtractSelection call <SID>ExtractSelection(visualmode())

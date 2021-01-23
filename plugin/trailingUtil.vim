@@ -1,16 +1,20 @@
 " Add trailing ;
-function! TrailingSemicolon()
-    execute "keepjumps normal! mzg_"
+function! TrailingChar(trailingChar)
+    let l:cursor = getpos('.')
+    execute "keepjumps normal g_"
     let l:currentChar = strcharpart(getline("."), col(".") - 1, 1)
-    if l:currentChar !=# ';'
-        execute "normal! a;"
+    execute "normal! a" . a:trailingChar
+    if l:currentChar !=# a:trailingChar
     endif
-    execute "keepjumps normal! `z<CR>"
+    call cursor(l:cursor[1], l:cursor[2])
 endfunction
 
-function! TrailingLinebreak()
+function! TrailingLinebreak(direction)
     let l:cursor = getpos('.')
-    execute "normal A\<cr>"
-    call cursor(l:cursor[1], l:cursor[2])
+    if a:direction ==# "down"
+        execute "normal A\<cr>"
+        call cursor(l:cursor[1], l:cursor[2])
+    elseif a:direction ==# "up"
+    endif
 endfunction
 

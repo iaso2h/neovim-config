@@ -1,9 +1,15 @@
 function! s:SpanWin()
     if MultiBufInWin()
         if &filetype ==# "" || &filetype ==# "help"
-            execute "normal \<C-w>v"
-            execute "bp"
-            execute "normal \<C-w>H"
+            if winwidth(0) <= 128 
+                wincmd s
+                execute "bp"
+                wincmd K
+            else
+                wincmd v
+                execute "bp"
+                wincmd H
+            endif
         endif
     endif
 endfunction
@@ -14,6 +20,7 @@ function! s:SaveQuit()
         execute "wq" 
     elseif l:answer == 2  
         execute "q!" 
+    else
     endif
 endfunction
 
@@ -23,6 +30,7 @@ function! s:SaveUnload()
         execute "w | bd" 
     elseif l:answer == 2 
         execute "bd!" 
+    else
     endif
 endfunction
 
@@ -53,7 +61,7 @@ function! s:SmartQuit()
             endif
         endif
     " Empty files
-    elseif &filetype == "" && s:curBufName == ""
+    elseif &filetype == ""
         " 1 Window
         if l:winNum == 1
             " 2+ Buffers in 1 window
