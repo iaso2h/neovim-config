@@ -1000,3 +1000,10 @@ call s:hi("Lf_hl_matchRefine", s:nord13_gui, "", s:nord13_term, "", "", "")
 
 " " the color of matching character in nameOnly mode when ';' is typed
 " highlight def Lf_hl_matchRefine gui=bold guifg=Magenta cterm=bold ctermfg=201
+
+" Sandwich {{{
+highlight link OperatorSandwichBuns Search
+highlight link OperatorSandwichChange Search
+highlight link OperatorSandwichDelete Search
+highlight link OperatorSandwichAddrcc Search
+" }}} Sandwich

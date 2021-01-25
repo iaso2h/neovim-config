@@ -43,7 +43,7 @@ function! s:ExtractSelection(modeType)
             echom "File created: " . l:filePath
             " Delete selection code
             let l:saveReg = @@
-            execute "normal! gvd"
+            normal! gvd
             let @@ = l:saveReg
         catch /.*/
             echo v:exception
@@ -59,7 +59,7 @@ function! s:ExtractSelection(modeType)
             echom "File created: " . l:answer
             " Delete selection code
             let l:saveReg = @@
-            execute "normal! gvd"
+            normal! gvd
             let @@ = l:saveReg
         catch /.*/
             echo v:exception

@@ -73,22 +73,27 @@ let g:Lf_DelimiterChar = ';'
 " nnoremap <silent> <C-e> :LeaderfFile<cr>
 nnoremap <leader>e :LeaderfFile .
 nnoremap <silent> <C-f>t :LeaderfBufTag<cr>
-cmap <C-c> <C-u>LeaderfCommand<cr>
+nnoremap <silent> <C-f>c :LeaderfCommand<cr>
 nnoremap <silent> <C-f><C-t> :LeaderfBufTagAll<cr>
 nnoremap <silent> <C-f>f :LeaderfFunction<cr>
 nnoremap <silent> <C-f><C-f> :LeaderfFunctionAll<cr>
-cmap <C-h> <C-u>LeaderfHelp<cr>
+nnoremap <silent> <C-f>h :LeaderfHelp<cr>
 nnoremap <silent> <C-f>l :LeaderfLine<cr>
 nnoremap <silent> <C-f><C-l> :LeaderfLineAll<cr>
 nnoremap <silent> <C-f>q :LeaderfQuickFix<cr>
 nnoremap <silent> <C-f>r :LeaderfRgInteractive<cr>
 " Normal mode
 let g:Lf_CommandMap = {
-            \'<C-X>': ['<C-S>'], 
-            \'<Up>': ['<C-K>'], 
-            \'<Down>': ['<C-J>'], 
-            \'<C-]>': ['<C-V>'],
+            \'<C-X>': ['<C-s>'], 
+            \'<Up>': ['<C-k>'], 
+            \'<Down>': ['<C-j>'], 
+            \'<Right>': ['<C-l>'], 
+            \'<Left>': ['<C-h>'], 
+            \'<Home>': ['<C-a>'], 
+            \'<End>': ['<C-e>'], 
             \'<C-W>': ['<C-BS>'],
+            \'<Del>': ['<C-d>'],
+            \'<C-]>': ['<C-v>'],
             \'<C-J>': ['<C-n>'],
             \'<C-K>': ['<C-p>'],
             \}

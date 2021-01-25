@@ -1,4 +1,3 @@
-" neoclide/coc.nvim {{{
 if !get(g:, 'coc_start_at_startup', 1)
     finish
 endif
@@ -74,7 +73,7 @@ nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gR <Plug>(coc-references)
 " Show Document
 nnoremap <silent> K :call <SID>show_documentation()<CR>
-nnoremap <silent> <A-q> :call <SID>show_documentation()<CR>
+nnoremap <silent> <C-q> :call <SID>show_documentation()<CR>
 " nnoremap <silent> <C-q> :call <SID>show_documentation()<CR>
 function! s:show_documentation()
     if (index(['help'], &filetype) >= 0)
@@ -92,7 +91,7 @@ nmap <leader>R <Plug>(coc-refactor)
 " Formatting selected code.
 xnoremap <A-f> <Plug>(coc-format-selected)
 nnoremap <A-f> <Plug>(coc-format-selected)
-" nmap <A-f> <C-m>zvae<Plug>(coc-format-selected)`z
+" nmap <A-f> <A-m>zvae<Plug>(coc-format-selected)`z
 " Applying codeAction to the selected [[region]].
 " Example: `<leader>aap` for current paragraph
 xmap <leader>a <Plug>(coc-codeaction-selected)
@@ -176,8 +175,8 @@ let g:coc_explorer_global_presets = {
 " Use preset argument to open it
 nmap <leader><A-1> :CocCommand explorer --preset floating<CR>
 nmap <A-1> :CocCommand explorer<CR>
-
 " List all presets
 nmap <space>el :CocList explPresets
 " }}} coc.explorer
-" }}} neoclide/coc.nvim
+
+

@@ -2,6 +2,8 @@ let $configPath = expand(stdpath('config'))
 let g:NERDCreateDefaultMappings = 0
 let g:expand_region_use_defaults = 0
 let g:VM_default_mappings = 0
+let g:sandwich_no_default_key_mappings = 1
+
 " Plug-ins list {{{
 let &runtimepath = &runtimepath . "," . expand('$configPath/dein/dein.vim')
 if 1
@@ -36,8 +38,10 @@ if 1
     " call dein#add('xolox/vim-misc')
     " call dein#add('szw/vim-maximizer')
     " call dein#add('tpope/vim-repeat')
+    " call dein#add('vim-scripts/pp.vim')
     "         call dein#add('easymotion/vim-easymotion')
-    "         call dein#add('tpope/vim-surround')
+    "         call dein#add('machakann/vim-sandwich')
+    "         call dein#add('tommcdo/vim-exchange')
     "         call dein#add('mg979/vim-visual-multi')
     "         call dein#add('junegunn/vim-easy-align')
     "         call dein#add('AndrewRadev/splitjoin.vim')
@@ -84,8 +88,10 @@ if 1
     Plug 'xolox/vim-misc'
     Plug 'szw/vim-maximizer'
     Plug 'tpope/vim-repeat'
+    Plug 'vim-scripts/pp.vim'
     Plug 'easymotion/vim-easymotion'
-    Plug 'tpope/vim-surround'
+    Plug 'machakann/vim-sandwich'
+    Plug 'tommcdo/vim-exchange'
     Plug 'mg979/vim-visual-multi'
     Plug 'junegunn/vim-easy-align'
     Plug 'AndrewRadev/splitjoin.vim'
@@ -206,19 +212,18 @@ augroup _fileType
     " Vim
     autocmd FileType vim setlocal foldmethod=marker
     autocmd FileType vim vnoremap <buffer> <A-f> =
-    autocmd FileType vim nmap <buffer> <A-f> <C-m>zvae=`z
-    autocmd FileType vim nmap <buffer> <silent> <A-S-q> :execute 'h ' . expand('<cword>')<cr>
-    autocmd FileType vim vmap <silent> <A-S-q> :<c-u>execute 'h ' . VisualSelection("string")<cr>
+    autocmd FileType vim nmap <buffer> <A-f> <A-m>zvae=`z
+    autocmd FileType vim nmap <buffer> <silent> <C-S-q> :execute 'h ' . expand('<cword>')<cr>
+    autocmd FileType vim vmap <silent> <C-S-q> :<c-u>execute 'h ' . VisualSelection("string")<cr>
     " autocmd FileType vim setlocal foldlevelstart=1
     " Quickfix window
     autocmd FileType qf setlocal number norelativenumber
     autocmd FileType qf map <buffer> <silent> <cr> :.cc<cr>:copen<cr>
     " Terminal
     autocmd TermOpen * startinsert
-    autocmd TermEnter * map <buffer> <A-S-q> <C-\><C-n>
     " Help
     " autocmd FileType help if winnr('$') > 2 | wincmd J | else | wincmd L | endif
-    autocmd FileType help if winwidth(0) <= 128 | wincmd J | else | wincmd L | endif
+    autocmd FileType help if winwidth(0) > 128 | wincmd L | endif
 augroup END
 " } fileType
 " Clear cmd line message {
@@ -243,7 +248,6 @@ augroup vimrcReload
 augroup END
 " } Autoreload vimrc
 " }}} Auto commands
-
 " Commands {{{
 " Echo with time
 command! -nargs=+ Echom call Echom(<args>)
@@ -272,26 +276,12 @@ command! -nargs=0 MyVimsrc source $MYVIMRC
 
 " Key mapping {{{
 let mapleader = "\<Space>" " First thing first
-" Exit insert mode
-imap jj <esc>
 " Remap for origin ,/;
 noremap ,, ,
 " noremap ;; ;
-" Register
-function! s:ClearReg()
-    for i in range(34,122) | silent! call setreg(nr2char(i), "") | endfor
-endfunction
-nmap <silent> <C-'> :reg<cr>
-nmap <silent> <A-'> :call <SID>ClearReg()<cr>
 " Paragraph & Block navigation
 noremap <silent> { :call InclusivePragraph("up")<cr>
 noremap <silent> } :call InclusivePragraph("down")<cr>
-" noremap { {j
-" noremap } }k
-noremap [ [[
-noremap ] ]]
-noremap <A-]> []
-noremap <A-[> ][
 " Line end/start
 nmap H ^
 vmap H ^
@@ -299,26 +289,66 @@ nmap L $
 vmap L $
 omap H ^
 omap L $
-" Force enter a linebreak up/down for popup menu
-imap <C-cr> <esc>o
-imap <S-cr> <esc>O
-" Regex very magic
-noremap / /\v
-noremap ? ?\v
 " Trailing Char
 nnoremap g; :call TrailingChar(";")<cr>
 nnoremap <silent> g<C-cr> :call TrailingLinebreak("down")<cr>
 nnoremap <silent> g<S-cr> :call TrailingLinebreak("up")<cr>
-" Vim query under cursor
-nmap <silent> <A-q> :execute 'h ' . expand('<cword>')<cr>
-vmap <silent> <A-q> :<c-u>execute 'h ' . VisualSelection("string")<cr>
 " Messages
 nmap <silent> <A-`> :messages clear<cr>:call EmptyMessage()<cr>
 nmap <silent> <C-`> :messages<cr>
 " Non-blank last character
 noremap g$ g_
-" Ctrl-BS for ins
-imap <C-BS> <C-\><C-o>db
+" Block visual mode
+nnoremap <A-v> <C-q>
+" Pageup/Pagedown
+map <A-e> <pageup>
+tmap <A-e> <pageup>
+map <A-d> <pagedown>
+tmap <A-d> <pagedown>
+" Terminal
+tmap <A-n> <C-\><C-n>
+" Macro
+nnoremap <A-q> q
+" Register
+function! s:ClearReg() 
+    for i in range(34,122) | silent! call setreg(nr2char(i), "") | endfor 
+endfunction
+nmap <silent> <C-'> :reg<cr>
+nmap <silent> <C-S-'> :call <SID>ClearReg()<cr>
+" " Buffer & Window & Tab{{{
+" Smart quit
+map q <Plug>smartQuit
+map <silent> Q :bd!<cr>
+" " Window
+map <silent> <C-w><C-m> :only<cr>
+" " Buffers
+map <silent> <A-h> :bp<cr>
+map <silent> <A-l> :bn<cr>
+map <silent> <C-w>o :let g:CloseBufferSavedView = winsaveview() <bar>
+            \ update <bar> %bd <bar> e# <bar> bd# <bar>
+            \call winrestview(g:CloseBufferSavedView)<cr>
+" Tab
+map <silent> <A-S-h> :tabp<cr>
+map <silent> <A-S-l> :tabn<cr>
+" }}} Buffer & Window & Tab
+" Search & Jumping {{{
+vmap * :<c-u>execute "/" . VisualSelection("string")<cr>
+vmap # :<c-u>execute "?" . VisualSelection("string")<cr>
+vmap / *
+vmap ? #
+" Regex very magic
+noremap / /\v
+noremap ? ?\v
+" Disable highlight search
+nmap <silent> <leader>h :noh<cr>
+vmap <silent> <leader>h :<c-u>call InplaceDisableVisual()<cr>
+" }}} Search & Jumping
+" Folding
+nnoremap <silent> <leader><Space> @=(foldlevel('.') ? 'za' : '\<Space>')<cr>
+vnoremap <leader>f zf
+nnoremap zo zR
+nnoremap zc zM
+" Copy && Paste {{{
 " <C-z/x/v/s> {{{
 nmap <C-z> u
 vmap <C-z> <esc>u
@@ -337,51 +367,20 @@ imap <C-v> <C-r>*
 
 map <C-s> :<c-u>w<cr>
 imap <C-s> <esc><C-s>
-
 " }}} <C-z/x/v/s>
-" Block visual mode
-nnoremap <A-v> <C-q>
-" Pageup/Pagedown
-map <A-e> <pageup>
-tmap <A-e> <pageup>
-map <A-d> <pagedown>
-tmap <A-d> <pagedown>
-" Terminal
-tmap <A-n> <C-\><C-n>
-" Macro
-nnoremap <C-q> q
-" Buffer & Window & Tab{{{
-" Smart quit
-map q <Plug>smartQuit
-map <silent> Q :bd!<cr>
-" Window
-map <silent> <C-w><C-m> :only<cr>
-" Buffers
-map <silent> <C-h> :bp<cr>
-map <silent> <C-l> :bn<cr>
-map <silent> <C-w>o :w <bar> %bd <bar> e# <bar> bd# <cr> " Close other buffers except for the current editting one
-" Tab
-map <silent> <A-h> :tabp<cr>
-map <silent> <A-l> :tabn<cr>
-" }}} Buffer & Window & Tab
-" VisualSelection
-vmap * :<c-u>execute "/" . VisualSelection("string")<cr>
-vmap # :<c-u>execute "?" . VisualSelection("string")<cr>
-vmap / *
-vmap ? #
-" Folding
-nnoremap <silent> <leader><Space> @=(foldlevel('.') ? 'za' : '\<Space>')<cr>
-vnoremap <leader>f zf
-nnoremap zo zR
-nnoremap zc zM
-" Yank from above and below
-nmap yk kYp
-nmap yj jYP
+" Put content from registers 0
+nmap <leader>p "0p
+nmap <leader>P "0P
+" Highlight New Paste Content
+nmap <silent> gp :call HighlightNewPaste()<cr>
 " Inplace copy
-vmap <silent> y :<c-u>call InplaceCopy(visualmode())<cr>
-" Disable highlight search
-nmap <silent> <leader>h :noh<cr>
-vmap <silent> <leader>h :<c-u>call InplaceDisableVisual(visualmode())<cr>
+nmap <silent><expr> y SetInplaceCopy()
+vmap <silent><expr> y SetInplaceCopy()
+omap <silent><expr> y SetInplaceCopy()
+" Inplace paste
+" nmap <silent><expr> p SetInplacePaste()
+" vmap <silent><expr> p SetInplacePaste()
+" omap <silent><expr> p SetInplacePaste()
 " Mimic the VSCode move/copy line up/down behavior {{{
 " Move line
 nmap <silent> <A-j> :m .+1<cr>==
@@ -400,15 +399,32 @@ imap <silent> <A-S-k> <C-\><C-o>:call VSCodeLineCopy(mode(), "up")<cr>
 vmap <silent> <A-S-j> :<c-u>call VSCodeLineCopy(visualmode(), "down")<cr>
 vmap <silent> <A-S-k> :<c-u>call VSCodeLineCopy(visualmode(), "up")<cr>
 " }}} Mimic the VSCode move/copy line up/down behavior 
-" Put content from registers 0
-nmap gp "0p
-nmap gP "0P
+" }}} Copy && Paste
 " Changelist jumping
 nnoremap <A-o> g;zz
 nnoremap <A-i> g,zz
 " Convert \ into /
 nmap <silent> g/ :s#\\#\/<cr>:noh<cr>
-" Commandline {{{
+" Commandline & Insert {{{
+imap <C-cr> <esc>o
+imap <S-cr> <esc>O
+imap jj <esc>
+imap <C-d> <Del>
+inoremap <S-Tab> <C-d>
+inoremap <C-.> <C-a>
+inoremap <C-S-.> <C-@>
+" Navigation {{{
+map! <C-a> <Home>
+map! <C-e> <End>
+map! <C-h> <Left>
+map! <C-l> <Right>
+map! <C-j> <Down>
+map! <C-k> <Up>
+map! <C-b> <C-Left>
+map! <C-w> <C-Right>
+map! <C-h> <Left>
+" }}} Navigation
+imap <C-BS> <C-\><C-o>db
 function! s:RemoveLastPathComponent()
     let l:cmdlineBeforeCursor = strpart(getcmdline(), 0, getcmdpos() - 1)
     let l:cmdlineAfterCursor = strpart(getcmdline(), getcmdpos() - 1)
@@ -419,22 +435,12 @@ function! s:RemoveLastPathComponent()
     return l:result . l:cmdlineAfterCursor
 endfunction
 cmap <C-BS> <C-\>e(<SID>RemoveLastPathComponent())<cr>
-cmap <C-e> <C-\>e
+cnoremap <C-S-l> <C-d>
+cmap <C-d> <Del>
+cmap <C-S-e> <C-\>e
 cmap <C-v> <C-R>*
-cmap <A-h> <Left>
-cmap <A-l> <Right>
-cmap <A-w> <S-Right>
-cmap <A-b> <S-Left>
-cmap <A-k> <Up>
-cmap <A-j> <Down>
-cmap <A-d> <Del>
-cmap <A-e> <End>
-cmap <A-a> <Home>
-
-" }}}Commandline
-" Shift-Tab to outdent for insert mode
-inoremap <S-Tab> <C-d>
-"  }}} Key mapping
+" }}} Commandline & Insert
+" }}} Key mapping
 
 " Plug-ins settings  {{{
 runtime! plugin/*.vim
@@ -442,6 +448,12 @@ execute "luafile " . expand("$configPath/lua/plug-colorizer.lua")
 if has('win32')
     lua require('dap-python').setup('D:/anaconda3/envs/test/python.exe')
 endif
+" Exchange {{{
+nmap gx <Plug>(Exchange)
+xmap X <Plug>(Exchange)
+nmap gxc <Plug>(ExchangeClear)
+nmap gxx <Plug>(ExchangeLine)
+" }}} Exchange
 " NOTE: anything mapping to the <C-n> must be sourced after Visual-Multi plug-in
 vmap <silent> <C-n> :ExtractSelection<cr>
 nmap <silent> <C-n> :new<cr>
@@ -502,10 +514,6 @@ let g:NERDRPlace="}}}"
 let g:NERDCompactSexyComs = 1
 let g:NERDToggleCheckAllLines = 1
 " }}} preservim/nerdcommenter
-" tpope/vim-surround {{{
-vmap S< S>
-nmap S ys
-" }}}
 " junegunn/vim-easy-align {{{
 vmap A <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
@@ -537,38 +545,34 @@ call camelcasemotion#CreateMotionMappings(',')
 " andymass/vim-matchup {{{
 " let g:matchup_matchparen_deferred = 1
 " let g:matchup_matchparen_hi_surround_always = 1
-" let g:matchup_matchparen_hi_background = 1
+let g:matchup_matchparen_hi_background = 1
 let g:matchup_matchparen_offscreen
             \ = {'method': 'popup', 'highlight': 'OffscreenPopup'}
-" BUG do not highlight mathup word agian after being selected in visual modes
 let g:matchup_matchparen_nomode = "i"
-" let g:matchup_matchparen_nomode = "ivV\<c-v>"
-let g:matchup_surround_enabled = 1
 let g:matchup_delim_noskips = 0
 " function! VimHotfix()
 "     " customization
 " endfunction
 " let g:matchup_hotfix['vim'] = 'VimHotfix'
+" Text obeject
+xmap am <Plug>(matchup-a%)
+xmap im <Plug>(matchup-i%)
+omap am <Plug>(matchup-a%)
+omap im <Plug>(matchup-i%)
+" vmap vim vi%
+" vmap vim vi%
+" Enter Fix
+noremap <cr> <cr>
 " Origin mark
-nnoremap <c-m> m
+nnoremap <A-m> m
+" Highlight
 nmap <silent> <leader>m <plug>(matchup-hi-surround)
 " Inclusive
-map <A-m> <Plug>(matchup-%)
-map <A-S-m> <Plug>(matchup-g%)
+map <C-m> <Plug>(matchup-%)
+map <C-S-m> <Plug>(matchup-g%)
 " Exclusive 
 map m <Plug>(matchup-]%)
 map M <Plug>(matchup-[%)
-" Text obeject
-vmap am <Plug>(matchup-a%)
-vmap im <Plug>(matchup-i%)
-nmap dim di%
-nmap dam da%
-nmap cim ci%
-nmap cam ca%
-nmap dsm ds%
-nmap csm cs%
-" Key fix
-noremap <cr> <cr>
 " }}} andymass/vim-matchup
 " landock/vim-expand-region {{{
 let g:expand_region_text_objects = {

@@ -51,8 +51,10 @@ let g:VM_maps['Visual All']      = ',<C-d>'
 let g:VM_maps['Invert Direction'] = 'o'
 let g:VM_maps['Find Next'] = 'n'
 let g:VM_maps['Find Prev'] = 'N'
-let g:VM_maps['Goto Next'] = '<A-n>'    " Without adding new occurrences
-let g:VM_maps['Goto Prev'] = '<A-S-n>'  " Without adding new occurrences
+let g:VM_maps['Goto Next'] = '<C-n>'    " Without adding new occurrences
+let g:VM_maps['Goto Prev'] = '<C-S-n>'  " Without adding new occurrences
+" let g:VM_maps['Goto Next'] = '<A-n>'    " Without adding new occurrences
+" let g:VM_maps['Goto Prev'] = '<A-S-n>'  " Without adding new occurrences
 " Modify selection
 let g:VM_maps['Enlarge']       = '<A-a>'
 let g:VM_maps['Shrink']        = '<A-s>'

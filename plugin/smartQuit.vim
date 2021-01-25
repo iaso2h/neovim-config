@@ -2,13 +2,9 @@ function! s:SpanWin()
     if MultiBufInWin()
         if &filetype ==# "" || &filetype ==# "help"
             if winwidth(0) <= 128 
-                wincmd s
-                execute "bp"
-                wincmd K
+                wincmd s | bp | wincmd K
             else
-                wincmd v
-                execute "bp"
-                wincmd H
+                wincmd v | bp | wincmd H
             endif
         endif
     endif
@@ -17,9 +13,9 @@ endfunction
 function! s:SaveQuit()
     let l:answer = confirm("Save modification?", ">>> &Yes\n&No\n&Cancel", 1, "Question")
     if l:answer == 1
-        execute "wq" 
+        wq 
     elseif l:answer == 2  
-        execute "q!" 
+        q!
     else
     endif
 endfunction
@@ -27,9 +23,9 @@ endfunction
 function! s:SaveUnload()
     let l:answer = confirm("Save modification?", ">>> &Yes\n&No\n&Cancel", 1, "Question")
     if l:answer == 1 
-        execute "w | bd" 
+        w | bd
     elseif l:answer == 2 
-        execute "bd!" 
+        bd!
     else
     endif
 endfunction
@@ -43,22 +39,16 @@ function! s:SmartQuit()
     let l:specialBuf = 0
     " Command Line
     if &filetype ==# "vim" && bufname() ==# "[Command Line]"
-        execute "q"
+        q
     " Newtre
     elseif &filetype ==# "netrw"
-        execute "q"
+        q
     elseif &filetype ==# "help" || (&filetype != "" && s:curBufName =="")
         if l:winNum == 1
-            if MultiBufInWin()
-                execute("bd")
-            else
-                execute("q")
-            endif
+            if MultiBufInWin() | bd | else | q | endif
         else
             execute "q"
-            if winnr("$") == 1
-                call s:SpanWin()
-            endif
+            if winnr("$") == 1 | call s:SpanWin() | endif
         endif
     " Empty files
     elseif &filetype == ""
@@ -66,23 +56,15 @@ function! s:SmartQuit()
         if l:winNum == 1
             " 2+ Buffers in 1 window
             if MultiBufInWin()
-                if &modified 
-                    call s:SaveUnload() 
-                else 
-                    execute "bd"
-                endif
+                if &modified | call s:SaveUnload() | else | bd | endif
             " 1 Buffer in 1 window
             else
-                if &modified 
-                    call s:SaveQuit() 
-                else 
-                    execute "q"
-                endif
+                if &modified | call s:SaveQuit() | else | q | endif
             endif
         " 2+ Windows 
         else
             if l:fileBufCount >= 1
-                execute "q"
+                q
             elseif l:fileBufCount == 0
                 " Check special buffer in other windows
                 for l:winIndex in range(l:winNum)
@@ -106,37 +88,21 @@ function! s:SmartQuit()
                 if l:specialBuf
                     " Multiple buffers in current window
                     if MultiBufInWin()
-                        if &modified 
-                            call s:SaveUnload() 
-                        else 
-                            execute "bd!"
-                        endif
-                        if winnr("$") == 1
-                            call s:SpanWin()
-                        endif
+                        if &modified | call s:SaveUnload() | else | bd! | endif
                     " One buffer in current window
                     else
-                        if &modified 
-                            call s:SaveQuit() 
-                        else 
-                            execute "q"
-                        endif
+                        if &modified | call s:SaveQuit() | else | q | endif
                     endif
                 " No special buffer in other windows
                 else
-                    execute "q"
+                    q
                 endif
             endif
         endif
     " Close Buffer
     else
         " 1 Window
-        if l:winNum == 1
-            if &modified 
-                call s:SaveUnload() 
-            else 
-                execute "bd!" 
-            endif
+        if l:winNum == 1 | if &modified | call s:SaveUnload() | else | bd!| endif
         " 2+ Windows
         else
             " Check buffer instances and special buffer in other windows
@@ -162,18 +128,18 @@ function! s:SmartQuit()
                 endif
             endfor
             if l:fileBufCount >= 1
-                execute "q"
+                q
             elseif l:fileBufCount == 0
                 " Close buffer
                 if l:bufferInstance
-                    execute "q"
+                    q
                 elseif !l:bufferInstance  && l:specialBuf
                     " Check if other buffers exist in current window
                     if MultiBufInWin()
                         if &modified 
                             call s:SaveUnload() 
                         else 
-                            execute "bd!" 
+                            bd!
                         endif
                         if winnr("$") == 1
                             call s:SpanWin()
@@ -183,14 +149,14 @@ function! s:SmartQuit()
                         if &modified 
                             call s:SaveUnload() 
                         else 
-                            execute "bd!" 
+                            bd!
                         endif
                     endif
                 elseif !l:bufferInstance  && !l:specialBuf
                     if &modified 
                         call s:SaveQuit() 
                     else 
-                        execute "q"
+                        q
                     endif
                 endif
             endif
