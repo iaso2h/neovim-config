@@ -157,6 +157,7 @@ set splitbelow
 set splitright
 set switchbuf=vsplit
 set tabstop=4
+set termguicolors
 set timeoutlen=500
 set undofile " Combine with undotree plugin
 set updatetime=150
@@ -372,15 +373,15 @@ imap <C-s> <esc><C-s>
 nmap <leader>p "0p
 nmap <leader>P "0P
 " Highlight New Paste Content
-nmap <silent> gp :call HighlightNewPaste()<cr>
+nmap <silent> gy :call LastYPHighlight("yank")<cr>
+nmap <silent> gp :call LastYPHighlight("put")<cr>
 " Inplace copy
+nmap Y yy
 nmap <silent><expr> y SetInplaceCopy()
 vmap <silent><expr> y SetInplaceCopy()
 omap <silent><expr> y SetInplaceCopy()
 " Inplace paste
-" nmap <silent><expr> p SetInplacePaste()
-" vmap <silent><expr> p SetInplacePaste()
-" omap <silent><expr> p SetInplacePaste()
+" onoremap <expr> p (v:count == 0 \|\| v:operator != 'p') ? 'd' : 'w'
 " Mimic the VSCode move/copy line up/down behavior {{{
 " Move line
 nmap <silent> <A-j> :m .+1<cr>==
@@ -545,7 +546,7 @@ call camelcasemotion#CreateMotionMappings(',')
 " andymass/vim-matchup {{{
 " let g:matchup_matchparen_deferred = 1
 " let g:matchup_matchparen_hi_surround_always = 1
-let g:matchup_matchparen_hi_background = 1
+" let g:matchup_matchparen_hi_background = 1
 let g:matchup_matchparen_offscreen
             \ = {'method': 'popup', 'highlight': 'OffscreenPopup'}
 let g:matchup_matchparen_nomode = "i"

@@ -1,3 +1,4 @@
+" VSCode copy line {{{
 function! VSCodeLineCopy(modeType, copyDirection)
     if a:modeType ==# "V"
         normal! gv
@@ -50,29 +51,36 @@ function! VSCodeLineCopy(modeType, copyDirection)
         let @@ = saved_reg
     endif
 endfunction
+" }}} VSCode copy line
+function! InplacePaste(type, direction)
+    Echo a:type
+    let l:InplacePastePos = getpos('.')
+    let l:startPos = getpos('.')
+    if a:type ==# "n"
+        if v:count
+            for l:i in range(v:count - 1)
+                silent execute "normal! p"
+            endfor
+        else
+            silent execute "normal! p"
+        endif
+    else
+        silent execute "normal! gv" . a:direction
+    endif
+    normal! `[mP
+    normal! `]mp
+    silent call cursor(l:InplacePastePos[1], l:InplacePastePos[2])
+    match Search #\%'P.*\(\_s.*\)*\%'p.#
+    silent call <SID>ClearYPHighlight(1)
+endfunction
 
-" function! InplacePaste(type)
-    " Echo a:type
-    " if a:type ==# "char"
-        " silent execute "normal! p"
-    " elseif a:type ==# "line"
-        " Echo getpos("'[")
-        " Echo getpos("']")
-        " Echo visualmode()
-        " silent execute "normal! p"
-    " else
-        " silent execute "normal! gvp"
-    " endif
-    " call cursor(g:inplcaPastePos[1], g:inplcaPastePos[2])
-" endfunction
+nmap <silent> p :<c-u>call InplacePaste(mode(), "p")<cr>
+vmap <silent> p :<c-u>call InplacePaste(visualmode(), "p")<cr>
+nmap <silent> p :<c-u>call InplacePaste(mode(), "P")<cr>
+vmap <silent> p :<c-u>call InplacePaste(visualmode(), "P")<cr>
 
-" function! SetInplacePaste()
-    " let g:inplcaPastePos = getpos('.')
-    " set opfunc=InplacePaste
-    " Echo 'g@'
-    " return 'g@'
-" endfunction
 
+" InplaceCopy {{{
 function! InplaceCopy(type, ...)
     if a:type ==# "char"
         silent execute "normal! `[v`]y"
@@ -81,13 +89,34 @@ function! InplaceCopy(type, ...)
     else
         silent execute "normal! gvy"
     endif
-    call cursor(g:inplcaCopyPos[1], g:inplcaCopyPos[2])
+    normal! `[mY
+    normal! `]my
+    silent call cursor(g:inplaceCopyCurStart[1], g:inplaceCopyCurStart[2])
+    2match Search #\%'Y.*\(\_s.*\)*\%'y.#
+    silent call <SID>ClearYPHighlight(2)
 endfunction
 
 function! SetInplaceCopy()
-    let g:inplcaCopyPos = getpos('.')
+    let g:inplaceCopyCurStart = getpos('.')
     set opfunc=InplaceCopy
-    return 'g@'
+    silent return 'g@'
+endfunction
+" }}} InplaceCopy
+
+function! s:ClearYPHighlight(priority)
+    if a:priority == 1
+        let l:timer = timer_start(1000, "ClearPutHighlightHandler")
+    elseif a:priority == 2
+        let l:timer = timer_start(1000, "ClearYankHighlightHandler")
+    endif
+endfunction
+
+function! ClearYankHighlightHandler(timer)
+    2match none
+endfunction
+
+function! ClearPutHighlightHandler(timer)
+    match none
 endfunction
 
 function! InplaceDisableVisual()
@@ -95,17 +124,22 @@ function! InplaceDisableVisual()
     execute "normal! \<esc>"
 endfunction
 
-function! HighlightNewPaste()
+function! LastYPHighlight(key)
     let l:pos = getpos('.')
-    let l:newContentStart = getpos("'[")
-    let l:newContentEnd = getpos("']")
-    if abs(l:pos[1] - l:newContentStart[1]) < abs(l:pos[1] - l:newContentEnd[1])
-        call cursor(l:newContentEnd[1], l:newContentEnd[2])
+    if a:key == "yank"
+        let l:Start = getpos("'Y")
+        let l:End = getpos("'y")
+    elseif a:key == "put"
+        let l:Start = getpos("'P")
+        let l:End = getpos("'p")
+    endif
+    if abs(l:pos[1] - l:Start[1]) < abs(l:pos[1] - l:End[1])
+        call cursor(l:End[1], l:End[2])
         normal! v
-        call cursor(l:newContentStart[1], l:newContentStart[2])
+        call cursor(l:Start[1], l:Start[2])
     else
-        call cursor(l:newContentStart[1], l:newContentStart[2])
+        call cursor(l:Start[1], l:Start[2])
         normal! v
-        call cursor(l:newContentEnd[1], l:newContentEnd[2])
+        call cursor(l:End[1], l:End[2])
     endif
 endfunction

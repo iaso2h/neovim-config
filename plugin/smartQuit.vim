@@ -10,7 +10,7 @@ function! s:SpanWin()
     endif
 endfunction
 
-function! s:SaveQuit()
+function! s:SaveQuit() abort
     let l:answer = confirm("Save modification?", ">>> &Yes\n&No\n&Cancel", 1, "Question")
     if l:answer == 1
         wq 
@@ -20,7 +20,7 @@ function! s:SaveQuit()
     endif
 endfunction
 
-function! s:SaveUnload()
+function! s:SaveUnload() abort
     let l:answer = confirm("Save modification?", ">>> &Yes\n&No\n&Cancel", 1, "Question")
     if l:answer == 1 
         w | bd
@@ -30,7 +30,7 @@ function! s:SaveUnload()
     endif
 endfunction
 
-function! s:SmartQuit() 
+function! s:SmartQuit()  abort
     let l:fileBufCount = 0
     let l:winNum = winnr("$")
     let s:curBufName = bufname()
