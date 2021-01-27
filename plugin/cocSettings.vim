@@ -68,7 +68,7 @@ nmap <silent> g] <Plug>(coc-diagnostic-next)
 nnoremap <silent> <leader>d  :<C-u>CocList diagnostics<CR>
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gt <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gR <Plug>(coc-references)
 " Show Document

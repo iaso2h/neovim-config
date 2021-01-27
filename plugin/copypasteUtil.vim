@@ -53,7 +53,7 @@ function! VSCodeLineCopy(modeType, copyDirection)
 endfunction
 " }}} VSCode copy line
 function! InplacePaste(type, direction)
-    Echo a:type
+    let g:putFilePath = expand("%:p")
     let l:InplacePastePos = getpos('.')
     let l:startPos = getpos('.')
     if a:type ==# "n"
@@ -74,14 +74,10 @@ function! InplacePaste(type, direction)
     silent call <SID>ClearYPHighlight(1)
 endfunction
 
-nmap <silent> p :<c-u>call InplacePaste(mode(), "p")<cr>
-vmap <silent> p :<c-u>call InplacePaste(visualmode(), "p")<cr>
-nmap <silent> p :<c-u>call InplacePaste(mode(), "P")<cr>
-vmap <silent> p :<c-u>call InplacePaste(visualmode(), "P")<cr>
-
 
 " InplaceCopy {{{
 function! InplaceCopy(type, ...)
+    let g:copyFilePath = expand("%:p")
     if a:type ==# "char"
         silent execute "normal! `[v`]y"
     elseif a:type ==# "line"
@@ -127,9 +123,15 @@ endfunction
 function! LastYPHighlight(key)
     let l:pos = getpos('.')
     if a:key == "yank"
+        if expand("%:p") !=# g:yankFilePath
+            return
+        endif
         let l:Start = getpos("'Y")
         let l:End = getpos("'y")
     elseif a:key == "put"
+        if expand("%:p") !=# g:putFilePath
+            return
+        endif
         let l:Start = getpos("'P")
         let l:End = getpos("'p")
     endif

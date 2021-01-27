@@ -381,7 +381,11 @@ nmap <silent><expr> y SetInplaceCopy()
 vmap <silent><expr> y SetInplaceCopy()
 omap <silent><expr> y SetInplaceCopy()
 " Inplace paste
-" onoremap <expr> p (v:count == 0 \|\| v:operator != 'p') ? 'd' : 'w'
+nmap <silent> p :<c-u>call InplacePaste(mode(), "p")<cr>
+vmap <silent> p :<c-u>call InplacePaste(visualmode(), "p")<cr>
+nmap <silent> P :<c-u>call InplacePaste(mode(), "P")<cr>
+vmap <silent> P :<c-u>call InplacePaste(visualmode(), "P")<cr>
+
 " Mimic the VSCode move/copy line up/down behavior {{{
 " Move line
 nmap <silent> <A-j> :m .+1<cr>==
