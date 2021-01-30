@@ -52,44 +52,52 @@ function! VSCodeLineCopy(modeType, copyDirection)
     endif
 endfunction
 " }}} VSCode copy line
+
+" InplacePaste {{{
 function! InplacePaste(type, direction)
     let g:putFilePath = expand("%:p")
-    let l:InplacePastePos = getpos('.')
+    let l:InplacePasteStart = getpos('.')
     let l:startPos = getpos('.')
     if a:type ==# "n"
         if v:count
             for l:i in range(v:count - 1)
-                silent execute "normal! p"
+                execute "normal! \"" . v:register . a:direction
             endfor
         else
-            silent execute "normal! p"
+            execute "normal! \"" . v:register . a:direction
         endif
     else
-        silent execute "normal! gv" . a:direction
+        execute "normal! gv\"" . v:register . a:direction
     endif
     normal! `[mP
     normal! `]mp
-    silent call cursor(l:InplacePastePos[1], l:InplacePastePos[2])
+    " Formatting 1 line long content
+    if getpos("'P")[1] == getpos("'p")[1] && a:type ==# "V"
+        normal! ==
+        normal! ^mP
+        normal! g_mp
+    endif
+    call cursor(l:InplacePasteStart[1], l:InplacePasteStart[2])
     match Search #\%'P.*\(\_s.*\)*\%'p.#
-    silent call <SID>ClearYPHighlight(1)
+    call <SID>ClearYPHighlight(1)
 endfunction
-
+" }}} InplacePaste
 
 " InplaceCopy {{{
 function! InplaceCopy(type, ...)
-    let g:copyFilePath = expand("%:p")
+    let g:yankFilePath = expand("%:p")
     if a:type ==# "char"
-        silent execute "normal! `[v`]y"
+        normal! `[v`]y
     elseif a:type ==# "line"
-        silent execute "normal! `[V`]y"
+        normal! `[V`]y
     else
-        silent execute "normal! gvy"
+        normal! gvy
     endif
     normal! `[mY
     normal! `]my
-    silent call cursor(g:inplaceCopyCurStart[1], g:inplaceCopyCurStart[2])
+    call cursor(g:inplaceCopyCurStart[1], g:inplaceCopyCurStart[2])
     2match Search #\%'Y.*\(\_s.*\)*\%'y.#
-    silent call <SID>ClearYPHighlight(2)
+    call <SID>ClearYPHighlight(2)
 endfunction
 
 function! SetInplaceCopy()
@@ -99,29 +107,34 @@ function! SetInplaceCopy()
 endfunction
 " }}} InplaceCopy
 
+" YPHighlight {{{
 function! s:ClearYPHighlight(priority)
     if a:priority == 1
-        let l:timer = timer_start(1000, "ClearPutHighlightHandler")
+        let l:timer = timer_start(500, "ClearPutHighlightHandler")
     elseif a:priority == 2
-        let l:timer = timer_start(1000, "ClearYankHighlightHandler")
+        let l:timer = timer_start(500, "ClearYankHighlightHandler")
     endif
 endfunction
 
 function! ClearYankHighlightHandler(timer)
-    2match none
+    let l:currentWin = nvim_get_current_win()
+    windo 2match none
+    if l:currentWin != nvim_get_current_win()
+        call nvim_set_current_win(l:currentWin)
+    endif
 endfunction
 
 function! ClearPutHighlightHandler(timer)
-    match none
-endfunction
-
-function! InplaceDisableVisual()
-    normal! gv
-    execute "normal! \<esc>"
+    let l:currentWin = nvim_get_current_win()
+    windo match none
+    if l:currentWin != nvim_get_current_win()
+        call nvim_set_current_win(l:currentWin)
+    endif
 endfunction
 
 function! LastYPHighlight(key)
     let l:pos = getpos('.')
+    normal! mz`z
     if a:key == "yank"
         if expand("%:p") !=# g:yankFilePath
             return
@@ -145,3 +158,41 @@ function! LastYPHighlight(key)
         call cursor(l:End[1], l:End[2])
     endif
 endfunction
+" }}} YPHighlight
+
+function! InplaceDisableVisual() " {{{
+    execute "normal! \<esc>"
+endfunction " }}}
+
+
+" InplaceReplace {{{
+if !exists('g:loaded_ReplaceWithRegister')
+    finish
+endif
+function! InplaceReplace(type, ...)
+    let g:yankFilePath = expand("%:p")
+    if a:type ==# "char"
+        call ReplaceWithRegister#OperatorExpression()
+    else
+        <C-u>call setline('.', getline('.'))<Bar>
+        \execute 'silent! call repeat#setreg("\<lt>Plug>ReplaceWithRegisterVisual", v:register)'<Bar>
+        \call ReplaceWithRegister#SetRegister()<Bar>
+        \if ReplaceWithRegister#IsExprReg()<Bar>
+        \    let g:ReplaceWithRegister#expr = getreg('=')<Bar>
+        \endif<Bar>
+        \call ReplaceWithRegister#Operator('visual', "\<lt>Plug>ReplaceWithRegisterVisual")<CR>    endif
+    endif
+    normal! `[mP
+    normal! `]mP
+    call cursor(g:InplacePasteStart[1], g:InplacePasteStart[2])
+    match Search #\%'P.*\(\_s.*\)*\%'p.#
+    call <SID>ClearYPHighlight(1)
+endfunction
+
+function! SetInplaceReplace()
+    let l:InplacePasteStart = getpos('.')
+    set opfunc=InplaceReplace
+    silent return 'g@'
+endfunction
+" }}} InplaceReplace
+

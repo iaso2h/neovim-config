@@ -1,3 +1,7 @@
+" File: cocSettings.vim
+" Author: iaso2h
+" Description: settings to control coc.nvim and coc plugin's behaviors
+" Last Modified: 一月 30, 2021
 if !get(g:, 'coc_start_at_startup', 1)
     finish
 endif
@@ -46,16 +50,6 @@ let g:markdown_fenced_languages = [
             \]
 " Snippet
 let g:coc_snippet_next= "<tab>"
-" Completion navigation
-" inoremap <silent><expr> <TAB>
-"             \ pumvisible() ? "\<C-n>" :
-"             \ <SID>check_back_space() ? "\<TAB>" :
-"             \ coc#refresh()
-" inoremap <silent><expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-function! s:check_back_space() abort
-    let col = col('.') - 1
-    return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
 " Trigger completion
 inoremap <silent><expr> <C-space> coc#refresh()
 " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
@@ -178,5 +172,19 @@ nmap <A-1> :CocCommand explorer<CR>
 " List all presets
 nmap <space>el :CocList explPresets
 " }}} coc.explorer
+imap <C-l> <Plug>(coc-snippets-expand)
+vmap <C-j> <Plug>(coc-snippets-select)
+imap <silent> <C-Tab> <C-o>:CocList snippets<cr>
+let g:coc_snippet_next = '<Tab>'
+let g:coc_snippet_prev = '<S-Tab>'
+" Snippet
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? coc#_select_confirm() :
+      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
 
-
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction

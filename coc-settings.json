@@ -25,12 +25,18 @@
     "diagnostic.format": "%message [%source]",
     "diagnostic.separateRelatedInformationAsDiagnostics": true,
     "diagnostic.virtualText": true,
-    "list.nextKeymap": "<A-j>",
-    "list.previousKeymap": "<A-k>",
+    "list.nextKeymap": "<C-n>",
+    "list.previousKeymap": "<C-p>",
     "markdownlint.config": {
         "default": true,
         "line-length": false
     },
+    "snippets.extends": {
+        "cpp":["c"],
+        "typescript": ["javascript"]
+    },
+    "snippets.shortcut": "V",
+    "snippets.enableStatusItem": true,
     "suggest.asciiCharactersOnly": true,
     "suggest.enablePreselect": true,
     "suggest.enablePreview": true,

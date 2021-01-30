@@ -4,14 +4,14 @@ let g:VM_quit_after_leaving_insert_mode = 1
 let g:VM_verbose_commands = 1
 let g:VM_skip_shorter_lines = 0
 let g:VM_skip_empty_lines = 1
+let g:VM_disable_syntax_in_imode = 1
+let g:VM_insert_special_keys = ['c-v', 'c-e', 'c-a']
 " Theme
 let g:VM_theme = 'nord'
 " Settings
 
 " NOTE: There are two main modes VM can work in, |cursor-mode| and |extend-mode|.
 " NOTE: They roughly correspond to |normal-mode| and |visual-mode|.
-
-
 " Add new mapping while preserving the orginal mapping at the same time
 let g:VM_custom_remaps = {"<C-v>": "<C-r>", "s": "c"}
 " To remap any key to normal! commands. Example:
@@ -44,8 +44,8 @@ let g:VM_maps["Select Cursor Down"] = ',j'
 let g:VM_maps["Select Cursor Up"]   = ',k'
 let g:VM_maps['Skip Region']     = '<C-k>'
 let g:VM_maps['Remove Region'] = 'u'
-let g:VM_maps['Select All']      = ',<C-d>'
-let g:VM_maps['Visual All']      = ',<C-d>'
+let g:VM_maps['Select All']      = '<C-S-a>'
+let g:VM_maps['Visual All']      = '<C-S-a>'
 
 " Navigaton
 let g:VM_maps['Invert Direction'] = 'o'

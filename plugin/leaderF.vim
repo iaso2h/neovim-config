@@ -72,16 +72,16 @@ let g:Lf_ShortcutF = '<C-e>'
 let g:Lf_DelimiterChar = ';'
 " nnoremap <silent> <C-e> :LeaderfFile<cr>
 nnoremap <leader>e :LeaderfFile .
-nnoremap <silent> <C-f>t :LeaderfBufTag<cr>
-nnoremap <silent> <C-f>c :LeaderfCommand<cr>
-nnoremap <silent> <C-f><C-t> :LeaderfBufTagAll<cr>
+nnoremap <silent> <C-S-p> :LeaderfCommand<cr>
+nnoremap <silent> <C-S-o> :LeaderfBufTag<cr>
+nnoremap <silent> <leader><C-S-o> :LeaderfBufTagAll<cr>
 nnoremap <silent> <C-f>f :LeaderfFunction<cr>
 nnoremap <silent> <C-f><C-f> :LeaderfFunctionAll<cr>
-nnoremap <silent> <C-f>h :LeaderfHelp<cr>
+nnoremap <silent> <C-S-h> :LeaderfHelp<cr>
 nnoremap <silent> <C-f>l :LeaderfLine<cr>
 nnoremap <silent> <C-f><C-l> :LeaderfLineAll<cr>
 nnoremap <silent> <C-f>q :LeaderfQuickFix<cr>
-nnoremap <silent> <C-f>r :LeaderfRgInteractive<cr>
+nnoremap <silent> <C-S-f> :LeaderfRgInteractive<cr>
 " Normal mode
 let g:Lf_CommandMap = {
             \'<C-X>': ['<C-s>'], 

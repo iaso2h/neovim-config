@@ -6,6 +6,7 @@ let g:sandwich_no_default_key_mappings = 1
 
 " Plug-ins list {{{
 let &runtimepath = &runtimepath . "," . expand('$configPath/dein/dein.vim')
+
 if 1
     "     if !isdirectory(expand('$configPath/dein'))
     "         execute "autocmd VimEnter * !git clone https://github.com/Shougo/dein.vim " . expand('$configPath/dein/dein.vim')
@@ -38,10 +39,11 @@ if 1
     " call dein#add('xolox/vim-misc')
     " call dein#add('szw/vim-maximizer')
     " call dein#add('tpope/vim-repeat')
-    " call dein#add('vim-scripts/pp.vim')
+    " call dein#add('tpope/vim-scriptease')
     "         call dein#add('easymotion/vim-easymotion')
     "         call dein#add('machakann/vim-sandwich')
     "         call dein#add('tommcdo/vim-exchange')
+    "         call dein#add('lag13/vim-create-variable')
     "         call dein#add('mg979/vim-visual-multi')
     "         call dein#add('junegunn/vim-easy-align')
     "         call dein#add('AndrewRadev/splitjoin.vim')
@@ -52,13 +54,13 @@ if 1
     " call dein#add('andymass/vim-matchup')
 
     "         call dein#add('neoclide/coc.nvim', {'merged': 0, 'rev': 'release'})
+    "         call dein#add('honza/vim-snippets')
+    "         call dein#add('SirVer/ultisnips')
     "         call dein#add('tmhedberg/SimpylFold')
     "         call dein#add('jmcantrell/vim-virtualenv')
 
     " call dein#add('lambdalisue/gina.vim')
-    " call dein#add('othree/eregex.vim')
     " call dein#add('skywind3000/asyncrun.vim')
-    " call dein#add('puremourning/vimspector')
     " call dein#add('mfussenegger/nvim-dap')
     " call dein#add('mfussenegger/nvim-dap-python')
     " call dein#add('nvim-treesitter/nvim-treesitter')
@@ -88,10 +90,11 @@ if 1
     Plug 'xolox/vim-misc'
     Plug 'szw/vim-maximizer'
     Plug 'tpope/vim-repeat'
-    Plug 'vim-scripts/pp.vim'
+    Plug 'tpope/vim-scriptease'
     Plug 'easymotion/vim-easymotion'
     Plug 'machakann/vim-sandwich'
     Plug 'tommcdo/vim-exchange'
+    Plug 'lag13/vim-create-variable'
     Plug 'mg979/vim-visual-multi'
     Plug 'junegunn/vim-easy-align'
     Plug 'AndrewRadev/splitjoin.vim'
@@ -104,6 +107,8 @@ if 1
     Plug 'andymass/vim-matchup'
 
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    Plug 'honza/vim-snippets'
+    Plug 'SirVer/ultisnips'
     Plug 'tmhedberg/SimpylFold'
     Plug 'jmcantrell/vim-virtualenv'
 
@@ -111,8 +116,6 @@ if 1
     Plug 'liuchengxu/vista.vim'
     Plug 'skywind3000/asyncrun.vim'
     Plug 'Yggdroot/LeaderF', { 'do': ':LeaderfInstallCExtension' }
-    " Plug 'othree/eregex.vim'
-    " Plug 'puremourning/vimspector'
     Plug 'mfussenegger/nvim-dap'
     Plug 'mfussenegger/nvim-dap-python'
     Plug 'theHamsta/nvim-dap-virtual-text'
@@ -123,13 +126,19 @@ if 1
 endif
 " }}} Plug-ins list
 " Basic settings {{{
+filetype plugin on
 let mydict = expand('$configPath/dev.dict')
 set ai
 set cindent " set C style indent
 set clipboard=unnamed
-set cursorline
 set cmdheight=2 "Give more space for displaying messages
+set complete=.,w,b,u,t,kspell,i,d,t
+set conceallevel=2
+set concealcursor=nc
+set cpoptions+=q "Failed on Win?
+set cursorline
 set dictionary+=mydict
+set diffopt=context:10000,filler,closeoff,vertical,algorithm:patience
 set expandtab " Soft tab
 set fillchars=fold:-,vert:╎ "Sarasa Nerd Mono SC
 set formatoptions=pj1Bml2nwc
@@ -138,19 +147,24 @@ set guicursor=n-v-sm:block,i-c-ci-ve:ver25-Cursor,o-r-cr:hor20
 set hidden
 set ignorecase " ignorecase for / and ?, work with smartcase
 set inccommand=nosplit " live substitution
+set keywordprg=:help
+set listchars=tab:>-,precedes:<,extends:>,trail:-,nbsp:%
 set langmenu=en
 set lazyredraw " Make Macro faster
 set mouse=a
 set nobackup
-set noswapfile
+set nojoinspaces
 set nostartofline
+set noswapfile
 set nowritebackup
 set number
 set scrolloff=5
 set sessionoptions=buffers,curdir,folds,help,resize,slash,tabpages,winpos,winsize
+set shada=!,'100,/100,:100,<100,s100,h
 set shiftround " Indent/outdent to nearest tabstop
 set shiftwidth=4 " Indent/outdent by four columns
 set shortmess=lxTI
+set signcolumn=yes:2
 set smartcase
 set softtabstop=4 " Indentation levels every four columns
 set splitbelow
@@ -162,10 +176,12 @@ set timeoutlen=500
 set undofile " Combine with undotree plugin
 set updatetime=150
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite,*.bak
-
+set wildoptions=pum
+set wildmode=full
 " Settings based on OS
 if has('win32')
     " Python executable
+    set wildignorecase
     let s = substitute(system('python -c "import sys; print(sys.executable)"'), '\n\+$', '', 'g')
     let g:python3_host_prog = strtrans(s)
 elseif has('unix')
@@ -195,7 +211,7 @@ endif
 " }}} Basic settings
 
 " Functions {{{
-function! Echom(expr)
+function! Echo(expr)
     echom strftime('%c') . ":" a:expr
 endfunction
 " }}}
@@ -207,6 +223,7 @@ augroup _fileType
     " Quick seperating line
     " autocmd FileType javascript nnoremap <buffer> gS iconsole.log("-".reapet(65))<esc>o
     " autocmd FileType python     nnoremap <buffer> gS iprint("-"*65)<esc>o<cr>
+
     nnoremap gs jO<esc>65a-<esc>gccj
     " C language
     autocmd BufRead *.c,*.h	execute "1;/^{"
@@ -251,7 +268,7 @@ augroup END
 " }}} Auto commands
 " Commands {{{
 " Echo with time
-command! -nargs=+ Echom call Echom(<args>)
+command! -nargs=+ Echo call Echo(<args>)
 " Custom old files
 command! -nargs=* O browse oldfiles
 " Redir command line output to clipboard
@@ -277,6 +294,11 @@ command! -nargs=0 MyVimsrc source $MYVIMRC
 
 " Key mapping {{{
 let mapleader = "\<Space>" " First thing first
+" Open/Search in browser
+nmap <silent> <A-S-s> :call OpenUrl()<cr>
+xmap <silent> <A-S-s> :<c-u>call OpenInBrowser(VisualSelection("string"))<cr>
+" Interrupt
+nnoremap <C-A-c> call interrupt()<cr>
 " Remap for origin ,/;
 noremap ,, ,
 " noremap ;; ;
@@ -291,11 +313,15 @@ vmap L $
 omap H ^
 omap L $
 " Trailing Char
+nmap g{ :<c-u>call TrailingFolderMarker(mode(), "{{{")<cr>
+nmap g} :<c-u>call TrailingFolderMarker(mode(), "}}}")<cr>
+vmap g{ <A-m>z:<c-u>call TrailingFolderMarker(visualmode(), "}}}")<cr>`z
+vmap g} <A-m>z:<c-u>call TrailingFolderMarker(visualmode(), "}}}")<cr>`z
 nnoremap g; :call TrailingChar(";")<cr>
 nnoremap <silent> g<C-cr> :call TrailingLinebreak("down")<cr>
 nnoremap <silent> g<S-cr> :call TrailingLinebreak("up")<cr>
 " Messages
-nmap <silent> <A-`> :messages clear<cr>:call EmptyMessage()<cr>
+nmap <silent> <A-`> :messages clear <bar> echo "Message clear"<cr>
 nmap <silent> <C-`> :messages<cr>
 " Non-blank last character
 noremap g$ g_
@@ -314,9 +340,10 @@ nnoremap <A-q> q
 function! s:ClearReg() 
     for i in range(34,122) | silent! call setreg(nr2char(i), "") | endfor 
 endfunction
-nmap <silent> <C-'> :reg<cr>
-nmap <silent> <C-S-'> :call <SID>ClearReg()<cr>
-" " Buffer & Window & Tab{{{
+map <silent> <C-'> :reg<cr>
+imap <silent> <C-'> <C-\><C-o>:reg<cr>
+map <silent> <A-'> :call <SID>ClearReg()<cr>
+" Buffer & Window & Tab{{{
 " Smart quit
 map q <Plug>smartQuit
 map <silent> Q :bd!<cr>
@@ -409,7 +436,7 @@ vmap <silent> <A-S-k> :<c-u>call VSCodeLineCopy(visualmode(), "up")<cr>
 nnoremap <A-o> g;zz
 nnoremap <A-i> g,zz
 " Convert \ into /
-nmap <silent> g/ :s#\\#\/<cr>:noh<cr>
+nmap <silent> g/ :<A-m>zs#\\#\/<cr>:noh<cr>`z
 " Commandline & Insert {{{
 imap <C-cr> <esc>o
 imap <S-cr> <esc>O
@@ -453,15 +480,22 @@ execute "luafile " . expand("$configPath/lua/plug-colorizer.lua")
 if has('win32')
     lua require('dap-python').setup('D:/anaconda3/envs/test/python.exe')
 endif
+" NOTE: anything mapping to the <C-n> must be sourced after Visual-Multi plug-in
+vmap <silent> <C-n> :ExtractSelection<cr>
+nmap <silent> <C-n> :new<cr>
+" UltiSnips {{{
+let g:UltiSnipsExpandTrigger = ""
+let g:UltiSnipsListSnippets = ""
+let g:UltiSnipsJumpForwardTrigger = ""
+let g:UltiSnipsJumpBackwardTrigger = "" 
+let g:UltiSnipsRemoveSelectModeMappings = 0
+" }}} UltiSnips
 " Exchange {{{
 nmap gx <Plug>(Exchange)
 xmap X <Plug>(Exchange)
 nmap gxc <Plug>(ExchangeClear)
 nmap gxx <Plug>(ExchangeLine)
 " }}} Exchange
-" NOTE: anything mapping to the <C-n> must be sourced after Visual-Multi plug-in
-vmap <silent> <C-n> :ExtractSelection<cr>
-nmap <silent> <C-n> :new<cr>
 " preservim/nerdcommenter {{{
 let g:FiletypeCommentDelimiter = {
     \ "vim": "\"",
@@ -566,18 +600,16 @@ omap am <Plug>(matchup-a%)
 omap im <Plug>(matchup-i%)
 " vmap vim vi%
 " vmap vim vi%
-" Enter Fix
-noremap <cr> <cr>
-" Origin mark
-nnoremap <A-m> m
-" Highlight
-nmap <silent> <leader>m <plug>(matchup-hi-surround)
 " Inclusive
-map <C-m> <Plug>(matchup-%)
-map <C-S-m> <Plug>(matchup-g%)
+map <C-m> %
+map <C-S-m> g%
 " Exclusive 
 map m <Plug>(matchup-]%)
 map M <Plug>(matchup-[%)
+" Origin mark
+noremap <A-m> m
+" Highlight
+nmap <silent> <leader>m <plug>(matchup-hi-surround)
 " }}} andymass/vim-matchup
 " landock/vim-expand-region {{{
 let g:expand_region_text_objects = {
