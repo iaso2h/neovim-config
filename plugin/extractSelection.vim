@@ -1,4 +1,4 @@
-function! s:ExtractSelection(modeType)
+function! ExtractSelection(modeType)
     if a:modeType !=# "V"
         return
     endif
@@ -77,4 +77,4 @@ function! s:AskEditFile()
         execute "e " . s:answer
     endif
 endfunction
-command -range -nargs=0 ExtractSelection call <SID>ExtractSelection(visualmode())
+

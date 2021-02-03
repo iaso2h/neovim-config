@@ -1,7 +1,7 @@
 function! s:SpanWin()
     if MultiBufInWin()
-        if &filetype ==# "" || &filetype ==# "help"
-            if winwidth(0) <= 128 
+        if &buftype == "help"
+            if winwidth(0) <= 116 
                 wincmd s | bp | wincmd K
             else
                 wincmd v | bp | wincmd H
@@ -11,7 +11,7 @@ function! s:SpanWin()
 endfunction
 
 function! s:SaveQuit() abort
-    let l:answer = confirm("Save modification?", ">>> &Yes\n&No\n&Cancel", 1, "Question")
+    let l:answer = confirm("Save modification?", ">>> &Save\n&Discard\n&Cancel", 3, "Question")
     if l:answer == 1
         wq 
     elseif l:answer == 2  
@@ -21,7 +21,7 @@ function! s:SaveQuit() abort
 endfunction
 
 function! s:SaveUnload() abort
-    let l:answer = confirm("Save modification?", ">>> &Yes\n&No\n&Cancel", 1, "Question")
+    let l:answer = confirm("Save modification?", ">>> &Save\n&Discard\n&Cancel", 3, "Question")
     if l:answer == 1 
         w | bd
     elseif l:answer == 2 
@@ -35,69 +35,14 @@ function! s:SmartQuit()  abort
     let l:winNum = winnr("$")
     let s:curBufName = bufname()
     let l:bufferInstance = 0
-    " Close Help, Quickfix
     let l:specialBuf = 0
-    " Command Line
-    if &filetype ==# "vim" && bufname() ==# "[Command Line]"
-        q
-    " Newtre
-    elseif &filetype ==# "netrw"
-        q
-    elseif &filetype ==# "help" || (&filetype != "" && s:curBufName =="")
+    " Special buffer
+    if &buftype != "" && &buftype !=# "acwrite"
         if l:winNum == 1
             if MultiBufInWin() | bd | else | q | endif
         else
             execute "q"
             if winnr("$") == 1 | call s:SpanWin() | endif
-        endif
-    " Empty files
-    elseif &filetype == ""
-        " 1 Window
-        if l:winNum == 1
-            " 2+ Buffers in 1 window
-            if MultiBufInWin()
-                if &modified | call s:SaveUnload() | else | bd | endif
-            " 1 Buffer in 1 window
-            else
-                if &modified | call s:SaveQuit() | else | q | endif
-            endif
-        " 2+ Windows 
-        else
-            if l:fileBufCount >= 1
-                q
-            elseif l:fileBufCount == 0
-                " Check special buffer in other windows
-                for l:winIndex in range(l:winNum)
-                    execute "normal! \<C-w>w"
-                    if l:winIndex != l:winNum - 1
-                        if &filetype ==# "" && bufname() ==# ""
-                            let l:specialBuf = 1
-                            let l:fileBufCount += 1
-                        elseif &filetype !=# "" && bufname() ==# ""
-                            let l:specialBuf = 1
-                        elseif &filetype !=# "" && bufname() !=# ""
-                            if &filetype !=# "help"
-                                let l:fileBufCount += 1
-                            else
-                                let l:specialBuf = 1
-                            endif
-                        endif
-                    endif
-                endfor
-                " Special buffer in other windows
-                if l:specialBuf
-                    " Multiple buffers in current window
-                    if MultiBufInWin()
-                        if &modified | call s:SaveUnload() | else | bd! | endif
-                    " One buffer in current window
-                    else
-                        if &modified | call s:SaveQuit() | else | q | endif
-                    endif
-                " No special buffer in other windows
-                else
-                    q
-                endif
-            endif
         endif
     " Close Buffer
     else

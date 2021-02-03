@@ -1,12 +1,14 @@
+" File: init.vim
+" Author: iaso2h
+" Description: Neovim v0.50
+" Last Modified: 一月 31, 2021
 let $configPath = expand(stdpath('config'))
 let g:NERDCreateDefaultMappings = 0
 let g:expand_region_use_defaults = 0
 let g:VM_default_mappings = 0
 let g:sandwich_no_default_key_mappings = 1
-
 " Plug-ins list {{{
 let &runtimepath = &runtimepath . "," . expand('$configPath/dein/dein.vim')
-
 if 1
     "     if !isdirectory(expand('$configPath/dein'))
     "         execute "autocmd VimEnter * !git clone https://github.com/Shougo/dein.vim " . expand('$configPath/dein/dein.vim')
@@ -42,6 +44,7 @@ if 1
     " call dein#add('tpope/vim-scriptease')
     "         call dein#add('easymotion/vim-easymotion')
     "         call dein#add('machakann/vim-sandwich')
+    "         call dein#add('landock/vim-expand-region')
     "         call dein#add('tommcdo/vim-exchange')
     "         call dein#add('lag13/vim-create-variable')
     "         call dein#add('mg979/vim-visual-multi')
@@ -49,7 +52,6 @@ if 1
     "         call dein#add('AndrewRadev/splitjoin.vim')
     "         call dein#add('preservim/nerdcommenter')
     "         call dein#add('inkarkat/vim-ReplaceWithRegister')
-    "         call dein#add('landock/vim-expand-region')
     " call dein#add('michaeljsmith/vim-indent-object')
     " call dein#add('andymass/vim-matchup')
 
@@ -124,150 +126,149 @@ if 1
     Plug 'dahu/VimRegexTutor'
     call plug#end()
 endif
+
+execute "luafile " . expand("$configPath/lua/plug-colorizer.lua")
+" execute "source " . expand("$configPath/plugin/copypasteUtil.vim")
+if has('win32')
+    lua require('dap-python').setup('D:/anaconda3/envs/test/python.exe')
+endif
 " }}} Plug-ins list
+" runtime! plugin/*.vim
 " Basic settings {{{
 filetype plugin on
-let mydict = expand('$configPath/dev.dict')
+let s:myDict = expand('$configPath/dev.dict')
 set ai
-set cindent " set C style indent
+set cindent expandtab shiftround shiftwidth=4 softtabstop=4 tabstop=4
 set clipboard=unnamed
 set cmdheight=2 "Give more space for displaying messages
 set complete=.,w,b,u,t,kspell,i,d,t
 set conceallevel=2
 set concealcursor=nc
-set cpoptions+=q "Failed on Win?
+set cpoptions+=q "Failed on nvim_qt?
 set cursorline
-set dictionary+=mydict
+set dictionary+=s:myyDict
 set diffopt=context:10000,filler,closeoff,vertical,algorithm:patience
-set expandtab " Soft tab
-set fillchars=fold:-,vert:╎ "Sarasa Nerd Mono SC
+set fileignorecase
+set fillchars=fold:-,vert:╎
+set foldcolumn=auto:4 signcolumn=auto:4
 set formatoptions=pj1Bml2nwc
 set gdefault
 set guicursor=n-v-sm:block,i-c-ci-ve:ver25-Cursor,o-r-cr:hor20
+set guifont=更纱黑体\ Mono\ SC\ Nerd:h13
 set hidden
-set ignorecase " ignorecase for / and ?, work with smartcase
-set inccommand=nosplit " live substitution
+set ignorecase smartcase
+set inccommand=nosplit
 set keywordprg=:help
 set listchars=tab:>-,precedes:<,extends:>,trail:-,nbsp:%
 set langmenu=en
-set lazyredraw " Make Macro faster
+set lazyredraw
 set mouse=a
-set nobackup
 set nojoinspaces
-set nostartofline
-set noswapfile
-set nowritebackup
+set noshowmode
 set number
-set scrolloff=5
+set scrolloff=8
 set sessionoptions=buffers,curdir,folds,help,resize,slash,tabpages,winpos,winsize
 set shada=!,'100,/100,:100,<100,s100,h
-set shiftround " Indent/outdent to nearest tabstop
-set shiftwidth=4 " Indent/outdent by four columns
 set shortmess=lxTI
-set signcolumn=yes:2
-set smartcase
-set softtabstop=4 " Indentation levels every four columns
-set splitbelow
-set splitright
-set switchbuf=vsplit
-set tabstop=4
+set splitbelow splitright switchbuf=vsplit
 set termguicolors
 set timeoutlen=500
-set undofile " Combine with undotree plugin
+set undofile undodir=~/.nvimcache/undodir nobackup noswapfile nowritebackup
 set updatetime=150
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite,*.bak
+set wildignorecase
 set wildoptions=pum
-set wildmode=full
+colorscheme onedarknord
 " Settings based on OS
 if has('win32')
     " Python executable
-    set wildignorecase
-    let s = substitute(system('python -c "import sys; print(sys.executable)"'), '\n\+$', '', 'g')
-    let g:python3_host_prog = strtrans(s)
+    set shell=powershell
+    set shellquote= shellpipe=\| shellxquote=
+    set shellcmdflag=-NoLogo\ -NoProfile\ -ExecutionPolicy\ RemoteSigned\ -Command
+    set shellredir=\|\ Out-File\ -Encoding\ UTF8
+    let g:python3_host_prog = expand("$HOME/AppData/Local/Programs/Python/Python38/python.exe")
+    if !executable(g:python3_host_prog)
+        let s:pythonPath = substitute(system('python -c "import sys; print(sys.executable)"'), '\n\+$', '', 'g')
+        let g:python3_host_prog = strtrans(s)
+        if !executable(g:python3_host_prog) | throw "Python path not found" | endif
+    endif
 elseif has('unix')
-    " Python executable
-    let s = substitute(system('which python3'), '\n\+$', '', 'g')
-    let g:python3_host_prog = strtrans(s)
+    let s:pythonPath = substitute(system('which python3'), '\n\+$', '', 'g')
+    let g:python3_host_prog = strtrans(s:pythonPath)
     " Linux input
     let g:input_toggle = 0
-    function! Fcitx2en()
-        let s:input_status = system("fcitx-remote")
-        if s:input_status == 2
-            let g:input_toggle = 1
-            let l:a = system("fcitx-remote -c")
-        endif
-    endfunction
-
-    function! Fcitx2zh()
-        let s:input_status = system("fcitx-remote")
-        if s:input_status != 2 && g:input_toggle == 1
-            let l:a = system("fcitx-remote -o")
-            let g:input_toggle = 0
-        endif
-    endfunction
-    autocmd InsertLeave * call Fcitx2en()
-    autocmd InsertEnter * call Fcitx2zh()
+    autocmd InsertLeave * call <SID>Fcitx2en()
+    autocmd InsertEnter * call <SID>Fcitx2zh()
 endif
 " }}} Basic settings
 
 " Functions {{{
+function! s:Fcitx2en()
+    let s:input_status = system("fcitx-remote")
+    if s:input_status == 2
+        let g:input_toggle = 1
+        let l:a = system("fcitx-remote -c")
+    endif
+endfunction
+function! s:Fcitx2zh()
+    let s:input_status = system("fcitx-remote")
+    if s:input_status != 2 && g:input_toggle == 1
+        let l:a = system("fcitx-remote -o")
+        let g:input_toggle = 0
+    endif
+endfunction
 function! Echo(expr)
     echom strftime('%c') . ":" a:expr
 endfunction
-" }}}
+function TrimWhiteSpaces()
+    let l:saveView = winsaveview()
+    keeppatterns %s#\s\+$##e
+    call winrestview(l:saveView)
+endfunction
+" }}} Functions
 
-" fileType {
-augroup _fileType
+" Auto commands {{{
+augroup _fileType " {{{
     autocmd!
+    autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
     autocmd FileType json syntax match Comment +\/\/.\+$+
-    " Quick seperating line
-    " autocmd FileType javascript nnoremap <buffer> gS iconsole.log("-".reapet(65))<esc>o
-    " autocmd FileType python     nnoremap <buffer> gS iprint("-"*65)<esc>o<cr>
-
-    nnoremap gs jO<esc>65a-<esc>gccj
     " C language
-    autocmd BufRead *.c,*.h	execute "1;/^{"
+    autocmd CursorHold *.c,*.h,*.cpp,*.cc,*.vim :call HLCIOFunc()
     " Vim
     autocmd FileType vim setlocal foldmethod=marker
     autocmd FileType vim vnoremap <buffer> <A-f> =
     autocmd FileType vim nmap <buffer> <A-f> <A-m>zvae=`z
     autocmd FileType vim nmap <buffer> <silent> <C-S-q> :execute 'h ' . expand('<cword>')<cr>
     autocmd FileType vim vmap <silent> <C-S-q> :<c-u>execute 'h ' . VisualSelection("string")<cr>
-    " autocmd FileType vim setlocal foldlevelstart=1
     " Quickfix window
     autocmd FileType qf setlocal number norelativenumber
     autocmd FileType qf map <buffer> <silent> <cr> :.cc<cr>:copen<cr>
+    " Startify
+    autocmd FileType startify nested setlocal buflisted
     " Terminal
-    autocmd TermOpen * startinsert
+    " autocmd TermOpen * startinsert
     " Help
-    " autocmd FileType help if winnr('$') > 2 | wincmd J | else | wincmd L | endif
-    autocmd FileType help if winwidth(0) > 128 | wincmd L | endif
-augroup END
-" } fileType
-" Clear cmd line message {
-function! EmptyMessage()
-    if mode() ==# 'n'
-        echo ''
-    endif
-endfunction
-" augroup cmd_msg_cls
-"     autocmd!
-"     autocmd CmdlineLeave :  call timer_start(5000, funcref('Empty_message'))
-" augroup END
-" } Clear cmd line message
-
-" Autoreload vimrc {
-augroup vimrcReload
+    autocmd BufEnter *.txt if &buftype == 'help' | if winwidth(0) > 116 | wincmd L | endif | endif
+augroup END " }}}
+" augroup highlightYank " {{{
+" autocmd!
+" autocmd TextYankPost * silent! lua vim.highlight.on_yank {on_visual=false, higroup="Search", timeout=500}
+" augroup END " }}}
+augroup checkBufChanged " {{{
     autocmd!
+    autocmd FocusGained,BufEnter * checktime
+augroup end " }}}
+augroup vimrcReload " {{{
+    autocmd!
+    let $COCVIMRC = expand("$configPath/plugin/cocSettings.vim")
     autocmd bufwritepost $MYVIMRC nested source $MYVIMRC | redraw! | echom "Reload: " . $MYVIMRC
-    autocmd bufwritepost *.vim if expand("%:p:h") ==# expand("$configPath" . "/plugin") | 
+    autocmd bufwritepost *.vim if expand("%:p:h") ==# expand("$configPath" . "/plugin") |
                 \ execute("source " . expand("%:p")) | redraw! | echom "Reload: " . expand("%:p") |
                 \ endif
-augroup END
-" } Autoreload vimrc
+augroup END " }}}
 " }}} Auto commands
+
 " Commands {{{
-" Echo with time
 command! -nargs=+ Echo call Echo(<args>)
 " Custom old files
 command! -nargs=* O browse oldfiles
@@ -285,7 +286,6 @@ command! -nargs=0 DEINClean call map(dein#check_clean(), "delete(v:val, 'rf')")
 command! -nargs=0 -range Backward setl revins | exe "norm! gvc\<C-r>\"" | setl norevins
 " Edit Vimrc
 if has('win32')
-    command! -nargs=0 PS | terminal powershell
     command! -nargs=0 IDEAVimedit vsplit ~/.ideavimrc
 endif
 command! -nargs=0 MyVimedit vsplit $MYVIMRC
@@ -294,6 +294,10 @@ command! -nargs=0 MyVimsrc source $MYVIMRC
 
 " Key mapping {{{
 let mapleader = "\<Space>" " First thing first
+" Extract selection
+vmap <silent> <C-x> :call ExtractSelection(visualmode())<cr>
+" Scratch file
+nmap <silent> <C-n> :new<cr>
 " Open/Search in browser
 nmap <silent> <A-S-s> :call OpenUrl()<cr>
 xmap <silent> <A-S-s> :<c-u>call OpenInBrowser(VisualSelection("string"))<cr>
@@ -303,8 +307,8 @@ nnoremap <C-A-c> call interrupt()<cr>
 noremap ,, ,
 " noremap ;; ;
 " Paragraph & Block navigation
-noremap <silent> { :call InclusivePragraph("up")<cr>
-noremap <silent> } :call InclusivePragraph("down")<cr>
+noremap <silent> { :call InclusiveParagraph("up")<cr>
+noremap <silent> } :call InclusiveParagraph("down")<cr>
 " Line end/start
 nmap H ^
 vmap H ^
@@ -317,12 +321,14 @@ nmap g{ :<c-u>call TrailingFolderMarker(mode(), "{{{")<cr>
 nmap g} :<c-u>call TrailingFolderMarker(mode(), "}}}")<cr>
 vmap g{ <A-m>z:<c-u>call TrailingFolderMarker(visualmode(), "}}}")<cr>`z
 vmap g} <A-m>z:<c-u>call TrailingFolderMarker(visualmode(), "}}}")<cr>`z
-nnoremap g; :call TrailingChar(";")<cr>
+nnoremap <silent> g; :call TrailingChar(";")<cr>
 nnoremap <silent> g<C-cr> :call TrailingLinebreak("down")<cr>
 nnoremap <silent> g<S-cr> :call TrailingLinebreak("up")<cr>
 " Messages
 nmap <silent> <A-`> :messages clear <bar> echo "Message clear"<cr>
 nmap <silent> <C-`> :messages<cr>
+" Bug
+nmap <silent> <C-S-`> :Messages<cr> 
 " Non-blank last character
 noremap g$ g_
 " Block visual mode
@@ -337,8 +343,8 @@ tmap <A-n> <C-\><C-n>
 " Macro
 nnoremap <A-q> q
 " Register
-function! s:ClearReg() 
-    for i in range(34,122) | silent! call setreg(nr2char(i), "") | endfor 
+function! s:ClearReg()
+    for i in range(34,122) | silent! call setreg(nr2char(i), "") | endfor
 endfunction
 map <silent> <C-'> :reg<cr>
 imap <silent> <C-'> <C-\><C-o>:reg<cr>
@@ -360,13 +366,13 @@ map <silent> <A-S-h> :tabp<cr>
 map <silent> <A-S-l> :tabn<cr>
 " }}} Buffer & Window & Tab
 " Search & Jumping {{{
-vmap * :<c-u>execute "/" . VisualSelection("string")<cr>
-vmap # :<c-u>execute "?" . VisualSelection("string")<cr>
-vmap / *
-vmap ? #
+vmap <silent> * :<c-u>execute "/" . VisualSelection("string")<cr>
+vmap <silent> # :<c-u>execute "?" . VisualSelection("string")<cr>
+vmap <silent> / *
+vmap <silent> ? #
 " Regex very magic
-noremap / /\v
-noremap ? ?\v
+nnoremap / /\v
+nnoremap ? ?\v
 " Disable highlight search
 nmap <silent> <leader>h :noh<cr>
 vmap <silent> <leader>h :<c-u>call InplaceDisableVisual()<cr>
@@ -376,26 +382,32 @@ nnoremap <silent> <leader><Space> @=(foldlevel('.') ? 'za' : '\<Space>')<cr>
 vnoremap <leader>f zf
 nnoremap zo zR
 nnoremap zc zM
-" Copy && Paste {{{
-" <C-z/x/v/s> {{{
+" MS bebhave {{{
+" <C-z/v/s> {{{
 nmap <C-z> u
 vmap <C-z> <esc>u
-imap <C-z> <esc>ua
-
-vmap <C-x> d
-" imap <C-x> <esc>dda
+imap <C-z> <C-\><C-o>u
 
 nmap <C-c> Y
 vmap <C-c> y
-imap <C-c> <esc>Ya
+imap <C-c> <C-\><C-o>Y
 
 nmap <C-v> i<C-v><esc>
 vmap <C-v> <esc>i<C-v><esc>
 imap <C-v> <C-r>*
 
-map <C-s> :<c-u>w<cr>
-imap <C-s> <esc><C-s>
+nmap <C-s> :<c-u>w<cr>
+vmap <C-s> :<c-u>w<cr>
+imap <silent> <C-s> <C-\><C-o>:w<cr>
 " }}} <C-z/x/v/s>
+" Saveas
+nmap <C-S-s> :saveas\<Space>
+vmap <C-S-s> :<c-u>saveas\<Space>
+imap <silent> <C-S-s> <C-\><C-o>:saveas\<Space>
+" Delete
+nmap <C-S-d> :d<cr>
+vmap <C-S-d> :d<cr>
+imap <silent> <C-S-d> <C-\><C-o>:d<cr>
 " Put content from registers 0
 nmap <leader>p "0p
 nmap <leader>P "0P
@@ -404,6 +416,7 @@ nmap <silent> gy :call LastYPHighlight("yank")<cr>
 nmap <silent> gp :call LastYPHighlight("put")<cr>
 " Inplace copy
 nmap Y yy
+vmap Y y
 nmap <silent><expr> y SetInplaceCopy()
 vmap <silent><expr> y SetInplaceCopy()
 omap <silent><expr> y SetInplaceCopy()
@@ -412,7 +425,9 @@ nmap <silent> p :<c-u>call InplacePaste(mode(), "p")<cr>
 vmap <silent> p :<c-u>call InplacePaste(visualmode(), "p")<cr>
 nmap <silent> P :<c-u>call InplacePaste(mode(), "P")<cr>
 vmap <silent> P :<c-u>call InplacePaste(visualmode(), "P")<cr>
-
+" Convert paste
+nmap cP :<c-u>call ConvertPaste("P")<CR>
+nmap cp :<c-u>call ConvertPaste("p")<CR>
 " Mimic the VSCode move/copy line up/down behavior {{{
 " Move line
 nmap <silent> <A-j> :m .+1<cr>==
@@ -430,13 +445,13 @@ imap <silent> <A-S-j> <C-\><C-o>:call VSCodeLineCopy(mode(), "down")<cr>
 imap <silent> <A-S-k> <C-\><C-o>:call VSCodeLineCopy(mode(), "up")<cr>
 vmap <silent> <A-S-j> :<c-u>call VSCodeLineCopy(visualmode(), "down")<cr>
 vmap <silent> <A-S-k> :<c-u>call VSCodeLineCopy(visualmode(), "up")<cr>
-" }}} Mimic the VSCode move/copy line up/down behavior 
-" }}} Copy && Paste
+" }}} Mimic the VSCode move/copy line up/down behavior
+" }}} MS bebhave
 " Changelist jumping
 nnoremap <A-o> g;zz
 nnoremap <A-i> g,zz
 " Convert \ into /
-nmap <silent> g/ :<A-m>zs#\\#\/<cr>:noh<cr>`z
+nnoremap <silent> g/ mz:s#\\#\/<cr>:noh<cr>g`z
 " Commandline & Insert {{{
 imap <C-cr> <esc>o
 imap <S-cr> <esc>O
@@ -475,35 +490,24 @@ cmap <C-v> <C-R>*
 " }}} Key mapping
 
 " Plug-ins settings  {{{
-runtime! plugin/*.vim
-execute "luafile " . expand("$configPath/lua/plug-colorizer.lua")
-if has('win32')
-    lua require('dap-python').setup('D:/anaconda3/envs/test/python.exe')
-endif
-" NOTE: anything mapping to the <C-n> must be sourced after Visual-Multi plug-in
-vmap <silent> <C-n> :ExtractSelection<cr>
-nmap <silent> <C-n> :new<cr>
-" UltiSnips {{{
+" SirVer/ultisnips {{{
+" Disable UltiSnips keymapping in favour of coc-snippets
 let g:UltiSnipsExpandTrigger = ""
 let g:UltiSnipsListSnippets = ""
 let g:UltiSnipsJumpForwardTrigger = ""
-let g:UltiSnipsJumpBackwardTrigger = "" 
-let g:UltiSnipsRemoveSelectModeMappings = 0
-" }}} UltiSnips
-" Exchange {{{
-nmap gx <Plug>(Exchange)
-xmap X <Plug>(Exchange)
-nmap gxc <Plug>(ExchangeClear)
-nmap gxx <Plug>(ExchangeLine)
-" }}} Exchange
+let g:UltiSnipsJumpBackwardTrigger = ""
+" }}} SirVer/ultisnips
 " preservim/nerdcommenter {{{
 let g:FiletypeCommentDelimiter = {
-    \ "vim": "\"",
-    \ "python": "#",
-    \ "c": "\\",
-    \ "json": "\\"
-  \ }
-
+            \ "vim": "\"",
+            \ "python": "#",
+            \ "c": "\/\/",
+            \ "cpp": "\/\/",
+            \ "json": "\/\/"
+            \ }
+let g:NERDAltDelims_c = 1
+let g:NERDAltDelims_cpp = 1
+let g:NERDAltDelims_javascript = 1
 function! CommentJump(keystroke)
     if getline(".") != ""
         execute "normal! Y"
@@ -517,6 +521,8 @@ endfunction
 nmap gco :call CommentJump("o")<cr>
 nmap gcO :call CommentJump("O")<cr>
 
+nmap gcc <plug>NERDCommenterToggle
+vmap gcc <plug>NERDCommenterToggle
 nmap gc<space> <plug>NERDCommenterToggle
 vmap gc<space> <plug>NERDCommenterToggle
 " nmap gcn <plug>NERDCommenterNested
@@ -598,12 +604,10 @@ xmap am <Plug>(matchup-a%)
 xmap im <Plug>(matchup-i%)
 omap am <Plug>(matchup-a%)
 omap im <Plug>(matchup-i%)
-" vmap vim vi%
-" vmap vim vi%
 " Inclusive
 map <C-m> %
 map <C-S-m> g%
-" Exclusive 
+" Exclusive
 map m <Plug>(matchup-]%)
 map M <Plug>(matchup-[%)
 " Origin mark
@@ -613,27 +617,27 @@ nmap <silent> <leader>m <plug>(matchup-hi-surround)
 " }}} andymass/vim-matchup
 " landock/vim-expand-region {{{
 let g:expand_region_text_objects = {
-        \ 'iw':  0,
-        \ 'iW':  0,
-        \ 'i"':  0,
-        \ 'i''': 0,
-        \ 'i]':  1,
-        \ 'ib':  1,
-        \ 'iB':  1,
-        \ 'il':  0,
-        \ 'ii':  0,
-        \ 'ip':  1,
-        \ 'ie':  0,
-        \ }
+            \ 'iw':  0,
+            \ 'iW':  0,
+            \ 'i"':  0,
+            \ 'i''': 0,
+            \ 'i]':  1,
+            \ 'ib':  1,
+            \ 'iB':  1,
+            \ 'il':  0,
+            \ 'ii':  0,
+            \ 'ip':  1,
+            \ 'ie':  0,
+            \ }
 call expand_region#custom_text_objects({
-        \ "\/\\n\\n\<CR>": 0,
-        \ 'i,w'  :1,
-        \ 'i%'  :0,
-        \ 'a]' :0,
-        \ 'ab' :0,
-        \ 'aB' :0,
-        \ 'ai' :0,
-        \ })
+            \ "\/\\n\\n\<CR>": 0,
+            \ 'i,w'  :1,
+            \ 'i%'  :0,
+            \ 'a]' :0,
+            \ 'ab' :0,
+            \ 'aB' :0,
+            \ 'ai' :0,
+            \ })
 map <A-a> <Plug>(expand_region_expand)
 map <A-s> <Plug>(expand_region_shrink)
 " }}} landock/vim-expand-region
@@ -648,9 +652,15 @@ let g:vista#renderer#icons = {
 nmap <leader>s :Vista!!<cr>
 " }}} liuchengxu/vista.vim
 " mbbill/undotree {{{
-nmap <silent> <c-u> :UndotreeToggle<cr>
+nmap <silent><expr> <c-u> &buftype? ":UndotreeToggle\<cr>" : ":UndotreeToggle\<bar>UndotreeFocus\<cr>"
 " }}} mbbill/undotree
 " tpope/vim-repeat {{{
 silent! call repeat#set("\<Plug>MyWonderfulMap", v:count)
 " }}} tpope/vim-repeat
+" Exchange {{{
+nmap gx <Plug>(Exchange)
+xmap X <Plug>(Exchange)
+nmap gxc <Plug>(ExchangeClear)
+nmap gxx <Plug>(ExchangeLine)
+" }}} Exchange
 " }}} Plug-ins settings

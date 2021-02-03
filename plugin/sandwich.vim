@@ -32,7 +32,7 @@ function! FolderMaker()
     if l:markName ==# ''
         throw 'OpertorSandwichCancel'
     endif
-    let l:former = "\r" . g:FiletypeCommentDelimiter[&filetype] . " " . l:markName . " {{{"
+    let l:former = g:FiletypeCommentDelimiter[&filetype] . " " . l:markName . " {{{"
     let l:latter = g:FiletypeCommentDelimiter[&filetype] . " }}} " . l:markName
     return [l:former, l:latter]
 endfunction

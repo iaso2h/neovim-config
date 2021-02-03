@@ -3,7 +3,8 @@
     "clangd.arguments": [
         "--background-index"
     ],
-    "cSpell.enabled": false,
+    "cmake.cmakePath": "D:\\CMake\\bin\\cmake.exe",
+    "cmake.lsp.enable": false,
     "codeLens.enable": true,
     "coc.preferences.colorSupport": true,
     "coc.preferences.currentFunctionSymbolAutoUpdate": true,
@@ -18,22 +19,50 @@
     "coc.source.around.firstMatch": false,
     "coc.source.file.ignoreHidden": false,
     "diagnostic.checkCurrentLine": true,
-    "diagnostic.errorSign": " ",
-    "diagnostic.hintSign": " ",
-    "diagnostic.infoSign": " ",
-    "diagnostic.warningSign": " ",
+    "diagnostic.errorSign": "❌",
+    "diagnostic.hintSign": "💡",
+    "diagnostic.infoSign": "🔎",
+    "diagnostic.warningSign": "⚠️",
     "diagnostic.format": "%message [%source]",
     "diagnostic.separateRelatedInformationAsDiagnostics": true,
     "diagnostic.virtualText": true,
     "list.nextKeymap": "<C-n>",
     "list.previousKeymap": "<C-p>",
+    "languageserver": {
+        "ccls": {
+            "command": "ccls",
+            "filetypes": [
+                "c",
+                "cpp",
+                "cuda",
+                "objc",
+                "objcpp"
+            ],
+            "rootPatterns": [
+                ".ccls-root",
+                "compile_commands.json"
+            ],
+            "initializationOptions": {
+                "cache": {
+                    "directory": ".ccls-cache"
+                },
+                "client": {
+                    "snippetSupport": true
+                }
+            }
+        }
+    },
     "markdownlint.config": {
         "default": true,
         "line-length": false
     },
     "snippets.extends": {
-        "cpp":["c"],
-        "typescript": ["javascript"]
+        "cpp": [
+            "c"
+        ],
+        "typescript": [
+            "javascript"
+        ]
     },
     "snippets.shortcut": "V",
     "snippets.enableStatusItem": true,
@@ -79,5 +108,10 @@
         "plugin"
     ],
     "python.formatting.provider": "black",
-    "python.formatting.blackPath": "/home/iaso2h/.local/bin/black"
+    "python.formatting.blackPath": "/home/iaso2h/.local/bin/black",
+    "cSpell.enabled": false,
+    "cSpell.allowCompoundWords": true,
+    "cSpell.userWords": [
+        "iaso2h"
+    ]
 }

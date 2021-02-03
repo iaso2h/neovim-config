@@ -1,10 +1,9 @@
-" mg979/vim-visual-multi-multi {
+" mg979/vim-visual-multi-multi {{{
 let g:VM_silent_exit = 1
 let g:VM_quit_after_leaving_insert_mode = 1
 let g:VM_verbose_commands = 1
 let g:VM_skip_shorter_lines = 0
 let g:VM_skip_empty_lines = 1
-let g:VM_disable_syntax_in_imode = 1
 let g:VM_insert_special_keys = ['c-v', 'c-e', 'c-a']
 " Theme
 let g:VM_theme = 'nord'
@@ -17,16 +16,17 @@ let g:VM_custom_remaps = {"<C-v>": "<C-r>", "s": "c"}
 " To remap any key to normal! commands. Example:
 let g:VM_custom_noremaps = {"==": "==", "<<": "<<", ">>": ">>"}
 function! VM_Start()
+    " TODO remap coc enter
     imap <C-BS> <C-\><C-o>db
     nmap S ys
-    " nmap q ,q
     nmap <leader>h <esc>
-    
+    nmap <C-n> ,<C-n>
+    nmap <C-p> ,<C-p>
 endfunction
 
 function! VM_Exit()
-    " map q <Plug>smartQuit
     nmap <silent> <leader>h :noh<cr>
+    nnoremap <C-p> <C-p>
 endfunction
 
 augroup VmStartMapping
@@ -51,10 +51,8 @@ let g:VM_maps['Visual All']      = '<C-S-a>'
 let g:VM_maps['Invert Direction'] = 'o'
 let g:VM_maps['Find Next'] = 'n'
 let g:VM_maps['Find Prev'] = 'N'
-let g:VM_maps['Goto Next'] = '<C-n>'    " Without adding new occurrences
-let g:VM_maps['Goto Prev'] = '<C-S-n>'  " Without adding new occurrences
-" let g:VM_maps['Goto Next'] = '<A-n>'    " Without adding new occurrences
-" let g:VM_maps['Goto Prev'] = '<A-S-n>'  " Without adding new occurrences
+let g:VM_maps['Goto Next'] = ',<C-n>'    " Without adding new occurrences
+let g:VM_maps['Goto Prev'] = ',<C-p>'  " Without adding new occurrences
 " Modify selection
 let g:VM_maps['Enlarge']       = '<A-a>'
 let g:VM_maps['Shrink']        = '<A-s>'
@@ -65,4 +63,4 @@ let g:VM_maps['Align Char'] = ',>'
 let g:VM_maps['Run Normal'] = ',!'
 let g:VM_maps['Run Macro'] = ',@'
 let g:VM_maps['Show Register'] = ',"'
-" } mg979/vim-visual-multi-multi
+" }}} mg979/vim-visual-multi-multi

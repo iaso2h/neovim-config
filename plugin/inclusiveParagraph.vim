@@ -1,4 +1,4 @@
-function! InclusivePragraph(direction)
+function! InclusiveParagraph(direction)
     let l:currentLineNum = getpos(".")[1]
     if a:direction ==# "up"
         if getline(".") ==# ""

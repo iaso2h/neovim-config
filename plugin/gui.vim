@@ -4,7 +4,8 @@ let g:indentLine_char= '▏'
 " }}} michaeljsmith/vim-indent-object
 
 " vim-airline/vim-airline {{{
-let g:airline_skip_empty_sections = 1
+let g:airline_theme='onedarknord'
+" let g:airline_skip_empty_sections = 1
 let g:airline_powerline_fonts = 1
 let g:airline_extensions = ['coc', 'tabline', 'wordcount', 'virtualenv', 'branch', 'fzf']
 let g:airline#extensions#wordcount#filetypes = ['all']
@@ -25,17 +26,17 @@ function! StatusDiagnostic(type) abort
     let msgs = []
     if a:type ==# "error"
         if get(info, 'error', 0)
-            call add(msgs, ' ' . info['error'])
+            call add(msgs, '❌ ' . info['error'])
         endif
     elseif a:type ==# "warning"
         if get(info, 'warning', 0)
-            call add(msgs, ' ' . info['warning'])
+            call add(msgs, '⚠️ ' . info['warning'])
         endif
         if get(info, 'information', 0)
-            call add(msgs, ' ' . info['information'])
+            call add(msgs, '🔎 ' . info['information'])
         endif
         if get(info, 'hint', 0)
-            call add(msgs, ' ' . info['hint'])
+            call add(msgs, '💡 ' . info['hint'])
         endif
     endif
     " echo get(g:, 'coc_status', '')

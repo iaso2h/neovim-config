@@ -54,6 +54,7 @@ endfunction
 " }}} VSCode copy line
 
 " InplaceUlti {{{
+" let s:ReplaceID = {}
 " InplaceCopy {{{
 function! InplaceCopy(type, ...)
     let s:yankFilePath = expand("%:p")
@@ -66,38 +67,32 @@ function! InplaceCopy(type, ...)
     endif
     normal! `[mY
     normal! `]my
-    call cursor(s:startPos[1], s:startPos[2])
-    " Create highlight {{{
-    " Clear previous HL before creating new HL
-    if get(s:YPRHLIDDict, s:yankWinID, 0)
-        call ClearPutHL(500)
-    endif
-    let s:YPRHLIDDict[s:yankWinID] = 9135
-    call matchadd("Search", "\\%'Y.*\\(\\_s.*\\)*\\%'y.", 50, 9135)
-    let l:timer = timer_start(500, "ClearYankHL")
-    " }}} Create highlight
+    call cursor(s:inplaceCopyCurStart[1], s:inplaceCopyCurStart[2])
+    call matchadd("Search", "\\%'Y.*\\(\\_s.*\\)*\\%'y.", 50, 9136)
+    let s:yankIDDict[win_getid()] = 9136
+    let l:timer = timer_start(500, "ClearYankHighlightHandler")
 endfunction
 
 function! SetInplaceCopy()
-    if !type(get(s:, "YPRHLIDDict", 0))
-        let s:YPRHLIDDict = {}
+    if !type(get(s:, "yankDict", 0))
+        let s:yankDict = {}
     endif
     let s:yankWinID = win_getid()
-    let s:startPos = getpos('.')
+    let s:inplaceCopyCurStart = getpos('.')
     set opfunc=InplaceCopy
     silent return 'g@'
 endfunction
 " }}} InplaceCopy
 
 function! InplacePaste(typeMode, pasteCMD) "  {{{
-    if !type(get(s:, "YPRHLIDDict", 0))
-        let s:YPRHLIDDict = {}
+    if !type(get(s:, "putIDDict", 0))
+        let s:putHLIDDict = {}
     endif
     let s:putWinID = win_getid()
     let s:putFilePath = expand("%:p")
+    let l:InplacePasteStart = getpos('.')
     let l:startPos = getpos('.')
     let l:curLine = getline('.')
-    let l:regType = getregtype(v:register)
     " Execute cmd {{{
     if a:typeMode ==# "n"
         if v:count
@@ -112,62 +107,69 @@ function! InplacePaste(typeMode, pasteCMD) "  {{{
     endif
     " }}} Execute cmd
     " Formatting 1 line long content and 'V' mode, then get position info {{{
-    if l:regType ==# "V"
+    if getregtype(v:register) ==# "V"
         normal! `[V`]=
         normal! `[0mP
+        let l:putStartPos = getpos('.')
         normal! `]g$mp
-    elseif l:regType ==# "v"
+        let l:putEndPos = getpos('.')
+    elseif getregtype(v:register) ==# "v"
         " New paste content is a single line
         let l:match = matchstr(l:curLine, '\S')
-        call cursor(l:startPos[1], l:startPos[2])
+        call cursor(l:InplacePasteStart[1], l:InplacePasteStart[2])
         if l:match == ""
             normal! ==
             normal! ^mP
+            let l:putStartPos = getpos('.')
             normal! g_mp
+            let l:putEndPos = getpos('.')
         else
             normal! `[mP
+            let l:putStartPos = getpos('.')
             normal! `]mp
+            let l:putEndPos = getpos('.')
         endif
     else
         normal! `[mP
+        let l:putStartPos = getpos('.')
         normal! `]mp
+        let l:putEndPos = getpos('.')
     endif
-    " }}} Formatting line long content and 'V' mode, then get position info
-    " Restore position
-    if a:pasteCMD ==# "P"
-        if l:regType !=# "V"
-            keepjumps normal! `]l
-        else
-            let l:putEndPos = getpos(".")
-            call cursor(l:putEndPos[1] + 1, l:startPos[2])
-        endif
-    else
-        call cursor(l:startPos[1], l:startPos[2])
-    endif
+    " }}} Formatting 1 line long content and 'V' mode, then get position info
+    call cursor(l:InplacePasteStart[1], l:InplacePasteStart[2])
     " Create highlight {{{
-    " Clear previous HL before creating new HL
-    if get(s:YPRHLIDDict, s:putWinID, 0)
-        call ClearPutHL(500)
+    let l:newHLID = 7137
+    if !type(get(s:putHLIDDict, s:putWinID, 0))
+        " Create highlight
+        let s:putHLIDDict[s:putWinID] = []
+        call add(s:putHLIDDict[s:putWinID], l:newHLID)
+    else
+        if s:putHLIDDict[s:putWinID] == []
+            call add(s:putHLIDDict[s:putWinID], l:newHLID)
+        else
+            " Increase 1 to the last item them add to the list
+            let l:newHLID = 1 + s:putHLIDDict[s:putWinID][-1]
+            call add(s:putHLIDDict[s:putWinID], l:newHLID)
+        endif
     endif
-    let s:YPRHLIDDict[s:putWinID] = 9134
-    call matchadd("Search", "\\%'P.*\\(\\_s.*\\)*\\%'p.", 50, 9134)
+    call matchadd("Search", "\\%'P.*\\(\\_s.*\\)*\\%'p.", 50, l:newHLID)
     let l:timer = timer_start(500, "ClearPutHL")
     " }}} Create highlight
 endfunction "  }}}
 
 " YPHighlight {{{
 function! ClearYankHL(timer)
-    if get(s:YPRHLIDDict, s:yankWinID, 0)
-        call matchdelete(s:YPRHLIDDict[s:yankWinID], s:yankWinID)
-        let s:YPRHLIDDict[s:yankWinID] = 0
+    if get(s:yankIDDict, s:yankWinID, 0)
+        if s:yankIDDict[s:yankWinID]
+            call matchdelete(9136, s:yankWinID)
+            let s:yankIDDict[s:yankWinID] = 0
+        endif
     endif
 endfunction
 
 function! ClearPutHL(timer)
-    if get(s:YPRHLIDDict, s:putWinID, 0)
-        call matchdelete(s:YPRHLIDDict[s:putWinID], s:putWinID)
-        let s:YPRHLIDDict[s:putWinID] = 0
-    endif
+    call matchdelete(s:putHLIDDict[s:putWinID][0], s:putWinID)
+    call remove(s:putHLIDDict[s:putWinID], 0)
 endfunction
 
 function! LastYPHL(key)
@@ -199,7 +201,6 @@ endfunction
 " }}} YPHighlight
 
 function! InplaceDisableVisual() " {{{
-    normal! gv
     execute "normal! \<esc>"
 endfunction " }}}
 
@@ -238,15 +239,12 @@ endfunction
 " }}} InplaceUlti
 
 function! g:ConvertPaste(pasteCMD) "  {{{
-    if !type(get(s:, "YPRHLIDDict", 0))
-        let s:YPRHLIDDict = {}
-    endif
     let s:putFilePath = expand("%:p")
-    let l:startPos = getpos(".")
+    let l:pasteStart = getpos(".")
     let l:regType = getregtype(v:register)
     let l:saveRegContent = getreg(v:register)
+    let l:startPos = getpos(".")
     let l:curLine = getline('.')
-
     if l:regType ==# "v" || l:regType ==# "c"
         call setreg(v:register, l:saveRegContent, "V")
     elseif l:regType ==# "V" || l:regType ==# "l"
@@ -262,11 +260,11 @@ function! g:ConvertPaste(pasteCMD) "  {{{
     else
         execute "normal \"". v:register . a:pasteCMD
     endif
-    if l:regType ==# "V"
+    " Formatting 1 line long content
+    if getregtype(v:register) ==# "V"
         " New paste content is a single line
         let l:match = matchstr(l:curLine, '\S')
         if l:match == ""
-            " Formatting 1 line long content
             normal! ==
             normal! ^mP
             normal! g_mp
@@ -274,33 +272,13 @@ function! g:ConvertPaste(pasteCMD) "  {{{
             normal! `[mP
             normal! `]mp
         endif
-        " Restore position
-        if a:pasteCMD ==# "P"
-            keepjumps normal! `]l
-        else
-            call cursor(l:startPos[1], l:startPos[2])
-        endif
     else
         normal! `[mP
         normal! `]mp
-        " Restore position
-        if a:pasteCMD ==# "P"
-            let l:putEndPos = getpos(".")
-            call cursor(l:putEndPos[1] + 1, l:startPos[2])
-        else
-            call cursor(l:startPos[1], l:startPos[2])
-        endif
     endif
-
-    " Create highlight {{{
-    " Clear previous HL before creating new HL
-    if get(s:YPRHLIDDict, s:putWinID, 0)
-        call ClearPutHL(500)
-    endif
-    let s:YPRHLIDDict[s:putWinID] = 9134
-    call matchadd("Search", "\\%'P.*\\(\\_s.*\\)*\\%'p.", 50, 9134)
-    let l:timer = timer_start(500, "ClearPutHL")
-    " }}} Create highlight
+    call cursor(l:pasteStart[1], l:pasteStart[2])
+    match Search #\%'P.*\(\_s.*\)*\%'p.#
+    call <SID>ClearYPHL(1)
     " Restore
     call setreg(v:register, getreg(v:register), l:regType)
 endfunction "  }}}
