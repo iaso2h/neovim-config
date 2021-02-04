@@ -1,5 +1,5 @@
 runtime macros/sandwich/keymap/surround.vim
-nmap S ys
+nmap gS ys
 xmap iq <Plug>(textobj-sandwich-literal-query-i)
 xmap aq <Plug>(textobj-sandwich-literal-query-a)
 omap iq <Plug>(textobj-sandwich-literal-query-i)

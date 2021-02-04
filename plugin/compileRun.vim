@@ -18,11 +18,7 @@ endfunction
 function s:create_term_buf(_type, size) abort
     set splitbelow
     set splitright
-    if a:_type ==# 'v'
-        vnew
-    else
-        new
-    endif
+    if a:_type ==# 'v' | vnew | else | new | endif
     execute 'resize ' . a:size
 endfunction
 

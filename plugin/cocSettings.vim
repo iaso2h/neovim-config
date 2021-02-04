@@ -53,8 +53,9 @@ function! s:checkCOCDiagnosticFirst(COCAction)
         else
             echohl WarningMsg | echo "Fix diagnostic info" | echohl None
         endif
+    else
+        call CocActionAsync(a:COCAction)
     endif
-    call CocActionAsync(a:COCAction)
 endfunction
 " }}} Function
 
@@ -71,7 +72,7 @@ nnoremap <silent> <leader>d  :<C-u>CocList diagnostics<CR>
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gD <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gI <Plug>(coc-implementation)
 nmap <silent> gR <Plug>(coc-references)
 " Show Document
 nnoremap <silent> K :call <SID>show_documentation()<CR>
@@ -178,8 +179,8 @@ nmap <A-1> :CocCommand explorer<CR>
 nmap <space>el :CocList explPresets
 " }}} COC-Explorer
 " COC-Snippets {{{
-vmap <C-j> <Plug>(coc-snippets-select)
-imap <silent> <C-Tab> <C-o>:CocList snippets<cr>
+nmap <C-j> :CocCommand snippets.<C-S-l>
+nmap <silent> <leader>j <C-o>:CocList snippets<cr>
 let g:coc_snippet_next = '<Tab>'
 let g:coc_snippet_prev = '<S-Tab>'
 inoremap <silent><expr> <TAB>

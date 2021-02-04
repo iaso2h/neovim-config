@@ -6,4 +6,5 @@
 /.idea/
 /dein/
 .netrwhist
+.ccls-cache/
 

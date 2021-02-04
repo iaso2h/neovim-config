@@ -22,14 +22,11 @@ function! VM_Start()
     nmap <leader>h <esc>
     nmap <C-n> ,<C-n>
     nmap <C-p> ,<C-p>
-    iunmap <cr>
 endfunction
 
 function! VM_Exit()
     nmap <silent> <leader>h :noh<cr>
     nnoremap <C-p> <C-p>
-    inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
-                \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 endfunction
 
 augroup VmStartMapping

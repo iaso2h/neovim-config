@@ -1,45 +1,44 @@
-" File: CIO.vim
+" File: CIOHighlight.vim
 " Author: iaso2h
 " Description: Highlight specific conversion keyword in c language function
 "            like printf(), scanf()
 "            HL stands for highlight, CIO stands for c language I/O 
 "            functions
 " Last Modified: 二月 04, 2021
+" Version: 0.0.3
 " Initiation {{{
-function! InitCIO()
-    if exists("g:CIOInit")  && g:CIOInit
-        " Initiate only once
-        return 0
-    else
-        let s:CIOInit = 1
-        let s:funckeywordDict = {
-                    \ "c": ["printf", "scanf", "sprintf"],
-                    \ "vim": ["printf"]
-                    \}
-        let s:specDict = {
-                    \ "printf": ["%\\w", 2],
-                    \ }
-        let s:skipCharacters = {
-                    \ "printf": ["!@#$^<>()[]{}-=+\\|/?;'\",. "]
-                    \ }
-        let s:varPattern = "[^ ,`~@#$%^=|\\/<>{};'\"?]\\+"
-        let s:varPatternLast = {
-                    \ "c":   "[^ ,`~@#$%^=|\\/<>{};'\"?]\\+\\ze\\()\\+;$\\)",
-                    \ "vim": "[^ ,`~@#$%^=|\\/<>{};'\"?]\\+\\ze\\()\\+$\\)",
-                    \}
-        let g:CIOHLMatch = {}
-        let g:specHLID = 9136
-        let g:varHLID = 9137
-        highlight! link CIOFunctionHighlight CocHighlightText
-    endif
+function! s:CIOInit()
+    " Initiate only once
+    if exists("g:CIOInit")  && g:CIOInit | return 0 | endif
+
+    let s:CIOInit = 1
+    let s:funckeywordDict = {
+                \ "c": ["printf", "scanf", "sprintf"],
+                \ "vim": ["printf"]
+                \}
+    let s:specDict = {
+                \ "printf": ["%\\w", 2],
+                \ }
+    let s:skipCharacters = {
+                \ "printf": ["!@#$^<>()[]{}-=+\\|/?;'\",. "]
+                \ }
+    let s:varPattern = "[^ ,`~@#$%^=|\\/<>{};'\"?]\\+"
+    let s:varPatternLast = {
+                \ "c":   "[^ ,`~@#$%^=|\\/<>{};'\"?]\\+\\ze\\()\\+;$\\)",
+                \ "vim": "[^ ,`~@#$%^=|\\/<>{};'\"?]\\+\\ze\\()\\+$\\)",
+                \}
+    let g:CIOHLMatch = {}
+    let g:CIOspecHLID = 9136
+    let g:CIOvarHLID = 9137
+    let g:CIOHLPriority = get(g:, "CIOHLPriority", 30)
+    highlight! link CIOFunctionHighlight CocHighlightText
 endfunction
-call InitCIO()
+call <SID>CIOInit()
 " }}} Initiation
 
 function! HLCIOFunc() " {{{
     " Parse all characters
     if !<SID>ParseChar() | call <SID>RemoveHLMatch() | return 0 | endif
-    " Skip chars for performance
     if !<SID>CIOSkipChar() | call <SID>RemoveHLMatch() | return 0 | endif
     " Get highlight offset count
     if !<SID>HLOffset() | call <SID>RemoveHLMatch() | return 0 | endif
@@ -84,25 +83,10 @@ function s:ParseChar() " {{{
         let s:funcKeywordPos = matchstrpos(s:curLine, k)
         if s:funcKeywordPos[0] != ""
             let s:foundFuncKeywordPat = deepcopy(k)
-            let s:specIndexList = []
 
             " Count conversion specifiers
-            while 1
-                if !exists("l:specIndex")
-                    let l:specIndex = matchstrpos(s:curLine,
-                                \ s:specDict[s:foundFuncKeywordPat][0],
-                                \ 0)
-                else
-                    let l:specIndex = matchstrpos(s:curLine,
-                                \ s:specDict[s:foundFuncKeywordPat][0],
-                                \ l:specIndex[2])
-                endif
-                if l:specIndex[0] != ""
-                    call add(s:specIndexList, l:specIndex)
-                else
-                    break
-                endif
-            endwhile
+            " NOTE MatchALLStrPos is from util.vim
+            let s:specIndexList = MatchALLStrPos(s:curLine, s:specDict[s:foundFuncKeywordPat][0])
             " Check specifiers found
             if s:specIndexList == [] | return 0 | endif
 
@@ -238,7 +222,7 @@ function! s:HLSpecs() " {{{
         let l:matchID = matchaddpos(
             \ "CIOFunctionHighlight" ,
             \ [[s:cursorPos[1], l:specColNumStart + 1, l:specLength]] ,
-            \ 30, g:specHLID)
+            \ g:CIOHLPriority, g:CIOspecHLID)
         call add(g:CIOHLMatch[s:winID], l:matchID)
         let l:matchAdd = 1
         return 0 " Failed in VimL
@@ -250,8 +234,8 @@ function! s:HLSpecs() " {{{
             let l:matchID = matchaddpos(
                         \ "CIOFunctionHighlight" ,
                         \ [[s:cursorPos[1], l:specColNumStart + 1, l:specLength]] ,
-                        \ 30)
-            let g:specHLID = l:matchID
+                        \ g:CIOHLPriority)
+            let g:CIOspecHLID = l:matchID
             call add(g:CIOHLMatch[s:winID], l:matchID)
         endif
     endtry
@@ -273,7 +257,7 @@ function! s:HLVars() " {{{
         let l:matchID = matchadd(
             \ "CIOFunctionHighlight" ,
             \ "\\%".s:cursorPos[1]."l\\%>".l:varColNumStart."c\\%<".l:varColNumEnd."c".l:matchPattern ,
-            \ 30, g:varHLID)
+            \ g:CIOHLPriority, g:CIOvarHLID)
         call add(g:CIOHLMatch[s:winID], l:matchID)
         let l:matchAdd = 1
         return 0 " Failed in VimL
@@ -285,11 +269,9 @@ function! s:HLVars() " {{{
             let l:matchID = matchadd(
                 \ "CIOFunctionHighlight" ,
                 \ "\\%".s:cursorPos[1]."l\\%>".l:varColNumStart."c\\%<".l:varColNumEnd."c".l:matchPattern ,
-                \ 30)
-            let g:varHLID = l:matchID
+                \ g:CIOHLPriority)
+            let g:CIOvarHLID = l:matchID
             call add(g:CIOHLMatch[s:winID], l:matchID)
         endif
     endtry
-
-    return 0
 endfunction " }}}

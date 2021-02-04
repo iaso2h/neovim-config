@@ -222,7 +222,10 @@ function! Echo(expr)
 endfunction
 function TrimWhiteSpaces()
     let l:saveView = winsaveview()
-    keeppatterns %s#\s\+$##e
+    keeppatterns let l:result = execute('g#\s\+$#p')
+    let l:count = len(MatchAll(l:result, '\n'))
+    keeppatterns let g:Result = execute('%s#\s\+$##e')
+    echom l:count . " line[s] trimmed"
     call winrestview(l:saveView)
 endfunction
 " }}} Functions
@@ -269,19 +272,11 @@ augroup END " }}}
 
 " Commands {{{
 command! -nargs=+ Echo call Echo(<args>)
-" Custom old files
 command! -nargs=* O browse oldfiles
-" Redir command line output to clipboard
 command! -nargs=* Redir redir @* | <args> | redir END
-" Custom Vim grep
 command! -nargs=* Vim vimgrep <args> | cw
-" CWD
 command! -nargs=0 CD execute "cd " . expand("%:p:h")
-" Debug mode
-command! -nargs=0 Debug echom getcwd()
-" Dein
 command! -nargs=0 DEINClean call map(dein#check_clean(), "delete(v:val, 'rf')")
-" Backward
 command! -nargs=0 -range Backward setl revins | exe "norm! gvc\<C-r>\"" | setl norevins
 " Edit Vimrc
 if has('win32')
@@ -293,6 +288,30 @@ command! -nargs=0 MyVimsrc source $MYVIMRC
 
 " Key mapping {{{
 let mapleader = "\<Space>" " First thing first
+" Add jump in jumplist for motions {{{
+" Changelist jumping {{{
+nmap <silent> <A-o> :<c-u>call AddJumpMotion(0, "g;zz")<cr>
+nmap <silent> <A-i> :<c-u>call AddJumpMotion(0, "g,zz")<cr>
+" }}} Changelist jumping
+" Count specified j/k {{{
+nmap <silent> j :<c-u>call AddJumpMotion(1, "j")<cr>
+nmap <silent> k :<c-u>call AddJumpMotion(1, "k")<cr>
+" }}} Count specified j/k
+" Search & Jumping {{{
+vnoremap <silent> * mz`z:<c-u>execute "/" . VisualSelection("string")<cr>
+vnoremap <silent> # mz`z:<c-u>execute "?" . VisualSelection("string")<cr>
+vmap <silent> / *
+vmap <silent> ? #
+" Regex very magic
+nnoremap / /\v
+nnoremap ? ?\v
+" Disable highlight search
+nmap <silent> <leader>h :noh<cr>
+vmap <silent> <leader>h :<c-u>call InplaceDisableVisual()<cr>
+" }}} Search & Jumping
+" }}} Add jump in jumplist for motions
+" Execute @. for selected lines
+vmap . :norm @.<cr>
 " Extract selection
 vmap <silent> <C-x> :call ExtractSelection(visualmode())<cr>
 " Scratch file
@@ -302,9 +321,6 @@ nmap <silent> <A-S-s> :call OpenUrl()<cr>
 xmap <silent> <A-S-s> :<c-u>call OpenInBrowser(VisualSelection("string"))<cr>
 " Interrupt
 nnoremap <C-A-c> call interrupt()<cr>
-" Remap for origin ,/;
-noremap ,, ,
-" noremap ;; ;
 " Paragraph & Block navigation
 noremap <silent> { :call InclusiveParagraph("up")<cr>
 noremap <silent> } :call InclusiveParagraph("down")<cr>
@@ -320,14 +336,22 @@ nmap g{ :<c-u>call TrailingFolderMarker(mode(), "{{{")<cr>
 nmap g} :<c-u>call TrailingFolderMarker(mode(), "}}}")<cr>
 vmap g{ <A-m>z:<c-u>call TrailingFolderMarker(visualmode(), "}}}")<cr>`z
 vmap g} <A-m>z:<c-u>call TrailingFolderMarker(visualmode(), "}}}")<cr>`z
-nnoremap <silent> g; :call TrailingChar(";")<cr>
-nnoremap <silent> g<C-cr> :call TrailingLinebreak("down")<cr>
-nnoremap <silent> g<S-cr> :call TrailingLinebreak("up")<cr>
+nmap <silent> g, :call TrailingChar(",")<cr>
+nmap <silent> g; :call TrailingChar(";")<cr>
+nmap <silent> g: :call TrailingChar(":")<cr>:
+nmap <silent> g" :call TrailingChar("\"")<cr>
+nmap <silent> g' :call TrailingChar("'")<cr>
+nmap <silent> g) :call TrailingChar(")")<cr>
+nmap <silent> g( :call TrailingChar("(")<cr>
+nmap <silent> g<C-cr> :call TrailingLinebreak("down")<cr>
+nmap <silent> g<S-cr> :call TrailingLinebreak("up")<cr>
 " Messages
+nmap <silent> g< :messages<cr>
+nnoremap g> g<
 nmap <silent> <A-`> :messages clear <bar> echo "Message clear"<cr>
-nmap <silent> <C-`> :messages<cr>
+nmap <silent> <C-`> :Messages<cr>
 " Bug
-nmap <silent> <C-S-`> :Messages<cr> 
+nmap <silent> <C-S-`> :Messages<cr>
 " Non-blank last character
 noremap g$ g_
 " Block visual mode
@@ -364,18 +388,6 @@ map <silent> <C-w>o :let g:CloseBufferSavedView = winsaveview() <bar>
 map <silent> <A-S-h> :tabp<cr>
 map <silent> <A-S-l> :tabn<cr>
 " }}} Buffer & Window & Tab
-" Search & Jumping {{{
-vmap <silent> * :<c-u>execute "/" . VisualSelection("string")<cr>
-vmap <silent> # :<c-u>execute "?" . VisualSelection("string")<cr>
-vmap <silent> / *
-vmap <silent> ? #
-" Regex very magic
-nnoremap / /\v
-nnoremap ? ?\v
-" Disable highlight search
-nmap <silent> <leader>h :noh<cr>
-vmap <silent> <leader>h :<c-u>call InplaceDisableVisual()<cr>
-" }}} Search & Jumping
 " Folding
 nnoremap <silent> <leader><Space> @=(foldlevel('.') ? 'za' : '\<Space>')<cr>
 vnoremap <leader>f zf
@@ -400,9 +412,8 @@ vmap <C-s> :<c-u>w<cr>
 imap <silent> <C-s> <C-\><C-o>:w<cr>
 " }}} <C-z/x/v/s>
 " Saveas
-nmap <C-S-s> :saveas\<Space>
-vmap <C-S-s> :<c-u>saveas\<Space>
-imap <silent> <C-S-s> <C-\><C-o>:saveas\<Space>
+map <C-S-s> :<c-u>execute "" . input(getcwd() . "   >>>:", "saveas ")<cr>
+imap <silent> <C-S-s> <C-\><C-o>:execute "" . input(getcwd() . "   >>>:", "saveas ")<cr>
 " Delete
 nmap <C-S-d> :d<cr>
 vmap <C-S-d> :d<cr>
@@ -411,8 +422,10 @@ imap <silent> <C-S-d> <C-\><C-o>:d<cr>
 nmap <leader>p "0p
 nmap <leader>P "0P
 " Highlight New Paste Content
-nmap <silent> gy :call LastYPHighlight("yank")<cr>
-nmap <silent> gp :call LastYPHighlight("put")<cr>
+nmap <silent> gy :call HighlightLastYP("yank")<cr>
+nmap gY gy
+nmap <silent> gp :call HighlightLastYP("put")<cr>
+nmap gP gp
 " Inplace copy
 nmap Y yy
 vmap Y y
@@ -446,9 +459,6 @@ vmap <silent> <A-S-j> :<c-u>call VSCodeLineCopy(visualmode(), "down")<cr>
 vmap <silent> <A-S-k> :<c-u>call VSCodeLineCopy(visualmode(), "up")<cr>
 " }}} Mimic the VSCode move/copy line up/down behavior
 " }}} MS bebhave
-" Changelist jumping
-nnoremap <A-o> g;zz
-nnoremap <A-i> g,zz
 " Convert \ into /
 nnoremap <silent> g/ mz:s#\\#\/<cr>:noh<cr>g`z
 " Commandline & Insert {{{
@@ -489,6 +499,9 @@ cmap <C-v> <C-R>*
 " }}} Key mapping
 
 " Plug-ins settings  {{{
+" lag13/vim-create-variable {{{
+vmap C <Plug>Createvariable
+" }}} lag13/vim-create-variable
 " SirVer/ultisnips {{{
 " Disable UltiSnips keymapping in favour of coc-snippets
 let g:UltiSnipsExpandTrigger = ""
@@ -507,16 +520,21 @@ let g:FiletypeCommentDelimiter = {
 let g:NERDAltDelims_c = 1
 let g:NERDAltDelims_cpp = 1
 let g:NERDAltDelims_javascript = 1
-function! CommentJump(keystroke)
+function! CommentJump(keystroke) " {{{
     if getline(".") != ""
-        execute "normal! Y"
         if a:keystroke ==# "o"
-            execute "normal! Pcca<C-\><C-o>:execute 'gc\<space>'\<cr>\<bs>"
+            let l:saveReg = @@
+            execute "normal! yypcc" . g:FiletypeCommentDelimiter[&filetype] . " "
+            let @@ = l:saveReg
+            startinsert!
         elseif a:keystroke ==# "O"
-            execute "normal! pcca<C-\><C-o>:execute 'gc\<space>'\<cr>\<bs>"
+            let l:saveReg = @@
+            execute "normal! yyPcc" . g:FiletypeCommentDelimiter[&filetype] . " "
+            let @@ = l:saveReg
+            startinsert!
         endif
     endif
-endfunction
+endfunction " }}}
 nmap gco :call CommentJump("o")<cr>
 nmap gcO :call CommentJump("O")<cr>
 
