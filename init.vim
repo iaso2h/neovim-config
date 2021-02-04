@@ -230,7 +230,7 @@ endfunction
 " Auto commands {{{
 augroup _fileType " {{{
     autocmd!
-    autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+    autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | execute "normal! g`\"" | endif
     autocmd FileType json syntax match Comment +\/\/.\+$+
     " C language
     autocmd CursorHold *.c,*.h,*.cpp,*.cc,*.vim :call HLCIOFunc()
@@ -260,7 +260,6 @@ augroup checkBufChanged " {{{
 augroup end " }}}
 augroup vimrcReload " {{{
     autocmd!
-    let $COCVIMRC = expand("$configPath/plugin/cocSettings.vim")
     autocmd bufwritepost $MYVIMRC nested source $MYVIMRC | redraw! | echom "Reload: " . $MYVIMRC
     autocmd bufwritepost *.vim if expand("%:p:h") ==# expand("$configPath" . "/plugin") |
                 \ execute("source " . expand("%:p")) | redraw! | echom "Reload: " . expand("%:p") |
@@ -382,7 +381,7 @@ nnoremap <silent> <leader><Space> @=(foldlevel('.') ? 'za' : '\<Space>')<cr>
 vnoremap <leader>f zf
 nnoremap zo zR
 nnoremap zc zM
-" MS bebhave {{{
+" MS behavior {{{
 " <C-z/v/s> {{{
 nmap <C-z> u
 vmap <C-z> <esc>u

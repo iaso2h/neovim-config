@@ -156,16 +156,24 @@ function! InplacePaste(typeMode, pasteCMD) "  {{{
 endfunction "  }}}
 
 " YPHighlight {{{
-function! ClearYankHL(timer)
+function! ClearYankHL(timer, ...)
     if get(s:YPRHLIDDict, s:yankWinID, 0)
-        call matchdelete(s:YPRHLIDDict[s:yankWinID], s:yankWinID)
+        if has("win32")
+            call matchdelete(s:YPRHLIDDict[s:yankWinID], s:yankWinID)
+        else
+            call matchdelete(s:YPRHLIDDict[s:yankWinID])
+        endif
         let s:YPRHLIDDict[s:yankWinID] = 0
     endif
 endfunction
 
-function! ClearPutHL(timer)
+function! ClearPutHL(timer, ...)
     if get(s:YPRHLIDDict, s:putWinID, 0)
-        call matchdelete(s:YPRHLIDDict[s:putWinID], s:putWinID)
+        if has("win32")
+            call matchdelete(s:YPRHLIDDict[s:putWinID], s:putWinID)
+        else
+            call matchdelete(s:YPRHLIDDict[s:putWinID])
+        endif
         let s:YPRHLIDDict[s:putWinID] = 0
     endif
 endfunction

@@ -68,8 +68,8 @@ let g:Lf_PreviewResult             = {
 " Key mapping {{{
 " Input mode
 let g:Lf_ShortcutB = ''
-" let g:Lf_ShortcutF = '<C-e>'
 let g:Lf_DelimiterChar = ';'
+let g:Lf_ShortcutF = '<C-e>'
 function! s:checkCWDFirst(cmd, input)
     if has('win32')
         if getcwd()[0] != expand("%:p")[0]
@@ -84,9 +84,12 @@ function! s:checkCWDFirst(cmd, input)
         execute input("", a:cmd)
     endif
 endfunction
-
 nnoremap <silent> <C-e> :call <SID>checkCWDFirst("LeaderfFile", 0)<cr>
-nnoremap <C-S-e> :call <SID>checkCWDFirst("LeaderfFile .", 1)<cr>
+if has("win32")
+    nnoremap <C-S-e> :call <SID>checkCWDFirst("LeaderfFile .", 1)<cr>
+else
+    " nnoremap <C-S-e> :Leaderf .
+endif
 nnoremap <silent> <C-S-p> :LeaderfCommand<cr>
 nnoremap <silent> <C-S-o> :LeaderfBufTag<cr>
 nnoremap <silent> <leader><C-S-o> :LeaderfBufTagAll<cr>
