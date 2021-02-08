@@ -3,14 +3,33 @@ function! ExtractSelection(modeType)
         return
     endif
 
-    let l:cwd = getcwd()
-    echo "CWD: " . l:cwd
+    let l:CWD = getcwd()
+    " Check CWD {{{
+    if has('win32')
+        " Check file cwd"
+        let l:newCWD = expand("%:p:h")
+        if getcwd() !=# l:newCWD
+            let l:answer = confirm("Change CWD to \"" . l:newCWD . "\"?", "&Yes\n&No")
+            if l:answer == 1
+                execute "cd " . l:newCWD
+                echohl MoreMsg | echom "CWD has changed to: " . l:newCWD
+            else
+                echohl MoreMsg | echom "CWD: " . l:CWD
+            endif
+        else
+            echohl MoreMsg | echom "CWD: " . l:CWD
+        endif
+    else
+        echohl MoreMsg | echom "CWD: " . l:CWD
+    endif " }}} Check CWD
     let l:prompt = "Enter new file path: "
     let s:answer = input(l:prompt)
     " Check valid input
     if s:answer == ""
+        echohl WarningMsg
         echo ""
         echom "Cancel"
+        echohl None
         return
     endif
     " Find slash
@@ -21,21 +40,23 @@ function! ExtractSelection(modeType)
     " Slash exist
     if l:slashPos != -1
         if l:slashPos == strlen(s:answer) - 1
+            echohl WarningMsg
             echo " "
             echom "Invalid file path"
+            echohl None
             return
         endif
         let l:selectedText = VisualSelection("list")
         " Refine file path
         if s:answer[0] ==# "/" || s:answer[0] ==# '\'
-            let l:filePath = l:cwd . s:answer
+            let l:filePath = l:CWD . s:answer
         elseif s:answer[0:2] ==# './'
-            let l:filePath = l:cwd . s:answer[1:]
+            let l:filePath = l:CWD . s:answer[1:]
         else
-            let l:filePath = l:cwd . "/" . s:answer
+            let l:filePath = l:CWD . "/" . s:answer
         endif
         " Find folder
-        let l:absFolder = strcharpart(l:filePath, 0, l:slashPos + strlen(l:cwd) + 1)
+        let l:absFolder = strcharpart(l:filePath, 0, l:slashPos + strlen(l:CWD) + 1)
         call mkdir(l:absFolder, "p")
         try
             call writefile(l:selectedText, l:filePath, "s")
@@ -49,7 +70,7 @@ function! ExtractSelection(modeType)
         catch /.*/
             echo v:exception
             echo " "
-            echom "Extraction failed"
+            echoerr "Extraction failed"
         endtry
     " Slash does not exist
     else
@@ -64,9 +85,10 @@ function! ExtractSelection(modeType)
             let @@ = l:saveReg
             call <SID>AskEditFile()
         catch /.*/
+            echohl None
             echo v:exception
             echo " "
-            echom "Extraction failed"
+            echoerr "Extraction failed"
         endtry
     endif
 endfunction
@@ -76,5 +98,6 @@ function! s:AskEditFile()
     if l:fileAnswer == 1
         execute "e " . s:answer
     endif
+    echohl None
 endfunction
 

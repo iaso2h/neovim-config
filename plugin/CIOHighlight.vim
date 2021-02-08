@@ -2,32 +2,36 @@
 " Author: iaso2h
 " Description: Highlight specific conversion keyword in c language function
 "            like printf(), scanf()
-"            HL stands for highlight, CIO stands for c language I/O 
+"            HL stands for highlight, CIO stands for c language I/O
 "            functions
-" Last Modified: 二月 04, 2021
-" Version: 0.0.3
+" Last Modified: 2021-02-08
+" Version: 0.0.6
+" TODO String:
+"
+" for i in range(10) | silent! execute printf("noremap z%d :set foldlevel=%d<bar>echohl Moremsg<bar>echo 'Foldlevel set to: %d'<bar>echohl None<cr>", i, i, i) | endfor
 " Initiation {{{
 function! s:CIOInit()
     " Initiate only once
     if exists("g:CIOInit")  && g:CIOInit | return 0 | endif
 
-    let s:CIOInit = 1
+    let g:CIOInit = 1
     let s:funckeywordDict = {
                 \ "c": ["printf", "scanf", "sprintf"],
-                \ "vim": ["printf"]
+                \ "vim": ["printf"],
                 \}
     let s:specDict = {
-                \ "printf": ["%\\w", 2],
+                \ "printf": ["\\(%\\w\\)\\|\\(%\\.\\d\\+\\w\\?\\f\\)"],
+                \ "scanf": ["%\\w"],
                 \ }
     let s:skipCharacters = {
-                \ "printf": ["!@#$^<>()[]{}-=+\\|/?;'\",. "]
+                \ "printf": ["!@#$^<>()[]{}-=+\\|/?;'\",. "],
+                \ "scanf": ["!@#$^<>()[]{}-=+\\|/?;'\",. "]
                 \ }
-    let s:varPattern = "[^ ,`~@#$%^=|\\/<>{};'\"?]\\+"
-    let s:varPatternLast = {
-                \ "c":   "[^ ,`~@#$%^=|\\/<>{};'\"?]\\+\\ze\\()\\+;$\\)",
-                \ "vim": "[^ ,`~@#$%^=|\\/<>{};'\"?]\\+\\ze\\()\\+$\\)",
-                \}
+    g:FiletypeCommentDelimiter[%filetype])
+    let s:varPattern = "[A-Za-z&\"'*].*\\ze\\([,\s]\\)"
+    let s:varPatternLast = "[A-Za-z&\"'*].*\\ze\\()\\+;\\?$\\)"
     let g:CIOHLMatch = {}
+    execute printf("%ds#%s##g", l:foldStartPos[1], s:startPat)
     let g:CIOspecHLID = 9136
     let g:CIOvarHLID = 9137
     let g:CIOHLPriority = get(g:, "CIOHLPriority", 30)
@@ -74,8 +78,8 @@ function s:ParseChar() " {{{
     let s:cursorColIndex = s:cursorPos[2] - 1
     let s:foundFuncKeywordPat = ""
     let s:specIndexList = []
+    "  Skip comment for performance
     let l:commentExist = matchstr(s:curLine, '^\s*' . g:FiletypeCommentDelimiter[&filetype])
-    " " Skip comment for performance
     if l:commentExist != "" | return 0 | endif
 
     " Parse characters {{{
@@ -139,8 +143,7 @@ endfunction " }}}
 
 function! s:CIOSkipChar() abort " {{{
     " Skip range for performance
-    if s:cursorPos[2] < s:specDict[s:foundFuncKeywordPat][1] ||
-                \ s:cursorPos[2] + s:specDict[s:foundFuncKeywordPat][1] - 1 > len(s:charList) 
+    if s:cursorPos[2] < 2 || s:cursorPos[2] + 2 - 1 > len(s:charList)
         return 0
     endif
     " Skip characters for performance
@@ -185,7 +188,7 @@ function! s:HLOffset() " {{{
                 endif
             endif
         endfor " }}}
-        
+
         " Not inside all indexes matchstrpos
         if s:offsetCount == -1 | return 0 | endif
     else
@@ -226,7 +229,7 @@ function! s:HLSpecs() " {{{
         call add(g:CIOHLMatch[s:winID], l:matchID)
         let l:matchAdd = 1
         return 0 " Failed in VimL
-       
+
     finally
         " If failed, let VimL deside which ID to use
         " When ID added successfully, don't execute it"
@@ -248,7 +251,7 @@ function! s:HLVars() " {{{
     let l:matchAdd = 0
     " Use different regex pattern based on cursor position
     if s:lastValidOffset == s:offsetCount
-        let l:matchPattern = s:varPatternLast[&filetype]
+        let l:matchPattern = s:varPatternLast
     else
         let l:matchPattern = s:varPattern
     endif
@@ -261,7 +264,7 @@ function! s:HLVars() " {{{
         call add(g:CIOHLMatch[s:winID], l:matchID)
         let l:matchAdd = 1
         return 0 " Failed in VimL
-        
+
     finally
         " If failed, let VimL deside which ID to use
         " When ID added successfully, don't execute it"

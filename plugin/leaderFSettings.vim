@@ -72,10 +72,10 @@ let g:Lf_DelimiterChar = ';'
 let g:Lf_ShortcutF = '<C-e>'
 function! s:checkCWDFirst(cmd, input)
     if has('win32')
-        if getcwd()[0] != expand("%:p")[0]
+        if getcwd() !=# expand("%:p:h")
             let l:newCWD = expand("%:h")
             execute "cd " . l:newCWD
-            echom "CWD: " . l:newCWD
+            echohl MoreMsg | echom "CWD: " . l:newCWD | echohl None
         endif
     endif
     if a:input == 0
@@ -114,6 +114,7 @@ let g:Lf_CommandMap = {
             \'<C-]>': ['<C-v>'],
             \'<C-J>': ['<C-n>'],
             \'<C-K>': ['<C-p>'],
+            \'<C-f>': ['<C-Tab>'],
             \}
 let g:Lf_NormalMap = {
             \ "_":           [["<C-v>", "v"],
@@ -520,4 +521,3 @@ let g:Lf_PopupPalette = {
             \  }
 " }}} Color scheme
 " }}} Yggdroot/LeaderF
-"

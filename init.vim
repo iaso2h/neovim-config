@@ -9,131 +9,66 @@ let g:VM_default_mappings = 0
 let g:sandwich_no_default_key_mappings = 1
 " Plug-ins list {{{
 let &runtimepath = &runtimepath . "," . expand('$configPath/dein/dein.vim')
-if 1
-    "     if !isdirectory(expand('$configPath/dein'))
-    "         execute "autocmd VimEnter * !git clone https://github.com/Shougo/dein.vim " . expand('$configPath/dein/dein.vim')
-    "         execute "autocmd VimEnter * !echo Require restarting Neovim"
-    "         finish
-    "     endif
-    "     if !isdirectory(expand('$configPath/dein/repos'))
-    "         echom "call dein#install()"
-    "         execute "messages"
-    "         finish
-    "     endif
-    "     if dein#load_state(expand('$configPath/dein'))
-    "         call dein#begin(expand('$configPath/dein'))
-    "         call dein#add('$configPath/dein/dein.vim')
-    "         call dein#add('Shougo/deoplete.nvim')
+call plug#begin(stdpath('config') . '/plugged')
+Plug 'joshdick/onedark.vim'
+Plug 'arcticicestudio/nord-vim'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'luochen1990/rainbow'
+Plug 'Yggdroot/indentLine'
+Plug 'norcalli/nvim-colorizer.lua'
+Plug 'mhinz/vim-startify'
 
-    "         call dein#add('joshdick/onedark.vim')
-    "         call dein#add('arcticicestudio/nord-vim')
-    "         call dein#add('vim-airline/vim-airline')
-    "         call dein#add('vim-airline/vim-airline-themes')
-    "         call dein#add('luochen1990/rainbow')
-    "         call dein#add('Yggdroot/indentLine')
-    " call dein#add('bkad/camelcasemotion')
-    " call dein#add('zatchheems/vim-camelsnek')
-    "         call dein#add('norcalli/nvim-colorizer.lua')
-    "         call dein#add('mhinz/vim-startify')
+Plug 'mbbill/undotree'
+Plug 'xolox/vim-session'
+Plug 'xolox/vim-misc'
+Plug 'szw/vim-maximizer'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-scriptease'
+Plug 'easymotion/vim-easymotion'
+Plug 'machakann/vim-sandwich'
+Plug 'tommcdo/vim-exchange'
+Plug 'lag13/vim-create-variable'
+Plug 'mg979/vim-visual-multi'
+Plug 'junegunn/vim-easy-align'
+Plug 'AndrewRadev/splitjoin.vim'
+Plug 'preservim/nerdcommenter'
+Plug 'inkarkat/vim-ReplaceWithRegister'
+Plug 'landock/vim-expand-region'
+Plug 'michaeljsmith/vim-indent-object'
+Plug 'bkad/camelcasemotion'
+Plug 'zatchheems/vim-camelsnek'
+Plug 'andymass/vim-matchup'
+Plug 'dm1try/golden_size'
 
-    " call dein#add('mbbill/undotree')
-    " call dein#add('xolox/vim-session')
-    " call dein#add('xolox/vim-misc')
-    " call dein#add('szw/vim-maximizer')
-    " call dein#add('tpope/vim-repeat')
-    " call dein#add('tpope/vim-scriptease')
-    "         call dein#add('easymotion/vim-easymotion')
-    "         call dein#add('machakann/vim-sandwich')
-    "         call dein#add('landock/vim-expand-region')
-    "         call dein#add('tommcdo/vim-exchange')
-    "         call dein#add('lag13/vim-create-variable')
-    "         call dein#add('mg979/vim-visual-multi')
-    "         call dein#add('junegunn/vim-easy-align')
-    "         call dein#add('AndrewRadev/splitjoin.vim')
-    "         call dein#add('preservim/nerdcommenter')
-    "         call dein#add('inkarkat/vim-ReplaceWithRegister')
-    " call dein#add('michaeljsmith/vim-indent-object')
-    " call dein#add('andymass/vim-matchup')
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'honza/vim-snippets'
+Plug 'SirVer/ultisnips'
+Plug 'tmhedberg/SimpylFold'
+Plug 'vim-python/python-syntax'
+Plug 'jmcantrell/vim-virtualenv'
+Plug 'octol/vim-cpp-enhanced-highlight'
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
+Plug 'plasticboy/vim-markdown'
 
-    "         call dein#add('neoclide/coc.nvim', {'merged': 0, 'rev': 'release'})
-    "         call dein#add('honza/vim-snippets')
-    "         call dein#add('SirVer/ultisnips')
-    "         call dein#add('tmhedberg/SimpylFold')
-    "         call dein#add('jmcantrell/vim-virtualenv')
+Plug 'lambdalisue/gina.vim'
+Plug 'liuchengxu/vista.vim'
+Plug 'skywind3000/asyncrun.vim'
+Plug 'Yggdroot/LeaderF', { 'do': ':LeaderfInstallCExtension' }
+Plug 'mfussenegger/nvim-dap'
+Plug 'mfussenegger/nvim-dap-python'
+Plug 'theHamsta/nvim-dap-virtual-text'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
-    " call dein#add('lambdalisue/gina.vim')
-    " call dein#add('skywind3000/asyncrun.vim')
-    " call dein#add('mfussenegger/nvim-dap')
-    " call dein#add('mfussenegger/nvim-dap-python')
-    " call dein#add('nvim-treesitter/nvim-treesitter')
-    " call dein#add('theHamsta/nvim-dap-virtual-text')
-    " call dein#add('liuchengxu/vista.vim')
-    " call dein#add('Yggdroot/LeaderF', { 'build': './install.bat' })
-
-    " call dein#add('dahu/VimRegexTutor')
-    "         call dein#end()
-    "         call dein#save_state()
-    "         filetype plugin indent on
-    "     endif
-    "     syntax enable
-    " elseif has('unix')
-    call plug#begin(stdpath('config') . '/plugged')
-    Plug 'joshdick/onedark.vim'
-    Plug 'arcticicestudio/nord-vim'
-    Plug 'vim-airline/vim-airline'
-    Plug 'vim-airline/vim-airline-themes'
-    Plug 'luochen1990/rainbow'
-    Plug 'Yggdroot/indentLine'
-    Plug 'norcalli/nvim-colorizer.lua'
-    Plug 'mhinz/vim-startify'
-
-    Plug 'mbbill/undotree'
-    Plug 'xolox/vim-session'
-    Plug 'xolox/vim-misc'
-    Plug 'szw/vim-maximizer'
-    Plug 'tpope/vim-repeat'
-    Plug 'tpope/vim-scriptease'
-    Plug 'easymotion/vim-easymotion'
-    Plug 'machakann/vim-sandwich'
-    Plug 'tommcdo/vim-exchange'
-    Plug 'lag13/vim-create-variable'
-    Plug 'mg979/vim-visual-multi'
-    Plug 'junegunn/vim-easy-align'
-    Plug 'AndrewRadev/splitjoin.vim'
-    Plug 'preservim/nerdcommenter'
-    Plug 'inkarkat/vim-ReplaceWithRegister'
-    Plug 'landock/vim-expand-region'
-    Plug 'michaeljsmith/vim-indent-object'
-    Plug 'bkad/camelcasemotion'
-    Plug 'zatchheems/vim-camelsnek'
-    Plug 'andymass/vim-matchup'
-
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
-    Plug 'honza/vim-snippets'
-    Plug 'SirVer/ultisnips'
-    Plug 'tmhedberg/SimpylFold'
-    Plug 'jmcantrell/vim-virtualenv'
-
-    Plug 'lambdalisue/gina.vim'
-    Plug 'liuchengxu/vista.vim'
-    Plug 'skywind3000/asyncrun.vim'
-    Plug 'Yggdroot/LeaderF', { 'do': ':LeaderfInstallCExtension' }
-    Plug 'mfussenegger/nvim-dap'
-    Plug 'mfussenegger/nvim-dap-python'
-    Plug 'theHamsta/nvim-dap-virtual-text'
-    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-
-    Plug 'dahu/VimRegexTutor'
-    call plug#end()
-endif
+Plug 'dahu/VimRegexTutor'
+Plug 'DanilaMihailov/vim-tips-wiki'
+call plug#end()
 
 execute "luafile " . expand("$configPath/lua/plug-colorizer.lua")
-" execute "source " . expand("$configPath/plugin/copypasteUtil.vim")
 if has('win32')
     lua require('dap-python').setup('D:/anaconda3/envs/test/python.exe')
 endif
 " }}} Plug-ins list
-" runtime! plugin/*.vim
 " Basic settings {{{
 filetype plugin on
 let s:myDict = expand('$configPath/dev.dict')
@@ -153,7 +88,7 @@ set fillchars=fold:-,vert:╎
 set foldcolumn=auto:4 signcolumn=auto:4
 set formatoptions=pj1Bml2nwc
 set gdefault
-set guicursor=n-v-sm:block,i-c-ci-ve:ver25-Cursor,o-r-cr:hor20
+set guicursor=n-v-sm:block,i-c-ci:ver25-Cursor,ve-o-r-cr:hor20
 set guifont=更纱黑体\ Mono\ SC\ Nerd:h13
 set hidden
 set ignorecase smartcase
@@ -182,10 +117,10 @@ colorscheme onedarknord
 " Settings based on OS
 if has('win32')
     " Python executable
-    set shell=powershell
-    set shellquote= shellpipe=\| shellxquote=
-    set shellcmdflag=-NoLogo\ -NoProfile\ -ExecutionPolicy\ RemoteSigned\ -Command
-    set shellredir=\|\ Out-File\ -Encoding\ UTF8
+    " set shell=powershell
+    " set shellquote= shellpipe=\| shellxquote=
+    " set shellcmdflag=-NoLogo\ -NoProfile\ -ExecutionPolicy\ RemoteSigned\ -Command
+    " set shellredir=\|\ Out-File\ -Encoding\ UTF8
     let g:python3_host_prog = expand("$HOME/AppData/Local/Programs/Python/Python38/python.exe")
     if !executable(g:python3_host_prog)
         let s:pythonPath = substitute(system('python -c "import sys; print(sys.executable)"'), '\n\+$', '', 'g')
@@ -217,16 +152,17 @@ function! s:Fcitx2zh()
         let g:input_toggle = 0
     endif
 endfunction
-function! Echo(expr)
-    echom strftime('%c') . ":" a:expr
-endfunction
-function TrimWhiteSpaces()
+function TrimWhiteSpaces(silent)
     let l:saveView = winsaveview()
-    keeppatterns let l:result = execute('g#\s\+$#p')
-    let l:count = len(MatchAll(l:result, '\n'))
-    keeppatterns let g:Result = execute('%s#\s\+$##e')
-    echom l:count . " line[s] trimmed"
+    if a:silent
+        keeppatterns let g:Result = execute('%s#\s\+$##e')
+    else
+        keeppatterns let l:result = execute('g#\s\+$#p')
+        let l:count = len(MatchAll(l:result, '\n'))
+        keeppatterns let g:Result = execute('%s#\s\+$##e')
+        echohl Moremsg | echom l:count . " line[s] trimmed" | echohl None
     call winrestview(l:saveView)
+    endif
 endfunction
 " }}} Functions
 
@@ -234,11 +170,13 @@ endfunction
 augroup _fileType " {{{
     autocmd!
     autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | execute "normal! g`\"" | endif
+    autocmd BufWritePre * call TrimWhiteSpaces(1)
     autocmd FileType json syntax match Comment +\/\/.\+$+
     " C language
     autocmd CursorHold *.c,*.h,*.cpp,*.cc,*.vim :call HLCIOFunc()
     " Vim
-    autocmd FileType vim setlocal foldmethod=marker
+    " autocmd FileType vim setlocal foldmethod=marker
+    autocmd FileType vim setlocal foldmethod=expr foldexpr=EnhanceFoldExpr()
     autocmd FileType vim vnoremap <buffer> <A-f> =
     autocmd FileType vim nmap <buffer> <A-f> <A-m>zvae=`z
     autocmd FileType vim nmap <buffer> <silent> <C-S-q> :execute 'h ' . expand('<cword>')<cr>
@@ -249,7 +187,7 @@ augroup _fileType " {{{
     " Startify
     autocmd FileType startify nested setlocal buflisted
     " Terminal
-    " autocmd TermOpen * startinsert
+    autocmd TermOpen * startinsert
     " Help
     autocmd BufEnter *.txt if &buftype == 'help' | if winwidth(0) > 116 | wincmd L | endif | endif
 augroup END " }}}
@@ -271,13 +209,15 @@ augroup END " }}}
 " }}} Auto commands
 
 " Commands {{{
-command! -nargs=+ Echo call Echo(<args>)
+command! -nargs=0 TrimWhiteSpaces call TrimWhiteSpaces(0)
+command! -nargs=+ Echo echom strftime('%c') . ": " . <args>
 command! -nargs=* O browse oldfiles
 command! -nargs=* Redir redir @* | <args> | redir END
 command! -nargs=* Vim vimgrep <args> | cw
 command! -nargs=0 CD execute "cd " . expand("%:p:h")
 command! -nargs=0 DEINClean call map(dein#check_clean(), "delete(v:val, 'rf')")
-command! -nargs=0 -range Backward setl revins | exe "norm! gvc\<C-r>\"" | setl norevins
+command! -nargs=0 -range ExtractSelection call ExtractSelection(visualmode())
+command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | setl norevins
 " Edit Vimrc
 if has('win32')
     command! -nargs=0 IDEAVimedit vsplit ~/.ideavimrc
@@ -288,10 +228,13 @@ command! -nargs=0 MyVimsrc source $MYVIMRC
 
 " Key mapping {{{
 let mapleader = "\<Space>" " First thing first
+" Motion
+map [Z zk
+map ]Z zj
 " Add jump in jumplist for motions {{{
 " Changelist jumping {{{
-nmap <silent> <A-o> :<c-u>call AddJumpMotion(0, "g;zz")<cr>
-nmap <silent> <A-i> :<c-u>call AddJumpMotion(0, "g,zz")<cr>
+nnoremap <expr><silent> <A-o> &diff? "mz`z[czz" : "mz`zg;zz"
+nnoremap <expr><silent> <A-i> &diff? "mz`z]czz" : "mz`zg,zz"
 " }}} Changelist jumping
 " Count specified j/k {{{
 nmap <silent> j :<c-u>call AddJumpMotion(1, "j")<cr>
@@ -308,17 +251,14 @@ nnoremap ? ?\v
 " Disable highlight search
 nmap <silent> <leader>h :noh<cr>
 vmap <silent> <leader>h :<c-u>call InplaceDisableVisual()<cr>
+nmap <silent> go gvo<esc>
 " }}} Search & Jumping
 " }}} Add jump in jumplist for motions
-" Execute @. for selected lines
-vmap . :norm @.<cr>
-" Extract selection
-vmap <silent> <C-x> :call ExtractSelection(visualmode())<cr>
 " Scratch file
 nmap <silent> <C-n> :new<cr>
 " Open/Search in browser
-nmap <silent> <A-S-s> :call OpenUrl()<cr>
-xmap <silent> <A-S-s> :<c-u>call OpenInBrowser(VisualSelection("string"))<cr>
+nmap <silent> <C-l> :call OpenUrl()<cr>
+xmap <silent> <C-l> :<c-u>call OpenInBrowser(VisualSelection("string"))<cr>
 " Interrupt
 nnoremap <C-A-c> call interrupt()<cr>
 " Paragraph & Block navigation
@@ -331,11 +271,7 @@ nmap L $
 vmap L $
 omap H ^
 omap L $
-" Trailing Char
-nmap g{ :<c-u>call TrailingFolderMarker(mode(), "{{{")<cr>
-nmap g} :<c-u>call TrailingFolderMarker(mode(), "}}}")<cr>
-vmap g{ <A-m>z:<c-u>call TrailingFolderMarker(visualmode(), "}}}")<cr>`z
-vmap g} <A-m>z:<c-u>call TrailingFolderMarker(visualmode(), "}}}")<cr>`z
+" Trailing character {{{
 nmap <silent> g, :call TrailingChar(",")<cr>
 nmap <silent> g; :call TrailingChar(";")<cr>
 nmap <silent> g: :call TrailingChar(":")<cr>:
@@ -345,13 +281,12 @@ nmap <silent> g) :call TrailingChar(")")<cr>
 nmap <silent> g( :call TrailingChar("(")<cr>
 nmap <silent> g<C-cr> :call TrailingLinebreak("down")<cr>
 nmap <silent> g<S-cr> :call TrailingLinebreak("up")<cr>
+" }}} Trailing character
 " Messages
 nmap <silent> g< :messages<cr>
-nnoremap g> g<
-nmap <silent> <A-`> :messages clear <bar> echo "Message clear"<cr>
-nmap <silent> <C-`> :Messages<cr>
-" Bug
-nmap <silent> <C-S-`> :Messages<cr>
+nmap <silent> g> :Messages<cr>
+nmap <A-,> :execute 'messages clear<bar>echohl Moremsg<bar>echo "Message clear"<bar>echohl None'<cr>
+nmap <A-.> :execute 'messages clear<bar>echohl Moremsg<bar>echo "Message clear"<bar>echohl None'<cr>
 " Non-blank last character
 noremap g$ g_
 " Block visual mode
@@ -363,11 +298,13 @@ map <A-d> <pagedown>
 tmap <A-d> <pagedown>
 " Terminal
 tmap <A-n> <C-\><C-n>
+if has('win32') | nmap <silent> <C-`> :te powershell<cr> | endif
 " Macro
 nnoremap <A-q> q
 " Register
 function! s:ClearReg()
     for i in range(34,122) | silent! call setreg(nr2char(i), "") | endfor
+    echohl Moremsg | echo "Register clear" | echohl None
 endfunction
 map <silent> <C-'> :reg<cr>
 imap <silent> <C-'> <C-\><C-o>:reg<cr>
@@ -375,7 +312,7 @@ map <silent> <A-'> :call <SID>ClearReg()<cr>
 " Buffer & Window & Tab{{{
 " Smart quit
 map q <Plug>smartQuit
-map <silent> Q :bd!<cr>
+map <silent> Q :execute "bdelete! " . bufnr()<cr>
 " " Window
 map <silent> <C-w><C-m> :only<cr>
 " " Buffers
@@ -388,11 +325,22 @@ map <silent> <C-w>o :let g:CloseBufferSavedView = winsaveview() <bar>
 map <silent> <A-S-h> :tabp<cr>
 map <silent> <A-S-l> :tabn<cr>
 " }}} Buffer & Window & Tab
-" Folding
-nnoremap <silent> <leader><Space> @=(foldlevel('.') ? 'za' : '\<Space>')<cr>
-vnoremap <leader>f zf
-nnoremap zo zR
-nnoremap zc zM
+" Folding {{{
+noremap <silent> [z :call EnhanceFoldJump("start", 1, 0)<cr>
+noremap <silent> ]z :call EnhanceFoldJump("end", 1, 0)<cr>
+noremap <silent> g[z [z
+noremap <silent> g]z ]z
+map <silent> <leader>z :call EnhanceFoldHL("No fold marker found", 500, "")<cr>
+map <silent> zd :call EnhanceFoldHL("", 800, "EnhanceDelete")<cr>
+map <silent> zc :call EnhanceFoldHL("", 0, "EnhanceChange")<cr>
+nmap g{ :<c-u>call EnhanceFold(mode(), "{{{")<cr>
+nmap g} :<c-u>call EnhanceFold(mode(), "}}}")<cr>
+vmap g{ <A-m>z:<c-u>call EnhanceFold(visualmode(), "}}}")<cr>`z
+vmap g} <A-m>z:<c-u>call EnhanceFold(visualmode(), "}}}")<cr>`z
+noremap <silent> <leader><Space> @=(foldlevel('.') ? 'za' : '\<Space>')<cr>
+noremap <silent> <S-Space> @=(foldlevel('.') ? 'zA' : 'zC')<cr>
+for i in range(10) | silent! execute printf("noremap z%d :set foldlevel=%d<bar>echohl Moremsg<bar>echo 'Foldlevel set to: %d'<bar>echohl None<cr>", i, i, i) | endfor
+" }}} Folding
 " MS behavior {{{
 " <C-z/v/s> {{{
 nmap <C-z> u
@@ -412,8 +360,9 @@ vmap <C-s> :<c-u>w<cr>
 imap <silent> <C-s> <C-\><C-o>:w<cr>
 " }}} <C-z/x/v/s>
 " Saveas
-map <C-S-s> :<c-u>execute "" . input(getcwd() . "   >>>:", "saveas ")<cr>
-imap <silent> <C-S-s> <C-\><C-o>:execute "" . input(getcwd() . "   >>>:", "saveas ")<cr>
+command! -nargs=0 Saveas echohl Moremsg | echo "CWD: ".getcwd() | execute input("", "saveas ") | echohl None<cr>
+map <C-S-s> :Saveas<cr>
+imap <silent> <C-S-s> <C-\><C-o>:Saveas<cr>
 " Delete
 nmap <C-S-d> :d<cr>
 vmap <C-S-d> :d<cr>
@@ -426,22 +375,22 @@ nmap <silent> gy :call HighlightLastYP("yank")<cr>
 nmap gY gy
 nmap <silent> gp :call HighlightLastYP("put")<cr>
 nmap gP gp
-" Inplace copy
+" Inplace yank
 nmap Y yy
 vmap Y y
-nmap <silent><expr> y SetInplaceCopy()
-vmap <silent><expr> y SetInplaceCopy()
-omap <silent><expr> y SetInplaceCopy()
-" Inplace paste
-nmap <silent> p :<c-u>call InplacePaste(mode(), "p")<cr>
-vmap <silent> p :<c-u>call InplacePaste(visualmode(), "p")<cr>
-nmap <silent> P :<c-u>call InplacePaste(mode(), "P")<cr>
-vmap <silent> P :<c-u>call InplacePaste(visualmode(), "P")<cr>
+nmap <silent><expr> y SetInplaceYank()
+vmap <silent><expr> y SetInplaceYank()
+omap <silent><expr> y SetInplaceYank()
+" Inplace put
+nmap <silent> p :<c-u>call InplacePut(mode(), "p")<cr>
+vmap <silent> p :<c-u>call InplacePut(visualmode(), "p")<cr>
+nmap <silent> P :<c-u>call InplacePut(mode(), "P")<cr>
+vmap <silent> P :<c-u>call InplacePut(visualmode(), "P")<cr>
 " Convert paste
-nmap cP :<c-u>call ConvertPaste("P")<CR>
-nmap cp :<c-u>call ConvertPaste("p")<CR>
+nmap cP :<c-u>call ConvertPut("P")<CR>
+nmap cp :<c-u>call ConvertPut("p")<CR>
 " Mimic the VSCode move/copy line up/down behavior {{{
-" Move line
+" Move line {{{
 nmap <silent> <A-j> :m .+1<cr>==
 nmap <silent> <A-k> :m .-2<cr>==
 command! -nargs=0 VSCodeLineMoveDownInsert m .+1 | execute "normal! =="
@@ -450,13 +399,15 @@ imap <A-j> <C-\><C-o>:VSCodeLineMoveDownInsert<cr>
 imap <A-k> <C-\><C-o>:VSCodeLineMoveUpInsert<cr>
 vmap <silent> <A-j> :m '>+1<cr>gv=gv
 vmap <silent> <A-k> :m '<-2<cr>gv=gv
-" Copy line
-nmap <silent> <A-S-j> :call VSCodeLineCopy(mode(), "down")<cr>
-nmap <silent> <A-S-k> :call VSCodeLineCopy(mode(), "up")<cr>
-imap <silent> <A-S-j> <C-\><C-o>:call VSCodeLineCopy(mode(), "down")<cr>
-imap <silent> <A-S-k> <C-\><C-o>:call VSCodeLineCopy(mode(), "up")<cr>
-vmap <silent> <A-S-j> :<c-u>call VSCodeLineCopy(visualmode(), "down")<cr>
-vmap <silent> <A-S-k> :<c-u>call VSCodeLineCopy(visualmode(), "up")<cr>
+" }}} Move line
+" Copy line {{{
+nmap <silent> <A-S-j> :call VSCodeLineYank(mode(), "down")<cr>
+nmap <silent> <A-S-k> :call VSCodeLineYank(mode(), "up")<cr>
+imap <silent> <A-S-j> <C-\><C-o>:call VSCodeLineYank(mode(), "down")<cr>
+imap <silent> <A-S-k> <C-\><C-o>:call VSCodeLineYank(mode(), "up")<cr>
+vmap <silent> <A-S-j> :<c-u>call VSCodeLineYank(visualmode(), "down")<cr>
+vmap <silent> <A-S-k> :<c-u>call VSCodeLineYank(visualmode(), "up")<cr>
+" }}} Copy line
 " }}} Mimic the VSCode move/copy line up/down behavior
 " }}} MS bebhave
 " Convert \ into /
@@ -481,7 +432,7 @@ map! <C-w> <C-Right>
 map! <C-h> <Left>
 " }}} Navigation
 imap <C-BS> <C-\><C-o>db
-function! s:RemoveLastPathComponent()
+function! s:RemoveLastPathComponent() " {{{
     let l:cmdlineBeforeCursor = strpart(getcmdline(), 0, getcmdpos() - 1)
     let l:cmdlineAfterCursor = strpart(getcmdline(), getcmdpos() - 1)
 
@@ -489,7 +440,7 @@ function! s:RemoveLastPathComponent()
     let l:result = (l:cmdlineBeforeCursor ==# l:cmdlineRoot ? substitute(l:cmdlineBeforeCursor, '\%(\\ \|[\\/]\@!\f\)\+[\\/]\=$\|.$', '', '') : l:cmdlineRoot)
     call setcmdpos(strlen(l:result) + 1)
     return l:result . l:cmdlineAfterCursor
-endfunction
+endfunction " }}}
 cmap <C-BS> <C-\>e(<SID>RemoveLastPathComponent())<cr>
 cnoremap <C-S-l> <C-d>
 cmap <C-d> <Del>
@@ -499,6 +450,31 @@ cmap <C-v> <C-R>*
 " }}} Key mapping
 
 " Plug-ins settings  {{{
+" AndrewRadev/splitjoin.vim {{{
+let g:splitjoin_join_mapping = ""
+let g:splitjoin_split_mapping = ""
+nmap <silent> gj :SplitjoinJoin<cr>
+nmap <silent> gs :SplitjoinSplit<cr>
+map gJ <nop>
+" }}} AndrewRadev/splitjoin.vim
+" inkarkat/vim-ReplaceWithRegister {{{
+vmap R gr
+" }}} inkarkat/vim-ReplaceWithRegister
+" Syntax enhance {{{
+" vim-python/python-syntax {{{
+let g:python_highlight_all = 1
+let g:python_highlight_file_headers_as_comments = 1
+" }}} vim-python/python-syntax
+" bfrg/vim-cpp-modern{{{
+let g:cpp_class_scope_highlight = 1
+let g:cpp_member_variable_highlight = 1
+let g:cpp_class_decl_highlight = 1
+let g:cpp_posix_standard = 1
+let g:cpp_experimental_simple_template_highlight = 1
+let g:cpp_concepts_highlight = 1
+let g:cpp_no_function_highlight = 1
+" }}} bfrg/vim-cpp-modern
+" }}} Syntax enhance
 " lag13/vim-create-variable {{{
 vmap C <Plug>Createvariable
 " }}} lag13/vim-create-variable
@@ -538,8 +514,6 @@ endfunction " }}}
 nmap gco :call CommentJump("o")<cr>
 nmap gcO :call CommentJump("O")<cr>
 
-nmap gcc <plug>NERDCommenterToggle
-vmap gcc <plug>NERDCommenterToggle
 nmap gc<space> <plug>NERDCommenterToggle
 vmap gc<space> <plug>NERDCommenterToggle
 " nmap gcn <plug>NERDCommenterNested
@@ -557,8 +531,8 @@ nmap gc$ <plug>NERDCommenterToEOL
 nmap gcA <plug>NERDCommenterAppend
 nmap gcI <plug>NERDCommenterInsert
 
-vmap gca <plug>NERDCommenterAltDelims
-nmap gca <plug>NERDCommenterAltDelims
+vmap <A-/> <plug>NERDCommenterAltDelims
+nmap <A-/> <plug>NERDCommenterAltDelims
 
 nmap gcn <plug>NERDCommenterAlignLeft
 vmap gcn <plug>NERDCommenterAlignLeft
@@ -596,10 +570,9 @@ let g:session_persist_colors = 0
 let g:camelsnek_alternative_camel_commands = 1
 let g:camelsnek_no_fun_allowed             = 1
 let g:camelsnek_iskeyword_overre           = 0
-vmap <silent> <A-c> :Camel<cr>
-nmap <silent> <A-c> :Camel<cr>
-vmap <silent> <A-S-c> :Snake<cr>
-nmap <silent> <A-S-c> :Snake<cr>
+vmap <silent> <A-c> :call CaseSwitcher()<cr>
+nmap <silent> <A-c> :call CaseSwitcher()<cr>
+nmap <silent> <A-S-c> :call CaseSwitcherDefaultCMDListOrder()<cr>
 " }}} zatchheems/vim-vimsnek
 " bkad/camelcasemotion {{{
 call camelcasemotion#CreateMotionMappings(',')
@@ -622,8 +595,8 @@ xmap im <Plug>(matchup-i%)
 omap am <Plug>(matchup-a%)
 omap im <Plug>(matchup-i%)
 " Inclusive
-map <C-m> %
-map <C-S-m> g%
+map <C-m> <Plug>(matchup-%)
+map <C-S-m> <Plug>(matchup-g%)
 " Exclusive
 map m <Plug>(matchup-]%)
 map M <Plug>(matchup-[%)

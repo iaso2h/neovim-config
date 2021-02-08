@@ -11,7 +11,9 @@ function! s:SpanWin()
 endfunction
 
 function! s:SaveQuit() abort
+    echohl MoreMsg
     let l:answer = confirm("Save modification?", ">>> &Save\n&Discard\n&Cancel", 3, "Question")
+    echohl None
     if l:answer == 1
         wq 
     elseif l:answer == 2  
@@ -21,7 +23,9 @@ function! s:SaveQuit() abort
 endfunction
 
 function! s:SaveUnload() abort
+    echohl MoreMsg
     let l:answer = confirm("Save modification?", ">>> &Save\n&Discard\n&Cancel", 3, "Question")
+    echohl None
     if l:answer == 1 
         w | bd
     elseif l:answer == 2 

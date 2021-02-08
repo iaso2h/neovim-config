@@ -65,8 +65,8 @@ let g:markdown_fenced_languages = [
             \ 'help'
             \]
 " Navigate through diagnostics list
-nmap <silent> g[ <Plug>(coc-diagnostic-prev)
-nmap <silent> g] <Plug>(coc-diagnostic-next)
+nmap <silent> [e <Plug>(coc-diagnostic-prev)
+nmap <silent> ]e <Plug>(coc-diagnostic-next)
 " Show all diagnostics.
 nnoremap <silent> <leader>d  :<C-u>CocList diagnostics<CR>
 " GoTo code navigation.
@@ -180,7 +180,7 @@ nmap <space>el :CocList explPresets
 " }}} COC-Explorer
 " COC-Snippets {{{
 nmap <C-j> :CocCommand snippets.<C-S-l>
-nmap <silent> <leader>j <C-o>:CocList snippets<cr>
+nmap <silent> <leader>j :CocList snippets<cr>
 let g:coc_snippet_next = '<Tab>'
 let g:coc_snippet_prev = '<S-Tab>'
 inoremap <silent><expr> <TAB>

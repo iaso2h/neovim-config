@@ -14,8 +14,8 @@ let g:sandwich#recipes += [
 \   'expr':     0,
 \   'listexpr': 1,
 \   'regex':    0,
-\   'input':    ['c'],
-\   'kind':     ['add', 'replace'],
+\   'input':    ['z'],
+\   'kind':     ['add'],
 \   'linewise': 2,
 \   },
 \   ]
@@ -28,7 +28,7 @@ let g:sandwich#magicchar#f#patterns = [
 \   },
 \ ]
 function! FolderMaker()
-    let l:markName = input('Makrer Name: ')
+    let l:markName = input('Fold makrer name: ')
     if l:markName ==# ''
         throw 'OpertorSandwichCancel'
     endif

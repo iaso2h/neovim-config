@@ -1,12 +1,21 @@
-function! OpenUrl()
-    let l:url = matchstr(getline("."), '[a-z]*:\/\/[^ >,;]*')
-    if l:url == ""
-        return
+function! OpenUrl(...)
+    if a:0 == 0
+        let l:url = matchstr(getline("."), '[a-z]*:\/\/[^ >,;]*')
+        if l:url == ""
+            execute "normal! \<C-l>"
+            return
+        else
+            if has('win32')
+                execute("!chrome " . l:url)
+            elseif has('unix')
+                execute("!open '" . l:url . "'")
+            endif
+        endif
     else
         if has('win32')
-            execute("!chrome " . l:url)
+            execute("!chrome " . a:1)
         elseif has('unix')
-            execute("!open '" . l:url . "'")
+            execute("!open '" . a:1 . "'")
         endif
     endif
 endfunction

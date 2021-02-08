@@ -1,18 +1,18 @@
 " VSCode copy line {{{
-function! VSCodeLineCopy(modeType, copyDirection)
+function! VSCodeLineCopy(modeType, direction)
     if a:modeType ==# "V"
         normal! gv
         let saved_reg = @@
         let l:col = col(".")
         let l:row = line(".")
-        let l:rowStart = line("'<") 
-        let l:rowEnd = line("'>") 
+        let l:rowStart = line("'<")
+        let l:rowEnd = line("'>")
         if l:row ==# l:rowStart
             let l:selectDirection = "up"
         else
             let l:selectDirection = "down"
         endif
-        if a:copyDirection ==# "up"
+        if a:direction ==# "up"
             normal! yP
             if l:selectDirection ==# "up"
                 call cursor(l:rowEnd, 0)
@@ -22,7 +22,7 @@ function! VSCodeLineCopy(modeType, copyDirection)
                 normal! V
                 call cursor(l:rowEnd, l:col)
             endif
-        elseif a:copyDirection ==# "down"
+        elseif a:direction ==# "down"
             normal! y
             call cursor(l:rowEnd, 0)
             normal! p
@@ -37,14 +37,51 @@ function! VSCodeLineCopy(modeType, copyDirection)
             endif
         endif
         let @@ = saved_reg
-    elseif a:modeType ==# "n"
+    elseif a:modeType ==# "v"
+        normal! gv
+        let saved_reg = @@
+        let l:cursor = getpos(".")
+        let l:selectStart = getpos("'<")
+        let l:selectEnd = getpos("'>")
+        execute printf("%d,%dyank", l:selectStart[1],l:selectEnd[1])
+        if a:direction ==# "up"
+            if l:cursor == l:selectStart
+                put!
+                call setpos(".", l:selectEnd)
+                normal! v
+                call setpos(".", l:selectStart)
+            else
+                put
+                call setpos(".", l:selectStart)
+                normal! v
+                call setpos(".", l:selectEnd)
+            endif
+        else
+            let l:newSelectStart = deepcopy(l:selectStart)
+            let l:newSelectEnd = deepcopy(l:selectEnd)
+            let l:newSelectStart[1] = l:selectStart[1] + l:selectEnd[1] - l:selectStart[1] + 1
+            let l:newSelectEnd[1] = l:selectEnd[1] + l:selectEnd[1] - l:selectStart[1] + 1
+            if l:cursor == l:selectStart
+                put!
+                call setpos(".", l:newSelectEnd)
+                normal! v
+                call setpos(".", l:newSelectStart)
+            else
+                put
+                call setpos(".", l:newSelectStart)
+                normal! v
+                call setpos(".", l:newSelectEnd)
+            endif
+        endif
+        let @@ = saved_reg
+    elseif a:modeType == "n"
         let saved_reg = @@
         let l:col = col(".")
         let l:row = line(".")
-        if a:copyDirection ==# "up"
+        if a:direction ==# "up"
             normal! yyP
             call cursor(l:row, l:col)
-        elseif a:copyDirection ==# "down"
+        elseif a:direction ==# "down"
             normal! yyp
             call cursor(l:row + 1, l:col)
         endif
@@ -57,15 +94,15 @@ endfunction
 function! s:InplaceInit()
     " Initiate only once
     if exists("g:InplaceInit") && g:InplaceInit | return 0 | endif
-    
+
     let g:InplaceInit = 1
     let g:InplaceYankHLID = get(g:, "InplaceYankHLID", 9134)
     let g:InplacePutHLID = get(g:, "InplacePutHLID", 9135)
     let g:InplacePriority = get(g:, "InplacePriority", 50)
 endfunction
 call <SID>InplaceInit()
-" InplaceCopy {{{
-function! InplaceCopy(type, ...)
+" InplaceYank {{{
+function! InplaceYank(type, ...)
     let s:yankFilePath = expand("%:p")
     let l:matchAdd = 0
     if a:type ==# "char"
@@ -82,7 +119,7 @@ function! InplaceCopy(type, ...)
     " Skip specical buffers
     if &buftype != "" | return 0 | endif
     " Clear previous HL before creating new HL
-    if exists("g:InplaceHLMatchID[s:yankWinID]") && g:InplaceHLMatchID[s:putWinID] != []
+    if exists("g:InplaceHLMatchID[s:yankWinID]") && g:InplaceHLMatchID[s:yankWinID] != []
         call ClearYankHL(500)
     else
         let g:InplaceHLMatchID[s:yankWinID] = []
@@ -111,18 +148,18 @@ function! InplaceCopy(type, ...)
     " }}} Create highlight
 endfunction
 
-function! SetInplaceCopy()
+function! SetInplaceYank()
     if !exists("g:InplaceHLMatchID")
         let g:InplaceHLMatchID = {}
     endif
     let s:yankWinID = win_getid()
     let s:startPos = getpos('.')
-    set opfunc=InplaceCopy
+    set opfunc=InplaceYank
     silent return 'g@'
 endfunction
-" }}} InplaceCopy
+" }}} InplaceYank
 
-function! InplacePaste(typeMode, pasteCMD) "  {{{
+function! InplacePut(typeMode, pasteCMD) "  {{{
     if !exists("g:InplaceHLMatchID")
         let g:InplaceHLMatchID = {}
     endif
@@ -216,11 +253,10 @@ function! ClearYankHL(timer, ...)
     let l:indexID = index(g:InplaceHLMatchID[s:yankWinID], g:InplaceYankHLID)
     if l:indexID != -1
         if CompareNeovimVersion("0.5.0", "<=")
-            call matchdelete(g:InplaceHLMatchID[s:yankWinID][l:indexID], s:yankWinID)
+            call matchdelete(remove(g:InplaceHLMatchID[s:yankWinID], indexID), s:yankWinID)
         else
-            call matchdelete(g:InplaceHLMatchID[s:yankWinID][l:indexID])
+            call matchdelete(remove(g:InplaceHLMatchID[s:yankWinID], indexID))
         endif
-        call remove(g:InplaceHLMatchID[s:yankWinID], indexID)
     endif
 endfunction
 
@@ -228,11 +264,10 @@ function! ClearPutHL(timer, ...)
     let l:indexID = index(g:InplaceHLMatchID[s:putWinID], g:InplacePutHLID)
     if l:indexID != -1
         if CompareNeovimVersion("0.5.0", "<=")
-            call matchdelete(g:InplaceHLMatchID[s:putWinID][l:indexID], s:putWinID)
+            call matchdelete(remove(g:InplaceHLMatchID[s:putWinID], indexID), s:putWinID)
         else
-            call matchdelete(g:InplaceHLMatchID[s:putWinID][l:indexID])
+            call matchdelete(remove(g:InplaceHLMatchID[s:putWinID], indexID))
         endif
-        call remove(g:InplaceHLMatchID[s:putWinID], indexID)
     endif
 endfunction
 
@@ -258,7 +293,7 @@ function! HighlightLastYP(cmdType)
         echom l:Start
         echom l:End
         echohl WarningMsg | echo "No records found" | echohl
-        return 0 
+        return 0
     endif
     " Determine select directioin
     if abs(l:pos[1] - l:Start[1]) < abs(l:pos[1] - l:End[1])
@@ -270,8 +305,8 @@ function! HighlightLastYP(cmdType)
         normal! v
         call cursor(l:End[1], l:End[2])
     endif
-    
-    return 0 " Since visual selection will always override any highlight match, 
+
+    return 0 " Since visual selection will always override any highlight match,
     " there is no point to execute more code
     " Create highlight {{{
     " Skip specical buffers
@@ -279,7 +314,7 @@ function! HighlightLastYP(cmdType)
     let l:curWinID = win_getid()
     let l:matchPat = a:cmdType == "yank" ?
                 \ "\\%'Y.*\\(\\_s.*\\)*\\%'y." :
-                \ "\\%'P.*\\(\\_s.*\\)*\\%'p." 
+                \ "\\%'P.*\\(\\_s.*\\)*\\%'p."
     let l:matchID = a:cmdType == "yank" ?
                 \ g:InplaceYankHLID :
                 \ g:InplacePutHLID
@@ -357,7 +392,7 @@ endfunction
 " }}} InplaceReplace
 " }}} InplaceUlti
 
-function! g:ConvertPaste(pasteCMD) "  {{{
+function! g:ConvertPut(pasteCMD) "  {{{
     if !type(get(s:, "YPRHLIDDict", 0))
         let g:InplaceHLMatchID = {}
     endif
@@ -417,19 +452,19 @@ function! g:ConvertPaste(pasteCMD) "  {{{
     " Skip specical buffers
     if &buftype != "" | return 0 | endif
     " Clear previous HL before creating new HL
-    if exists("g:InplaceHLMatchID[s:yankWinID]") && g:InplaceHLMatchID[s:putWinID] != []
-        call ClearYankHL(500)
+    if exists("g:InplaceHLMatchID[s:putWinID]") && g:InplaceHLMatchID[s:putWinID] != []
+        call ClearPutHL(500)
     else
-        let g:InplaceHLMatchID[s:yankWinID] = []
+        let g:InplaceHLMatchID[s:putWinID] = []
     endif
     try
         let l:matchID = matchadd("Search",
                     \ "\\%'P.*\\(\\_s.*\\)*\\%'p.",
                     \ g:InplacePriority,
-                    \ g:InplaceYankHLID)
+                    \ g:InplacePutHLID)
         let l:matchAdd = 1
-        call add(g:InplaceHLMatchID[s:yankWinID], l:matchID)
-        let l:timer = timer_start(500, "ClearYankHL")
+        call add(g:InplaceHLMatchID[s:putWinID], l:matchID)
+        let l:timer = timer_start(500, "ClearPutHL")
     finally
         " If failed, let VimL deside which ID to use
         " When ID added successfully, don't execute it"
@@ -439,8 +474,8 @@ function! g:ConvertPaste(pasteCMD) "  {{{
                         \ g:InplacePriority,
                         \ )
             let g:matchAdd = l:matchID
-            call add(g:InplaceHLMatchID[s:yankWinID], l:matchID)
-            let l:timer = timer_start(500, "ClearYankHL")
+            call add(g:InplaceHLMatchID[s:putWinID], l:matchID)
+            let l:timer = timer_start(500, "ClearPutHL")
         endif
     endtry
     " }}} Create highlight
