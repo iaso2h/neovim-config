@@ -72,10 +72,11 @@ let g:Lf_DelimiterChar = ';'
 let g:Lf_ShortcutF = '<C-e>'
 function! s:checkCWDFirst(cmd, input)
     if has('win32')
-        if getcwd() !=# expand("%:p:h")
-            let l:newCWD = expand("%:h")
-            execute "cd " . l:newCWD
-            echohl MoreMsg | echom "CWD: " . l:newCWD | echohl None
+        let l:fileDir = expand("%:p:h")
+        let l:CWD = getcwd()
+        if l:CWD[0] !=# l:fileDir[0]
+            execute "cd " . l:fileDir
+            echohl MoreMsg | echom "New CWD: " . l:fileDir | echohl None
         endif
     endif
     if a:input == 0
@@ -102,13 +103,13 @@ nnoremap <silent> <C-f>q :LeaderfQuickFix<cr>
 nnoremap <silent> <C-S-f> :call <SID>checkCWDFirst("LeaderfRgInteractive", 0)<cr>
 " Normal mode
 let g:Lf_CommandMap = {
-            \'<C-X>': ['<C-s>'], 
-            \'<Up>': ['<C-k>'], 
-            \'<Down>': ['<C-j>'], 
-            \'<Right>': ['<C-l>'], 
-            \'<Left>': ['<C-h>'], 
-            \'<Home>': ['<C-a>'], 
-            \'<End>': ['<C-e>'], 
+            \'<C-X>': ['<C-s>'],
+            \'<Up>': ['<C-k>'],
+            \'<Down>': ['<C-j>'],
+            \'<Right>': ['<C-l>'],
+            \'<Left>': ['<C-h>'],
+            \'<Home>': ['<C-a>'],
+            \'<End>': ['<C-e>'],
             \'<C-W>': ['<C-BS>'],
             \'<Del>': ['<C-d>'],
             \'<C-]>': ['<C-v>'],

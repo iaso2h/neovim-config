@@ -1,7 +1,7 @@
 " File: init.vim
 " Author: iaso2h
 " Description: Neovim v0.50
-" Last Modified: 一月 31, 2021
+" Last Modified: 2021-02-10
 let $configPath = expand(stdpath('config'))
 let g:NERDCreateDefaultMappings = 0
 let g:expand_region_use_defaults = 0
@@ -51,6 +51,9 @@ Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
 Plug 'plasticboy/vim-markdown'
 
+Plug 'mg979/docgen.vim'
+Plug 'RishabhRD/popfix'
+Plug 'RishabhRD/nvim-cheat.sh'
 Plug 'lambdalisue/gina.vim'
 Plug 'liuchengxu/vista.vim'
 Plug 'skywind3000/asyncrun.vim'
@@ -68,10 +71,12 @@ execute "luafile " . expand("$configPath/lua/plug-colorizer.lua")
 if has('win32')
     lua require('dap-python').setup('D:/anaconda3/envs/test/python.exe')
 endif
+filetype plugin on
 " }}} Plug-ins list
 " Basic settings {{{
-filetype plugin on
 let s:myDict = expand('$configPath/dev.dict')
+" let &path.="src/include,/usr/include/AL,"
+colorscheme onedarknord
 set ai
 set cindent expandtab shiftround shiftwidth=4 softtabstop=4 tabstop=4
 set clipboard=unnamed
@@ -99,7 +104,7 @@ set langmenu=en
 set lazyredraw
 set mouse=a
 set nojoinspaces
-set noshowmode
+set noshowcmd noshowmode
 set number
 set scrolloff=8
 set sessionoptions=buffers,curdir,folds,help,resize,slash,tabpages,winpos,winsize
@@ -113,8 +118,21 @@ set updatetime=150
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite,*.bak
 set wildignorecase
 set wildoptions=pum
-colorscheme onedarknord
-" Settings based on OS
+
+" Syntax {{{
+" c.vim
+let g:c_gnu = 1
+let g:c_ansi_typedefs = 1
+let g:c_ansi_constants = 1
+let g:c_no_comment_fold = 1
+let g:c_syntax_for_h = 1
+" doxygen.vim
+let g:load_doxygen_syntax= 1
+let g:doxygen_enhanced_color = 1
+" msql.vim
+let g:msql_sql_query = 1
+" }}} Syntax
+" OS varied settings {{{
 if has('win32')
     " Python executable
     " set shell=powershell
@@ -135,9 +153,28 @@ elseif has('unix')
     autocmd InsertLeave * call <SID>Fcitx2en()
     autocmd InsertEnter * call <SID>Fcitx2zh()
 endif
+" }}} OS varied settings
 " }}} Basic settings
 
 " Functions {{{
+let g:enhanceFoldStartPat = {
+            \ "vim": "\\s\\{-}\"[^\"]\\{-}{{{[^\"]*$",
+            \ "c": "\\s\\{-}/[^/]\\{-}{{{[^/]*$",
+            \ }
+let g:enhanceFoldEndPat = {
+            \ "vim": "\\s\\{-}\"[^\"]\\{-}}}}[^\"]*$",
+            \ "c": "\\s\\{-}/[^/]\\{-}}}}[^/]*$",
+            \ }
+function! EnhanceFoldExpr() " {{{
+    let l:line = getline(v:lnum)
+    if match(l:line, g:enhanceFoldStartPat[&filetype]) > -1
+        return "a1"
+    elseif match(l:line, g:enhanceFoldEndPat[&filetype]) > -1
+        return "s1"
+    else
+        return "="
+    endif
+endfunction " }}}
 function! s:Fcitx2en()
     let s:input_status = system("fcitx-remote")
     if s:input_status == 2
@@ -152,6 +189,11 @@ function! s:Fcitx2zh()
         let g:input_toggle = 0
     endif
 endfunction
+""
+" Function: TrimWhiteSpaces Trim all trailing white spaces in current buffer
+"
+" @param silent: non-zero value will show trimming result when complete
+""
 function TrimWhiteSpaces(silent)
     let l:saveView = winsaveview()
     if a:silent
@@ -164,16 +206,25 @@ function TrimWhiteSpaces(silent)
     call winrestview(l:saveView)
     endif
 endfunction
+function! s:TrailingEmptyLine()
+    if getline('$') != ""
+        let l:saveView = winsaveview()
+        keepjumps normal! Go
+        call winrestview(l:saveView)
+    endif
+endfunction
 " }}} Functions
 
 " Auto commands {{{
 augroup _fileType " {{{
     autocmd!
     autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | execute "normal! g`\"" | endif
-    autocmd BufWritePre * call TrimWhiteSpaces(1)
+    autocmd BufWritePre * call TrimWhiteSpaces(1) | call <SID>TrailingEmptyLine()
     autocmd FileType json syntax match Comment +\/\/.\+$+
     " C language
     autocmd CursorHold *.c,*.h,*.cpp,*.cc,*.vim :call HLCIOFunc()
+    " Java
+    autocmd FileType java setlocal includeexpr=substitute(v:fname,'\\.','/','g')
     " Vim
     " autocmd FileType vim setlocal foldmethod=marker
     autocmd FileType vim setlocal foldmethod=expr foldexpr=EnhanceFoldExpr()
@@ -207,13 +258,12 @@ augroup vimrcReload " {{{
                 \ endif
 augroup END " }}}
 " }}} Auto commands
-
 " Commands {{{
+command! -nargs=+ -complete=command Echo echom strftime('%c') . ": " . <args>
+command! -nargs=+ -complete=command Redir call Redir(<q-args>)
 command! -nargs=0 TrimWhiteSpaces call TrimWhiteSpaces(0)
-command! -nargs=+ Echo echom strftime('%c') . ": " . <args>
-command! -nargs=* O browse oldfiles
-command! -nargs=* Redir redir @* | <args> | redir END
-command! -nargs=* Vim vimgrep <args> | cw
+command! -nargs=0 PS terminal powershell
+command! -nargs=0 O browse oldfiles
 command! -nargs=0 CD execute "cd " . expand("%:p:h")
 command! -nargs=0 DEINClean call map(dein#check_clean(), "delete(v:val, 'rf')")
 command! -nargs=0 -range ExtractSelection call ExtractSelection(visualmode())
@@ -228,13 +278,12 @@ command! -nargs=0 MyVimsrc source $MYVIMRC
 
 " Key mapping {{{
 let mapleader = "\<Space>" " First thing first
-" Motion
-map [Z zk
-map ]Z zj
 " Add jump in jumplist for motions {{{
 " Changelist jumping {{{
 nnoremap <expr><silent> <A-o> &diff? "mz`z[czz" : "mz`zg;zz"
 nnoremap <expr><silent> <A-i> &diff? "mz`z]czz" : "mz`zg,zz"
+nmap <C-o> <C-o>zz
+nmap <C-i> <C-i>zz
 " }}} Changelist jumping
 " Count specified j/k {{{
 nmap <silent> j :<c-u>call AddJumpMotion(1, "j")<cr>
@@ -293,12 +342,9 @@ noremap g$ g_
 nnoremap <A-v> <C-q>
 " Pageup/Pagedown
 map <A-e> <pageup>
-tmap <A-e> <pageup>
+tmap <A-e> <C-\><C-n><pageup>
 map <A-d> <pagedown>
-tmap <A-d> <pagedown>
-" Terminal
-tmap <A-n> <C-\><C-n>
-if has('win32') | nmap <silent> <C-`> :te powershell<cr> | endif
+tmap <A-d> <C-\><C-n><pagedown>
 " Macro
 nnoremap <A-q> q
 " Register
@@ -311,13 +357,22 @@ imap <silent> <C-'> <C-\><C-o>:reg<cr>
 map <silent> <A-'> :call <SID>ClearReg()<cr>
 " Buffer & Window & Tab{{{
 " Smart quit
-map q <Plug>smartQuit
-map <silent> Q :execute "bdelete! " . bufnr()<cr>
+nmap <silent> q :call SmartClose("window")<cr>
+nmap <silent> Q :call SmartClose("buffer")<cr>
 " " Window
 map <silent> <C-w><C-m> :only<cr>
 " " Buffers
-map <silent> <A-h> :bp<cr>
-map <silent> <A-l> :bn<cr>
+function! s:BufSwitcher(direction)
+    if a:direction == "previous"
+        bp
+        while &buftype == "terminal" | bp | endwhile
+    elseif a:direction == "next"
+        bn
+        while &buftype == "terminal" | bn | endwhile
+    endif
+endfunction
+map <silent> <A-h> :call <SID>BufSwitcher("previous")<cr>
+map <silent> <A-l> :call <SID>BufSwitcher("next")<cr>
 map <silent> <C-w>o :let g:CloseBufferSavedView = winsaveview() <bar>
             \ update <bar> %bd <bar> e# <bar> bd# <bar>
             \call winrestview(g:CloseBufferSavedView)<cr>
@@ -326,8 +381,10 @@ map <silent> <A-S-h> :tabp<cr>
 map <silent> <A-S-l> :tabn<cr>
 " }}} Buffer & Window & Tab
 " Folding {{{
-noremap <silent> [z :call EnhanceFoldJump("start", 1, 0)<cr>
-noremap <silent> ]z :call EnhanceFoldJump("end", 1, 0)<cr>
+map [Z zk
+map ]Z zj
+noremap <silent> [z :call EnhanceFoldJump("previous", 1, 0)<cr>
+noremap <silent> ]z :call EnhanceFoldJump("next", 1, 0)<cr>
 noremap <silent> g[z [z
 noremap <silent> g]z ]z
 map <silent> <leader>z :call EnhanceFoldHL("No fold marker found", 500, "")<cr>
@@ -412,7 +469,28 @@ vmap <silent> <A-S-k> :<c-u>call VSCodeLineYank(visualmode(), "up")<cr>
 " }}} MS bebhave
 " Convert \ into /
 nnoremap <silent> g/ mz:s#\\#\/<cr>:noh<cr>g`z
-" Commandline & Insert {{{
+" Mode - Terminal {{{
+tmap <A-n> <C-\><C-n>
+nmap <silent> <C-`> :call TerminalToggle()<cr>
+tmap <silent> <C-`> <A-n>:call TerminalToggle()<cr>
+tmap <A-h> <A-n><A-h>
+tmap <A-l> <A-n><A-l>
+tmap <A-S-h> <A-n><A-S-h>
+tmap <A-S-l> <A-n><A-S-l>
+tmap <expr> <C-r> '\<A-n>"' . nr2char(getchar()) . 'pi'
+tmap <C-w>k <A-n><C-w>k<cr>
+tmap <C-w>j <A-n><C-w>j<cr>
+tmap <C-w>h <A-n><C-w>h<cr>
+tmap <C-w>l <A-n><C-w>l<cr>
+tmap <C-w>w <A-n><C-w>w<cr>
+tmap <C-w><C-w> <A-n><C-w><C-w><cr>
+tmap <C-w>W <A-n><C-w>W<cr>
+tmap <C-w>H <A-n><C-w>H<cr>
+tmap <C-w>L <A-n><C-w>L<cr>
+tmap <C-w>J <A-n><C-w>J<cr>
+tmap <C-w>K <A-n><C-w>K<cr>
+" }}} Mode - Terminal
+" Mode - Commandline " Commandline & Insert {{{ Insert {{{
 imap <C-cr> <esc>o
 imap <S-cr> <esc>O
 imap jj <esc>
@@ -446,10 +524,13 @@ cnoremap <C-S-l> <C-d>
 cmap <C-d> <Del>
 cmap <C-S-e> <C-\>e
 cmap <C-v> <C-R>*
-" }}} Commandline & Insert
+" }}} Mode - Commandline " }}} Commandline & Insert Insert
 " }}} Key mapping
 
 " Plug-ins settings  {{{
+" mg979/docgen.vim {{{
+nmap <silent> ,d :DocGen<cr>
+" }}} mg979/docgen.vim
 " AndrewRadev/splitjoin.vim {{{
 let g:splitjoin_join_mapping = ""
 let g:splitjoin_split_mapping = ""
@@ -497,7 +578,7 @@ let g:NERDAltDelims_c = 1
 let g:NERDAltDelims_cpp = 1
 let g:NERDAltDelims_javascript = 1
 function! CommentJump(keystroke) " {{{
-    if getline(".") != ""
+    if getline(".") != ''
         if a:keystroke ==# "o"
             let l:saveReg = @@
             execute "normal! yypcc" . g:FiletypeCommentDelimiter[&filetype] . " "
@@ -654,3 +735,4 @@ nmap gxc <Plug>(ExchangeClear)
 nmap gxx <Plug>(ExchangeLine)
 " }}} Exchange
 " }}} Plug-ins settings
+

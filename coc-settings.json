@@ -1,8 +1,4 @@
 {
-    "clangd.semanticHighlighting": true,
-    "clangd.arguments": [
-        "--background-index"
-    ],
     "cmake.cmakePath": "D:\\CMake\\bin\\cmake.exe",
     "cmake.lsp.enable": false,
     "codeLens.enable": true,
@@ -107,6 +103,34 @@
         "autoload",
         "plugin"
     ],
+    "zi.enable": true,
+    "zi.patterns": {
+        "": [],
+        "c" :[
+            "\\s*//"
+        ],
+        "cpp" :[
+            "\\s*//"
+        ],
+        "javascript": [
+            "^\\s*\\/\\/",
+            "^\\s*\\/\\*",
+            "^\\s*\\*"
+        ],
+        "typescript": [
+            "^\\s*\\/\\/",
+            "^\\s*\\/\\*",
+            "^\\s*\\*"
+        ],
+        "markdown": [],
+        "python": [
+            "\\s*#"
+        ],
+        "vim": [
+            "\\s*\""
+        ],
+        "gitcommit": []
+    },
     "python.formatting.provider": "black",
     "python.formatting.blackPath": "/home/iaso2h/.local/bin/black",
     "cSpell.enabled": false,

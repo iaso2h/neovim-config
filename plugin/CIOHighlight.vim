@@ -31,7 +31,7 @@ function! s:CIOInit()
     let s:varPattern = "[A-Za-z&\"'*].*\\ze\\([,\s]\\)"
     let s:varPatternLast = "[A-Za-z&\"'*].*\\ze\\()\\+;\\?$\\)"
     let g:CIOHLMatch = {}
-    execute printf("%ds#%s##g", l:foldStartPos[1], s:startPat)
+    " execute printf("%ds#%s##g", l:foldStartPos[1], s:startPat)
     let g:CIOspecHLID = 9136
     let g:CIOvarHLID = 9137
     let g:CIOHLPriority = get(g:, "CIOHLPriority", 30)
@@ -80,7 +80,7 @@ function s:ParseChar() " {{{
     let s:specIndexList = []
     "  Skip comment for performance
     let l:commentExist = matchstr(s:curLine, '^\s*' . g:FiletypeCommentDelimiter[&filetype])
-    if l:commentExist != "" | return 0 | endif
+    if empty(l:commentExist) | return 0 | endif
 
     " Parse characters {{{
     for k in s:funckeywordDict[&filetype]
@@ -92,7 +92,7 @@ function s:ParseChar() " {{{
             " NOTE MatchALLStrPos is from util.vim
             let s:specIndexList = MatchALLStrPos(s:curLine, s:specDict[s:foundFuncKeywordPat][0])
             " Check specifiers found
-            if s:specIndexList == [] | return 0 | endif
+            if empty(s:specIndexList) | return 0 | endif
 
             " Parse symbols and variable
             let s:charList = split(s:curLine, '\zs')
@@ -126,7 +126,7 @@ function s:ParseChar() " {{{
                 endif
             endfor
             " Check vars found
-            if s:delimiterColNumList == [] | return 0 | endif
+            if empty(s:delimiterColNumList) | return 0 | endif
             " Check valid syntax
             if l:openParen == 0 || l:openParen != l:closeParen
                 return 0
@@ -138,22 +138,27 @@ function s:ParseChar() " {{{
     " }}} Parse characters
 
     " No function keyword found
-    if s:foundFuncKeywordPat == "" | return 0 | endif
+    if empty(s:foundFuncKeywordPat) | return 0 | endif
 endfunction " }}}
 
+""
+" Function: s:CIOSkipChar Skip when cursor is on some specific characters or out of range
+"
+" Returns: return 0 when cursor is on skipping area, otherwise return 1 in the end
+""
 function! s:CIOSkipChar() abort " {{{
-    " Skip range for performance
+    " Skip range
     if s:cursorPos[2] < 2 || s:cursorPos[2] + 2 - 1 > len(s:charList)
         return 0
     endif
-    " Skip characters for performance
+    " Skip characters
     let l:curChar = s:charList[s:cursorPos[2] - 1]
-    if matchstr(s:skipCharacters[s:foundFuncKeywordPat], l:curChar) != "" | return 0 | endif
+    if !empty(matchstr(s:skipCharacters[s:foundFuncKeywordPat], l:curChar))  | return 0 | endif
     return 1
 endfunction " }}}
 
 function! s:RemoveHLMatch() " {{{
-    while exists("g:CIOHLMatch[s:winID]") && g:CIOHLMatch[s:winID] != []
+    while exists("g:CIOHLMatch[s:winID]") && !empty(g:CIOHLMatch[s:winID])
         call matchdelete(remove(g:CIOHLMatch[s:winID], 0), s:winID)
     endwhile
 endfunction " }}}
@@ -278,3 +283,4 @@ function! s:HLVars() " {{{
         endif
     endtry
 endfunction " }}}
+

@@ -11,7 +11,7 @@ end
 local golden_size = require("golden_size")
 -- set the callbacks, preserve the defaults
 golden_size.set_ignore_callbacks({
-  { ignore_by_buftype, {'nofile', 'quickfix', 'nerdtree'} },
+  { ignore_by_buftype, {'terminal', 'nofile', 'quickfix', 'nerdtree'} },
   { golden_size.ignore_float_windows }, -- default one, ignore float windows
   { golden_size.ignore_by_window_flag }, -- default one, ignore windows with w:ignore_gold_size=1
 })

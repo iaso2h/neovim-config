@@ -1,6 +1,8 @@
 " mg979/vim-visual-multi-multi {{{
 let g:VM_silent_exit = 1
 let g:VM_quit_after_leaving_insert_mode = 1
+let g:VM_use_first_cursor_in_line = 1
+let g:VM_reselect_first = 1
 let g:VM_verbose_commands = 1
 let g:VM_skip_shorter_lines = 0
 let g:VM_skip_empty_lines = 1

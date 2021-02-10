@@ -1,5 +1,5 @@
 " VSCode copy line {{{
-function! VSCodeLineCopy(modeType, direction)
+function! VSCodeLineYank(modeType, direction)
     if a:modeType ==# "V"
         normal! gv
         let saved_reg = @@
@@ -117,9 +117,9 @@ function! InplaceYank(type, ...)
     call cursor(s:startPos[1], s:startPos[2])
     " Create highlight {{{
     " Skip specical buffers
-    if &buftype != "" | return 0 | endif
+    if &buftype != "" || &filetype == "help" | return 0 | endif
     " Clear previous HL before creating new HL
-    if exists("g:InplaceHLMatchID[s:yankWinID]") && g:InplaceHLMatchID[s:yankWinID] != []
+    if exists("g:InplaceHLMatchID[s:yankWinID]") && !empty(g:InplaceHLMatchID[s:yankWinID])
         call ClearYankHL(500)
     else
         let g:InplaceHLMatchID[s:yankWinID] = []
@@ -217,9 +217,9 @@ function! InplacePut(typeMode, pasteCMD) "  {{{
     endif
     " Create highlight {{{
     " Skip specical buffers
-    if &buftype != "" | return 0 | endif
+    if &buftype != "" || &filetype == "help" | return 0 | endif
     " Clear previous HL before creating new HL
-    if exists("g:InplaceHLMatchID[s:putWinID]") && g:InplaceHLMatchID[s:putWinID] != []
+    if exists("g:InplaceHLMatchID[s:putWinID]") && !empty(g:InplaceHLMatchID[s:putWinID])
         call ClearPutHL(500)
     else
         let g:InplaceHLMatchID[s:putWinID] = []
@@ -248,30 +248,29 @@ function! InplacePut(typeMode, pasteCMD) "  {{{
     " }}} Create highlight
 endfunction "  }}}
 
-" YPHighlight {{{
+" Highlight {{{
 function! ClearYankHL(timer, ...)
-    let l:indexID = index(g:InplaceHLMatchID[s:yankWinID], g:InplaceYankHLID)
-    if l:indexID != -1
+    while !empty(g:InplaceHLMatchID[s:yankWinID])
         if CompareNeovimVersion("0.5.0", "<=")
-            call matchdelete(remove(g:InplaceHLMatchID[s:yankWinID], indexID), s:yankWinID)
+            call matchdelete(remove(g:InplaceHLMatchID[s:yankWinID], 0), s:yankWinID)
         else
-            call matchdelete(remove(g:InplaceHLMatchID[s:yankWinID], indexID))
+            call matchdelete(remove(g:InplaceHLMatchID[s:yankWinID], 0))
         endif
-    endif
+    endwhile
 endfunction
 
 function! ClearPutHL(timer, ...)
-    let l:indexID = index(g:InplaceHLMatchID[s:putWinID], g:InplacePutHLID)
-    if l:indexID != -1
+    while !empty(g:InplaceHLMatchID[s:putWinID])
         if CompareNeovimVersion("0.5.0", "<=")
-            call matchdelete(remove(g:InplaceHLMatchID[s:putWinID], indexID), s:putWinID)
+            call matchdelete(remove(g:InplaceHLMatchID[s:putWinID], 0), s:putWinID)
         else
-            call matchdelete(remove(g:InplaceHLMatchID[s:putWinID], indexID))
+            call matchdelete(remove(g:InplaceHLMatchID[s:putWinID], 0))
         endif
-    endif
+    endwhile
 endfunction
+" }}} Highlight
 
-function! HighlightLastYP(cmdType)
+function! HighlightLastYP(cmdType) " {{{
     let l:pos = getpos('.')
     " Create jump location in jumplist
     normal! mz`z
@@ -308,50 +307,7 @@ function! HighlightLastYP(cmdType)
 
     return 0 " Since visual selection will always override any highlight match,
     " there is no point to execute more code
-    " Create highlight {{{
-    " Skip specical buffers
-    if &buftype != "" | return 0 | endif
-    let l:curWinID = win_getid()
-    let l:matchPat = a:cmdType == "yank" ?
-                \ "\\%'Y.*\\(\\_s.*\\)*\\%'y." :
-                \ "\\%'P.*\\(\\_s.*\\)*\\%'p."
-    let l:matchID = a:cmdType == "yank" ?
-                \ g:InplaceYankHLID :
-                \ g:InplacePutHLID
-    let l:clearHLHandler = a:cmdType == "yank" ?
-                \ "ClearYankHL" :
-                \ "ClearPutHL"
-    let l:matchAdd = 0
-    " Clear previous HL before creating new HL
-    if exists("g:InplaceHLMatchID[l:curWinID]") && g:InplaceHLMatchID[l:curWinID] != []
-        call ClearYankHL(500)
-    else
-        let g:InplaceHLMatchID[l:curWinID] = []
-    endif
-    try
-        let l:matchID = matchadd("Search",
-                    \ l:matchPat,
-                    \ g:InplacePriority,
-                    \ l:matchID)
-        let l:matchAdd = 1
-        call add(g:InplaceHLMatchID[l:curWinID], l:matchID)
-        let l:timer = timer_start(11500, l:clearHLHandler)
-    finally
-        " If failed, let VimL deside which ID to use
-        " When ID added successfully, don't execute it"
-        if !l:matchAdd
-            let l:matchID = matchadd("Search",
-                        \ l:matchPat,
-                        \ g:InplacePriority,
-                        \ )
-            let g:matchAdd = l:matchID
-            call add(g:InplaceHLMatchID[l:curWinID], l:matchID)
-            let l:timer = timer_start(11500, l:clearHLHandler)
-        endif
-    endtry
-    " }}} Create highlight
-endfunction
-" }}} YPHighlight
+endfunction " }}}
 
 function! InplaceDisableVisual() " {{{
     normal! gv
@@ -393,7 +349,7 @@ endfunction
 " }}} InplaceUlti
 
 function! g:ConvertPut(pasteCMD) "  {{{
-    if !type(get(s:, "YPRHLIDDict", 0))
+    if !exists("g:InplaceHLMatchID")
         let g:InplaceHLMatchID = {}
     endif
     let s:putFilePath = expand("%:p")
@@ -450,9 +406,9 @@ function! g:ConvertPut(pasteCMD) "  {{{
 
     " Create highlight {{{
     " Skip specical buffers
-    if &buftype != "" | return 0 | endif
+    if &buftype != "" || &filetype == "help" | return 0 | endif
     " Clear previous HL before creating new HL
-    if exists("g:InplaceHLMatchID[s:putWinID]") && g:InplaceHLMatchID[s:putWinID] != []
+    if exists("g:InplaceHLMatchID[s:putWinID]") && !empty(g:InplaceHLMatchID[s:putWinID])
         call ClearPutHL(500)
     else
         let g:InplaceHLMatchID[s:putWinID] = []
@@ -482,3 +438,4 @@ function! g:ConvertPut(pasteCMD) "  {{{
     " Restore
     call setreg(v:register, getreg(v:register), l:regType)
 endfunction "  }}}
+

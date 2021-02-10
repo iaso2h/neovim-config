@@ -18,6 +18,7 @@ let g:coc_global_extensions = [
             \'coc-snippets',
             \'coc-spell-checker',
             \'coc-vimlsp',
+            \'coc-zi',
             \]
 " \'coc-nextword',
 " \'coc-highlight'
@@ -110,7 +111,7 @@ xmap ic <Plug>(coc-classobj-i)
 omap ic <Plug>(coc-classobj-i)
 xmap ac <Plug>(coc-classobj-a)
 omap ac <Plug>(coc-classobj-a)
-" }}} Function & Class text objects 
+" }}} Function & Class text objects
 " NOTE: Remap <C-f> and <C-b> for scroll float windows/popups.
 " nnoremap <nowait><expr> <A-d> coc#float#has_scroll() ? coc#float#scroll(1) : "\<PageDown>"
 " nnoremap <silent><nowait><expr> <A-e> coc#float#has_scroll() ? coc#float#scroll(0) : "\<PageUp>"
@@ -179,7 +180,7 @@ nmap <A-1> :CocCommand explorer<CR>
 nmap <space>el :CocList explPresets
 " }}} COC-Explorer
 " COC-Snippets {{{
-nmap <C-j> :CocCommand snippets.<C-S-l>
+nmap <C-j> :CocCommand snippets
 nmap <silent> <leader>j :CocList snippets<cr>
 let g:coc_snippet_next = '<Tab>'
 let g:coc_snippet_prev = '<S-Tab>'

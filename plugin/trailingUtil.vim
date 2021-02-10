@@ -12,8 +12,11 @@ endfunction " }}}
 function! TrailingLinebreak(direction) " {{{
     let l:cursor = getpos('.')
     if a:direction ==# "down"
-        normal! A
+        normal! o
         call cursor(l:cursor[1], l:cursor[2])
     elseif a:direction ==# "up"
+        normal! O
+        call cursor(l:cursor[1], l:cursor[2])
     endif
 endfunction " }}}
+

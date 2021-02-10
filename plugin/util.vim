@@ -119,3 +119,89 @@ function! MatchALLStrPos(expr, pat)
     endwhile
 endfunction
 " }}} Match all item based on regex
+
+""
+" Smart split {{{
+" Function: SmartSplit Create a new split window based on the current window
+" layout
+"
+" @param funcName:    string value of function name
+" @param funcArgList: function argument list, can be empty
+""
+function SmartSplit(funcName, funcArgList)
+    let s:width2height = 0.3678
+    let s:height2width = 2.7188
+    let s:screenWidth = &columns
+    let s:screenHeight = &lines
+    let l:winInfo = getwininfo()
+    let s:curWinID = win_getid()
+    let l:winCount = winnr("$")
+    if l:winCount == 1 " {{{
+        if winwidth(0) <= winheight(0) * s:height2width
+            call <SID>ToggleOnBelow(a:funcName, a:funcArgList)
+        else
+            echom winwidth(0)
+            echom &columns/2
+            call <SID>ToggleOnRight(a:funcName, a:funcArgList)
+        endif " }}}
+    elseif l:winCount == 2 " {{{
+        if winheight(0) + 6 > s:screenHeight
+            execute "normal! \<C-w>w"
+            call <SID>ToggleOnBelow(a:funcName, a:funcArgList)
+        else
+            execute "normal! \<C-w>w"
+            call <SID>ToggleOnRight(a:funcName, a:funcArgList)
+        endif " }}}
+    elseif l:winCount == 3 " {{{
+        " Get the largest window {{{
+        let l:dictIndex = -1
+        for dict in l:winInfo
+            let l:dictIndex += 1
+            if dict['height'] + 6 > s:screenHeight || dict['width'] + 6 > s:screenWidth
+                let l:largeWinDict = deepcopy(dict)
+                let l:largeWinIndex = l:dictIndex
+            endif
+            if dict['winid'] == s:curWinID | let s:curWinIndex = l:dictIndex | endif
+        endfor
+        " }}} Get the largest window
+        if s:curWinIndex == l:largeWinIndex
+            if winheight(0) + 6 > s:screenHeight
+                call <SID>ToggleOnBelow(a:funcName, a:funcArgList)
+            else
+                call <SID>ToggleOnRight(a:funcName, a:funcArgList)
+            endif
+        else
+            let l:offset = l:largeWinIndex - s:curWinIndex
+            if l:offset > 0
+                execute printf("normal! %d\<C-w>w", abs(l:offset) + 1)
+            else
+                execute printf("normal! %d\<C-w>W", abs(l:offset) + 1)
+            endif
+            if winheight(0) + 6 > s:screenHeight
+                call <SID>ToggleOnBelow(a:funcName, a:funcArgList)
+            else
+                call <SID>ToggleOnRight(a:funcName, a:funcArgList)
+            endif
+        endif " }}}
+    endif
+endfunction
+
+function s:ToggleOnRight(funcName, funcArgList)
+    vnew
+    let l:scratchBuf = bufnr()
+    execute "vertical resize " . (s:screenWidth - float2nr(winheight(0) * 0.618 * s:height2width))
+    let l:Func = function(a:funcName, a:funcArgList)
+    call l:Func()
+    execute "bdelete " . l:scratchBuf
+endfunction
+
+function s:ToggleOnBelow(funcName, funcArgList)
+    new
+    let l:scratchBuf = bufnr()
+    execute "resize " . (s:screenHeight - float2nr(winwidth(0) * 0.618 * s:width2height))
+    let l:Func = function(a:funcName, a:funcArgList)
+    call l:Func()
+    execute "bdelete " . l:scratchBuf
+endfunction
+" }}} Smart split
+
