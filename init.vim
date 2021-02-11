@@ -259,7 +259,7 @@ augroup vimrcReload " {{{
 augroup END " }}}
 " }}} Auto commands
 " Commands {{{
-command! -nargs=+ -complete=command Echo echom strftime('%c') . ": " . <args>
+command! -nargs=+ -complete=command Echo PPmsg strftime('%c') . ": " . <args>
 command! -nargs=+ -complete=command Redir call Redir(<q-args>)
 command! -nargs=0 TrimWhiteSpaces call TrimWhiteSpaces(0)
 command! -nargs=0 PS terminal powershell
@@ -478,17 +478,17 @@ tmap <A-l> <A-n><A-l>
 tmap <A-S-h> <A-n><A-S-h>
 tmap <A-S-l> <A-n><A-S-l>
 tmap <expr> <C-r> '\<A-n>"' . nr2char(getchar()) . 'pi'
-tmap <C-w>k <A-n><C-w>k<cr>
-tmap <C-w>j <A-n><C-w>j<cr>
-tmap <C-w>h <A-n><C-w>h<cr>
-tmap <C-w>l <A-n><C-w>l<cr>
-tmap <C-w>w <A-n><C-w>w<cr>
-tmap <C-w><C-w> <A-n><C-w><C-w><cr>
-tmap <C-w>W <A-n><C-w>W<cr>
-tmap <C-w>H <A-n><C-w>H<cr>
-tmap <C-w>L <A-n><C-w>L<cr>
-tmap <C-w>J <A-n><C-w>J<cr>
-tmap <C-w>K <A-n><C-w>K<cr>
+tmap <C-w>k <A-n><C-w>k
+tmap <C-w>j <A-n><C-w>j
+tmap <C-w>h <A-n><C-w>h
+tmap <C-w>l <A-n><C-w>l
+tmap <C-w>w <A-n><C-w>w
+tmap <C-w><C-w> <A-n><C-w><C-w>
+tmap <C-w>W <A-n><C-w>W
+tmap <C-w>H <A-n><C-w>H
+tmap <C-w>L <A-n><C-w>L
+tmap <C-w>J <A-n><C-w>J
+tmap <C-w>K <A-n><C-w>K
 " }}} Mode - Terminal
 " Mode - Commandline " Commandline & Insert {{{ Insert {{{
 imap <C-cr> <esc>o

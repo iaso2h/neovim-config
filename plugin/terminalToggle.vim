@@ -15,7 +15,7 @@ function! TerminalToggle() " {{{
     let l:curWinID = win_getid()
     if &buftype != "Terminal"
         let s:lastWinID = l:curWinID
-        call SmartSplit("TTerminal", [])
+        call SmartSplit("TTerminal", [], 1)
     else
         if l:winCount == 1
             bp

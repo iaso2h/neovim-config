@@ -128,7 +128,7 @@ endfunction
 " @param funcName:    string value of function name
 " @param funcArgList: function argument list, can be empty
 ""
-function SmartSplit(funcName, funcArgList)
+function SmartSplit(funcName, funcArgList, noFileCheck)
     let s:width2height = 0.3678
     let s:height2width = 2.7188
     let s:screenWidth = &columns
@@ -138,19 +138,17 @@ function SmartSplit(funcName, funcArgList)
     let l:winCount = winnr("$")
     if l:winCount == 1 " {{{
         if winwidth(0) <= winheight(0) * s:height2width
-            call <SID>ToggleOnBelow(a:funcName, a:funcArgList)
+            call <SID>ToggleOnBelow(a:funcName, a:funcArgList, a:noFileCheck)
         else
-            echom winwidth(0)
-            echom &columns/2
-            call <SID>ToggleOnRight(a:funcName, a:funcArgList)
+            call <SID>ToggleOnRight(a:funcName, a:funcArgList, a:noFileCheck)
         endif " }}}
     elseif l:winCount == 2 " {{{
         if winheight(0) + 6 > s:screenHeight
             execute "normal! \<C-w>w"
-            call <SID>ToggleOnBelow(a:funcName, a:funcArgList)
+            call <SID>ToggleOnBelow(a:funcName, a:funcArgList, a:noFileCheck)
         else
             execute "normal! \<C-w>w"
-            call <SID>ToggleOnRight(a:funcName, a:funcArgList)
+            call <SID>ToggleOnRight(a:funcName, a:funcArgList, a:noFileCheck)
         endif " }}}
     elseif l:winCount == 3 " {{{
         " Get the largest window {{{
@@ -166,9 +164,9 @@ function SmartSplit(funcName, funcArgList)
         " }}} Get the largest window
         if s:curWinIndex == l:largeWinIndex
             if winheight(0) + 6 > s:screenHeight
-                call <SID>ToggleOnBelow(a:funcName, a:funcArgList)
+                call <SID>ToggleOnBelow(a:funcName, a:funcArgList, a:noFileCheck)
             else
-                call <SID>ToggleOnRight(a:funcName, a:funcArgList)
+                call <SID>ToggleOnRight(a:funcName, a:funcArgList, a:noFileCheck)
             endif
         else
             let l:offset = l:largeWinIndex - s:curWinIndex
@@ -178,30 +176,32 @@ function SmartSplit(funcName, funcArgList)
                 execute printf("normal! %d\<C-w>W", abs(l:offset) + 1)
             endif
             if winheight(0) + 6 > s:screenHeight
-                call <SID>ToggleOnBelow(a:funcName, a:funcArgList)
+                call <SID>ToggleOnBelow(a:funcName, a:funcArgList, a:noFileCheck)
             else
-                call <SID>ToggleOnRight(a:funcName, a:funcArgList)
+                call <SID>ToggleOnRight(a:funcName, a:funcArgList, a:noFileCheck)
             endif
         endif " }}}
     endif
 endfunction
 
-function s:ToggleOnRight(funcName, funcArgList)
+function s:ToggleOnRight(funcName, funcArgList, noFileCheck)
     vnew
-    let l:scratchBuf = bufnr()
+    if a:noFileCheck
+        setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted nomodified
+    endif
     execute "vertical resize " . (s:screenWidth - float2nr(winheight(0) * 0.618 * s:height2width))
     let l:Func = function(a:funcName, a:funcArgList)
     call l:Func()
-    execute "bdelete " . l:scratchBuf
 endfunction
 
-function s:ToggleOnBelow(funcName, funcArgList)
+function s:ToggleOnBelow(funcName, funcArgList, noFileCheck)
     new
-    let l:scratchBuf = bufnr()
+    if a:noFileCheck
+        setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted nomodified
+    endif
     execute "resize " . (s:screenHeight - float2nr(winwidth(0) * 0.618 * s:width2height))
     let l:Func = function(a:funcName, a:funcArgList)
     call l:Func()
-    execute "bdelete " . l:scratchBuf
 endfunction
 " }}} Smart split
 
