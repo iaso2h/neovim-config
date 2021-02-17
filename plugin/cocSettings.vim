@@ -48,8 +48,7 @@ command! -nargs=0 Spell   :CocCommand cSpell.toggleEnableSpellChecker
 " Function {{{
 function! s:checkCOCDiagnosticFirst(COCAction)
     if exists("b:coc_diagnostic_info")
-        if items(b:coc_diagnostic_info) ==
-                    \ [['information', 0], ['hint', 0], ['lnums', [0, 0, 0, 0]], ['warning', 0], ['error', 0]]
+        if !b:coc_diagnostic_info["warning"] && !b:coc_diagnostic_info["error"]
             call CocActionAsync(a:COCAction)
         else
             echohl WarningMsg | echo "Fix diagnostic info" | echohl None
@@ -59,7 +58,20 @@ function! s:checkCOCDiagnosticFirst(COCAction)
     endif
 endfunction
 " }}} Function
-
+" VSCode lua {{{
+let lua_lsp = glob('~/.vscode/extensions/sumneko.lua*', 0, 1)
+if len(lua_lsp)
+    let lua_lsp = lua_lsp[-1] . '\server'
+    call coc#config('languageserver', {
+        \ 'lua-language-server': {
+        \     'cwd': lua_lsp,
+        \     'command': lua_lsp . '\bin\Windows\lua-language-server.exe',
+        \     'args': ['-E', '-e', 'LANG="en"', lua_lsp . '\main.lua'],
+        \     'filetypes': ['lua'],
+        \ }
+    \ })
+endif
+" }}} VSCode lua
 " Document highlight
 let g:markdown_fenced_languages = [
             \ 'vim',
@@ -202,3 +214,11 @@ inoremap <silent><expr> <C-space> pumvisible() ? "\<C-e>" : coc#refresh()
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
             \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 " }}} Completion
+"
+"
+"
+"
+"
+"
+"
+"

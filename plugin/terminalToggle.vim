@@ -12,35 +12,20 @@
 function! TerminalToggle() " {{{
     let l:winCount = winnr("$")
     let l:winInfo = getwininfo()
-    let l:curWinID = win_getid()
     if &buftype != "Terminal"
-        let s:lastWinID = l:curWinID
-        call SmartSplit("TTerminal", [], 1)
+        call SmartSplit("TTerminal", [], "^term.*", 1)
     else
         if l:winCount == 1
             bp
         elseif l:winCount == 2
-            execute "normal! \<C-w>w"
-            only
+            wincmd w | only
         else
             q
-            " Switch back to last window id if exist
-            let l:dictIndex = -1
-            let l:lastWinIndex = 0
-            for dict in l:winInfo
-                let l:dictIndex += 1
-                if dict['winid'] == s:lastWinID | let l:lastWinIndex = l:dictIndex | endif
-                if dict['winid'] == l:curWinID | let l:curWinIndex = l:dictIndex | endif
-            endfor
-            if l:lastWinIndex
-                let l:offset = l:lastWinIndex - l:curWinIndex
-                if l:offset > 0
-                    execute printf("normal! %d\<C-w>w", abs(l:offset) + 1)
-                else
-                    execute printf("normal! %d\<C-w>W", abs(l:offset) + 1)
-                endif
-            else
-                return 0
+            " Switch back last window if exists
+            if exists("g:smartSplitLastBufNr")
+                for dict in l:winInfo
+                    if winbufnr(dict['winid']) == g:smartSplitLastBufNr | execute printf("%dwincmd w", dict["winnr"]) | endif
+                endfor
             endif
         endif
     endif
@@ -67,6 +52,14 @@ function! TTerminal() " {{{
     endif
 endfunction " }}}
 
+function! TerminalClose()
+    let l:winInfo = getwininfo()
+    for dict in l:winInfo
+        if bufname(winbufnr(dict["winid"])) =~ "term:"
+            execute printf("%dwincmd q", dict["winnr"])
+        endif
+    endfor
+endfunction
 " let l:winInfo =
 " [{'botline': 91,
 " 'bufnr': 10,

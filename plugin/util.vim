@@ -127,8 +127,12 @@ endfunction
 "
 " @param funcName:    string value of function name
 " @param funcArgList: function argument list, can be empty
+" @param bufnamePat:  Switch to window contain the buffer that match the
+" pattern if that buffer is displayed in window
+" @param noFileCheck: Set this value for the new window buffer setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted nomodified
+" Returns: 0
 ""
-function SmartSplit(funcName, funcArgList, noFileCheck)
+function SmartSplit(funcName, funcArgList, bufnamePat, noFileCheck)
     let s:width2height = 0.3678
     let s:height2width = 2.7188
     let s:screenWidth = &columns
@@ -136,6 +140,20 @@ function SmartSplit(funcName, funcArgList, noFileCheck)
     let l:winInfo = getwininfo()
     let s:curWinID = win_getid()
     let l:winCount = winnr("$")
+
+    " Switch to window contain the buffer that match the
+    " pattern if that buffer is displayed in window
+    if !empty(a:bufnamePat) " {{{
+        for dict in l:winInfo
+            if bufname(winbufnr(dict["winid"])) =~ a:bufnamePat
+                execute printf("%dwincmd w", dict["winnr"])
+                startinsert
+                return 0
+            endif
+        endfor
+    endif " }}}
+
+    let g:smartSplitLastBufNr = bufnr()
     if l:winCount == 1 " {{{
         if winwidth(0) <= winheight(0) * s:height2width
             call <SID>ToggleOnBelow(a:funcName, a:funcArgList, a:noFileCheck)
@@ -144,43 +162,28 @@ function SmartSplit(funcName, funcArgList, noFileCheck)
         endif " }}}
     elseif l:winCount == 2 " {{{
         if winheight(0) + 6 > s:screenHeight
-            execute "normal! \<C-w>w"
+            wincmd w
             call <SID>ToggleOnBelow(a:funcName, a:funcArgList, a:noFileCheck)
         else
-            execute "normal! \<C-w>w"
+            wincmd w
             call <SID>ToggleOnRight(a:funcName, a:funcArgList, a:noFileCheck)
         endif " }}}
     elseif l:winCount == 3 " {{{
-        " Get the largest window {{{
-        let l:dictIndex = -1
         for dict in l:winInfo
-            let l:dictIndex += 1
             if dict['height'] + 6 > s:screenHeight || dict['width'] + 6 > s:screenWidth
-                let l:largeWinDict = deepcopy(dict)
-                let l:largeWinIndex = l:dictIndex
+                execute printf("%dwincmd w", dict["winnr"])
+                break
             endif
-            if dict['winid'] == s:curWinID | let s:curWinIndex = l:dictIndex | endif
         endfor
-        " }}} Get the largest window
-        if s:curWinIndex == l:largeWinIndex
-            if winheight(0) + 6 > s:screenHeight
-                call <SID>ToggleOnBelow(a:funcName, a:funcArgList, a:noFileCheck)
-            else
-                call <SID>ToggleOnRight(a:funcName, a:funcArgList, a:noFileCheck)
-            endif
+
+        if winheight(0) + 6 > s:screenHeight
+            call <SID>ToggleOnBelow(a:funcName, a:funcArgList, a:noFileCheck)
         else
-            let l:offset = l:largeWinIndex - s:curWinIndex
-            if l:offset > 0
-                execute printf("normal! %d\<C-w>w", abs(l:offset) + 1)
-            else
-                execute printf("normal! %d\<C-w>W", abs(l:offset) + 1)
-            endif
-            if winheight(0) + 6 > s:screenHeight
-                call <SID>ToggleOnBelow(a:funcName, a:funcArgList, a:noFileCheck)
-            else
-                call <SID>ToggleOnRight(a:funcName, a:funcArgList, a:noFileCheck)
-            endif
+            call <SID>ToggleOnRight(a:funcName, a:funcArgList, a:noFileCheck)
         endif " }}}
+    else
+        only
+        call <SID>ToggleOnRight(a:funcName, a:funcArgList, a:noFileCheck)
     endif
 endfunction
 

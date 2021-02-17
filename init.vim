@@ -20,11 +20,10 @@ Plug 'norcalli/nvim-colorizer.lua'
 Plug 'mhinz/vim-startify'
 
 Plug 'mbbill/undotree'
-Plug 'xolox/vim-session'
-Plug 'xolox/vim-misc'
 Plug 'szw/vim-maximizer'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-scriptease'
+Plug 'tpope/vim-eunuch'
 Plug 'easymotion/vim-easymotion'
 Plug 'machakann/vim-sandwich'
 Plug 'tommcdo/vim-exchange'
@@ -47,6 +46,7 @@ Plug 'SirVer/ultisnips'
 Plug 'tmhedberg/SimpylFold'
 Plug 'vim-python/python-syntax'
 Plug 'jmcantrell/vim-virtualenv'
+Plug 'davisdude/vim-love-docs', {'branch': 'build', 'for': 'lua'}
 Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
 Plug 'plasticboy/vim-markdown'
@@ -106,6 +106,7 @@ set mouse=a
 set nojoinspaces
 set noshowcmd noshowmode
 set number
+set path+=**
 set scrolloff=8
 set sessionoptions=buffers,curdir,folds,help,resize,slash,tabpages,winpos,winsize
 set shada=!,'100,/100,:100,<100,s100,h
@@ -220,6 +221,8 @@ augroup _fileType " {{{
     autocmd!
     autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | execute "normal! g`\"" | endif
     autocmd BufWritePre * call TrimWhiteSpaces(1) | call <SID>TrailingEmptyLine()
+    " BUG: failed in command line mode press Ctrl-f
+    autocmd FocusGained,BufEnter * if bufname() != "[Command Line]" | checktime | endif
     autocmd FileType json syntax match Comment +\/\/.\+$+
     " C language
     autocmd CursorHold *.c,*.h,*.cpp,*.cc,*.vim :call HLCIOFunc()
@@ -231,7 +234,7 @@ augroup _fileType " {{{
     autocmd FileType vim vnoremap <buffer> <A-f> =
     autocmd FileType vim nmap <buffer> <A-f> <A-m>zvae=`z
     autocmd FileType vim nmap <buffer> <silent> <C-S-q> :execute 'h ' . expand('<cword>')<cr>
-    autocmd FileType vim vmap <silent> <C-S-q> :<c-u>execute 'h ' . VisualSelection("string")<cr>
+    autocmd FileType vim vmap <buffer> <silent> <C-S-q> :<c-u>execute 'h ' . VisualSelection("string")<cr>
     " Quickfix window
     autocmd FileType qf setlocal number norelativenumber
     autocmd FileType qf map <buffer> <silent> <cr> :.cc<cr>:copen<cr>
@@ -246,10 +249,6 @@ augroup END " }}}
 " autocmd!
 " autocmd TextYankPost * silent! lua vim.highlight.on_yank {on_visual=false, higroup="Search", timeout=500}
 " augroup END " }}}
-augroup checkBufChanged " {{{
-    autocmd!
-    autocmd FocusGained,BufEnter * checktime
-augroup end " }}}
 augroup vimrcReload " {{{
     autocmd!
     autocmd bufwritepost $MYVIMRC nested source $MYVIMRC | redraw! | echom "Reload: " . $MYVIMRC
@@ -260,7 +259,8 @@ augroup END " }}}
 " }}} Auto commands
 " Commands {{{
 command! -nargs=+ -complete=command Echo PPmsg strftime('%c') . ": " . <args>
-command! -nargs=+ -complete=command Redir call Redir(<q-args>)
+command! -nargs=+ -complete=command Redirc call Redir(<q-args>, "command")
+command! -nargs=+ -complete=function Redirf call Redir(<q-args>, "function")
 command! -nargs=0 TrimWhiteSpaces call TrimWhiteSpaces(0)
 command! -nargs=0 PS terminal powershell
 command! -nargs=0 O browse oldfiles
@@ -359,9 +359,16 @@ map <silent> <A-'> :call <SID>ClearReg()<cr>
 " Smart quit
 nmap <silent> q :call SmartClose("window")<cr>
 nmap <silent> Q :call SmartClose("buffer")<cr>
-" " Window
-map <silent> <C-w><C-m> :only<cr>
-" " Buffers
+" Window
+function! s:WinFocus(CMD)
+    execute a:CMD | if &buftype == "terminal" | startinsert | endif
+endfunction
+map <silent> <C-w>o :only<cr>
+map <silent> <C-w>h :call <SID>WinFocus("wincmd h")<cr>
+map <silent> <C-w>l :call <SID>WinFocus("wincmd l")<cr>
+map <silent> <C-w>j :call <SID>WinFocus("wincmd j")<cr>
+map <silent> <C-w>k :call <SID>WinFocus("wincmd k")<cr>
+" Buffers
 function! s:BufSwitcher(direction)
     if a:direction == "previous"
         bp
@@ -373,8 +380,8 @@ function! s:BufSwitcher(direction)
 endfunction
 map <silent> <A-h> :call <SID>BufSwitcher("previous")<cr>
 map <silent> <A-l> :call <SID>BufSwitcher("next")<cr>
-map <silent> <C-w>o :let g:CloseBufferSavedView = winsaveview() <bar>
-            \ update <bar> %bd <bar> e# <bar> bd# <bar>
+map <silent> <C-w>O :let g:CloseBufferSavedView = winsaveview() <bar>
+            \ update <bar> %bd! <bar> e# <bar> bd# <bar>
             \call winrestview(g:CloseBufferSavedView)<cr>
 " Tab
 map <silent> <A-S-h> :tabp<cr>
@@ -388,8 +395,8 @@ noremap <silent> ]z :call EnhanceFoldJump("next", 1, 0)<cr>
 noremap <silent> g[z [z
 noremap <silent> g]z ]z
 map <silent> <leader>z :call EnhanceFoldHL("No fold marker found", 500, "")<cr>
-map <silent> zd :call EnhanceFoldHL("", 800, "EnhanceDelete")<cr>
-map <silent> zc :call EnhanceFoldHL("", 0, "EnhanceChange")<cr>
+nmap <silent> dz :call EnhanceFoldHL("", 800, "EnhanceDelete")<cr>
+nmap <silent> cz :call EnhanceFoldHL("", 0, "EnhanceChange")<cr>
 nmap g{ :<c-u>call EnhanceFold(mode(), "{{{")<cr>
 nmap g} :<c-u>call EnhanceFold(mode(), "}}}")<cr>
 vmap g{ <A-m>z:<c-u>call EnhanceFold(visualmode(), "}}}")<cr>`z
@@ -473,6 +480,8 @@ nnoremap <silent> g/ mz:s#\\#\/<cr>:noh<cr>g`z
 tmap <A-n> <C-\><C-n>
 nmap <silent> <C-`> :call TerminalToggle()<cr>
 tmap <silent> <C-`> <A-n>:call TerminalToggle()<cr>
+nmap <silent> <A-`> <A-n>:call TerminalClose()<cr>
+tmap <silent> <A-`> <A-n>:call TerminalToggle()<cr>
 tmap <A-h> <A-n><A-h>
 tmap <A-l> <A-n><A-l>
 tmap <A-S-h> <A-n><A-S-h>
@@ -493,7 +502,7 @@ tmap <C-w>K <A-n><C-w>K
 " Mode - Commandline " Commandline & Insert {{{ Insert {{{
 imap <C-cr> <esc>o
 imap <S-cr> <esc>O
-imap jj <esc>
+imap jj <esc>`^
 imap <C-d> <Del>
 inoremap <S-Tab> <C-d>
 inoremap <C-.> <C-a>
@@ -534,9 +543,8 @@ nmap <silent> ,d :DocGen<cr>
 " AndrewRadev/splitjoin.vim {{{
 let g:splitjoin_join_mapping = ""
 let g:splitjoin_split_mapping = ""
-nmap <silent> gj :SplitjoinJoin<cr>
-nmap <silent> gs :SplitjoinSplit<cr>
-map gJ <nop>
+nmap <silent> gJ :SplitjoinJoin<cr>
+nmap <silent> gS :SplitjoinSplit<cr>
 " }}} AndrewRadev/splitjoin.vim
 " inkarkat/vim-ReplaceWithRegister {{{
 vmap R gr
@@ -572,11 +580,13 @@ let g:FiletypeCommentDelimiter = {
             \ "python": "#",
             \ "c": "\/\/",
             \ "cpp": "\/\/",
-            \ "json": "\/\/"
+            \ "json": "\/\/",
+            \ "lua": "--",
             \ }
 let g:NERDAltDelims_c = 1
 let g:NERDAltDelims_cpp = 1
 let g:NERDAltDelims_javascript = 1
+let g:NERDAltDelims_lua = 1
 function! CommentJump(keystroke) " {{{
     if getline(".") != ''
         if a:keystroke ==# "o"
@@ -638,15 +648,9 @@ nmap ga <Plug>(EasyAlign)
 " szw/vim-maximizer {{{
 map <C-w>m <f3>
 " }}} szw/vim-maximizer
-" vim-xolox/vim-session {{{
-let g:session_directory         = expand("$HOME/.nvimcache")
-let g:session_autosave          = 'yes'
-let g:session_autosave_periodic = 15
-let g:session_autosave_silent   = 1
-let g:session_command_aliases   = 1 " TODO
-let g:session_persist_font = 0
-let g:session_persist_colors = 0
-" }}} vim-xolox/vim-session
+" rmagatti/auto-session {{{
+let g:auto_session_root_dir         = expand("$HOME/.nvimcache")
+" }}} rmagatti/auto-session
 " zatchheems/vim-camelsnek {{{
 let g:camelsnek_alternative_camel_commands = 1
 let g:camelsnek_no_fun_allowed             = 1

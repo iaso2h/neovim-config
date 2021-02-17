@@ -50,22 +50,23 @@ function! EnhanceFold(modeType, ...) " {{{
                     execute "normal! g_a " . "{{{"
                     call cursor(l:selectEnd[1], 0)
                     execute "normal! g_a " . "}}}"
-                    call cursor (l:saveCursor[1], l:saveCursor[2])
                 else
                     call cursor(l:selectStart[1], 0)
                     execute "normal! g_a " . "\" {{{"
                     call cursor(l:selectEnd[1], 0)
                     execute "normal! g_a " . "\" }}}"
-                    call cursor (l:saveCursor[1], l:saveCursor[2])
                 endif
             else
                 call cursor(l:selectStart[1], 0)
                 execute "normal! g_a " . g:FiletypeCommentDelimiter[&filetype] . " {{{"
                 call cursor(l:selectEnd[1], 0)
                 execute "normal! g_a " . g:FiletypeCommentDelimiter[&filetype] . " }}}"
-                call cursor (l:saveCursor[1], l:saveCursor[2])
             endif
         endif
+
+        " Refresh fold sign column ?
+        normal! gv=
+        call cursor (l:saveCursor[1], l:saveCursor[2])
     endif
 endfunction " }}}
 
@@ -226,6 +227,8 @@ function! EnhanceDelete(...) abort " {{{
     let l:foldStartPos = s:foldStartDict["foldPos"]
     let l:foldEndPos = s:foldEndDict["foldPos"]
     let l:saveView = winsaveview()
+    " Create restore point
+    normal! mz`z
     " }}} Fold marker info
 
     if s:lineComment == 1

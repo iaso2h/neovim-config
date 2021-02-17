@@ -1,5 +1,5 @@
 runtime macros/sandwich/keymap/surround.vim
-nmap gS ys
+nmap gs ys
 xmap iq <Plug>(textobj-sandwich-literal-query-i)
 xmap aq <Plug>(textobj-sandwich-literal-query-a)
 omap iq <Plug>(textobj-sandwich-literal-query-i)
@@ -36,3 +36,4 @@ function! FolderMaker()
     let l:latter = g:FiletypeCommentDelimiter[&filetype] . " }}} " . l:markName
     return [l:former, l:latter]
 endfunction
+

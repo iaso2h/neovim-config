@@ -6,38 +6,40 @@
 function SmartClose(type) " {{{
     let s:curBufNr = winbufnr(0)
     let l:winCount = winnr("$")
-    let l:bufListLength = len(split(execute("ls"), "\\n", 0))
+    let l:bufListLength = len(filter(split(execute("ls"), '\n', 0), 'v:val !~# "term:"'))
     let l:bufName = bufname()
-    if a:type == "window"
+    if a:type == "window" " {{{
         if !empty(&buftype)               " Sepecial buffer
             if &buftype != "nofile"
-                if l:bufListLength == 0
-                    bd!
-                else
-                    q
-                endif
+                bdelete
             else                          " nofile, treated like a scratch file
-                if l:bufListLength == 1 " 1 Buffer
-                    if winCount > 1 | only | endif
-                    call <SID>SaveWipe(s:curBufNr)
-                else                      " 1+ Buffers
-                    if winCount > 1       " 1+ Windows
-                        q
-                        if !&modified | silent execute "bwipe! " . s:curBufNr | endif
-                    else                  " 1 Window
+                if bufname() == "[Command Line]"
+                    q
+                else
+                    if l:bufListLength == 1 " 1 Buffer
+                        if winCount > 1 | only | endif
                         call <SID>SaveWipe(s:curBufNr)
+                    else                      " 1+ Buffers
+                        if winCount > 1       " 1+ Windows
+                            q
+                            if !&modified && buflisted(l:bufName) | execute "bwipe! " . s:curBufNr | endif
+                        else                  " 1 Window
+                            call <SID>SaveWipe(s:curBufNr)
+                        endif
                     endif
                 endif
             endif
+            " }}}
         else                              " Standard buffer
             if empty(l:bufName)           " Scratch File
                 if l:bufListLength == 1 " 1 Buffer
                     if winCount > 1 | only | endif
                     call <SID>SaveWipe(s:curBufNr)
+                    q
                 else                      " 1+ Buffers
                     if winCount > 1       " 1+ Windows
                         q
-                        if !&modified | execute "bwipe! " . s:curBufNr | endif
+                        if !&modified && buflisted(l:bufName) | execute "bwipe! " . s:curBufNr | endif
                     else                  " 1 Window
                         call <SID>SaveWipe(s:curBufNr)
                     endif
@@ -57,6 +59,9 @@ function SmartClose(type) " {{{
         endif
         " }}}
     elseif a:type == "buffer"
+        " Delete unlisted buffer
+        if !buflisted(expand("%")) | bdelete! | return 0 | endif
+
         if l:bufListLength == 1         " 1 Buffer
             if winCount > 1 | only | endif
             call <SID>SaveWipe(s:curBufNr)
@@ -84,12 +89,13 @@ function! s:SaveWipe(bufNr) abort " {{{
         let l:answer = confirm("Save modification?", ">>> &Save\n&Discard\n&Cancel", 3, "Question")
         echohl None
         if l:answer == 1
-            w | execute "bw " . a:bufNr
+            w
+            execute "bwipe " . a:bufNr
         elseif l:answer == 2
-            execute "bw! " . a:bufNr
+            execute "bwipe! " . a:bufNr
         endif
     else
-        execute "bw " . a:bufNr
+        execute "bwipe " . a:bufNr
     endif
 endfunction " }}}
 

@@ -5,7 +5,7 @@ let g:indentLine_char= '▏'
 
 " vim-airline/vim-airline {{{
 let g:airline_theme='onedarknord'
-" let g:airline_skip_empty_sections = 1
+let g:airline_skip_empty_sections = 1
 let g:airline_powerline_fonts = 1
 let g:airline_extensions = ['coc', 'tabline', 'wordcount', 'virtualenv', 'branch', 'fzf']
 let g:airline#extensions#wordcount#filetypes = ['all']
@@ -159,3 +159,5 @@ let g:rainbow_conf = {
             \}
 " [vim css color](https://github.com/ap/vim-css-color) compatibility
 " }}} luochen1990/rainbow
+"
+"

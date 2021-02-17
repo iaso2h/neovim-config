@@ -1,5 +1,5 @@
 {
-    "cmake.cmakePath": "D:\\CMake\\bin\\cmake.exe",
+    "cmake.cmakePath": "D:/CMake/bin/cmake.exe",
     "cmake.lsp.enable": false,
     "codeLens.enable": true,
     "coc.preferences.colorSupport": true,
@@ -22,9 +22,56 @@
     "diagnostic.format": "%message [%source]",
     "diagnostic.separateRelatedInformationAsDiagnostics": true,
     "diagnostic.virtualText": true,
+    "list.normalMappings": {
+        "<C-t>": "action:tabe",
+        "<C-v>": "action:vsplit",
+        "<C-s>": "action:split",
+        "d": "expr:GetDeleteAction",
+        "?": "do:help"
+    },
+    "list.indicator": "->>",
+    "list.insertMappings": {
+        "<C-t>": "action:tabe",
+        "<C-v>": "action:vsplit",
+        "<C-s>": "action:split",
+        "<C-n>": "normal:j",
+        "<C-p>": "normal:k"
+    },
     "list.nextKeymap": "<C-n>",
     "list.previousKeymap": "<C-p>",
+    "list.previewSplitRight": true,
+    "list.selectedSignText": "",
     "languageserver": {
+        "lua-language-server": {
+            "rootPatterns": [
+                ".git/"
+            ],
+            "trace.server": "verbose",
+            "diagnostics": {
+                "enable": true,
+                "globals": [
+                    "vim",
+                    "use",
+                    "awesome",
+                    "client"
+                ],
+                "disable": [
+                    "lowercase-global"
+                ]
+            },
+            "workspace": {
+                "library": {
+                    "C:/Users/Hashub/.lua": true,
+                    "D:/Neovim nightly/share/nvim/runtime": true,
+                    "D:/Neovim nightly/share/nvim/runtime/lua/vim/lsp": true
+                },
+                "maxPreload": 2000,
+                "preloadFileSize": 1000
+            },
+            "completion": {
+                "keywordSnippet": "Enable"
+            }
+        },
         "ccls": {
             "command": "ccls",
             "filetypes": [
@@ -62,6 +109,7 @@
     },
     "snippets.shortcut": "V",
     "snippets.enableStatusItem": true,
+    "snippets.snipmate.enable": false,
     "suggest.asciiCharactersOnly": true,
     "suggest.enablePreselect": true,
     "suggest.enablePreview": true,
@@ -106,10 +154,10 @@
     "zi.enable": true,
     "zi.patterns": {
         "": [],
-        "c" :[
+        "c": [
             "\\s*//"
         ],
-        "cpp" :[
+        "cpp": [
             "\\s*//"
         ],
         "javascript": [
@@ -139,3 +187,4 @@
         "iaso2h"
     ]
 }
+
