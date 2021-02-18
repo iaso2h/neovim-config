@@ -41,37 +41,24 @@
     "list.previousKeymap": "<C-p>",
     "list.previewSplitRight": true,
     "list.selectedSignText": "",
+    "Lua.completion.callSnippet": "Replace",
+    "Lua.workspace.library": {
+        "usr/share/nvim/runtime": true,
+        "usr/share/nvim/runtime/lua/vim/lsp": true},
+    "Lua.diagnostics.globals": [
+        "vim",
+        "client"
+    ],
+    "Lua.intelliSense.searchDepth": 1,
+    "Lua.runtime.version": "LuaJIT",
+    "Lua.workspace.ignoreDir": [
+        ".vim",
+        ".git"
+    ],
+    "Lua.diagnostics.disable": ["global-variable"],
+    "Lua.workspace.preloadFileSize": 1000,
+    "Lua.workspace.maxPreload": 2000,
     "languageserver": {
-        "lua-language-server": {
-            "rootPatterns": [
-                ".git/"
-            ],
-            "trace.server": "verbose",
-            "diagnostics": {
-                "enable": true,
-                "globals": [
-                    "vim",
-                    "use",
-                    "awesome",
-                    "client"
-                ],
-                "disable": [
-                    "lowercase-global"
-                ]
-            },
-            "workspace": {
-                "library": {
-                    "C:/Users/Hashub/.lua": true,
-                    "D:/Neovim nightly/share/nvim/runtime": true,
-                    "D:/Neovim nightly/share/nvim/runtime/lua/vim/lsp": true
-                },
-                "maxPreload": 2000,
-                "preloadFileSize": 1000
-            },
-            "completion": {
-                "keywordSnippet": "Enable"
-            }
-        },
         "ccls": {
             "command": "ccls",
             "filetypes": [

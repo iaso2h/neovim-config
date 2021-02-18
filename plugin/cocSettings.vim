@@ -9,7 +9,7 @@ endif
 " Extensions {{{
 let g:coc_global_extensions = [
             \'coc-cmake',
-            \'coc-explorer',
+            \'coc-lua',
             \'coc-json',
             \'coc-markdownlint',
             \'coc-marketplace',
@@ -214,6 +214,7 @@ inoremap <silent><expr> <C-space> pumvisible() ? "\<C-e>" : coc#refresh()
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
             \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 " }}} Completion
+"
 "
 "
 "
