@@ -47,7 +47,7 @@ command! -nargs=0 Spell   :CocCommand cSpell.toggleEnableSpellChecker
 
 " Function {{{
 function! s:checkCOCDiagnosticFirst(COCAction)
-    if exists("b:coc_diagnostic_info")
+    if exists("b:coc_diagnostic_info") && &filetype != "lua"
         if !b:coc_diagnostic_info["warning"] && !b:coc_diagnostic_info["error"]
             call CocActionAsync(a:COCAction)
         else
@@ -63,13 +63,13 @@ let lua_lsp = glob('~/.vscode/extensions/sumneko.lua*', 0, 1)
 if len(lua_lsp)
     let lua_lsp = lua_lsp[-1] . '\server'
     call coc#config('languageserver', {
-        \ 'lua-language-server': {
-        \     'cwd': lua_lsp,
-        \     'command': lua_lsp . '\bin\Windows\lua-language-server.exe',
-        \     'args': ['-E', '-e', 'LANG="en"', lua_lsp . '\main.lua'],
-        \     'filetypes': ['lua'],
-        \ }
-    \ })
+                \ 'lua-language-server': {
+                \     'cwd': lua_lsp,
+                \     'command': lua_lsp . '\bin\Windows\lua-language-server.exe',
+                \     'args': ['-E', '-e', 'LANG="en"', lua_lsp . '\main.lua'],
+                \     'filetypes': ['lua'],
+                \ }
+                \ })
 endif
 " }}} VSCode lua
 " Document highlight
@@ -104,8 +104,38 @@ endfunction
 nmap <leader>r :<c-u>call <SID>checkCOCDiagnosticFirst("rename")<cr>
 nmap <leader>R :<c-u>call <SID>checkCOCDiagnosticFirst("refactor")<cr>
 " Formatting selected code.
-xnoremap <A-f> <Plug>(coc-format-selected)
-nmap <A-f> <A-m>zvae<Plug>(coc-format-selected)`z
+autocmd FileType vim vnoremap <buffer> <A-f> =
+autocmd FileType vim nmap <buffer> <A-f> <A-m>zvae=`z
+nmap <A-f> :<C-u>call <SID>formatCode(mode())<cr>
+vmap <A-f> :<C-u>call <SID>formatCode(visualmode())<cr>
+function s:formatCode(mode) abort " {{{
+    if &modified | up | endif
+    if a:mode == "n"
+        if &filetype == "lua"
+            let l:saveView = winsaveview()
+            silent %!lua-format %
+            call winrestview(l:saveView)
+        elseif &filetype == "vim"
+            let l:saveView = winsaveview()
+            normal! vae=
+            call winrestview(l:saveView)
+        else
+            call CocActionAsync('format')
+        endif
+    else
+        if &filetype == "lua"
+            let l:saveView = winsaveview()
+            silent %!lua-format %
+            call winrestview(l:saveView)
+        elseif &filetype == "vim"
+            let l:saveView = winsaveview()
+            normal! gv=
+            call winrestview(l:saveView)
+        else
+            call CocActionAsync('formatSelected', visualmode())
+        endif
+    endif
+endfunction " }}}
 " Codeaction operator
 xmap <leader>a <Plug>(coc-codeaction-selected)
 nmap <leader>a <Plug>(coc-codeaction-selected)
@@ -197,13 +227,13 @@ nmap <silent> <leader>j :CocList snippets<cr>
 let g:coc_snippet_next = '<Tab>'
 let g:coc_snippet_prev = '<S-Tab>'
 inoremap <silent><expr> <TAB>
-      \ pumvisible() ? coc#_select_confirm() :
-      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
+            \ pumvisible() ? coc#_select_confirm() :
+            \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+            \ <SID>check_back_space() ? "\<TAB>" :
+            \ coc#refresh()
 function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 " }}} COC-Snippets
 " Completion {{{
@@ -214,12 +244,6 @@ inoremap <silent><expr> <C-space> pumvisible() ? "\<C-e>" : coc#refresh()
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
             \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 " }}} Completion
-"
-"
-"
-"
-"
-"
 "
 "
 "

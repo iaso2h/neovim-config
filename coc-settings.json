@@ -41,21 +41,28 @@
     "list.previousKeymap": "<C-p>",
     "list.previewSplitRight": true,
     "list.selectedSignText": "",
+    "Lua.checkForUpdates": "install",
     "Lua.completion.callSnippet": "Replace",
+    "Lua.runtime.version": "LuaJIT",
     "Lua.workspace.library": {
         "usr/share/nvim/runtime": true,
-        "usr/share/nvim/runtime/lua/vim/lsp": true},
+        "usr/share/nvim/runtime/lua/vim": true,
+        "usr/share/nvim/runtime/lua/vim/lsp": true
+    },
     "Lua.diagnostics.globals": [
         "vim",
         "client"
     ],
-    "Lua.intelliSense.searchDepth": 1,
-    "Lua.runtime.version": "LuaJIT",
+    "Lua,hint.enable": true,
+    "Lua,hint.setType": true,
+    "Lua.intelliSense.searchDepth": 3,
     "Lua.workspace.ignoreDir": [
         ".vim",
         ".git"
     ],
-    "Lua.diagnostics.disable": ["global-variable"],
+    "Lua.diagnostics.disable": [
+        "lowercase-global"
+    ],
     "Lua.workspace.preloadFileSize": 1000,
     "Lua.workspace.maxPreload": 2000,
     "languageserver": {
@@ -140,12 +147,14 @@
     ],
     "zi.enable": true,
     "zi.patterns": {
-        "": [],
+        "lua": [
+            "^\\s*--"
+        ],
         "c": [
-            "\\s*//"
+            "^\\s*\\/\\/"
         ],
         "cpp": [
-            "\\s*//"
+            "^\\s*\\/\\/"
         ],
         "javascript": [
             "^\\s*\\/\\/",
@@ -159,10 +168,10 @@
         ],
         "markdown": [],
         "python": [
-            "\\s*#"
+            "^\\s*#"
         ],
         "vim": [
-            "\\s*\""
+            "^\\s*\\\""
         ],
         "gitcommit": []
     },

@@ -66,8 +66,7 @@ let s:sep = " %{get(g:, 'airline_right_alt_sep', '')} "
 " let g:airline_section_x = "%{coc#status()}" . s:sep . "%{strlen(&filetype)?&filetype:'no ft'}"
 let g:asyncrun_status = ''
 let g:airline_section_error = airline#section#create_right(['%{g:asyncrun_status}'])
-let g:airline_section_x = "%{get(b:,'coc_current_function','')}" .
-            \s:sep . "%{strlen(&filetype)?&filetype:'no ft'}"
+let g:airline_section_x = s:sep . "%{strlen(&filetype)?&filetype:'no ft'}"
 let g:airline_section_z ='%p%% %l:%v'
 let g:airline_section_y = airline#section#create_right(['%{IconFileFormat()}'])
 let g:airline_section_error = airline#section#create_right(['%{StatusDiagnostic("error")}'])
@@ -159,5 +158,6 @@ let g:rainbow_conf = {
             \}
 " [vim css color](https://github.com/ap/vim-css-color) compatibility
 " }}} luochen1990/rainbow
+"
 "
 "

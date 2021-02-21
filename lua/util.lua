@@ -1,0 +1,221 @@
+local fn = vim.fn
+local cmd = vim.cmd
+local api = vim.api
+local vim = vim
+local M = {}
+
+function Print(...) print(vim.inspect(...)) end
+
+----
+-- Function: Vim2Lua___
+--
+-- @param mode:    string value. "syntax" or "map" mode
+-- @param verbose: boolean value, when set true, all opts keyword will be output in "map" mode
+-- @return: 0
+----
+function Vim2Lua(mode, verbose) -- {{{
+    if mode == "syntax" then
+        -- Change vim script syntax into lua {{{
+        local curPos = api.nvim_win_get_cursor(0)
+        local range = curPos[1] .. ",$"
+        local t = {
+            [range .. "s#endfunction#end#e"]= true,
+            [range .. "s#endif#end#e"] = true,
+            [range .. "s#endwhile#end#e"] = true,
+            [range .. "s#endfor#end#e"] = true,
+            [range .. "s#!=#~=#e"] = true,
+            [range .. "s#==?#==#e"] = true,
+            [range .. "s/==#/==/e"] = true,
+            [range .. "s#||#or#e"] = true,
+            [range .. "s#&&#and#e"] = true,
+            [range .. "s#!\\(\\w\\)#not \\1#e"] = true,
+            [range .. "s#|# #e"] = true,
+            [range .. "s#a:##e"]= true,
+            [range .. "s#\\(let \\)\\?g:#vim.g.#e"] = true,
+            [range .. "s#&buftype#vim.bo.buftype#e"] = true,
+            [range .. "s#&filetype#vim.bo.filetype#e"] = true,
+            [range .. "s#&diff#vim.bo.diff#e"] = true,
+        }
+        local functionCallRep     = string.format(range .. [[s#call <sid>#lua require("%s").#e]],"%s", fn.expand("%:t:r"))
+        local functionIdRep       = range .. [[s#function! s:\(\w\)#function M\.\1#e]]
+        local strConcanationRep   = range .. [["s# \. # \.\. "]]
+        local continueLine        = range .. [["s#\(\s\+\)\\#\1#e"]]
+        local listLenRep          = range .. [[s/\(str\)len(/#]/e]]
+        local normalRep           = range ..[=[s#\(^\s*\)\(normal!.*\)#\1cmd [[\2]]#e]=]
+        local commentStartRep     = range .. [=[s#\(\s\+\)\\ #\1 ]=]
+        local commentStartMarkRep = range .. [=[s#" {{{#-- {{{#e]=]
+        local commentEndMarkRep   = range .. [=[s#" }}}#-- }}}#e]=]
+        local defaultInitRep      = range .. [=[%s#get(g:, "\(.\{-}\)", \(.\{-}\))#vim.g.\1 or \2]=]
+        t[strConcanationRep]   = true
+        t[continueLine]        = true
+        t[listLenRep]          = true
+        t[functionIdRep]       = true
+        t[functionCallRep]     = true
+        t[normalRep]           = true
+        t[commentStartRep]     = true
+        t[commentStartMarkRep] = true
+        t[commentEndMarkRep]   = true
+        t[defaultInitRep]   = true
+
+        for str, bool in pairs(t) do
+            if bool then
+                cmd(str)
+            end
+        end
+        api.nvim_win_set_cursor(0, curPos)
+        -- }}} Change vim script syntax into lua
+        elseif mode == "map" then
+            -- Change vim mapping syntax into lua mapping syntax {{{
+            local curLine = api.nvim_get_current_line()
+            local optKeyword = {noremap = false, silent = false, expr = false, nowait = false}
+            local mapKeyword = fn.matchstr(curLine, "^\\w\\{-}map!\\?")
+            if mapKeyword == "" then do return end end
+            optKeyword["silent"] = string.match(curLine, "<silent>") ~= nil and true or false
+            optKeyword["expr"]   = string.match(curLine, "<expr>")   ~= nil and true or false
+            optKeyword["nowait"] = string.match(curLine, "<nowait>") ~= nil and true or false
+            local mapMode
+            if #mapKeyword == 3 then
+                mapMode = ""
+            elseif #mapKeyword == 4 then
+                mapMode = string.match(mapKeyword, "map!")
+                if not mapMode then mapMode = string.sub(mapKeyword, 1, 1) end
+            elseif #mapKeyword == 7 then
+                optKeyword["noremap"] = true
+                mapMode = ""
+            elseif #mapKeyword == 8 then
+                optKeyword["noremap"] = true
+                mapMode = string.sub(mapKeyword, 1, 1)
+                if mapMode == "m" then mapMode = "!" end
+            else
+                do return end
+            end
+            local mapping = fn.matchstr(curLine,
+                            [[^[nvicxto]\?\(nore\)\?map!\? \(<expr>\)\? \?\(<silent>\)\? \?\(<expr>\)\? \?\(nowait\)\? \?\zs.*]])
+            if mapping == "" then do return end end
+            local LHS = fn.matchstr(mapping, [[^.\{-}\ze .*$]])
+            local RHS = fn.matchstr(mapping, [[^.\{-} \zs.*]])
+
+            local optString = ""
+            for optName, val in pairs(optKeyword) do
+                if (not verbose and val) or verbose then
+                    optString = optString .. '"' .. optName .. '", '
+                end
+            end
+            optString = string.sub(optString, 1, -3)
+            local luaMapping
+            luaMapping = string.format([=[map("%s", [[%s]], [[%s]], {%s})]=], mapMode, LHS, RHS, optString)
+            local cursor = api.nvim_win_get_cursor(0)
+            api.nvim_buf_set_lines(0, cursor[1] - 1, cursor[1], {false}, {luaMapping})
+            -- setKey("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", {noremap = true, silent = true})
+            -- setKey('n', 'j', "v:count == 0 ? 'gj' : 'j'", {noremap= true, expr = true, silent = true})
+            -- setKey(0, 'i', '<C-Space>','pumvisible() ? "<C-e>" : "<Plug>(completion_trigger)"', {expr=true})
+            -- }}} Change vim mapping syntax into lua mapping syntax
+        end
+end -- }}}
+
+----
+-- Function: RELOAD Reload lua module path
+--
+-- @param module: string value of module name, use current lua file name when nil is provided
+-- @return: Return 0 when failed, otherwise return require(module)
+----
+function RELOAD(module)
+    if not module then
+        local curModuleFullPath = vim.fn.expand("%:p")
+        local luaModulePath = vim.api.nvim_eval("expand('$configPath' . '/lua')")
+        if string.match(curModuleFullPath, luaModulePath) then
+            module = fn.expand("%:t:r")
+            api.nvim_echo({{"Reload: " .. curModuleFullPath, "Normal"}}, true, {})
+        else
+            do return end
+        end
+    else
+        api.nvim_echo({{"Reload: " .. module, "Normal"}}, true, {})
+    end
+
+    package.loaded[module] = nil
+    return require(module)
+end
+----
+-- Function: M.tblLoaded return all loaded buffer listed in the :ls command in a table
+--
+-- @param termInclude: boolean value to determine whether contains terminal or not
+-- @return: table
+----
+function M.tblLoaded(termInclude)
+    local bufTbl = vim.split(fn.execute("ls"), '\n', false)
+    table.remove(bufTbl, 1)
+    if not termInclude then
+        local bufTbl = vim.tbl_filter(function(buf)
+            return string.match(buf, "term://") == nil
+        end, vim.split(fn.execute("ls"), '\n', false))
+        table.remove(bufTbl, 1)
+    end
+    return bufTbl
+end
+
+function M.map(mode, lhs, rhs, optsTbl)
+    if optsTbl == {} then
+        api.nvim_set_keymap(mode, lhs, rhs, optsTbl)
+    else
+        local optskeywordTbl = {}
+        for idx, val in ipairs(optsTbl) do
+            optskeywordTbl[val] = true
+        end
+        api.nvim_set_keymap(mode, lhs, rhs, optskeywordTbl)
+    end
+end
+-- Match enhance {{{
+function M.matchAll(expr, pat)
+    -- Based on VimL match(), Always return a list
+    local t = {}
+    local idx = -1
+    while 1 do
+        idx = fn.match(expr, pat, idx + 1)
+        if idx == -1 then return t end
+        table.insert(t, idx)
+    end
+end
+
+function M.matchAllStrPos(expr, pat)
+    -- Based on VimL matchstrpos(), Always return a list
+    local t = {}
+    local posList = {0, 0, 0}
+    while 1 do
+        posList = fn.matchstrpos(expr, pat, posList[3])
+        if posList[1] == "" then return t end
+        table.insert(t, posList)
+    end
+end
+-- }}} Match enhance
+
+function M.trailingEmptyLine()
+    if api.nvim_buf_get_lines(0, -2, -1, false)[1] ~= "" then
+        local saveView = fn.winsaveview()
+        cmd('keepjumps normal! Go')
+        fn.winrestview(saveView)
+    end
+end
+
+----
+-- Function: TrimWhiteSpaces: Trim all trailing white spaces in current buffer
+--
+-- @param silent: non-zero value will show trimming result when complete
+----
+function M.trimWhiteSpaces(silent)
+    local saveView = fn.winsaveview()
+    silent = silent or 1
+    if silent == 1 then
+        cmd [[keeppatterns %s#\s\+$##e]]
+    else
+        cmd [[keeppatterns %s#\s\+$##e]]
+        local result = fn.execute [[g#\s\+$#p]]
+        local count = #M.matchAll(result, [[\n]])
+        cmd [[keeppatterns %s#\s\+$##e]]
+        api.nvim_echo({{count .. " line[s] trimmed", "Moremsg"}}, false, {})
+    end
+    fn.winrestview(saveView)
+end
+
+return M
+

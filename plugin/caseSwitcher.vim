@@ -14,7 +14,7 @@ function! CaseSwitcher() abort " {{{
     echohl MoreMsg | echo "Switch to \"" . l:firstCMD . "\"" | echohl None
     call cursor(l:cursorPos[1], l:cursorPos[2])
     " When the first CMD is execute, it will reappend to the list
-    call add(g:caseSwitcherCmdList, l:firstCMD)
+    call add(g:caseSwitcherCMDList, l:firstCMD)
     " Stop previous timer, make sure only the latest timer can run
     if len(g:caseSwitcherTimer) > 1
         let l:timerIndex = 0
@@ -38,3 +38,4 @@ function! CaseSwitcherDefaultCMDListOrder() " {{{
     echom g:caseSwitcherDefaultCMDList
     echohl None
 endfunction " }}}
+

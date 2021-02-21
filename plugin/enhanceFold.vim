@@ -107,7 +107,6 @@ function! EnhanceFoldJump(direction, showWarning, returnVar) " {{{
         " Check inside foldermarker scope
         if l:foldPos == l:lastFoldPos
             if a:showWarning == 1 | echohl WarningMsg | echo "Not inside fold scope" | echohl None | endif
-            " call cursor(l:cursorPos[1], l:cursorPos[2])
             call winrestview(l:saveView)
             return [0]
         else
