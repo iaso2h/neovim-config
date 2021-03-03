@@ -207,4 +207,3 @@ function s:ToggleOnBelow(funcName, funcArgList, noFileCheck)
     call l:Func()
 endfunction
 " }}} Smart split
-
