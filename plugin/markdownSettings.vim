@@ -92,6 +92,18 @@ let g:mkdp_filetypes = ['markdown']
 " }}} iamcco/markdown-preview.nvim
 
 " plasticboy/vim-markdown {{{
+let g:markdown_fenced_languages = [
+    \ 'vim',
+    \ 'python',
+    \ 'lua',
+    \ 'bash=sh',
+    \ 'javascript',
+    \ 'typescript',
+    \ 'yaml',
+    \ 'json',
+    \ 'gql=graphql',
+    \ 'graphql',
+\ ]
 let g:vim_markdown_follow_anchor = 1
 let g:vim_markdown_no_default_key_mappings = 1
 augroup MarkdownFile
@@ -104,3 +116,4 @@ augroup MarkdownFile
     autocmd FileType markdown nmap <buffer> gl <Plug>Markdown_EditUrlUnderCursor
 augroup END
 " }}} plasticboy/vim-markdown
+

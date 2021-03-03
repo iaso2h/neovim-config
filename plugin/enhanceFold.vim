@@ -138,6 +138,8 @@ endfunction " }}}
 ""
 function! EnhanceFoldHL(warningMsg, time, funcName) " {{{
     let l:saveView = winsaveview()
+    " Doesn't suport fold line yet
+    if foldclosed(l:saveView["lnum"]) > 0 | return | endif
     " Fold marker info
     let l:validStartFoldPos = EnhanceFoldJump("previous", 0, 1)
     " Check valid fold position

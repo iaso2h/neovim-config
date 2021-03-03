@@ -1,8 +1,9 @@
 " VSCode copy line {{{
 function! VSCodeLineYank(modeType, direction)
     if a:modeType ==# "V"
+        " Visual line mode {{{
         normal! gv
-        let saved_reg = @@
+        lua require("util").saveReg()
         let l:col = col(".")
         let l:row = line(".")
         let l:rowStart = line("'<")
@@ -36,10 +37,12 @@ function! VSCodeLineYank(modeType, direction)
                 call cursor(l:rowEnd + 1, 0)
             endif
         endif
-        let @@ = saved_reg
+        lua require("util").restoreReg()
+        " }}} Visual line mode
     elseif a:modeType ==# "v"
+        " Visual char mode {{{
         normal! gv
-        let saved_reg = @@
+        let saveReg = @@
         let l:cursor = getpos(".")
         let l:selectStart = getpos("'<")
         let l:selectEnd = getpos("'>")
@@ -73,19 +76,23 @@ function! VSCodeLineYank(modeType, direction)
                 call setpos(".", l:newSelectEnd)
             endif
         endif
-        let @@ = saved_reg
+        call setreg('"', saveReg)
+        " }}} Visual char mode
     elseif a:modeType == "n"
-        let saved_reg = @@
+        " Normal mode {{{
+        lua require("util").saveReg()
         let l:col = col(".")
         let l:row = line(".")
         if a:direction ==# "up"
-            normal! yyP
+            normal! YP
             call cursor(l:row, l:col)
         elseif a:direction ==# "down"
-            normal! yyp
+            normal! Yp
             call cursor(l:row + 1, l:col)
         endif
-        let @@ = saved_reg
+        lua require("util").restoreReg()
+        " call setreg('"', saveReg)
+        " }}} Normal mode
     endif
 endfunction
 " }}} VSCode copy line
@@ -317,7 +324,7 @@ endfunction " }}}
 " InplaceReplace {{{
 " TODO need fix load after ReplaceWithRegister plugin
 " if !exists('g:loaded_ReplaceWithRegister')
-    " finish
+" finish
 " endif
 
 function! InplaceReplace(type, ...)
@@ -326,12 +333,12 @@ function! InplaceReplace(type, ...)
         call ReplaceWithRegister#OperatorExpression()
     else
         <C-u>call setline('.', getline('.'))<Bar>
-        \execute 'silent! call repeat#setreg("\<lt>Plug>ReplaceWithRegisterVisual", v:register)'<Bar>
-        \call ReplaceWithRegister#SetRegister()<Bar>
-        \if ReplaceWithRegister#IsExprReg()<Bar>
-        \    let g:ReplaceWithRegister#expr = getreg('=')<Bar>
-        \endif<Bar>
-        \call ReplaceWithRegister#Operator('visual', "\<lt>Plug>ReplaceWithRegisterVisual")<CR>    endif
+                    \execute 'silent! call repeat#setreg("\<lt>Plug>ReplaceWithRegisterVisual", v:register)'<Bar>
+                    \call ReplaceWithRegister#SetRegister()<Bar>
+                    \if ReplaceWithRegister#IsExprReg()<Bar>
+                    \    let g:ReplaceWithRegister#expr = getreg('=')<Bar>
+                    \endif<Bar>
+                    \call ReplaceWithRegister#Operator('visual', "\<lt>Plug>ReplaceWithRegisterVisual")<CR>    endif
     endif
     normal! g`[mP
     normal! g`]mP
