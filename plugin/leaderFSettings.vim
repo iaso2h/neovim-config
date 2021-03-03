@@ -71,7 +71,7 @@ let g:Lf_ShortcutB = ''
 let g:Lf_DelimiterChar = ';'
 let g:Lf_ShortcutF = '<C-e>'
 function! s:checkCWDFirst(cmd, input)
-    if has('win32')
+    if has('win32') && &buftype != "help"
         let l:fileDir = expand("%:p:h")
         let l:CWD = getcwd()
         if l:CWD[0] !=# l:fileDir[0]
@@ -91,16 +91,16 @@ if has("win32")
 else
     " nnoremap <C-S-e> :Leaderf .
 endif
-nnoremap <silent> <C-S-p> :LeaderfCommand<cr>
-nnoremap <silent> <C-S-o> :LeaderfBufTag<cr>
+nnoremap <silent> <C-S-p>         :LeaderfCommand<cr>
+nnoremap <silent> <C-S-o>         :LeaderfBufTag<cr>
 nnoremap <silent> <leader><C-S-o> :LeaderfBufTagAll<cr>
-nnoremap <silent> <C-f>f :LeaderfFunction<cr>
-nnoremap <silent> <C-f><C-f> :LeaderfFunctionAll<cr>
-nnoremap <silent> <C-S-h> :LeaderfHelp<cr>
-nnoremap <silent> <C-f>l :LeaderfLine<cr>
-nnoremap <silent> <C-f><C-l> :LeaderfLineAll<cr>
-nnoremap <silent> <C-f>q :LeaderfQuickFix<cr>
-nnoremap <silent> <C-S-f> :call <SID>checkCWDFirst("LeaderfRgInteractive", 0)<cr>
+nnoremap <silent> <C-f>f          :LeaderfFunction<cr>
+nnoremap <silent> <C-f><C-f>      :LeaderfFunctionAll<cr>
+nnoremap <silent> <C-S-h>         :LeaderfHelp<cr>
+nnoremap <silent> <C-f>l          :LeaderfLine<cr>
+nnoremap <silent> <C-f><C-l>      :LeaderfLineAll<cr>
+nnoremap <silent> <C-f>q          :LeaderfQuickFix<cr>
+nnoremap <silent> <C-S-f>         :call <SID>checkCWDFirst("LeaderfRgInteractive", 0)<cr>
 " Normal mode
 let g:Lf_CommandMap = {
             \'<C-X>': ['<C-s>'],
@@ -115,18 +115,17 @@ let g:Lf_CommandMap = {
             \'<C-]>': ['<C-v>'],
             \'<C-J>': ['<C-n>'],
             \'<C-K>': ['<C-p>'],
-            \'<C-f>': ['<C-Tab>'],
             \}
 let g:Lf_NormalMap = {
             \ "_":           [["<C-v>", "v"],
-            \            ["<C-s>", "x"]
-            \           ],
+                \            ["<C-s>", "x"]
+                \           ],
             \ "File":        [["<ESC>", ':exec g:Lf_py "fileExplManager.quit()"<CR>'],
-            \            ["<F6>", ':exec g:Lf_py "fileExplManager.quit()"<CR>']
-            \           ],
+                \            ["<F6>", ':exec g:Lf_py "fileExplManager.quit()"<CR>']
+                \           ],
             \ "Buffer":      [["<ESC>", ':exec g:Lf_py "bufExplManager.quit()"<CR>'],
-            \            ["<F6>", ':exec g:Lf_py "bufExplManager.quit()"<CR>']
-            \           ],
+                \            ["<F6>", ':exec g:Lf_py "bufExplManager.quit()"<CR>']
+                \           ],
             \ "Mru":         [["<ESC>", ':exec g:Lf_py "mruExplManager.quit()"<CR>']],
             \ "Tag":         [],
             \ "BufTag":      [],
@@ -522,3 +521,4 @@ let g:Lf_PopupPalette = {
             \  }
 " }}} Color scheme
 " }}} Yggdroot/LeaderF
+

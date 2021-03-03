@@ -980,7 +980,13 @@ highlight EasyMotionTarget guibg=white guifg=black
 highlight link EasyMotionShade  Comment
 highlight EasyMotionTarget2First guibg=#ED427C guifg=white
 highlight EasyMotionTarget2Second guibg=#ED427C guifg=white
-" }}}
+" }}} EasyMotion
+
+" phaazon/hop.nvim {{{
+highlight HopNextKey guibg=white guifg=black
+highlight HopNextKey1 guibg=#ED427C guifg=white
+highlight HopNextKey2 guibg=#ED427C guifg=white
+" }}} phaazon/hop.nvim
 
 
 " " the color of the cursorline
@@ -1008,4 +1014,8 @@ highlight link OperatorSandwichDelete Search
 highlight link OperatorSandwichAddrcc Search
 " }}} Sandwich
 "
+
+" lukas-reineke/indent-blankline.nvim {{{
+call s:hi("indent_blankline", "#3b4252", s:nord0_gui, s:nord1_term, "NONE", "", "")
+" }}} lukas-reineke/indent-blankline.nvim
 

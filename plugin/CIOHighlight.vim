@@ -27,7 +27,6 @@ function! s:CIOInit()
                 \ "printf": ["!@#$^<>()[]{}-=+\\|/?;'\",. "],
                 \ "scanf": ["!@#$^<>()[]{}-=+\\|/?;'\",. "]
                 \ }
-    g:FiletypeCommentDelimiter[%filetype])
     let s:varPattern = "[A-Za-z&\"'*].*\\ze\\([,\s]\\)"
     let s:varPatternLast = "[A-Za-z&\"'*].*\\ze\\()\\+;\\?$\\)"
     let g:CIOHLMatch = {}

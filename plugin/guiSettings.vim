@@ -1,13 +1,11 @@
-" michaeljsmith/vim-indent-object {{{
-let g:indentLine_color_gui = '#3b4252'
-let g:indentLine_char= '▏'
-" }}} michaeljsmith/vim-indent-object
-
 " vim-airline/vim-airline {{{
+
+
+
 let g:airline_theme='onedarknord'
 let g:airline_skip_empty_sections = 1
 let g:airline_powerline_fonts = 1
-let g:airline_extensions = ['coc', 'tabline', 'wordcount', 'virtualenv', 'branch', 'fzf']
+let g:airline_extensions = ["branch", "coc", "gina", "hunks", "keymap", "nvimlsp", "quickfix", "tabline", "term", "whitespace", "wordcount"]
 let g:airline#extensions#wordcount#filetypes = ['all']
 let g:airline#extensions#tabline#show_buffers = 1
 let g:airline#extensions#tabline#show_tabs = 0
@@ -158,6 +156,4 @@ let g:rainbow_conf = {
             \}
 " [vim css color](https://github.com/ap/vim-css-color) compatibility
 " }}} luochen1990/rainbow
-"
-"
-"
+
