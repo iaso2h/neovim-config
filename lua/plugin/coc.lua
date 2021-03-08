@@ -92,6 +92,9 @@ function M.formatCode(mode) -- {{{
             cmd [[normal! gv=]]
             fn.winrestview(saveView)
         elseif vim.bo.filetype == "lua" then
+            local saveView = fn.winsaveview()
+            cmd [[normal! gv=]]
+            fn.winrestview(saveView)
         else
             api.nvim_call_function("CocActionAsync", {"formatSelected", mode})
         end

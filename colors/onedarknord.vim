@@ -296,9 +296,9 @@ call s:hi("MatchParen", s:nord8_gui, s:nord3_gui_bright, s:nord8_term, s:nord3_t
 call s:hi("MatchWord", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "", "")
 call s:hi("NonText", s:nord2_gui, "", s:nord3_term, "", "", "")
 call s:hi("Normal", s:nord4_gui, s:nord0_gui, "NONE", "NONE", "", "")
-call s:hi("PMenu", s:nord4_gui, s:nord2_gui, "NONE", s:nord1_term, "NONE", "")
+call s:hi("Pmenu", s:nord4_gui, s:nord2_gui, "NONE", s:nord1_term, "NONE", "")
 call s:hi("PmenuSbar", s:nord4_gui, s:nord2_gui, "NONE", s:nord1_term, "", "")
-call s:hi("PMenuSel", "#FFFFFF", s:nord8_gui, s:nord3_term, s:nord8_term, "", "")
+call s:hi("PmenuSel", "#FFFFFF", s:nord8_gui, s:nord3_term, s:nord8_term, "", "")
 call s:hi("OffscreenPopup", "NONE", s:nord8_gui, s:nord3_term, s:nord8_term, "", "")
 call s:hi("PmenuThumb", s:nord8_gui, s:nord3_gui, "NONE", s:nord3_term, "", "")
 call s:hi("SpecialKey", s:nord3_gui, "", s:nord3_term, "", "", "")
@@ -1008,4 +1008,3 @@ highlight link OperatorSandwichDelete Search
 highlight link OperatorSandwichAddrcc Search
 " }}} Sandwich
 "
-

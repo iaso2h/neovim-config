@@ -1,5 +1,17 @@
 " Description: Neovim v0.50
 " Last Modified: 2021-02-22
+
+let $configPath = stdpath('config')
+if exists("g:vscode")
+    set timeoutlen=500
+    set updatetime=150
+    set ignorecase smartcase
+    lua require("init")
+    lua require("util")
+    finish
+endif
+
+
 let g:NERDCreateDefaultMappings = 0
 let g:expand_region_use_defaults = 0
 let g:VM_default_mappings = 0
@@ -106,7 +118,6 @@ augroup fileType
     autocmd TermOpen             * startinsert
     autocmd FocusGained,BufEnter * checktime
     " autocmd BufAdd               * lua require("consistantTab").adaptBufTab()
-    " autocmd TextYankPost         * silent! lua vim.highlight.on_yank {on_visual=false, higroup="Search", timeout=500}
 
     autocmd CursorHold            *.c,*.h,*.cpp,*.cc,*.vim :call HLCIOFunc()
     autocmd FileType              java setlocal includeexpr=substitute(v:fname,'\\.','/','g')
@@ -121,7 +132,7 @@ augroup fileType
     autocmd BufReadPre,BufNewFile *.twig      setlocal filetype=twig.html
     autocmd BufReadPre,BufNewFile *.gitignore setlocal filetype=gitignore
     autocmd BufReadPre,BufNewFile config      setlocal filetype=config
-    autocmd BufWritePost          *.lua,*.vim lua RELOAD(nil)
+    autocmd BufWritePost          *.lua,*.vim lua RELOAD()
 augroup END
 " }}} Auto commands
 
@@ -129,13 +140,13 @@ augroup END
 command! -nargs=+ -complete=command  Echo PPmsg strftime('%c') . ": " . <args>
 command! -nargs=+ -complete=command  Redirc call Redir(<q-args>, "command")
 command! -nargs=+ -complete=function Redirf call Redir(<q-args>, "function")
+command! -nargs=0 -range ExtractSelection lua require("extractSelection").main(vim.fn.visualmode())
+command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | setl norevins
 command! -nargs=0 TrimWhiteSpaces call TrimWhiteSpaces(0)
 command! -nargs=0 PS terminal powershell
-command! -nargs=0 O browse oldfiles
+command! -nargs=0 O  browse oldfiles
 command! -nargs=0 CD execute "cd " . expand("%:p:h")
-command! -nargs=0 DEINClean call map(dein#check_clean(), "delete(v:val, 'rf')")
-command! -nargs=0 -range ExtractSelection call ExtractSelection(visualmode())
-command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | setl norevins
+command! -nargs=0 E  up | e! | zA
 " Edit Vimrc
 if has('win32')
     command! -nargs=0 IDEAVimedit vsplit ~/.ideavimrc
@@ -143,4 +154,3 @@ endif
 command! -nargs=0 MyVimedit edit $MYVIMRC
 command! -nargs=0 MyVimsrc source $MYVIMRC
 " }}} Commands
-

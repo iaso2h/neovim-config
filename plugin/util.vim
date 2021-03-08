@@ -45,17 +45,6 @@ function! CompareNeovimVersion(compareVersion, operator) " {{{
     endif
 endfunction " }}}
 
-function! MultiBufInWin() " {{{
-    let l:curBufName = bufname()
-    execute "bp"
-    if bufname() !=# l:curBufName
-        execute "normal! \<C-o>"
-        return 1
-    else
-        return 0
-    endif
-endfunction " }}}
-
 function! VisualSelection(returnType) " {{{
     if mode()=="v"
         let [line_start, column_start] = getpos("v")[1:2]
