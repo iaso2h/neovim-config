@@ -65,15 +65,17 @@ function M.VSCodeLineYank(visualMode, direction)
 end
 -- }}} VSCode copy line
 
-function M.inplaceYank(argTbl, opts) -- {{{
-    opts = opts or {hlGroup="Search", timeout=500}
+function M.inplaceYank(argTbl) -- {{{
+    -- TODO add opts
+    -- opts = opts or {hlGroup="Search", timeout=500}
+    local opts = {hlGroup="Search", timeout=500}
     local modeType = argTbl[1]
     local curWinID = api.nvim_get_current_win()
     local curBufNr = api.nvim_get_current_buf()
     local pos1 = api.nvim_buf_get_mark(0, "[")
     local pos2 = api.nvim_buf_get_mark(0, "]")
     if modeType == "line" then
-        pos1 = pos1[1] == operator.nvimOperatorCursor[1] and {pos1[1] - 1, 0} or
+        pos1 = pos1[1] == operator.cursorPos[1] and {pos1[1] - 1, 0} or
                                                 {pos1[1] - 1, pos1[2]}
         pos2 = {
             pos2[1] - 1, #api.nvim_buf_get_lines(0, pos2[1] - 1, pos2[1], false)[1] - 1
@@ -106,7 +108,7 @@ function M.inplaceYank(argTbl, opts) -- {{{
     end
 
     -- Restor cursor position
-    api.nvim_win_set_cursor(curWinID, operator.nvimOperatorCursor)
+    api.nvim_win_set_cursor(curWinID, operator.cursorPos)
 
     vim.defer_fn(function()
         api.nvim_buf_clear_namespace(curBufNr, yankHLNS, 0, -1)
@@ -223,64 +225,6 @@ function M.inplacePut(modeType, pasteCMD, opts) -- {{{
     end
 end --  }}}
 
-function M.lastYankPut(hlType) -- {{{
-    -- Create jump location in jumplist
-
-    cmd [[normal! mz`z]]
-
-    local curBufNr = api.nvim_get_current_buf()
-    local curWinID = api.nvim_get_current_win()
-    local cursor   = api.nvim_win_get_cursor(curWinID)
-    local extmark
-    local linewise
-    if hlType == "yank" then
-        if not M.lastYankNS then return end
-        extmark  = api.nvim_buf_get_extmark_by_id(curBufNr, M.lastYankNS,
-            M.lastYankExtmark, {details=true})
-        linewise = M.lastYankLinewise
-    elseif hlType == "put" then
-        if not M.inplacePutNewContentNS then return end
-        extmark  = api.nvim_buf_get_extmark_by_id(curBufNr, M.inplacePutNewContentNS,
-            M.inplacePutNewContentExtmark, {details=true})
-        linewise = M.lastPutLinewise
-    end
-    -- Check valid extmark
-    if not next(extmark) then
-        api.nvim_echo({{"No record found on current buffer", "WarningMsg"}}, false, {})
-        return
-    end
-
-    local selectStart = {extmark[1] + 1, extmark[2]}
-    local selectEnd   = {extmark[3]["end_row"] + 1, extmark[3]["end_col"]}
-
-    -- Determine select directioin
-    local startDist = util.posDist(cursor, selectStart)
-    local endDist   = util.posDist(cursor, selectEnd)
-    if startDist < endDist then
-        if linewise then
-            api.nvim_win_set_cursor(curWinID, selectEnd)
-            cmd [[normal! V]]
-            api.nvim_win_set_cursor(curWinID, {selectStart[1], cursor[2]})
-        else
-            api.nvim_win_set_cursor(curWinID, selectEnd)
-            cmd [[normal! v]]
-            api.nvim_win_set_cursor(curWinID, selectStart)
-        end
-    else
-        if linewise then
-            api.nvim_win_set_cursor(curWinID, selectStart)
-            cmd [[normal! V]]
-            api.nvim_win_set_cursor(curWinID, {selectEnd[1], cursor[2]})
-        else
-            api.nvim_win_set_cursor(curWinID, selectStart)
-            cmd [[normal! v]]
-            api.nvim_win_set_cursor(curWinID, selectEnd)
-        end
-    end
-
-    return 0
-end -- }}}
-
 -- TODO replace with register
 
 function M.convertPut(pasteCMD, opts) --  {{{
@@ -289,7 +233,7 @@ function M.convertPut(pasteCMD, opts) --  {{{
     local curWinID = api.nvim_get_current_win()
     local cursorPos   = api.nvim_win_get_cursor(curWinID)
     local regType = fn.getregtype()
-    local saveRegContent = fn.getreg(vim.v.register)
+    local saveRegContent = fn.getreg(vim.v.register, 1)
     local curLine = api.nvim_get_current_line()
     local cursorNS      = api.nvim_create_namespace("inplacePutCursor")
     local cursorExtmark = api.nvim_buf_set_extmark(curBufNr, cursorNS, cursorPos[1] - 1, cursorPos[2], {})
@@ -369,6 +313,64 @@ function M.convertPut(pasteCMD, opts) --  {{{
     -- Restore register content
     fn.setreg(vim.v.register, saveRegContent, regType)
 end --  }}}
+
+function M.lastYankPut(hlType) -- {{{
+    -- Create jump location in jumplist
+
+    cmd [[normal! mz`z]]
+
+    local curBufNr = api.nvim_get_current_buf()
+    local curWinID = api.nvim_get_current_win()
+    local cursor   = api.nvim_win_get_cursor(curWinID)
+    local extmark
+    local linewise
+    if hlType == "yank" then
+        if not M.lastYankNS then return end
+        extmark  = api.nvim_buf_get_extmark_by_id(curBufNr, M.lastYankNS,
+        M.lastYankExtmark, {details=true})
+        linewise = M.lastYankLinewise
+    elseif hlType == "put" then
+        if not M.inplacePutNewContentNS then return end
+        extmark  = api.nvim_buf_get_extmark_by_id(curBufNr, M.inplacePutNewContentNS,
+        M.inplacePutNewContentExtmark, {details=true})
+        linewise = M.lastPutLinewise
+    end
+    -- Check valid extmark
+    if not next(extmark) then
+        api.nvim_echo({{"No record found on current buffer", "WarningMsg"}}, false, {})
+        return
+    end
+
+    local selectStart = {extmark[1] + 1, extmark[2]}
+    local selectEnd   = {extmark[3]["end_row"] + 1, extmark[3]["end_col"]}
+
+    -- Determine select directioin
+    local startDist = util.posDist(cursor, selectStart)
+    local endDist   = util.posDist(cursor, selectEnd)
+    if startDist < endDist then
+        if linewise then
+            api.nvim_win_set_cursor(curWinID, selectEnd)
+            cmd [[normal! V]]
+            api.nvim_win_set_cursor(curWinID, {selectStart[1], cursor[2]})
+        else
+            api.nvim_win_set_cursor(curWinID, selectEnd)
+            cmd [[normal! v]]
+            api.nvim_win_set_cursor(curWinID, selectStart)
+        end
+    else
+        if linewise then
+            api.nvim_win_set_cursor(curWinID, selectStart)
+            cmd [[normal! V]]
+            api.nvim_win_set_cursor(curWinID, {selectEnd[1], cursor[2]})
+        else
+            api.nvim_win_set_cursor(curWinID, selectStart)
+            cmd [[normal! v]]
+            api.nvim_win_set_cursor(curWinID, selectEnd)
+        end
+    end
+
+    return 0
+end -- }}}
 
 return M
 

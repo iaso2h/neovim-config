@@ -77,8 +77,8 @@ map("n", [[<S-F9>]], [[:lua require("compileRun").runCode()<cr>]],     {"noremap
 -- Changelist jumping
 map("n", [[<A-o>]], [[&diff? "mz`z[czz" : "mz`zg;zz"]], {"noremap", "silent", "expr"})
 map("n", [[<A-i>]], [[&diff? "mz`z]czz" : "mz`zg,zz"]], {"noremap", "silent", "expr"})
-map("n", [[<C-o>]], [[<C-o>zz]], {"novscode"})
-map("n", [[<C-i>]], [[<C-i>zz]], {"novscode"})
+map("n", [[<C-o>]], [[<C-o>zz]])
+map("n", [[<C-i>]], [[<C-i>zz]])
 map("n", [[j]], [[:lua require("util").addJumpMotion("j", true)<cr>]],     {"silent"})
 map("n", [[k]], [[:lua require("util").addJumpMotion("k", true)<cr>]],     {"silent"})
 map("v", [[*]], [[mz`z:<c-u>execute "/" . VisualSelection("string")<cr>]], {"noremap", "silent"})
@@ -141,14 +141,13 @@ map("n", [[g<S-cr>]], [[:lua require("trailingUtil").trailingChar("O")<cr>]],  {
 -- Messages
 map("n", [[g<]],    [[:<c-u>messages<cr>]], {"silent"})
 map("n", [[g>]],    [[:<c-u>Messages<cr>]], {"silent", "novscode"})
--- TODO
--- map("n", [[g>]],    [[:<c-u>messages<cr>]], {"silent", "vscodeonly"})
+map("n", [[g>]],    [[:<c-u>messages<cr>]], {"silent", "vscodeonly"})
 map("n", [[<A-,>]], [[:<c-u>execute 'messages clear<bar>echohl Moremsg<bar>echo "Message clear"<bar>echohl None'<cr>]])
 map("n", [[<A-.>]], [[:<c-u>execute 'messages clear<bar>echohl Moremsg<bar>echo "Message clear"<bar>echohl None'<cr>]])
 -- Pageup/Pagedown
-map("",  [[<A-e>]], [[<pageup>]], {"novscode"})
-map("t", [[<A-e>]], [[<C-\><C-n><pageup>]], {"novscode"})
-map("",  [[<A-d>]], [[<pagedown>]], {"novscode"})
+map("",  [[<A-e>]], [[<pageup>]],             {"novscode"})
+map("t", [[<A-e>]], [[<C-\><C-n><pageup>]],   {"novscode"})
+map("",  [[<A-d>]], [[<pagedown>]],           {"novscode"})
 map("t", [[<A-d>]], [[<C-\><C-n><pagedown>]], {"novscode"})
 -- Macro
 -- <C-q> has been mapped to COC showDoc
@@ -177,8 +176,8 @@ map("", [[<C-w>j]], [[:lua require("init").winFocus("wincmd j")<cr>]],          
 map("", [[<C-w>k]], [[:lua require("init").winFocus("wincmd k")<cr>]],           {"silent", "novscode"})
 map("", [[<C-w>v]], [[:lua require("consistantTab").splitCopy("wincmd v")<cr>]], {"silent", "novscode"})
 map("", [[<C-w>s]], [[:lua require("consistantTab").splitCopy("wincmd s")<cr>]], {"silent", "novscode"})
-map("", [[<C-w>V]], [[:only<cr><C-w>v]], {"silent", "novscode"})
-map("", [[<C-w>S]], [[:only<cr><C-w>s]], {"silent", "novscode"})
+map("", [[<C-w>V]], [[:only<cr><C-w>v]],                                         {"silent", "novscode"})
+map("", [[<C-w>S]], [[:only<cr><C-w>s]],                                         {"silent", "novscode"})
 -- Buffers
 function M.bufSwitcher(command)
     cmd(command)
@@ -194,26 +193,26 @@ map("", [[<A-S-l>]], [[:tabn<cr>]], {"silent", "novscode"})
 -- Folding {{{
 map("",  [[[Z]],              [[zk]])
 map("",  [[]Z]],              [[zj]])
-map("",  [[[z]],              [[:<c-u>call EnhanceFoldJump("previous", 1, 0)<cr>]], {"noremap", "silent", "novscode"})
-map("",  [[]z]],              [[:<c-u>call EnhanceFoldJump("next",     1, 0)<cr>]], {"noremap", "silent", "novscode"})
-map("",  [[g[z]],             [[[z]], {"noremap", "silent", "novscode"})
-map("",  [[g]z]],             [[]z]], {"noremap", "silent", "novscode"})
+map("",  [[[z]],              [[:<c-u>call EnhanceFoldJump("previous", 1, 0)<cr>]],              {"noremap", "silent", "novscode"})
+map("",  [[]z]],              [[:<c-u>call EnhanceFoldJump("next",     1, 0)<cr>]],              {"noremap", "silent", "novscode"})
+map("",  [[g[z]],             [[[z]],                                                            {"noremap", "silent", "novscode"})
+map("",  [[g]z]],             [[]z]],                                                            {"noremap", "silent", "novscode"})
 map("",  [[<leader>z]],       [[:<c-u>call EnhanceFoldHL("No fold marker found", 500, "")<cr>]], {"silent", "novscode"})
-map("n", [[dz]],              [[:<c-u>call EnhanceFoldHL("", 800, "EnhanceDelete")<cr>]],        {"silent"})
-map("n", [[zd]],              [[:<c-u>call EnhanceFoldHL("", 800, "EnhanceDelete")<cr>]],        {"silent"})
-map("n", [[cz]],              [[:<c-u>call EnhanceFoldHL("", 0, "EnhanceChange")<cr>]],          {"silent"})
-map("n", [[g{]],              [[:<c-u>call EnhanceFold(mode(), "{{{")<cr>]])
-map("n", [[g}]],              [[:<c-u>call EnhanceFold(mode(), "}}}")<cr>]])
-map("v", [[g{]],              [[<A-m>z:<c-u>call EnhanceFold(visualmode(), "}}}")<cr>`z]])
-map("v", [[g}]],              [[<A-m>z:<c-u>call EnhanceFold(visualmode(), "}}}")<cr>`z]])
-map("",  [[<leader><Space>]], [[@=(foldlevel('.') ? 'za' : '\<Space>')<cr>]], {"noremap", "silent"})
-map("",  [[<S-Space>]],       [[@=(foldlevel('.') ? 'zA' : '\<Space>')<cr>]], {"noremap", "silent"})
+map("n", [[dz]],              [[:<c-u>call EnhanceFoldHL("", 800, "EnhanceDelete")<cr>]],        {"silent", "novscode"})
+map("n", [[zd]],              [[:<c-u>call EnhanceFoldHL("", 800, "EnhanceDelete")<cr>]],        {"silent", "novscode"})
+map("n", [[cz]],              [[:<c-u>call EnhanceFoldHL("", 0, "EnhanceChange")<cr>]],          {"silent", "novscode"})
+map("n", [[g{]],              [[:<c-u>call EnhanceFold(mode(), "{{{")<cr>]],                     {"novscode"})
+map("n", [[g}]],              [[:<c-u>call EnhanceFold(mode(), "}}}")<cr>]],                     {"novscode"})
+map("v", [[g{]],              [[<A-m>z:<c-u>call EnhanceFold(visualmode(), "}}}")<cr>`z]],       {"novscode"})
+map("v", [[g}]],              [[<A-m>z:<c-u>call EnhanceFold(visualmode(), "}}}")<cr>`z]],       {"novscode"})
+map("",  [[<leader><Space>]], [[@=(foldlevel('.') ? 'za' : '\<Space>')<cr>]],                    {"noremap", "silent"})
+map("",  [[<S-Space>]],       [[@=(foldlevel('.') ? 'zA' : '\<Space>')<cr>]],                    {"noremap", "silent"})
 for i=0, 9 do map("", string.format("z%d", i), string.format([[:set foldlevel=%d<bar>echohl Moremsg<bar>echo 'Foldlevel set to: %d'<bar>echohl None<cr>]], i, i), {}) end
 -- }}} Folding
 -- MS behavior {{{
 -- <C-z/v/s> {{{
-map("n", [[<C-z>]], [[u]], {"novscode"})
-map("v", [[<C-z>]], [[<esc>u]], {"novscode"})
+map("n", [[<C-z>]], [[u]],           {"novscode"})
+map("v", [[<C-z>]], [[<esc>u]],      {"novscode"})
 map("i", [[<C-z>]], [[<C-\><C-o>u]], {"novscode"})
 
 map("n", [[<C-c>]], [[Y]], {"novscode"})
@@ -222,10 +221,10 @@ map("v", [[<C-c>]], [[y]], {"novscode"})
 
 map("n", [[<C-v>]], [[p]],                {"noremap", "novscode"})
 map("v", [[<C-v>]], [[<esc>i<C-v><esc>]], {"novscode"})
-map("i", [[<C-v>]], [[<C-r>*]], {"novscode"})
+map("i", [[<C-v>]], [[<C-r>*]],           {"novscode"})
 
-map("n", [[<C-s>]], [[:<c-u>w<cr>]], {"novscode"})
-map("v", [[<C-s>]], [[:<c-u>w<cr>]], {"novscode"})
+map("n", [[<C-s>]], [[:<c-u>w<cr>]],      {"novscode"})
+map("v", [[<C-s>]], [[:<c-u>w<cr>]],      {"novscode"})
 map("i", [[<C-s>]], [[<C-\><C-o>:w<cr>]], {"novscode"})
 -- }}} <C-z/x/v/s>
 -- Saveas
@@ -246,12 +245,20 @@ map("n", [[<leader>p]], [["0p]])
 map("n", [[<leader>P]], [["0P]])
 -- Inplace yank
 map("n", [[Y]], [[yy]])
-map("",  [[y]], [[luaeval("require('operator').main(require('yankPut').inplaceYank)")]], {"silent", "expr"})
+map("",  [[y]], [[luaeval("require('operator').main(require('yankPut').inplaceYank, false)")]], {"silent", "expr"})
 -- Inplace put
 map("n", [[p]], [[:lua require("yankPut").inplacePut("n", "p")<cr>]], {"silent"})
 map("v", [[p]], [[:lua require("yankPut").inplacePut("v", "p")<cr>]], {"silent"})
 map("n", [[P]], [[:lua require("yankPut").inplacePut("n", "P")<cr>]], {"silent"})
 map("v", [[P]], [[:lua require("yankPut").inplacePut("v", "P")<cr>]], {"silent"})
+-- Inplace replace
+map("n", [[<Plug>InplaceReplaceLine]], [[:<c-u>execute 'normal! V' . v:count1 . "_\<lt>Esc>"<bar> lua ReplaceOperator({"visual", "InplaceReplaceLine"})<cr>]], {"noremap", "silent"})
+-- Repeat not defined in visual mode, but enabled through visualrepeat.vim.
+map("v", [[<Plug>InplaceReplaceVisual]], [[:lua ReplaceOperator({"visual", "InplaceReplaceVisual"})<cr>]], {"noremap", "silent"})
+map("v", [[<Plug>InplaceReplaceVisual]], [[:lua ReplaceVisualMode()<cr>]],                                 {"noremap", "silent"})
+map("n", [[grr]], [[<Plug>InplaceReplaceLine]])
+map("n", [[gr]],  [[luaeval("require('replace').expression()")]], {"silent", "expr"})
+map("v", [[R]],   [[<Plug>InplaceReplaceVisual]])
 -- Convert paste
 map("n", [[cP]], [[:lua require("yankPut").convertPut("P")<CR>]])
 map("n", [[cp]], [[:lua require("yankPut").convertPut("p")<CR>]])
@@ -259,27 +266,27 @@ map("n", [[cp]], [[:lua require("yankPut").convertPut("p")<CR>]])
 -- Move line
 cmd [[command! -nargs=0 VSCodeLineMoveDownInsert m .+1  execute "normal! =="]]
 cmd [[command! -nargs=0 VSCodeLineMoveUpInsert   m .-2  execute "normal! =="]]
-map("i", [[<A-j>]], [[<C-\><C-o>:VSCodeLineMoveDownInsert<cr>]], {"novscode"})
-map("i", [[<A-k>]], [[<C-\><C-o>:VSCodeLineMoveUpInsert<cr>]], {"novscode"})
-map("i", [[<A-j>]], [[<C-\><C-o>:call VSCodeCall("editor.action.moveLinesDownAction")<cr>]],                       {"silent", "vscodeonly"})
-map("i", [[<A-k>]], [[<C-\><C-o>:call VSCodeCall("editor.action.moveLinesUpAction")<cr>]],                       {"silent", "vscodeonly"})
-map("n", [[<A-j>]], [[:<c-u>m .+1<cr>==]],                       {"silent", "novscode"})
-map("n", [[<A-k>]], [[:<c-u>m .-2<cr>==]],                       {"silent", "novscode"})
-map("n", [[<A-j>]], [[:call VSCodeCall("editor.action.moveLinesDownAction")<cr>]],                       {"silent", "vscodeonly"})
-map("n", [[<A-k>]], [[:call VSCodeCall("editor.action.moveLinesUpAction")<cr>]],                       {"silent", "vscodeonly"})
-map("v", [[<A-j>]], [[:m '>+1<cr>gv=gv]],                        {"silent", "novscode"})
-map("v", [[<A-k>]], [[:m '<-2<cr>gv=gv]],                        {"silent", "novscode"})
+map("i", [[<A-j>]], [[<C-\><C-o>:VSCodeLineMoveDownInsert<cr>]],                             {"silent", "novscode"})
+map("i", [[<A-k>]], [[<C-\><C-o>:VSCodeLineMoveUpInsert<cr>]],                               {"silent", "novscode"})
+map("i", [[<A-j>]], [[<C-\><C-o>:call VSCodeCall("editor.action.moveLinesDownAction")<cr>]], {"silent", "vscodeonly"})
+map("i", [[<A-k>]], [[<C-\><C-o>:call VSCodeCall("editor.action.moveLinesUpAction")<cr>]],   {"silent", "vscodeonly"})
+map("n", [[<A-j>]], [[:<c-u>m .+1<cr>==]],                                                   {"silent", "novscode"})
+map("n", [[<A-k>]], [[:<c-u>m .-2<cr>==]],                                                   {"silent", "novscode"})
+map("n", [[<A-j>]], [[:call VSCodeCall("editor.action.moveLinesDownAction")<cr>]],           {"silent", "vscodeonly"})
+map("n", [[<A-k>]], [[:call VSCodeCall("editor.action.moveLinesUpAction")<cr>]],             {"silent", "vscodeonly"})
+map("v", [[<A-j>]], [[:m '>+1<cr>gv=gv]],                                                    {"silent", "novscode"})
+map("v", [[<A-k>]], [[:m '<-2<cr>gv=gv]],                                                    {"silent", "novscode"})
 -- Copy line
-map("i", [[<A-S-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n",       "down")<cr>]], {"silent", "vscode"})
-map("i", [[<A-S-k>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n",       "up")<cr>]],   {"silent", "vscode"})
-map("i", [[<A-S-j>]], [[<C-\><C-o>:call VSCodeCall("editor.action.copyLinesUpAction")]], {"silent", "vscodeonly"})
-map("i", [[<A-S-k>]], [[<C-\><C-o>:call VSCodeCall("editor.action.copyLinesUpAction")]], {"silent", "vscodeonly"})
-map("n", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank("n",                 "down")<cr>]], {"silent", "vscode"})
-map("n", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank("n",                 "up")<cr>]],   {"silent", "vscode"})
-map("n", [[<A-S-j>]], [[:call VSCodeCall("editor.action.copyLinesUpAction")]], {"silent", "vscodeonly"})
-map("n", [[<A-S-k>]], [[:call VSCodeCall("editor.action.copyLinesUpAction")]], {"silent", "vscodeonly"})
-map("v", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "down")<cr>]], {"silent", "vscode"})
-map("v", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "up")<cr>]],   {"silent", "vscode"})
+map("i", [[<A-S-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "down")<cr>]],       {"silent", "novscode"})
+map("i", [[<A-S-k>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "up")<cr>]],         {"silent", "novscode"})
+map("i", [[<A-S-j>]], [[<C-\><C-o>:call VSCodeCall("editor.action.copyLinesUpAction")]],           {"silent", "vscodeonly"})
+map("i", [[<A-S-k>]], [[<C-\><C-o>:call VSCodeCall("editor.action.copyLinesUpAction")]],           {"silent", "vscodeonly"})
+map("n", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank("n", "down")<cr>]],                 {"silent", "novscode"})
+map("n", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank("n", "up")<cr>]],                   {"silent", "novscode"})
+map("n", [[<A-S-j>]], [[:call VSCodeCall("editor.action.copyLinesUpAction")]],                     {"silent", "vscodeonly"})
+map("n", [[<A-S-k>]], [[:call VSCodeCall("editor.action.copyLinesUpAction")]],                     {"silent", "vscodeonly"})
+map("v", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "down")<cr>]], {"silent", "novscode"})
+map("v", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "up")<cr>]],   {"silent", "novscode"})
 -- }}} Mimic the VSCode move/copy line up/down behavior
 -- }}} MS bebhave
 -- Convert \ into /
@@ -287,37 +294,37 @@ map("n", [[g/]], [[mz:s#\\#\/#e<cr>:noh<cr>g`z]],   {"noremap", "silent"})
 map("n", [[g\]], [[mz:s#\\#\\\\#e<cr>:noh<cr>g`z]], {"noremap", "silent"})
 -- Mode: Terminal {{{
 map("t", [[<A-n>]],      [[<C-\><C-n>]])
-map("n", [[<C-`>]],      [[:<c-u>call TerminalToggle()<cr>]],       {"silent", "novscode"})
-map("t", [[<C-`>]],      [[<A-n>:call TerminalToggle()<cr>]],       {"silent", "novscode"})
-map("n", [[<A-`>]],      [[<A-n>:call TerminalClose()<cr>]],        {"silent", "novscode"})
-map("t", [[<A-`>]],      [[<A-n>:call TerminalClose()<cr>]],        {"silent", "novscode"})
-map("t", [[<A-h>]],      [[<A-n><A-h>]], {"novscode"})
-map("t", [[<A-l>]],      [[<A-n><A-l>]], {"novscode"})
-map("t", [[<A-S-h>]],    [[<A-n><A-S-h>]], {"novscode"})
-map("t", [[<A-S-l>]],    [[<A-n><A-S-l>]], {"novscode"})
+map("n", [[<C-`>]],      [[:<c-u>call TerminalToggle()<cr>]],       {"silent",  "novscode"})
+map("t", [[<C-`>]],      [[<A-n>:call TerminalToggle()<cr>]],       {"silent",  "novscode"})
+map("n", [[<A-`>]],      [[<A-n>:call TerminalClose()<cr>]],        {"silent",  "novscode"})
+map("t", [[<A-`>]],      [[<A-n>:call TerminalClose()<cr>]],        {"silent",  "novscode"})
+map("t", [[<A-h>]],      [[<A-n><A-h>]],                            {"novscode"})
+map("t", [[<A-l>]],      [[<A-n><A-l>]],                            {"novscode"})
+map("t", [[<A-S-h>]],    [[<A-n><A-S-h>]],                          {"novscode"})
+map("t", [[<A-S-l>]],    [[<A-n><A-S-l>]],                          {"novscode"})
 map("t", [[<C-BS>]],     [[<C-w>]],                                 {"noremap", "novscode"})
-map("t", [[<C-r>]],      [['\<A-n>"' . nr2char(getchar()) . 'pi']], {"expr", "novscode"})
-map("t", [[<C-w>k]],     [[<A-n><C-w>k]], {"novscode"})
-map("t", [[<C-w>j]],     [[<A-n><C-w>j]], {"novscode"})
-map("t", [[<C-w>h]],     [[<A-n><C-w>h]], {"novscode"})
-map("t", [[<C-w>l]],     [[<A-n><C-w>l]], {"novscode"})
-map("t", [[<C-w>w]],     [[<A-n><C-w>w]], {"novscode"})
-map("t", [[<C-w><C-w>]], [[<A-n><C-w><C-w>]], {"novscode"})
-map("t", [[<C-w>W]],     [[<A-n><C-w>W]], {"novscode"})
-map("t", [[<C-w>H]],     [[<A-n><C-w>H]], {"novscode"})
-map("t", [[<C-w>L]],     [[<A-n><C-w>L]], {"novscode"})
-map("t", [[<C-w>J]],     [[<A-n><C-w>J]], {"novscode"})
-map("t", [[<C-w>K]],     [[<A-n><C-w>K]], {"novscode"})
+map("t", [[<C-r>]],      [['\<A-n>"' . nr2char(getchar()) . 'pi']], {"expr",    "novscode"})
+map("t", [[<C-w>k]],     [[<A-n><C-w>k]],                           {"novscode"})
+map("t", [[<C-w>j]],     [[<A-n><C-w>j]],                           {"novscode"})
+map("t", [[<C-w>h]],     [[<A-n><C-w>h]],                           {"novscode"})
+map("t", [[<C-w>l]],     [[<A-n><C-w>l]],                           {"novscode"})
+map("t", [[<C-w>w]],     [[<A-n><C-w>w]],                           {"novscode"})
+map("t", [[<C-w><C-w>]], [[<A-n><C-w><C-w>]],                       {"novscode"})
+map("t", [[<C-w>W]],     [[<A-n><C-w>W]],                           {"novscode"})
+map("t", [[<C-w>H]],     [[<A-n><C-w>H]],                           {"novscode"})
+map("t", [[<C-w>L]],     [[<A-n><C-w>L]],                           {"novscode"})
+map("t", [[<C-w>J]],     [[<A-n><C-w>J]],                           {"novscode"})
+map("t", [[<C-w>K]],     [[<A-n><C-w>K]],                           {"novscode"})
 -- }}} Mode: Terminal
 -- Mode: Commandline & Insert {{{
-map("i", [[<C-cr>]],  [[<esc>o]], {"novscode"})
-map("i", [[<S-cr>]],  [[<esc>O]], {"novscode"})
+map("i", [[<C-cr>]],  [[<esc>o]],  {"novscode"})
+map("i", [[<S-cr>]],  [[<esc>O]],  {"novscode"})
 map("i", [[jj]],      [[<esc>`^]], {"novscode"})
-map("i", [[<C-d>]],   [[<Del>]], {"novscode"})
-map("i", [[<S-Tab>]], [[<C-d>]], {"noremap"})
-map("i", [[<C-.>]],   [[<C-a>]], {"noremap"})
-map("i", [[<C-S-.>]], [[<C-@>]], {"noremap"})
-map("i", [[<C-BS>]],  [[<C-w>]], {"noremap"})
+map("i", [[<C-d>]],   [[<Del>]],   {"novscode"})
+map("i", [[<S-Tab>]], [[<C-d>]],   {"noremap"})
+map("i", [[<C-.>]],   [[<C-a>]],   {"noremap"})
+map("i", [[<C-S-.>]], [[<C-@>]],   {"noremap"})
+map("i", [[<C-BS>]],  [[<C-w>]],   {"noremap"})
 -- Navigation {{{
 map("!", [[<C-a>]], [[<Home>]])
 map("!", [[<C-e>]], [[<End>]])
@@ -359,10 +366,6 @@ if vim.g.vscode == 1 then
   -- VSCode do not need the next settings
   return
 end
--- inkarkat/vim-ReplaceWithRegister {{{
-map("n", [[grr]], [[<Plug>ReplaceWithRegisterLine==]], {"nowait"})
-map("v", [[R]],   [[<Plug>ReplaceWithRegisterVisual`<v`>=]])
--- }}} inkarkat/vim-ReplaceWithRegister
 -- RishabhRD/nvim-cheat.sh {{{
 map("n", [[<C-S-l>]], [[:<c-u>Cheat<cr>]], {"silent"})
 -- }}} RishabhRD/nvim-cheat.sh
@@ -402,36 +405,36 @@ function M.commentJump(keystroke) -- {{{
         cmd [[startinsert!]]
     end
 end -- }}}
-map("n", [[gco]], [[:lua require("init").commentJump("o")<cr>]], {"silent"})
-map("n", [[gcO]], [[:lua require("init").commentJump("O")<cr>]], {"silent"})
+map("n", [[g<space>o]], [[:lua require("init").commentJump("o")<cr>]], {"silent"})
+map("n", [[g<space>O]], [[:lua require("init").commentJump("O")<cr>]], {"silent"})
 
-map("n", [[gc<space>]], [[<plug>NERDCommenterToggle]])
-map("v", [[gc<space>]], [[<plug>NERDCommenterToggle]])
--- map("n", [[gcn]], [[<plug>NERDCommenterNested]])
--- map("v", [[gcn]], [[<plug>NERDCommenterNested]])
-map("n", [[gci]], [[<plug>NERDCommenterInvert]])
-map("v", [[gci]], [[<plug>NERDCommenterInvert]])
+map("n", [[g<space><space>]], [[<plug>NERDCommenterToggle]])
+map("v", [[g<space><space>]], [[<plug>NERDCommenterToggle]])
+-- map("n", [[g<space>n]], [[<plug>NERDCommenterNested]])
+-- map("v", [[g<space>n]], [[<plug>NERDCommenterNested]])
+map("n", [[g<space>i]], [[<plug>NERDCommenterInvert]])
+map("v", [[g<space>i]], [[<plug>NERDCommenterInvert]])
 
-map("n", [[gcs]], [[<plug>NERDCommenterSexy]])
-map("v", [[gcs]], [[<plug>NERDCommenterSexy]])
+map("n", [[g<space>s]], [[<plug>NERDCommenterSexy]])
+map("v", [[g<space>s]], [[<plug>NERDCommenterSexy]])
 
-map("n", [[gcy]], [[<plug>NERDCommenterYank]])
-map("v", [[gcy]], [[<plug>NERDCommenterYank]])
+map("n", [[g<space>y]], [[<plug>NERDCommenterYank]])
+map("v", [[g<space>y]], [[<plug>NERDCommenterYank]])
 
-map("n", [[gc$]], [[<plug>NERDCommenterToEOL]])
-map("n", [[gcA]], [[<plug>NERDCommenterAppend]])
-map("n", [[gcI]], [[<plug>NERDCommenterInsert]])
+map("n", [[g<space>$]], [[<plug>NERDCommenterToEOL]])
+map("n", [[g<space>A]], [[<plug>NERDCommenterAppend]])
+map("n", [[g<space>I]], [[<plug>NERDCommenterInsert]])
 
 map("v", [[<A-/>]], [[<plug>NERDCommenterAltDelims]])
 map("n", [[<A-/>]], [[<plug>NERDCommenterAltDelims]])
 
-map("n", [[gcn]], [[<plug>NERDCommenterAlignLeft]])
-map("v", [[gcn]], [[<plug>NERDCommenterAlignLeft]])
-map("n", [[gcb]], [[<plug>NERDCommenterAlignBoth]])
-map("v", [[gcb]], [[<plug>NERDCommenterAlignBoth]])
+map("n", [[g<space>n]], [[<plug>NERDCommenterAlignLeft]])
+map("v", [[g<space>n]], [[<plug>NERDCommenterAlignLeft]])
+map("n", [[g<space>b]], [[<plug>NERDCommenterAlignBoth]])
+map("v", [[g<space>b]], [[<plug>NERDCommenterAlignBoth]])
 
-map("n", [[gcu]], [[<plug>NERDCommenterUncomment]])
-map("v", [[gcu]], [[<plug>NERDCommenterUncomment]])
+map("n", [[g<space>u]], [[<plug>NERDCommenterUncomment]])
+map("v", [[g<space>u]], [[<plug>NERDCommenterUncomment]])
 
 vim.g.NERDSpaceDelims              = 1
 vim.g.NERDRemoveExtraSpaces        = 1
@@ -535,12 +538,12 @@ map("", [[<leader>f]], [[:lua require("hop").hint_char1()<cr>]], {"silent"})
 map("", [[<leader>F]], [[:lua require("hop").hint_lines()<cr>]], {"silent"})
 -- }}} phaazon/hop.nvim
 -- michaeljsmith/vim-indent-object {{{
-vim.g.indentLine_char                   = '▏'
-vim.g.indent_blankline_buftype_exclude  = {'terminal'}
-vim.g.indent_blankline_filetype_exclude = {'help'}
-vim.g.indent_blankline_bufname_exclude  = {'*.md'}
+vim.g.indentLine_char                   = "▏"
+vim.g.indent_blankline_buftype_exclude  = {"terminal"}
+vim.g.indent_blankline_filetype_exclude = {"help", "startify"}
+vim.g.indent_blankline_bufname_exclude  = {"*.md"}
 vim.g.indent_blankline_use_treesitter   = true
-vim.g.indent_blankline_char_highlight   = 'SignColumn'
+vim.g.indent_blankline_char_highlight   = "SignColumn"
 -- }}} michaeljsmith/vim-indent-object
 -- Startify {{{
 vim.g.startify_session_dir  = '~/.nvimcache/session'
@@ -565,12 +568,10 @@ vim.g.startify_relative_path          = 1
 vim.g.startify_use_env                = 1
 if fn.has("win32") == 1 then table.insert(vim.g.startify_bookmarks, 'H:/code') end
 -- }}} Startify
--- tpope/vim-repeat {{{
-cmd [[silent! call repeat#set("\<Plug>MyWonderfulMap", v:count)]]
--- }}} tpope/vim-repeat
 -- iaso2h/nlua {{{
 vim.g.nlua_keywordprg_map_key = "<C-S-q>"
 -- }}} iaso2h/nlua
 -- }}} Plug-ins settings
 
 return M
+

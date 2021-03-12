@@ -13,6 +13,7 @@ Plug 'mhinz/vim-startify'
 Plug 'simnalamburt/vim-mundo', {'on': 'MundoToggle'}
 Plug 'szw/vim-maximizer', {'on': 'MaximizerToggle'}
 Plug 'tpope/vim-repeat'
+Plug 'inkarkat/vim-visualrepeat'
 Plug 'tpope/vim-eunuch'
 " Plug 'iaso2h/hop.nvim'
 Plug 'machakann/vim-sandwich'
@@ -73,7 +74,9 @@ lua require "util"
 lua require "init"
 lua require "plugin"
 lua require "debug"
+lua require "replace"
 if has('win32')
     lua require('dap-python').setup('D:/anaconda3/envs/test/python.exe')
 endif
 " lua require('hop').setup({teasing = true, winblend = 50, keys = 'ghfjdkstyrueiwovbcnxalqozm'})
+

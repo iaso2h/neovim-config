@@ -46,45 +46,41 @@ function Vim2Lua(mode) -- {{{
             [range .. "s#expand(#fn.expand(#e"] = true,
             [range .. "s#has(#fn.has(#e"] = true
         }
-        local functionSCallRep = string.format(
-                                     range ..
-                                         [=[s#call <sid>#lua require("%s").#e]=],
-                                     fn.expand("%:t:r"))
-        local functionSIdRep = range ..
-                                   [=[s#^\(\s*\)function\(!\)\? s:\(\w\)#\1function M\.\3#e]=]
-        local functionGIdRep = range ..
-                                   [=[s#^\(\s*\)function\(!\)\? \(\u.\)\(.*\)#\1function M\.\l\3\4#e]=]
-        local strConcanationRep = range .. [=[s# \. # \.\. #e]=]
-        local continueLineRep = range .. [=[s#^\(\s\+\)\\#\1#e]=]
-        local termStartRep = range .. [=[s#^\(\s\+\)!\(.\+\)#\1cmd [[\2]]#e]=]
-        local listLenRep = range .. [=[s/\(str\)len(/#/e]=]
-        local normalRep = range .. [=[s#\(^\s*\)\(normal!.*\)#\1cmd [[\2]]#e]=]
-        local executeRep = range .. [=[s#\(\s\+\)execute#\1cmd#e]=]
-        local commentStartRep = range .. [=[s#^\(\s\{-}\)"#\1--#e]=]
+        local functionSCallRep    = string.format(range .. [=[s#call <sid>#lua require("%s").#e]=], fn.expand("%:t:r"))
+        local functionSIdRep      = range .. [=[s#^\(\s*\)function\(!\)\? s:\(\w\)#\1function M\.\3#e]=]
+        local functionGIdRep      = range .. [=[s#^\(\s*\)function\(!\)\? \(\u.\)\(.*\)#\1function M\.\l\3\4#e]=]
+        local functionCallRep     = range .. [=[s#^\(\s*\)call \(.*\)#\1\2#e]=]
+        local optionSetRep        = range .. [=[s#^\(\s*\)set \(.*\)#\1\2#e]=]
+        local strConcanationRep   = range .. [=[s# \. # \.\. #e]=]
+        local continueLineRep     = range .. [=[s#^\(\s\+\)\\#\1#e]=]
+        local termStartRep        = range .. [=[s#^\(\s\+\)!\(.\+\)#\1cmd [[\2]]#e]=]
+        local listLenRep          = range .. [=[s/\(str\)len(/#/e]=]
+        local normalRep           = range .. [=[s#\(^\s*\)\(normal!.*\)#\1cmd [[\2]]#e]=]
+        local executeRep          = range .. [=[s#\(\s\+\)execute#\1cmd#e]=]
+        local commentStartRep     = range .. [=[s#^\(\s\{-}\)"#\1--#e]=]
         local commentStartMarkRep = range .. [=[s#" {{{#-- {{{#e]=]
-        local commentEndMarkRep = range .. [=[s#" }}}#-- }}}#e]=]
-        local defaultInitRep1 = range ..
-                                    [=[s#get(g:, "\(.\{-}\)", \(.\{-}\))#vim.g.\1 or \2#e]=]
-        local defaultInitRep2 = range ..
-                                    [=[s#get(g:, '\(.\{-}\)', \(.\{-}\))#vim.g.\1 or \2#e]=]
-        local commandRep = range .. [=[s#command!.*#cmd [[&]]#e]=]
-        local userCommandStartRep = range ..
-                                        [=[s#^\(\s\+\)\(\u.\+\)#\1cmd [[\2]]#e]=]
-        t[strConcanationRep] = true
-        t[continueLineRep] = true
-        t[termStartRep] = true
-        t[listLenRep] = true
-        t[functionSCallRep] = true
-        t[functionSIdRep] = true
-        t[functionGIdRep] = true
-        t[normalRep] = true
-        t[executeRep] = true
-        t[commentStartRep] = true
+        local commentEndMarkRep   = range .. [=[s#" }}}#-- }}}#e]=]
+        local defaultInitRep1     = range .. [=[s#get(g:, "\(.\{-}\)", \(.\{-}\))#vim.g.\1 or \2#e]=]
+        local defaultInitRep2     = range .. [=[s#get(g:, '\(.\{-}\)', \(.\{-}\))#vim.g.\1 or \2#e]=]
+        local commandRep          = range .. [=[s#command!.*#cmd [[&]]#e]=]
+        local userCommandStartRep = range .. [=[s#^\(\s\+\)\(\u.\+\)#\1cmd [[\2]]#e]=]
+        t[strConcanationRep]   = true
+        t[continueLineRep]     = true
+        t[termStartRep]        = true
+        t[listLenRep]          = true
+        t[functionSCallRep]    = true
+        t[functionSIdRep]      = true
+        t[functionGIdRep]      = true
+        t[functionCallRep]    = true
+        t[optionSetRep]        = true
+        t[normalRep]           = true
+        t[executeRep]          = true
+        t[commentStartRep]     = true
         t[commentStartMarkRep] = true
-        t[commentEndMarkRep] = true
-        t[defaultInitRep1] = false
-        t[defaultInitRep2] = false
-        t[commandRep] = true
+        t[commentEndMarkRep]   = true
+        t[defaultInitRep1]     = false
+        t[defaultInitRep2]     = false
+        t[commandRep]          = true
         t[userCommandStartRep] = true
 
         for str, bool in pairs(t) do if bool then cmd(str) end end
@@ -261,7 +257,7 @@ end -- }}}
 ----
 function M.map(mode, lhs, rhs, optsTbl) -- {{{
     optsTbl = optsTbl or {}
-    if vim.tbl_contains(optsTbl, "novscode") then
+    if vim.tbl_contains(optsTbl, "novscode") and vim.g.vscode then
         return
     end
     if vim.tbl_contains(optsTbl, "vscodeonly") then
@@ -396,11 +392,13 @@ end -- }}}
 -- independantly, restoreReg can be accessed after saveReg is called
 ----
 function M.saveReg() -- {{{
-    local unnamed = fn.getreg('"')
-    local quote = fn.getreg('*')
+    local unnamed     = fn.getreg('"', 1)
+    local unnamedType = fn.getregtype('"')
+    local quote       = fn.getreg('*', 1)
+    local quoteType   = fn.getregtype('*')
     M.restoreReg = function()
-        fn.setreg('"', unnamed)
-        fn.setreg('*', quote)
+        fn.setreg('"', unnamed, unnamedType)
+        fn.setreg('*', quote, quoteType)
     end
 end -- }}}
 
@@ -456,3 +454,4 @@ function M.posDist(pos1, pos2, bias, baisIdx)
 end
 
 return M
+
