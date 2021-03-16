@@ -6,7 +6,9 @@ local vim = vim
 local fn = vim.fn
 local cmd = vim.cmd
 local api = vim.api
+local map = require("util").map
 local M = {}
+
 -- Extensions {{{
 vim.g.coc_global_extensions = {
     'coc-cmake',
@@ -29,7 +31,7 @@ vim.g.coc_global_extensions = {
 api.nvim_exec([[
 augroup COC
 autocmd!
-autocmd CursorHold *               lua require("plugin.coc").checkCOCDiagnosticFirst('highlight')
+autocmd CursorHold *               lua CheckCOCDiagnosticFirst('highlight')
 autocmd FileType   typescript,json setlocal formatexpr=CocAction('formatSelected')
 autocmd FileType   lua,python      let b:coc_root_patterns =  ['.git', '.env']
 autocmd User                       CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
@@ -44,7 +46,7 @@ cmd [[command! -nargs=0 Spell  :CocCommand cSpell.toggleEnableSpellChecker]]
 -- }}} Commands
 
 -- Function {{{
-function M.checkCOCDiagnosticFirst(cocAction) -- {{{
+function CheckCOCDiagnosticFirst(cocAction) -- {{{
     if vim.b.coc_diagnostic_info and vim.bo.filetype ~= "lua" then
         if vim.b.coc_diagnostic_info["warning"] == 0 and
             vim.b.coc_diagnostic_info["error"] == 0 then
@@ -113,14 +115,14 @@ map("n", [[gD]], [[<Plug>(coc-type-definition)]], {})
 map("n", [[gI]], [[<Plug>(coc-implementation)]],  {})
 map("n", [[gR]], [[<Plug>(coc-references-used)]], {})
 -- Show Document
-map("n", [[K]],     [[:lua require("plugin.coc").showDoc()<cr>]], {"silent"})
-map("n", [[<C-q>]], [[:lua require("plugin.coc").showDoc()<cr>]], {"silent"})
+map("n", [[K]],     [[:lua require("plugins.coc").showDoc()<cr>]], {"silent"})
+map("n", [[<C-q>]], [[:lua require("plugins.coc").showDoc()<cr>]], {"silent"})
 -- Symbol renaming
-map("n", [[<leader>r]], [[:lua require("plugin.coc").checkCOCDiagnosticFirst("rename")<cr>]],   {})
-map("n", [[<leader>R]], [[:lua require("plugin.coc").checkCOCDiagnosticFirst("refactor")<cr>]], {})
+map("n", [[<leader>r]], [[:lua COCDiagnosticFirst("rename")<cr>]],   {})
+map("n", [[<leader>R]], [[:lua COCDiagnosticFirst("refactor")<cr>]], {})
 -- Formatting selected code.
-map("n", [[<A-f>]], [[:lua require("plugin.coc").formatCode(vim.fn.mode())<cr>]],       {"silent"})
-map("v", [[<A-f>]], [[:lua require("plugin.coc").formatCode(vim.fn.visualmode())<cr>]], {"silent"})
+map("n", [[<A-f>]], [[:lua require("plugins.coc").formatCode(vim.fn.mode())<cr>]],       {"silent"})
+map("v", [[<A-f>]], [[:lua require("plugins.coc").formatCode(vim.fn.visualmode())<cr>]], {"silent"})
 -- Code action operator
 map("v", [[<leader>a]], [[<Plug>(coc-codeaction-selected)]], {})
 map("n", [[<leader>a]], [[<Plug>(coc-codeaction-selected)]], {})
@@ -201,7 +203,6 @@ function! CheckBackspace()
 endfunction
 ]], false)
 -- }}} COC-Snippets
-
 -- Completion {{{
 -- Trigger completion
 map("i", [[<C-space>]], [[pumvisible() ? "\<C-e>" : coc#refresh()]], {"noremap", "silent", "expr"})
@@ -215,28 +216,7 @@ map("i", [[<C-f>]], [[<C-\><C-o>:call coc#float#jump()<cr>]],                   
 map("i", [[<C-f>]], [[<C-\><C-o>:call coc#float#jump()<cr>]],                      {"silent"})
 -- }}} Completion
 
--- LSP {{{
--- Lua {{{
-local lua_lsp = fn.glob('~/.vscode/extensions/sumneko.lua*', 0, 1)
-if #lua_lsp ~= 0 then
-    fn.nvim_call_function("coc#config", {
-        "Lua.workspace.library", {
-            [api.nvim_eval("$VIMRUNTIME")]                   = true,
-            [api.nvim_eval("$VIMRUNTIME") .. "/lua/vim"]     = true,
-            [api.nvim_eval("$VIMRUNTIME") .. "/lua/vim/lsp"] = true,
-            [api.nvim_eval("$configPath") .. "/lua/"] = true
-        }
-    })
-end
--- }}} Lua
--- Python {{{
-if fn.has("win32") then
-    fn.nvim_call_function("coc#config", {
-        "python.analysis.stubPath", "C:/Users/Hashub/.vscode/extensions/ms-python.vscode-pylance-2021.2.4/dist/typeshed-fallback" })
-end
--- }}} Python
 -- }}} LSP
-
 
 return M
 

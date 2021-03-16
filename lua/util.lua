@@ -89,20 +89,13 @@ function Vim2Lua(mode) -- {{{
     elseif mode == "map" then
         -- Change vim mapping syntax into lua mapping syntax {{{
         local curLine = api.nvim_get_current_line()
-        local optKeyword = {
-            noremap = false,
-            silent = false,
-            expr = false,
-            nowait = false
-        }
+        local optKeyword = {}
         local mapKeyword = fn.matchstr(curLine, "^\\w\\{-}map!\\?")
         if mapKeyword == "" then do return end end
-        optKeyword["silent"] =
-            string.match(curLine, "<silent>") ~= nil and true or false
-        optKeyword["expr"] = string.match(curLine, "<expr>") ~= nil and true or
-                                 false
-        optKeyword["nowait"] =
-            string.match(curLine, "<nowait>") ~= nil and true or false
+        if string.match(curLine, "<silent>") ~= nil then optKeyword["silent"] = true end
+        if string.match(curLine, "<expr>") ~= nil then optKeyword["expr"] = true end
+        if string.match(curLine, "<nowait>") ~= nil then optKeyword["nowait"] = true end
+
         local mapMode
         if #mapKeyword == 3 then
             mapMode = ""
@@ -128,15 +121,21 @@ function Vim2Lua(mode) -- {{{
         local RHS = fn.matchstr(mapping, [[^.\{-} \zs.*]])
 
         local optString = ""
-        for optName, val in pairs(optKeyword) do
-            if val then
-                optString = optString .. '"' .. optName .. '", '
-            end
-        end
-        optString = string.sub(optString, 1, -3)
         local luaMapping
-        luaMapping = string.format([=[map("%s", [[%s]], [[%s]], {%s})]=],
-                                   mapMode, LHS, RHS, optString)
+        if next(optKeyword) then
+            for optName, val in pairs(optKeyword) do
+                if val then
+                    optString = optString .. '"' .. optName .. '", '
+                end
+            end
+            optString = string.sub(optString, 1, -3)
+            luaMapping = string.format([=[map("%s", [[%s]], [[%s]], {%s})]=],
+                                    mapMode, LHS, RHS, optString)
+        else
+            luaMapping = string.format([=[map("%s", [[%s]], [[%s]])]=],
+                                    mapMode, LHS, RHS)
+        end
+
         local cursor = api.nvim_win_get_cursor(0)
         api.nvim_buf_set_lines(0, cursor[1] - 1, cursor[1], {false},
                                {luaMapping})
@@ -196,7 +195,7 @@ function RELOAD(module) -- {{{
             cmd("source " .. module)
             api.nvim_echo({{"Reload: " .. module, "Normal"}}, true, {})
         elseif fn.expand("%:p:h") ==
-            api.nvim_eval("expand('$configPath/plugin')") then
+            api.nvim_eval("expand('$configPath/plugins')") then
             cmd("source " .. module)
             api.nvim_echo({{"Reload: " .. module, "Normal"}}, true, {})
         end

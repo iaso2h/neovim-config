@@ -1007,4 +1007,39 @@ highlight link OperatorSandwichChange Search
 highlight link OperatorSandwichDelete Search
 highlight link OperatorSandwichAddrcc Search
 " }}} Sandwich
-"
+
+" mg979/vim-visual-multi-multi {{{
+hi! VMExtend      ctermbg=239 guibg=#434C5E
+hi! VMCursor      ctermbg=245 ctermfg=24  guibg=#8a8a8a guifg=black
+hi! VMInsert      ctermbg=239 guibg=#8a8a8a
+hi! VMMono        ctermbg=131 ctermfg=235 guibg=#88c0d0 guifg=white
+" }}} mg979/vim-visual-multi-multi
+
+" p00f/nvim-ts-rainbow {{{
+hi rainbowcol1 guifg=Gold
+hi rainbowcol2 guifg=DarkOrchid3
+hi rainbowcol3 guifg=RoyalBlue2
+hi rainbowcol4 guifg=Firebrick
+hi rainbowcol5 guifg=SeaGreen3
+hi rainbowcol6 guifg=DarkOrange3
+hi rainbowcol7 guifg=#458588
+" }}} p00f/nvim-ts-rainbow
+
+" nvim-telescope/telescope.nvim {{{
+highlight TelescopeSelection      guifg=#EBCB8B gui=bold
+highlight TelescopeSelectionCaret guifg=#EBCB8B
+highlight TelescopeMultiSelection guifg=#928374
+
+" Border highlight groups.
+highlight TelescopeBorder         guifg=#88C0D0
+highlight TelescopePromptBorder   guifg=#88C0D0
+highlight TelescopeResultsBorder  guifg=#88C0D0
+highlight TelescopePreviewBorder  guifg=#88C0D0
+
+" Used for highlighting characters that you match.
+highlight TelescopeMatching       guifg=#5E81AC
+
+" Used for the prompt prefix
+highlight TelescopePromptPrefix   guifg=#88C0D0
+" }}} nvim-telescope/telescope.nvim
+

@@ -4,7 +4,6 @@ endif
 call plug#begin(stdpath('config') . '/plugged')
 Plug 'arcticicestudio/nord-vim'
 Plug 'vim-airline/vim-airline'
-Plug 'luochen1990/rainbow'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'lukas-reineke/indent-blankline.nvim', {'branch': 'lua'}
 Plug 'norcalli/nvim-colorizer.lua'
@@ -15,7 +14,7 @@ Plug 'szw/vim-maximizer', {'on': 'MaximizerToggle'}
 Plug 'tpope/vim-repeat'
 Plug 'inkarkat/vim-visualrepeat'
 Plug 'tpope/vim-eunuch'
-" Plug 'iaso2h/hop.nvim'
+Plug 'iaso2h/hop.nvim'
 Plug 'machakann/vim-sandwich'
 Plug 'tommcdo/vim-exchange', {'on': ['<Plug>(Exchange)', '<Plug>(Exchange)', '<Plug>(ExchangeClear)', '<Plug>(ExchangeLine)']}
 Plug 'lag13/vim-create-variable', {'on': '<Plug>Createvariable'}
@@ -58,25 +57,24 @@ Plug 'RishabhRD/nvim-cheat.sh', {'on': ['Cheat', 'CheatList', 'CheatListWithoutC
 Plug 'lambdalisue/gina.vim'
 Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
 Plug 'skywind3000/asyncrun.vim'
-Plug 'Yggdroot/LeaderF', {'do': ':LeaderfInstallCExtension' }
+
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'fhill2/telescope-ultisnips.nvim'
+Plug 'nvim-telescope/telescope-symbols.nvim'
+Plug 'nvim-telescope/telescope-fzy-native.nvim'
+Plug 'nvim-telescope/telescope-media-files.nvim'
 
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'mfussenegger/nvim-dap'
 Plug 'mfussenegger/nvim-dap-python', {'for': 'python'}
 Plug 'theHamsta/nvim-dap-virtual-text'
 Plug 'romgrk/nvim-treesitter-context'
+Plug 'p00f/nvim-ts-rainbow'
 
 Plug 'dahu/VimRegexTutor'
 Plug 'DanilaMihailov/vim-tips-wiki'
 call plug#end()
 
-lua require "util"
-lua require "init"
-lua require "plugin"
-lua require "debug"
-lua require "replace"
-if has('win32')
-    lua require('dap-python').setup('D:/anaconda3/envs/test/python.exe')
-endif
-" lua require('hop').setup({teasing = true, winblend = 50, keys = 'ghfjdkstyrueiwovbcnxalqozm'})
 

@@ -122,38 +122,38 @@ nmap <leader>0 <Plug>AirlineSelectTab0
 " }}} Key mapping
 " }}} vim-airline/vim-airline
 
-" luochen1990/rainbow {{{
-let g:rainbow_active = 1
-let g:rainbow_conf = {
-            \ 'guifgs': ['Gold', 'DarkOrchid3', 'RoyalBlue2'],
-            \ 'ctermfgs': ['yellow', 'magenta', 'lightblue'],
-            \	'guis': [''],
-            \	'cterms': [''],
-            \	'operators': '',
-            \	'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
-            \	'separately': {
-            \		'*': {},
-            \		'markdown': {
-            \			'parentheses_options': 'containedin=markdownCode contained',
-            \		},
-            \		'lisp': {
-            \			'guifgs': ['Gold', 'DarkOrchid3', 'RoyalBlue2', 'Firebrick', 'SeaGreen3', 'DarkOrange3'],
-            \		},
-            \		'haskell': {
-            \			'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/\v\{\ze[^-]/ end=/}/ fold'],
-            \		},
-            \		'vim': {
-            \			'parentheses_options': 'containedin=vimFuncBody',
-            \		},
-            \		'perl': {
-            \			'syn_name_prefix': 'perlBlockFoldRainbow',
-            \		},
-            \		'stylus': {
-            \			'parentheses': ['start=/{/ end=/}/ fold contains=@colorableGroup'],
-            \		},
-            \		'css': 1,
-            \	}
-            \}
-" [vim css color](https://github.com/ap/vim-css-color) compatibility
-" }}} luochen1990/rainbow
+" " luochen1990/rainbow {{{
+" let g:rainbow_active = 1
+" let g:rainbow_conf = {
+            " \ 'guifgs': ['Gold', 'DarkOrchid3', 'RoyalBlue2'],
+            " \ 'ctermfgs': ['yellow', 'magenta', 'lightblue'],
+            " \	'guis': [''],
+            " \	'cterms': [''],
+            " \	'operators': '',
+            " \	'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
+            " \	'separately': {
+            " \		'*': {},
+            " \		'markdown': {
+            " \			'parentheses_options': 'containedin=markdownCode contained',
+            " \		},
+            " \		'lisp': {
+            " \			'guifgs': ['Gold', 'DarkOrchid3', 'RoyalBlue2', 'Firebrick', 'SeaGreen3', 'DarkOrange3'],
+            " \		},
+            " \		'haskell': {
+            " \			'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/\v\{\ze[^-]/ end=/}/ fold'],
+            " \		},
+            " \		'vim': {
+            " \			'parentheses_options': 'containedin=vimFuncBody',
+            " \		},
+            " \		'perl': {
+            " \			'syn_name_prefix': 'perlBlockFoldRainbow',
+            " \		},
+            " \		'stylus': {
+            " \			'parentheses': ['start=/{/ end=/}/ fold contains=@colorableGroup'],
+            " \		},
+            " \		'css': 1,
+            " \	}
+            " \}
+" " [vim css color](https://github.com/ap/vim-css-color) compatibility
+" " }}} luochen1990/rainbow
 

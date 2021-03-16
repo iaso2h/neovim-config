@@ -1,69 +1,11 @@
--- Author: iaso2h
--- File: init.lua
--- Description: lua initialization
--- Version: 0.0.2
--- Last Modified: 2021/02/21
-
 local vim = vim
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
 local map = require("util").map
 local M   = {}
+print("load mappings.lua")
 
-
--- Build-in plugin {{{
--- c.vim
-vim.g.c_gnu = 1
-vim.g.c_ansi_typedefs = 1
-vim.g.c_ansi_constants = 1
-vim.g.c_no_comment_fold = 1
-vim.g.c_syntax_for_h = 1
--- doxygen.vim
-vim.g.load_doxygen_syntax= 1
-vim.g.doxygen_enhanced_color = 1
--- msql.vim
-vim.g.msql_sql_query = 1
--- }}} Build-in plugin
-
--- OS varied settings {{{
-if fn.has('win32') == 1 then
-    -- o.shell="powershell"
-    -- o.shellquote="shellpipe= shellxquote="
-    -- o.shellcmdflag="-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command"
-    -- o.shellredir=" Out-File -Encoding UTF8"
-    -- Python executable
-    local winPython = fn.expand("$HOME/AppData/Local/Programs/Python/Python38/python.exe")
-    api.nvim_set_var("python3_host_prog", winPython)
-    if fn.executable(winPython) == 0 then
-        local pythonPath = (string.gsub(fn.system('python -c "import sys; print(sys.executable)"'),"(\n+$)", ""))
-        api.nvim_set_var("python3_host_prog", pythonPath)
-        if not fn.executable(api.nvim_get_var("python3_host_prog")) then
-            api.nvim_err_write("Python path not found\n")
-        end
-    end
-elseif fn.has('unix') == 1 then
-    local pythonPath = (string.gsub(fn.system('which python3'), "\n+$"))
-    api.nvim_set_var(pythonPath)
-    if not fn.executable(api.nvim_get_var("python3_host_prog")) then
-        api.nvim_err_write("Python path not found\n")
-    end
-end
--- }}} OS varied settings
-
--- Neovide settings {{{
-if vim.g.neovide then
-    vim.g.neovide_no_idle                 = true
-    vim.g.neovide_cursor_animation_length = 0.04
-    vim.g.neovide_cursor_trail_length     = 0.6
-    -- vim.g.neovide_cursor_antialiasing     = true
-    vim.g.neovide_window_floating_blur    = false
-    vim.g.neovide_refresh_rate            = 60
-    -- vim.g.neovide_cursor_vfx_mode = "pixiedust"
-end
--- }}} Neovide settings
-
--- Key mapping {{{
 vim.g.mapleader = " " -- First thing first
 -- Don't truncate the name
 map("n", [[<C-g>]], [[:file!<cr>]], {"silent"})
@@ -105,11 +47,18 @@ function M.oppoSelection() -- {{{
     local curPos         = api.nvim_win_get_cursor(0)
     local startSelectPos = api.nvim_buf_get_mark(0, "<")
     local endSelectPos   = api.nvim_buf_get_mark(0, ">")
+    if curPos[1] == startSelectPos[1] then
+        api.nvim_win_set_cursor(0, endSelectPos)
+        return
+    elseif curPos[1] == endSelectPos[1] then
+        api.nvim_win_set_cursor(0, startSelectPos)
+        return
+    end
     local closerToStart  = require("util").posDist(startSelectPos, curPos) < require("util").posDist(endSelectPos, curPos) and true or false
     if closerToStart then api.nvim_win_set_cursor(0, endSelectPos) else api.nvim_win_set_cursor(0, startSelectPos) end
 end -- }}}
-map("n", [[go]],    [[:lua require("init").oppoSelection()<cr>]], { "silent"})
-map("n", [[<A-v>]], [[<C-q>]],                                    {"noremap"})
+map("n", [[go]],    [[:lua require("mappings").oppoSelection()<cr>]], { "silent"})
+map("n", [[<A-v>]], [[<C-q>]],                                        {"noremap"})
 -- }}} Search & Jumping
 -- Scratch file
 map("n", [[<C-n>]], [[:<c-u>new<cr>]], {"silent"})
@@ -170,10 +119,10 @@ map("n", [[q]], [[:lua require"smartClose".main("window")<cr>]], {"silent"})
 map("n", [[Q]], [[:lua require"smartClose".main("buffer")<cr>]], {"silent"})
 -- Window
 function M.winFocus(command) cmd(command); if vim.bo.buftype == "terminal" then cmd "startinsert" end end
-map("", [[<C-w>h]], [[:lua require("init").winFocus("wincmd h")<cr>]],           {"silent", "novscode"})
-map("", [[<C-w>l]], [[:lua require("init").winFocus("wincmd l")<cr>]],           {"silent", "novscode"})
-map("", [[<C-w>j]], [[:lua require("init").winFocus("wincmd j")<cr>]],           {"silent", "novscode"})
-map("", [[<C-w>k]], [[:lua require("init").winFocus("wincmd k")<cr>]],           {"silent", "novscode"})
+map("", [[<C-w>h]], [[:lua require("mappings").winFocus("wincmd h")<cr>]],       {"silent", "novscode"})
+map("", [[<C-w>l]], [[:lua require("mappings").winFocus("wincmd l")<cr>]],       {"silent", "novscode"})
+map("", [[<C-w>j]], [[:lua require("mappings").winFocus("wincmd j")<cr>]],       {"silent", "novscode"})
+map("", [[<C-w>k]], [[:lua require("mappings").winFocus("wincmd k")<cr>]],       {"silent", "novscode"})
 map("", [[<C-w>v]], [[:lua require("consistantTab").splitCopy("wincmd v")<cr>]], {"silent", "novscode"})
 map("", [[<C-w>s]], [[:lua require("consistantTab").splitCopy("wincmd s")<cr>]], {"silent", "novscode"})
 map("", [[<C-w>V]], [[:only<cr><C-w>v]],                                         {"silent", "novscode"})
@@ -183,9 +132,9 @@ function M.bufSwitcher(command)
     cmd(command)
     while vim.bo.buftype == "terminal" or vim.bo.buftype == "quickfix" do cmd(command) end
 end
-map("", [[<A-h>]],  [[:lua require("init").bufSwitcher("bp")<cr>]],  {"silent", "novscode"})
-map("", [[<A-l>]],  [[:lua require("init").bufSwitcher("bn")<cr>]],  {"silent", "novscode"})
-map("", [[<C-w>O]], [[:lua require("closeOtherBuffer").main()<cr>]], {"silent", "novscode"})
+map("", [[<A-h>]],  [[:lua require("mappings").bufSwitcher("bp")<cr>]], {"silent", "novscode"})
+map("", [[<A-l>]],  [[:lua require("mappings").bufSwitcher("bn")<cr>]], {"silent", "novscode"})
+map("", [[<C-w>O]], [[:lua require("closeOtherBuffer").main()<cr>]],    {"silent", "novscode"})
 -- Tab
 map("", [[<A-S-h>]], [[:tabp<cr>]], {"silent", "novscode"})
 map("", [[<A-S-l>]], [[:tabn<cr>]], {"silent", "novscode"})
@@ -354,224 +303,6 @@ map("c", [[<C-d>]],   [[<Del>]])
 map("c", [[<C-S-e>]], [[<C-\>e]])
 map("c", [[<C-v>]],   [[<C-R>*]])
 -- }}} Mode: Commandline & Insert
--- }}} Key mapping
-
--- Plug-ins settings  {{{
--- Build-in plugin {{{
--- Netrow
-vim.g.loaded_netrw       = 1
-vim.g.loaded_netrwPlugin = 1
--- }}} Build-in plugin
-if vim.g.vscode == 1 then
-  -- VSCode do not need the next settings
-  return
-end
--- RishabhRD/nvim-cheat.sh {{{
-map("n", [[<C-S-l>]], [[:<c-u>Cheat<cr>]], {"silent"})
--- }}} RishabhRD/nvim-cheat.sh
--- mg979/docgen.vim {{{
-map("n", [[,d]], [[:<c-u>DocGen<cr>]], {"silent"})
--- }}} mg979/docgen.vim
--- AndrewRadev/splitjoin.vim {{{
-vim.g.splitjoin_align = 1
-vim.g.splitjoin_curly_brace_padding = 0
-map("n", [["gS"]], [[:<c-u>SplitjoinSplit<cr>]], {"silent"})
-map("n", [["gJ"]], [[:<c-u>SplitjoinJoin<cr>]],  {"silent"})
--- }}} AndrewRadev/splitjoin.vim
--- lag13/vim-create-variable {{{
-map("v", [[C]], [[<Plug>Createvariable]])
--- }}} lag13/vim-create-variable
--- SirVer/ultisnips {{{
--- Disable UltiSnips keymapping in favour of coc-snippets
-vim.g.UltiSnipsExpandTrigger = ""
-vim.g.UltiSnipsListSnippets = ""
-vim.g.UltiSnipsJumpForwardTrigger = ""
-vim.g.UltiSnipsJumpBackwardTrigger = ""
--- }}} SirVer/ultisnips
--- preservim/nerdcommenter {{{
-vim.g.NERDAltDelims_c = 1
-vim.g.NERDAltDelims_cpp = 1
-vim.g.NERDAltDelims_javascript = 1
-vim.g.NERDAltDelims_lua = 0
-function M.commentJump(keystroke) -- {{{
-    if api.nvim_get_current_line() ~= '' then
-        local saveReg = fn.getreg('"')
-        if keystroke == "o" then
-            cmd("normal! YpS" .. vim.g.FiletypeCommentDelimiter[vim.bo.filetype] .. " ")
-        elseif keystroke == "O" then
-            cmd("normal! YPS" .. vim.g.FiletypeCommentDelimiter[vim.bo.filetype] .. " ")
-        end
-        fn.setreg('"', saveReg)
-        cmd [[startinsert!]]
-    end
-end -- }}}
-map("n", [[g<space>o]], [[:lua require("init").commentJump("o")<cr>]], {"silent"})
-map("n", [[g<space>O]], [[:lua require("init").commentJump("O")<cr>]], {"silent"})
-
-map("n", [[g<space><space>]], [[<plug>NERDCommenterToggle]])
-map("v", [[g<space><space>]], [[<plug>NERDCommenterToggle]])
--- map("n", [[g<space>n]], [[<plug>NERDCommenterNested]])
--- map("v", [[g<space>n]], [[<plug>NERDCommenterNested]])
-map("n", [[g<space>i]], [[<plug>NERDCommenterInvert]])
-map("v", [[g<space>i]], [[<plug>NERDCommenterInvert]])
-
-map("n", [[g<space>s]], [[<plug>NERDCommenterSexy]])
-map("v", [[g<space>s]], [[<plug>NERDCommenterSexy]])
-
-map("n", [[g<space>y]], [[<plug>NERDCommenterYank]])
-map("v", [[g<space>y]], [[<plug>NERDCommenterYank]])
-
-map("n", [[g<space>$]], [[<plug>NERDCommenterToEOL]])
-map("n", [[g<space>A]], [[<plug>NERDCommenterAppend]])
-map("n", [[g<space>I]], [[<plug>NERDCommenterInsert]])
-
-map("v", [[<A-/>]], [[<plug>NERDCommenterAltDelims]])
-map("n", [[<A-/>]], [[<plug>NERDCommenterAltDelims]])
-
-map("n", [[g<space>n]], [[<plug>NERDCommenterAlignLeft]])
-map("v", [[g<space>n]], [[<plug>NERDCommenterAlignLeft]])
-map("n", [[g<space>b]], [[<plug>NERDCommenterAlignBoth]])
-map("v", [[g<space>b]], [[<plug>NERDCommenterAlignBoth]])
-
-map("n", [[g<space>u]], [[<plug>NERDCommenterUncomment]])
-map("v", [[g<space>u]], [[<plug>NERDCommenterUncomment]])
-
-vim.g.NERDSpaceDelims              = 1
-vim.g.NERDRemoveExtraSpaces        = 1
-vim.g.NERDCommentWholeLinesInVMode = 1
-vim.g.NERDLPlace                   = "{{{"
-vim.g.NERDRPlace                   = "}}}"
-vim.g.NERDCompactSexyComs          = 1
-vim.g.NERDToggleCheckAllLines      = 1
--- }}} preservim/nerdcommenter
--- junegunn/vim-easy-align {{{
-vim.g.easy_align_delimiters = vim.g.easy_align_delimiters or {}
--- Lua comment
-vim.g.easy_align_delimiters = { ["l"] = {
-    pattern       = '--',
-    left_margin   = 2,
-    right_margin  = 1,
-    stick_to_left = 0 ,
-    ignore_groups = {'String'}
-    }
-}
-map("v", [[A]],  [[<Plug>(EasyAlign)]])
-map("n", [[ga]], [[<Plug>(EasyAlign)]])
--- }}} junegunn/vim-easy-align
--- szw/vim-maximizer {{{
-map("", [[<C-w>m]], [[:MaximizerToggle<cr>]], {"silent"})
--- }}} szw/vim-maximizer
--- zatchheems/vim-camelsnek {{{
-vim.g.camelsnek_alternative_camel_commands = 1
-vim.g.camelsnek_no_fun_allowed             = 1
-vim.g.camelsnek_iskeyword_overre           = 0
-map("v", [[<A-c>]],   [[:call CaseSwitcher()<cr>]],                         {"silent"})
-map("n", [[<A-c>]],   [[:<c-u>call CaseSwitcher()<cr>]],                    {"silent"})
-map("n", [[<A-S-c>]], [[:<c-u>call CaseSwitcherDefaultCMDListOrder()<cr>]], {"silent"})
--- }}} zatchheems/vim-vimsnek
--- bkad/camelcasemotion {{{
-vim.g.camelcasemotion_key = ','
--- }}} bkad/camelcasemotion
--- andymass/vim-matchup {{{
--- vim.g.matchup_matchparen_deferred = 1
--- vim.g.matchup_matchparen_hi_surround_always = 1
--- vim.g.matchup_matchparen_hi_background = 1
-vim.g.matchup_matchparen_offscreen = {method = 'popup', highlight = 'OffscreenPopup'}
-vim.g.matchup_matchparen_nomode = "i"
-vim.g.matchup_delim_noskips = 0
--- Text obeject
-map("x", [[am]],      [[<Plug>(matchup-a%)]])
-map("x", [[im]],      [[<Plug>(matchup-i%)]])
-map("o", [[am]],      [[<Plug>(matchup-a%)]])
-map("o", [[im]],      [[<Plug>(matchup-i%)]])
--- Inclusive
-map("",  [[<C-m>]],   [[<Plug>(matchup-%)]])
-map("",  [[<C-S-m>]], [[<Plug>(matchup-g%)]])
--- Exclusive
-map("",  [[m]],       [[<Plug>(matchup-]%)]])
-map("",  [[M]],       [[<Plug>(matchup-[%)]])
--- Highlight
-map("n", [[<leader>m]], [[<plug>(matchup-hi-surround)]])
--- Origin mark
-map("",  [[<A-m>]], [[m]], {"noremap"})
--- }}} andymass/vim-matchup
--- landock/vim-expand-region {{{
-vim.g.expand_region_text_objects = {
-            ['iw'] = 0,
-            ['iW'] = 0,
-            ['i"'] = 0,
-            ["i'"] = 0,
-            ['i]'] = 1,
-            ['ib'] = 1,
-            ['iB'] = 1,
-            ['il'] = 0,
-            ['ii'] = 0,
-            ['ip'] = 1,
-            ['ie'] = 0,
-            }
-cmd([[call expand_region#custom_text_objects({ "\/\\n\\n\<CR>": 0, 'i,w':1, 'i%':0, 'a]' :0, 'ab' :0, 'aB' :0, 'ai' :0, })]])
-map("", [[<A-a>]], [[<Plug>(expand_region_expand)]])
-map("", [[<A-s>]], [[<Plug>(expand_region_shrink)]])
--- }}} landock/vim-expand-region
--- liuchengxu/vista.vim {{{
-vim.g.vista_default_executive = 'ctags'
-vim.g.vista_icon_indent = {"╰─▸ ", "├─▸ "}
-cmd [=[let g:vista#finders = ['fzf']]=]
--- Base on Sarasa Nerd Mono SC
-cmd [[let g:vista#renderer#icons = {"variable": "\uF194"}]]
-map("n", [[<leader>s]], [[:Vista!!<cr>]], {"silent"})
--- }}} liuchengxu/vista.vim
--- simnalamburt/vim-mundo {{{
-vim.g.mundo_help               = 1
-vim.g.mundo_tree_statusline    = 'Mundo'
-vim.g.mundo_preview_statusline = 'Mundo Preview'
-map("n", [[<c-u>]], [[:<c-u>MundoToggle<cr>]], {"silent"})
--- }}} simnalamburt/vim-mundo
--- tommcdo/vim-exchange {{{
-map("n", [[gx]],  [[<Plug>(Exchange)]])
-map("x", [[X]],   [[<Plug>(Exchange)]])
-map("n", [[gxc]], [[<Plug>(ExchangeClear)]])
-map("n", [[gxx]], [[<Plug>(ExchangeLine)]])
--- }}} tommcdo/vim-exchange
--- phaazon/hop.nvim {{{
-map("", [[<leader>f]], [[:lua require("hop").hint_char1()<cr>]], {"silent"})
-map("", [[<leader>F]], [[:lua require("hop").hint_lines()<cr>]], {"silent"})
--- }}} phaazon/hop.nvim
--- michaeljsmith/vim-indent-object {{{
-vim.g.indentLine_char                   = "▏"
-vim.g.indent_blankline_buftype_exclude  = {"terminal"}
-vim.g.indent_blankline_filetype_exclude = {"help", "startify"}
-vim.g.indent_blankline_bufname_exclude  = {"*.md"}
-vim.g.indent_blankline_use_treesitter   = true
-vim.g.indent_blankline_char_highlight   = "SignColumn"
--- }}} michaeljsmith/vim-indent-object
--- Startify {{{
-vim.g.startify_session_dir  = '~/.nvimcache/session'
-vim.g.startify_padding_left = 20
-vim.g.startify_lists = {
-{type = 'files',     header = {string.rep(" ", vim.g.startify_padding_left) .. 'MRU'}            },
-{type = 'dir',       header = {string.rep(" ", vim.g.startify_padding_left) .. 'MRU ' .. fn.getcwd()}},
-{type = 'sessions',  header = {string.rep(" ", vim.g.startify_padding_left) .. 'Sessions'}       },
-{type = 'bookmarks', header = {string.rep(" ", vim.g.startify_padding_left) .. 'Bookmarks'}      },
-}
-vim.g.startify_update_oldfiles        = 1
-vim.g.startify_session_autoload       = 1
-if fn.has("win32") == 1 then
-    vim.g.startify_bookmarks = {{v = '~/AppData/Local/nvim'}, {c = "H:/code"}}
-end
-vim.g.startify_session_before_save    = {'echo "Cleaning up before saving.."' }
-vim.g.startify_session_persistence    = 1
-vim.g.startify_session_delete_buffers = 1
-vim.g.startify_change_to_vcs_root     = 1
-vim.g.startify_fortune_use_unicode    = 1
-vim.g.startify_relative_path          = 1
-vim.g.startify_use_env                = 1
-if fn.has("win32") == 1 then table.insert(vim.g.startify_bookmarks, 'H:/code') end
--- }}} Startify
--- iaso2h/nlua {{{
-vim.g.nlua_keywordprg_map_key = "<C-S-q>"
--- }}} iaso2h/nlua
--- }}} Plug-ins settings
 
 return M
 
