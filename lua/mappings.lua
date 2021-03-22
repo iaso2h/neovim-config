@@ -4,9 +4,7 @@ local cmd = vim.cmd
 local api = vim.api
 local map = require("util").map
 local M   = {}
-print("load mappings.lua")
 
-vim.g.mapleader = " " -- First thing first
 -- Don't truncate the name
 map("n", [[<C-g>]], [[:file!<cr>]], {"silent"})
 -- Tab switcher {{{
@@ -115,6 +113,7 @@ map("i", [[<C-'>]], [[<C-\><C-o>:reg<cr>]],        {"silent"})
 map("",  [[<A-'>]], [[:<c-u>call ClearReg()<cr>]], {"silent"})
 -- Buffer & Window & Tab{{{
 -- Smart quit
+-- Similar work: https://github.com/ojroques/nvim-bufdel
 map("n", [[q]], [[:lua require"smartClose".main("window")<cr>]], {"silent"})
 map("n", [[Q]], [[:lua require"smartClose".main("buffer")<cr>]], {"silent"})
 -- Window
@@ -128,16 +127,16 @@ map("", [[<C-w>s]], [[:lua require("consistantTab").splitCopy("wincmd s")<cr>]],
 map("", [[<C-w>V]], [[:only<cr><C-w>v]],                                         {"silent", "novscode"})
 map("", [[<C-w>S]], [[:only<cr><C-w>s]],                                         {"silent", "novscode"})
 -- Buffers
-function M.bufSwitcher(command)
-    cmd(command)
-    while vim.bo.buftype == "terminal" or vim.bo.buftype == "quickfix" do cmd(command) end
-end
-map("", [[<A-h>]],  [[:lua require("mappings").bufSwitcher("bp")<cr>]], {"silent", "novscode"})
-map("", [[<A-l>]],  [[:lua require("mappings").bufSwitcher("bn")<cr>]], {"silent", "novscode"})
+-- function M.bufSwitcher(command)
+    -- cmd(command)
+    -- while vim.bo.buftype == "terminal" or vim.bo.buftype == "quickfix" do cmd(command) end
+-- end
+-- map("", [[<A-h>]],  [[:lua require("mappings").bufSwitcher("bp")<cr>]], {"silent", "novscode"})
+-- map("", [[<A-l>]],  [[:lua require("mappings").bufSwitcher("bn")<cr>]], {"silent", "novscode"})
 map("", [[<C-w>O]], [[:lua require("closeOtherBuffer").main()<cr>]],    {"silent", "novscode"})
 -- Tab
-map("", [[<A-S-h>]], [[:tabp<cr>]], {"silent", "novscode"})
-map("", [[<A-S-l>]], [[:tabn<cr>]], {"silent", "novscode"})
+map("", [[<A-<>]], [[:tabp<cr>]], {"silent", "novscode"})
+map("", [[<A->>]], [[:tabn<cr>]], {"silent", "novscode"})
 -- }}} Buffer & Window & Tab
 -- Folding {{{
 map("",  [[[Z]],              [[zk]])

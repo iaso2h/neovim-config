@@ -101,7 +101,7 @@ cmd[[command! -nargs=0 O lua require('telescope.builtin').oldfiles(require('tele
 map("n", [[<C-e>]],   [[:lua require('telescope.builtin').find_files(require('telescope.themes').get_dropdown({}))<cr>]],                {"novscode", "silent"})
 map("n", [[<C-S-e>]], [[:Telescope ]],                                                                                                   {"novscode", "silent"})
 map("n", [[<C-f>f]],  [[:lua require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown({}))<cr>]], {"novscode", "silent"})
-map("n", [[<C-f>g]],  [[:lua require('telescope.builtin').live_grep(require('telescope.themes').get_dropdown({}))<cr>]],                 {"novscode", "silent"})
+map("n", [[<C-S-f>]],  [[:lua require('telescope.builtin').live_grep(require('telescope.themes').get_dropdown({}))<cr>]],                 {"novscode", "silent"})
 map("n", [[<C-f>b]],  [[:lua require('telescope.builtin').buffers(require('telescope.themes').get_dropdown({}))<cr>]],                   {"novscode", "silent"})
 map("n", [[<C-S-c>]], [[:lua require('telescope.builtin').commands(require('telescope.themes').get_dropdown({}))<cr>]],                  {"novscode", "silent"})
 map("n", [[<C-S-p>]], [[:lua require('telescope.builtin').builtin(require('telescope.themes').get_dropdown({}))<cr>]],                   {"novscode", "silent"})

@@ -1,3 +1,4 @@
+
 " Copyright (C) 2016-present Arctic Ice Studio <development@arcticicestudio.com>
 " Copyright (C) 2016-present Sven Greb <development@svengreb.de>
 
@@ -175,7 +176,7 @@ function! s:h(group, style, ...)
     let s:group_colors[a:group] = s:highlight " Cache default highlight group settings
 
     if g:onedark_terminal_italics == 0
-    " if 1
+        " if 1
         if has_key(s:highlight, "cterm") && s:highlight["cterm"] == "italic"
             unlet s:highlight.cterm
         endif
@@ -743,7 +744,7 @@ call s:hi("CocErrorHighlight" , s:nord11_gui, "", s:nord11_term, "", "undercurl"
 call s:hi("CocWarningSign", s:nord13_gui, "", s:nord13_term, "", "", "")
 call s:hi("CocErrorSign" , s:nord11_gui, "", s:nord11_term, "", "", "")
 call s:hi("CocInfoSign" , s:nord8_gui, "", s:nord8_term, "", "", "")
-call s:hi("CocHintSign" , s:nord10_gui, "", s:nord10_term, "", "", "")
+call s:hi("CocHintSign" , s:nord13_gui, "", s:nord13_term, "", "", "")
 call s:hi("CocHighlightText" , "", s:nord3_gui_bright, "", s:nord3_term, "", "")
 call s:hi("CocWarningFloat", s:nord13_gui, s:nord2_gui, s:nord13_term, s:nord1_term, "", "")
 call s:hi("CocErrorFloat", s:nord11_gui, s:nord2_gui, s:nord11_term, s:nord1_term, "", "")
@@ -1042,4 +1043,31 @@ highlight TelescopeMatching       guifg=#5E81AC
 " Used for the prompt prefix
 highlight TelescopePromptPrefix   guifg=#88C0D0
 " }}} nvim-telescope/telescope.nvim
+
+" romgrk/barbar.nvim {{{
+call s:hi("BufferCurrent",       s:nord8_gui,  s:nord3_gui, s:nord8_term,  s:nord3_term, "", "")
+call s:hi("BufferCurrentIcon",   "",           s:nord3_gui, "",            s:nord3_term, "", "")
+call s:hi("BufferCurrentIndex",  s:nord8_gui,  s:nord3_gui, s:nord8_term,  s:nord3_term, "", "")
+call s:hi("BufferCurrentMod",    s:nord13_gui, s:nord3_gui, s:nord13_term, s:nord3_term, "", "")
+call s:hi("BufferCurrentSign",   s:nord8_gui,  s:nord3_gui, s:nord8_term,  s:nord3_term, "", "")
+call s:hi("BufferCurrentTarget", "#FFFFFF",    s:nord3_gui, s:nord10_term, s:nord3_term, "", "")
+
+call s:hi("BufferVisible",       "#66738e",    s:nord1_gui, s:nord3_term,  s:nord1_term, "", "")
+call s:hi("BufferVisibleIcon",   "#66738e",    s:nord1_gui, s:nord3_term,  s:nord1_term, "", "")
+call s:hi("BufferVisibleIndex",  "#66738e",    s:nord1_gui, s:nord3_term,  s:nord1_term, "", "")
+call s:hi("BufferVisibleMod",    s:nord13_gui, s:nord1_gui, s:nord13_term, s:nord1_term, "", "")
+call s:hi("BufferVisibleSign",   s:nord8_gui,  s:nord1_gui, s:nord8_term,  s:nord1_term, "", "")
+call s:hi("BufferVisibleTarget", "#ED427C",    s:nord1_gui, s:nord11_term, s:nord1_term, "", "")
+
+
+hi! link BufferInactive       BufferVisible
+hi! link BufferInactiveIcon   BufferVisibleIcon
+hi! link BufferInactiveIndex  BufferVisibleIndex
+hi! link BufferInactiveMod    BufferVisibleMod
+hi! link BufferInactiveSign   BufferVisibleSign
+hi! link BufferInactiveTarget BufferVisibleTarget
+
+call s:hi("BufferTabpages",       s:nord10_gui, s:nord3_gui, s:nord10_term, s:nord3_term, "", "")
+call s:hi("BufferInactiveTarget", s:nord5_gui,  s:nord1_gui, s:nord5_term,  s:nord1_term, "", "")
+" }}} romgrk/barbar.nvim
 

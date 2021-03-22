@@ -1,13 +1,13 @@
 -- File: cocSettings.vim
 -- Author: iaso2h
 -- Description: settings to control coc.nvim and coc plugin's behaviors
--- Last Modified: 一月 31, 2021
+-- Last Modified: 2021-03-22
 local vim = vim
-local fn = vim.fn
+local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
 local map = require("util").map
-local M = {}
+local M   = {}
 
 -- Extensions {{{
 vim.g.coc_global_extensions = {
@@ -27,6 +27,7 @@ vim.g.coc_global_extensions = {
 -- 'coc-nextword',
 -- }}}
 
+-- Known issue: https://github.com/neovim/neovim/issues/12587
 -- AutoCommad {{{
 api.nvim_exec([[
 augroup COC
@@ -62,13 +63,10 @@ function CheckCOCDiagnosticFirst(cocAction) -- {{{
 end -- }}}
 function M.showDoc() -- {{{
     if vim.bo.buftype == "help" then
-        print(1)
         cmd('h ' .. fn.expand('<cword>'))
     elseif api.nvim_eval("coc#rpc#ready()") == 1 then
-        print(2)
         api.nvim_call_function("CocActionAsync", {"doHover"})
     else
-        print(3)
         cmd('!' .. vim.o.keywordprg .. " " .. fn.expand('<cword>'))
     end
 end -- }}}
@@ -110,50 +108,50 @@ map("n", [[[E]], [[mz`z:call CocActionAsync('diagnosticPrevious', 'error')<CR>]]
 map("n", [[]E]], [[mz`z:call CocActionAsync('diagnosticNext',     'error')<CR>]], {"silent", "noremap"})
 map("n", [[<leader>e]], [[:CocList diagnostics<cr>]], {"silent"})
 -- GoTo code navigation.
-map("n", [[gd]], [[<Plug>(coc-definition)]],      {})
-map("n", [[gD]], [[<Plug>(coc-type-definition)]], {})
-map("n", [[gI]], [[<Plug>(coc-implementation)]],  {})
-map("n", [[gR]], [[<Plug>(coc-references-used)]], {})
+map("n", [[gd]], [[<Plug>(coc-definition)]])
+map("n", [[gD]], [[<Plug>(coc-type-definition)]])
+map("n", [[gI]], [[<Plug>(coc-implementation)]])
+map("n", [[gR]], [[<Plug>(coc-references-used)]])
 -- Show Document
-map("n", [[K]],     [[:lua require("plugins.coc").showDoc()<cr>]], {"silent"})
-map("n", [[<C-q>]], [[:lua require("plugins.coc").showDoc()<cr>]], {"silent"})
+map("n", [[K]],     [[:lua require("config.coc").showDoc()<cr>]], {"silent"})
+map("n", [[<C-q>]], [[:lua require("config.coc").showDoc()<cr>]], {"silent"})
 -- Symbol renaming
-map("n", [[<leader>r]], [[:lua COCDiagnosticFirst("rename")<cr>]],   {})
-map("n", [[<leader>R]], [[:lua COCDiagnosticFirst("refactor")<cr>]], {})
+map("n", [[<leader>r]], [[:lua CheckCOCDiagnosticFirst("rename")<cr>]])
+map("n", [[<leader>R]], [[:lua CheckCOCDiagnosticFirst("refactor")<cr>]])
 -- Formatting selected code.
-map("n", [[<A-f>]], [[:lua require("plugins.coc").formatCode(vim.fn.mode())<cr>]],       {"silent"})
-map("v", [[<A-f>]], [[:lua require("plugins.coc").formatCode(vim.fn.visualmode())<cr>]], {"silent"})
+map("n", [[<A-f>]], [[:lua require("config.coc").formatCode(vim.fn.mode())<cr>]],       {"silent"})
+map("v", [[<A-f>]], [[:lua require("config.coc").formatCode(vim.fn.visualmode())<cr>]], {"silent"})
 -- Code action operator
-map("v", [[<leader>a]], [[<Plug>(coc-codeaction-selected)]], {})
-map("n", [[<leader>a]], [[<Plug>(coc-codeaction-selected)]], {})
+map("v", [[<leader>a]], [[<Plug>(coc-codeaction-selected)]])
+map("n", [[<leader>a]], [[<Plug>(coc-codeaction-selected)]])
 -- Remap keys for applying codeAction to the current buffer.
-map("n", [[<A-Enter>]], [[<Plug>(coc-codeaction)]], {})
+map("n", [[<A-Enter>]], [[<Plug>(coc-codeaction)]])
 -- Apply AutoFix to problem on the current line.
-map("n", [[<A-S-Enter>]], [[<Plug>(coc-fix-current)]], {})
+map("n", [[<A-S-Enter>]], [[<Plug>(coc-fix-current)]])
 -- Function & Class text objects {{{
 -- NOTE: Requires 'textDocument.documentSymbol' support from the language server.
-map("v", [[if]], [[<Plug>(coc-funcobj-i)]], {})
-map("o", [[if]], [[<Plug>(coc-funcobj-i)]], {})
-map("v", [[af]], [[<Plug>(coc-funcobj-a)]], {})
-map("o", [[af]], [[<Plug>(coc-funcobj-a)]], {})
-map("v", [[ic]], [[<Plug>(coc-classobj-i)]], {})
-map("o", [[ic]], [[<Plug>(coc-classobj-i)]], {})
-map("v", [[ac]], [[<Plug>(coc-classobj-a)]], {})
-map("o", [[ac]], [[<Plug>(coc-classobj-a)]], {})
+map("v", [[if]], [[<Plug>(coc-funcobj-i)]])
+map("o", [[if]], [[<Plug>(coc-funcobj-i)]])
+map("v", [[af]], [[<Plug>(coc-funcobj-a)]])
+map("o", [[af]], [[<Plug>(coc-funcobj-a)]])
+map("v", [[ic]], [[<Plug>(coc-classobj-i)]])
+map("o", [[ic]], [[<Plug>(coc-classobj-i)]])
+map("v", [[ac]], [[<Plug>(coc-classobj-a)]])
+map("o", [[ac]], [[<Plug>(coc-classobj-a)]])
 -- }}} Function & Class text objects
 -- Scroll float windows/popups.
-map("n", [[<A-d>]], [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<PageDown>"]],               {"nowait", "noremap", "expr"})
-map("n", [[<A-e>]], [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<PageUp>"]],                 {"nowait", "noremap", "silent", "expr"})
-map("i", [[<A-d>]], [[coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : ""]], {"noremap", "silent", "nowait", "expr"})
-map("i", [[<A-e>]], [[coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : ""]], {"noremap", "silent", "nowait", "expr"})
+map("n", [[<A-d>]], [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<PageDown>"]],    {"nowait",  "noremap", "expr"})
+map("n", [[<A-e>]], [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<PageUp>"]],      {"nowait",  "noremap", "silent", "expr"})
+map("i", [[<A-d>]], [[coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : ""]], {"noremap", "silent",  "nowait", "expr"})
+map("i", [[<A-e>]], [[coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : ""]], {"noremap", "silent",  "nowait", "expr"})
 -- map("v", [[<A-d>]], [[coc#float#has_scroll() ? coc#float#scroll(1) : "\<PageDown>"]],               {"nowait", "noremap", "silent", "expr"})
 -- map("v", [[<A-e>]], [[coc#float#has_scroll() ? coc#float#scroll(0) : "\<PageUp>"]],                 {"nowait", "noremap", "silent", "expr"})
 
 -- Use <TAB> for selections ranges.
 -- NOTE: Requires 'textDocument/selectionRange' support from the language server.
 -- coc-tsserver, coc-python are the examples of servers that support it.
-map("n", [[<leader>s]], [[<Plug>(coc-range-select)]], {"silent"})
-map("v", [[<leader>s]], [[<Plug>(coc-range-select)]], {"silent"})
+-- map("n", [[<leader>s]], [[<Plug>(coc-range-select)]], {"silent"})
+-- map("v", [[<leader>s]], [[<Plug>(coc-range-select)]], {"silent"})
 -- Mappings for COC list
 map("n", [[<leader>ce]], [[:CocList extensions<cr>]], {"nowait", "noremap", "silent"})
 map("n", [[<leader>cc]], [[:CocList commands<cr>]],   {"nowait", "noremap", "silent"})
@@ -185,13 +183,13 @@ vim.g.coc_explorer_global_presets = {
     buffer = {['sources'] = {{['name'] = 'buffer', ['expand'] = true}}}
 }
 -- Use preset argument to open it
-map("n", [[<leader><A-1>]], [[:CocCommand explorer --preset floating<cr>]], {})
-map("n", [[<A-1>]],         [[:CocCommand explorer<cr>]],                   {})
--- map("n", [[<space>1]], [[:CocList explPresets<cr>]], {})
+map("n", [[<leader><C-w>e]], [[:CocCommand explorer --preset floating<cr>]])
+map("n", [[<C-w>e]],         [[:CocCommand explorer<cr>]])
+-- map("n", [[<space>1]], [[:CocList explPresets<cr>]])
 -- }}} COC-Explorer
 
 -- COC-Snippets {{{
-map("n", [[<C-j>]],     [[:CocCommand snippets]],  {})
+map("n", [[<C-j>]],     [[:CocCommand snippets]])
 map("n", [[<leader>j]], [[:CocList snippets<cr>]], {"silent"})
 vim.g.coc_snippet_next = '<Tab>'
 vim.g.coc_snippet_prev = '<S-Tab>'

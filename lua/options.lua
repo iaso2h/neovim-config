@@ -4,7 +4,6 @@ local cmd = vim.cmd
 local api = vim.api
 local M   = {}
 
-print("load options.lua")
 -- let &path.="src/include,/usr/include/AL,"
 
 -- GUI {{{
@@ -85,8 +84,8 @@ M.opts = {
     wildignorecase = true,
     wildoptions    = "pum",
     winhighlight   = "NormalNC:WinNormalNC",
-
 }
+
 -- }}} Basic settings
 for key, val in pairs(M.opts) do
     if optsLocal[key] ~= nil then

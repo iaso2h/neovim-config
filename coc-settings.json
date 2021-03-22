@@ -16,7 +16,7 @@
         //"json",
         "jsonc"
     ],
-    "diagnostic.enableSign": false,
+    "diagnostic.enableSign": true,
     "diagnostic.checkCurrentLine":                        true,
     "diagnostic.errorSign":                               "❌",
     "diagnostic.hintSign":                                "💡",
@@ -70,6 +70,7 @@
         "sh": "shfmt",
         "blade": "blade-formatter"
     },
+    "explorer.icon.enableNerdfont": true,
     "list.normalMappings": {
         "?":     "do:help",
         "d":     "expr:GetDeleteAction",

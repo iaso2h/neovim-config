@@ -1,0 +1,62 @@
+local vim = vim
+local M   = {}
+local map = require("util").map
+
+-- Re-order to previous/next
+map("n", [[<A-S-h>]], [[:BufferMovePrevious<CR>]], {"noremap", "silent"})
+map("n", [[<A-S-l>]], [[:BufferMoveNext<cr>]],     {"noremap", "silent"})
+-- Goto buffer in position...
+map("n", [[<A-1>]], [[:BufferGoto 1<cr>]], {"noremap", "silent"})
+map("n", [[<A-2>]], [[:BufferGoto 2<cr>]], {"noremap", "silent"})
+map("n", [[<A-3>]], [[:BufferGoto 3<cr>]], {"noremap", "silent"})
+map("n", [[<A-4>]], [[:BufferGoto 4<cr>]], {"noremap", "silent"})
+map("n", [[<A-5>]], [[:BufferGoto 5<cr>]], {"noremap", "silent"})
+map("n", [[<A-6>]], [[:BufferGoto 6<cr>]], {"noremap", "silent"})
+map("n", [[<A-7>]], [[:BufferGoto 7<cr>]], {"noremap", "silent"})
+map("n", [[<A-8>]], [[:BufferGoto 8<cr>]], {"noremap", "silent"})
+map("n", [[<A-9>]], [[:BufferLast<cr>]],   {"noremap", "silent"})
+-- Magic buffer-picking mode
+map("n", [[<leader>b]], [[:BufferPick<cr>]], {"noremap", "silent"})
+-- Sort automatically by...
+map("n", [[gbd]], [[:BufferOrderByDirectory<cr>]], {"noremap", "silent"})
+map("n", [[gbl]], [[:BufferOrderByLanguage<cr>]],  {"noremap", "silent"})
+
+-- Other:
+-- :BarbarEnable - enables barbar (enabled by default)
+-- :BarbarDisable - very bad command, should never be used
+
+vim.g.bufferline = {
+    animation = true,
+    -- Enable/disable auto-hiding the tab bar when there is a single buffer
+    auto_hide = false,
+    -- Enable/disable close button
+    closable = true,
+    -- Enables/disable clickable tabs
+    --  - left-click: go to buffer
+    --  - middle-click: delete buffer
+    clickable = true,
+    -- Enable/disable icons
+    -- if set to 'numbers', will show buffer index in the tabline
+    -- if set to 'both', will show buffer index and icons in the tabline
+    icons = "both",
+    -- Sets the icon's highlight group.
+    -- If false, will use nvim-web-devicons colors
+    icon_custom_colors = false,
+    -- Configure icons on the bufferline.
+    icon_separator_active = '▎',
+    icon_separator_inactive = '▎',
+    icon_close_tab = '',
+    icon_close_tab_modified = '●',
+    -- Sets the maximum padding width with which to surround each tab
+    maximum_padding = 4,
+    -- If set, the letters for each buffer in buffer-pick mode will be
+    -- assigned based on their name. Otherwise or in case all letters are
+    -- already assigned, the behavior is to assign letters in order of
+    -- usability (see order below)
+    semantic_letters = true,
+    -- New buffer letters are assigned in this order. This order is
+    -- optimal for the qwerty keyboard layout but might need adjustement
+    -- for other layouts.
+    letters = 'asdfjkl;ghnmxcvbziowerutyqpASDFJKLGHNMXCVBZIOWERUTYQP'
+}
+

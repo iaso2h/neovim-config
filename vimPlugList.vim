@@ -3,12 +3,16 @@ if exists('g:vscode') == 1
 endif
 call plug#begin(stdpath('config') . '/plugged')
 Plug 'arcticicestudio/nord-vim'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'lukas-reineke/indent-blankline.nvim', {'branch': 'lua'}
-Plug 'norcalli/nvim-colorizer.lua'
+" Plug 'vim-airline/vim-airline'
+" Plug 'vim-airline/vim-airline-themes'
+Plug 'glepnir/galaxyline.nvim'
+Plug 'romgrk/barbar.nvim'
+Plug 'kyazdani42/nvim-web-devicons'
+" Plug 'norcalli/nvim-colorizer.lua'
+Plug 'RRethy/vim-hexokinase', {'do': 'make hexokinase'}
 Plug 'mhinz/vim-startify'
 
+Plug 'lukas-reineke/indent-blankline.nvim', {'branch': 'lua'}
 Plug 'simnalamburt/vim-mundo', {'on': 'MundoToggle'}
 Plug 'szw/vim-maximizer', {'on': 'MaximizerToggle'}
 Plug 'tpope/vim-repeat'
@@ -29,6 +33,9 @@ Plug 'bkad/camelcasemotion'
 Plug 'zatchheems/vim-camelsnek'
 Plug 'andymass/vim-matchup'
 Plug 'dm1try/golden_size'
+Plug 'antoinemadec/FixCursorHold.nvim'
+Plug 'monaqa/dial.nvim'
+" Plug 'kyazdani42/nvim-tree.lua'
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'honza/vim-snippets'
@@ -54,7 +61,9 @@ Plug 'MTDL9/vim-log-highlighting', {'for': 'log'}
 Plug 'mg979/docgen.vim'
 Plug 'RishabhRD/popfix'
 Plug 'RishabhRD/nvim-cheat.sh', {'on': ['Cheat', 'CheatList', 'CheatListWithoutComments', 'CheatWithoutComments']}
-Plug 'lambdalisue/gina.vim'
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+" Plug 'lewis6991/gitsigns.nvim'
 Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
 Plug 'skywind3000/asyncrun.vim'
 
@@ -72,6 +81,8 @@ Plug 'mfussenegger/nvim-dap-python', {'for': 'python'}
 Plug 'theHamsta/nvim-dap-virtual-text'
 Plug 'romgrk/nvim-treesitter-context'
 Plug 'p00f/nvim-ts-rainbow'
+Plug 'windwp/nvim-ts-autotag'
+Plug 'nvim-treesitter/nvim-treesitter-textobjects'
 
 Plug 'dahu/VimRegexTutor'
 Plug 'DanilaMihailov/vim-tips-wiki'

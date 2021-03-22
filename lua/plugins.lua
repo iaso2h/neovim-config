@@ -5,39 +5,31 @@ local api = vim.api
 local M   = {}
 local map = require("util").map
 
-require "plugins.vim-visual-multi"
-require "plugins.golden_size"
-require "plugins.markdown"
-require "plugins.asyncrun"
-require "plugins.telescope"
-require "plugins.treesitter"
-require "plugins.nvim-dap"
-require "plugins.coc"
+require "config.vim-visual-multi"
+require "config.golden_size"
+require "config.markdown"
+require "config.asyncrun"
+require "config.telescope"
+require "config.treesitter"
+require "config.nvim-dap"
+require "config.coc"
+require "config.barbar-nvim"
+require "config.galaxyline-nvim"
+-- require "config.gitsigns-nvim"
 
 if vim.g.vscode == 1 then
-    return
     -- VSCode do not need the next settings
+    return
 end
--- norcalli/nvim-colorizer.lua {{{
-require('colorizer').setup(
-    {
-        '*',                      -- Highlight all files, but customize some others.
-        css  = { rgb_fn = true},  -- Enable parsing rgb(...) functions in css.
-        html = { names = false}   -- Disable parsing "names" like Blue or Gray
-    },
-    {
-        RGB      = true;          -- #RGB hex codes
-        RRGGBB   = true;          -- #RRGGBB hex codes
-        names    = true;          -- "Name" codes like Blue
-        RRGGBBAA = true;          -- #RRGGBBAA hex codes
-        rgb_fn   = true;          -- CSS rgb() and rgba() functions
-        hsl_fn   = true;          -- CSS hsl() and hsla() functions
-        css      = true;          -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
-        css_fn   = true;          -- Enable all CSS *functions*: rgb_fn, hsl_fn
-        mode     = 'background';  -- Set the display mode.
-    }
-)
--- }}} norcalli/nvim-colorizer.lua
+
+-- monaqa/dial.nvim {{{
+map("n", [[<C-a>]],  [[<Plug>(dial-increment)]])
+map("n", [[<C-x>]],  [[<Plug>(dial-decrement)]])
+map("v", [[<C-a>]],  [[<Plug>(dial-increment)]])
+map("v", [[<C-x>]],  [[<Plug>(dial-decrement)]])
+map("v", [[g<C-a>]], [[<Plug>(dial-increment-additional)]])
+map("v", [[g<C-x>]], [[<Plug>(dial-decrement-additional)]])
+-- }}} monaqa/dial.nvim
 -- RishabhRD/nvim-cheat.sh {{{
 map("n", [[<C-S-l>]], [[:<c-u>Cheat<cr>]], {"silent"})
 -- }}} RishabhRD/nvim-cheat.sh
@@ -82,7 +74,7 @@ map("n", [[g<space>o]], [[:lua require("plugins").commentJump("o")<cr>]], {"sile
 map("n", [[g<space>O]], [[:lua require("plugins").commentJump("O")<cr>]], {"silent"})
 
 map("n", [[g<space><space>]], [[<plug>NERDCommenterToggle]])
-map("v", [[g<space>]],        [[<plug>NERDCommenterToggle]])
+map("v", [[g<space><space>]],        [[<plug>NERDCommenterToggle]])
 -- map("n", [[g<space>n]], [[<plug>NERDCommenterNested]])
 -- map("v", [[g<space>n]], [[<plug>NERDCommenterNested]])
 map("n", [[g<space>i]], [[<plug>NERDCommenterInvert]])
@@ -184,14 +176,6 @@ cmd([[call expand_region#custom_text_objects({ "\/\\n\\n\<CR>": 0, 'i,w':1, 'i%'
 map("", [[<A-a>]], [[<Plug>(expand_region_expand)]])
 map("", [[<A-s>]], [[<Plug>(expand_region_shrink)]])
 -- }}} landock/vim-expand-region
--- liuchengxu/vista.vim {{{
-vim.g.vista_default_executive = 'ctags'
-vim.g.vista_icon_indent = {"╰─▸ ", "├─▸ "}
-cmd [=[let g:vista#finders = ['fzf']]=]
-    -- Base on Sarasa Nerd Mono SC
-    cmd [[let g:vista#renderer#icons = {"variable": "\uF194"}]]
-map("n", [[<leader>s]], [[:Vista!!<cr>]], {"silent"})
--- }}} liuchengxu/vista.vim
 -- simnalamburt/vim-mundo {{{
 vim.g.mundo_help               = 1
 vim.g.mundo_tree_statusline    = 'Mundo'
@@ -242,5 +226,26 @@ vim.g.startify_use_env                = 1
 -- iaso2h/nlua {{{
 vim.g.nlua_keywordprg_map_key = "<C-S-q>"
 -- }}} iaso2h/nlua
+-- barbar {{{
+map("n", [[<A-h>]], [[:BufferPrevious<cr>]], {"noremap", "silent", "novscode"})
+map("n", [[<A-l>]], [[:BufferNext<cr>]],     {"noremap", "silent", "novscode"})
+-- }}} barbar
+-- liuchengxu/vista.vim {{{
+vim.g.vista_default_executive = 'ctags'
+vim.g.vista_icon_indent = {"╰─▸ ", "├─▸ "}
+cmd [=[let g:vista#finders = ['fzf']]=]
+-- Base on Sarasa Nerd Mono SC
+cmd [[let g:vista#renderer#icons = {"variable": "\uF194"}]]
+map("n", [[<leader>s]], [[:Vista!!<cr>]], {"silent"})
+-- }}} liuchengxu/vista.vim
+-- airblade/vim-gitgutter {{{
+vim.g.gitgutter_map_keys = 0
+map("n", [[]h]], [[<Plug>(GitGutterNextHunk)]])
+map("n", [[[h]], [[<Plug>(GitGutterPrevHunk)]])
+map("o", [[ih]], [[<Plug>(GitGutterTextObjectInnerPending)]])
+map("o", [[ah]], [[<Plug>(GitGutterTextObjectOuterPending)]])
+map("x", [[ih]], [[<Plug>(GitGutterTextObjectInnerVisual)]])
+map("x", [[ah]], [[<Plug>(GitGutterTextObjectOuterVisual)]])
+-- }}} airblade/vim-gitgutter
 return M
 

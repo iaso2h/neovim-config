@@ -9,6 +9,8 @@ local vim = vim
 vim.api.nvim_exec([[let $configPath = stdpath('config')]], false)
 vim.api.nvim_exec([[execute "source " . expand('$configPath/vimPlugList.vim')]], false)
 
+vim.g.mapleader = " " -- First thing first
+
 require "plugins"
 require "util"
 require "options"
@@ -33,4 +35,71 @@ vim.g.doxygen_enhanced_color = 1
 -- msql.vim
 vim.g.msql_sql_query = 1
 -- }}} Build-in plugin
+
+-- nvim-web-devicons {{{
+require'nvim-web-devicons'.setup {
+    -- your personnal icons can go here (to override)
+    -- DevIcon will be appended to `name`
+    override = {
+    html = {
+    icon = "",
+    color = "#DE8C92",
+    name = "html"
+    },
+    css = {
+    icon = "",
+    color = "#61afef",
+    name = "css"
+    },
+    js = {
+    icon = "",
+    color = "#EBCB8B",
+    name = "js"
+    },
+    png = {
+    icon = " ",
+    color = "#BD77DC",
+    name = "png"
+    },
+    jpg = {
+    icon = " ",
+    color = "#BD77DC",
+    name = "jpg"
+    },
+    jpeg = {
+    icon = " ",
+    color = "#BD77DC",
+    name = "jpeg"
+    },
+    mp3 = {
+    icon = "",
+    color = "#C8CCD4",
+    name = "mp3"
+    },
+    mp4 = {
+    icon = "",
+    color = "#C8CCD4",
+    name = "mp4"
+    },
+    out = {
+    icon = "",
+    color = "#C8CCD4",
+    name = "out"
+    },
+    toml = {
+    icon = "",
+    color = "#61afef",
+    name = "toml"
+    },
+    lock = {
+    icon = "",
+    color = "#DE6B74",
+    name = "lock"
+    }
+    };
+    -- globally enable default icons (default to false)
+    -- will get overriden by `get_icons` option
+    default = true;
+    }
+-- }}} nvim-web-devicons
 

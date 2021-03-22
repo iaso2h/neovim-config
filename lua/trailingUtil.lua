@@ -16,7 +16,7 @@ function M.trailingChar(trailingChar) -- {{{
         api.nvim_win_set_cursor(0, curPos)
     else
         local curLine = api.nvim_get_current_line()
-        if string.sub(curLine, #curLine - 1) ~= trailingChar then
+        if string.sub(curLine, #curLine) ~= trailingChar then
             curPos = api.nvim_win_get_cursor(0)
             cmd("normal! A" .. trailingChar)
             api.nvim_win_set_cursor(0, curPos)
