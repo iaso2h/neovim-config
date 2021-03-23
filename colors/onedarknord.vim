@@ -1055,7 +1055,7 @@ call s:hi("BufferCurrentTarget", "#FFFFFF",    s:nord3_gui, s:nord10_term, s:nor
 call s:hi("BufferVisible",       "#66738e",    s:nord1_gui, s:nord3_term,  s:nord1_term, "", "")
 call s:hi("BufferVisibleIcon",   "#66738e",    s:nord1_gui, s:nord3_term,  s:nord1_term, "", "")
 call s:hi("BufferVisibleIndex",  "#66738e",    s:nord1_gui, s:nord3_term,  s:nord1_term, "", "")
-call s:hi("BufferVisibleMod",    s:nord13_gui, s:nord1_gui, s:nord13_term, s:nord1_term, "", "")
+call s:hi("BufferVisibleMod",    "#9B8473",    s:nord1_gui, s:nord13_term, s:nord1_term, "", "")
 call s:hi("BufferVisibleSign",   s:nord8_gui,  s:nord1_gui, s:nord8_term,  s:nord1_term, "", "")
 call s:hi("BufferVisibleTarget", "#ED427C",    s:nord1_gui, s:nord11_term, s:nord1_term, "", "")
 

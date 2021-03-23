@@ -1,7 +1,7 @@
 -- File: cocSettings.vim
 -- Author: iaso2h
 -- Description: settings to control coc.nvim and coc plugin's behaviors
--- Last Modified: 2021-03-22
+-- Last Modified: 2021-03-23
 local vim = vim
 local fn  = vim.fn
 local cmd = vim.cmd
@@ -65,7 +65,7 @@ function M.showDoc() -- {{{
     if vim.bo.buftype == "help" then
         cmd('h ' .. fn.expand('<cword>'))
     elseif api.nvim_eval("coc#rpc#ready()") == 1 then
-        api.nvim_call_function("CocActionAsync", {"doHover"})
+        fn.CocActionAsync("doHover")
     else
         cmd('!' .. vim.o.keywordprg .. " " .. fn.expand('<cword>'))
     end

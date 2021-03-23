@@ -9,8 +9,8 @@ require "config.vim-visual-multi"
 require "config.golden_size"
 require "config.markdown"
 require "config.asyncrun"
-require "config.telescope"
-require "config.treesitter"
+require "config.telescope-nvim"
+require "config.nvim-treesitter"
 require "config.nvim-dap"
 require "config.coc"
 require "config.barbar-nvim"
@@ -122,7 +122,8 @@ map("v", [[A]],  [[<Plug>(EasyAlign)]])
 map("n", [[ga]], [[<Plug>(EasyAlign)]])
 -- }}} junegunn/vim-easy-align
 -- szw/vim-maximizer {{{
-map("", [[<C-w>m]], [[:MaximizerToggle<cr>]], {"silent"})
+map("",  [[<C-w>m]], [[:MaximizerToggle<cr>]],      {"silent"})
+map("t", [[<C-w>m]], [[<A-n>:MaximizerToggle<cr>]], {"silent"})
 -- }}} szw/vim-maximizer
 -- zatchheems/vim-camelsnek {{{
 vim.g.camelsnek_alternative_camel_commands = 1
@@ -172,7 +173,15 @@ vim.g.expand_region_text_objects = {
     ['ip'] = 1,
     ['ie'] = 0,
 }
-cmd([[call expand_region#custom_text_objects({ "\/\\n\\n\<CR>": 0, 'i,w':1, 'i%':0, 'a]' :0, 'ab' :0, 'aB' :0, 'ai' :0, })]])
+local expand_region_custom_text_objects = {
+    ['i,w'] = 1,
+    ['i%'] = 0,
+    ['a]'] = 0,
+    ab = 0,
+    aB = 0,
+    ai = 0
+}
+fn["expand_region#custom_text_objects"](expand_region_custom_text_objects)
 map("", [[<A-a>]], [[<Plug>(expand_region_expand)]])
 map("", [[<A-s>]], [[<Plug>(expand_region_shrink)]])
 -- }}} landock/vim-expand-region
@@ -226,16 +235,12 @@ vim.g.startify_use_env                = 1
 -- iaso2h/nlua {{{
 vim.g.nlua_keywordprg_map_key = "<C-S-q>"
 -- }}} iaso2h/nlua
--- barbar {{{
-map("n", [[<A-h>]], [[:BufferPrevious<cr>]], {"noremap", "silent", "novscode"})
-map("n", [[<A-l>]], [[:BufferNext<cr>]],     {"noremap", "silent", "novscode"})
--- }}} barbar
 -- liuchengxu/vista.vim {{{
 vim.g.vista_default_executive = 'ctags'
 vim.g.vista_icon_indent = {"╰─▸ ", "├─▸ "}
-cmd [=[let g:vista#finders = ['fzf']]=]
+vim.g["vista#finders"] = {'fzf'}
 -- Base on Sarasa Nerd Mono SC
-cmd [[let g:vista#renderer#icons = {"variable": "\uF194"}]]
+vim.g["vista#renderer#icons"] = {variable = "\\uF194"}
 map("n", [[<leader>s]], [[:Vista!!<cr>]], {"silent"})
 -- }}} liuchengxu/vista.vim
 -- airblade/vim-gitgutter {{{

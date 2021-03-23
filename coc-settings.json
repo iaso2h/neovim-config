@@ -109,8 +109,12 @@
         "vim",
         "client"
     ],
-    "Lua,hint.enable":              true,
-    "Lua,hint.setType":             true,
+    "Lua.hint.enable":              true,
+    "Lua.hint.setType":             true,
+    "Lua.hint.paramName":           true,
+    "Lua.hover.viewString":         true,
+    "Lua.completion.enable":        true,
+    "Lua.hover.enable":             true,
     "Lua.intelliSense.searchDepth": 3,
     "Lua.diagnostics.disable": [
         "lowercase-global"

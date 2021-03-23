@@ -454,25 +454,127 @@ end
 
 -- Convert UTF-8 hex code to character
 function M.u2char(code)
-  if type(code) == 'string' then code = tonumber('0x' .. code) end
-  local c = string.char
-  if code <= 0x7f then return c(code) end
-  local t = {}
-  if code <= 0x07ff then
-    t[1] = c(bit.bor(0xc0, bit.rshift(code, 6)))
-    t[2] = c(bit.bor(0x80, bit.band(code, 0x3f)))
-  elseif code <= 0xffff then
-    t[1] = c(bit.bor(0xe0, bit.rshift(code, 12)))
-    t[2] = c(bit.bor(0x80, bit.band(bit.rshift(code, 6), 0x3f)))
-    t[3] = c(bit.bor(0x80, bit.band(code, 0x3f)))
-  else
-    t[1] = c(bit.bor(0xf0, bit.rshift(code, 18)))
-    t[2] = c(bit.bor(0x80, bit.band(bit.rshift(code, 12), 0x3f)))
-    t[3] = c(bit.bor(0x80, bit.band(bit.rshift(code, 6), 0x3f)))
-    t[4] = c(bit.bor(0x80, bit.band(code, 0x3f)))
-  end
-  return table.concat(t)
+    if type(code) == 'string' then code = tonumber('0x' .. code) end
+    local c = string.char
+    if code <= 0x7f then return c(code) end
+    local t = {}
+    if code <= 0x07ff then
+        t[1] = c(bit.bor(0xc0, bit.rshift(code, 6)))
+        t[2] = c(bit.bor(0x80, bit.band(code, 0x3f)))
+    elseif code <= 0xffff then
+        t[1] = c(bit.bor(0xe0, bit.rshift(code, 12)))
+        t[2] = c(bit.bor(0x80, bit.band(bit.rshift(code, 6), 0x3f)))
+        t[3] = c(bit.bor(0x80, bit.band(code, 0x3f)))
+    else
+        t[1] = c(bit.bor(0xf0, bit.rshift(code, 18)))
+        t[2] = c(bit.bor(0x80, bit.band(bit.rshift(code, 12), 0x3f)))
+        t[3] = c(bit.bor(0x80, bit.band(bit.rshift(code, 6), 0x3f)))
+        t[4] = c(bit.bor(0x80, bit.band(code, 0x3f)))
+    end
+    return table.concat(t)
 end
+
+-- TODO: Clear scratch over times
+
+function M.splitExist()
+    local winCount  = fn.winnr("$")
+    local ui        = api.nvim_list_uis()[1]
+    -- Based on vim.o.guifont = "更纱黑体 Mono SC Nerd:h13"
+    if winCount == 2 and 232/2 < ui["width"] then cmd [[wincmd L]] end
+end
+
+
+local function newWin(func, funcArgList, bufListed, scratchBuf, layoutStyle, height2width, width2height)
+    local newBufNr = api.nvim_create_buf(bufListed, scratchBuf)
+    if layoutStyle == "col" then
+        cmd [[wincmd v]]
+        api.nvim_win_set_buf(0, newBufNr)
+        cmd("vertical resize " .. (api.nvim_win_get_width(0) - math.floor(api.nvim_win_get_height(0) * 0.618 * height2width)))
+    else
+        cmd [[wincmd s]]
+        api.nvim_win_set_buf(0, newBufNr)
+        cmd("resize " .. (api.nvim_win_get_height(0) - math.floor(api.nvim_win_get_width(0) * 0.618 * width2height)))
+    end
+    if func then
+        if next(funcArgList) then
+            func(newBufNr, funcArgList)
+        else
+            func(newBufNr)
+        end
+    end
+end
+
+----
+-- Function: M.newSplit :Create a new split window based on the window layout
+--
+-- @param funcName:    String value of function name
+-- @param funcArgList: function argument list, can be empty
+-- @param bufnamePat:  Switch to window contain the buffer that match the
+-- @param scratchBuf: Create a "throwaway" scratch-buffer when calling api.nvim_create_buf(), expected boolean
+-- @return: 0
+----
+function M.newSplit(funcName, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
+    local width2height = 0.3678
+    local height2width = 2.7188
+    local ui           = api.nvim_list_uis()[1]
+    local screenWidth  = ui.width
+    local screenHeight = ui.height
+    local winInfo      = fn.getwininfo()
+    local curWinID     = api.nvim_get_current_win()
+    local winLayout    = fn.winlayout()
+
+    -- Store windows ID for position restoration
+    M.newSplitLastBufNr = curWinID
+    -- Filter out invalid window of which height is 1
+    local winCount = 0
+    for _, tbl in ipairs(winInfo) do if tbl["height"] ~= 1 then winCount = winCount + 1 end end
+
+    -- If bufnamePat is provided and vim find the buffer that match the
+    -- pattern, Switch to that buffer in current window instead
+    if bufnamePat ~= "" then -- {{{
+        local matchResult
+        for _, tbl in ipairs(winInfo) do
+            matchResult = string.match(api.nvim_buf_get_name(api.nvim_win_get_buf(tbl["winid"])), bufnamePat)
+            if matchResult then
+                cmd(string.format("%dwincmd w", tbl["winnr"]))
+                cmd "startinsert"
+                return 0
+            end
+        end
+    end -- }}}
+
+    -- Create new windows based on various window count {{{
+    if winCount == 1 then -- {{{
+        if screenWidth <= screenHeight * height2width then
+            return newWin(funcName, funcArgList, bufListed, scratchBuf, "row", height2width, width2height)
+        else
+            return newWin(funcName, funcArgList, bufListed, scratchBuf, "col", height2width, width2height)
+        end -- }}}
+    elseif winCount == 2 then -- {{{
+        cmd "wincmd w"
+        return newWin(funcName, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height) -- }}}
+    elseif winCount == 3 then -- {{{
+        for _, layoutTbl in ipairs(winLayout[2]) do
+            local winID = layoutTbl[2]
+            if type(winID) == "number" then
+                -- TODO don't split on special buffer like coc-explorer
+                if winID ~= curWinID then
+                    for _, winTbl in ipairs(winInfo) do
+                        if winTbl["winid"] == winID then
+                            cmd(string.format("%dwincmd w", winTbl["winnr"]))
+                            return newWin(funcName, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
+                        end
+                    end
+                end
+                return newWin(funcName, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
+            end
+        end -- }}}
+    else -- {{{
+        if winCount > 4 then cmd "only" end
+        return newWin(funcName, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
+    end -- }}}
+    -- }}} Create new windows based on various window count
+end -- }}}
 
 return M
 

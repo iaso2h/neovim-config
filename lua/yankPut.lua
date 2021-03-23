@@ -1,3 +1,9 @@
+-- File: yankPut
+-- Author: iaso2h
+-- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
+-- Version: 0.0.12
+-- Last Modified: 2021/03/23
+
 local vim = vim
 local fn = vim.fn
 local cmd = vim.cmd
@@ -12,6 +18,7 @@ function M.VSCodeLineYank(visualMode, direction)
 
     -- Duplication {{{
     if string.lower(visualMode) == "v" then
+        cmd [[normal! gv]]
         -- Visual mode {{{
         local cursor = api.nvim_win_get_cursor(0)
         local selectStart = api.nvim_buf_get_mark(0, "<")
@@ -74,12 +81,18 @@ function M.inplaceYank(argTbl) -- {{{
     local curBufNr = api.nvim_get_current_buf()
     local pos1 = api.nvim_buf_get_mark(0, "[")
     local pos2 = api.nvim_buf_get_mark(0, "]")
+
+    -- Change position info to (0,0) index based
     if modeType == "line" then
-        pos1 = pos1[1] == operator.cursorPos[1] and {pos1[1] - 1, 0} or
-                                                {pos1[1] - 1, pos1[2]}
-        pos2 = {
-            pos2[1] - 1, #api.nvim_buf_get_lines(0, pos2[1] - 1, pos2[1], false)[1] - 1
-        }
+        pos1 = {pos1[1] - 1, 0}
+        -- Get the exact end position to avoid surprising pos2 value like {88, 2147483647}
+        local lines = #api.nvim_buf_get_lines(0, pos2[1] - 1, pos2[1], false)[1]
+        if lines ~= 0 then
+            pos2 = {pos2[1] - 1, lines - 1}
+        else
+            -- Avoid negative col index
+            pos2 = {pos2[1] - 1, lines}
+        end
     else
         pos1 = {pos1[1] - 1, pos1[2]}
         pos2 = {pos2[1] - 1, pos2[2]}
@@ -101,10 +114,9 @@ function M.inplaceYank(argTbl) -- {{{
     api.nvim_buf_clear_namespace(curBufNr, yankHLNS, 0, -1)
 
     local region = vim.region(curBufNr, pos1, pos2, fn.getregtype(),
-    vim.o.selection == "inclusive" and true or false)
+        vim.o.selection == "inclusive" and true or false)
     for lineNr, cols in pairs(region) do
-        api.nvim_buf_add_highlight(curBufNr, yankHLNS, opts["hlGroup"], lineNr, cols[1],
-        cols[2])
+        api.nvim_buf_add_highlight(curBufNr, yankHLNS, opts["hlGroup"], lineNr, cols[1], cols[2])
     end
 
     -- Restor cursor position

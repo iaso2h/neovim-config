@@ -11,8 +11,11 @@ local extension = require("galaxyline.provider_extensions")
 
 gl.short_line_list = {
     "LuaTree", "vista", "dbui", "startify", "term", "nerdtree", "fugitive",
-    "fugitiveblame", "plug", "coc-explorer", "Mundo", "MundoDiff", "vim-plug"
+    "fugitiveblame", "plug", "coc-explorer", "Mundo", "MundoDiff", "vim-plug",
+    "qf"
 }
+
+-- TODO support qf and statify
 
 local colors = {
     bg       = '#4C566A',
@@ -137,7 +140,7 @@ CocFunc = GalaxyGetCurFunc
 
 local hasFileType = function()
     local fileType = vim.bo.filetype
-    if not fileType or fileType == '' then return false end
+    if not fileType or fileType == "" then return false end
     return true
 end
 
@@ -180,7 +183,7 @@ gls.left[3] = {
         provider = function() return '' end,
         separator = " ",
         separator_highlight = {colors.bg, colors.line_bg},
-        highlight = {colors.bg, colors.line_bg}
+        highlight = {colors.bg, colors.line_bg},
     }
 }
 
@@ -257,7 +260,7 @@ gls.left[11] = {
         provider = function() return '' end,
         separator = '',
         separator_highlight = {colors.bg, colors.line_bg},
-        highlight = {colors.line_bg, colors.line_bg}
+        highlight = {colors.line_bg, colors.line_bg},
     }
 }
 
@@ -386,7 +389,8 @@ gls.right[1] = { -- {{{
         end,
         separator = '',
         separator_highlight = {colors.bg, colors.line_bg},
-        highlight = {colors.fg, colors.line_bg}
+        highlight = {colors.fg, colors.line_bg},
+        condition = hasFileType
     }
 }
 
@@ -395,7 +399,8 @@ gls.right[2] = {
         provider = function() return ' ' end,
         separator = '',
         separator_highlight = {colors.bg, colors.line_bg},
-        highlight = {colors.bg, colors.bg}
+        highlight = {colors.bg, colors.bg},
+        condition = hasFileType
     }
 }
 
@@ -446,7 +451,7 @@ gls.short_line_left[2] = {
                 end
             end
         end,
-        condition = condition.buffer_not_empty,
+        -- condition = condition.buffer_not_empty,
         highlight = {colors.blue, colors.bg, 'bold'}
     }
 }

@@ -1,8 +1,26 @@
 local vim = vim
+local cmd = vim.cmd
+local fn  = vim.fn
 local M   = {}
 local map = require("util").map
 
--- Re-order to previous/next
+function M.bufferSwitcher(CMD)
+    local fileType = vim.bo.filetype
+    local bufType  = vim.bo.buftype
+    if (fn.winnr("$") == 1 and vim.tbl_contains(require("galaxyline").short_line_list, fileType)) or (fn.winnr("$") == 1 and bufType == "terminal") then
+            cmd(CMD)
+    else
+        if CMD == "bp" then
+            cmd "BufferPrevious"
+        else
+            cmd "BufferNext"
+        end
+    end
+end
+map("n", [[<A-h>]], [[:lua require("config.barbar-nvim").bufferSwitcher("bp")<cr>]], {"noremap", "silent", "novscode"})
+map("n", [[<A-l>]], [[:lua require("config.barbar-nvim").bufferSwitcher("bn")<cr>]], {"noremap", "silent", "novscode"})
+-- map("n", [[<A-h>]], [[:BufferPrevious<cr>]], {"noremap", "silent", "novscode"})
+-- map("n", [[<A-l>]], [[:BufferNext<cr>]],     {"noremap", "silent", "novscode"})
 map("n", [[<A-S-h>]], [[:BufferMovePrevious<CR>]], {"noremap", "silent"})
 map("n", [[<A-S-l>]], [[:BufferMoveNext<cr>]],     {"noremap", "silent"})
 -- Goto buffer in position...
@@ -59,4 +77,6 @@ vim.g.bufferline = {
     -- for other layouts.
     letters = 'asdfjkl;ghnmxcvbziowerutyqpASDFJKLGHNMXCVBZIOWERUTYQP'
 }
+
+return M
 

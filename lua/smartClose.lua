@@ -1,8 +1,10 @@
 -- File: smartClose.lua
 -- Author: iaso2h
 -- Description: Close window safely and wipe buffer without modifying the layout
--- Version: 0.0.8
--- Last Modified: 2021-02-27
+-- Version: 0.0.9
+-- Last Modified: 2021-03-23
+-- TODO: Q on qf not working well
+-- TODO: q on coc showouput not working well
 local fn = vim.fn
 local cmd = vim.cmd
 local api = vim.api
@@ -16,6 +18,7 @@ local curWinID
 local winIDTbl
 local winIDBufNrTbl
 local bufNrTbl
+
 
 ----
 -- Function: saveModified: Check buffer modification and ask save
@@ -43,6 +46,23 @@ local function saveModified(bufNr) -- {{{
     end
 end -- }}}
 
+
+-- Function: bwipe :perform a bufferline update for barbar.nvim after the origin vim bwipe
+--
+-- @param bufNr: bufNr, same as the origin vim bwipe
+----
+local function bwipe(bufNr)
+    if bufNr then
+        cmd("bwipe! " .. bufNr)
+    else
+        cmd "bwipe!"
+    end
+    if fn.exists("g:bufferline") == 1 then
+        fn['bufferline#update']()
+    end
+end
+
+
 ----
 -- Function: wipeBuf: Wipe buffer on all windows
 --
@@ -54,7 +74,7 @@ end -- }}}
 local function wipeBuf(checkBuftype) -- {{{
     -- Wipe unlisted buffer
     if not vim.tbl_contains(bufNrTbl, curBufNr) then
-        cmd "bwipe!"
+        bwipe()
         return
     end
     -- Check if it's called from a special buffer
@@ -68,7 +88,7 @@ local function wipeBuf(checkBuftype) -- {{{
         -- Return when false is evaluated
         if not saveModified(curBufNr) then return end
         if #winIDTbl == 1 then -- 1 Window
-            cmd("bwipe! " .. curBufNr)
+            bwipe(curBufNr)
         else -- 1+ Windows
             winIDBufNrTbl = {}
             local bufInstance = 0
@@ -95,7 +115,7 @@ local function wipeBuf(checkBuftype) -- {{{
             end
             -- Restore window focus
             api.nvim_set_current_win(curWinID)
-            cmd("bwipe! " .. curBufNr)
+            bwipe(curBufNr)
             -- Merge when there are two windows sharing the last buffer
             -- Note: eif this evaluated to true, then the current length of bufNrtble
             -- has been reduced to 1, #bufNrTbl is just a value of previous state
@@ -166,12 +186,12 @@ function M.main(type) -- {{{
                         if not saveModified(curBufNr) then
                             return
                         end
-                        cmd("bwipe! " .. curBufNr)
+                        bwipe(curBufNr)
                     end
                 else -- 1 Window
                     -- Return 0 when false is evaluated
                     if not saveModified(curBufNr) then return end
-                    cmd("bwipe! " .. curBufNr)
+                    bwipe(curBufNr)
                 end
             end
         end
