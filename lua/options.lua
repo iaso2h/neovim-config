@@ -43,7 +43,7 @@ local optsLocal = {
     winhighlight  = "wo",
 }
 
-M.opts = {
+local opts = {
     autoindent = true, cindent = true, expandtab = true, shiftround = true, shiftwidth=4, softtabstop=4, tabstop=4,
     clipboard      = "unnamed",
     cmdheight      = 2,
@@ -87,7 +87,7 @@ M.opts = {
 }
 
 -- }}} Basic settings
-for key, val in pairs(M.opts) do
+for key, val in pairs(opts) do
     if optsLocal[key] ~= nil then
         vim[optsLocal[key]][key] = val
     end

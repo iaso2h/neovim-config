@@ -505,14 +505,16 @@ end
 ----
 -- Function: M.newSplit :Create a new split window based on the window layout
 --
--- @param funcName:    String value of function name
--- @param funcArgList: function argument list, can be empty
--- @param bufnamePat:  Switch to window contain the buffer that match the
--- @param scratchBuf: Create a "throwaway" scratch-buffer when calling api.nvim_create_buf(), expected boolean
+-- @param func:        function object to be executed after new window is
+-- create. This function must accept the buffer number of the new buffer as the first argument
+-- @param funcArgList: function argument table, can be empty
+-- @param bufnamePat:  Shift focus to window if any window contains the buffer that match the given pattern, can be an empty string
+-- @param bufListed:   Determine whether the new create buffer listed when calling api.nvim_create_buf(), expected boolean
+-- @param scratchBuf:  Create a "throwaway" scratch-buffer when calling api.nvim_create_buf(), expected boolean
 -- @return: 0
 ----
-function M.newSplit(funcName, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
-    local winInfo               = fn.getwininfo()
+function M.newSplit(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
+    local winInfo = fn.getwininfo()
 
     -- Filter out invalid window of which height is 1
     local winCount = 0
@@ -545,14 +547,13 @@ function M.newSplit(funcName, funcArgList, bufnamePat, bufListed, scratchBuf) --
     M.newSplitLastBufNr = curWinID
 
     -- If bufnamePat is provided and vim find the buffer that match the
-    -- pattern, Switch to that buffer in current window instead
+    -- pattern, Shift focus to that buffer in current window instead
     if bufnamePat ~= "" then -- {{{
         local matchResult
         for _, tbl in ipairs(winInfo) do
             matchResult = string.match(api.nvim_buf_get_name(api.nvim_win_get_buf(tbl["winid"])), bufnamePat)
             if matchResult then
                 cmd(string.format("%dwincmd w", tbl["winnr"]))
-                cmd "startinsert"
                 return 0
             end
         end
@@ -561,13 +562,13 @@ function M.newSplit(funcName, funcArgList, bufnamePat, bufListed, scratchBuf) --
     -- Create new windows based on various window count {{{
     if winCount == 1 then -- {{{
         if screenWidth <= screenHeight * height2width then
-            return newWin(funcName, funcArgList, bufListed, scratchBuf, "row", height2width, width2height)
+            return newWin(func, funcArgList, bufListed, scratchBuf, "row", height2width, width2height)
         else
-            return newWin(funcName, funcArgList, bufListed, scratchBuf, "col", height2width, width2height)
+            return newWin(func, funcArgList, bufListed, scratchBuf, "col", height2width, width2height)
         end -- }}}
     elseif winCount == 2 then -- {{{
         if not nonSplitFileTypeCheck then cmd "wincmd w" end
-        return newWin(funcName, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height) -- }}}
+        return newWin(func, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height) -- }}}
     elseif winCount == 3 then -- {{{
         if not nonSplitFileTypeCheck then
             for _, layoutTbl in ipairs(winLayout[2]) do
@@ -577,11 +578,11 @@ function M.newSplit(funcName, funcArgList, bufnamePat, bufListed, scratchBuf) --
                         for _, winTbl in ipairs(winInfo) do
                             if winTbl["winid"] == winID then
                                 cmd(string.format("%dwincmd w", winTbl["winnr"]))
-                                return newWin(funcName, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
+                                return newWin(func, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
                             end
                         end
                     end
-                    return newWin(funcName, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
+                    return newWin(func, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
                 end
             end
         else
@@ -589,17 +590,35 @@ function M.newSplit(funcName, funcArgList, bufnamePat, bufListed, scratchBuf) --
                 cmd "wincmd w"
             end
             if #winLayout[2] == 2 then
-                return newWin(funcName, funcArgList, bufListed, scratchBuf, "col", height2width, width2height)
+                return newWin(func, funcArgList, bufListed, scratchBuf, "col", height2width, width2height)
             else
-                return newWin(funcName, funcArgList, bufListed, scratchBuf, "row", height2width, width2height)
+                return newWin(func, funcArgList, bufListed, scratchBuf, "row", height2width, width2height)
             end
         end -- }}}
     else -- {{{
         if winCount > 4 then cmd "only" end
-        return newWin(funcName, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
+        return newWin(func, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
     end -- }}}
     -- }}} Create new windows based on various window count
 end -- }}}
+
+----
+-- Function: M.redirCatch : Redir Vim Ex-command output into a new created scratch buffer
+--
+-- @param CMD: String value of Vim Ex-command
+----
+function M.redirCatch(CMD)
+    local output = api.nvim_exec(string.format([[%s]], CMD), true)
+    require("util").newSplit(require("util").redirDump, {output}, "", false, true)
+end
+
+function M.redirDump(newBufNr, funcArgTbl)
+    Print(funcArgTbl)
+    local output = funcArgTbl[1]
+    local lines = vim.split(output, "\n", true)
+    api.nvim_buf_set_lines(newBufNr, 0, -1, false, lines)
+    api.nvim_put({string.format("\"%s\"", output)}, "l", false, false)
+end
 
 return M
 

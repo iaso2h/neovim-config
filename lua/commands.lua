@@ -71,8 +71,7 @@ augroup END
 -- Commands {{{
 api.nvim_exec([[
 command! -nargs=+ -complete=command  Echo PPmsg strftime('%c') . ": " . <args>
-command! -nargs=+ -complete=command  Redirc call Redir(<q-args>, "command")
-command! -nargs=+ -complete=function Redirf call Redir(<q-args>, "function")
+command! -nargs=+ -complete=command  Redir call luaeval('require("util").redirCatch(_A)', <q-args>)
 command! -nargs=0 -range ExtractSelection lua require("extractSelection").main(vim.fn.visualmode())
 command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | setl norevins
 command! -nargs=0 TrimWhiteSpaces call TrimWhiteSpaces(0)
