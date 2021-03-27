@@ -235,10 +235,10 @@ function M.tblLoaded(termInclude) -- {{{
     if not termInclude then
         bufTbl = vim.tbl_filter(function(buf)
             return string.match(buf, "term://") == nil
-        end, vim.split(fn.execute("ls"), '\n', false))
+        end, vim.split(fn.execute("ls!"), '\n', false))
         table.remove(bufTbl, 1)
     else
-        bufTbl = vim.split(fn.execute("ls"), '\n', false)
+        bufTbl = vim.split(fn.execute("ls!"), '\n', false)
         table.remove(bufTbl, 1)
     end
     return bufTbl
@@ -474,8 +474,6 @@ function M.u2char(code)
     return table.concat(t)
 end
 
--- TODO: Clear scratch over times
-
 function M.splitExist()
     local winCount  = fn.winnr("$")
     local ui        = api.nvim_list_uis()[1]
@@ -514,20 +512,37 @@ end
 -- @return: 0
 ----
 function M.newSplit(funcName, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
-    local width2height = 0.3678
-    local height2width = 2.7188
-    local ui           = api.nvim_list_uis()[1]
-    local screenWidth  = ui.width
-    local screenHeight = ui.height
-    local winInfo      = fn.getwininfo()
-    local curWinID     = api.nvim_get_current_win()
-    local winLayout    = fn.winlayout()
+    local winInfo               = fn.getwininfo()
 
-    -- Store windows ID for position restoration
-    M.newSplitLastBufNr = curWinID
     -- Filter out invalid window of which height is 1
     local winCount = 0
     for _, tbl in ipairs(winInfo) do if tbl["height"] ~= 1 then winCount = winCount + 1 end end
+
+    -- Check existence of special nonsplitfiletype
+    local nonSplitFileTypeTbl   = {"coc-explorer", "qf"}
+    local nonSplitFileTypeCheck = false
+    local bufFileTypeTbl = {}
+    for _, winTbl in ipairs(winInfo) do
+        bufFileTypeTbl[#bufFileTypeTbl + 1] = api.nvim_buf_get_option(winTbl["bufnr"], "filetype")
+    end
+    for _, fileType in ipairs(bufFileTypeTbl) do
+        if vim.tbl_contains(nonSplitFileTypeTbl, fileType) then
+            nonSplitFileTypeCheck = true
+        end
+    end
+    -- Do not split on special window
+    if winCount ~= 1 and vim.tbl_contains(nonSplitFileTypeTbl, vim.bo.filetype) then cmd "wincmd w" end
+
+    local width2height   = 0.3678
+    local height2width   = 2.7188
+    local ui             = api.nvim_list_uis()[1]
+    local screenWidth    = ui.width
+    local screenHeight   = ui.height
+    local curWinID       = api.nvim_get_current_win()
+    local winLayout      = fn.winlayout()
+
+    -- Store windows ID for position restoration
+    M.newSplitLastBufNr = curWinID
 
     -- If bufnamePat is provided and vim find the buffer that match the
     -- pattern, Switch to that buffer in current window instead
@@ -551,22 +566,32 @@ function M.newSplit(funcName, funcArgList, bufnamePat, bufListed, scratchBuf) --
             return newWin(funcName, funcArgList, bufListed, scratchBuf, "col", height2width, width2height)
         end -- }}}
     elseif winCount == 2 then -- {{{
-        cmd "wincmd w"
+        if not nonSplitFileTypeCheck then cmd "wincmd w" end
         return newWin(funcName, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height) -- }}}
     elseif winCount == 3 then -- {{{
-        for _, layoutTbl in ipairs(winLayout[2]) do
-            local winID = layoutTbl[2]
-            if type(winID) == "number" then
-                -- TODO don't split on special buffer like coc-explorer
-                if winID ~= curWinID then
-                    for _, winTbl in ipairs(winInfo) do
-                        if winTbl["winid"] == winID then
-                            cmd(string.format("%dwincmd w", winTbl["winnr"]))
-                            return newWin(funcName, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
+        if not nonSplitFileTypeCheck then
+            for _, layoutTbl in ipairs(winLayout[2]) do
+                local winID = layoutTbl[2]
+                if type(winID) == "number" then
+                    if winID ~= curWinID then
+                        for _, winTbl in ipairs(winInfo) do
+                            if winTbl["winid"] == winID then
+                                cmd(string.format("%dwincmd w", winTbl["winnr"]))
+                                return newWin(funcName, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
+                            end
                         end
                     end
+                    return newWin(funcName, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
                 end
-                return newWin(funcName, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
+            end
+        else
+            while vim.tbl_contains(nonSplitFileTypeTbl, vim.bo.filetype) or api.nvim_get_current_win() == curWinID do
+                cmd "wincmd w"
+            end
+            if #winLayout[2] == 2 then
+                return newWin(funcName, funcArgList, bufListed, scratchBuf, "col", height2width, width2height)
+            else
+                return newWin(funcName, funcArgList, bufListed, scratchBuf, "row", height2width, width2height)
             end
         end -- }}}
     else -- {{{

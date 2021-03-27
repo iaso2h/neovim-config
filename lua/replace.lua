@@ -52,7 +52,7 @@ local function correctRegtype(typeMode, register, regType ,replacement)
         -- and the replacement would put an additional newline to the end.
         -- To fix that, we temporarily remove the trailing newline character from
         -- the register contents and set the register type to characterwise yank.
-        fn.setreg(register, replacement["text"]:sub(1, #replacement["text"] - 2), 'v')
+        fn.setreg(register, replacement["text"]:sub(1, #replacement["text"] - 1), 'v')
         return 1
     end
 

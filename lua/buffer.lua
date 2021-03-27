@@ -1,8 +1,8 @@
--- File: smartClose.lua
+-- File: buffer.lua
 -- Author: iaso2h
--- Description: Close window safely and wipe buffer without modifying the layout
--- Version: 0.0.9
--- Last Modified: 2021-03-23
+-- Description: Close buffer in a smart way
+-- Version: 0.0.10
+-- Last Modified: 2021-03-27
 -- TODO: Q on qf not working well
 -- TODO: q on coc showouput not working well
 local fn = vim.fn
@@ -45,6 +45,32 @@ local function saveModified(bufNr) -- {{{
         return true
     end
 end -- }}}
+
+
+----
+-- Function: puregeBufList :Purge buffer list and preserve the current buffer and special buffer
+--
+-- @return: 0
+----
+local function puregeBufList()
+    curBufNr = api.nvim_get_current_buf()
+    bufNrTbl = vim.tbl_map(function(bufNr)
+        return tonumber(string.match(bufNr, "%d+"))
+    end, util.tblLoaded(false))
+    -- Filter out terminal and special buffer, because I don't want close them yet
+    local filterBuf = function(bufNr)
+        local bufType = vim.bo.buftype
+        return bufNr ~= curBufNr and (bufType == "" or bufType == "nofile" or bufType == "nowrite")
+    end
+
+    bufNrTbl = vim.tbl_filter(filterBuf, bufNrTbl)
+    -- Wipe buffers
+    for _, bufNr in ipairs(bufNrTbl) do
+        if api.nvim_buf_is_valid(bufNrTbl) then
+            cmd("bwipe! " .. bufNr)
+        end
+    end
+end
 
 
 -- Function: bwipe :perform a bufferline update for barbar.nvim after the origin vim bwipe
@@ -128,11 +154,18 @@ local function wipeBuf(checkBuftype) -- {{{
             local unwantedBufType = {"quickfix", "terminal"}
             if vim.tbl_contains(unwantedBufType, vim.bo.buftype) then cmd "bp" end
         end
+
         -- }}} Standard buffer
     end
 end -- }}}
 
-function M.main(type) -- {{{
+----
+-- Function: M.smartClose Close window safely and wipe buffer without modifying the layout
+--
+-- @param type: expect string value. possible value: "buffer", "window"
+-- @return: 0
+----
+function M.smartClose(type) -- {{{
     curBufName = api.nvim_buf_get_name(0)
     curBufNr = api.nvim_get_current_buf()
     curBufType = vim.o.buftype
@@ -200,6 +233,68 @@ function M.main(type) -- {{{
         wipeBuf(true)
     end
 end
+
+----
+-- Function: M.wipeOtherBuf wipe all the other buffers except for the special buffers without changing the window layout
+--
+-- @return: 0
+----
+function M.wipeOtherBuf()
+    curBufNr = api.nvim_get_current_buf()
+    bufNrTbl = vim.tbl_map(function(bufNr)
+        return tonumber(string.match(bufNr, "%d+"))
+    end, util.tblLoaded(false))
+    -- Filter out terminal and special buffer, because I don't want close them yet
+    local filterBuf = function(bufNr)
+        local bufType = vim.bo.buftype
+        return bufNr ~= curBufNr and (bufType == "" or bufType == "nofile" or bufType == "nowrite")
+    end
+
+    bufNrTbl = vim.tbl_filter(filterBuf, bufNrTbl)
+    winIDTbl = api.nvim_list_wins()
+    local unsavedChange = false
+    local answer = -1
+    -- Check unsaved change
+    for _, bufNr in ipairs(bufNrTbl) do
+        if bufNr ~= curBufNr then
+            local modified = api.nvim_buf_get_option(bufNr, "modified")
+            if modified then unsavedChange = true; break end
+        end
+    end
+    -- Ask for saving, return when cancel is input
+    if unsavedChange then
+        cmd "echohl MoreMsg"
+        answer = fn.confirm("Save modification?",
+            ">>> &Save\n&Discard\n&Cancel", 3, "Question")
+        cmd "echohl None"
+        -- Interrupt
+        if answer == 3 or answer == 0 then
+            return 0
+        elseif answer == 1 then
+            cmd "bufdo update"
+        end
+    end
+    -- Close other window that doesn't contain the current buffers
+    if #winIDTbl > 1 then
+        for _, winID in ipairs(winIDTbl) do
+            if vim.tbl_contains(bufNrTbl, api.nvim_win_get_buf(winID)) then
+                api.nvim_win_close(winID, false)
+            end
+        end
+    end
+    -- Wipe buffers
+    for _, bufNr in ipairs(bufNrTbl) do
+        if api.nvim_buf_is_valid(bufNrTbl) then
+            cmd("bwipe! " .. bufNr)
+        end
+    end
+
+    -- Update barbar.nvim tabline
+    if fn.exists("g:bufferline") == 1 then
+        fn['bufferline#update']()
+    end
+end
+
 
 return M
 

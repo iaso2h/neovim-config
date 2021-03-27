@@ -61,7 +61,6 @@ map("n", [[<A-v>]], [[<C-q>]],                                        {"noremap"
 -- Scratch file
 map("n", [[<C-n>]], [[:<c-u>new<cr>]], {"silent"})
 -- Open/Search in browser
--- TODO:
 map("v", [[<C-l>]], [[:lua require("openBrowser").openInBrowser(require("util").visualSelection("string"))<cr>]], {"silent"})
 -- Interrupt
 map("n", [[<C-A-c>]], [[:<c-u>call interrupt()<cr>]], {"noremap"})
@@ -114,8 +113,8 @@ map("",  [[<A-'>]], [[:<c-u>call ClearReg()<cr>]], {"silent"})
 -- Buffer & Window & Tab{{{
 -- Smart quit
 -- Similar work: https://github.com/ojroques/nvim-bufdel
-map("n", [[q]], [[:lua require"smartClose".main("window")<cr>]], {"silent"})
-map("n", [[Q]], [[:lua require"smartClose".main("buffer")<cr>]], {"silent"})
+map("n", [[q]], [[:lua require("buffer").smartClose("window")<cr>]], {"silent"})
+map("n", [[Q]], [[:lua require("buffer").smartClose("buffer")<cr>]], {"silent"})
 -- Window
 function M.winFocus(command) cmd(command); if vim.bo.buftype == "terminal" then cmd "startinsert" end end
 map("",  [[<C-w>h]],   [[:lua require("mappings").winFocus("wincmd h")<cr>]],       {"silent", "novscode"})
@@ -134,7 +133,7 @@ map("i", [[<C-S-w>=]], [[<C-\><C-O>:wincmd =<cr>]],                             
 -- end
 -- map("", [[<A-h>]],  [[:lua require("mappings").bufSwitcher("bp")<cr>]], {"silent", "novscode"})
 -- map("", [[<A-l>]],  [[:lua require("mappings").bufSwitcher("bn")<cr>]], {"silent", "novscode"})
-map("", [[<C-w>O]], [[:lua require("closeOtherBuffer").main()<cr>]],    {"silent", "novscode"})
+map("", [[<C-w>O]], [[:lua require("buffer").wipeOtherBuf()<cr>]],    {"silent", "novscode"})
 -- Tab
 map("", [[<A-<>]], [[:tabp<cr>]], {"silent", "novscode"})
 map("", [[<A->>]], [[:tabn<cr>]], {"silent", "novscode"})

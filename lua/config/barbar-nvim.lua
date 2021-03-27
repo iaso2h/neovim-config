@@ -7,8 +7,16 @@ local map = require("util").map
 function M.bufferSwitcher(CMD)
     local fileType = vim.bo.filetype
     local bufType  = vim.bo.buftype
-    if (fn.winnr("$") == 1 and vim.tbl_contains(require("galaxyline").short_line_list, fileType)) or (fn.winnr("$") == 1 and bufType == "terminal") then
+    if fn.winnr("$") == 1 then
+        if vim.tbl_contains(require("galaxyline").short_line_list, fileType) or bufType == "terminal" or bufType == "help" or bufType == "nofile" or bufType == "nowrite" then
             cmd(CMD)
+        else
+            if CMD == "bp" then
+                cmd "BufferPrevious"
+            else
+                cmd "BufferNext"
+            end
+        end
     else
         if CMD == "bp" then
             cmd "BufferPrevious"
