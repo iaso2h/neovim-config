@@ -2,13 +2,9 @@ if exists('g:vscode') == 1
     finish
 endif
 call plug#begin(stdpath('config') . '/plugged')
-Plug 'arcticicestudio/nord-vim'
-" Plug 'vim-airline/vim-airline'
-" Plug 'vim-airline/vim-airline-themes'
 Plug 'glepnir/galaxyline.nvim'
 Plug 'romgrk/barbar.nvim'
 Plug 'kyazdani42/nvim-web-devicons'
-" Plug 'norcalli/nvim-colorizer.lua'
 Plug 'RRethy/vim-hexokinase', {'do': 'make hexokinase'}
 Plug 'mhinz/vim-startify'
 
@@ -41,10 +37,6 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'honza/vim-snippets'
 Plug 'SirVer/ultisnips'
 Plug 'iaso2h/vim-scriptease', {'branch': 'ftplugin'}
-" python {{{
-Plug 'tmhedberg/SimpylFold', {'for': 'python'}
-Plug 'jmcantrell/vim-virtualenv', {'for': 'python'}
-" }}} python
 " lua {{{
 Plug 'davisdude/vim-love-docs', {'branch': 'build', 'for': 'lua'}
 Plug 'iaso2h/nlua.nvim', {'branch': 'iaso2h', 'for': 'lua'}
@@ -79,7 +71,7 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'mfussenegger/nvim-dap'
 Plug 'mfussenegger/nvim-dap-python', {'for': 'python'}
 Plug 'theHamsta/nvim-dap-virtual-text'
-Plug 'romgrk/nvim-treesitter-context'
+" Plug 'romgrk/nvim-treesitter-context'
 Plug 'p00f/nvim-ts-rainbow'
 Plug 'windwp/nvim-ts-autotag'
 Plug 'nvim-treesitter/nvim-treesitter-textobjects'

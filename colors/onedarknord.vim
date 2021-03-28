@@ -1,11 +1,3 @@
-
-" Copyright (C) 2016-present Arctic Ice Studio <development@arcticicestudio.com>
-" Copyright (C) 2016-present Sven Greb <development@svengreb.de>
-
-" Project: Nord Vim
-" Repository: https://github.com/arcticicestudio/nord-vim
-" License: MIT
-
 " Custom highlight {{{
 highlight NordMain guifg=#88c0d0 gui=bold
 highlight Myw term=bold guifg=white
@@ -1070,4 +1062,52 @@ hi! link BufferInactiveTarget BufferVisibleTarget
 call s:hi("BufferTabpages",       s:nord10_gui, s:nord3_gui, s:nord10_term, s:nord3_term, "", "")
 call s:hi("BufferInactiveTarget", s:nord5_gui,  s:nord1_gui, s:nord5_term,  s:nord1_term, "", "")
 " }}} romgrk/barbar.nvim
+
+highlight link TSAnnotation         PreProc
+highlight link TSAttribute          PreProc
+highlight link TSBoolean            Boolean
+highlight link TSCharacter          Character
+highlight link TSComment            Comment
+highlight link TSConditional        Conditional
+highlight link TSConstant           Constant
+highlight link TSConstBuiltin       Special
+highlight link TSConstMacro         Define
+highlight link TSConstructor        Special
+highlight link TSEmphasis           Italic
+highlight link TSError              Error
+highlight link TSException          Exception
+highlight link TSField              Identifier
+highlight link TSFloat              Float
+highlight link TSFunction           Function
+highlight link TSFuncBuiltin        Special
+highlight link TSFuncMacro          Macro
+highlight link TSInclude            Include
+highlight link TSKeyword            Keyword
+highlight link TSKeywordFunction    Keyword
+highlight link TSKeywordOperator    Operator
+highlight link TSLabel              Label
+highlight link TSLiteral            String
+highlight link TSMethod             Function
+call s:hi("TSNamespace", "#00ffe5", "", s:nord8_term, "", "", "")
+highlight link TSNumber             Number
+highlight link TSOperator           Operator
+highlight link TSParameter          Identifier
+highlight link TSParameterReference Identifier
+highlight link TSProperty           Identifier
+highlight link TSPunctBracket       Delimiter
+highlight link TSPunctDelimiter     Delimiter
+highlight link TSPunctSpecial       Delimiter
+highlight link TSRepeat             Repeat
+highlight link TSString             String
+highlight link TSStringEscape       SpecialChar
+highlight link TSStringRegex        String
+highlight link TSStrong             bold
+highlight link TSTag                Label
+highlight link TSTagDelimiter       Label
+highlight link TSTitle              Title
+highlight link TSType               Type
+highlight link TSTypeBuiltin        Type
+highlight link TSUnderline          Underlined
+highlight link TSURI                Underlined
+highlight link TSVariableBuiltin    Special
 

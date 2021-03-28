@@ -33,7 +33,6 @@ map("v", [[g<C-x>]], [[<Plug>(dial-decrement-additional)]])
 -- RishabhRD/nvim-cheat.sh {{{
 map("n", [[<C-S-l>]], [[:<c-u>Cheat<cr>]], {"silent"})
 -- }}} RishabhRD/nvim-cheat.sh
--- BUG
 -- mg979/docgen.vim {{{
 map("n", [[,d]], [[:<c-u>DocGen<cr>]], {"silent"})
 -- }}} mg979/docgen.vim

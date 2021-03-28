@@ -6,9 +6,10 @@ local M   = {}
 
 function M.compileCode()
     if vim.bo.filetype == "c" then
-        local srcPath = fn.expand('%:p')
+        local srcPath  = fn.expand('%:p')
         local srcNoExt = fn.expand('%:p:r')
-        local flags = '-Wall -std=c99'
+        local flags    = '-Wall -Wextra -std=c99 -g'
+        local ext      = fn.has("win32") == 1 and ".exe" or ".out"
         local prog
 
         if fn.executable('clang') then
@@ -20,7 +21,7 @@ function M.compileCode()
             return
         end
         -- lua require("%s").create_term_buf('v', 80)
-        local compileCMD = string.format("%s %s %s -o %s.exe", prog, flags, srcPath, srcNoExt)
+        local compileCMD = string.format("%s %s %s -o %s%s", prog, flags, srcPath, srcNoExt, ext)
         vim.g.asyncrun_status = 0
         cmd("AsyncRun " .. compileCMD)
         -- cmd printf('term %s.exe', l:srcNoExt)
