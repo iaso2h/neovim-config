@@ -183,8 +183,10 @@ vim.g.coc_explorer_global_presets = {
     buffer = {['sources'] = {{['name'] = 'buffer', ['expand'] = true}}}
 }
 -- Use preset argument to open it
-map("n", [[<leader><C-w>e]], [[:CocCommand explorer --preset floating<cr>]])
-map("n", [[<C-w>e]],         [[:CocCommand explorer<cr>]])
+map("n", [[<leader><C-w>e]], [[:CocCommand explorer --preset floating<cr>]],      {"silent"})
+map("t", [[<leader><C-w>e]], [[<A-n>:CocCommand explorer --preset floating<cr>]], {"silent"})
+map("n", [[<C-w>e]],         [[:CocCommand explorer<cr>]],                        {"silent"})
+map("t", [[<C-w>e]],         [[<A-n>:CocCommand explorer<cr>]],                   {"silent"})
 -- map("n", [[<space>1]], [[:CocList explPresets<cr>]])
 -- }}} COC-Explorer
 

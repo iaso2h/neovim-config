@@ -5,6 +5,8 @@ local api = vim.api
 local map = require("util").map
 local M   = {}
 
+-- Extraction
+map("v", [[C]], [[:lua require("extraction").main(nil, vim.fn.visualmode())<cr>]], {"silent"})
 -- Zeal query
 map("",  [[gz]], [[luaeval("require('operator').main(require('zeal').query, false, 'n')")]], {"silent", "expr"})
 map("v", [[Z]],  [[:lua require("zeal").query({"v"})<cr>]],                                  {"silent"})
@@ -78,6 +80,7 @@ map("", [[L]], [[$]])
 -- Non-blank last character
 map("", [[g$]], [[g_]], {"noremap"})
 -- Trailing character {{{
+map("n", [[g.]],      [[:lua require("trailingUtil").trailingChar(".")<cr>]],  {"silent"})
 map("n", [[g,]],      [[:lua require("trailingUtil").trailingChar(",")<cr>]],  {"silent"})
 map("n", [[g;]],      [[:lua require("trailingUtil").trailingChar(";")<cr>]],  {"silent"})
 map("n", [[g:]],      [[:lua require("trailingUtil").trailingChar(":")<cr>]],  {"silent"})
@@ -260,12 +263,14 @@ map("t", [[<C-w>h]],     [[<A-n><C-w>h]],                           {"novscode"}
 map("t", [[<C-w>l]],     [[<A-n><C-w>l]],                           {"novscode"})
 map("t", [[<C-w>w]],     [[<A-n><C-w>w]],                           {"novscode"})
 map("t", [[<C-w><C-w>]], [[<A-n><C-w><C-w>]],                       {"novscode"})
-map("t", [[<C-w>o]],     [[<A-n><C-w>o]],                           {"novscode"})
-map("t", [[<C-w>W]],     [[<A-n><C-w>W]],                           {"novscode"})
-map("t", [[<C-w>H]],     [[<A-n><C-w>H]],                           {"novscode"})
-map("t", [[<C-w>L]],     [[<A-n><C-w>L]],                           {"novscode"})
-map("t", [[<C-w>J]],     [[<A-n><C-w>J]],                           {"novscode"})
-map("t", [[<C-w>K]],     [[<A-n><C-w>K]],                           {"novscode"})
+map("t", [[<C-w>=]],     [[<A-n><C-w>=:startinsert<cr>]],           {"silent",  "novscode"})
+map("t", [[<C-w>o]],     [[<A-n><C-w>o:startinsert<cr>]],           {"silent",  "novscode"})
+map("t", [[<C-w>W]],     [[<A-n><C-w>W:startinsert<cr>]],           {"silent",  "novscode"})
+map("t", [[<C-w>H]],     [[<A-n><C-w>H:startinsert<cr>]],           {"silent",  "novscode"})
+map("t", [[<C-w>L]],     [[<A-n><C-w>L:startinsert<cr>]],           {"silent",  "novscode"})
+map("t", [[<C-w>J]],     [[<A-n><C-w>J:startinsert<cr>]],           {"silent",  "novscode"})
+map("t", [[<C-w>K]],     [[<A-n><C-w>K:startinsert<cr>]],           {"silent",  "novscode"})
+-- TODO: Split terminal in new instance
 -- }}} Mode: Terminal
 -- Mode: Commandline & Insert {{{
 map("i", [[<C-cr>]],  [[<esc>o]],  {"novscode"})

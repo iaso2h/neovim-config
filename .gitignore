@@ -7,4 +7,5 @@
 .netrwhist
 .vscode/
 .ccls-cache/
+*temp*
 

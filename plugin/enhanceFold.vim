@@ -215,11 +215,7 @@ endfunction " }}}
 
 function! EnhanceFoldRemoveHLMatch(...) " {{{
     while exists("g:enhanceFoldHLMatch[s:winID]") && g:enhanceFoldHLMatch[s:winID] != []
-        if CompareNeovimVersion("0.5.0", "<=")
-            call matchdelete(remove(g:enhanceFoldHLMatch[s:winID], 0), s:winID)
-        else
-            call matchdelete(remove(g:enhanceFoldHLMatch[s:winID], 0))
-        endif
+        call matchdelete(remove(g:enhanceFoldHLMatch[s:winID], 0))
     endwhile
 endfunction " }}}
 

@@ -43,7 +43,7 @@ map("n", [["gS"]], [[:<c-u>SplitjoinSplit<cr>]], {"silent"})
 map("n", [["gJ"]], [[:<c-u>SplitjoinJoin<cr>]],  {"silent"})
 -- }}} AndrewRadev/splitjoin.vim
 -- lag13/vim-create-variable {{{
-map("v", [[C]], [[<Plug>Createvariable]])
+-- map("v", [[C]], [[<Plug>Createvariable]])
 -- }}} lag13/vim-create-variable
 -- SirVer/ultisnips {{{
 -- Disable UltiSnips keymapping in favour of coc-snippets
@@ -128,9 +128,9 @@ map("t", [[<C-w>m]], [[<A-n>:MaximizerToggle<cr>]], {"silent"})
 vim.g.camelsnek_alternative_camel_commands = 1
 vim.g.camelsnek_no_fun_allowed             = 1
 vim.g.camelsnek_iskeyword_overre           = 0
-map("v", [[<A-c>]],   [[:call CaseSwitcher()<cr>]],                         {"silent"})
-map("n", [[<A-c>]],   [[:<c-u>call CaseSwitcher()<cr>]],                    {"silent"})
-map("n", [[<A-S-c>]], [[:<c-u>call CaseSwitcherDefaultCMDListOrder()<cr>]], {"silent"})
+map("v", [[<A-c>]],   [[:call CaseSwitcher()<cr>]],                               {"silent"})
+map("n", [[<A-c>]],   [[:lua require("caseSwitcher").cycleCase()<cr>]],           {"silent"})
+map("n", [[<A-S-c>]], [[:lua require("caseSwitcher").cycleDefaultCMDList()<cr>]], {"silent"})
 -- }}} zatchheems/vim-vimsnek
 -- bkad/camelcasemotion {{{
 vim.g.camelcasemotion_key = ','

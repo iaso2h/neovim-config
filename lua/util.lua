@@ -250,9 +250,9 @@ end -- }}}
 -- @param mode:    Same as nvim_set_keymap
 -- @param lhs:     Same as nvim_set_keymap
 -- @param rhs:     Same as nvim_set_keymap
--- @param optsTbl: Table value contain string elements that will be pass into
--- the fourth argument of nvim_set_keymap as the key name, and the value is set to
--- true
+-- @param optsTbl: Table value contain string elements that will be pass into_
+-- the fourth argument of nvim_set_keymap as the key name of value pairs, and
+-- the value is true
 ----
 function M.map(mode, lhs, rhs, optsTbl) -- {{{
     optsTbl = optsTbl or {}
@@ -367,23 +367,43 @@ function M.trailingEmptyLine() -- {{{
 end -- }}}
 
 ----
--- Function: TrimWhiteSpaces Trim all trailing white spaces in current buffer
+-- Function: TrimWhiteSpaces Trim all trailing white spaces in the current
+-- buffer or in the given string table
 --
 -- @param silent: non-zero value will show trimming result when complete
 ----
-function M.trimWhiteSpaces(silent) -- {{{
-    local saveView = fn.winsaveview()
-    silent = silent or 1
-    if silent == 1 then
-        cmd [[keeppatterns %s#\s\+$##e]]
-    else
-        cmd [[keeppatterns %s#\s\+$##e]]
-        local result = fn.execute [[g#\s\+$#p]]
-        local count = #M.matchAll(result, [[\n]])
-        cmd [[keeppatterns %s#\s\+$##e]]
-        api.nvim_echo({{count .. " line[s] trimmed", "Moremsg"}}, false, {})
+----
+-- Function: M.trimWhiteSpaces :Trim all trailing white spaces in current buffer
+--
+-- @param strTbl: Lua table of source string need to be trimmed
+-- @param silent: Non-zero value will show trimming result when complete
+-- @param trimSuffix: set to true to trim the suffix as well
+-- @return:       return table of trimmed string, otherwise return 0
+----
+function M.trimWhiteSpaces(strTbl, silent, trimSuffix) -- {{{
+    if not strTbl then
+        local saveView = fn.winsaveview()
+        silent = silent or 1
+        if silent == 1 then
+            cmd [[keeppatterns %s#\s\+$##e]]
+        else
+            cmd [[keeppatterns %s#\s\+$##e]]
+            local result = fn.execute [[g#\s\+$#p]]
+            local count = #M.matchAll(result, [[\n]])
+            cmd [[keeppatterns %s#\s\+$##e]]
+            api.nvim_echo({{count .. " line[s] trimmed", "Moremsg"}}, false, {})
+        end
+        fn.winrestview(saveView)
+    elseif next(strTbl) then
+        if trimSuffix then
+            strTbl = vim.tbl_map(function(str)
+                return fn.substitute(str, "^\\s\\+", "", "")
+            end, strTbl)
+        end
+        return vim.tbl_map(function(str)
+            return fn.substitute(str, "\\s\\+$", "", "")
+        end, strTbl)
     end
-    fn.winrestview(saveView)
 end -- }}}
 
 ----
@@ -398,6 +418,7 @@ function M.saveReg() -- {{{
     M.restoreReg = function()
         fn.setreg('"', unnamed, unnamedType)
         fn.setreg('*', quote, quoteType)
+        vim.defer_fn(function() M.restoreReg = nil end, 1000)
     end
 end -- }}}
 
@@ -601,24 +622,6 @@ function M.newSplit(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
     end -- }}}
     -- }}} Create new windows based on various window count
 end -- }}}
-
-----
--- Function: M.redirCatch : Redir Vim Ex-command output into a new created scratch buffer
---
--- @param CMD: String value of Vim Ex-command
-----
-function M.redirCatch(CMD)
-    local output = api.nvim_exec(string.format([[%s]], CMD), true)
-    require("util").newSplit(require("util").redirDump, {output}, "", false, true)
-end
-
-function M.redirDump(newBufNr, funcArgTbl)
-    Print(funcArgTbl)
-    local output = funcArgTbl[1]
-    local lines = vim.split(output, "\n", true)
-    api.nvim_buf_set_lines(newBufNr, 0, -1, false, lines)
-    api.nvim_put({string.format("\"%s\"", output)}, "l", false, false)
-end
 
 return M
 
