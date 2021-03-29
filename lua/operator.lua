@@ -18,7 +18,7 @@ endfunction
 -- function will abort when the modifiable option is off
 -- @return: string value "g@" when successful
 ----
-function M.main(func, checkModifiable)
+function M.main(func, checkModifiable, vimMode)
     if checkModifiable then
         if not vim.o.modifiable or vim.o.readonly then
             api.nvim_echo({{"Cannot make changes", "MoreMsg"}}, true, {})
@@ -26,6 +26,11 @@ function M.main(func, checkModifiable)
         end
     end
     if vim.v.register == "=" then return end
+    if vimMode then
+        M.vimMode = vimMode
+    else
+        M.vimMode = nil
+    end
 
     Opfunc = func
     M.cursorPos = api.nvim_win_get_cursor(0)

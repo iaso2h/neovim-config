@@ -5,6 +5,9 @@ local api = vim.api
 local map = require("util").map
 local M   = {}
 
+-- Zeal query
+map("",  [[gz]], [[luaeval("require('operator').main(require('zeal').query, false, 'n')")]], {"silent", "expr"})
+map("v", [[Z]],  [[:lua require("zeal").query({"v"})<cr>]],                                  {"silent"})
 -- Don't truncate the name
 map("n", [[<C-g>]], [[:file!<cr>]], {"silent"})
 -- Tab switcher {{{
@@ -194,7 +197,7 @@ map("n", [[<leader>p]], [["0p]])
 map("n", [[<leader>P]], [["0P]])
 -- Inplace yank
 map("n", [[Y]], [[yy]])
-map("",  [[y]], [[luaeval("require('operator').main(require('yankPut').inplaceYank, false)")]], {"silent", "expr"})
+map("",  [[y]], [[luaeval("require('operator').main(require('yankPut').inplaceYank, false, nil)")]], {"silent", "expr"})
 -- Inplace put
 map("n", [[p]], [[:lua require("yankPut").inplacePut("n", "p")<cr>]], {"silent"})
 map("v", [[p]], [[:lua require("yankPut").inplacePut("v", "p")<cr>]], {"silent"})
