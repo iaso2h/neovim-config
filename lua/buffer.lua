@@ -244,6 +244,7 @@ function M.wipeOtherBuf()
     bufNrTbl = vim.tbl_map(function(bufNr)
         return tonumber(string.match(bufNr, "%d+"))
     end, util.tblLoaded(false))
+
     -- Filter out terminal and special buffer, because I don't want close them yet
     local filterBuf = function(bufNr)
         local bufType = vim.bo.buftype
@@ -254,6 +255,7 @@ function M.wipeOtherBuf()
     winIDTbl = api.nvim_list_wins()
     local unsavedChange = false
     local answer = -1
+
     -- Check unsaved change
     for _, bufNr in ipairs(bufNrTbl) do
         if bufNr ~= curBufNr then
@@ -261,6 +263,7 @@ function M.wipeOtherBuf()
             if modified then unsavedChange = true; break end
         end
     end
+
     -- Ask for saving, return when cancel is input
     if unsavedChange then
         cmd "echohl MoreMsg"
@@ -274,6 +277,7 @@ function M.wipeOtherBuf()
             cmd "bufdo update"
         end
     end
+
     -- Close other window that doesn't contain the current buffers
     if #winIDTbl > 1 then
         for _, winID in ipairs(winIDTbl) do
@@ -282,6 +286,7 @@ function M.wipeOtherBuf()
             end
         end
     end
+
     -- Wipe buffers
     for _, bufNr in ipairs(bufNrTbl) do
         if api.nvim_buf_is_valid(bufNrTbl) then

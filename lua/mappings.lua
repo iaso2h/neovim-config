@@ -6,9 +6,10 @@ local map = require("util").map
 local M   = {}
 
 -- Extraction
-map("v", [[C]], [[:lua require("extraction").main(nil, vim.fn.visualmode())<cr>]], {"silent"})
+map("",  [[gc]], [[luaeval("require('operator').main(require('extraction').main, false)")]], {"silent", "expr"})
+map("v", [[C]],  [[:lua require("extraction").main({nil, vim.fn.visualmode()})<cr>]],               {"silent"})
 -- Zeal query
-map("",  [[gz]], [[luaeval("require('operator').main(require('zeal').query, false, 'n')")]], {"silent", "expr"})
+map("",  [[gz]], [[luaeval("require('operator').main(require('zeal').query, false)")]], {"silent", "expr"})
 map("v", [[Z]],  [[:lua require("zeal").query({"v"})<cr>]],                                  {"silent"})
 -- Don't truncate the name
 map("n", [[<C-g>]], [[:file!<cr>]], {"silent"})
@@ -134,13 +135,7 @@ map("",  [[<C-w>V]],   [[:only<cr><C-w>v]],                                     
 map("",  [[<C-w>S]],   [[:only<cr><C-w>s]],                                         {"silent", "novscode"})
 map("i", [[<C-S-w>=]], [[<C-\><C-O>:wincmd =<cr>]],                                 {"silent", "novscode"})
 -- Buffers
--- function M.bufSwitcher(command)
-    -- cmd(command)
-    -- while vim.bo.buftype == "terminal" or vim.bo.buftype == "quickfix" do cmd(command) end
--- end
--- map("", [[<A-h>]],  [[:lua require("mappings").bufSwitcher("bp")<cr>]], {"silent", "novscode"})
--- map("", [[<A-l>]],  [[:lua require("mappings").bufSwitcher("bn")<cr>]], {"silent", "novscode"})
-map("", [[<C-w>O]], [[:lua require("buffer").wipeOtherBuf()<cr>]],    {"silent", "novscode"})
+map("",  [[<C-w>O]], [[:lua require("buffer").wipeOtherBuf()<cr>]], {"silent", "novscode"})
 -- Tab
 map("", [[<A-<>]], [[:tabp<cr>]], {"silent", "novscode"})
 map("", [[<A->>]], [[:tabn<cr>]], {"silent", "novscode"})

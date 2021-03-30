@@ -1,3 +1,8 @@
+-- File: extraction
+-- Author: iaso2h
+-- Description: Extract selected content into new variable or new file
+-- Version: 0.0.4
+-- Last Modified: 2021/03/30
 local vim = vim
 local fn  = vim.fn
 local cmd = vim.cmd
@@ -8,10 +13,10 @@ local langAmid = {
     go = " := "
 }
 local langSuffix = {
-    c          = ";",
-    cpp        = ";",
-    java       = ";",
-    javascript = ";",
+    c          = {";", "\\"},
+    cpp        = {";", "\\"},
+    java       = {";"},
+    javascript = {";"},
 }
 
 ----
@@ -57,47 +62,70 @@ end
 -- @param lang:     String value of coding language.
 -- @param vimMode:  String value of Vim mode.
 -- @param curBufNr: Integer number of current buffer.
+-- @param curBufNr: Integer number of window ID.
 -- @return: For "v" mode, return string value of source content value, and the
 -- namespace together with the extmark to track the position information; For
 -- "V" mode return string value of source content value for "V" mode only.
 ----
-local getSrcContent = function(lang, vimMode, curBufNr) -- {{{
+local getSrcContent = function(lang, vimMode, curBufNr, curWinID) -- {{{
     local pos1
     local pos2
     local srcContent
+    local linebreakSelectCheck = false
 
     if vimMode == "n" then
-        pos1 = api.nvim_buf_get_mark(0, "[")
-        pos2 = api.nvim_buf_get_mark(0, "]")
+        pos1 = api.nvim_buf_get_mark(curBufNr, "[")
+        pos2 = api.nvim_buf_get_mark(curBufNr, "]")
+        api.nvim_win_set_cursor(curWinID, pos1)
+        cmd("normal! v")
+        api.nvim_win_set_cursor(curWinID, pos2)
+        cmd("normal! v")
     elseif vimMode:lower() == "v" then
-        pos1 = api.nvim_buf_get_mark(0, "<")
-        pos2 = api.nvim_buf_get_mark(0, ">")
+        pos1 = api.nvim_buf_get_mark(curBufNr, "<")
+        pos2 = api.nvim_buf_get_mark(curBufNr, ">")
+        -- Abort when selection is invalid
+        if pos1[1] == pos2[1] and pos1[2] == pos2[2] then return false end
     end
-
-    -- Create extmark to track position of new content
-    local extra2VarNS      = api.nvim_create_namespace("extra2Var")
-    local extra2VarExtmark = api.nvim_buf_set_extmark(curBufNr, extra2VarNS,
-        pos1[1] - 1, pos1[2],
-        {end_line = pos2[1] - 1, end_col = pos2[2]})
-
-    -- Abort when selection is invalid
-    if pos1[1] == pos2[1] and pos1[2] == pos2[2] then return false end
 
     -- Cut content into register and retrieve it as RHS content
     util.saveReg()
-    cmd [[normal! gvd]]
-    if vimMode == "v" then
-        srcContent = fn.getreg("\"", 1)
-
-        -- Join RHS content for multiple line selection in visual mode
-        if vimMode == "v" and pos1[1] ~= pos2[2] then
-            srcContent = joinRHS(lang, srcContent)
+    if vimMode == "v" or vimMode == "n" then
+        -- Avoid delete "\n" line break character in the end of line
+        local pos2LineLen = #api.nvim_buf_get_lines(curBufNr, pos2[1] - 1, pos2[1], false)[1]
+        if vimMode == "v" then
+            if pos2[2] == pos2LineLen then
+                linebreakSelectCheck = true
+                pos2 = {pos2[1], pos2[2] - 1}
+            end
+        else
+            if pos2[2] == pos2LineLen - 1 then
+                linebreakSelectCheck = true
+            end
         end
 
-        util.restoreReg()
+        -- Create extmark to track position of new content
+        local extra2VarNS      = api.nvim_create_namespace("extra2Var")
+        local extra2VarExtmark = api.nvim_buf_set_extmark(curBufNr, extra2VarNS,
+                                    pos1[1] - 1, pos1[2],
+                                    {end_line = pos2[1] - 1, end_col = pos2[2]})
 
-        return srcContent, extra2VarNS, extra2VarExtmark
+        -- Cut source content into register
+        api.nvim_win_set_cursor(curWinID, pos1)
+        cmd "normal! v"
+        api.nvim_win_set_cursor(curWinID, pos2)
+        cmd "normal! d"
+        srcContent = fn.getreg("\"", 1)
+
+        -- Join source content for multiple line visual characterwise selection
+        srcContent = joinRHS(lang, srcContent)
+
+        -- util.restoreReg()
+        return srcContent, extra2VarNS, extra2VarExtmark, linebreakSelectCheck
     elseif vimMode == "V" then
+        cmd [[normal! gvd]]
+        srcContent = fn.getreg("\"", 1)
+
+        util.restoreReg()
         return srcContent
     end
 end -- }}}
@@ -106,17 +134,18 @@ end -- }}}
 ----
 -- Function: newVar :Create new variable
 --
--- @param lang:             String value of coding language
--- @param curWinID:         Integer value of current window ID
--- @param curBufNr:         Integer value of current buffer number
--- @param lhs:              String value of the LHS
--- @param rhs:              String value of the RHS
--- @param extra2VarNS:      Integer value of the namespace handler
--- @param extra2VarExtmark: Integer value of the extmark ID
+-- @param lang:                 String value of coding language
+-- @param curWinID:             Integer value of current window ID
+-- @param curBufNr:             Integer value of current buffer number
+-- @param lhs:                  String value of the LHS
+-- @param rhs:                  String value of the RHS
+-- @param extra2VarNS:          Integer value of the namespace handler
+-- @param extra2VarExtmark:     Integer value of the extmark ID
+-- @param linebreakSelectCheck: Boolean
 ----
-local newVar = function(lang, curWinID, curBufNr, lhs, rhs, extra2VarNS, extra2VarExtmark) -- {{{
+local newVar = function(lang, curWinID, curBufNr, lhs, rhs, extra2VarNS, extra2VarExtmark, linebreakSelectCheck) -- {{{
     local prefix
-    local suffix = langSuffix[lang] or ""
+    local suffix = langSuffix[lang][1] or ""
     local amid   = langAmid[lang]   or " = "
     -- Retrieve RHS source location
     local rhsSrcResExtmark = api.nvim_buf_get_extmark_by_id(curBufNr,
@@ -135,7 +164,14 @@ local newVar = function(lang, curWinID, curBufNr, lhs, rhs, extra2VarNS, extra2V
     api.nvim_win_set_cursor(curWinID, {rhsSrcResEnd[1] + 2, rhsSrcResEnd[2]})
     -- Create record in jumplist
     cmd [[normal! mz`z]]
-    api.nvim_put({lhs}, "c", false, false)
+
+    -- Put lhs value after when linebreak character is selected
+    Print(linebreakSelectCheck)
+    if not linebreakSelectCheck then
+        api.nvim_put({lhs}, "c", false, false)
+    else
+        api.nvim_put({lhs}, "c", true, false)
+    end
     local lhsNewStart = {rhsSrcResStart[1] + 1, indentWidth + #prefix}
     api.nvim_win_set_cursor(curWinID, lhsNewStart)
     -- }}} Put new content
@@ -153,10 +189,11 @@ end -- }}}
 ----
 -- Function: newFile :Create new file at given path
 --
--- @param newFilePath: string value contain new file path
--- @param srcContent:  source content of the new file
+-- @param newFilePath: String value contain new file path
+-- @param srcContent:  String value of source content of the new file
+-- @param CWD:         String value of current working directory
 ----
-local newFile = function(newFilePath, srcContent) -- {{{
+local newFile = function(newFilePath, srcContent, CWD) -- {{{
     -- Find slash
     local byteSlashIndex = util.matchAll(newFilePath, "/")
     local filePath
@@ -204,26 +241,28 @@ end -- }}}
 -- Function: M.main :Main function to start the extraction for creating either
 -- new variable or new file
 --
--- @param operType: String value of operator type generated when g@ is called
--- @param vimMode:  Vim mode
--- @param ...:
+-- @param argTbl: argTbl[1] is the string value of motionwise, which is return
+-- when g@ is called
 -- @return: 0
 ----
-function M.main(operType, vimMode, ...) -- {{{
+function M.main(argTbl) -- {{{
+    local motionwise = argTbl[1]
     -- Dosn't support block mode
-    if operType == "block" then return end
-
+    if motionwise == "block" then return end
     -- opts = opts or {hlGroup="Search", timeout=500}
-    local lang   = vim.bo.filetype
-    local newID
-    local srcContent
+    local vimMode  = argTbl[2] or "n"
+    local lang     = vim.bo.filetype
+    local CWD      = fn.getcwd()
     local curWinID = api.nvim_get_current_win()
     local curBufNr = api.nvim_get_current_buf()
+    local newID
+    local srcContent
     local extra2VarNS
     local extra2VarExtmark
+    local linebreakSelectCheck
 
     -- Get new identifier for new LHS or new file {{{
-    if vimMode == "v" then
+    if vimMode == "v" or vimMode == "n" then
         cmd [[echohl Moremsg]]
         newID = fn.input("Variable Name: ")
         cmd [[echohl None]]
@@ -231,7 +270,7 @@ function M.main(operType, vimMode, ...) -- {{{
     elseif vimMode == "V" then
         -- Check CWD {{{
         if fn.has('win32') == 1 then
-            -- Check file cwd"
+            -- Check file cwd
             local newCWD = fn.expand("%:p:h")
             if CWD ~= newCWD then
                 local answerCD = fn.confirm("Change CWD to \"" .. newCWD .. "\"?", "&Yes\n&No")
@@ -252,15 +291,15 @@ function M.main(operType, vimMode, ...) -- {{{
     -- }}} Get new identifier for new LHS or new file
 
     -- Get source content {{{
-    srcContent, extra2VarNS, extra2VarExtmark = getSrcContent(lang, vimMode, curBufNr)
+    srcContent, extra2VarNS, extra2VarExtmark, linebreakSelectCheck = getSrcContent(lang, vimMode, curBufNr, curWinID)
     if not srcContent then return end -- Sanity check
     -- }}} Get source content
 
     -- Create new variable or new file {{{
-    if vimMode == "v" then
-        return newVar(lang, curWinID, curBufNr, newID, srcContent, extra2VarNS, extra2VarExtmark)
+    if vimMode == "v" or vimMode == "n" then
+        return newVar(lang, curWinID, curBufNr, newID, srcContent, extra2VarNS, extra2VarExtmark, linebreakSelectCheck)
     elseif vimMode == "V" then
-        return newFile(newID, srcContent)
+        return newFile(newID, srcContent, CWD)
     end
     -- }}} Create new variable or new file
 end -- }}}

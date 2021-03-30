@@ -9,33 +9,31 @@ function M.query(argTble)
         api.nvim_echo({{"Zeal not found on Path", "ErrorMsg"}}, true, {})
     end
 
-    local opts     = {hlGroup="Search", timeout=500}
+    -- local opts     = {hlGroup="Search", timeout=500}
     local curWinID = api.nvim_get_current_win()
-    local curBufNr = api.nvim_get_current_buf()
-    local operType  = argTble[1]
-    local content  = "zeal " .. vim.bo.filetype .. ":"
-    local operator = require("operator")
+    -- local curBufNr = api.nvim_get_current_buf()
+    local motionwise = argTble[1]
+    local vimMode    = argTble[2] or "n"
+    local content    = "zeal " .. vim.bo.filetype .. ":"
+    local operator   = require("operator")
     local pos1
     local pos2
 
-    if operType == "char" then
+    if vimMode == "n" then
         pos1 = api.nvim_buf_get_mark(0, "[")
         pos2 = api.nvim_buf_get_mark(0, "]")
         api.nvim_win_set_cursor(0, pos1)
         cmd("normal! v")
         api.nvim_win_set_cursor(0, pos2)
         cmd("normal! v")
+    else
+        pos1 = api.nvim_buf_get_mark(0, "<")
+        pos2 = api.nvim_buf_get_mark(0, ">")
     end
     content = content .. require("util").visualSelection("string")
 
     -- fn.system(content)
     fn.jobstart(content)
-
-    -- Get position in visual mode
-    if not operator.vimMode then
-        pos1 = api.nvim_buf_get_mark(0, "<")
-        pos2 = api.nvim_buf_get_mark(0, ">")
-    end
 
     -- Change to 0,0 based index
     pos1 = {pos1[1] - 1, pos1[2]}

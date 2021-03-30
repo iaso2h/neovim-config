@@ -100,7 +100,6 @@ cmd[[command! -nargs=0 O lua require('telescope.builtin').oldfiles(require('tele
 -- Mappings
 -- Try to fix crash problem in <C-e> by disable the previewer
 map("n", [[<C-e>]],   [[:lua require('telescope.builtin').find_files(require('telescope.themes').get_dropdown({previewer = false}))<cr>]], {"silent"})
-map("t", [[<C-e>]],   [[<A-n>:lua require('telescope.builtin').find_files(require('telescope.themes').get_dropdown({previewer = false}))<cr>]], {"silent"})
 map("n", [[<C-f>f]],  [[:lua require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown({}))<cr>]],   {"silent"})
 map("n", [[<C-S-f>]], [[:lua require('telescope.builtin').live_grep(require('telescope.themes').get_dropdown({}))<cr>]],                   {"silent"})
 map("n", [[<C-f>b]],  [[:lua require('telescope.builtin').buffers(require('telescope.themes').get_dropdown({}))<cr>]],                     {"silent"})

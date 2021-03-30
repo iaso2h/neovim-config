@@ -17,7 +17,6 @@ Plug 'tpope/vim-eunuch'
 Plug 'iaso2h/hop.nvim'
 Plug 'machakann/vim-sandwich'
 Plug 'tommcdo/vim-exchange', {'on': ['<Plug>(Exchange)', '<Plug>(Exchange)', '<Plug>(ExchangeClear)', '<Plug>(ExchangeLine)']}
-Plug 'lag13/vim-create-variable', {'on': '<Plug>Createvariable'}
 Plug 'mg979/vim-visual-multi'
 Plug 'junegunn/vim-easy-align'
 Plug 'AndrewRadev/splitjoin.vim'
@@ -71,7 +70,7 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'mfussenegger/nvim-dap'
 Plug 'mfussenegger/nvim-dap-python', {'for': 'python'}
 Plug 'theHamsta/nvim-dap-virtual-text'
-Plug 'romgrk/nvim-treesitter-context'
+" Plug 'romgrk/nvim-treesitter-context'
 Plug 'p00f/nvim-ts-rainbow'
 Plug 'windwp/nvim-ts-autotag'
 Plug 'nvim-treesitter/nvim-treesitter-textobjects'
