@@ -16,6 +16,10 @@
         //"json",
         "jsonc"
     ],
+<<<<<<< HEAD
+=======
+    "diagnostic.enableSign": true,
+>>>>>>> master
     "diagnostic.checkCurrentLine":                        true,
     "diagnostic.errorSign":                               "❌",
     "diagnostic.hintSign":                                "💡",
@@ -69,6 +73,10 @@
         "sh": "shfmt",
         "blade": "blade-formatter"
     },
+<<<<<<< HEAD
+=======
+    "explorer.icon.enableNerdfont": true,
+>>>>>>> master
     "list.normalMappings": {
         "?":     "do:help",
         "d":     "expr:GetDeleteAction",
@@ -107,8 +115,17 @@
         "vim",
         "client"
     ],
+<<<<<<< HEAD
     "Lua,hint.enable":              true,
     "Lua,hint.setType":             true,
+=======
+    "Lua.hint.enable":              true,
+    "Lua.hint.setType":             true,
+    "Lua.hint.paramName":           true,
+    "Lua.hover.viewString":         true,
+    "Lua.completion.enable":        true,
+    "Lua.hover.enable":             true,
+>>>>>>> master
     "Lua.intelliSense.searchDepth": 3,
     "Lua.diagnostics.disable": [
         "lowercase-global"
@@ -210,7 +227,11 @@
         "plugin"
     ],
     "workspace.workspaceFolderCheckCwd": true,
+<<<<<<< HEAD
     "zi.enable": false,
+=======
+    "zi.enable": true,
+>>>>>>> master
     "zi.patterns": {
         "lua": [
             "\\s*--"

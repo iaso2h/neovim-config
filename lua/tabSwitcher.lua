@@ -5,17 +5,13 @@ local api = vim.api
 local M   = {}
 
 function M.main()
-  if vim.bo.shiftwidth == 4 then
-    local flags = [[setlocal shiftwidth=2 softtabstop=2 tabstop=2]]
-    vim.b.luaFormatflags = [[--indent-width=2 --tab-width=2 --continuation-indent-width=2]]
-    cmd(flags)
-    api.nvim_echo({{"Shiftwidth has been changed to 2", "Moremsg"}}, true, {})
-  elseif vim.bo.shiftwidth == 2 then
-    local flags = [[setlocal shiftwidth=4 softtabstop=4 tabstop=4]]
-    vim.b.luaFormatflags = [[--indent-width=4 --tab-width=4 --continuation-indent-width=4]]
-    cmd(flags)
-    api.nvim_echo({{"Shiftwidth has been changed to 4", "Moremsg"}}, true, {})
+  local newWidth = vim.bo.shiftwidth == 4 and 2 or 4
+  if vim.bo.filetype == "lua" then
+    vim.b.luaFormatflags = string.format("--indent-width=%d --tab-width=%d --continuation-indent-width=%d", newWidth, newWidth, newWidth)
   end
+  local flags = string.format("setlocal shiftwidth=%d softtabstop=%d tabstop=%d", newWidth, newWidth, newWidth)
+  cmd(flags)
+  api.nvim_echo({{string.format("Shiftwidth has been changed to %d", newWidth), "Moremsg"}}, true, {})
 end
 
 return M

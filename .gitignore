@@ -5,5 +5,7 @@
 /.idea/
 /dein/
 .netrwhist
+.vscode/
 .ccls-cache/
+*temp*
 

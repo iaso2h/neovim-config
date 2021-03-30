@@ -7,6 +7,7 @@ vmap <buffer> g=         <plug>(Luadev-Run)
 nmap <buffer> g=iw       <plug>(Luadev-RunWord)
 imap <buffer> <C-x><C-l> <plug>(Luadev-Complete)
 
+<<<<<<< HEAD
 let b:next_toplevel='\v%$\|^(function)>'
 let b:prev_toplevel='\v^(function)>'
 let b:next_endtoplevel='\v%$\|\S.*\n+(end)'
@@ -71,3 +72,5 @@ if !exists('*<SID>Lua_jump')
     endfun
 endif
 
+=======
+>>>>>>> master

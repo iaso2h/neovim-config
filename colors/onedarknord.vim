@@ -1,10 +1,3 @@
-" Copyright (C) 2016-present Arctic Ice Studio <development@arcticicestudio.com>
-" Copyright (C) 2016-present Sven Greb <development@svengreb.de>
-
-" Project: Nord Vim
-" Repository: https://github.com/arcticicestudio/nord-vim
-" License: MIT
-
 " Custom highlight {{{
 highlight NordMain guifg=#88c0d0 gui=bold
 highlight Myw term=bold guifg=white
@@ -175,7 +168,7 @@ function! s:h(group, style, ...)
     let s:group_colors[a:group] = s:highlight " Cache default highlight group settings
 
     if g:onedark_terminal_italics == 0
-    " if 1
+        " if 1
         if has_key(s:highlight, "cterm") && s:highlight["cterm"] == "italic"
             unlet s:highlight.cterm
         endif
@@ -296,9 +289,9 @@ call s:hi("MatchParen", s:nord8_gui, s:nord3_gui_bright, s:nord8_term, s:nord3_t
 call s:hi("MatchWord", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "", "")
 call s:hi("NonText", s:nord2_gui, "", s:nord3_term, "", "", "")
 call s:hi("Normal", s:nord4_gui, s:nord0_gui, "NONE", "NONE", "", "")
-call s:hi("PMenu", s:nord4_gui, s:nord2_gui, "NONE", s:nord1_term, "NONE", "")
+call s:hi("Pmenu", s:nord4_gui, s:nord2_gui, "NONE", s:nord1_term, "NONE", "")
 call s:hi("PmenuSbar", s:nord4_gui, s:nord2_gui, "NONE", s:nord1_term, "", "")
-call s:hi("PMenuSel", "#FFFFFF", s:nord8_gui, s:nord3_term, s:nord8_term, "", "")
+call s:hi("PmenuSel", "#FFFFFF", s:nord8_gui, s:nord3_term, s:nord8_term, "", "")
 call s:hi("OffscreenPopup", "NONE", s:nord8_gui, s:nord3_term, s:nord8_term, "", "")
 call s:hi("PmenuThumb", s:nord8_gui, s:nord3_gui, "NONE", s:nord3_term, "", "")
 call s:hi("SpecialKey", s:nord3_gui, "", s:nord3_term, "", "", "")
@@ -743,7 +736,7 @@ call s:hi("CocErrorHighlight" , s:nord11_gui, "", s:nord11_term, "", "undercurl"
 call s:hi("CocWarningSign", s:nord13_gui, "", s:nord13_term, "", "", "")
 call s:hi("CocErrorSign" , s:nord11_gui, "", s:nord11_term, "", "", "")
 call s:hi("CocInfoSign" , s:nord8_gui, "", s:nord8_term, "", "", "")
-call s:hi("CocHintSign" , s:nord10_gui, "", s:nord10_term, "", "", "")
+call s:hi("CocHintSign" , s:nord13_gui, "", s:nord13_term, "", "", "")
 call s:hi("CocHighlightText" , "", s:nord3_gui_bright, "", s:nord3_term, "", "")
 call s:hi("CocWarningFloat", s:nord13_gui, s:nord2_gui, s:nord13_term, s:nord1_term, "", "")
 call s:hi("CocErrorFloat", s:nord11_gui, s:nord2_gui, s:nord11_term, s:nord1_term, "", "")
@@ -1013,7 +1006,116 @@ highlight link OperatorSandwichChange Search
 highlight link OperatorSandwichDelete Search
 highlight link OperatorSandwichAddrcc Search
 " }}} Sandwich
-"
+
+" mg979/vim-visual-multi-multi {{{
+hi! VMExtend      ctermbg=239 guibg=#434C5E
+hi! VMCursor      ctermbg=245 ctermfg=24  guibg=#8a8a8a guifg=black
+hi! VMInsert      ctermbg=239 guibg=#8a8a8a
+hi! VMMono        ctermbg=131 ctermfg=235 guibg=#88c0d0 guifg=white
+" }}} mg979/vim-visual-multi-multi
+
+" p00f/nvim-ts-rainbow {{{
+hi rainbowcol1 guifg=Gold
+hi rainbowcol2 guifg=DarkOrchid3
+hi rainbowcol3 guifg=RoyalBlue2
+hi rainbowcol4 guifg=Firebrick
+hi rainbowcol5 guifg=SeaGreen3
+hi rainbowcol6 guifg=DarkOrange3
+hi rainbowcol7 guifg=#458588
+" }}} p00f/nvim-ts-rainbow
+
+" nvim-telescope/telescope.nvim {{{
+highlight TelescopeSelection      guifg=#EBCB8B gui=bold
+highlight TelescopeSelectionCaret guifg=#EBCB8B
+highlight TelescopeMultiSelection guifg=#928374
+
+" Border highlight groups.
+highlight TelescopeBorder         guifg=#88C0D0
+highlight TelescopePromptBorder   guifg=#88C0D0
+highlight TelescopeResultsBorder  guifg=#88C0D0
+highlight TelescopePreviewBorder  guifg=#88C0D0
+
+" Used for highlighting characters that you match.
+highlight TelescopeMatching       guifg=#5E81AC
+
+" Used for the prompt prefix
+highlight TelescopePromptPrefix   guifg=#88C0D0
+" }}} nvim-telescope/telescope.nvim
+
+" romgrk/barbar.nvim {{{
+call s:hi("BufferCurrent",       s:nord8_gui,  s:nord3_gui, s:nord8_term,  s:nord3_term, "", "")
+call s:hi("BufferCurrentIcon",   "",           s:nord3_gui, "",            s:nord3_term, "", "")
+call s:hi("BufferCurrentIndex",  s:nord8_gui,  s:nord3_gui, s:nord8_term,  s:nord3_term, "", "")
+call s:hi("BufferCurrentMod",    s:nord13_gui, s:nord3_gui, s:nord13_term, s:nord3_term, "", "")
+call s:hi("BufferCurrentSign",   s:nord8_gui,  s:nord3_gui, s:nord8_term,  s:nord3_term, "", "")
+call s:hi("BufferCurrentTarget", "#FFFFFF",    s:nord3_gui, s:nord10_term, s:nord3_term, "", "")
+
+call s:hi("BufferVisible",       "#66738e",    s:nord1_gui, s:nord3_term,  s:nord1_term, "", "")
+call s:hi("BufferVisibleIcon",   "#66738e",    s:nord1_gui, s:nord3_term,  s:nord1_term, "", "")
+call s:hi("BufferVisibleIndex",  "#66738e",    s:nord1_gui, s:nord3_term,  s:nord1_term, "", "")
+call s:hi("BufferVisibleMod",    "#9B8473",    s:nord1_gui, s:nord13_term, s:nord1_term, "", "")
+call s:hi("BufferVisibleSign",   s:nord8_gui,  s:nord1_gui, s:nord8_term,  s:nord1_term, "", "")
+call s:hi("BufferVisibleTarget", "#ED427C",    s:nord1_gui, s:nord11_term, s:nord1_term, "", "")
+
+
+hi! link BufferInactive       BufferVisible
+hi! link BufferInactiveIcon   BufferVisibleIcon
+hi! link BufferInactiveIndex  BufferVisibleIndex
+hi! link BufferInactiveMod    BufferVisibleMod
+hi! link BufferInactiveSign   BufferVisibleSign
+hi! link BufferInactiveTarget BufferVisibleTarget
+
+call s:hi("BufferTabpages",       s:nord10_gui, s:nord3_gui, s:nord10_term, s:nord3_term, "", "")
+call s:hi("BufferInactiveTarget", s:nord5_gui,  s:nord1_gui, s:nord5_term,  s:nord1_term, "", "")
+" }}} romgrk/barbar.nvim
+
+highlight link TSAnnotation         PreProc
+highlight link TSAttribute          PreProc
+highlight link TSBoolean            Boolean
+highlight link TSCharacter          Character
+highlight link TSComment            Comment
+highlight link TSConditional        Conditional
+highlight link TSConstant           Constant
+highlight link TSConstBuiltin       Special
+highlight link TSConstMacro         Define
+highlight link TSConstructor        Special
+highlight link TSEmphasis           Italic
+highlight link TSError              Error
+highlight link TSException          Exception
+highlight link TSField              Identifier
+highlight link TSFloat              Float
+highlight link TSFunction           Function
+highlight link TSFuncBuiltin        Special
+highlight link TSFuncMacro          Macro
+highlight link TSInclude            Include
+highlight link TSKeyword            Keyword
+highlight link TSKeywordFunction    Keyword
+highlight link TSKeywordOperator    Operator
+highlight link TSLabel              Label
+highlight link TSLiteral            String
+highlight link TSMethod             Function
+call s:hi("TSNamespace", "#00ffe5", "", s:nord8_term, "", "", "")
+highlight link TSNumber             Number
+highlight link TSOperator           Operator
+highlight link TSParameter          Identifier
+highlight link TSParameterReference Identifier
+highlight link TSProperty           Identifier
+highlight link TSPunctBracket       Delimiter
+highlight link TSPunctDelimiter     Delimiter
+highlight link TSPunctSpecial       Delimiter
+highlight link TSRepeat             Repeat
+highlight link TSString             String
+highlight link TSStringEscape       SpecialChar
+highlight link TSStringRegex        String
+highlight link TSStrong             bold
+highlight link TSTag                Label
+highlight link TSTagDelimiter       Label
+highlight link TSTitle              Title
+highlight link TSType               Type
+highlight link TSTypeBuiltin        Type
+highlight link TSUnderline          Underlined
+highlight link TSURI                Underlined
+highlight link TSVariableBuiltin    Special
 
 " lukas-reineke/indent-blankline.nvim {{{
 call s:hi("indent_blankline", "#3b4252", s:nord0_gui, s:nord1_term, "NONE", "", "")
