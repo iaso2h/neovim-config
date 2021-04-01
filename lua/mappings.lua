@@ -270,9 +270,10 @@ map("t", [[<C-w>K]],     [[<A-n><C-w>K:startinsert<cr>]],           {"silent",  
 -- Mode: Commandline & Insert {{{
 map("i", [[<C-cr>]],  [[<esc>o]],  {"novscode"})
 map("i", [[<S-cr>]],  [[<esc>O]],  {"novscode"})
-map("i", [[jj]],      [[<esc>`^]], {"novscode"})
+map("i", [[jj]],      [[<esc>`^]], {"noremap", "novscode"})
 map("i", [[<C-d>]],   [[<Del>]],   {"novscode"})
-map("i", [[<S-Tab>]], [[<C-d>]],   {"noremap"})
+map("i", [[<C-[>]],   [[<C-d>]],   {"noremap"})
+map("i", [[<C-]>]],   [[<C-t>]],   {"noremap"})
 map("i", [[<C-.>]],   [[<C-a>]],   {"noremap"})
 map("i", [[<C-S-.>]], [[<C-@>]],   {"noremap"})
 map("i", [[<C-BS>]],  [[<C-w>]],   {"noremap"})

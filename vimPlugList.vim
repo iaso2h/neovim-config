@@ -2,63 +2,64 @@ if exists('g:vscode') == 1
     finish
 endif
 call plug#begin(stdpath('config') . '/plugged')
+" UI {{{
 Plug 'glepnir/galaxyline.nvim'
 Plug 'romgrk/barbar.nvim'
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'RRethy/vim-hexokinase', {'do': 'make hexokinase'}
 Plug 'mhinz/vim-startify'
-
 Plug 'lukas-reineke/indent-blankline.nvim', {'branch': 'lua'}
-Plug 'simnalamburt/vim-mundo', {'on': 'MundoToggle'}
-Plug 'szw/vim-maximizer', {'on': 'MaximizerToggle'}
+Plug 'kyazdani42/nvim-tree.lua'
+" }}} UI
+
+" Vim enhancement {{{
 Plug 'tpope/vim-repeat'
 Plug 'inkarkat/vim-visualrepeat'
+Plug 'antoinemadec/FixCursorHold.nvim'
 Plug 'tpope/vim-eunuch'
-Plug 'iaso2h/hop.nvim'
-Plug 'machakann/vim-sandwich'
-Plug 'tommcdo/vim-exchange', {'on': ['<Plug>(Exchange)', '<Plug>(Exchange)', '<Plug>(ExchangeClear)', '<Plug>(ExchangeLine)']}
-Plug 'mg979/vim-visual-multi'
-Plug 'junegunn/vim-easy-align'
-Plug 'AndrewRadev/splitjoin.vim'
-Plug 'preservim/nerdcommenter'
-Plug 'inkarkat/vim-ReplaceWithRegister'
-Plug 'landock/vim-expand-region'
-Plug 'michaeljsmith/vim-indent-object'
+Plug 'skywind3000/asyncrun.vim'
 Plug 'bkad/camelcasemotion'
 Plug 'zatchheems/vim-camelsnek'
+Plug 'landock/vim-expand-region'
 Plug 'andymass/vim-matchup'
-Plug 'dm1try/golden_size'
-Plug 'antoinemadec/FixCursorHold.nvim'
+Plug 'iaso2h/hop.nvim'
+Plug 'tommcdo/vim-exchange', {'on': ['<Plug>(Exchange)', '<Plug>(Exchange)', '<Plug>(ExchangeClear)', '<Plug>(ExchangeLine)']}
+" Plug 'inkarkat/vim-ReplaceWithRegister'
+Plug 'machakann/vim-sandwich'
+Plug 'junegunn/vim-easy-align'
+Plug 'windwp/nvim-autopairs'
+Plug 'michaeljsmith/vim-indent-object'
 Plug 'monaqa/dial.nvim'
-" Plug 'kyazdani42/nvim-tree.lua'
-
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'honza/vim-snippets'
-Plug 'SirVer/ultisnips'
-Plug 'iaso2h/vim-scriptease', {'branch': 'ftplugin'}
-
-" lua {{{
-Plug 'davisdude/vim-love-docs', {'branch': 'build', 'for': 'lua'}
-Plug 'iaso2h/nlua.nvim', {'branch': 'iaso2h', 'for': 'lua'}
-Plug 'bfredl/nvim-luadev', {'for': 'lua'}
-" }}} lua
-" markdown {{{
-Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
-Plug 'plasticboy/vim-markdown', {'for': ['markdown', 'md']}
-" }}} markdown
-" log {{{
-Plug 'MTDL9/vim-log-highlighting', {'for': 'log'}
-" }}} log
-
+Plug 'preservim/nerdcommenter'
 Plug 'mg979/docgen.vim'
-Plug 'RishabhRD/popfix'
-Plug 'RishabhRD/nvim-cheat.sh', {'on': ['Cheat', 'CheatList', 'CheatListWithoutComments', 'CheatWithoutComments']}
-Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
-" Plug 'lewis6991/gitsigns.nvim'
-Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
-Plug 'skywind3000/asyncrun.vim'
+Plug 'AndrewRadev/splitjoin.vim'
+Plug 'mg979/vim-visual-multi'
+Plug 'szw/vim-maximizer', {'on': 'MaximizerToggle'}
+Plug 'simnalamburt/vim-mundo', {'on': 'MundoToggle'}
+Plug 'dm1try/golden_size'
+" }}} Vim enhancement
 
+" Tree-sitter {{{
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+" Plug 'romgrk/nvim-treesitter-context'
+Plug 'p00f/nvim-ts-rainbow'
+Plug 'nvim-treesitter/nvim-treesitter-textobjects'
+" }}} Tree-sitter
+
+" Intellisense {{{
+" Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'neovim/nvim-lspconfig'
+Plug 'kabouzeid/nvim-lspinstall'
+Plug 'glepnir/lspsaga.nvim'
+Plug 'hrsh7th/nvim-compe'
+Plug 'tzachar/compe-tabnine', { 'do': './install.sh' }
+Plug 'hrsh7th/vim-vsnip'
+Plug 'hrsh7th/vim-vsnip-integ'
+Plug 'windwp/nvim-ts-autotag'
+Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
+" }}} Intellisense
+
+" Telescope {{{
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
@@ -66,16 +67,35 @@ Plug 'fhill2/telescope-ultisnips.nvim'
 Plug 'nvim-telescope/telescope-symbols.nvim'
 Plug 'nvim-telescope/telescope-fzy-native.nvim'
 Plug 'nvim-telescope/telescope-media-files.nvim'
+" }}} Telescope
 
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+" Language {{{
+" Lua
+Plug 'davisdude/vim-love-docs', {'branch': 'build', 'for': 'lua'}
+Plug 'iaso2h/nlua.nvim', {'branch': 'iaso2h', 'for': 'lua'}
+" Markdown
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
+Plug 'plasticboy/vim-markdown', {'for': ['markdown', 'md']}
+" Log
+Plug 'MTDL9/vim-log-highlighting', {'for': 'log'}
+" }}} Language
+
+" Debug {{{
+Plug 'bfredl/nvim-luadev', {'for': 'lua'}
+Plug 'iaso2h/vim-scriptease', {'branch': 'ftplugin'}
 Plug 'mfussenegger/nvim-dap'
-Plug 'mfussenegger/nvim-dap-python', {'for': 'python'}
 Plug 'theHamsta/nvim-dap-virtual-text'
-" Plug 'romgrk/nvim-treesitter-context'
-Plug 'p00f/nvim-ts-rainbow'
-Plug 'windwp/nvim-ts-autotag'
-Plug 'nvim-treesitter/nvim-treesitter-textobjects'
+Plug 'mfussenegger/nvim-dap-python', {'for': 'python'}
+" }}} Debug
 
+" Version control {{{
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+" Plug 'lewis6991/gitsigns.nvim'
+" }}} Version control
+
+Plug 'RishabhRD/popfix'
+Plug 'RishabhRD/nvim-cheat.sh', {'on': ['Cheat', 'CheatList', 'CheatListWithoutComments', 'CheatWithoutComments']}
 Plug 'dahu/VimRegexTutor'
 Plug 'DanilaMihailov/vim-tips-wiki'
 call plug#end()

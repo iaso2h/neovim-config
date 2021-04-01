@@ -50,7 +50,7 @@ autocmd TermOpen             * setlocal nobuflisted
 autocmd FocusGained,BufEnter * checktime
 " autocmd BufAdd               * lua require("consistantTab").adaptBufTab()
 
-autocmd CursorHold            *.c,*.h,*.cpp,*.cc,*.vim :call HLCIOFunc()
+" autocmd CursorHold            *.c,*.h,*.cpp,*.cc,*.vim :call HLCIOFunc()
 autocmd FileType              java setlocal includeexpr=substitute(v:fname,'\\.','/','g')
 autocmd FileType              git  setlocal nofoldenable
 autocmd FileType              json setlocal conceallevel=0 concealcursor=

@@ -11,17 +11,23 @@ require "config.markdown"
 require "config.asyncrun"
 require "config.telescope-nvim"
 require "config.nvim-treesitter"
+require "config.nvim-tree"
 require "config.nvim-dap"
-require "config.coc"
+-- require "config.coc"
+-- require "config.gitsigns-nvim"
 require "config.barbar-nvim"
 require "config.galaxyline-nvim"
--- require "config.gitsigns-nvim"
+require "config.nvim-lsp"
+require "config.nvim-comp"
 
 if vim.g.vscode == 1 then
     -- VSCode do not need the next settings
     return
 end
 
+-- windwp/nvim-autopairs {{{
+require('nvim-autopairs').setup()
+-- }}} windwp/nvim-autopairs
 -- monaqa/dial.nvim {{{
 map("n", [[<C-a>]],  [[<Plug>(dial-increment)]])
 map("n", [[<C-x>]],  [[<Plug>(dial-decrement)]])
@@ -45,13 +51,6 @@ map("n", [["gJ"]], [[:<c-u>SplitjoinJoin<cr>]],  {"silent"})
 -- lag13/vim-create-variable {{{
 -- map("v", [[C]], [[<Plug>Createvariable]])
 -- }}} lag13/vim-create-variable
--- SirVer/ultisnips {{{
--- Disable UltiSnips keymapping in favour of coc-snippets
-vim.g.UltiSnipsExpandTrigger = ""
-vim.g.UltiSnipsListSnippets = ""
-vim.g.UltiSnipsJumpForwardTrigger = ""
-vim.g.UltiSnipsJumpBackwardTrigger = ""
--- }}} SirVer/ultisnips
 -- preservim/nerdcommenter {{{
 vim.g.NERDAltDelims_c = 1
 vim.g.NERDAltDelims_cpp = 1

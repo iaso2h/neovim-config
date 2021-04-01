@@ -1,8 +1,8 @@
 -- File: buffer.lua
 -- Author: iaso2h
 -- Description: Close buffer in a smart way
--- Version: 0.0.10
--- Last Modified: 2021-03-27
+-- Version: 0.0.11
+-- Last Modified: 2021-03-31
 -- TODO: Q on qf not working well
 -- TODO: q on coc showouput not working well
 local fn = vim.fn
@@ -79,9 +79,9 @@ end
 ----
 local function bwipe(bufNr)
     if bufNr then
-        cmd("bwipe! " .. bufNr)
+        api.nvim_buf_delete(bufNr, {force = true})
     else
-        cmd "bwipe!"
+        api.nvim_buf_delete(0, {force = true})
     end
     if fn.exists("g:bufferline") == 1 then
         fn['bufferline#update']()
@@ -97,7 +97,7 @@ end
 -- buffer
 -- @return: 0
 ----
-local function wipeBuf(checkBuftype) -- {{{
+local function wipeBuf() -- {{{
     -- Wipe unlisted buffer
     if not vim.tbl_contains(bufNrTbl, curBufNr) then
         bwipe()
@@ -105,11 +105,10 @@ local function wipeBuf(checkBuftype) -- {{{
     end
     -- Check if it's called from a special buffer
     if curBufType ~= "" then
-        -- Special buffer {{{
-        cmd "q"
-        -- }}} Special buffer
+        -- Special buffer
+        api.nvim_win_close(curWinID, true)
     else
-        -- Standard buffer {{{
+        -- Standard buffer
         if not vim.bo.modifiable then return end
         -- Return when false is evaluated
         if not saveModified(curBufNr) then return end
@@ -119,7 +118,7 @@ local function wipeBuf(checkBuftype) -- {{{
             winIDBufNrTbl = {}
             local bufInstance = 0
             -- Create table with all different window ID as key, buffer number as value
-            for idx, win in ipairs(winIDTbl) do
+            for _, win in ipairs(winIDTbl) do
                 winIDBufNrTbl[win] = api.nvim_win_get_buf(win)
             end
             -- Loop through winIDBufNrTbl to check other window contain the same
@@ -155,7 +154,6 @@ local function wipeBuf(checkBuftype) -- {{{
             if vim.tbl_contains(unwantedBufType, vim.bo.buftype) then cmd "bp" end
         end
 
-        -- }}} Standard buffer
     end
 end -- }}}
 
@@ -180,14 +178,14 @@ function M.smartClose(type) -- {{{
             if curBufType == "nofile" then
                 -- nofile buffer, treated like standard buffer {{{
                 if curBufName == "[Command Line]" then
-                    cmd "q"
+                    api.nvim_win_close(curWinID, true)
                 else
-                    wipeBuf(false)
-                    if #winIDTbl > 1 then cmd "q" end
+                    wipeBuf()
+                    if #winIDTbl > 1 then api.nvim_win_close(curWinID, true) end
                 end
                 -- }}} nofile buffer, treated like standard buffer
             elseif curBufType == "terminal" then
-                cmd "q"
+                api.nvim_win_close(curWinID, true)
             else -- other special buffer
                 cmd "bwipe"
             end
@@ -197,23 +195,23 @@ function M.smartClose(type) -- {{{
             if curBufName == "" then
                 if api.nvim_win_get_config(0)['relative'] ~= '' then
                     -- Close floating window
-                    cmd "q"
+                    api.nvim_win_close(curWinID, true)
                 else
                     -- Scratch File
-                    wipeBuf(false)
+                    wipeBuf()
                     saveModified(curBufNr)
-                    if #winIDTbl > 1 then cmd "q" end
+                    if #winIDTbl > 1 then api.nvim_win_close(curWinID, true) end
                 end
             else -- Standard buffer
                 if #winIDTbl > 1 then -- 1+ Windows
                     local bufInstance = 0
-                    for idx, val in ipairs(winIDTbl) do
+                    for _, val in ipairs(winIDTbl) do
                         if vim.tbl_contains(bufNrTbl, api.nvim_win_get_buf(val)) then
                             bufInstance = bufInstance + 1
                         end
                     end
                     if bufInstance == 0 or bufInstance > 1 then
-                        cmd "q"
+                        api.nvim_win_close(curWinID, true)
                     else -- 1 buffer instance
                         -- Return 0 when false is evaluated
                         if not saveModified(curBufNr) then
@@ -230,7 +228,7 @@ function M.smartClose(type) -- {{{
         end
         -- }}} Close window containing buffer
     elseif type == "buffer" then
-        wipeBuf(true)
+        wipeBuf()
     end
 end
 
@@ -239,7 +237,7 @@ end
 --
 -- @return: 0
 ----
-function M.wipeOtherBuf()
+function M.wipeOtherBuf() -- {{{
     curBufNr = api.nvim_get_current_buf()
     bufNrTbl = vim.tbl_map(function(bufNr)
         return tonumber(string.match(bufNr, "%d+"))
@@ -298,8 +296,28 @@ function M.wipeOtherBuf()
     if fn.exists("g:bufferline") == 1 then
         fn['bufferline#update']()
     end
-end
+end -- }}}
 
+local hideCursorFileTypeTbl = {
+    "NvimTree",
+    "qf",
+    "startify",
+    "coc-explorer"
+}
+local hideCursorStatus = false
+-- TODO: hide cursor in specific buffer type
+function M.hideCursor()
+    local fileType = vim.bo.filetype
+    if vim.tbl_contains(hideCursorFileTypeTbl, fileType) then
+        cmd "hi! Cursor guifg=black guibg=bg=white ctermbg=15"
+        vim.o.guicursor = "n-v-sm:block,i-c-ci:ver25-Cursor,ve-o-r-cr:hor20"
+        hideCursorStatus = true
+    end
+    if hideCursorStatus then
+        cmd "hi! Cursor guibg=#3B4252"
+        vim.o.guicursor = "v-sm:block,v-i-c-ci:ver25-Cursor,ve-o-r-cr:hor20"
+    end
+end
 
 return M
 

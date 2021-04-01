@@ -44,9 +44,9 @@ end
 
 api.nvim_exec([[
 augroup VmStartMapping
-autocmd!
-autocmd User visual_multi_start lua require("config.vim-visual-multi").VM_Start()
-autocmd User visual_multi_exit  lua require("config.vim-visual-multi").VM_Exit()
+    autocmd!
+    autocmd User visual_multi_start lua require("config.vim-visual-multi").VM_Start()
+    autocmd User visual_multi_exit  lua require("config.vim-visual-multi").VM_Exit()
 augroup END
     ]], false)
 

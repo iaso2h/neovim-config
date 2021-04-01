@@ -274,6 +274,30 @@ function M.map(mode, lhs, rhs, optsTbl) -- {{{
         api.nvim_set_keymap(mode, lhs, rhs, optskeywordTbl)
     end
 end -- }}}
+----
+-- Function: M.bmap wrap around the nvim_set_keymap, and accept the fouth argument as table
+--
+-- @param bufNr:   Same as nvim_buf_set_keymap
+-- @param mode:    Same as nvim_buf_set_keymap
+-- @param lhs:     Same as nvim_buf_set_keymap
+-- @param rhs:     Same as nvim_buf_set_keymap
+-- @param optsTbl: Table value contain string elements that will be pass into_
+-- the fourth argument of nvim_set_keymap as the key name of value pairs, and
+-- the value is true
+----
+
+function M.bmap(bufNr, mode, lhs, rhs, optsTbl) -- {{{
+    optsTbl = optsTbl or {}
+    if not next(optsTbl) then
+        api.nvim_buf_set_keymap(bufNr, mode, lhs, rhs, optsTbl)
+    else
+        local optskeywordTbl = {}
+        for _, val in ipairs(optsTbl) do
+            optskeywordTbl[val] = true
+        end
+        api.nvim_buf_set_keymap(bufNr, mode, lhs, rhs, optskeywordTbl)
+    end
+end -- }}}
 
 function M.convertMap(mode, lhs, rhs, optsTbl)
     local specArg = ""

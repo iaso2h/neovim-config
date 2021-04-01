@@ -1,8 +1,9 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.0.12
--- Last Modified: 2021/03/23
+-- Version: 0.0.12.5
+-- Last Modified: 2021/03/31
+-- TODO: Disable == when indentation is eauql
 
 local vim = vim
 local fn = vim.fn
@@ -12,12 +13,22 @@ local M = {}
 local util = require("util")
 local operator = require("operator")
 
--- VSCode copy line {{{
-function M.VSCodeLineYank(visualMode, direction)
+function M.VSCodeLineMove(vimMode, direction)
+    if vimMode == "n" then
+        if direction == "down" then
+            cmd [[m .+1==]]
+        elseif direction == "up" then
+            cmd [[m .-2==]]
+        end
+    end
+    map("n", [[<A-k>]], [[:<c-u>m .-2<cr>==]], {"silent", "novscode"})
+end
+-- VSCode yank line {{{
+function M.VSCodeLineYank(vimMode, direction)
     util.saveReg()
 
     -- Duplication {{{
-    if string.lower(visualMode) == "v" then
+    if string.lower(vimMode) == "v" then
         cmd [[normal! gv]]
         -- Visual mode {{{
         local cursor = api.nvim_win_get_cursor(0)
@@ -33,7 +44,7 @@ function M.VSCodeLineYank(visualMode, direction)
                 api.nvim_win_set_cursor(0, selectStart)
             end
 
-            cmd([[normal! ]] .. visualMode)
+            cmd([[normal! ]] .. vimMode)
             api.nvim_win_set_cursor(0, cursor)
         elseif direction == "down" then
             if cursor[1] == selectStart[1] then
@@ -47,13 +58,13 @@ function M.VSCodeLineYank(visualMode, direction)
                 api.nvim_win_set_cursor(0, {selectEnd[1] + 1, selectStart[2]})
             end
 
-            cmd([[normal! ]] .. visualMode)
+            cmd([[normal! ]] .. vimMode)
             api.nvim_win_set_cursor(0, {
                 cursor[1] + selectEnd[1] - selectStart[1] + 1, cursor[2]
             })
         end
         -- }}} Visual mode
-    elseif visualMode == "n" then
+    elseif vimMode == "n" then
         -- Normal mode {{{
         local cursor = api.nvim_win_get_cursor(0)
         cmd [[yank]]
@@ -70,20 +81,20 @@ function M.VSCodeLineYank(visualMode, direction)
 
     util.restoreReg()
 end
--- }}} VSCode copy line
+-- }}} VSCode yank line
 
 function M.inplaceYank(argTbl) -- {{{
     -- TODO add opts
     -- opts = opts or {hlGroup="Search", timeout=500}
     local opts = {hlGroup="Search", timeout=500}
-    local modeType = argTbl[1]
+    local motionwise = argTbl[1]
     local curWinID = api.nvim_get_current_win()
     local curBufNr = api.nvim_get_current_buf()
     local pos1 = api.nvim_buf_get_mark(0, "[")
     local pos2 = api.nvim_buf_get_mark(0, "]")
 
     -- Change position info to (0,0) index based
-    if modeType == "line" then
+    if motionwise == "line" then
         pos1 = {pos1[1] - 1, 0}
         -- Get the exact end position to avoid surprising pos2 value like {88, 2147483647}
         local lines = #api.nvim_buf_get_lines(0, pos2[1] - 1, pos2[1], false)[1]
@@ -98,10 +109,10 @@ function M.inplaceYank(argTbl) -- {{{
         pos2 = {pos2[1] - 1, pos2[2]}
     end
 
-    if modeType == "char" then
+    if motionwise == "char" then
         cmd [[normal! g`[vg`]y]]
         M.lastYankLinewise = false
-    elseif modeType == "line" then
+    elseif motionwise == "line" then
         cmd [[normal! g`[Vg`]y]]
         M.lastYankLinewise = true
     else
@@ -148,7 +159,7 @@ function M.inplaceYank(argTbl) -- {{{
 
 end -- }}}
 
-function M.inplacePut(modeType, pasteCMD, opts) -- {{{
+function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
     opts = opts or {hlGroup="Search", timeout=500}
     local regType   = fn.getregtype()
     local curLine   = api.nvim_get_current_line()
@@ -159,13 +170,13 @@ function M.inplacePut(modeType, pasteCMD, opts) -- {{{
     -- Use extmark to track strating cursor position in normal mode
     local cursorNS
     local cursorExtmark
-    if modeType == "n" then
+    if vimMode == "n" then
         cursorNS      = api.nvim_create_namespace("inplacePutCursor")
         cursorExtmark = api.nvim_buf_set_extmark(curBufNr, cursorNS, cursorPos[1] - 1, cursorPos[2], {})
     end
 
     -- Execute EX command
-    if modeType == "n" then
+    if vimMode == "n" then
         if vim.v.count ~= 0 then
             for _=0, vim.v.count do
                 cmd("normal! \"" .. vim.v.register .. pasteCMD)
@@ -228,7 +239,7 @@ function M.inplacePut(modeType, pasteCMD, opts) -- {{{
     -- }}} Create highlight
 
     -- Restore cursor position
-    if modeType == "n" then
+    if vimMode == "n" then
         local cursorResExtmark = api.nvim_buf_get_extmark_by_id(curBufNr, cursorNS, cursorExtmark, {})
         api.nvim_win_set_cursor(curWinID, {cursorResExtmark[1] + 1, cursorResExtmark[2]})
         api.nvim_buf_clear_namespace(curBufNr, cursorNS, 0, -1)

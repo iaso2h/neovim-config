@@ -1,5 +1,8 @@
 local map = require("util").map
 local ts = require 'nvim-treesitter.configs'
+
+-- TODO disable tree-sitter rainbow for floating window
+
 ts.setup{
     ensure_installed      = {"c", "cpp", "lua", "json", "bash", "regex", "css", "html", "go", "javascript", "rust", "ruby", "vue", "c_sharp", "typescript"},
     -- ensure_installed      = {"c", "cpp", "lua", "python", "json", "bash", "regex", "css", "html", "go", "javascript", "rust", "ruby", "vue", "c_sharp", "typescript"},

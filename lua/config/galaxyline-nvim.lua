@@ -10,9 +10,8 @@ local condition = require("galaxyline.condition")
 local extension = require("galaxyline.provider_extensions")
 
 gl.short_line_list = {
-    "LuaTree", "vista", "dbui", "startify", "term", "nerdtree", "fugitive",
-    "fugitiveblame", "plug", "coc-explorer", "Mundo", "MundoDiff", "vim-plug",
-    "qf"
+    "LuaTree", "vista", "dbui", "startify", "term", "fugitive", "fugitiveblame",
+    "plug", "coc-explorer", "Mundo", "MundoDiff", "vim-plug", "qf", "NvimTree"
 }
 
 -- TODO support qf and statify
@@ -89,16 +88,19 @@ local fileFormatIcons = {
 
 -- Based on 更纱黑体 Mono SC Nerd
 local bufTypeIcons = {
-    help             = '  ',
+    help             = ' 📖 ',
     defx             = '  ',
     denite           = '  ',
-    ["vim-plug"]     = '  ',
-    vista            = ' 識',
-    vista_kind       = '  ',
-    dbui             = '  ',
+    ["vim-plug"]     = ' 🔌',
+    vista            = ' 🏷️',
+    vista_kind       = ' 🏷️',
+    dbui             = ' 🏷️',
     magit            = '  ',
-    NvimTree         = '  ',
-    ["coc-explorer"] = '  ',
+    Mundo            = '  ',
+    startify         = ' 🏳️',
+    NvimTree         = ' 🗂️ ',
+    ["coc-explorer"] = ' 🗂️ ',
+    terminal         = '  ',
 }
 
 function GalaxyLSPStatus(status)
