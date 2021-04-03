@@ -235,10 +235,11 @@ function M.tblLoaded(termInclude) -- {{{
     if not termInclude then
         bufTbl = vim.tbl_filter(function(buf)
             return string.match(buf, "term://") == nil
-        end, vim.split(fn.execute("ls!"), '\n', false))
+        end, vim.split(fn.execute("ls"), '\n', false))
         table.remove(bufTbl, 1)
     else
-        bufTbl = vim.split(fn.execute("ls!"), '\n', false)
+        -- BUG: Execute ls! will incur Neovim built-in LSP complain
+        bufTbl = vim.split(fn.execute("ls"), '\n', false)
         table.remove(bufTbl, 1)
     end
     return bufTbl

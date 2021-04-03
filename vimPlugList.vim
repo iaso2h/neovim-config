@@ -7,6 +7,7 @@ Plug 'glepnir/galaxyline.nvim'
 Plug 'romgrk/barbar.nvim'
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'RRethy/vim-hexokinase', {'do': 'make hexokinase'}
+Plug 'chentau/todolist.nvim'
 Plug 'mhinz/vim-startify'
 Plug 'lukas-reineke/indent-blankline.nvim', {'branch': 'lua'}
 Plug 'kyazdani42/nvim-tree.lua'
@@ -57,6 +58,7 @@ Plug 'hrsh7th/vim-vsnip'
 Plug 'hrsh7th/vim-vsnip-integ'
 Plug 'windwp/nvim-ts-autotag'
 Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
+Plug 'nvim-lua/lsp-status.nvim'
 " }}} Intellisense
 
 " Telescope {{{

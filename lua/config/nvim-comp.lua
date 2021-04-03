@@ -56,26 +56,26 @@ end
 --- move to prev/next item in completion menuone
 --- jump to prev/next snippet's placeholder
 _G.tabComplete = function()
-    if vim.fn.pumvisible() == 1 then
-        return t "<C-n>"
-    elseif vim.fn.call("vsnip#available", {1}) == 1 then
+    -- if vim.fn.pumvisible() == 1 then
+        -- return t "<C-n>"
+    if vim.fn.call("vsnip#available", {1}) == 1 then
         return t "<Plug>(vsnip-expand-or-jump)"
     elseif checkBackSpace() then
-        return t "<C-]>"
+        return t "<C-S-]>"
     else
         return vim.fn['compe#complete']()
     end
 end
-
 _G.sTabComplete = function()
-    if vim.fn.pumvisible() == 1 then
-        return t "<C-p>"
-    elseif vim.fn.call("vsnip#jumpable", {-1}) == 1 then
+    -- if vim.fn.pumvisible() == 1 then
+        -- return t "<C-p>"
+    if vim.fn.call("vsnip#jumpable", {-1}) == 1 then
         return t "<Plug>(vsnip-jump-prev)"
     else
-        return t "<C-[>"
+        return t "<C-S-[>"
     end
 end
+
 
 map("i", [[<Tab>]], [[v:lua.tabComplete()]],    {"silent", "expr"})
 map("s", [[<Tab>]], [[v:lua.tabComplete()]],    {"silent", "expr"})

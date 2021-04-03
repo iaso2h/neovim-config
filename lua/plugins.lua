@@ -25,6 +25,33 @@ if vim.g.vscode == 1 then
     return
 end
 
+-- hrsh7th/vim-vsnip {{{
+vim.g.vsnip_snippet_dir   = fn.expand('$configPath/snippets')
+vim.g.vsnip_extra_mapping = false
+-- BUG: not working
+vim.g.vsnip_filetypes = {
+    txt        = {"all"},
+    md         = {"all"},
+    vim        = {"all"},
+    lua        = {"all"},
+    python     = {"all"},
+    c          = {"all"},
+    cpp        = {"all"},
+    javascript = {"all"},
+    json       = {"all"},
+    html       = {"all"},
+    css        = {"all"},
+    typescript = {"all"},
+}
+
+-- }}} hrsh7th/vim-vsnip
+-- romgrk/todoist.nvim {{{
+vim.g.todo_keywords = {
+    "TODO",
+    "BUG",
+    "NOTE",
+}
+-- }}} romgrk/todoist.nvim
 -- windwp/nvim-autopairs {{{
 require('nvim-autopairs').setup()
 -- }}} windwp/nvim-autopairs
@@ -150,8 +177,10 @@ map("o", [[im]],      [[<Plug>(matchup-i%)]])
 map("",  [[<C-m>]],   [[<Plug>(matchup-%)]])
 map("",  [[<C-S-m>]], [[<Plug>(matchup-g%)]])
 -- Exclusive
-map("",  [[m]],       [[<Plug>(matchup-]%)]])
-map("",  [[M]],       [[<Plug>(matchup-[%)]])
+map("n", [[m]],       [[<Plug>(matchup-]%)]])
+map("x", [[m]],       [[<Plug>(matchup-]%)]])
+map("n", [[M]],       [[<Plug>(matchup-[%)]])
+map("x", [[M]],       [[<Plug>(matchup-[%)]])
 -- Highlight
 map("n", [[<leader>m]], [[<plug>(matchup-hi-surround)]])
 -- Origin mark
@@ -220,7 +249,7 @@ vim.g.startify_lists = {
 vim.g.startify_update_oldfiles        = 1
 vim.g.startify_session_autoload       = 1
 if fn.has("win32") == 1 then
-    vim.g.startify_bookmarks = {{v = os.getenv("HOME") .. '/AppData/Local/nvim'}, {c = "H:/code"}}
+    vim.g.startify_bookmarks = {{v = fn.expand("$MYVIMRC")}}
 end
 vim.g.startify_session_before_save    = {'echo "Cleaning up before saving.."' }
 vim.g.startify_session_persistence    = 1
@@ -242,6 +271,7 @@ vim.g["vista#renderer#icons"] = {variable = "\\uF194"}
 map("n", [[<leader>s]], [[:Vista!!<cr>]], {"silent"})
 -- }}} liuchengxu/vista.vim
 -- airblade/vim-gitgutter {{{
+if fn.has('win32') then vim.g.gitgutter_git_executable = "D:/Git/bin/git.exe" end
 vim.g.gitgutter_map_keys = 0
 map("n", [[]h]], [[<Plug>(GitGutterNextHunk)]])
 map("n", [[[h]], [[<Plug>(GitGutterPrevHunk)]])

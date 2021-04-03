@@ -3,10 +3,12 @@ local api  = vim.api
 local cmd  = vim.cmd
 local bmap = require("util").bmap
 local lspConfig = require('lspconfig')
+local lspStatus = require('lsp-status')
+require("config.lsp-status-nvim").setup()
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities.textDocument.completion.completionItem.snippetSupport = true
-
+local snippetCapabilities = vim.lsp.protocol.make_client_capabilities()
+snippetCapabilities.textDocument.completion.completionItem.snippetSupport = true
+local capabilities = vim.tbl_deep_extend("keep", {}, lspStatus.capabilities, snippetCapabilities)
 
 ----
 -- Function: onAttach :Mappings or commands need to be loaded when specific LSP is attach
@@ -15,7 +17,7 @@ capabilities.textDocument.completion.completionItem.snippetSupport = true
 -- @param bufNr:  ___
 ----
 local onAttach  = function(client, bufNr)
-    -- api.nvim_buf_set_option(bufNr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+    lspStatus.on_attach(client)
 
     -- Mappings
     bmap(bufNr, "n", [=[gD]=],         [[:lua vim.lsp.buf.declaration()<cr>]],                                {"silent"})
@@ -64,13 +66,33 @@ local onAttach  = function(client, bufNr)
 end
 
 -- LSP config {{{
+-- Setup() function: https://github.com/neovim/nvim-lspconfig#setup-function
+-- Individual configuration: https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md
+local checkExt = function(langServer)
+    return vim.fn.has('win32') == 1 and langServer .. ".cmd" or langServer
+end
+
 -- Python {{{
+-- https://github.com/microsoft/pyright
+-- npm i -g pyright
+-- https://github.com/microsoft/pyright/blob/master/docs/configuration.md
 lspConfig.pyright.setup{
     capabilities = capabilities,
-    on_attach    = onAttach
+    on_attach    = onAttach,
+    setting      = {
+        pyright = {
+            venvPath = "",
+            typeCheckingMode = "basic",
+            extraPaths = "",
+            verboseOutput = true,
+            reportMissingImports = true,
+        }
+    }
 }
 -- }}} Python
 -- Lua {{{
+-- https://github.com/sumneko/lua-language-server
+-- Settings: https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md#sumneko_lua
 local sumneko_root_path
 local sumneko_binary
 local systemName
@@ -114,6 +136,9 @@ if sumneko_root_path then
                     -- Setup your lua path
                     path = vim.split(package.path, ';'),
                 },
+                completion = {
+                    callSnippet = "Replace",
+                },
                 diagnostics = {
                     enable  = true,
                     globals = {'vim'},
@@ -123,6 +148,9 @@ if sumneko_root_path then
                         [fn.expand('$VIMRUNTIME/lua')] = true,
                         [fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
                     },
+                    maxPreload = 2000,
+                    preloadFileSize = 1000,
+                    ignoreDir = {".vscode", ".git"}
                 },
                 -- Do not send telemetry data containing a randomized but unique identifier
                 telemetry = {
@@ -134,12 +162,13 @@ if sumneko_root_path then
 end
 -- }}} Lua
 -- Vimscript {{{
+-- npm install -g vim-language-server
 vim.g.markdown_fenced_languages = {
       'vim',
       'help'
 }
 lspConfig.vimls.setup{
-    cmd = {"vim-language-server", "--stdio"},
+    cmd = {checkExt("vim-language-server"), "--stdio"},
     capabilities = capabilities,
     on_attach = onAttach,
     filetypes = {"vim"},
@@ -168,25 +197,42 @@ lspConfig.vimls.setup{
 }
 -- }}} Vimscript
 -- CCLS {{{
+-- https://github.com/MaskRay/ccls
 lspConfig.ccls.setup {
     cmd = {"ccls"},
     on_attach = onAttach,
     filetypes = {"c", "cpp", "objc", "objcpp"},
     init_options = {
         -- capabilities = capabilities,
-        compilationDatabaseDirectory = "build",
-        index = {
-            threads = 3,
-        },
+        compilationDatabaseDirectory = "",
         clang = {
             excludeArgs = {"-frounding-math"},
+            -- TODO linux
+            resourceDir = fn.has("win32") == 1 and "D:/LLVM/lib/clang/11.1.0" or ""
+        },
+        completion = {
+            caseSensitivity = 1
+        },
+        diagnostics = {
+            blacklist = {
+            }
+        },
+        index = {
+            threads = 2,
         },
     },
     root_dir = lspConfig.util.root_pattern(".git", "compile_commands.json", "compile_flags.txt", "build", "README.md", "makefile"),
 }
 -- }}} CCLS
 -- JSON {{{
+-- https://github.com/vscode-langservers/vscode-json-languageserver
+-- npm install -g vscode-json-languageserver
 lspConfig.jsonls.setup {
+    cmd = {checkExt("vscode-json-languageserver"), "--stdio"},
+    filetypes = {"json"},
+    init_options = {
+        provideFormatter = true
+    },
     commands = {
         Format = {
             function()
@@ -195,15 +241,15 @@ lspConfig.jsonls.setup {
         }
     },
     capabilities = capabilities,
-    on_attach = onAttach
+    on_attach = onAttach,
+    root_dir = lspConfig.util.root_pattern(".git", vim.fn.getcwd())
 }
 -- }}} JSON
 -- HTML {{{
---Enable (broadcasting) snippet capability for completion
-
+-- npm install -g vscode-html-languageserver-bin
 lspConfig.html.setup {
     capabilities = capabilities,
-    cmd = {"html-languageserver", "--stdio"},
+    cmd = {checkExt("html-languageserver"), "--stdio"},
     on_attach = onAttach,
     filetypes = {"html"},
     init_options = {
@@ -220,6 +266,7 @@ lspConfig.html.setup {
 }
 -- }}} HTML
 -- TypeScript {{{
+-- npm install -g typescript typescript-language-server
 require'lspconfig'.tsserver.setup{
     cmd = {"typescript-language-server", "--stdio"},
     capabilities = capabilities,
@@ -236,9 +283,9 @@ local saga = require 'lspsaga'
 saga.init_lsp_saga {
     use_saga_diagnostic_sign = true,
     error_sign            = "❌",
-    warn_sign             = "💡",
-    hint_sign             = "🔎",
-    infor_sign            = "⚠️",
+    warn_sign             = "⚠️",
+    hint_sign             = "💡",
+    infor_sign            = "🔎",
     dianostic_header_icon = '   ',
     code_action_icon      = ' ',
     code_action_prompt = {

@@ -68,7 +68,8 @@ map("n", [[<A-v>]], [[<C-q>]],                                        {"noremap"
 -- Scratch file
 map("n", [[<C-n>]], [[:<c-u>new<cr>]], {"silent"})
 -- Open/Search in browser
-map("v", [[<C-l>]], [[:lua require("openBrowser").openInBrowser(require("util").visualSelection("string"))<cr>]], {"silent"})
+map("n", [[<C-l>]], [[:lua require("openBrowser").openUrl()<cr>]], {"silent"})
+map("v", [[<C-l>]], [[:lua require("openBrowser").openUrl(require("util").visualSelection("string"))<cr>]], {"silent"})
 -- Interrupt
 map("n", [[<C-A-c>]], [[:<c-u>call interrupt()<cr>]], {"noremap"})
 -- Paragraph & Block navigation
@@ -214,18 +215,16 @@ map("n", [[cP]], [[:lua require("yankPut").convertPut("P")<CR>]])
 map("n", [[cp]], [[:lua require("yankPut").convertPut("p")<CR>]])
 -- Mimic the VSCode move/copy line up/down behavior {{{
 -- Move line
-cmd [[command! -nargs=0 VSCodeLineMoveDownInsert m .+1  execute "normal! =="]]
-cmd [[command! -nargs=0 VSCodeLineMoveUpInsert   m .-2  execute "normal! =="]]
 map("i", [[<A-j>]], [[<C-\><C-o>:VSCodeLineMoveDownInsert<cr>]],                             {"silent", "novscode"})
 map("i", [[<A-k>]], [[<C-\><C-o>:VSCodeLineMoveUpInsert<cr>]],                               {"silent", "novscode"})
 map("i", [[<A-j>]], [[<C-\><C-o>:call VSCodeCall("editor.action.moveLinesDownAction")<cr>]], {"silent", "vscodeonly"})
 map("i", [[<A-k>]], [[<C-\><C-o>:call VSCodeCall("editor.action.moveLinesUpAction")<cr>]],   {"silent", "vscodeonly"})
-map("n", [[<A-j>]], [[:<c-u>m .+1<cr>==]],                                                   {"silent", "novscode"})
-map("n", [[<A-k>]], [[:<c-u>m .-2<cr>==]],                                                   {"silent", "novscode"})
+map("n", [[<A-j>]], [[:lua require("yankPut").VSCodeLineMove("n", "down")<cr>]],             {"silent", "novscode"})
+map("n", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("n", "up")<cr>]],               {"silent", "novscode"})
 map("n", [[<A-j>]], [[:call VSCodeCall("editor.action.moveLinesDownAction")<cr>]],           {"silent", "vscodeonly"})
 map("n", [[<A-k>]], [[:call VSCodeCall("editor.action.moveLinesUpAction")<cr>]],             {"silent", "vscodeonly"})
-map("v", [[<A-j>]], [[:m '>+1<cr>gv=gv]],                                                    {"silent", "novscode"})
-map("v", [[<A-k>]], [[:m '<-2<cr>gv=gv]],                                                    {"silent", "novscode"})
+map("v", [[<A-j>]], [[:lua require("yankPut").VSCodeLineMove("v", "down")<cr>]],             {"silent", "novscode"})
+map("v", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("v", "up")<cr>]],               {"silent", "novscode"})
 -- Copy line
 map("i", [[<A-S-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "down")<cr>]],       {"silent", "novscode"})
 map("i", [[<A-S-k>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "up")<cr>]],         {"silent", "novscode"})
@@ -271,9 +270,9 @@ map("t", [[<C-w>K]],     [[<A-n><C-w>K:startinsert<cr>]],           {"silent",  
 map("i", [[<C-cr>]],  [[<esc>o]],  {"novscode"})
 map("i", [[<S-cr>]],  [[<esc>O]],  {"novscode"})
 map("i", [[jj]],      [[<esc>`^]], {"noremap", "novscode"})
+map("i", [[<C-S-[>]], [[<C-d>]],   {"noremap", "novscode"})
+map("i", [[<C-S-]>]], [[<C-t>]],   {"noremap", "novscode"})
 map("i", [[<C-d>]],   [[<Del>]],   {"novscode"})
-map("i", [[<C-[>]],   [[<C-d>]],   {"noremap"})
-map("i", [[<C-]>]],   [[<C-t>]],   {"noremap"})
 map("i", [[<C-.>]],   [[<C-a>]],   {"noremap"})
 map("i", [[<C-S-.>]], [[<C-@>]],   {"noremap"})
 map("i", [[<C-BS>]],  [[<C-w>]],   {"noremap"})

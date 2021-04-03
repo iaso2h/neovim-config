@@ -1,0 +1,25 @@
+{
+    "file info": {
+        "prefix": [
+            "finfo"
+        ],
+        "body": [
+            "-- File: ${VIM:expand(\"%:t:r\")}",
+            "-- Author: iaso2h",
+            "-- Description: ${1}",
+            "-- Version: ${2:0.0.1}",
+            "-- Last Modified: ${VIM:strftime(\"%Y-%m-%d\")}"
+        ],
+        "description": "file infomation header"
+    },
+    "date": {
+        "prefix": [
+            "date"
+        ],
+        "body": [
+            "${VIM:strftime(\"%Y-%m-%d\")}"
+        ],
+        "description": "insert date time"
+    }
+}
+

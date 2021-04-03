@@ -47,32 +47,6 @@ local function saveModified(bufNr) -- {{{
 end -- }}}
 
 
-----
--- Function: puregeBufList :Purge buffer list and preserve the current buffer and special buffer
---
--- @return: 0
-----
-local function puregeBufList()
-    curBufNr = api.nvim_get_current_buf()
-    bufNrTbl = vim.tbl_map(function(bufNr)
-        return tonumber(string.match(bufNr, "%d+"))
-    end, util.tblLoaded(false))
-    -- Filter out terminal and special buffer, because I don't want close them yet
-    local filterBuf = function(bufNr)
-        local bufType = vim.bo.buftype
-        return bufNr ~= curBufNr and (bufType == "" or bufType == "nofile" or bufType == "nowrite")
-    end
-
-    bufNrTbl = vim.tbl_filter(filterBuf, bufNrTbl)
-    -- Wipe buffers
-    for _, bufNr in ipairs(bufNrTbl) do
-        if api.nvim_buf_is_valid(bufNrTbl) then
-            cmd("bwipe! " .. bufNr)
-        end
-    end
-end
-
-
 -- Function: bwipe :perform a bufferline update for barbar.nvim after the origin vim bwipe
 --
 -- @param bufNr: bufNr, same as the origin vim bwipe
@@ -142,9 +116,10 @@ local function wipeBuf() -- {{{
             api.nvim_set_current_win(curWinID)
             bwipe(curBufNr)
             -- Merge when there are two windows sharing the last buffer
-            -- Note: eif this evaluated to true, then the current length of bufNrtble
+            -- Note: If this evaluated to true, then the current length of bufNrtble
             -- has been reduced to 1, #bufNrTbl is just a value of previous state
             if #winIDTbl == 2 and bufInstance == #winIDTbl and #bufNrTbl == 2 then
+                Print("Merge windows")
                 cmd "only"
             end
         end
@@ -198,9 +173,9 @@ function M.smartClose(type) -- {{{
                     api.nvim_win_close(curWinID, true)
                 else
                     -- Scratch File
-                    wipeBuf()
                     saveModified(curBufNr)
-                    if #winIDTbl > 1 then api.nvim_win_close(curWinID, true) end
+                    wipeBuf()
+                    if #winIDTbl > 1 and api.nvim_win_is_valid(curWinID) then api.nvim_win_close(curWinID, true) end
                 end
             else -- Standard buffer
                 if #winIDTbl > 1 then -- 1+ Windows
@@ -242,7 +217,6 @@ function M.wipeOtherBuf() -- {{{
     bufNrTbl = vim.tbl_map(function(bufNr)
         return tonumber(string.match(bufNr, "%d+"))
     end, util.tblLoaded(false))
-
     -- Filter out terminal and special buffer, because I don't want close them yet
     local filterBuf = function(bufNr)
         local bufType = vim.bo.buftype
@@ -288,7 +262,7 @@ function M.wipeOtherBuf() -- {{{
     -- Wipe buffers
     for _, bufNr in ipairs(bufNrTbl) do
         if api.nvim_buf_is_valid(bufNrTbl) then
-            cmd("bwipe! " .. bufNr)
+            api.nvim_buf_delete(bufNr, {force = true})
         end
     end
 

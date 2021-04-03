@@ -33,10 +33,6 @@ function M.compileCode()
     end
 end
 
--- function M.create_term_buf(_type, size)
-    -- if _type == 'v'   vnew   else   new   end
-    -- cmd 'resize ' .. size
--- end
 
 function M.runCode()
     if vim.bo.modified then cmd "up" end

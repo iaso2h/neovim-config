@@ -13,18 +13,75 @@ local M = {}
 local util = require("util")
 local operator = require("operator")
 
-function M.VSCodeLineMove(vimMode, direction)
+function M.VSCodeLineMove(vimMode, direction) -- {{{
+    if not vim.bo.modifiable then return end
+    local curWinID = api.nvim_get_current_win()
+    local cursorPos = api.nvim_win_get_cursor(curWinID)
+    local curIndent = fn.indent(cursorPos[1])
     if vimMode == "n" then
         if direction == "down" then
-            cmd [[m .+1==]]
+            local nextIndent = fn.indent(cursorPos[1] + 1)
+            if nextIndent == curIndent or nextIndent == 0 then
+                cmd [[m .+1]]
+            else
+                cmd [[m .+1]]
+                if api.nvim_eval("&equalprg") == "" then cmd [[normal! ==]] end
+            end
         elseif direction == "up" then
-            cmd [[m .-2==]]
+            local previousIndent = fn.indent(cursorPos[1] - 1)
+            if previousIndent == curIndent or previousIndent == 0 then
+                cmd [[m .-2]]
+            else
+                cmd [[m .-2]]
+                if api.nvim_eval("&equalprg") == "" then cmd [[normal! ==]] end
+            end
+        end
+    elseif vimMode == "v" then
+        local curWinInfo = fn.getwininfo(curWinID)
+        local changeWinInfo
+        if direction == "down" then
+            local selectEnd = api.nvim_buf_get_mark(0, ">")
+            local endAdjacentIndent = fn.indent(selectEnd[1] + 1)
+            if endAdjacentIndent == curIndent or endAdjacentIndent == 0 then
+                cmd [['<,'>m '>+1]]
+                cmd [[normal! gv]]
+            else
+                cmd [['<,'>m '>+1]]
+                if api.nvim_eval("&equalprg") == "" then
+                    cmd [[normal! gv=]]
+                    changeWinInfo = fn.getwininfo(curWinID)
+                    if changeWinInfo["topline"] == curWinInfo["topline"] and changeWinInfo["botline"] == curWinInfo["botline"] then
+                        cmd [[normal! gv]]
+                    end
+                else
+                    cmd [[normal! gv]]
+                end
+            end
+        elseif direction == "up" then
+            local selectStart = api.nvim_buf_get_mark(0, "<")
+            local startAdjacentIndent = fn.indent(selectStart[1] - 1)
+            if startAdjacentIndent == curIndent or startAdjacentIndent == 0 then
+                cmd [['<,'>m '<-2]]
+                cmd [[normal! gv]]
+            else
+                cmd [['<,'>m '<-2]]
+                if api.nvim_eval("&equalprg") == "" then
+                    cmd [[normal! gv=]]
+                    changeWinInfo = fn.getwininfo(curWinID)
+                    if changeWinInfo["topline"] == curWinInfo["topline"] and changeWinInfo["botline"] == curWinInfo["botline"] then
+                        cmd [[normal! gv]]
+                    end
+                else
+                    cmd [[normal! gv]]
+                end
+            end
         end
     end
-    map("n", [[<A-k>]], [[:<c-u>m .-2<cr>==]], {"silent", "novscode"})
-end
+end -- }}}
+
 -- VSCode yank line {{{
 function M.VSCodeLineYank(vimMode, direction)
+    if not vim.bo.modifiable then return end
     util.saveReg()
 
     -- Duplication {{{
@@ -160,12 +217,15 @@ function M.inplaceYank(argTbl) -- {{{
 end -- }}}
 
 function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
+    if not vim.bo.modifiable then return end
     opts = opts or {hlGroup="Search", timeout=500}
     local regType   = fn.getregtype()
     local curLine   = api.nvim_get_current_line()
     local curBufNr  = api.nvim_get_current_buf()
     local curWinID  = api.nvim_get_current_win()
     local cursorPos = api.nvim_win_get_cursor(curWinID)
+    local curIndent = fn.indent(cursorPos[1])
+    local adjacentLineIndent
 
     -- Use extmark to track strating cursor position in normal mode
     local cursorNS
@@ -173,6 +233,17 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
     if vimMode == "n" then
         cursorNS      = api.nvim_create_namespace("inplacePutCursor")
         cursorExtmark = api.nvim_buf_set_extmark(curBufNr, cursorNS, cursorPos[1] - 1, cursorPos[2], {})
+    end
+
+    if regType == "V" or regType == "l" then
+        if pasteCMD == "P" then
+            adjacentLineIndent = fn.indent(cursorPos[1] - 1)
+        else
+            adjacentLineIndent = fn.indent(cursorPos[1] + 1)
+        end
+        M.lastPutLinewise = true
+    else
+        M.lastPutLinewise = false
     end
 
     -- Execute EX command
@@ -185,6 +256,7 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
             cmd("normal! \"" .. vim.v.register .. pasteCMD)
         end
     else
+
         cmd("normal! gv\"" .. vim.v.register .. pasteCMD)
     end
 
@@ -202,17 +274,18 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
                     pos1[1], pos1[2], {end_line = pos2[1], end_col = pos2[2]})
 
     if regType == "V" or regType == "l" then
-        api.nvim_win_set_cursor(curWinID, {pos1[1] + 1, pos1[2]})
-        cmd "normal! V"
-        api.nvim_win_set_cursor(curWinID, {pos2[1] + 1, pos2[2]})
-        cmd "normal! ="
-        M.lastPutLinewise = true
-        -- Change to 0-based for extmark creation
+        if curIndent ~= 0 and adjacentLineIndent ~= 0 and curIndent ~= adjacentLineIndent and api.nvim_eval("&equalprg") == "" then
+            api.nvim_win_set_cursor(curWinID, {pos1[1] + 1, pos1[2]})
+            cmd "normal! V"
+            api.nvim_win_set_cursor(curWinID, {pos2[1] + 1, pos2[2]})
+            cmd "normal! ="
+        end
     else
         -- Format current line if new paste content consists a single line
-        local match = string.match(curLine, '%w')
-        if not match then cmd [[normal! ==]] end
-        M.lastPutLinewise = false
+        if api.nvim_eval("&equalprg") == "" then
+            local match = string.match(curLine, '%w')
+            if not match then cmd [[normal! ==]] end
+        end
     end
     -- }}} Format new created content when possible
 
@@ -248,9 +321,8 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
     end
 end --  }}}
 
--- TODO replace with register
-
 function M.convertPut(pasteCMD, opts) --  {{{
+    if not vim.bo.modifiable then return end
     opts = opts or {hlGroup="Search", timeout=500}
     local curBufNr = api.nvim_get_current_buf()
     local curWinID = api.nvim_get_current_win()
