@@ -293,5 +293,22 @@ function M.hideCursor()
     end
 end
 
+
+function M.quickfixToggle() -- {{{
+    local winInfo = fn.getwininfo()
+    -- Toogle off
+    if vim.bo.buftype == "quickfix" then
+        return cmd "q"
+    end
+
+    -- Toggle on
+    for _, tbl in ipairs(winInfo) do
+        if tbl["quickfix"] == 1 then
+            return api.nvim_set_current_win(tbl["winid"])
+        end
+    end
+    cmd "copen"
+end -- }}}
+
 return M
 

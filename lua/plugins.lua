@@ -6,7 +6,7 @@ local M   = {}
 local map = require("util").map
 
 require "config.vim-visual-multi"
-require "config.golden_size"
+-- require "config.golden_size"
 require "config.markdown"
 require "config.asyncrun"
 require "config.telescope-nvim"
@@ -25,11 +25,13 @@ if vim.g.vscode == 1 then
     return
 end
 
+-- vim.g.python_highlight_all = 1 {{{
+vim.g.python_highlight_all = 1
+-- }}} vim.g.python_highlight_all = 1
 -- hrsh7th/vim-vsnip {{{
 vim.g.vsnip_snippet_dir   = fn.expand('$configPath/snippets')
 vim.g.vsnip_extra_mapping = false
--- BUG: not working
-vim.g.vsnip_filetypes = {
+vim.g.vsnip_filetypes     = {
     txt        = {"all"},
     md         = {"all"},
     vim        = {"all"},
@@ -43,13 +45,13 @@ vim.g.vsnip_filetypes = {
     css        = {"all"},
     typescript = {"all"},
 }
-
 -- }}} hrsh7th/vim-vsnip
 -- romgrk/todoist.nvim {{{
 vim.g.todo_keywords = {
     "TODO",
     "BUG",
     "NOTE",
+    "DEBUG"
 }
 -- }}} romgrk/todoist.nvim
 -- windwp/nvim-autopairs {{{
@@ -99,9 +101,10 @@ map("n", [[g<space>o]], [[:lua require("plugins").commentJump("o")<cr>]], {"sile
 map("n", [[g<space>O]], [[:lua require("plugins").commentJump("O")<cr>]], {"silent"})
 
 map("n", [[g<space><space>]], [[<plug>NERDCommenterToggle]])
-map("v", [[g<space><space>]],        [[<plug>NERDCommenterToggle]])
+map("v", [[<space><space>]], [[<plug>NERDCommenterToggle]])
 -- map("n", [[g<space>n]], [[<plug>NERDCommenterNested]])
 -- map("v", [[g<space>n]], [[<plug>NERDCommenterNested]])
+
 map("n", [[g<space>i]], [[<plug>NERDCommenterInvert]])
 map("v", [[g<space>i]], [[<plug>NERDCommenterInvert]])
 
@@ -273,6 +276,7 @@ map("n", [[<leader>s]], [[:Vista!!<cr>]], {"silent"})
 -- airblade/vim-gitgutter {{{
 if fn.has('win32') then vim.g.gitgutter_git_executable = "D:/Git/bin/git.exe" end
 vim.g.gitgutter_map_keys = 0
+vim.g.gitgutter_sign_priority = 30
 map("n", [[]h]], [[<Plug>(GitGutterNextHunk)]])
 map("n", [[[h]], [[<Plug>(GitGutterPrevHunk)]])
 map("o", [[ih]], [[<Plug>(GitGutterTextObjectInnerPending)]])

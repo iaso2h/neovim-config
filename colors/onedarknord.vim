@@ -269,6 +269,7 @@ call s:hi("Underline", "", "", "", "", s:underline, "")
 
 "+--- Editor ---+
 call s:hi("ColorColumn", "", s:nord1_gui, "NONE", s:nord1_term, "", "")
+call s:hi("NonText", s:nord2_gui, "", s:nord3_term, "", "", "")
 call s:hi("Cursor", "#000000", "#FFFFFF", "",s:nord6_term, "", "")
 call s:hi("CursorLine", "", s:nord1_gui, "NONE", s:nord1_term, "NONE", "")
 call s:hi("Error", s:nord4_gui, s:nord11_gui, "", s:nord11_term, "", "")
@@ -276,7 +277,6 @@ call s:hi("iCursor", s:nord0_gui, s:nord4_gui, "", "NONE", "", "")
 call s:hi("LineNr", s:nord3_gui, "NONE", s:nord3_term, "NONE", "", "")
 call s:hi("MatchParen", s:nord8_gui, s:nord3_gui_bright, s:nord8_term, s:nord3_term, "", "")
 call s:hi("MatchWord", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "", "")
-call s:hi("NonText", s:nord2_gui, "", s:nord3_term, "", "", "")
 call s:hi("Normal", s:nord4_gui, s:nord0_gui, "NONE", "NONE", "", "")
 call s:hi("Pmenu", s:nord4_gui, s:nord2_gui, "NONE", s:nord1_term, "NONE", "")
 call s:hi("PmenuSbar", s:nord4_gui, s:nord2_gui, "NONE", s:nord1_term, "", "")
@@ -386,45 +386,46 @@ endif
 "+----------------------+
 " Syntax Groups (descriptions and ordering from `:h w18`) {{{
 
-call s:h("Comment", { "fg": s:comment_grey, "gui": "italic", "cterm": "italic" }) " any comment
-call s:h("Constant", { "fg": s:cyan }) " any constant
-call s:h("String", { "fg": s:green }) " a string constant: "this is a string"
-call s:h("Character", { "fg": s:green }) " a character constant: 'c', '\n'
-call s:h("Number", { "fg": s:dark_yellow }) " a number constant: 234, 0xff
-call s:h("Boolean", { "fg": s:dark_yellow }) " a boolean constant: TRUE, false
-call s:h("Float", { "fg": s:dark_yellow }) " a floating point constant: 2.3e10
-call s:h("Identifier", { "fg": s:red }) " any variable name
-call s:h("Function", { "fg": s:blue }) " function name (also: methods for classes)
-call s:h("Statement", { "fg": s:purple, "gui": "italic", "cterm": "italic" }) " any statement
-call s:h("Conditional", { "fg": s:purple, "gui": "italic", "cterm": "italic" }) " if, then, else, endif, switch, etc.
-call s:h("Repeat", { "fg": s:purple, "gui": "italic", "cterm": "italic" }) " for, do, while, etc.
-call s:h("Label", { "fg": s:purple }) " case, default, etc.
-call s:h("Operator", { "fg": s:purple }) " sizeof", "+", "*", etc.
-call s:h("Keyword", { "fg": s:red }) " any other keyword
-call s:h("Exception", { "fg": s:purple, "gui": "italic", "cterm": "italic" }) " try, catch, throw
-call s:h("PreProc", { "fg": s:yellow }) " generic Preprocessor
-call s:h("Include", { "fg": s:blue }) " preprocessor #include
-call s:h("Define", { "fg": s:purple }) " preprocessor #define
-call s:h("Macro", { "fg": s:purple }) " same as Define
-call s:h("PreCondit", { "fg": s:yellow }) " preprocessor #if, #else, #endif, etc.
-call s:h("Type", { "fg": s:yellow }) " int, long, char, etc.
-call s:h("StorageClass", { "fg": s:yellow }) " static, register, volatile, etc.
-call s:h("Structure", { "fg": s:yellow }) " struct, union, enum, etc.
-call s:h("Typedef", { "fg": s:yellow }) " A typedef
-call s:h("Special", { "fg": s:blue }) " any special symbol
-call s:h("SpecialChar", { "fg": s:dark_yellow }) " special character in a constant
+call s:h("Comment", {"fg": s:comment_grey, "gui": "italic", "cterm": "italic" }) " any comment
+call s:h("Constant", {"fg": s:cyan }) " any constant
+call s:h("String", {"fg": s:green }) " a string constant: "this is a string"
+call s:h("Character", {"fg": s:green }) " a character constant: 'c', '\n'
+call s:h("Number", {"fg": s:dark_yellow }) " a number constant: 234, 0xff
+call s:h("Boolean", {"fg": s:dark_yellow }) " a boolean constant: TRUE, false
+call s:h("Float", {"fg": s:dark_yellow }) " a floating point constant: 2.3e10
+" call s:h("Identifier", {"fg": s:colors.white }) " any variable name
+call s:hi("Identifier", s:nord4_gui, "", "NONE", "", "NONE", "") " any variable name
+call s:h("Function", {"fg": s:blue }) " function name (also: methods for classes)
+call s:h("Statement", {"fg": s:purple, "gui": "italic", "cterm": "italic" }) " any statement
+call s:h("Conditional", {"fg": s:purple, "gui": "italic", "cterm": "italic" }) " if, then, else, endif, switch, etc.
+call s:h("Repeat", {"fg": s:purple, "gui": "italic", "cterm": "italic" }) " for, do, while, etc.
+call s:h("Label", {"fg": s:purple }) " case, default, etc.
+call s:h("Operator", {"fg": s:purple }) " sizeof", "+", "*", etc.
+call s:h("Keyword", {"fg": s:red }) " any other keyword
+call s:h("Exception", {"fg": s:purple, "gui": "italic", "cterm": "italic" }) " try, catch, throw
+call s:h("PreProc", {"fg": s:yellow }) " generic Preprocessor
+call s:h("Include", {"fg": s:purple }) " preprocessor #include
+" TODO
+call s:h("Define", {"fg": s:purple }) " preprocessor #define
+" call s:h("Macro", {"fg": s:purple }) " same as Define
+call s:hi("Macro", "#7E57C2", "NONE", s:nord15_term, "NONE", "", "")
+call s:h("PreCondit", {"fg": s:yellow }) " preprocessor #if, #else, #endif, etc.
+call s:h("Type", {"fg": s:yellow }) " int, long, char, etc.
+call s:h("StorageClass", {"fg": s:yellow }) " static, register, volatile, etc.
+call s:h("Structure", {"fg": s:yellow }) " struct, union, enum, etc.
+call s:h("Typedef", {"fg": s:yellow }) " A typedef
+call s:h("Special", {"fg": s:blue }) " any special symbol
+call s:h("SpecialChar", {"fg": s:dark_yellow }) " special character in a constant
 call s:h("Tag", {}) " you can use CTRL-] on this
 call s:h("Delimiter", {}) " character that needs attention
-call s:h("SpecialComment", { "fg": s:comment_grey }) " special things inside a comment
+call s:h("SpecialComment", {"fg": s:comment_grey }) " special things inside a comment
 call s:h("Debug", {}) " debugging statements
-call s:h("Underlined", { "gui": "underline", "cterm": "underline" }) " text that stands out, HTML links
+call s:h("Underlined", {"gui": "underline", "cterm": "underline" }) " text that stands out, HTML links
 call s:h("Ignore", {}) " left blank, hidden
-call s:h("Error", { "fg": s:red }) " any erroneous construct
+call s:h("Error", {"fg": s:red }) " any erroneous construct
+call s:h("Parameter", {"fg": s:dark_yellow }) " Function parameter
 call s:hi("Todo", s:nord13_gui, "NONE", s:nord13_term, "NONE", "", "") " anything that needs extra attention; mostly the keywords TODO FIXME and XXX
 
-" }}}
-hi! link Macro Define
-hi! link PreCondit PreProc
 
 "+-----------+
 "+ Languages +
@@ -1067,7 +1068,8 @@ highlight link TSComment            Comment
 highlight link TSConditional        Conditional
 highlight link TSConstant           Constant
 highlight link TSConstBuiltin       Special
-highlight link TSConstMacro         Define
+highlight link TSConstMacro         Macro
+" highlight link TSConstMacro         Define
 highlight link TSConstructor        Special
 highlight link TSEmphasis           Italic
 highlight link TSError              Error
@@ -1087,12 +1089,14 @@ highlight link TSMethod             Function
 call s:hi("TSNamespace", "#00ffe5", "", s:nord8_term, "", "", "")
 highlight link TSNumber             Number
 highlight link TSOperator           Operator
-highlight link TSParameter          Identifier
-highlight link TSParameterReference Identifier
+highlight link TSParameter          Parameter
+highlight link TSParameterReference Parameter
 highlight link TSProperty           Identifier
 highlight link TSPunctBracket       Delimiter
-highlight link TSPunctDelimiter     Delimiter
-highlight link TSPunctSpecial       Delimiter
+call s:hi("TSPunctDelimiter", "#A1887F", "NONE", s:nord12_term, "NONE", "", "")
+highlight link TSPunctSpecial       TSPunctDelimiter
+" highlight link TSPunctDelimiter     Delimiter
+" highlight link TSPunctSpecial       Delimiter
 highlight link TSRepeat             Repeat
 highlight link TSString             String
 highlight link TSStringEscape       SpecialChar
@@ -1109,7 +1113,7 @@ highlight link TSVariableBuiltin    Special
 " }}} nvim-treesitter/nvim-treesitter
 
 " lukas-reineke/indent-blankline.nvim {{{
-call s:hi("indent_blankline", "#3b4252", s:nord0_gui, s:nord1_term, "NONE", "", "")
+hi! link indent-blankline SignColorm
 " }}} lukas-reineke/indent-blankline.nvim
 
 " glepnir/lspsaga.nvim {{{

@@ -1,8 +1,9 @@
 -- File: extraction
 -- Author: iaso2h
 -- Description: Extract selected content into new variable or new file
--- Version: 0.0.4
--- Last Modified: 2021/03/30
+-- Version: 0.0.5
+-- Last Modified: 2021-04-05
+-- TODO: change the other var in the same scope
 local vim = vim
 local fn  = vim.fn
 local cmd = vim.cmd
@@ -145,7 +146,8 @@ end -- }}}
 ----
 local newVar = function(lang, curWinID, curBufNr, lhs, rhs, extra2VarNS, extra2VarExtmark, linebreakSelectCheck) -- {{{
     local prefix
-    local suffix = langSuffix[lang][1] or ""
+    local suffix = langSuffix[lang] or ""
+    suffix = suffix ~= "" and langSuffix[1] or ""
     local amid   = langAmid[lang]   or " = "
     -- Retrieve RHS source location
     local rhsSrcResExtmark = api.nvim_buf_get_extmark_by_id(curBufNr,
@@ -166,7 +168,6 @@ local newVar = function(lang, curWinID, curBufNr, lhs, rhs, extra2VarNS, extra2V
     cmd [[normal! mz`z]]
 
     -- Put lhs value after when linebreak character is selected
-    Print(linebreakSelectCheck)
     if not linebreakSelectCheck then
         api.nvim_put({lhs}, "c", false, false)
     else

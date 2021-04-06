@@ -57,6 +57,7 @@ autocmd FileType              json setlocal conceallevel=0 concealcursor=
 autocmd FileType              qf   setlocal number norelativenumber nobuflisted
 autocmd FileType              qf map <buffer> <silent> <cr> :.cc<cr>:copen<cr>
 autocmd FileType              vim,lua     setlocal foldmethod=expr foldexpr=EnhanceFoldExpr()
+autocmd BufEnter              term://*    startinsert
 autocmd BufEnter              *.txt       lua require("util").splitExist()
 autocmd BufReadPre,BufNewFile *.jsx       setlocal filetype=jypescript
 autocmd BufReadPre,BufNewFile *.tsx       setlocal filetype=typescript
@@ -77,7 +78,7 @@ command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | se
 command! -nargs=0 TrimWhiteSpaces call TrimWhiteSpaces(0)
 command! -nargs=0 PS terminal powershell
 command! -nargs=0 CD execute "cd " . expand("%:p:h")
-command! -nargs=0 E  up | e! | zA
+command! -nargs=0 E  up | let g:refreshBufSavView = winsaveview() | e! | call winrestview(g:refreshBufSavView)
 " Edit Vimrc
 if has('win32')
 command! -nargs=0 IDEAVimedit vsplit ~/.ideavimrc

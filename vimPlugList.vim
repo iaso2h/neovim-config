@@ -17,7 +17,7 @@ Plug 'kyazdani42/nvim-tree.lua'
 Plug 'tpope/vim-repeat'
 Plug 'inkarkat/vim-visualrepeat'
 Plug 'antoinemadec/FixCursorHold.nvim'
-Plug 'tpope/vim-eunuch'
+Plug 'iaso2h/vim-eunuch'
 Plug 'skywind3000/asyncrun.vim'
 Plug 'bkad/camelcasemotion'
 Plug 'zatchheems/vim-camelsnek'
@@ -37,7 +37,7 @@ Plug 'AndrewRadev/splitjoin.vim'
 Plug 'mg979/vim-visual-multi'
 Plug 'szw/vim-maximizer', {'on': 'MaximizerToggle'}
 Plug 'simnalamburt/vim-mundo', {'on': 'MundoToggle'}
-Plug 'dm1try/golden_size'
+" Plug 'dm1try/golden_size'
 " }}} Vim enhancement
 
 " Tree-sitter {{{
@@ -72,9 +72,12 @@ Plug 'nvim-telescope/telescope-media-files.nvim'
 " }}} Telescope
 
 " Language {{{
+" Python
+Plug 'vim-python/python-syntax'
 " Lua
 Plug 'davisdude/vim-love-docs', {'branch': 'build', 'for': 'lua'}
 Plug 'iaso2h/nlua.nvim', {'branch': 'iaso2h', 'for': 'lua'}
+Plug 'euclidianAce/BetterLua.vim'
 " Markdown
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
 Plug 'plasticboy/vim-markdown', {'for': ['markdown', 'md']}
@@ -83,6 +86,7 @@ Plug 'MTDL9/vim-log-highlighting', {'for': 'log'}
 " }}} Language
 
 " Debug {{{
+Plug 'kergoth/vim-hilinks'
 Plug 'bfredl/nvim-luadev', {'for': 'lua'}
 Plug 'iaso2h/vim-scriptease', {'branch': 'ftplugin'}
 Plug 'mfussenegger/nvim-dap'

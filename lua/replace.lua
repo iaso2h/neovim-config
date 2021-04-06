@@ -21,8 +21,8 @@ local M   = {}
 
 -- Note: Could use ingo#pos#IsOnOrAfter(), but avoid dependency to ingo-library
 -- for now.
-local function correctRegtype(typeMode, register, regType ,replacement)
-    if typeMode == "block" then
+local function correctRegtype(motionwise, register, regType ,replacement)
+    if motionwise == "block" then
         -- Adaptations for blockwise replace.
         local pasteTextTbl = vim.split(replacement["text"], "\n", false)
         local pasteLineNr  = #pasteTextTbl
@@ -59,7 +59,7 @@ local function correctRegtype(typeMode, register, regType ,replacement)
     return 0
 end
 
-local function replace(typeMode, register, replacement, curBufNr)
+local function replace(motionwise, register, replacement, curBufNr)
     -- With a put in visual mode, the selected text will be replaced with the
     -- contents of the register. This works better than first deleting the
     -- selection into the black-hole register and then doing the insert; as
@@ -81,35 +81,37 @@ local function replace(typeMode, register, replacement, curBufNr)
         -- -- register; this will be restored, anyway.
         -- fn.setreg('"', vim.g.ReplaceWithRegisterExpr)
         -- -- TODO
-        -- correctForRegtype(typeMode, '"', fn.getregtype('"'), vim.g.ReplaceWithRegisterExpr)
+        -- correctForRegtype(motionwise, '"', fn.getregtype('"'), vim.g.ReplaceWithRegisterExpr)
         -- -- Must not clean up the global temp variable to allow command
         -- -- repetition.
         -- -- local pasteRegister = ''
     -- end
 
-    local newStartPos
-    local newEndPos
-    if typeMode == 'visual' then
+    local newContentStart
+    local newContentEnd
+    if motionwise == 'visual' then
         cmd("silent normal! gv" .. replacement["register"] .. "p")
-        newStartPos  = api.nvim_buf_get_mark(0, "[")
-        newEndPos    = api.nvim_buf_get_mark(0, "]")
+        newContentStart  = api.nvim_buf_get_mark(0, "[")
+        newContentEnd    = api.nvim_buf_get_mark(0, "]")
         -- Create extmark to track position of new content
         require("yankPut").inplacePutNewContentNS      = api.nvim_create_namespace("inplacePutNewContent")
         require("yankPut").inplacePutNewContentExtmark = api.nvim_buf_set_extmark(curBufNr,
                                                     require("yankPut").inplacePutNewContentNS,
-                                                    newStartPos[1] - 1,
-                                                    newStartPos[2],
-                                                    {end_line = newEndPos[1] - 1,
-                                                        end_col = newEndPos[2]})
-        cmd("normal! ==")
+                                                    newContentStart[1] - 1,
+                                                    newContentStart[2],
+                                                    {end_line = newContentEnd[1] - 1,
+                                                        end_col = newContentEnd[2]})
+        api.nvim_win_set_cursor(0, api.nvim_buf_get_mark(0, "["))
+        cmd("normal! v")
+        api.nvim_win_set_cursor(0, api.nvim_buf_get_mark(0, "]"))
+        cmd("normal! =")
     else
         -- TODO
-        -- replacement["mode"]     = fn.visualmode()
         -- replacement["mode"]     = fn.visualmode()
 
         api.nvim_win_set_cursor(0, replacement["startPos"])
         local visualCMD
-        if typeMode == "line" then
+        if motionwise == "line" then
             visualCMD = "V"
         else
             visualCMD = "v"
@@ -117,16 +119,16 @@ local function replace(typeMode, register, replacement, curBufNr)
         cmd("normal! " .. visualCMD)
         api.nvim_win_set_cursor(0, replacement["endPos"])
         cmd('normal!' .. replacement["register"] .. "p")
-        newStartPos  = api.nvim_buf_get_mark(0, "[")
-        newEndPos    = api.nvim_buf_get_mark(0, "]")
+        newContentStart  = api.nvim_buf_get_mark(0, "[")
+        newContentEnd    = api.nvim_buf_get_mark(0, "]")
         -- Create extmark to track position of new content
         require("yankPut").inplacePutNewContentNS      = api.nvim_create_namespace("inplacePutNewContent")
         require("yankPut").inplacePutNewContentExtmark = api.nvim_buf_set_extmark(curBufNr,
                                                     require("yankPut").inplacePutNewContentNS,
-                                                    newStartPos[1] - 1,
-                                                    newStartPos[2],
-                                                    {end_line = newEndPos[1] - 1,
-                                                        end_col = newEndPos[2]})
+                                                    newContentStart[1] - 1,
+                                                    newContentStart[2],
+                                                    {end_line = newContentEnd[1] - 1,
+                                                        end_col = newContentEnd[2]})
 
         -- TODO
         -- silent! call('ingo#selection#Set', l:save_visualarea)
@@ -134,7 +136,7 @@ local function replace(typeMode, register, replacement, curBufNr)
 
     -- Report change in Neovim statusbar
     local srcLineCount = replacement["endPos"][1] - replacement["startPos"][1] + 1
-    local repLineCount = newEndPos[1] - newStartPos[1] + 1
+    local repLineCount = newContentEnd[1] - newContentStart[1] + 1
     if srcLineCount >= vim.o.report or repLineCount >= vim.o.report then
         local srcReport = string.format("Replaced %d line%s", srcLineCount, srcLineCount == 1 and "" or "s")
         local repReport = srcLineCount == repLineCount and '' or
@@ -148,16 +150,20 @@ function ReplaceOperator(argTbl)
     -- TODO
     local opts = {hlGroup = "Search", timeout = 500}
     local curBufNr      = api.nvim_get_current_buf()
-    local typeMode      = argTbl[1]
+    local motionwise      = argTbl[1]
     local register      = vim.v.register
     local regType       = fn.getregtype(register)
     local saveClipboard = vim.o.clipboard
     vim.o.clipboard     = "" -- Avoid clobbering the selection and clipboard registers.
     local replacement   = {}
     replacement["text"] = fn.getreg(register, 1) -- Expression evaluation inside function context may cause errors, therefore get unevaluated expression when register == '='.
+    -- DEBUG:
+    -- Print(argTbl)
 
+    -- DEBUG:
+    if not cursorPos then Print(api.nvim_win_get_cursor(0)) end
 
-    if typeMode == "visual" then
+    if motionwise == "visual" then
         cursorPos = api.nvim_win_get_cursor(0)
         replacement["startPos"]  = api.nvim_buf_get_mark(0, "<")
         replacement["endPos"]    = api.nvim_buf_get_mark(0, ">")
@@ -176,9 +182,9 @@ function ReplaceOperator(argTbl)
     -- Save registers
     require("util").saveReg()
 
-    local isCorrected = correctRegtype(typeMode, register, regType, replacement)
+    local isCorrected = correctRegtype(motionwise, register, regType, replacement)
 
-    replace(typeMode, register, replacement, curBufNr)
+    replace(motionwise, register, replacement, curBufNr)
 
     -- Add hightlight
     -- Restoration
@@ -215,19 +221,29 @@ function ReplaceOperator(argTbl)
     -- }}} Create highlight
 
     -- Restore cursor {{{
-    -- Use extmark to track the new position of newStartPos after executing
+    -- Use extmark to track the new position of newContentStart after executing_
     -- formaprg in some cases
-    if typeMode ~= "visual" then
-        if cursorPos[2] > newContentResEnd[2] then
-            -- In cases where then size of the new text content is less than the
-            -- size of the origin text content
-            api.nvim_win_set_cursor(0, {cursorPos[1], newContentResStart[2]})
-        else
-            api.nvim_win_set_cursor(0, cursorPos)
+    -- Skip when it's called from repeat key
+    if motionwise ~= "visual" then
+        if cursorPos then
+            if cursorPos[2] > newContentResEnd[2] then
+                -- In cases where then size of the new text content is less than the
+                -- size of the origin text content
+                api.nvim_win_set_cursor(0, {cursorPos[1], newContentResStart[2]})
+            else
+                api.nvim_win_set_cursor(0, cursorPos)
+            end
+
+            cursorPos = nil
         end
     else
-        -- newStartPos directly
+        -- newContentStart directly
+        -- TODO: Retrieve cursor at starting position
+
+        -- Place cursor at non-blank position
+        local newContentFirstLine = api.nvim_buf_get_lines(0, newContentResStart[1], newContentResStart[1] + 1, false)[1]
         api.nvim_win_set_cursor(0, {newContentResStart[1] + 1, newContentResStart[2]})
+        if string.sub(newContentFirstLine, 1, 1) == " " then cmd "normal! w" end
     end
     -- }}} Restore cursor
 
@@ -267,6 +283,7 @@ function M.expression()
     end
 
     cursorPos = api.nvim_win_get_cursor(0)
+
 
     -- TODO
     -- if vim.v.register == '=' then

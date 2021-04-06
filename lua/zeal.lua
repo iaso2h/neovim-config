@@ -3,8 +3,9 @@ local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
 local M   = {}
+local globalCheck
 
-function M.query(argTble)
+local function query(argTble)
     if fn.executable("zeal") ~= 1 then
         api.nvim_echo({{"Zeal not found on Path", "ErrorMsg"}}, true, {})
     end
@@ -12,23 +13,27 @@ function M.query(argTble)
     -- local opts     = {hlGroup="Search", timeout=500}
     local curWinID = api.nvim_get_current_win()
     -- local curBufNr = api.nvim_get_current_buf()
-    local motionwise = argTble[1]
-    local vimMode    = argTble[2] or "n"
-    local content    = "zeal " .. vim.bo.filetype .. ":"
-    local operator   = require("operator")
+    -- local motionwise = argTble[1]
+    local vimMode  = argTble[2] or "n"
+    local content  = globalCheck and "zeal " or "zeal " .. vim.bo.filetype .. ":"
+    local operator = require("operator")
+    local cursorPos
     local pos1
     local pos2
 
     if vimMode == "n" then
+        cursorPos = operator.cursorPos
         pos1 = api.nvim_buf_get_mark(0, "[")
         pos2 = api.nvim_buf_get_mark(0, "]")
         api.nvim_win_set_cursor(0, pos1)
-        cmd("normal! v")
+        cmd "normal! v"
         api.nvim_win_set_cursor(0, pos2)
-        cmd("normal! v")
+        cmd "normal! v"
     else
-        pos1 = api.nvim_buf_get_mark(0, "<")
-        pos2 = api.nvim_buf_get_mark(0, ">")
+        cmd "normal! gv"
+        cursorPos = api.nvim_win_get_cursor(0)
+        pos1      = api.nvim_buf_get_mark(0, "<")
+        pos2      = api.nvim_buf_get_mark(0, ">")
     end
     content = content .. require("util").visualSelection("string")
 
@@ -55,7 +60,18 @@ function M.query(argTble)
     -- }}} Create highlight
 
     -- Restor cursor position
-    api.nvim_win_set_cursor(curWinID, operator.cursorPos)
+    api.nvim_win_set_cursor(curWinID, cursorPos)
+end
+
+function M.globalQuery(argTbl)
+    globalCheck = true
+    query(argTbl)
+end
+
+
+function M.nonglobalQuery(argTbl)
+    globalCheck = false
+    query(argTbl)
 end
 
 return M

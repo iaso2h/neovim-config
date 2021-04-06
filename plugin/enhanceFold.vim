@@ -1,9 +1,9 @@
 " File: enhanceFold.vim
 " Author: iaso2h
 " Description: Enhnace origin fold feature, mainly focus on markder fold method
-" Version: 0.0.6
-" TODO: Better [z and [Z algorithm
-" Last Modified: 2021-02-09
+" Version: 0.0.7
+" Last Modified: 2021-04-06
+
 " Initiation {{{
 let g:enhanceFoldInit = 1
 let g:enhanceFoldStartHLID = 9138
@@ -37,6 +37,9 @@ function! EnhanceFold(modeType, ...) " {{{
         else
             execute "normal! A " . g:FiletypeCommentDelimiter[&filetype] . " " . a:1
         endif
+        if a:1 == "}}}"
+            execute "normal! zx"
+        endif
     elseif a:modeType ==# "v" || a:modeType ==# "V"
         let l:selectStart = getpos("'<")
         let l:selectEnd = getpos("'>")
@@ -64,9 +67,8 @@ function! EnhanceFold(modeType, ...) " {{{
             endif
         endif
 
-        " Refresh fold sign column ?
-        normal! gv=
         call cursor (l:saveCursor[1], l:saveCursor[2])
+        execute "normal! zx"
     endif
 endfunction " }}}
 

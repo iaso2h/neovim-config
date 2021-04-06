@@ -1,0 +1,189 @@
+{
+    "def": {
+        "prefix": ["def"],
+        "body": [
+            "#define $1"
+        ],
+        "description": "#define ..."
+    },
+    "#ifndef": {
+        "prefix": ["#ifndef"],
+        "body": [
+            "#ifndef ${1/([A-Za-z0-9_]+).*/$1/}",
+            "#define ${1:SYMBOL} ${2:value}",
+            "#endif /* ifndef $1 */"
+        ],
+        "description": "#ifndef ... #define ... #endif"
+    },
+
+    "#if": {
+        "prefix": ["#if"],
+        "body": [
+            "#if ${1:0}",
+            "${VISUAL}$0",
+            "#endif"
+        ],
+        "description": "#if #endif"
+    },
+    "mark": {
+        "prefix": ["mark"],
+        "body": [
+            "#if 0",
+            "${1:#pragma mark -",
+            "}#pragma mark $2",
+            "#endif",
+            "$0"
+        ],
+        "description": "#pragma mark (mark)"
+    },
+    "main": {
+        "prefix": ["main"],
+        "body": [
+            "int main(int argc, char *argv[])",
+            "{",
+            "\t${VISUAL}$0",
+            "\treturn 0;",
+            "}"
+        ],
+        "description": "main() (main)"
+    },
+    "for": {
+        "prefix": ["for"],
+        "body": [
+            "for (${2:i} = 0; $2 < ${1:count}; ${3:++$2}) {",
+            "\t${VISUAL}$0",
+            "}"
+        ],
+        "description": "for loop (for)"
+    },
+    "fori": {
+        "prefix": ["fori"],
+        "body": [
+            "for (${4:int} ${2:i} = 0; $2 < ${1:count}; ${3:++$2}) {",
+            "\t${VISUAL}$0",
+            "}"
+        ],
+        "description": "for int loop (fori)"
+    },
+    "fora": {
+        "prefix": ["fora"],
+        "body": [
+            "for (${1:var}; ${2:condition}; `!p",
+            "if len(t[1]) > 0:",
+            "\tsnip.rv = t[1].split('=')[0].split()[-1]",
+            "`++) {",
+            "",
+            "\t$0",
+            "} /* for ($1; $2; `!p if len(t[1]) > 0: snip.rv = t[1].split('=')[0].split()[-1]`++) */"
+        ],
+        "description": "for-loop"
+    },
+    "once": {
+        "prefix": ["once"],
+        "body": [
+            "#ifndef ${1:`!p",
+            "if not snip.c:",
+            "\timport random, string",
+            "\tname = re.sub(r'[^A-Za-z0-9]+','_', snip.fn).upper()",
+            "\trand = ''.join(random.sample(string.ascii_letters+string.digits, 8))",
+            "\tsnip.rv = ('%s_%s' % (name,rand)).upper()",
+            "else:",
+            "\tsnip.rv = snip.c`}",
+            "#define $1",
+            "",
+            "${VISUAL}$0",
+            "",
+            "#endif /* end of include guard: $1 */"
+        ],
+        "description": "Include header once only guard"
+    },
+    "fprintf": {
+        "prefix": ["fprintf"],
+        "body": [
+            "fprintf(${1:stderr}, \"${2:%s}\n\"${2/([^%]|%%)*(%.)?.*/(?2:, :\\);)/}$3${2/([^%]|%%)*(%.)?.*/(?2:\\);)/}"
+        ],
+        "description": "fprintf ..."
+    },
+    "elif": {
+        "prefix": ["elif"],
+        "body": [
+            "else if (${1:/* condition */}) {",
+            "${VISUAL}$0",
+            "}"
+        ],
+        "description": "else if .. (eli)"
+    },
+    "printf": {
+        "prefix": ["printf"],
+        "body": [
+            "printf(\"$1\n\"$2);"
+        ],
+        "description": "printf with auto-expand args"
+    },
+    "st": {
+        "prefix": ["st"],
+        "body": [
+            "struct ${1:`!p snip.rv = (snip.basename or \"name\") + \"_t\"`} {",
+            "\t${0:/* data */}",
+            "};"
+        ],
+        "description": "struct"
+    },
+    "fu": {
+        "prefix": ["fu"],
+        "body": [
+            "${1:void} ${2:function_name}($3)",
+            "{",
+            "\t${VISUAL}$0",
+            "}"
+        ],
+        "description": "function"
+    },
+    "fund": {
+        "prefix": ["fund"],
+        "body": [
+            "${1:void} ${2:function_name}($3);"
+        ],
+        "description": "function declaration"
+    },
+    "head": {
+        "prefix": ["head"],
+        "body": [
+            "/******************************************************************************",
+            "* File:             `!p snip.rv = fn`",
+            "*",
+            "* Author:           ${2}",
+            "* Created:          `date +%m/%d/%y`",
+            "* Description:      ${4:${VISUAL}}",
+            "*****************************************************************************/",
+            "${0}"
+        ],
+        "description": "File Header"
+    },
+    "func": {
+        "prefix": ["func"],
+        "body": [
+            "/******************************************************************************",
+            "* Function:         $1",
+            "* Description:      ${4:${VISUAL}}",
+            "* Where:`!p",
+            "snip.rv = \"\"",
+            "snip >> 2",
+            "",
+            "args = get_args(t[2])",
+            "if args:",
+            "\tfor arg in args:",
+            "\t\tsnip.rv += '\n' + '*' + ' '*19 + arg + ' - TODO'",
+            "snip << 2",
+            "`",
+            "* Return:           $5",
+            "* Error:            $6",
+            "*****************************************************************************/",
+            "${1}($2){",
+            "\t${0}",
+            "}"
+        ],
+        "description": "Function Header"
+    }
+}
+

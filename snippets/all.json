@@ -4,11 +4,11 @@
             "finfo"
         ],
         "body": [
-            "-- File: ${VIM:expand(\"%:t:r\")}",
-            "-- Author: iaso2h",
-            "-- Description: ${1}",
-            "-- Version: ${2:0.0.1}",
-            "-- Last Modified: ${VIM:strftime(\"%Y-%m-%d\")}"
+            "${VIM:g:FiletypeCommentDelimiter[&filetype]} File: ${VIM:expand(\"%:t:r\")}",
+            "${VIM:g:FiletypeCommentDelimiter[&filetype]} Author: iaso2h",
+            "${VIM:g:FiletypeCommentDelimiter[&filetype]} Description: ${1}",
+            "${VIM:g:FiletypeCommentDelimiter[&filetype]} Version: ${2:0.0.1}",
+            "${VIM:g:FiletypeCommentDelimiter[&filetype]} Last Modified: ${VIM:strftime(\"%Y-%m-%d\")}"
         ],
         "description": "file infomation header"
     },
@@ -20,6 +20,11 @@
             "${VIM:strftime(\"%Y-%m-%d\")}"
         ],
         "description": "insert date time"
+    },
+    "lorem": {
+        "prefix": ["lorem"],
+        "body": ["Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren no sea takimata sanctus est Lorem ipsum dolor sit amet."],
+        "description": "insert lorem"
     }
 }
 

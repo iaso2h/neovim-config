@@ -7,12 +7,14 @@ local M   = {}
 
 -- Extraction
 map("",  [[gc]], [[luaeval("require('operator').main(require('extraction').main, false)")]], {"silent", "expr"})
-map("v", [[C]],  [[:lua require("extraction").main({nil, vim.fn.visualmode()})<cr>]],               {"silent"})
+map("v", [[C]],  [[:lua require("extraction").main({nil, vim.fn.visualmode()})<cr>]],        {"silent"})
 -- Zeal query
-map("",  [[gz]], [[luaeval("require('operator').main(require('zeal').query, false)")]], {"silent", "expr"})
-map("v", [[Z]],  [[:lua require("zeal").query({"v"})<cr>]],                                  {"silent"})
+map("",  [[gz]], [[luaeval("require('operator').main(require('zeal').nonglobalQuery, false)")]], {"silent", "expr"})
+map("",  [[gZ]], [[luaeval("require('operator').main(require('zeal').globalQuery, false)")]],    {"silent", "expr"})
+map("v", [[Z]],  [[:lua require("zeal").globalQuery({nil, "v"})<cr>]],                           {"silent"})
 -- Don't truncate the name
-map("n", [[<C-g>]], [[:file!<cr>]], {"silent"})
+map("n", [[<C-g>]],   [[:file!<cr>]],         {"silent"})
+map("n", [[<C-S-g>]], [[:echo getcwd()<cr>]], {"silent"})
 -- Tab switcher {{{
 map("n", [[<S-tab>]], [[:lua require("tabSwitcher").main()<cr>]], {"silent", "novscode"})
 -- }}} Tab switcher
@@ -125,15 +127,11 @@ map("",  [[<A-'>]], [[:<c-u>call ClearReg()<cr>]], {"silent"})
 map("n", [[q]], [[:lua require("buffer").smartClose("window")<cr>]], {"silent"})
 map("n", [[Q]], [[:lua require("buffer").smartClose("buffer")<cr>]], {"silent"})
 -- Window
-function M.winFocus(command) cmd(command); if vim.bo.buftype == "terminal" then cmd "startinsert" end end
-map("",  [[<C-w>h]],   [[:lua require("mappings").winFocus("wincmd h")<cr>]],       {"silent", "novscode"})
-map("",  [[<C-w>l]],   [[:lua require("mappings").winFocus("wincmd l")<cr>]],       {"silent", "novscode"})
-map("",  [[<C-w>j]],   [[:lua require("mappings").winFocus("wincmd j")<cr>]],       {"silent", "novscode"})
-map("",  [[<C-w>k]],   [[:lua require("mappings").winFocus("wincmd k")<cr>]],       {"silent", "novscode"})
 map("",  [[<C-w>v]],   [[:lua require("consistantTab").splitCopy("wincmd v")<cr>]], {"silent", "novscode"})
 map("",  [[<C-w>s]],   [[:lua require("consistantTab").splitCopy("wincmd s")<cr>]], {"silent", "novscode"})
 map("",  [[<C-w>V]],   [[:only<cr><C-w>v]],                                         {"silent", "novscode"})
 map("",  [[<C-w>S]],   [[:only<cr><C-w>s]],                                         {"silent", "novscode"})
+map("",  [[<C-w>q]],   [[:lua require("buffer").quickfixToggle()<cr>]],             {"silent", "novscode"})
 map("i", [[<C-S-w>=]], [[<C-\><C-O>:wincmd =<cr>]],                                 {"silent", "novscode"})
 -- Buffers
 map("",  [[<C-w>O]], [[:lua require("buffer").wipeOtherBuf()<cr>]], {"silent", "novscode"})
@@ -156,8 +154,8 @@ map("n", [[g{]],              [[:<c-u>call EnhanceFold(mode(), "{{{")<cr>]],    
 map("n", [[g}]],              [[:<c-u>call EnhanceFold(mode(), "}}}")<cr>]],                     {"novscode"})
 map("v", [[g{]],              [[<A-m>z:<c-u>call EnhanceFold(visualmode(), "}}}")<cr>`z]],       {"novscode"})
 map("v", [[g}]],              [[<A-m>z:<c-u>call EnhanceFold(visualmode(), "}}}")<cr>`z]],       {"novscode"})
-map("",  [[<leader><Space>]], [[@=(foldlevel('.') ? 'za' : '\<Space>')<cr>]],                    {"noremap", "silent"})
-map("",  [[<S-Space>]],       [[@=(foldlevel('.') ? 'zA' : '\<Space>')<cr>]],                    {"noremap", "silent"})
+map("n", [[<leader><Space>]], [[@=(foldlevel('.') ? 'za' : '\<Space>')<cr>]],                    {"noremap", "silent"})
+map("n", [[<S-Space>]],       [[@=(foldlevel('.') ? 'zA' : '\<Space>')<cr>]],                    {"noremap", "silent"})
 for i=0, 9 do map("", string.format("z%d", i), string.format([[:set foldlevel=%d<bar>echohl Moremsg<bar>echo 'Foldlevel set to: %d'<bar>echohl None<cr>]], i, i), {}) end
 -- }}} Folding
 -- MS behavior {{{
@@ -203,13 +201,13 @@ map("v", [[p]], [[:lua require("yankPut").inplacePut("v", "p")<cr>]], {"silent"}
 map("n", [[P]], [[:lua require("yankPut").inplacePut("n", "P")<cr>]], {"silent"})
 map("v", [[P]], [[:lua require("yankPut").inplacePut("v", "P")<cr>]], {"silent"})
 -- Inplace replace
-map("n", [[<Plug>InplaceReplaceLine]], [[:<c-u>execute 'normal! V' . v:count1 . "_\<lt>Esc>"<bar> lua ReplaceOperator({"visual", "InplaceReplaceLine"})<cr>]], {"noremap", "silent"})
 -- Repeat not defined in visual mode, but enabled through visualrepeat.vim.
+map("n", [[gr]],  [[luaeval("require('replace').expression()")]], {"silent", "expr"})
+map("n", [[grr]], [[<Plug>InplaceReplaceLine]])
+map("n", [[<Plug>InplaceReplaceLine]], [[:<c-u>execute 'normal! V' . v:count1 . "_\<lt>Esc>"<bar> lua ReplaceOperator({"visual", "InplaceReplaceLine"})<cr>]], {"noremap", "silent"})
+map("v", [[R]], [[<Plug>InplaceReplaceVisual]])
 map("v", [[<Plug>InplaceReplaceVisual]], [[:lua ReplaceOperator({"visual", "InplaceReplaceVisual"})<cr>]], {"noremap", "silent"})
 map("v", [[<Plug>InplaceReplaceVisual]], [[:lua ReplaceVisualMode()<cr>]],                                 {"noremap", "silent"})
-map("n", [[grr]], [[<Plug>InplaceReplaceLine]])
-map("n", [[gr]],  [[luaeval("require('replace').expression()")]], {"silent", "expr"})
-map("v", [[R]],   [[<Plug>InplaceReplaceVisual]])
 -- Convert paste
 map("n", [[cP]], [[:lua require("yankPut").convertPut("P")<CR>]])
 map("n", [[cp]], [[:lua require("yankPut").convertPut("p")<CR>]])
