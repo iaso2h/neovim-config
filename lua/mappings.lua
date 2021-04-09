@@ -12,9 +12,7 @@ map("v", [[C]],  [[:lua require("extraction").main({nil, vim.fn.visualmode()})<c
 map("",  [[gz]], [[luaeval("require('operator').main(require('zeal').nonglobalQuery, false)")]], {"silent", "expr"})
 map("",  [[gZ]], [[luaeval("require('operator').main(require('zeal').globalQuery, false)")]],    {"silent", "expr"})
 map("v", [[Z]],  [[:lua require("zeal").globalQuery({nil, "v"})<cr>]],                           {"silent"})
--- Don't truncate the name
-map("n", [[<C-g>]],   [[:file!<cr>]],         {"silent"})
-map("n", [[<C-S-g>]], [[:echo getcwd()<cr>]], {"silent"})
+map("n", [[<C-g>]],   [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖥 CWD: " .. vim.fn.getcwd())<cr>]], {"silent", "novscode"})
 -- Tab switcher {{{
 map("n", [[<S-tab>]], [[:lua require("tabSwitcher").main()<cr>]], {"silent", "novscode"})
 -- }}} Tab switcher
@@ -53,6 +51,7 @@ map("v", [[<leader>h]], [[:<c-u>call ExitVisual()<cr>]], {"silent"})
 function M.oppoSelection() -- {{{
     local curPos         = api.nvim_win_get_cursor(0)
     local startSelectPos = api.nvim_buf_get_mark(0, "<")
+    if startSelectPos[1] == 0 then return end  -- Sanity check
     local endSelectPos   = api.nvim_buf_get_mark(0, ">")
     if curPos[1] == startSelectPos[1] then
         api.nvim_win_set_cursor(0, endSelectPos)
@@ -102,10 +101,10 @@ map("n", [[g>]],    [[:<c-u>messages<cr>]], {"silent", "vscodeonly"})
 map("n", [[<A-,>]], [[:<c-u>execute 'messages clear<bar>echohl Moremsg<bar>echo "Message clear"<bar>echohl None'<cr>]])
 map("n", [[<A-.>]], [[:<c-u>execute 'messages clear<bar>echohl Moremsg<bar>echo "Message clear"<bar>echohl None'<cr>]])
 -- Pageup/Pagedown
-map("",  [[<A-e>]], [[<pageup>]],             {"novscode"})
-map("t", [[<A-e>]], [[<C-\><C-n><pageup>]],   {"novscode"})
-map("",  [[<A-d>]], [[<pagedown>]],           {"novscode"})
-map("t", [[<A-d>]], [[<C-\><C-n><pagedown>]], {"novscode"})
+map("",  [[<A-e>]], [[<PageUp>]],             {"novscode"})
+map("t", [[<A-e>]], [[<C-\><C-n><PageUp>]],   {"novscode"})
+map("",  [[<A-d>]], [[<PageDown>]],           {"novscode"})
+map("t", [[<A-d>]], [[<C-\><C-n><PageDown>]], {"novscode"})
 -- Macro
 -- <C-q> has been mapped to COC showDoc
 map("n", [[<A-q>]], [[q]], {"noremap"})
@@ -132,12 +131,14 @@ map("",  [[<C-w>s]],   [[:lua require("consistantTab").splitCopy("wincmd s")<cr>
 map("",  [[<C-w>V]],   [[:only<cr><C-w>v]],                                         {"silent", "novscode"})
 map("",  [[<C-w>S]],   [[:only<cr><C-w>s]],                                         {"silent", "novscode"})
 map("",  [[<C-w>q]],   [[:lua require("buffer").quickfixToggle()<cr>]],             {"silent", "novscode"})
+map("",  [[<C-w>t]],   [[:wincmd T]],                                               {"silent", "novscode"})
 map("i", [[<C-S-w>=]], [[<C-\><C-O>:wincmd =<cr>]],                                 {"silent", "novscode"})
 -- Buffers
 map("",  [[<C-w>O]], [[:lua require("buffer").wipeOtherBuf()<cr>]], {"silent", "novscode"})
 -- Tab
-map("", [[<A-<>]], [[:tabp<cr>]], {"silent", "novscode"})
-map("", [[<A->>]], [[:tabn<cr>]], {"silent", "novscode"})
+map("", [[<A-S-h>]], [[:tabp<cr>]],    {"silent", "novscode"})
+map("", [[<A-S-l>]], [[:tabn<cr>]],    {"silent", "novscode"})
+map("", [[<A-S-o>]], [[:tabonly<cr>]], {"silent", "novscode"})
 -- }}} Buffer & Window & Tab
 -- Folding {{{
 map("",  [[[Z]],              [[zk]])
@@ -276,7 +277,8 @@ map("i", [[<C-S-.>]], [[<C-@>]],   {"noremap"})
 map("i", [[<C-BS>]],  [[<C-w>]],   {"noremap"})
 -- Navigation {{{
 map("!", [[<C-a>]], [[<Home>]])
-map("!", [[<C-e>]], [[<End>]])
+-- Overiide in nvim-comp
+-- map("!", [[<C-e>]], [[<End>]])
 map("!", [[<C-h>]], [[<Left>]])
 map("!", [[<C-l>]], [[<Right>]])
 map("!", [[<C-j>]], [[<Down>]])

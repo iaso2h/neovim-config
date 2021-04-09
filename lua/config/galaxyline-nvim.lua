@@ -294,15 +294,15 @@ gls.left[15] = {
     -- }
 -- }
 
-gls.mid[3] = {
-    lspMsg = {
-        provider  = require("config.lsp-status-nvim").lspMsg,
-        condition = function()
-            return vim.lsp.buf.server_ready() and condition.hide_in_width()
-        end,
-        highlight = {colors.blue, colors.bright_bg}
-    }
-}
+-- gls.mid[3] = {
+    -- lspMsg = {
+        -- provider  = require("config.lsp-status-nvim").lspMsg,
+        -- condition = function()
+            -- return vim.lsp.buf.server_ready() and condition.hide_in_width()
+        -- end,
+        -- highlight = {colors.blue, colors.bright_bg}
+    -- }
+-- }
 -- }}} Mid
 
 gls.right[1] = { -- {{{

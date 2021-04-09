@@ -161,7 +161,6 @@ function ReplaceOperator(argTbl)
     -- Print(argTbl)
 
     -- DEBUG:
-    if not cursorPos then Print(api.nvim_win_get_cursor(0)) end
 
     if motionwise == "visual" then
         cursorPos = api.nvim_win_get_cursor(0)
@@ -235,6 +234,8 @@ function ReplaceOperator(argTbl)
             end
 
             cursorPos = nil
+        else
+            api.nvim_win_set_cursor(0, {newContentResStart[1] + 1, newContentResStart[2]})
         end
     else
         -- newContentStart directly

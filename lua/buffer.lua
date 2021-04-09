@@ -3,8 +3,7 @@
 -- Description: Close buffer in a smart way
 -- Version: 0.0.11
 -- Last Modified: 2021-03-31
--- TODO: Q on qf not working well
--- TODO: q on coc showouput not working well
+-- BUG: q on startup-log.txt
 local fn = vim.fn
 local cmd = vim.cmd
 local api = vim.api
@@ -71,21 +70,33 @@ end
 -- buffer
 -- @return: 0
 ----
-local function wipeBuf() -- {{{
+local function wipeBuf(checkBuftype) -- {{{
     -- Wipe unlisted buffer
     if not vim.tbl_contains(bufNrTbl, curBufNr) then
         bwipe()
         return
     end
     -- Check if it's called from a special buffer
+    -- Wipe buffer depend on buffer type {{{
     if curBufType ~= "" then
         -- Special buffer
-        api.nvim_win_close(curWinID, true)
+        if #winIDTbl ~= 1 then
+            api.nvim_win_close(curWinID, true)
+        else
+            bwipe()
+        end
     else
-        -- Standard buffer
+        -- Standard buffer -- {{{
+        -- Return when file is readonly
         if not vim.bo.modifiable then return end
-        -- Return when false is evaluated
+        -- Return when cancel is return from prompt is evaluated
         if not saveModified(curBufNr) then return end
+        -- Add Luapad support
+        if vim.bo.filetype == "lua" and fn.match(fn.expand("%"), "Luapad_") ~= -1 then
+            bwipe()
+            return
+        end
+        -- Normal wipe
         if #winIDTbl == 1 then -- 1 Window
             bwipe(curBufNr)
         else -- 1+ Windows
@@ -119,7 +130,6 @@ local function wipeBuf() -- {{{
             -- Note: If this evaluated to true, then the current length of bufNrtble
             -- has been reduced to 1, #bufNrTbl is just a value of previous state
             if #winIDTbl == 2 and bufInstance == #winIDTbl and #bufNrTbl == 2 then
-                Print("Merge windows")
                 cmd "only"
             end
         end
@@ -127,9 +137,9 @@ local function wipeBuf() -- {{{
         if #bufNrTbl - 1 > 2 then
             local unwantedBufType = {"quickfix", "terminal"}
             if vim.tbl_contains(unwantedBufType, vim.bo.buftype) then cmd "bp" end
-        end
-
+        end -- }}}
     end
+    -- }}} Wipe buffer depend on buffer type
 end -- }}}
 
 ----
@@ -251,9 +261,10 @@ function M.wipeOtherBuf() -- {{{
     end
 
     -- Close other window that doesn't contain the current buffers
+    -- Reserve windows that contain special buffer like help, quickfix
     if #winIDTbl > 1 then
         for _, winID in ipairs(winIDTbl) do
-            if vim.tbl_contains(bufNrTbl, api.nvim_win_get_buf(winID)) then
+            if vim.tbl_contains(bufNrTbl, api.nvim_win_get_buf(winID)) and api.nvim_buf_get_option(api.nvim_win_get_buf(winID), "buftype") == "" then
                 api.nvim_win_close(winID, false)
             end
         end

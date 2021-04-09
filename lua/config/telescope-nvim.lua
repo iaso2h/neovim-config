@@ -31,9 +31,9 @@ require('telescope').setup{
                 mirror = true,
             },
         },
-        file_sorter          = require'telescope.sorters'.get_fuzzy_file,
+        file_sorter          = require'telescope.sorters'.get_fzy_sorter,
         file_ignore_patterns = {'*.sw?','~$*','*.bak','*.o','*.so','*.py[co]'},
-        generic_sorter       = require'telescope.sorters'.get_generic_fuzzy_sorter,
+        generic_sorter       = require'telescope.sorters'.get_fzy_sorter,
         shorten_path         = false,
         winblend             = 0,
         width                = 0.75,
@@ -53,7 +53,7 @@ require('telescope').setup{
         buffer_previewer_maker = require'telescope.previewers'.buffer_previewer_maker,
         extensions = {
             fzy_native = {
-            override_generic_sorter = false,
+            override_generic_sorter = true,
             override_file_sorter = true,
             },
             media_files = {
@@ -65,13 +65,11 @@ require('telescope').setup{
         mapping = {
             i = {
                 -- Otherwise, just set the mapping to the function that you want it to be.
-                ["<C-d>"]     = actions.add_selection,
-                ["<C-u>"]     = actions.remove_selection,
-                ["<Tab>"]     = actions.toggle_selection,
-                ["<A-d>"]     = actions.preview_scrolling_down,
-                ["<A-e>"]     = actions.preview_scrolling_up,
+                -- ["<A-d>"]     = actions.preview_scrolling_down, -- BUG:
+                -- ["<A-e>"]     = actions.preview_scrolling_up,
                 ["<C-r>"]     = actions.paste_register,
                 ["<C-Space>"] = actions.complete_tag,
+                -- ["<C-S>"] = actions.file_split, -- BUG:
                 -- Add up multiple actions
                 ["<CR>"]      = actions.select_default + actions.center,
             },
@@ -96,15 +94,14 @@ api.nvim_exec([[autocmd User TelescopePreviewerLoaded lua TelescopePreStart()]],
 cmd[[command! -nargs=0 O lua require('telescope.builtin').oldfiles(require('telescope.themes').get_dropdown({}))]]
 
 -- Mappings
--- Try to fix crash problem in <C-e> by disable the previewer
+-- BUG: Try to fix crash problem in <C-e> by disable the previewer
 map("n", [[<C-e>]],   [[:lua require('telescope.builtin').find_files(require('telescope.themes').get_dropdown({previewer = false}))<cr>]], {"silent"})
 map("n", [[<C-f>f]],  [[:lua require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown({}))<cr>]],   {"silent"})
 map("n", [[<C-S-f>]], [[:lua require('telescope.builtin').live_grep(require('telescope.themes').get_dropdown({}))<cr>]],                   {"silent"})
-map("n", [[<C-f>b]],  [[:lua require('telescope.builtin').buffers(require('telescope.themes').get_dropdown({}))<cr>]],                     {"silent"})
+map("n", [[<C-S-b>]], [[:lua require('telescope.builtin').buffers(require('telescope.themes').get_dropdown({}))<cr>]],                     {"silent"})
 map("n", [[<C-S-c>]], [[:lua require('telescope.builtin').commands(require('telescope.themes').get_dropdown({}))<cr>]],                    {"silent"})
 map("n", [[<C-S-p>]], [[:lua require('telescope.builtin').builtin(require('telescope.themes').get_dropdown({}))<cr>]],                     {"silent"})
 map("n", [[<C-S-h>]], [[:lua require('telescope.builtin').help_tags(require('telescope.themes').get_dropdown({}))<cr>]],                   {"silent"})
 map("n", [[<C-S-o>]], [[:lua require('telescope.builtin').current_buffer_tags(require('telescope.themes').get_dropdown({}))<cr>]],         {"silent"})
-map("n", [[C-']],     [[:lua require('telescope.builtin').registers(require('telescope.themes').get_dropdown({}))<cr>]],                   {"silent"})
-map("n", [[<C-k>]],   [[:lua require('telescope.builtin').vim_options(require('telescope.themes').get_dropdown({}))<cr>]],                 {"silent"})
+map("n", [[<C-S-k>]], [[:lua require('telescope.builtin').vim_options(require('telescope.themes').get_dropdown({}))<cr>]],                 {"silent"})
 

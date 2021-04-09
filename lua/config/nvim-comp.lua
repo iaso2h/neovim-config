@@ -149,7 +149,7 @@ end
 -- }}} Confirm key
 
 map('i', [[<CR>]],      [[v:lua.Completion.confirm()]],                     {"silent", "expr"})
-map("i", [[<C-e>]],     [[compe#close('<C-e>')]],                           {"silent", "expr"})
+map("i", [[<C-e>]],     [[pumvisible() ? compe#close('<C-e>') : "\<End>"]], {"silent", "expr"})
 map("i", [[<A-e>]],     [[compe#scroll({'delta': +4})]],                    {"silent", "expr"})
 map("i", [[<A-d>]],     [[compe#scroll({'delta': -4})]],                    {"silent", "expr"})
 map("i", [[<C-Space>]], [[pumvisible() ? compe#close('<C-e>') : "\<C-n>"]], {"silent", "expr"})

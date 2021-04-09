@@ -42,23 +42,21 @@ endfunctio
 api.nvim_exec([[
 augroup fileType
 autocmd!
-autocmd BufReadPost          * if line("'\"") > 0 && line("'\"") <= line("$") | execute "normal! g`\"" | endif
-autocmd BufWritePre          * lua require"util".trimWhiteSpaces(); require"util".trailingEmptyLine()
-autocmd BufEnter             * set formatoptions=pj1Bml2nwc
-autocmd TermOpen             * startinsert
-autocmd TermOpen             * setlocal nobuflisted
-autocmd FocusGained,BufEnter * checktime
+autocmd BufWinEnter          *        lua require("cursorRecall").main()
+autocmd BufWritePre          *        lua require"util".trimWhiteSpaces(); require"util".trailingEmptyLine()
+autocmd BufEnter             *.txt    lua require("util").splitExist()
+autocmd BufEnter             *        set formatoptions=pj1Bml2nwc
+autocmd BufEnter             term://* startinsert
+autocmd TermOpen             *        startinsert
+autocmd TermOpen             *        setlocal nobuflisted | setlocal nonumber
+autocmd FocusGained,BufEnter *        checktime
 " autocmd BufAdd               * lua require("consistantTab").adaptBufTab()
 
 " autocmd CursorHold            *.c,*.h,*.cpp,*.cc,*.vim :call HLCIOFunc()
 autocmd FileType              java setlocal includeexpr=substitute(v:fname,'\\.','/','g')
 autocmd FileType              git  setlocal nofoldenable
 autocmd FileType              json setlocal conceallevel=0 concealcursor=
-autocmd FileType              qf   setlocal number norelativenumber nobuflisted
-autocmd FileType              qf map <buffer> <silent> <cr> :.cc<cr>:copen<cr>
-autocmd FileType              vim,lua     setlocal foldmethod=expr foldexpr=EnhanceFoldExpr()
-autocmd BufEnter              term://*    startinsert
-autocmd BufEnter              *.txt       lua require("util").splitExist()
+
 autocmd BufReadPre,BufNewFile *.jsx       setlocal filetype=jypescript
 autocmd BufReadPre,BufNewFile *.tsx       setlocal filetype=typescript
 autocmd BufReadPre,BufNewFile *.twig      setlocal filetype=twig.html

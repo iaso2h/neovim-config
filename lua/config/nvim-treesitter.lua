@@ -9,7 +9,7 @@ ts.setup{
     -- ensure_installed      = {"c", "cpp", "lua", "python", "json", "bash", "regex", "css", "html", "go", "javascript", "rust", "ruby", "vue", "c_sharp", "typescript"},
     highlight             = {enable = true},
     indent                = {enable = true},
-    rainbow               = {enable = true},
+    rainbow               = {enable = true, extended_mode = false},
     incremental_selection = { -- {{{
         enable = true,
         keymaps = {

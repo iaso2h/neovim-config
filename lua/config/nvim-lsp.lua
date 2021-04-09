@@ -3,14 +3,15 @@ local api  = vim.api
 local cmd  = vim.cmd
 local bmap = require("util").bmap
 local lspConfig = require('lspconfig')
-local lspStatus = require('lsp-status')
+-- local lspStatus = require('lsp-status')
 local M = {}
 require("config.lsp-status-nvim").setup()
 
 
 local snippetCapabilities = vim.lsp.protocol.make_client_capabilities()
 snippetCapabilities.textDocument.completion.completionItem.snippetSupport = true
-local capabilities = vim.tbl_deep_extend("keep", {}, lspStatus.capabilities, snippetCapabilities)
+local capabilities = snippetCapabilities
+-- local capabilities = vim.tbl_deep_extend("keep", {}, lspStatus.capabilities, snippetCapabilities)
 
 
 -- Gerneral format mapping {{{
@@ -48,7 +49,7 @@ map("v", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("v")<cr>]], {"s
 -- @param bufNr:  ___
 ----
 local onAttach  = function(client, bufNr)
-    lspStatus.on_attach(client)
+    -- lspStatus.on_attach(client)
 
     -- Mappings
     bmap(bufNr, "n", [=[gD]=],         [[:lua vim.lsp.buf.declaration()<cr>]],                                {"silent"})
@@ -73,6 +74,7 @@ local onAttach  = function(client, bufNr)
     end
 
     -- lspsaga.nvim {{{
+    -- BUG: break in new version of newovim
     bmap(bufNr, "n", [[gF]],         [[:lua require("lspsaga.provider").lsp_finder()<cr>]],                 {"silent"})
     bmap(bufNr, "n", [[<C-enter>]],  [[:lua require("lspsaga.codeaction").code_action()<cr>]],              {"silent"})
     bmap(bufNr, "v", [[<C-enter>]],  [[:lua require("lspsaga.codeaction").range_code_action()<cr>]],        {"silent"})
@@ -115,14 +117,22 @@ end
 -- https://github.com/microsoft/pyright
 -- npm i -g pyright
 -- https://github.com/microsoft/pyright/blob/master/docs/configuration.md
+-- https://github.com/microsoft/pyright/blob/96871bec5a427048fead499ab151be87b7baf023/packages/vscode-pyright/package.json
 lspConfig.pyright.setup{
     capabilities = capabilities,
     on_attach    = onAttach,
     setting      = {
-        pyright = {
+        python = {
+            pythonPath = "python",
             venvPath = "",
-            typeCheckingMode = "basic",
-            extraPaths = "",
+            analysis = {
+                diagnosticMode = "openFileOnly",
+                extraPaths = "",
+                typeCheckingMode = "basic",
+                useLibraryCodeForTypes = false
+            }
+        },
+        pyright = {
             verboseOutput = true,
             reportMissingImports = true,
         }
@@ -187,8 +197,8 @@ if sumneko_root_path then
                         [fn.expand('$VIMRUNTIME/lua')] = true,
                         [fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
                     },
-                    maxPreload = 2000,
-                    preloadFileSize = 1000,
+                    -- maxPreload = 2000,
+                    -- preloadFileSize = 1000,
                     ignoreDir = {".vscode", ".git"}
                 },
                 -- Do not send telemetry data containing a randomized but unique identifier

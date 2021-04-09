@@ -401,7 +401,7 @@ call s:h("Conditional", {"fg": s:purple, "gui": "italic", "cterm": "italic" }) "
 call s:h("Repeat", {"fg": s:purple, "gui": "italic", "cterm": "italic" }) " for, do, while, etc.
 call s:h("Label", {"fg": s:purple }) " case, default, etc.
 call s:h("Operator", {"fg": s:purple }) " sizeof", "+", "*", etc.
-call s:h("Keyword", {"fg": s:red }) " any other keyword
+call s:h("Keyword", {"fg": s:purple }) " any other keyword
 call s:h("Exception", {"fg": s:purple, "gui": "italic", "cterm": "italic" }) " try, catch, throw
 call s:h("PreProc", {"fg": s:yellow }) " generic Preprocessor
 call s:h("Include", {"fg": s:purple }) " preprocessor #include
@@ -425,7 +425,7 @@ call s:h("Ignore", {}) " left blank, hidden
 call s:h("Error", {"fg": s:red }) " any erroneous construct
 call s:h("Parameter", {"fg": s:dark_yellow }) " Function parameter
 call s:hi("Todo", s:nord13_gui, "NONE", s:nord13_term, "NONE", "", "") " anything that needs extra attention; mostly the keywords TODO FIXME and XXX
-
+" }}}
 
 "+-----------+
 "+ Languages +
@@ -1165,4 +1165,6 @@ call s:hi("NvimTreeSpecialFile", s:nord3_gui_bright, "", s:nord3_term, "", s:ita
 call s:hi("NvimTreePopup", s:nord15_gui, "", s:nord15_term, "", "", "")
 call s:hi("NvimTreeNormal", s:nord15_gui, "", s:nord15_term, "", "", "")
 " }}} kyazdani42/nvim-tree.lua
+
+call s:hi("TabCWD", s:nord10_gui, "", s:nord10_term, "", "", "")
 

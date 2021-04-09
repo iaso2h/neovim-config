@@ -1,6 +1,17 @@
 if exists('g:vscode') == 1
     finish
 endif
+
+if has("unix")
+    if empty(glob("~/.local/share/nvim/site/autoload/plug.vim"))
+        execute "silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+    endif
+elseif has("win32")
+    if empty(glob(stdpath("data") . "/site/autoload/plug.vim"))
+        execute 'silent !iwr -useb https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim | ni "$(@($env:XDG_DATA_HOME, $env:LOCALAPPDATA)[$null -eq $env:XDG_DATA_HOME])/nvim-data/site/autoload/plug.vim" -Force'
+    endif
+endif
+
 call plug#begin(stdpath('config') . '/plugged')
 " UI {{{
 Plug 'glepnir/galaxyline.nvim'
@@ -32,12 +43,14 @@ Plug 'windwp/nvim-autopairs'
 Plug 'michaeljsmith/vim-indent-object'
 Plug 'monaqa/dial.nvim'
 Plug 'preservim/nerdcommenter'
-Plug 'mg979/docgen.vim'
+Plug 'mg979/docgen.vim', {'on': 'DocGen'}
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'mg979/vim-visual-multi'
 Plug 'szw/vim-maximizer', {'on': 'MaximizerToggle'}
 Plug 'simnalamburt/vim-mundo', {'on': 'MundoToggle'}
 " Plug 'dm1try/golden_size'
+Plug 'airblade/vim-rooter'
+" Plug 'AndrewRadev/switch.vim'
 " }}} Vim enhancement
 
 " Tree-sitter {{{
@@ -87,6 +100,8 @@ Plug 'MTDL9/vim-log-highlighting', {'for': 'log'}
 
 " Debug {{{
 Plug 'kergoth/vim-hilinks'
+Plug 'dstein64/vim-startuptime', {'on': 'StartupTime'}
+Plug 'rafcamlet/nvim-luapad', {'on': ['Luapad', 'LuaRun', 'Lua']}
 Plug 'bfredl/nvim-luadev', {'for': 'lua'}
 Plug 'iaso2h/vim-scriptease', {'branch': 'ftplugin'}
 Plug 'mfussenegger/nvim-dap'
@@ -98,6 +113,7 @@ Plug 'mfussenegger/nvim-dap-python', {'for': 'python'}
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 " Plug 'lewis6991/gitsigns.nvim'
+Plug 'rhysd/git-messenger.vim', {'on': ['GitMessenger', '<Plug>(git-messenger)']}
 " }}} Version control
 
 Plug 'RishabhRD/popfix'

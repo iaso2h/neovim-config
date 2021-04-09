@@ -520,6 +520,7 @@ function M.u2char(code)
     return table.concat(t)
 end
 
+
 function M.splitExist()
     local winCount  = fn.winnr("$")
     local ui        = api.nvim_list_uis()[1]
@@ -647,6 +648,10 @@ function M.newSplit(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
     end -- }}}
     -- }}} Create new windows based on various window count
 end -- }}}
+
+function M.isFloatWin()
+     return api.nvim_win_get_config(api.nvim_get_current_win()).relative ~= ''
+end
 
 return M
 

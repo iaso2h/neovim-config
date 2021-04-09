@@ -101,7 +101,7 @@ map("n", [[g<space>o]], [[:lua require("plugins").commentJump("o")<cr>]], {"sile
 map("n", [[g<space>O]], [[:lua require("plugins").commentJump("O")<cr>]], {"silent"})
 
 map("n", [[g<space><space>]], [[<plug>NERDCommenterToggle]])
-map("v", [[<space><space>]], [[<plug>NERDCommenterToggle]])
+map("v", [[g<space><space>]], [[<plug>NERDCommenterToggle]])
 -- map("n", [[g<space>n]], [[<plug>NERDCommenterNested]])
 -- map("v", [[g<space>n]], [[<plug>NERDCommenterNested]])
 
@@ -271,12 +271,12 @@ vim.g.vista_icon_indent = {"╰─▸ ", "├─▸ "}
 vim.g["vista#finders"] = {'fzf'}
 -- Base on Sarasa Nerd Mono SC
 vim.g["vista#renderer#icons"] = {variable = "\\uF194"}
-map("n", [[<leader>s]], [[:Vista!!<cr>]], {"silent"})
+map("n", [[<leader>t]], [[:Vista!!<cr>]], {"silent"})
 -- }}} liuchengxu/vista.vim
 -- airblade/vim-gitgutter {{{
 if fn.has('win32') then vim.g.gitgutter_git_executable = "D:/Git/bin/git.exe" end
 vim.g.gitgutter_map_keys = 0
-vim.g.gitgutter_sign_priority = 30
+vim.g.gitgutter_sign_priority = 10
 map("n", [[]h]], [[<Plug>(GitGutterNextHunk)]])
 map("n", [[[h]], [[<Plug>(GitGutterPrevHunk)]])
 map("o", [[ih]], [[<Plug>(GitGutterTextObjectInnerPending)]])
@@ -284,5 +284,140 @@ map("o", [[ah]], [[<Plug>(GitGutterTextObjectOuterPending)]])
 map("x", [[ih]], [[<Plug>(GitGutterTextObjectInnerVisual)]])
 map("x", [[ah]], [[<Plug>(GitGutterTextObjectOuterVisual)]])
 -- }}} airblade/vim-gitgutter
+-- rafcamlet/nvim-luapad {{{
+-- BUG: Cannot find nvim-luapad???
+-- require("luapad").config{
+    -- count_limit     = 150000,
+    -- error_indicator = true,
+    -- eval_on_move    = true,
+    -- error_highlight = 'WarningMsg',
+    -- on_init         = function()
+        -- print 'Hello from Luapad!'
+    -- end,
+    -- context = {
+        -- the_answer = 42,
+        -- shout = function(str) return(string.upper(str) .. '!') end
+    -- }
+-- }
+-- }}} rafcamlet/nvim-luapad
+-- airblade/vim-rooter {{{
+vim.g.rooter_patterns                               = {".git", "makefile", "*.sln", "build/env.sh", ".vscode", "^config", "^local"}
+vim.g.rooter_change_directory_for_non_project_files = "current"
+vim.g.rooter_cd_cmd                                 = "lcd"
+vim.g.rooter_silent_chdir                           = 1
+vim.g.rooter_resolve_links                          = 1
+-- }}} airblade/vim-rooter
+-- rhysd/git-messenger.vim {{{
+vim.g.git_messenger_date_format = "%Y-%m-%d %X"
+api.nvim_exec([["
+function! SetupGitMessengerPopup() abort
+    nmap <buffer> <C-o> o
+    nmap <buffer> <C-i> O
+endfunction
+autocmd FileType gitmessengerpopup call SetupGitMessengerPopup()
+"]], false)
+-- }}} rhysd/git-messenger.vim
+-- nvim-web-devicons {{{
+require'nvim-web-devicons'.setup {
+    override = {
+        html = {
+            icon = "",
+            color = "#DE8C92",
+            name = "html"
+        },
+        css = {
+            icon = "",
+            color = "#61afef",
+            name = "css"
+        },
+        js = {
+            icon = "",
+            color = "#EBCB8B",
+            name = "js"
+        },
+        png = {
+            icon = " ",
+            color = "#BD77DC",
+            name = "png"
+        },
+        jpg = {
+            icon = " ",
+            color = "#BD77DC",
+            name = "jpg"
+        },
+        jpeg = {
+            icon = " ",
+            color = "#BD77DC",
+            name = "jpeg"
+        },
+        mp3 = {
+            icon = "",
+            color = "#C8CCD4",
+            name = "mp3"
+        },
+        mp4 = {
+            icon = "",
+            color = "#C8CCD4",
+            name = "mp4"
+        },
+        out = {
+            icon = "",
+            color = "#C8CCD4",
+            name = "out"
+        },
+        toml = {
+            icon = "",
+            color = "#61afef",
+            name = "toml"
+        },
+        lock = {
+            icon = "",
+            color = "#DE6B74",
+            name = "lock"
+        },
+        webpack = {
+            icon = "",
+            color = "#519aba",
+            name = "Webpack",
+        },
+        svg = {
+            icon = "",
+            color = "#FFB13B",
+            name = "Svg",
+        },
+        [".babelrc"] = {
+            icon = "",
+            color = "#cbcb41",
+            name = "Babelrc"
+        },
+        ["_vimrc"] = {
+            icon = "",
+            color = "#019833",
+            name = "Vimrc",
+        },
+        [".vimrc"] = {
+            icon = "",
+            color = "#019833",
+            name = "Vimrc"
+        },
+        ["_gvimrc"] = {
+            icon = "",
+            color = "#019833",
+            name = "Vimrc"
+        },
+        ["vim"] = {
+            icon = "",
+            color = "#019833",
+            name = "Vim"
+        },
+        [".exe"] = {
+            icon = "",
+            color = "#6d8086",
+            name = "Executable"
+        },
+    },
+    default = true
+    }
+-- }}} nvim-web-devicons
 return M
 

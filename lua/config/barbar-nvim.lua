@@ -21,8 +21,8 @@ map("n", [[<A-h>]], [[:lua require("config.barbar-nvim").bufferSwitcher("bp")<cr
 map("n", [[<A-l>]], [[:lua require("config.barbar-nvim").bufferSwitcher("bn")<cr>]], {"silent"})
 -- map("n", [[<A-h>]], [[:BufferPrevious<cr>]], {"silent"})
 -- map("n", [[<A-l>]], [[:BufferNext<cr>]],     {"silent"})
-map("n", [[<A-S-h>]], [[:BufferMovePrevious<CR>]], {"silent"})
-map("n", [[<A-S-l>]], [[:BufferMoveNext<cr>]],     {"silent"})
+map("n", [[<leader><A-h>]], [[:BufferMovePrevious<CR>]], {"silent"})
+map("n", [[<leader><A-l>]], [[:BufferMoveNext<cr>]],     {"silent"})
 -- Goto buffer in position...
 map("n", [[<A-1>]], [[:BufferGoto 1<cr>]],           {"silent"})
 map("n", [[<A-2>]], [[:BufferGoto 2<cr>]],           {"silent"})
