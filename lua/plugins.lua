@@ -25,6 +25,37 @@ if vim.g.vscode == 1 then
     return
 end
 
+vim.g.rainbow_active = 1
+vim.g.rainbow_conf = {
+            guifgs = {'Gold', 'DarkOrchid3', 'RoyalBlue2'},
+            ctermfgs = {'yellow', 'magenta', 'lightblue'},
+            	guis = {''},
+            	cterms = {''},
+            	operators = '',
+            	parentheses = {'start=/(/ end=/)/ fold', 'start=/\\{/ end=/\\}/ fold', 'start=/{/ end=/}/ fold'},
+            	separately = {
+            		["*"] = {},
+            		markdown = {
+            			parentheses_options = 'containedin=markdownCode contained',
+            		},
+            		lisp = {
+            			guifgs = {'Gold', 'DarkOrchid3', 'RoyalBlue2', 'Firebrick', 'SeaGreen3', 'DarkOrange3'},
+            		},
+            		haskell = {
+            			parentheses = {'start=/(/ end=/)/ fold', 'start=/\\{/ end=/\\}/ fold', 'start=/\\v\\{\\ze{^-}/ end=/}/ fold'},
+            		},
+            		vim = {
+            			parentheses_options = 'containedin=vimFuncBody',
+            		},
+            		perl = {
+            			syn_name_prefix = 'perlBlockFoldRainbow',
+            		},
+            		stylus = {
+            			parentheses = {'start=/{/ end=/}/ fold contains=@colorableGroup'},
+            		},
+            		css = 1,
+            	}
+            }
 -- vim.g.python_highlight_all = 1 {{{
 vim.g.python_highlight_all = 1
 -- }}} vim.g.python_highlight_all = 1

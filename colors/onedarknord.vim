@@ -1166,5 +1166,3 @@ call s:hi("NvimTreePopup", s:nord15_gui, "", s:nord15_term, "", "", "")
 call s:hi("NvimTreeNormal", s:nord15_gui, "", s:nord15_term, "", "", "")
 " }}} kyazdani42/nvim-tree.lua
 
-call s:hi("TabCWD", s:nord10_gui, "", s:nord10_term, "", "", "")
-

@@ -1,8 +1,3 @@
--- Author: iaso2h
--- File: init.lua
--- Description: lua initialization
--- Version: 0.0.5
--- Last Modified: 2021-03-15
 local vim = vim
 
 -- TODO: Migrate to packer.nvim, but it's still unstable yet

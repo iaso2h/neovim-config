@@ -1,5 +1,6 @@
 local fn = vim.fn
 local api = vim.api
+local map = require("util").map
 
 -- LSP completion icon {{{
 require('vim.lsp.protocol').CompletionItemKind = {

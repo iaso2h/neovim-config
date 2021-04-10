@@ -22,13 +22,14 @@ Plug 'chentau/todolist.nvim'
 Plug 'mhinz/vim-startify'
 Plug 'lukas-reineke/indent-blankline.nvim', {'branch': 'lua'}
 Plug 'kyazdani42/nvim-tree.lua'
+Plug 'luochen1990/rainbow'
 " }}} UI
 
 " Vim enhancement {{{
-Plug 'tpope/vim-repeat'
 Plug 'inkarkat/vim-visualrepeat'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-eunuch'
 Plug 'antoinemadec/FixCursorHold.nvim'
-Plug 'iaso2h/vim-eunuch'
 Plug 'skywind3000/asyncrun.vim'
 Plug 'bkad/camelcasemotion'
 Plug 'zatchheems/vim-camelsnek'

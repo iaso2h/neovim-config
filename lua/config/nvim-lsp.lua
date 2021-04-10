@@ -1,17 +1,17 @@
-local fn   = vim.fn
-local api  = vim.api
-local cmd  = vim.cmd
-local bmap = require("util").bmap
+local fn        = vim.fn
+local api       = vim.api
+local cmd       = vim.cmd
+local bmap      = require("util").bmap
+local map       = require("util").map
 local lspConfig = require('lspconfig')
--- local lspStatus = require('lsp-status')
-local M = {}
-require("config.lsp-status-nvim").setup()
+local lspStatus = require('lsp-status')
+local M         = {}
 
+require("config.lsp-status-nvim").setup()
 
 local snippetCapabilities = vim.lsp.protocol.make_client_capabilities()
 snippetCapabilities.textDocument.completion.completionItem.snippetSupport = true
-local capabilities = snippetCapabilities
--- local capabilities = vim.tbl_deep_extend("keep", {}, lspStatus.capabilities, snippetCapabilities)
+local capabilities = vim.tbl_deep_extend("keep", {}, lspStatus.capabilities, snippetCapabilities)
 
 
 -- Gerneral format mapping {{{
@@ -42,13 +42,19 @@ map("n", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("n")<cr>]], {"s
 map("v", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("v")<cr>]], {"silent"})
 -- }}} Gerneral format mapping
 
+
+local ex = function(langBin)
+    return fn.executable(langBin) == 1
+end
+
+
 ----
 -- Function: onAttach :Mappings or commands need to be loaded when specific LSP is attach
 --
 -- @param client: ___
 -- @param bufNr:  ___
 ----
-local onAttach  = function(client, bufNr)
+local onAttach  = function(client, bufNr) -- {{{
     -- lspStatus.on_attach(client)
 
     -- Mappings
@@ -104,7 +110,7 @@ local onAttach  = function(client, bufNr)
     augroup END
     ]], false)
     end
-end
+end -- }}}
 
 -- LSP config {{{
 -- Setup() function: https://github.com/neovim/nvim-lspconfig#setup-function
@@ -118,26 +124,28 @@ end
 -- npm i -g pyright
 -- https://github.com/microsoft/pyright/blob/master/docs/configuration.md
 -- https://github.com/microsoft/pyright/blob/96871bec5a427048fead499ab151be87b7baf023/packages/vscode-pyright/package.json
-lspConfig.pyright.setup{
-    capabilities = capabilities,
-    on_attach    = onAttach,
-    setting      = {
-        python = {
-            pythonPath = "python",
-            venvPath = "",
-            analysis = {
-                diagnosticMode = "openFileOnly",
-                extraPaths = "",
-                typeCheckingMode = "basic",
-                useLibraryCodeForTypes = false
+if ex("pyright") then
+    lspConfig.pyright.setup{
+        capabilities = capabilities,
+        on_attach    = onAttach,
+        setting      = {
+            python = {
+                pythonPath = "python",
+                venvPath = "",
+                analysis = {
+                    diagnosticMode = "openFileOnly",
+                    extraPaths = "",
+                    typeCheckingMode = "basic",
+                    useLibraryCodeForTypes = false
+                }
+            },
+            pyright = {
+                verboseOutput = true,
+                reportMissingImports = true,
             }
-        },
-        pyright = {
-            verboseOutput = true,
-            reportMissingImports = true,
         }
     }
-}
+end
 -- }}} Python
 -- Lua {{{
 -- https://github.com/sumneko/lua-language-server
@@ -216,114 +224,191 @@ vim.g.markdown_fenced_languages = {
       'vim',
       'help'
 }
-lspConfig.vimls.setup{
-    cmd = {checkExt("vim-language-server"), "--stdio"},
-    capabilities = capabilities,
-    on_attach = onAttach,
-    filetypes = {"vim"},
-    init_options = {
-        isNeovim = true,
-        iskeyword = "@,48-57,_,192-255,-#",
-        diagnostic = {
-            enable = true
+if ex("vim-language-server") then 
+    lspConfig.vimls.setup{
+        cmd = {checkExt("vim-language-server"), "--stdio"},
+        capabilities = capabilities,
+        on_attach = onAttach,
+        filetypes = {"vim"},
+        init_options = {
+            isNeovim = true,
+            iskeyword = "@,48-57,_,192-255,-#",
+            diagnostic = {
+                enable = true
+            },
+            indexes = {
+                count = 3,
+                gap = 100,
+                projectRootPatterns = {"runtime", "nvim", ".git", "autoload", "plugin"},
+                runtimepath = true
+            },
+            runtimepath = "",
+            vimruntime = "",
+            suggest = {
+                fromRuntimepath = true,
+                fromVimruntime = true
+            },
         },
-        indexes = {
-            count = 3,
-            gap = 100,
-            projectRootPatterns = {"runtime", "nvim", ".git", "autoload", "plugin"},
-            runtimepath = true
-        },
-        runtimepath = "",
-        vimruntime = "",
-        suggest = {
-            fromRuntimepath = true,
-            fromVimruntime = true
-        },
-    },
-    root_dir = function(fname)
-          return lspConfig.util.find_git_ancestor(fname) or fn.getcwd()
-    end,
-}
+        root_dir = function(fname)
+            return lspConfig.util.find_git_ancestor(fname) or fn.getcwd()
+        end,
+    }
+end
 -- }}} Vimscript
--- CCLS {{{
--- https://github.com/MaskRay/ccls
-lspConfig.ccls.setup {
-    cmd = {"ccls"},
-    on_attach = onAttach,
-    filetypes = {"c", "cpp", "objc", "objcpp"},
-    init_options = {
-        -- capabilities = capabilities,
-        compilationDatabaseDirectory = "",
-        clang = {
-            excludeArgs = {"-frounding-math"},
-            -- TODO linux
-            resourceDir = fn.has("win32") == 1 and "D:/LLVM/lib/clang/11.1.0" or ""
+-- Clangd {{{
+-- https://github.com/llvm/llvm-project/tree/main/clang-tools-extra/clangd
+if ex("clangd") then
+    lspConfig.clangd.setup {
+        cmd = {
+            "clangd",
+            "--all-scopes-completion",
+            "--background-index",
+            "--clang-tidy",
+            "--clang-tidy-checks=google-*,clang-analyzer-*, cert-*,performance-*,misc-,modernize-*,-modernize-use-trailing-return-type,concurrency-*,bugprone-*,readability-*,-readability-magic-numbers",
+            "--completion-parse=auto",
+            "--completion-style=detailed",
+            "--cross-file-rename",
+            "--header-insertion=iwyu",
+            "--j=4",
+            "--pretty",
+            "--suggest-missing-includes",
+            "--fallback-style=google"
         },
-        completion = {
-            caseSensitivity = 1
-        },
-        diagnostics = {
-            blacklist = {
+        on_attach = onAttach,
+        filetypes = {"c", "cpp", "objc", "objcpp"},
+        init_options = {
+            capabilities         = capabilities,
+            clangdFileStatus     = true,
+            usePlaceholders      = true,
+            completeUnimported   = true,
+            semanticHighlighting = true,
+            fallbackFlags = {
+                "-std=c99",
+                "-Wall",
+                "-Wextra",
+                "-Wno-deprecated-declarations"
             }
         },
-        index = {
-            threads = 2,
-        },
-    },
-    root_dir = lspConfig.util.root_pattern(".git", "compile_commands.json", "compile_flags.txt", "build", "README.md", "makefile"),
-}
+        root_dir = lspConfig.util.root_pattern(".git", "compile_commands.json", "compile_flags.txt", "build", "README.md", "makefile"),
+    }
+end
+-- }}} Clangd
+-- CCLS {{{
+-- https://github.com/MaskRay/ccls
+-- if ex("ccls") then
+    -- lspConfig.ccls.setup {
+        -- cmd = {"ccls"},
+        -- on_attach = onAttach,
+        -- filetypes = {"c", "cpp", "objc", "objcpp"},
+        -- init_options = {
+            -- -- capabilities = capabilities,
+            -- compilationDatabaseDirectory = "",
+            -- clang = {
+                -- excludeArgs = {"-frounding-math"},
+                -- -- TODO linux
+                -- resourceDir = fn.has("win32") == 1 and "D:/LLVM/lib/clang/11.1.0" or ""
+            -- },
+            -- completion = {
+                -- caseSensitivity = 1
+            -- },
+            -- diagnostics = {
+                -- blacklist = {
+                -- }
+            -- },
+            -- index = {
+                -- threads = 2,
+            -- },
+        -- },
+        -- root_dir = lspConfig.util.root_pattern(".git", "compile_commands.json", "compile_flags.txt", "build", "README.md", "makefile"),
+    -- }
+-- end
 -- }}} CCLS
 -- JSON {{{
 -- https://github.com/vscode-langservers/vscode-json-languageserver
 -- npm install -g vscode-json-languageserver
-lspConfig.jsonls.setup {
-    cmd = {checkExt("vscode-json-languageserver"), "--stdio"},
-    filetypes = {"json"},
-    init_options = {
-        provideFormatter = true
-    },
-    commands = {
-        Format = {
-            function()
-                vim.lsp.buf.range_formatting({},{0,0},{fn.line("$"),0})
-            end
-        }
-    },
-    capabilities = capabilities,
-    on_attach = onAttach,
-    root_dir = lspConfig.util.root_pattern(".git", vim.fn.getcwd())
-}
+if ex("vscode-json-languageserver") then
+    lspConfig.jsonls.setup {
+        cmd = {checkExt("vscode-json-languageserver"), "--stdio"},
+        filetypes = {"json"},
+        init_options = {
+            provideFormatter = true
+        },
+        commands = {
+            Format = {
+                function()
+                    vim.lsp.buf.range_formatting({},{0,0},{fn.line("$"),0})
+                end
+            }
+        },
+        capabilities = capabilities,
+        on_attach = onAttach,
+        root_dir = lspConfig.util.root_pattern(".git", vim.fn.getcwd())
+    }
+end
 -- }}} JSON
 -- HTML {{{
 -- npm install -g vscode-html-languageserver-bin
-lspConfig.html.setup {
-    capabilities = capabilities,
-    cmd = {checkExt("html-languageserver"), "--stdio"},
-    on_attach = onAttach,
-    filetypes = {"html"},
-    init_options = {
-        configurationSection = { "html", "css", "javascript" },
-        embeddedLanguages = {
-            css = true,
-            javascript = true
+if ex("html-languageserver") then
+    lspConfig.html.setup {
+        capabilities = capabilities,
+        cmd = {checkExt("html-languageserver"), "--stdio"},
+        on_attach = onAttach,
+        filetypes = {"html"},
+        init_options = {
+            configurationSection = { "html", "css", "javascript" },
+            embeddedLanguages = {
+                css = true,
+                javascript = true
+            },
         },
-    },
-    root_dir = function(fname)
-          return lspConfig.util.find_git_ancestor(fname) or fn.getcwd()
-    end,
-    settings = {}
-}
+        root_dir = function(fname)
+            return lspConfig.util.find_git_ancestor(fname) or fn.getcwd()
+        end,
+        settings = {}
+    }
+end
 -- }}} HTML
 -- TypeScript {{{
 -- npm install -g typescript typescript-language-server
-require'lspconfig'.tsserver.setup{
-    cmd = {"typescript-language-server", "--stdio"},
-    capabilities = capabilities,
-    on_attach = onAttach,
-    filetypes = {"javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx"},
-    root_dir = lspConfig.util.root_pattern("package.json", "tsconfig.json", "jsconfig.json", ".git")
-}
+if ex("typescript-language-server") then
+    require'lspconfig'.tsserver.setup{
+        cmd = {"typescript-language-server", "--stdio"},
+        capabilities = capabilities,
+        on_attach = onAttach,
+        filetypes = {"javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx"},
+        root_dir = lspConfig.util.root_pattern("package.json", "tsconfig.json", "jsconfig.json", ".git")
+    }
+end
 -- }}} TypeScript
+-- YAML {{{
+-- https://github.com/redhat-developer/yaml-language-server#readme
+-- npm install -g yaml-language-server
+if ex("yaml-language-server") then
+    require("lspconfig").yamlls.setup {
+        on_attach = onAttach,
+        cmd = {checkExt("yaml-language-server"), "--stdio"},
+        settings = {
+                yaml = {
+                    schemas = {
+                        ["https://json.schemastore.org/gitlab-ci.json"] = {".gitlab-ci.yml"},
+                        ["https://json.schemastore.org/drone.json"] = {".drone.yml"},
+                        ["https://json.schemastore.org/ansible-playbook.json"] = {"deploy.yml", "provision.yml"}
+                    }
+                }
+            },
+    }
+end
+-- }}} YAML
+-- CSS {{{
+-- npm install -g vscode-css-languageserver-bin
+-- https://www.npmjs.com/package/vscode-css-languageserver-bin
+if ex("css-languageserver") then
+    require("lspconfig").cssls.setup {
+        on_attach = onAttach,
+        cmd = {checkExt("languageserver"), "--stdio"},
+    }
+end
+-- }}} CSS
 -- }}} LSP config
 
 -- glepnir/lspsaga.nvim {{{

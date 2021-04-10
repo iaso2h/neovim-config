@@ -1,13 +1,12 @@
 local vim = vim
 local fn  = vim.fn
-local cmd = vim.cmd
-local api = vim.api
+local map = require("util").map
 
-map = require("util").map
 map("n", [[<F5>]],       [[:lua require('dap').continue()<cr>]],                                                    {"noremap", "silent"})
-map("n", [[<F10>]],      [[:lua require('dap').step_over()<cr>]],                                                   {"noremap", "silent"})
-map("n", [[<F11>]],      [[:lua require('dap').step_into()<cr>]],                                                   {"noremap", "silent"})
-map("n", [[<F12>]],      [[:lua require('dap').step_out()<cr>]],                                                    {"noremap", "silent"})
+map("n", [[<S-F5>]],     [[:lua require('dap').run_last()<cr>]],                                                    {"noremap", "silent"})
+map("n", [[<F6>]],       [[:lua require('dap').step_into()<cr>]],                                                   {"noremap", "silent"})
+map("n", [[<S-F6>]],     [[:lua require('dap').step_over()<cr>]],                                                   {"noremap", "silent"})
+map("n", [[<A-F6>]],     [[:lua require('dap').step_out()<cr>]],                                                    {"noremap", "silent"})
 map("n", [[<leader>b]],  [[:lua require('dap').toggle_breakpoint()<cr>]],                                           {"noremap", "silent"})
 map("n", [[<leader>B]],  [[:lua require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: '))<cr>]],        {"noremap", "silent"})
 map("n", [[<leader>lp]], [[:lua require('dap').set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<cr>]], {"noremap", "silent"})

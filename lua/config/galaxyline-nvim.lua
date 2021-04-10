@@ -8,7 +8,6 @@ local gl = require("galaxyline")
 local gls = gl.section
 local condition = require("galaxyline.condition")
 -- local extension = require("galaxyline.provider_extensions")
--- local lspStatus = require('lsp-status')
 
 gl.short_line_list = {
     "LuaTree", "vista", "dbui", "startify", "term", "fugitive", "fugitiveblame",
@@ -244,17 +243,17 @@ gls.left[13] = {
 
 gls.left[14] = {
     DiagnosticWarn = {
-    provider = 'DiagnosticWarn',
-    icon = '  ',
-    highlight = {colors.yellow, colors.bright_bg}
+        provider = 'DiagnosticWarn',
+        icon = '  ',
+        highlight = {colors.yellow, colors.bright_bg}
     }
 }
 
 gls.left[15] = {
     DiagnosticError = {
-    provider = 'DiagnosticError',
-    icon = '  ',
-    highlight = {colors.red, colors.bright_bg}
+        provider = 'DiagnosticError',
+        icon = '  ',
+        highlight = {colors.red, colors.bright_bg}
     }
 }
 
@@ -294,15 +293,15 @@ gls.left[15] = {
     -- }
 -- }
 
--- gls.mid[3] = {
-    -- lspMsg = {
-        -- provider  = require("config.lsp-status-nvim").lspMsg,
-        -- condition = function()
-            -- return vim.lsp.buf.server_ready() and condition.hide_in_width()
-        -- end,
-        -- highlight = {colors.blue, colors.bright_bg}
-    -- }
--- }
+gls.mid[3] = {
+    lspMsg = {
+        provider  = require("config.lsp-status-nvim").lspMsg,
+        condition = function()
+            return vim.lsp.buf.server_ready() and condition.hide_in_width()
+        end,
+        highlight = {colors.blue, colors.bright_bg}
+    }
+}
 -- }}} Mid
 
 gls.right[1] = { -- {{{
@@ -331,29 +330,26 @@ gls.right[2] = {
 
 -- TODO: does parse when in visual mode
 -- gls.right[3] = {
-    -- SelectLineInfo = {
+    -- SelectedLineInfo = {
         -- provider = function()
-            -- local selectStart = api.nvim_buf_get_mark(0, "<")
-            -- local selectEnd = api.nvim_buf_get_mark(0, ">")
+            -- local selectStart = vim.api.nvim_buf_get_mark(0, "<")
+            -- local selectEnd = vim.api.nvim_buf_get_mark(0, ">")
             -- if selectStart[1] == selectEnd[1] then
-                -- return "1"
+                -- return "1 line"
             -- else
-                -- return tostring(selectEnd[1] - selectStart[1])
+                -- return tostring(selectEnd[1] - selectStart[1]) .. " lines"
             -- end
         -- end,
-        -- condition = function()
-            -- return vimMode == "V" or vimMode == "v" or vimMode == "^V"
-        -- end,
-        -- separator = ' |',
-        -- separator_highlight = {colors.blue, colors.bright_bg},
-        -- highlight = {colors.blue, colors.bright_bg}
+        -- highlight = {colors.orange, colors.bright_bg}
     -- }
 -- }
 
 gls.right[4] = {
     LineInfo = {
         provider = 'LineColumn',
-        highlight = {colors.blue, colors.bright_bg}
+        highlight = {colors.blue, colors.bright_bg},
+        -- separator = ' | ',
+        -- separator_highlight = {colors.blue, colors.bright_bg},
     }
 }
 
@@ -361,7 +357,7 @@ gls.right[4] = {
 gls.right[5] = {
     PerCent = {
         provider = 'LinePercent',
-        separator = ' |',
+        separator = '|',
         separator_highlight = {colors.blue, colors.bright_bg},
         highlight = {colors.blue, colors.bright_bg}
     }

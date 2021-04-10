@@ -1,4 +1,3 @@
-local fn = vim.fn
 local lspStatus = require('lsp-status')
 local M = {}
 
@@ -51,7 +50,6 @@ end -- }}}
 
 
 -- LSP Message for galaxyline.nvim {{{
-local lastMsg
 local spinnerFrames = { '🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘' }
 function M.lspMsg()
     local msgs = lspStatus.messages()
@@ -63,25 +61,25 @@ function M.lspMsg()
             if msg.progress then
                 parsedMsg = parsedMsg .. " " .. msg.title
                 if msg.message then parsedMsg = parsedMsg .. " " .. msg.message end
+                if msg.percentage == 0 or not msg.percentage then return "" end
                 if msg.percentage then parsedMsg = parsedMsg .. " (" .. msg.percentage .. "%)" end
                 if msg.spinner then
                     parsedMsg = spinnerFrames[(msg.spinner % #spinnerFrames) + 1] .. " " .. parsedMsg
                 end
-            -- elseif msg.status then
+                -- elseif msg.status then
                 -- parsedMsg = parsedMsg .. " " .. msg.contents
                 -- if msg.uri then
-                    -- local fileName = vim.uri_from_fname(msg.uri)
-                    -- fileName = vim.fn.fnamemodify(fileName, ":~:.")
-                    -- local space = math.min(60, math.floor(0.6 * fn.winwidth(0)))
-                    -- if #fileName > space then fileName = fn.pathshorten(fileName) end
+                -- local fileName = vim.uri_from_fname(msg.uri)
+                -- fileName = vim.fn.fnamemodify(fileName, ":~:.")
+                -- local space = math.min(60, math.floor(0.6 * fn.winwidth(0)))
+                -- if #fileName > space then fileName = fn.pathshorten(fileName) end
 
-                    -- parsedMsg = "(" .. fileName .. ") " .. parsedMsg
+                -- parsedMsg = "(" .. fileName .. ") " .. parsedMsg
                 -- end
-            -- else
+                -- else
                 -- parsedMsg = parsedMsg .. " " .. msg.content
             end
         end
-        lastMsg = parsedMsg
         return parsedMsg
     end -- }}}
     return ""
