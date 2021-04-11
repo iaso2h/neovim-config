@@ -17,8 +17,8 @@ function M.bufferSwitcher(CMD)
         end
     end
 end
-map("n", [[<A-h>]], [[:lua require("config.barbar-nvim").bufferSwitcher("bp")<cr>]], {"silent"})
-map("n", [[<A-l>]], [[:lua require("config.barbar-nvim").bufferSwitcher("bn")<cr>]], {"silent"})
+map("n", [[<A-h>]], [[:lua require("config.nvim-barbar").bufferSwitcher("bp")<cr>]], {"silent"})
+map("n", [[<A-l>]], [[:lua require("config.nvim-barbar").bufferSwitcher("bn")<cr>]], {"silent"})
 -- map("n", [[<A-h>]], [[:BufferPrevious<cr>]], {"silent"})
 -- map("n", [[<A-l>]], [[:BufferNext<cr>]],     {"silent"})
 map("n", [[<leader><A-h>]], [[:BufferMovePrevious<CR>]], {"silent"})

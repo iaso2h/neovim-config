@@ -6,19 +6,19 @@ local M   = {}
 local map = require("util").map
 
 require "config.vim-visual-multi"
-require "config.asyncrun"
+require "config.vim-asyncrun"
 
 if not vim.g.vscode then
-    -- require "config.golden_size"
-    require "config.markdown"
-    require "config.telescope-nvim"
+    require "config.vim-markdown"
+    -- require "config.nvim-golden_size"
+    require "config.nvim-telescope"
     require "config.nvim-treesitter"
     require "config.nvim-tree"
     require "config.nvim-dap"
-    -- require "config.coc"
-    -- require "config.gitsigns-nvim"
-    require "config.barbar-nvim"
-    require "config.galaxyline-nvim"
+    -- require "config.nvim-gitsigns"
+    require "config.nvim-barbar"
+    require "config.nvim-galaxyline"
+    -- require "config.nvim-coc"
     require "config.nvim-lsp"
     require "config.nvim-comp"
 end
@@ -124,8 +124,8 @@ if api.nvim_get_current_line() ~= '' then
     cmd [[startinsert!]]
 end
 end -- }}}
-map("n", [[g<space>o]], [[:lua require("plugins").commentJump("o")<cr>]], {"silent"})
-map("n", [[g<space>O]], [[:lua require("plugins").commentJump("O")<cr>]], {"silent"})
+map("n", [[g<space>o]], [[:lua require("core.plugins").commentJump("o")<cr>]], {"silent"})
+map("n", [[g<space>O]], [[:lua require("core.plugins").commentJump("O")<cr>]], {"silent"})
 
 map("n", [[g<space><space>]], [[<c-u>:call VSCodeCall("editor.action.commentLine")<cr>]], {"silent", "vscodeonly"})
 map("v", [[g<space><space>]], [[:call VSCodeCall("editor.action.commentLine")<cr>]], {"silent", "vscodeonly"})
@@ -202,17 +202,22 @@ if not vim.g.vscode then
     -- luochen1990/rainbow {{{
     vim.g.rainbow_active = 1
     vim.g.rainbow_conf = {
-                guifgs = {"Gold", "DarkOrchid3", "RoyalBlue2"},
-                guis = {""},
-                ctermfgs = {"yellow", "magenta", "lightblue"},
-                cterms = {""},
-                operators = "",
-                parentheses = {"start=/(/ end=/)/ fold", "start=/\\[/ end=/\\]/ fold", "start=/{/ end=/}/ fold"},
+        guifgs      = {"Gold", "DarkOrchid3", "RoyalBlue2"},
+        guis        = {""},
+        ctermfgs    = {"yellow", "magenta", "lightblue"},
+        cterms      = {""},
+        operators   = "",
+        parentheses = {"start=/(/ end=/)/ fold", "start=/\\[/ end=/\\]/ fold", "start=/{/ end=/}/ fold"},
+        separately  = {
+            lisp = {
+                guifgs = {'Gold', 'DarkOrchid3', 'RoyalBlue2', 'Firebrick', 'SeaGreen3', 'DarkOrange3'},
+            },
+        }
     }
     -- }}} luochen1990/rainbow
-    -- vim.g.python_highlight_all = 1 {{{
+    -- vim-python/python-syntax {{{
     vim.g.python_highlight_all = 1
-    -- }}} vim.g.python_highlight_all = 1
+    -- }}} vim-python/python-syntax
     -- hrsh7th/vim-vsnip {{{
     vim.g.vsnip_snippet_dir   = fn.expand('$configPath/snippets')
     vim.g.vsnip_extra_mapping = false

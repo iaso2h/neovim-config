@@ -6,11 +6,10 @@ vim.api.nvim_exec([[execute "source " . expand('$configPath/vimPlugList.vim')]],
 
 vim.g.mapleader = " " -- First thing first
 
-require "options"
-require "util"
-require "mappings"
-require "plugins"
-require "commands"
+require "core.options"
+require "core.mappings"
+require "core.plugins"
+require "core.commands"
 require "debug"
 require "replace"
 

@@ -296,7 +296,7 @@ gls.left[15] = {
 
 gls.mid[3] = {
     lspMsg = {
-        provider  = require("config.lsp-status-nvim").lspMsg,
+        provider  = require("config.nvim-lsp-status").lspMsg,
         condition = function()
             return vim.lsp.buf.server_ready() and condition.hide_in_width()
         end,

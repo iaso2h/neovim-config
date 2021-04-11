@@ -51,11 +51,11 @@ if not vim.g.vscode then
     autocmd FocusGained,BufEnter * checktime
   " autocmd BufAdd               * lua require("consistantTab").adaptBufTab()
 
-    autocmd BufEnter             *.txt              lua require("util").splitExist()
-    autocmd BufEnter             fugitive,gitcommit lua require("util").splitExist()
-    autocmd BufEnter             term://*           startinsert
-    autocmd TermOpen             *                  startinsert
-    autocmd TermOpen             *                  setlocal nobuflisted | setlocal nonumber
+    autocmd BufEnter             term://* startinsert
+    autocmd TermOpen             *        startinsert
+    autocmd TermOpen             *        setlocal nobuflisted | setlocal nonumber
+
+    autocmd BufEnter             *.txt,COMMIT_EDITMSG,index lua require("util").splitExist()
 
   " autocmd CursorHold            *.c,*.h,*.cpp,*.cc,*.vim :call HLCIOFunc()
     autocmd FileType              java setlocal includeexpr=substitute(v:fname,'\\.','/','g')

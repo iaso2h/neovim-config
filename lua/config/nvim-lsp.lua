@@ -7,7 +7,7 @@ local lspConfig = require('lspconfig')
 local lspStatus = require('lsp-status')
 local M         = {}
 
-require("config.lsp-status-nvim").setup()
+require("config.nvim-lsp-status").setup()
 
 local snippetCapabilities = vim.lsp.protocol.make_client_capabilities()
 snippetCapabilities.textDocument.completion.completionItem.snippetSupport = true
