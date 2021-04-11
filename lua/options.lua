@@ -5,17 +5,6 @@ local api = vim.api
 local M   = {}
 
 -- let &path.="src/include,/usr/include/AL,"
-
--- GUI {{{
-cmd [[colorscheme onedarknord]]
-if vim.g.neovide ~= nil then
-    vim.o.guifont = "更纱黑体 Mono SC Nerd:h18"
-else
-    vim.o.guifont = "更纱黑体 Mono SC Nerd:h13"
-end
-vim.o.guicursor = "n-v-sm:block,i-c-ci:ver25-Cursor,ve-o-r-cr:hor20"
--- }}} GUI
-
 if vim.fn.executable('rg') == 1 then
     vim.o.grepprg = 'rg --vimgrep'
     vim.o.grepformat = '%f:%l:%c:%m'
@@ -86,14 +75,68 @@ local opts = {
     winhighlight   = "NormalNC:WinNormalNC",
 }
 
--- }}} Basic settings
-for key, val in pairs(opts) do
-    if optsLocal[key] ~= nil then
-        vim[optsLocal[key]][key] = val
+if not vim.g.vscode then
+    for key, val in pairs(opts) do
+        if optsLocal[key] ~= nil then
+            vim[optsLocal[key]][key] = val
+        end
+        vim["o"][key] = val
     end
-    vim["o"][key] = val
-end
 
+
+    -- GUI
+    cmd [[colorscheme onedarknord]]
+    if vim.g.neovide ~= nil then
+        vim.o.guifont = "更纱黑体 Mono SC Nerd:h18"
+    else
+        vim.o.guifont = "更纱黑体 Mono SC Nerd:h13"
+    end
+    vim.o.guicursor = "n-v-sm:block,i-c-ci:ver25-Cursor,ve-o-r-cr:hor20"
+end
+-- }}} Basic settings
+-- VS Code settings {{{
+local vscodeOpts = {
+    clipboard      = "unnamed",
+    complete       = ".,w,b,u,t,kspell,i,d,t",
+    completeopt    = "menuone,noselect,noinsert",
+    conceallevel   = 0,
+    concealcursor  = "nc",
+    cpoptions      = vim.o.cpoptions .. "q",
+    cursorline     = true,
+    gdefault       = true,
+    hidden         = true,
+    ignorecase     = true, smartcase = true,
+    inccommand     = "nosplit",
+    listchars      = "tab:>-,precedes:❮,extends:❯,trail:-,nbsp:%,eol:↴",
+    langmenu       = "en",
+    lazyredraw     = true,
+    mouse          = "a",
+    joinspaces     = false,
+    path           = vim.o.path .. "**",
+    scrolloff      = 10,
+    sessionoptions = "buffers,curdir,folds,help,resize,slash,tabpages,winpos,winsize",
+    shada          = "!,'100,/100,:100,<100,s100,h",
+    shortmess      = "clxTI",
+    showtabline    = 2,
+    showbreak      = "↳",
+    splitbelow = true, splitright = true, switchbuf = "split",
+    termguicolors  = true,
+    timeoutlen     = 500,
+    updatetime     = 150,
+    wildignore     = vim.o.wildignore .. "*/tmp/*,*.so,*.swp,*.zip,*.db,*.sqlite,*.bak",
+    wildignorecase = true,
+    winhighlight   = "NormalNC:WinNormalNC",
+}
+
+if vim.g.vscode then
+    for key, val in pairs(vscodeOpts) do
+        if optsLocal[key] ~= nil then
+            vim[optsLocal[key]][key] = val
+        end
+        vim["o"][key] = val
+    end
+end
+-- }}} VS Code settings
 -- OS varied settings {{{
 if fn.has('win32') == 1 then
     -- o.shell="powershell"
@@ -118,7 +161,6 @@ if fn.has('win32') == 1 then
     end
 end
 -- }}} OS varied settings
-
 -- Neovide settings {{{
 if vim.g.neovide then
     vim.g.neovide_no_idle                 = true

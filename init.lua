@@ -37,17 +37,19 @@ vim.g.loaded_netrwSettings     = 1
 vim.g.loaded_netrwFileHandlers = 1
 vim.g.loaded_tarPlugin         = 1
 vim.g.loaded_tutor_mode_plugin = 1
--- c.vim
-vim.g.c_gnu = 1
-vim.g.c_ansi_typedefs = 1
-vim.g.c_ansi_constants = 1
-vim.g.c_no_comment_fold = 1
-vim.g.c_syntax_for_h = 1
--- doxygen.vim
-vim.g.load_doxygen_syntax= 1
-vim.g.doxygen_enhanced_color = 1
--- msql.vim
-vim.g.msql_sql_query = 1
+if not vim.g.vscode then
+    -- c.vim
+    vim.g.c_gnu = 1
+    vim.g.c_ansi_typedefs = 1
+    vim.g.c_ansi_constants = 1
+    vim.g.c_no_comment_fold = 1
+    vim.g.c_syntax_for_h = 1
+    -- doxygen.vim
+    vim.g.load_doxygen_syntax= 1
+    vim.g.doxygen_enhanced_color = 1
+    -- msql.vim
+    vim.g.msql_sql_query = 1
+end
 -- }}} Build-in plugin
 
 

@@ -67,7 +67,7 @@ map("n", [[go]],    [[:lua require("mappings").oppoSelection()<cr>]], { "silent"
 map("n", [[<A-v>]], [[<C-q>]],                                        {"noremap"})
 -- }}} Search & Jumping
 -- Scratch file
-map("n", [[<C-n>]], [[:<c-u>new<cr>]], {"silent"})
+map("n", [[<C-n>]], [[:<c-u>new<cr>]], {"silent", "novscode"})
 -- Open/Search in browser
 map("n", [[<C-l>]], [[:lua require("openBrowser").openUrl()<cr>]], {"silent"})
 map("v", [[<C-l>]], [[:lua require("openBrowser").openUrl(require("util").visualSelection("string"))<cr>]], {"silent"})
@@ -225,16 +225,16 @@ map("n", [[<A-k>]], [[:call VSCodeCall("editor.action.moveLinesUpAction")<cr>]],
 map("v", [[<A-j>]], [[:lua require("yankPut").VSCodeLineMove("v", "down")<cr>]],             {"silent", "novscode"})
 map("v", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("v", "up")<cr>]],               {"silent", "novscode"})
 -- Copy line
-map("i", [[<A-S-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "down")<cr>]],       {"silent", "novscode"})
-map("i", [[<A-S-k>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "up")<cr>]],         {"silent", "novscode"})
-map("i", [[<A-S-j>]], [[<C-\><C-o>:call VSCodeCall("editor.action.copyLinesUpAction")]],           {"silent", "vscodeonly"})
-map("i", [[<A-S-k>]], [[<C-\><C-o>:call VSCodeCall("editor.action.copyLinesUpAction")]],           {"silent", "vscodeonly"})
-map("n", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank("n", "down")<cr>]],                 {"silent", "novscode"})
-map("n", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank("n", "up")<cr>]],                   {"silent", "novscode"})
-map("n", [[<A-S-j>]], [[:call VSCodeCall("editor.action.copyLinesUpAction")]],                     {"silent", "vscodeonly"})
-map("n", [[<A-S-k>]], [[:call VSCodeCall("editor.action.copyLinesUpAction")]],                     {"silent", "vscodeonly"})
-map("v", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "down")<cr>]], {"silent", "novscode"})
-map("v", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "up")<cr>]],   {"silent", "novscode"})
+map("i", [[<A-S-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "down")<cr>]],       {"silent"})
+map("i", [[<A-S-k>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "up")<cr>]],         {"silent"})
+-- map("i", [[<A-S-j>]], [[<C-\><C-o>:call VSCodeCall("editor.action.copyLinesUpAction")]],           {"silent", "vscodeonly"})
+-- map("i", [[<A-S-k>]], [[<C-\><C-o>:call VSCodeCall("editor.action.copyLinesUpAction")]],           {"silent", "vscodeonly"})
+map("n", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank("n", "down")<cr>]],                 {"silent"})
+map("n", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank("n", "up")<cr>]],                   {"silent"})
+-- map("n", [[<A-S-j>]], [[:call VSCodeCall("editor.action.copyLinesUpAction")]],                     {"silent", "vscodeonly"})
+-- map("n", [[<A-S-k>]], [[:call VSCodeCall("editor.action.copyLinesUpAction")]],                     {"silent", "vscodeonly"})
+map("v", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "down")<cr>]], {"silent"})
+map("v", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "up")<cr>]],   {"silent"})
 -- }}} Mimic the VSCode move/copy line up/down behavior
 -- }}} MS bebhave
 -- Convert \ into /

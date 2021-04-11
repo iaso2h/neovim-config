@@ -150,11 +150,9 @@ endif
 " Not all terminals support italics properly. If yours does, opt-in.
 " This function is based on one from FlatColor: https://github.com/MaxSt/FlatColor/
 " Which in turn was based on one found in hemisu: https://github.com/noahfrederick/vim-hemisu/
-let s:group_colors = {} " Cache of default highlight group settings, for later reference via `onedark#extend_highlight`
 let g:onedark_terminal_italics = 1
 function! s:h(group, style, ...)
     let s:highlight = a:style
-    let s:group_colors[a:group] = s:highlight " Cache default highlight group settings
 
     if g:onedark_terminal_italics == 0
         " if 1

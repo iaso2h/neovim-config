@@ -92,6 +92,7 @@ local bufTypeIcons = {
     vista_kind       = ' 🏷️ ',
     dbui             = ' 🏷️ ',
     magit            = '   ',
+    fugitive         = '   ',
     Mundo            = '  ',
     startify         = ' 🏳️ ',
     NvimTree         = ' 🗃️ ',
