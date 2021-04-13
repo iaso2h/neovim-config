@@ -4,8 +4,6 @@ local vim = vim
 vim.api.nvim_exec([[let $configPath = stdpath('config')]], false)
 vim.api.nvim_exec([[execute "source " . expand('$configPath/vimPlugList.vim')]], false)
 
-vim.g.mapleader = " " -- First thing first
-
 require "core.options"
 require "core.mappings"
 require "core.plugins"
@@ -50,5 +48,4 @@ if not vim.g.vscode then
     vim.g.msql_sql_query = 1
 end
 -- }}} Build-in plugin
-
 

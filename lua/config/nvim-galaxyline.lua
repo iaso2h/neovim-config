@@ -11,7 +11,8 @@ local condition = require("galaxyline.condition")
 
 gl.short_line_list = {
     "LuaTree", "vista", "dbui", "startify", "term", "fugitive", "fugitiveblame",
-    "plug", "coc-explorer", "Mundo", "MundoDiff", "vim-plug", "qf", "NvimTree"
+    "plug", "coc-explorer", "Mundo", "MundoDiff", "vim-plug", "qf", "NvimTree",
+    "dap-repl"
 }
 
 -- TODO support qf and statify
@@ -91,6 +92,7 @@ local bufTypeIcons = {
     vista            = ' 🏷️ ',
     vista_kind       = ' 🏷️ ',
     dbui             = ' 🏷️ ',
+    ["dap-repl"]     = '  ',
     magit            = '   ',
     fugitive         = '   ',
     Mundo            = '  ',

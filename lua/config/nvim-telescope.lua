@@ -103,5 +103,4 @@ map("n", [[<C-S-c>]], [[:lua require('telescope.builtin').commands(require('tele
 map("n", [[<C-S-p>]], [[:lua require('telescope.builtin').builtin(require('telescope.themes').get_dropdown({}))<cr>]],                     {"silent"})
 map("n", [[<C-S-h>]], [[:lua require('telescope.builtin').help_tags(require('telescope.themes').get_dropdown({}))<cr>]],                   {"silent"})
 map("n", [[<C-S-o>]], [[:lua require('telescope.builtin').current_buffer_tags(require('telescope.themes').get_dropdown({}))<cr>]],         {"silent"})
-map("n", [[<C-S-k>]], [[:lua require('telescope.builtin').vim_options(require('telescope.themes').get_dropdown({}))<cr>]],                 {"silent"})
 

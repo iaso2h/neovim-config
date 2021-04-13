@@ -37,6 +37,7 @@ Plug 'airblade/vim-rooter'
 " }}} Vim enhancement
 if !exists('g:vscode')
     " UI {{{
+    Plug 'joshdick/onedark.vim'
     Plug 'glepnir/galaxyline.nvim'
     Plug 'romgrk/barbar.nvim'
     Plug 'kyazdani42/nvim-web-devicons'
@@ -102,9 +103,11 @@ if !exists('g:vscode')
     Plug 'rafcamlet/nvim-luapad', {'on': ['Luapad', 'LuaRun', 'Lua']}
     Plug 'bfredl/nvim-luadev', {'for': 'lua'}
     Plug 'iaso2h/vim-scriptease', {'branch': 'ftplugin'}
-    Plug 'mfussenegger/nvim-dap'
-    Plug 'theHamsta/nvim-dap-virtual-text'
-    Plug 'mfussenegger/nvim-dap-python', {'for': 'python'}
+    " Plug 'mfussenegger/nvim-dap'
+    " Plug 'theHamsta/nvim-dap-virtual-text'
+    " Plug 'mfussenegger/nvim-dap-python', {'for': 'python'}
+    " Plug 'puremourning/vimspector'
+    Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh' }
     " }}} Debug
 
     " Version control {{{

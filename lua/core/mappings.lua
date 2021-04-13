@@ -1,10 +1,16 @@
 local vim = vim
-local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
 local map = require("util").map
 local M   = {}
 
+-- First thing first
+vim.g.mapleader = " "
+
+-- Change font size
+map("", [[\[]],    [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = "更纱黑体 Mono SC Nerd:h" .. GuiFontSize<cr>]], {"novscode"})
+map("", [=[\]]=],  [[:lua GuiFontSize = GuiFontSize - 1; vim.o.guifont = "更纱黑体 Mono SC Nerd:h" .. GuiFontSize<cr>]], {"novscode"})
+map("", [[<C-0>]], [[:lua GuiFontSize = 13; vim.o.guifont = "更纱黑体 Mono SC Nerd:h13"<cr>]],                           {"novscode"})
 -- Extraction
 map("",  [[gc]], [[luaeval("require('operator').main(require('extraction').main, false)")]], {"silent", "expr"})
 map("v", [[C]],  [[:lua require("extraction").main({nil, vim.fn.visualmode()})<cr>]],        {"silent"})
@@ -17,8 +23,8 @@ map("n", [[<C-g>]],   [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 
 map("n", [[<S-tab>]], [[:lua require("tabSwitcher").main()<cr>]], {"silent", "novscode"})
 -- }}} Tab switcher
 -- Compile & run
-map("n", [[<F9>]],   [[:lua require("compileRun").compileCode()<cr>]], {"noremap", "silent", "novscode"})
-map("n", [[<S-F9>]], [[:lua require("compileRun").runCode()<cr>]],     {"noremap", "silent", "novscode"})
+map("n", [[<F9>]],   [[:lua require("compileRun").compileCode(true)<cr>]], {"noremap", "silent", "novscode"})
+map("n", [[<S-F9>]], [[:lua require("compileRun").runCode(true)<cr>]],     {"noremap", "silent", "novscode"})
 -- Search & Jumping {{{
 -- Changelist jumping
 map("n", [[<A-o>]], [[&diff? "mz`z[czz" : "mz`zg;zz"]], {"noremap", "silent", "expr"})

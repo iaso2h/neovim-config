@@ -171,7 +171,7 @@ end
 local findSumnekoLua = function()
     sumneko_root_path = fn.glob("~/.vscode/extensions/sumneko.lua*", 0, 1)
     if not next(sumneko_root_path) then
-        print("Sumneko not found")
+        api.nvim_echo({{"Sumneko not found", "WarningMsg"}}, true, {})
         return
     end
     sumneko_root_path = sumneko_root_path[#sumneko_root_path] .. "/server"
@@ -224,7 +224,7 @@ vim.g.markdown_fenced_languages = {
       'vim',
       'help'
 }
-if ex("vim-language-server") then 
+if ex("vim-language-server") then
     lspConfig.vimls.setup{
         cmd = {checkExt("vim-language-server"), "--stdio"},
         capabilities = capabilities,
@@ -264,7 +264,7 @@ if ex("clangd") then
             "--all-scopes-completion",
             "--background-index",
             "--clang-tidy",
-            "--clang-tidy-checks=google-*,clang-analyzer-*, cert-*,performance-*,misc-,modernize-*,-modernize-use-trailing-return-type,concurrency-*,bugprone-*,readability-*,-readability-magic-numbers",
+            "--clang-tidy-checks=google-*,llvm-*,clang-analyzer-*, cert-*,performance-*,misc-,modernize-*,-modernize-use-trailing-return-type,concurrency-*,bugprone-*,readability-*,-readability-magic-numbers",
             "--completion-parse=auto",
             "--completion-style=detailed",
             "--cross-file-rename",

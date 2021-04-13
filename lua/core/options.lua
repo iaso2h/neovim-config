@@ -32,6 +32,8 @@ local optsLocal = {
     winhighlight  = "wo",
 }
 
+vim.g.winminheight = 2
+
 local opts = {
     autoindent = true, cindent = true, expandtab = true, shiftround = true, shiftwidth=4, softtabstop=4, tabstop=4,
     clipboard      = "unnamed",
@@ -42,6 +44,7 @@ local opts = {
     concealcursor  = "nc",
     cpoptions      = vim.o.cpoptions .. "q",
     cursorline     = true,
+    fileencodings  = "utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1",
     diffopt        = "context:10000,filler,closeoff,vertical,algorithm:patience",
     fileignorecase = true,
     fillchars      = "fold:-,vert:╎",
@@ -53,10 +56,12 @@ local opts = {
     listchars      = "tab:>-,precedes:❮,extends:❯,trail:-,nbsp:%,eol:↴",
     langmenu       = "en",
     lazyredraw     = true,
+    matchpairs     = vim.o.matchpairs .. ",<:>,《:》,（:）,【:】,“:”,‘:’",
     mouse          = "a",
     joinspaces     = false,
     number         = true,
     path           = vim.o.path .. "**",
+    ruler          = false,
     scrolloff      = 10,
     sessionoptions = "buffers,curdir,folds,help,resize,slash,tabpages,winpos,winsize",
     shada          = "!,'100,/100,:100,<100,s100,h",
@@ -72,6 +77,7 @@ local opts = {
     wildignore     = vim.o.wildignore .. "*/tmp/*,*.so,*.swp,*.zip,*.db,*.sqlite,*.bak",
     wildignorecase = true,
     wildoptions    = "pum",
+    winminwidth = 3, winheight = 3,
     winhighlight   = "NormalNC:WinNormalNC",
 }
 
@@ -86,10 +92,11 @@ if not vim.g.vscode then
 
     -- GUI
     cmd [[colorscheme onedarknord]]
+    GuiFontSizes = 13
     if vim.g.neovide ~= nil then
-        vim.o.guifont = "更纱黑体 Mono SC Nerd:h18"
+        vim.o.guifont = "更纱黑体 Mono SC Nerd:h" .. (GuiFontSizes + 5)
     else
-        vim.o.guifont = "更纱黑体 Mono SC Nerd:h13"
+        vim.o.guifont = "更纱黑体 Mono SC Nerd:h" .. GuiFontSizes
     end
     vim.o.guicursor = "n-v-sm:block,i-c-ci:ver25-Cursor,ve-o-r-cr:hor20"
 end

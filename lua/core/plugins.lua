@@ -14,13 +14,14 @@ if not vim.g.vscode then
     require "config.nvim-telescope"
     require "config.nvim-treesitter"
     require "config.nvim-tree"
-    require "config.nvim-dap"
+    -- require "config.nvim-dap"
     -- require "config.nvim-gitsigns"
     require "config.nvim-barbar"
     require "config.nvim-galaxyline"
     -- require "config.nvim-coc"
     require "config.nvim-lsp"
     require "config.nvim-comp"
+    require "config.nvim-gdb"
 end
 
 -- michaeljsmith/vim-indent-object {{{
@@ -245,7 +246,7 @@ if not vim.g.vscode then
     }
     -- }}} romgrk/todoist.nvim
     -- RishabhRD/nvim-cheat.sh {{{
-    map("n", [[<C-S-l>]], [[:<c-u>Cheat<cr>]], {"silent"})
+    -- map("n", [[<C-S-l>]], [[:<c-u>Cheat<cr>]], {"silent"})
     -- }}} RishabhRD/nvim-cheat.sh
     -- szw/vim-maximizer {{{
     map("",  [[<C-w>m]], [[:MaximizerToggle<cr>]],      {"silent"})
@@ -299,6 +300,7 @@ if not vim.g.vscode then
     if fn.has('win32') then vim.g.gitgutter_git_executable = "D:/Git/bin/git.exe" end
     vim.g.gitgutter_map_keys = 0
     vim.g.gitgutter_sign_priority = 10
+    vim.g.gitgutter_preview_win_floating = 1
     map("n", [[]h]], [[<Plug>(GitGutterNextHunk)]])
     map("n", [[[h]], [[<Plug>(GitGutterPrevHunk)]])
     map("o", [[ih]], [[<Plug>(GitGutterTextObjectInnerPending)]])
