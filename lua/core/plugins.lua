@@ -21,7 +21,7 @@ if not vim.g.vscode then
     -- require "config.nvim-coc"
     require "config.nvim-lsp"
     require "config.nvim-comp"
-    require "config.nvim-gdb"
+    -- require "config.nvim-gdb"
 end
 
 -- michaeljsmith/vim-indent-object {{{
@@ -274,9 +274,7 @@ if not vim.g.vscode then
     }
     vim.g.startify_update_oldfiles        = 1
     vim.g.startify_session_autoload       = 1
-    if fn.has("win32") == 1 then
-        vim.g.startify_bookmarks = {{v = fn.expand("$MYVIMRC")}}
-    end
+    vim.g.startify_bookmarks              = {{v = fn.expand("$MYVIMRC")}}
     vim.g.startify_session_before_save    = {'echo "Cleaning up before saving.."' }
     vim.g.startify_session_persistence    = 1
     vim.g.startify_session_delete_buffers = 1
@@ -297,7 +295,7 @@ if not vim.g.vscode then
     map("n", [[<leader>t]], [[:Vista!!<cr>]], {"silent"})
     -- }}} liuchengxu/vista.vim
     -- airblade/vim-gitgutter {{{
-    if fn.has('win32') then vim.g.gitgutter_git_executable = "D:/Git/bin/git.exe" end
+    if fn.has('win32') == 1 then vim.g.gitgutter_git_executable = "D:/Git/bin/git.exe" end
     vim.g.gitgutter_map_keys = 0
     vim.g.gitgutter_sign_priority = 10
     vim.g.gitgutter_preview_win_floating = 1

@@ -18,7 +18,7 @@ map("v", [[C]],  [[:lua require("extraction").main({nil, vim.fn.visualmode()})<c
 map("",  [[gz]], [[luaeval("require('operator').main(require('zeal').nonglobalQuery, false)")]], {"silent", "expr"})
 map("",  [[gZ]], [[luaeval("require('operator').main(require('zeal').globalQuery, false)")]],    {"silent", "expr"})
 map("v", [[Z]],  [[:lua require("zeal").globalQuery({nil, "v"})<cr>]],                           {"silent"})
-map("n", [[<C-g>]],   [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖥 CWD: " .. vim.fn.getcwd())<cr>]], {"silent", "novscode"})
+map("",  [[<C-g>]],   [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<cr>]], {"silent", "novscode"})
 -- Tab switcher {{{
 map("n", [[<S-tab>]], [[:lua require("tabSwitcher").main()<cr>]], {"silent", "novscode"})
 -- }}} Tab switcher
@@ -69,7 +69,7 @@ function M.oppoSelection() -- {{{
     local closerToStart  = require("util").posDist(startSelectPos, curPos) < require("util").posDist(endSelectPos, curPos) and true or false
     if closerToStart then api.nvim_win_set_cursor(0, endSelectPos) else api.nvim_win_set_cursor(0, startSelectPos) end
 end -- }}}
-map("n", [[go]],    [[:lua require("mappings").oppoSelection()<cr>]], { "silent"})
+map("n", [[go]],    [[:lua require("core.mappings").oppoSelection()<cr>]], { "silent"})
 map("n", [[<A-v>]], [[<C-q>]],                                        {"noremap"})
 -- }}} Search & Jumping
 -- Scratch file

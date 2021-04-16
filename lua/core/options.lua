@@ -103,7 +103,7 @@ end
 -- }}} Basic settings
 -- VS Code settings {{{
 local vscodeOpts = {
-    clipboard      = "unnamed",
+    clipboard      = "unnamed,unnamedplus",
     complete       = ".,w,b,u,t,kspell,i,d,t",
     completeopt    = "menuone,noselect,noinsert",
     conceallevel   = 0,
@@ -161,8 +161,8 @@ if fn.has('win32') == 1 then
         end
     end
     elseif fn.has('unix') == 1 then
-    local pythonPath = (string.gsub(fn.system('which python3'), "\n+$"))
-    api.nvim_set_var(pythonPath)
+    local pythonPath = (fn.system('which python3')):gsub("\n+$", "")
+    api.nvim_set_var("python3_host_prog", pythonPath)
     if not fn.executable(api.nvim_get_var("python3_host_prog")) then
         api.nvim_err_write("Python path not found\n")
     end

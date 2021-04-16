@@ -3,13 +3,15 @@ local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
 local M   = {}
--- mg979/vim-visual-multi-multi {{{
+local map = require("util").map
+
 vim.g.VM_default_mappings               = 0
 vim.g.VM_silent_exit                    = 1
 vim.g.VM_quit_after_leaving_insert_mode = 1
 vim.g.VM_use_first_cursor_in_line       = 1
 vim.g.VM_reselect_first                 = 1
 vim.g.VM_verbose_commands               = 1
+vim.g.VM_mouse_mappings                 = 1
 vim.g.VM_skip_shorter_lines             = 0
 vim.g.VM_skip_empty_lines               = 1
 vim.g.VM_insert_special_keys            = {'c-v', 'c-e', 'c-a'}
@@ -29,7 +31,6 @@ vim.g.VM_custom_remaps = {["<C-v>"] = "<C-r>", ["s"] = "c"}
 -- To remap any key to normal! commands. Example:
 vim.g.VM_custom_noremaps = {["=="] = "==", ["<<"] = "<<", [">>"] = ">>"}
 function M.VM_Start()
-    -- TODO remap coc enter
     map("i", [[<C-BS>]],    [[<C-\><C-o>db]])
     map("n", [[S]],         [[ys]])
     map("n", [[<leader>h]], [[<esc>]])
@@ -49,8 +50,6 @@ augroup VmStartMapping
     autocmd User visual_multi_exit  lua require("config.vim-visual-multi").VM_Exit()
 augroup END
     ]], false)
-
-vim.g.VM_mouse_mappings             = 1
 
 local VMMaps = {}
 VMMaps['Reselect Last']      = 'gm'
@@ -80,7 +79,6 @@ VMMaps['Run Normal']    = ',!'
 VMMaps['Run Macro']     = ',@'
 VMMaps['Show Register'] = ',"'
 vim.g.VM_maps = VMMaps
--- }}} mg979/vim-visual-multi-multi
 
 return M
 

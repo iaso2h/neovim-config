@@ -5,6 +5,7 @@ local api = vim.api
 vim.g.FiletypeCommentDelimiter = {
     vim    = "\"",
     python = "#",
+    zsh    = "#",
     c      = "\\/\\/",
     cpp    = "\\/\\/",
     json   = "\\/\\/",
@@ -17,6 +18,7 @@ if not vim.g.vscode then
         c      = '\\s\\{-}//.\\{-}{{{.*$',
         cpp    = '\\s\\{-}//.\\{-}{{{.*$',
         lua    = '\\s\\{-}--.\\{-}{{{.*$',
+        zsh    = '\\s\\{-}\\"[^#]\\{-}{{{[^#]*$',
     }
     vim.g.enhanceFoldEndPat = {
         vim    = '\\s\\{-}\\"[^\\"]\\{-}}}}[^\\"]*$',
@@ -24,6 +26,7 @@ if not vim.g.vscode then
         c      = '\\s\\{-}//.\\{-}}}}.*$',
         cpp    = '\\s\\{-}//.\\{-}}}}.*$',
         lua    = '\\s\\{-}--.\\{-}}}}.*$',
+        zsh    = '\\s\\{-}\\"[^#"]\\{-}}}}[^#]*$',
     }
     api.nvim_exec([[
     function! EnhanceFoldExpr()

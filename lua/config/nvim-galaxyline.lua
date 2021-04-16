@@ -87,18 +87,16 @@ local fileFormatIcons = {
 local bufTypeIcons = {
     help             = '   ',
     defx             = '   ',
-    denite           = '   ',
-    ["vim-plug"]     = ' 🔌 ',
-    vista            = ' 🏷️ ',
-    vista_kind       = ' 🏷️ ',
-    dbui             = ' 🏷️ ',
+    ["vim-plug"]     = '  ',
+    vista            = '  ',
+    vista_kind       = '  ',
     ["dap-repl"]     = '  ',
     magit            = '   ',
     fugitive         = '   ',
     Mundo            = '  ',
-    startify         = ' 🏳️ ',
-    NvimTree         = ' 🗃️ ',
-    ["coc-explorer"] = ' 🗃️ ',
+    startify         = '  ',
+    NvimTree         = '  ',
+    ["coc-explorer"] = '  ',
     qf               = '  ',
 }
 
@@ -175,23 +173,27 @@ gls.left[5] = {
     }
 }
 
--- gls.left[6] = {
-    -- GitIcon = {
-        -- provider = function() return '  ' end,
-        -- condition = condition.check_git_workspace,
-        -- separator = ' ',
-        -- separator_highlight = {'NONE',colors.bg},
-        -- highlight = {colors.purple, colors.bg,'bold'},
-    -- }
--- }
-
-gls.left[7] = {
-    GitBranch = {
-        provider = 'GitBranch',
-        condition = condition.check_git_workspace,
-        highlight = {'#8FBCBB', colors.bg}
+if fn.has("unix") == 1 then
+    gls.left[6] = {
+        GitIcon = {
+            provider = function() return '  ' end,
+            condition = condition.check_git_workspace,
+            separator = ' ',
+            separator_highlight = {'NONE',colors.bg},
+            highlight = {colors.purple, colors.bg,'bold'},
+        }
     }
-}
+
+    gls.left[7] = {
+        GitBranch = {
+            provider = 'GitBranch',
+            condition = condition.check_git_workspace,
+            highlight = {colors.purple, colors.bg},
+            separator = ' ',
+            separator_highlight = {'NONE',colors.bg},
+        }
+    }
+end
 
 gls.left[8] = {
     DiffAdd = {
@@ -199,8 +201,8 @@ gls.left[8] = {
         condition = condition.hide_in_width,
         icon = ' ',
         highlight = {colors.green, colors.bg}
-    }
 }
+    }
 gls.left[9] = {
     DiffModified = {
         provider = 'DiffModified',
@@ -231,7 +233,7 @@ gls.left[11] = {
 gls.left[12] = {
     DiagnosticHint = {
         provider = 'DiagnosticHint',
-        icon = ' 💡',
+        icon = '  ',
         highlight = {colors.yellow,colors.bright_bg},
     }
 }
@@ -239,7 +241,7 @@ gls.left[12] = {
 gls.left[13] = {
     DiagnosticInfo = {
         provider = 'DiagnosticInfo',
-        icon = ' 🔎 ',
+        icon = '  ',
         highlight = {colors.blue,colors.bright_bg},
     }
 }

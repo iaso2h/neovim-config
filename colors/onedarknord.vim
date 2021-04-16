@@ -987,7 +987,8 @@ call s:hi("Lf_hl_matchRefine", s:nord13_gui, "", s:nord13_term, "", "", "")
 " highlight def Lf_hl_matchRefine gui=bold guifg=Magenta cterm=bold ctermfg=201
 
 " Sandwich {{{
-hi! link OperatorSandwichBuns Search
+hi! link OperatorSandwichAdd    Search
+hi! link OperatorSandwichBuns   Search
 hi! link OperatorSandwichChange Search
 hi! link OperatorSandwichDelete Search
 hi! link OperatorSandwichAddrcc Search
@@ -1111,7 +1112,7 @@ highlight link TSVariableBuiltin    Special
 " }}} nvim-treesitter/nvim-treesitter
 
 " lukas-reineke/indent-blankline.nvim {{{
-hi! link indent-blankline SignColorm
+" hi! link indent-blankline SignColorm
 " }}} lukas-reineke/indent-blankline.nvim
 
 " glepnir/lspsaga.nvim {{{

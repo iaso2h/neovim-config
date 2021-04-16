@@ -50,7 +50,7 @@ end -- }}}
 
 
 -- LSP Message for galaxyline.nvim {{{
-local spinnerFrames = { '🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘' }
+local spinnerFrames = {'⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷'}
 function M.lspMsg()
     local msgs = lspStatus.messages()
     if next(msgs) then -- {{{

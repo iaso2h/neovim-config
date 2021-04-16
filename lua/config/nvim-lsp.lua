@@ -149,6 +149,7 @@ end
 -- }}} Python
 -- Lua {{{
 -- https://github.com/sumneko/lua-language-server
+-- For linux: https://github.com/sumneko/lua-language-server/wiki/Build-and-Run-(Standalone)
 -- Settings: https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md#sumneko_lua
 local sumneko_root_path
 local sumneko_binary
@@ -169,14 +170,23 @@ else
 end
 
 local findSumnekoLua = function()
-    sumneko_root_path = fn.glob("~/.vscode/extensions/sumneko.lua*", 0, 1)
-    if not next(sumneko_root_path) then
-        api.nvim_echo({{"Sumneko not found", "WarningMsg"}}, true, {})
-        return
+    if fn.has("win32") == 1 then
+        sumneko_root_path = fn.glob("~/.vscode/extensions/sumneko.lua*", 0, 1)
+        if not next(sumneko_root_path) then
+            api.nvim_echo({{"Sumneko not found", "WarningMsg"}}, true, {})
+            return
+        end
+
+        sumneko_root_path = sumneko_root_path[#sumneko_root_path] .. "/server"
+        sumneko_binary = sumneko_root_path .. "/bin/".. systemName .. "/lua-language-server" .. binaryExt[systemName]
+    elseif fn.has("unix") == 1 then
+        sumneko_binary = fn.glob("~/.config/nvim/lsp/lua-language-server/bin/Linux/lua-language-server")
+        if fn.executable(sumneko_binary) == 1 then
+            sumneko_root_path = fn.glob("~/.config/nvim/lsp/lua-language-server")
+        end
     end
-    sumneko_root_path = sumneko_root_path[#sumneko_root_path] .. "/server"
-    sumneko_binary = sumneko_root_path .. "/bin/".. systemName .. "/lua-language-server" .. binaryExt[systemName]
 end
+
 
 findSumnekoLua()
 
@@ -197,7 +207,6 @@ if sumneko_root_path then
                     callSnippet = "Replace",
                 },
                 diagnostics = {
-                    enable  = true,
                     globals = {'vim'},
                 },
                 workspace = {
@@ -416,10 +425,10 @@ local saga = require 'lspsaga'
 
 saga.init_lsp_saga {
     use_saga_diagnostic_sign = true,
-    error_sign            = "❌",
-    warn_sign             = "⚠️",
-    hint_sign             = "💡",
-    infor_sign            = "🔎",
+    error_sign            = "  ",
+    warn_sign             = " ⚠️ ",
+    hint_sign             = "  ",
+    infor_sign            = "  ",
     dianostic_header_icon = '   ',
     code_action_icon      = ' ',
     code_action_prompt = {
