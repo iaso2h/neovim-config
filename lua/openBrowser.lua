@@ -35,18 +35,18 @@ function M.openUrl(selectText)
         end, opts["timeout"])
     else
         if fn.has('win32') == 1 then
-            cmd("explorer " .. selectText)
+            fn.system("explorer " .. selectText)
         elseif fn.has('unix') == 1 then
-            cmd("!open '" .. selectText .. "'")
+            fn.system("open '" .. selectText .. "'")
         end
     end
 end
 
 function M.openInBrowser(str)
     if fn.has('win32') == 1 then
-        cmd("!chrome \"? " .. str .. "\"")
+        fn.system("explorer \"? " .. str .. "\"")
     elseif fn.has('unix') == 1 then
-        cmd("!open '" .. str .. "'")
+        fn.system("open '" .. str .. "'")
     end
 end
 

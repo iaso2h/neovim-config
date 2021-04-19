@@ -62,10 +62,6 @@ local onAttach  = function(client, bufNr) -- {{{
     bmap(bufNr, "n", [=[gd]=],         [[:lua vim.lsp.buf.definition()<cr>]],                                 {"silent"})
     bmap(bufNr, "n", [=[<leader>D]=],  [[:lua vim.lsp.buf.type_definition()<cr>]],                            {"silent"})
     bmap(bufNr, "n", [=[gi]=],         [[:lua vim.lsp.buf.implementation()<cr>]],                             {"silent"})
-    function M.references()
-        vim.lsp.buf.references()
-        require("buffer").quickfixToggle()
-    end
     bmap(bufNr, "n", [=[gR]=],         [[:lua vim.lsp.buf.references()<cr>]],                                 {"silent"})
     bmap(bufNr, "n", [=[<leader>wa]=], [[:lua vim.lsp.buf.add_workspace_folder()<cr>]],                       {"silent"})
     bmap(bufNr, "n", [=[<leader>wr]=], [[:lua vim.lsp.buf.remove_workspace_folder()<cr>]],                    {"silent"})
@@ -81,16 +77,16 @@ local onAttach  = function(client, bufNr) -- {{{
 
     -- lspsaga.nvim {{{
     -- BUG: break in new version of newovim
-    bmap(bufNr, "n", [[gF]],         [[:lua require("lspsaga.provider").lsp_finder()<cr>]],                 {"silent"})
-    bmap(bufNr, "n", [[<C-enter>]],  [[:lua require("lspsaga.codeaction").code_action()<cr>]],              {"silent"})
-    bmap(bufNr, "v", [[<C-enter>]],  [[:lua require("lspsaga.codeaction").range_code_action()<cr>]],        {"silent"})
-    bmap(bufNr, "n", [[K]],          [[:lua require("lspsaga.hover").render_hover_doc()<cr>]],              {"silent"})
-    bmap(bufNr, "n", [[<A-d>]],      [[:lua require("lspsaga.action").smart_scroll_with_saga(1)<cr>]],      {"silent"})
-    bmap(bufNr, "n", [[<A-e>]],      [[:lua require("lspsaga.action").smart_scroll_with_saga(-1)<cr>]],     {"silent"})
-    bmap(bufNr, "n", [[<C-p>]],      [[:lua require("lspsaga.signaturehelp").signature_help()<cr>]],        {"silent"})
-    bmap(bufNr, "n", [[<leader>r]],  [[:lua require("lspsaga.rename").rename()<cr>]],                       {"silent"})
-    bmap(bufNr, "n", [[<leader>gd]], [[:lua require("lspsaga.provider").preview_definition()<cr>]],         {"silent"})
-    bmap(bufNr, "n", [[<leader>E]],  [[:lua require("lspsaga.diagnostic").show_line_diagnostics()<cr>]],    {"silent"})
+    bmap(bufNr, "n", [[gF]],         [[:lua require("lspsaga.provider").lsp_finder()<cr>]],              {"silent"})
+    bmap(bufNr, "n", [[<C-enter>]],  [[:lua require("lspsaga.codeaction").code_action()<cr>]],           {"silent"})
+    bmap(bufNr, "v", [[<C-enter>]],  [[:lua require("lspsaga.codeaction").range_code_action()<cr>]],     {"silent"})
+    bmap(bufNr, "n", [[K]],          [[:lua require("lspsaga.hover").render_hover_doc()<cr>]],           {"silent"})
+    bmap(bufNr, "n", [[<A-d>]],      [[:lua require("lspsaga.action").smart_scroll_with_saga(1)<cr>]],   {"silent"})
+    bmap(bufNr, "n", [[<A-e>]],      [[:lua require("lspsaga.action").smart_scroll_with_saga(-1)<cr>]],  {"silent"})
+    bmap(bufNr, "n", [[<C-p>]],      [[:lua require("lspsaga.signaturehelp").signature_help()<cr>]],     {"silent"})
+    bmap(bufNr, "n", [[<leader>r]],  [[:lua require("lspsaga.rename").rename()<cr>]],                    {"silent"})
+    bmap(bufNr, "n", [[<leader>gd]], [[:lua require("lspsaga.provider").preview_definition()<cr>]],      {"silent"})
+    bmap(bufNr, "n", [[<leader>E]],  [[:lua require("lspsaga.diagnostic").show_line_diagnostics()<cr>]], {"silent"})
 
     bmap(bufNr, "n", [[[e]], [[:lua require("lspsaga.diagnostic").lsp_jump_diagnostic_prev()<cr>]],                     {"silent"})
     bmap(bufNr, "n", [[]e]], [[:lua require("lspsaga.diagnostic").lsp_jump_diagnostic_next()<cr>]],                     {"silent"})
@@ -121,7 +117,7 @@ end
 
 -- Python {{{
 -- https://github.com/microsoft/pyright
--- npm i -g pyright
+-- npm install -g pyright
 -- https://github.com/microsoft/pyright/blob/master/docs/configuration.md
 -- https://github.com/microsoft/pyright/blob/96871bec5a427048fead499ab151be87b7baf023/packages/vscode-pyright/package.json
 if ex("pyright") then
@@ -418,6 +414,13 @@ if ex("css-languageserver") then
     }
 end
 -- }}} CSS
+-- Bash {{{
+-- https://github.com/bash-lsp/bash-language-server
+-- npm i -g bash-language-server
+require'lspconfig'.bashls.setup{
+    on_attach = onAttach,
+}
+-- }}} Bash
 -- }}} LSP config
 
 -- glepnir/lspsaga.nvim {{{
@@ -425,12 +428,10 @@ local saga = require 'lspsaga'
 
 saga.init_lsp_saga {
     use_saga_diagnostic_sign = true,
-    error_sign            = "  ",
-    warn_sign             = " ⚠️ ",
-    hint_sign             = "  ",
-    infor_sign            = "  ",
-    dianostic_header_icon = '   ',
-    code_action_icon      = ' ',
+--    error_sign            = "  ",
+--    warn_sign             = " ⚠️ ",
+--    hint_sign             = "  ",
+--    infor_sign            = "  ",
     code_action_prompt = {
         enable        = true,
         sign          = false,
@@ -450,8 +451,7 @@ saga.init_lsp_saga {
         quit = '<C-c>',exec = '<CR>'
     },
     definition_preview_icon = '  ',
-    -- 1: thin border | 2: rounded border | 3: thick border | 4: ascii border
-    border_style = 2,
+    border_style = "round",
     rename_prompt_prefix = '>>>',
     -- server_filetype_map = {}
 }

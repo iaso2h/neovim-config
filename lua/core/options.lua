@@ -36,7 +36,7 @@ vim.g.winminheight = 2
 
 local opts = {
     autoindent = true, cindent = true, expandtab = true, shiftround = true, shiftwidth=4, softtabstop=4, tabstop=4,
-    clipboard      = "unnamed",
+    clipboard      = "unnamed,unnamedplus",
     cmdheight      = 2,
     complete       = ".,w,b,u,t,kspell,i,d,t",
     completeopt    = "menuone,noselect,noinsert",
@@ -56,7 +56,7 @@ local opts = {
     listchars      = "tab:>-,precedes:❮,extends:❯,trail:-,nbsp:%,eol:↴",
     langmenu       = "en",
     lazyredraw     = true,
-    matchpairs     = vim.o.matchpairs .. ",<:>,《:》,（:）,【:】,“:”,‘:’",
+    matchpairs     = vim.o.matchpairs .. ",\":\",<:>,《:》,（:）,【:】,“:”,‘:’",
     mouse          = "a",
     joinspaces     = false,
     number         = true,
