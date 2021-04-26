@@ -1,8 +1,9 @@
-local vim = vim
-local cmd = vim.cmd
-local api = vim.api
-local map = require("util").map
-local M   = {}
+local vim  = vim
+local cmd  = vim.cmd
+local api  = vim.api
+local map  = require("util").map
+local vmap = require("util").vmap
+local M    = {}
 
 -- First thing first
 vim.g.mapleader = " "
@@ -101,16 +102,23 @@ map("n", [[g<C-cr>]], [[:lua require("trailingUtil").trailingChar("o")<cr>]],  {
 map("n", [[g<S-cr>]], [[:lua require("trailingUtil").trailingChar("O")<cr>]],  {"silent"})
 -- }}} Trailing character
 -- Messages
+vmap("n", [[g>]],    [[:<c-u>messages<cr>]])
 map("n", [[g<]],    [[:<c-u>messages<cr>]], {"silent"})
 map("n", [[g>]],    [[:<c-u>Messages<cr>]], {"silent", "novscode"})
-map("n", [[g>]],    [[:<c-u>messages<cr>]], {"silent", "vscodeonly"})
 map("n", [[<A-,>]], [[:<c-u>execute 'messages clear<bar>echohl Moremsg<bar>echo "Message clear"<bar>echohl None'<cr>]])
 map("n", [[<A-.>]], [[:<c-u>execute 'messages clear<bar>echohl Moremsg<bar>echo "Message clear"<bar>echohl None'<cr>]])
 -- Pageup/Pagedown
-map("",  [[<A-e>]], [[<PageUp>]],             {"novscode"})
-map("t", [[<A-e>]], [[<C-\><C-n><PageUp>]],   {"novscode"})
-map("",  [[<A-d>]], [[<PageDown>]],           {"novscode"})
-map("t", [[<A-d>]], [[<C-\><C-n><PageDown>]], {"novscode"})
+map("",  [[<A-e>]], [[<PageUp>]], {"novscode"})
+map("",  [[<A-d>]], [[<PageDown>]], {"novscode"})
+map("t", [[<A-e>]], [[<C-\><C-n><PageUp>]])
+map("t", [[<A-d>]], [[<C-\><C-n><PageDown>]])
+
+vmap("n", [[<A-e>]], [[:call VSCodeCall("cursorPageUp")<cr>]])
+vmap("n", [[<A-d>]], [[:call VSCodeCall("cursorPageDown")<cr>]])
+vmap("i", [[<A-e>]], [[<C-o>:call VSCodeCall("cursorPageUp")<cr>]])
+vmap("i", [[<A-d>]], [[<C-o>:call VSCodeCall("cursorPageDown")<cr>]])
+vmap("v", [[<A-e>]], [[<C-b>]])
+vmap("v", [[<A-d>]], [[<C-f>]])
 -- Macro
 -- <C-q> has been mapped to COC showDoc
 map("n", [[<A-q>]], [[q]], {"noremap"})
@@ -220,27 +228,28 @@ map("n", [[cP]], [[:lua require("yankPut").convertPut("P")<CR>]])
 map("n", [[cp]], [[:lua require("yankPut").convertPut("p")<CR>]])
 -- Mimic the VSCode move/copy line up/down behavior {{{
 -- Move line
-map("i", [[<A-j>]], [[<C-\><C-o>:VSCodeLineMoveDownInsert<cr>]],                             {"silent", "novscode"})
-map("i", [[<A-k>]], [[<C-\><C-o>:VSCodeLineMoveUpInsert<cr>]],                               {"silent", "novscode"})
-map("i", [[<A-j>]], [[<C-\><C-o>:call VSCodeCall("editor.action.moveLinesDownAction")<cr>]], {"silent", "vscodeonly"})
-map("i", [[<A-k>]], [[<C-\><C-o>:call VSCodeCall("editor.action.moveLinesUpAction")<cr>]],   {"silent", "vscodeonly"})
-map("n", [[<A-j>]], [[:lua require("yankPut").VSCodeLineMove("n", "down")<cr>]],             {"silent", "novscode"})
-map("n", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("n", "up")<cr>]],               {"silent", "novscode"})
-map("n", [[<A-j>]], [[:call VSCodeCall("editor.action.moveLinesDownAction")<cr>]],           {"silent", "vscodeonly"})
-map("n", [[<A-k>]], [[:call VSCodeCall("editor.action.moveLinesUpAction")<cr>]],             {"silent", "vscodeonly"})
-map("v", [[<A-j>]], [[:lua require("yankPut").VSCodeLineMove("v", "down")<cr>]],             {"silent", "novscode"})
-map("v", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("v", "up")<cr>]],               {"silent", "novscode"})
+map("i", [[<A-j>]], [[<C-\><C-o>:VSCodeLineMoveDownInsert<cr>]],                 {"silent", "novscode"})
+map("i", [[<A-k>]], [[<C-\><C-o>:VSCodeLineMoveUpInsert<cr>]],                   {"silent", "novscode"})
+map("n", [[<A-j>]], [[:lua require("yankPut").VSCodeLineMove("n", "down")<cr>]], {"silent", "novscode"})
+map("n", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("n", "up")<cr>]],   {"silent", "novscode"})
+map("v", [[<A-j>]], [[:lua require("yankPut").VSCodeLineMove("v", "down")<cr>]], {"silent", "novscode"})
+map("v", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("v", "up")<cr>]],   {"silent", "novscode"})
 -- Copy line
 map("i", [[<A-S-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "down")<cr>]],       {"silent"})
 map("i", [[<A-S-k>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "up")<cr>]],         {"silent"})
--- map("i", [[<A-S-j>]], [[<C-\><C-o>:call VSCodeCall("editor.action.copyLinesUpAction")]],           {"silent", "vscodeonly"})
--- map("i", [[<A-S-k>]], [[<C-\><C-o>:call VSCodeCall("editor.action.copyLinesUpAction")]],           {"silent", "vscodeonly"})
 map("n", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank("n", "down")<cr>]],                 {"silent"})
 map("n", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank("n", "up")<cr>]],                   {"silent"})
--- map("n", [[<A-S-j>]], [[:call VSCodeCall("editor.action.copyLinesUpAction")]],                     {"silent", "vscodeonly"})
--- map("n", [[<A-S-k>]], [[:call VSCodeCall("editor.action.copyLinesUpAction")]],                     {"silent", "vscodeonly"})
 map("v", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "down")<cr>]], {"silent"})
 map("v", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "up")<cr>]],   {"silent"})
+
+vmap("n", [[<A-j>]],   [[:call VSCodeCall("editor.action.moveLinesDownAction")<cr>]])
+vmap("n", [[<A-k>]],   [[:call VSCodeCall("editor.action.moveLinesUpAction")<cr>]])
+vmap("i", [[<A-j>]],   [[<C-\><C-o>:call VSCodeCall("editor.action.moveLinesDownAction")<cr>]])
+vmap("i", [[<A-k>]],   [[<C-\><C-o>:call VSCodeCall("editor.action.moveLinesUpAction")<cr>]])
+vmap("i", [[<A-S-j>]], [[<C-\><C-o>:call VSCodeCall("editor.action.copyLinesUpAction")]])
+vmap("i", [[<A-S-k>]], [[<C-\><C-o>:call VSCodeCall("editor.action.copyLinesUpAction")]])
+vmap("n", [[<A-S-j>]], [[:call VSCodeCall("editor.action.copyLinesUpAction")]])
+vmap("n", [[<A-S-k>]], [[:call VSCodeCall("editor.action.copyLinesUpAction")]])
 -- }}} Mimic the VSCode move/copy line up/down behavior
 -- }}} MS bebhave
 -- Convert \ into /
@@ -248,27 +257,27 @@ map("n", [[g/]], [[mz:s#\\#\/#e<cr>:noh<cr>g`z]],   {"noremap", "silent"})
 map("n", [[g\]], [[mz:s#\\#\\\\#e<cr>:noh<cr>g`z]], {"noremap", "silent"})
 -- Mode: Terminal {{{
 map("t", [[<A-n>]],      [[<C-\><C-n>]])
-map("n", [[<C-`>]],      [[:lua require("terminal").terminalToggle()<cr>]],       {"silent",  "novscode"})
-map("t", [[<C-`>]],      [[<A-n>:lua require("terminal").terminalToggle()<cr>]],  {"silent",  "novscode"})
-map("t", [[<A-h>]],      [[<A-n><A-h>]],                            {"novscode"})
-map("t", [[<A-l>]],      [[<A-n><A-l>]],                            {"novscode"})
-map("t", [[<A-S-h>]],    [[<A-n><A-S-h>]],                          {"novscode"})
-map("t", [[<A-S-l>]],    [[<A-n><A-S-l>]],                          {"novscode"})
-map("t", [[<C-BS>]],     [[<C-w>]],                                 {"novscode", "noremap"})
-map("t", [[<C-r>]],      [['\<A-n>"' . nr2char(getchar()) . 'pi']], {"novscode", "expr"})
-map("t", [[<C-w>k]],     [[<A-n><C-w>k]],                           {"novscode"})
-map("t", [[<C-w>j]],     [[<A-n><C-w>j]],                           {"novscode"})
-map("t", [[<C-w>h]],     [[<A-n><C-w>h]],                           {"novscode"})
-map("t", [[<C-w>l]],     [[<A-n><C-w>l]],                           {"novscode"})
-map("t", [[<C-w>w]],     [[<A-n><C-w>w]],                           {"novscode"})
-map("t", [[<C-w><C-w>]], [[<A-n><C-w><C-w>]],                       {"novscode"})
-map("t", [[<C-w>=]],     [[<A-n><C-w>=:startinsert<cr>]],           {"silent",  "novscode"})
-map("t", [[<C-w>o]],     [[<A-n><C-w>o:startinsert<cr>]],           {"silent",  "novscode"})
-map("t", [[<C-w>W]],     [[<A-n><C-w>W:startinsert<cr>]],           {"silent",  "novscode"})
-map("t", [[<C-w>H]],     [[<A-n><C-w>H:startinsert<cr>]],           {"silent",  "novscode"})
-map("t", [[<C-w>L]],     [[<A-n><C-w>L:startinsert<cr>]],           {"silent",  "novscode"})
-map("t", [[<C-w>J]],     [[<A-n><C-w>J:startinsert<cr>]],           {"silent",  "novscode"})
-map("t", [[<C-w>K]],     [[<A-n><C-w>K:startinsert<cr>]],           {"silent",  "novscode"})
+map("n", [[<C-`>]],      [[:lua require("terminal").terminalToggle()<cr>]],      {"silent"})
+map("t", [[<C-`>]],      [[<A-n>:lua require("terminal").terminalToggle()<cr>]], {"silent"})
+map("t", [[<A-h>]],      [[<A-n><A-h>]])
+map("t", [[<A-l>]],      [[<A-n><A-l>]])
+map("t", [[<A-S-h>]],    [[<A-n><A-S-h>]])
+map("t", [[<A-S-l>]],    [[<A-n><A-S-l>]])
+map("t", [[<C-BS>]],     [[<C-w>]],                                 { "noremap"})
+map("t", [[<C-r>]],      [['\<A-n>"' . nr2char(getchar()) . 'pi']], { "expr"})
+map("t", [[<C-w>k]],     [[<A-n><C-w>k]])
+map("t", [[<C-w>j]],     [[<A-n><C-w>j]])
+map("t", [[<C-w>h]],     [[<A-n><C-w>h]])
+map("t", [[<C-w>l]],     [[<A-n><C-w>l]])
+map("t", [[<C-w>w]],     [[<A-n><C-w>w]])
+map("t", [[<C-w><C-w>]], [[<A-n><C-w><C-w>]])
+map("t", [[<C-w>=]],     [[<A-n><C-w>=:startinsert<cr>]], {"silent"})
+map("t", [[<C-w>o]],     [[<A-n><C-w>o:startinsert<cr>]], {"silent"})
+map("t", [[<C-w>W]],     [[<A-n><C-w>W:startinsert<cr>]], {"silent"})
+map("t", [[<C-w>H]],     [[<A-n><C-w>H:startinsert<cr>]], {"silent"})
+map("t", [[<C-w>L]],     [[<A-n><C-w>L:startinsert<cr>]], {"silent"})
+map("t", [[<C-w>J]],     [[<A-n><C-w>J:startinsert<cr>]], {"silent"})
+map("t", [[<C-w>K]],     [[<A-n><C-w>K:startinsert<cr>]], {"silent"})
 -- TODO: Split terminal in new instance
 -- }}} Mode: Terminal
 -- Mode: Commandline & Insert {{{

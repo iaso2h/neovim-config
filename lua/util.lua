@@ -260,9 +260,6 @@ function M.map(mode, lhs, rhs, optsTbl) -- {{{
     if vim.tbl_contains(optsTbl, "novscode") and vim.g.vscode then
         return
     end
-    if vim.tbl_contains(optsTbl, "vscodeonly") then
-        if not vim.g.vscode then return end
-    end
     if not next(optsTbl) then
         api.nvim_set_keymap(mode, lhs, rhs, optsTbl)
     else
@@ -275,6 +272,20 @@ function M.map(mode, lhs, rhs, optsTbl) -- {{{
         api.nvim_set_keymap(mode, lhs, rhs, optskeywordTbl)
     end
 end -- }}}
+----
+-- Function: M.vmap wrap around the nvim_set_keymap. This is for VS Code only!
+--
+-- @param mode:    Same as nvim_set_keymap
+-- @param lhs:     Same as nvim_set_keymap
+-- @param rhs:     Same as nvim_set_keymap
+----
+function M.vmap(mode, lhs, rhs) -- {{{
+    if vim.g.vscode then
+        api.nvim_set_keymap(mode, lhs, rhs, {silent=true})
+    end
+end -- }}}
+
+
 ----
 -- Function: M.bmap wrap around the nvim_set_keymap, and accept the fouth argument as table
 --
