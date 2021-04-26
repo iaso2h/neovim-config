@@ -23,7 +23,9 @@ if not vim.g.vscode then
     require "config.nvim-comp"
     -- require "config.nvim-gdb"
 end
-
+-- lambdalisue/suda.vim {{{
+vim.g.suda_smart_edit = 1
+-- }}} lambdalisue/suda.vim
 -- michaeljsmith/vim-indent-object {{{
 vim.g.indentLine_char                   = "▏"
 vim.g.indent_blankline_buftype_exclude  = {"terminal"}

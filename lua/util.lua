@@ -525,7 +525,11 @@ function M.splitExist()
     local winCount  = fn.winnr("$")
     local ui        = api.nvim_list_uis()[1]
     -- Based on vim.o.guifont = "更纱黑体 Mono SC Nerd:h13"
-    if winCount == 2 and 232/2 < ui["width"] then cmd [[wincmd L]] end
+    if fn.has("win32") == 1 then
+        if winCount == 2 and 232/2 < ui["width"] then cmd [[wincmd L]] end
+    elseif fn.has("unix") == 1 then
+        if winCount == 2 and 284/2 < ui["width"] then cmd [[wincmd L]] end
+    end
 end
 
 

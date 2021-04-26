@@ -123,7 +123,6 @@ local vscodeOpts = {
     scrolloff      = 10,
     sessionoptions = "buffers,curdir,folds,help,resize,slash,tabpages,winpos,winsize",
     shada          = "!,'100,/100,:100,<100,s100,h",
-    shortmess      = "clxTI",
     showtabline    = 2,
     showbreak      = "↳",
     splitbelow = true, splitright = true, switchbuf = "split",
@@ -160,11 +159,14 @@ if fn.has('win32') == 1 then
             api.nvim_err_write("Python path not found\n")
         end
     end
-    elseif fn.has('unix') == 1 then
-    local pythonPath = (fn.system('which python3')):gsub("\n+$", "")
-    api.nvim_set_var("python3_host_prog", pythonPath)
-    if not fn.executable(api.nvim_get_var("python3_host_prog")) then
-        api.nvim_err_write("Python path not found\n")
+elseif fn.has('unix') == 1 then
+    local linuxPython = "/usr/bin/python3"
+    if fn.executable(linuxPython) == 0 then
+        linuxPython = (fn.system('which python3')):gsub("\n+$", "")
+        api.nvim_set_var("python3_host_prog", linuxPython)
+        if not fn.executable(api.nvim_get_var("python3_host_prog")) then
+            api.nvim_err_write("Python path not found\n")
+        end
     end
 end
 -- }}} OS varied settings

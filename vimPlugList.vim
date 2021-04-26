@@ -34,6 +34,7 @@ Plug 'AndrewRadev/splitjoin.vim'
 Plug 'mg979/vim-visual-multi'
 Plug 'airblade/vim-rooter'
 " Plug 'AndrewRadev/switch.vim'
+Plug 'lambdalisue/suda.vim'
 " }}} Vim enhancement
 if !exists('g:vscode')
     " UI {{{
