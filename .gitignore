@@ -9,4 +9,5 @@
 .ccls-cache/
 *temp*
 *.snippets
+lsp/
 

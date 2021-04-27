@@ -34,7 +34,6 @@ Plug 'AndrewRadev/splitjoin.vim'
 Plug 'mg979/vim-visual-multi'
 Plug 'airblade/vim-rooter'
 " Plug 'AndrewRadev/switch.vim'
-Plug 'lambdalisue/suda.vim'
 " }}} Vim enhancement
 if !exists('g:vscode')
     " UI {{{
@@ -96,6 +95,8 @@ if !exists('g:vscode')
     Plug 'plasticboy/vim-markdown', {'for': ['markdown', 'md']}
     " Log
     Plug 'MTDL9/vim-log-highlighting', {'for': 'log'}
+    " Fish script
+    Plug 'dag/vim-fish', {'for': 'fish'}
     " }}} Language
 
     " Debug {{{
