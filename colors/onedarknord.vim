@@ -725,7 +725,7 @@ call s:hi("LspDiagnosticsDefaultInformation",   s:nord8_gui,  "",          s:nor
 call s:hi("LspDiagnosticsDefaultHint",          s:nord10_gui, "",          s:nord10_term, "",           "", "")
 call s:hi("LspDiagnosticsUnderlineWarning",     "",           "",          "",            "",           "", s:nord13_gui)
 call s:hi("LspDiagnosticsUnderlineError",       "",           "",          "",            "",           "", s:nord11_gui)
-call s:hi("LspDiagnosticsUnderlineInformation", "",           "",          "",            "",           s:nord8_gui)
+call s:hi("LspDiagnosticsUnderlineInformation", "",           "",          "",            "",           "", s:nord8_gui)
 call s:hi("LspDiagnosticsUnderlineHint",        "",           "",          "",            "",           "", s:nord10_gui)
 call s:hi("LspReferenceText",                   "",           s:nord3_gui, "NONE",        s:nord1_term, "", "")
 call s:hi("LspReferenceRead",                   "",           s:nord3_gui, "NONE",        s:nord1_term, "", "")
