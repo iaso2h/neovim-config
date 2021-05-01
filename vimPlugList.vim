@@ -18,7 +18,7 @@ Plug 'bkad/camelcasemotion'
 Plug 'zatchheems/vim-camelsnek'
 Plug 'landock/vim-expand-region'
 Plug 'andymass/vim-matchup'
-Plug 'iaso2h/hop.nvim'
+Plug 'phaazon/hop.nvim'
 Plug 'tommcdo/vim-exchange', {'on': ['<Plug>(Exchange)', '<Plug>(Exchange)', '<Plug>(ExchangeClear)', '<Plug>(ExchangeLine)']}
 " Plug 'inkarkat/vim-ReplaceWithRegister'
 Plug 'machakann/vim-sandwich'

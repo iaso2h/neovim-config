@@ -1,14 +1,15 @@
-local vim = vim
-local fn  = vim.fn
-local cmd = vim.cmd
-local api = vim.api
-local M   = {}
-local map = require("util").map
+local vim  = vim
+local fn   = vim.fn
+local cmd  = vim.cmd
+local api  = vim.api
+local M    = {}
+local map  = require("util").map
+local vmap = require("util").vmap
 
 require "config.vim-visual-multi"
 require "config.vim-asyncrun"
 
-if not vim.g.vscode then
+if not vim.g.vscode then -- {{{
     require "config.vim-markdown"
     -- require "config.nvim-golden_size"
     require "config.nvim-telescope"
@@ -22,7 +23,8 @@ if not vim.g.vscode then
     require "config.nvim-lsp"
     require "config.nvim-comp"
     -- require "config.nvim-gdb"
-end
+end -- }}}
+
 -- michaeljsmith/vim-indent-object {{{
 vim.g.indentLine_char                   = "▏"
 vim.g.indent_blankline_buftype_exclude  = {"terminal"}
@@ -127,8 +129,9 @@ end -- }}}
 map("n", [[g<space>o]], [[:lua require("core.plugins").commentJump("o")<cr>]], {"silent"})
 map("n", [[g<space>O]], [[:lua require("core.plugins").commentJump("O")<cr>]], {"silent"})
 
-map("n", [[g<space><space>]], [[<c-u>:call VSCodeCall("editor.action.commentLine")<cr>]], {"silent", "vscodeonly"})
-map("v", [[g<space><space>]], [[:call VSCodeCall("editor.action.commentLine")<cr>]], {"silent", "vscodeonly"})
+vmap("n", [[g<space><space>]], [[<c-u>:call VSCodeCall("editor.action.commentLine")<cr>]])
+vmap("v", [[g<space><space>]], [[:call VSCodeCall("editor.action.commentLine")<cr>]])
+
 map("n", [[g<space><space>]], [[<plug>NERDCommenterToggle]], {"novscode"})
 map("v", [[g<space><space>]], [[<plug>NERDCommenterToggle]], {"novscode"})
 -- map("n", [[g<space>n]], [[<plug>NERDCommenterNested]], {"novscode"})
@@ -198,7 +201,7 @@ vim.g.rooter_silent_chdir                           = 1
 vim.g.rooter_resolve_links                          = 1
 -- }}} airblade/vim-rooter
 
-if not vim.g.vscode then
+if not vim.g.vscode then -- {{{
     -- luochen1990/rainbow {{{
     vim.g.rainbow_active = 1
     vim.g.rainbow_conf = {
@@ -433,6 +436,7 @@ if not vim.g.vscode then
         default = true
         }
     -- }}} nvim-web-devicons
-end
+end -- }}}
+
 return M
 

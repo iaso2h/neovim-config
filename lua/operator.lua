@@ -4,11 +4,11 @@ local cmd = vim.cmd
 local api = vim.api
 local M   = {}
 
-api.nvim_exec([[
+cmd [[
 function! LuaExprCallback(...)
     return luaeval("Opfunc(_A)", a:000)
 endfunction
-]], false)
+]]
 
 ----
 -- Function: M.main

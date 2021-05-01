@@ -43,35 +43,11 @@ map("v", [[?]], [[#]])
 map("n", [[/]], [[/\v]], {"noremap"})
 map("n", [[?]], [[?\v]], {"noremap"})
 -- Disable highlight search & Exit visual mode
-
--- ExitVisual() {{{
-api.nvim_exec([[
-function! ExitVisual()
-    normal! gv
-    execute "normal! \<esc>"
-endfunction
-]], false)
--- }}} ExitVisual()
 map("n", [[<leader>h]], [[:<c-u>noh<cr>]],     {"silent"})
 map("v", [[<leader>h]], [[:<c-u>call ExitVisual()<cr>]], {"silent"})
 -- Visual selection
-function M.oppoSelection() -- {{{
-    local curPos         = api.nvim_win_get_cursor(0)
-    local startSelectPos = api.nvim_buf_get_mark(0, "<")
-    if startSelectPos[1] == 0 then return end  -- Sanity check
-    local endSelectPos   = api.nvim_buf_get_mark(0, ">")
-    if curPos[1] == startSelectPos[1] then
-        api.nvim_win_set_cursor(0, endSelectPos)
-        return
-    elseif curPos[1] == endSelectPos[1] then
-        api.nvim_win_set_cursor(0, startSelectPos)
-        return
-    end
-    local closerToStart  = require("util").posDist(startSelectPos, curPos) < require("util").posDist(endSelectPos, curPos) and true or false
-    if closerToStart then api.nvim_win_set_cursor(0, endSelectPos) else api.nvim_win_set_cursor(0, startSelectPos) end
-end -- }}}
-map("n", [[go]],    [[:lua require("core.mappings").oppoSelection()<cr>]], { "silent"})
-map("n", [[<A-v>]], [[<C-q>]],                                        {"noremap"})
+map("n", [[go]],    [[:lua require("selection").oppoSelection()<cr>]], {"silent"})
+map("n", [[<A-v>]], [[<C-q>]],                                         {"noremap"})
 -- }}} Search & Jumping
 -- Scratch file
 map("n", [[<C-n>]], [[:<c-u>new<cr>]], {"silent", "novscode"})
@@ -124,12 +100,12 @@ vmap("v", [[<A-d>]], [[<C-f>]])
 map("n", [[<A-q>]], [[q]], {"noremap"})
 -- Register
 -- ClearReg() {{{
-api.nvim_exec([[
+cmd [[
 function! ClearReg()
     for i in range(34,122) | silent! call setreg(nr2char(i), "") | endfor
     echohl Moremsg | echo "Register clear" | echohl None
 endfunction
-]], false)
+]]
 -- }}} ClearReg()
 map("",  [[<C-'>]], [[:<c-u>reg<cr>]],             {"silent"})
 map("i", [[<C-'>]], [[<C-\><C-o>:reg<cr>]],        {"silent"})
@@ -303,7 +279,7 @@ map("!", [[<C-w>]], [[<C-Right>]])
 map("!", [[<C-h>]], [[<Left>]])
 -- }}} Navigation
 -- RemoveLastPathComponent() {{{
-api.nvim_exec([[
+cmd [[
 function! RemoveLastPathComponent()
     let l:cmdlineBeforeCursor = strpart(getcmdline(), 0, getcmdpos() - 1)
     let l:cmdlineAfterCursor  = strpart(getcmdline(), getcmdpos() - 1)
@@ -312,7 +288,7 @@ function! RemoveLastPathComponent()
     call setcmdpos(strlen(l:result) + 1)
     return l:result . l:cmdlineAfterCursor
 endfunction
-]], false)
+]]
 -- }}} RemoveLastPathComponent()
 map("c", [[<C-BS>]],  [[<C-\>e(RemoveLastPathComponent())<cr>]])
 map("c", [[<C-S-l>]], [[<C-d>]], {"noremap"})

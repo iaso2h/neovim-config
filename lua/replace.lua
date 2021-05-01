@@ -250,7 +250,7 @@ function ReplaceOperator(argTbl)
 
     M.argTbl = argTbl
     -- if argTbl[1] == "visual" then
-        -- api.nvim_exec([[call repeat#set("\<plug>InplaceReplaceLine", v:count)]], false)
+        -- cmd [[call repeat#set("\<plug>InplaceReplaceLine", v:count)]]
     -- end
 
     if #argTbl >= 2 then
@@ -258,10 +258,10 @@ function ReplaceOperator(argTbl)
         M.argTbl = argTbl
 
         if argTbl[2] == "InplaceReplaceLine" then
-            api.nvim_exec([[call repeat#set("\<lt>plug>InplaceReplaceLine", v:count)]], false)
+            cmd [[call repeat#set("\<lt>plug>InplaceReplaceLine", v:count)]]
         elseif argTbl[2] == "InplaceReplaceVisual" then
-            api.nvim_exec([[call repeat#set("\<lt>plug>InplaceReplaceVisual")]],        false)
-            api.nvim_exec([[call visualrepeat#set("\<lt>plug>InplaceReplaceVisual")]],  false)
+            cmd [[call repeat#set("\<lt>plug>InplaceReplaceVisual")]]
+            cmd [[call visualrepeat#set("\<lt>plug>InplaceReplaceVisual")]]
         end
     end
 end

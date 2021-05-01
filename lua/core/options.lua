@@ -72,7 +72,7 @@ local opts = {
     splitbelow = true, splitright = true, switchbuf = "split",
     termguicolors  = true,
     timeoutlen     = 500,
-    undofile = true, undodir = os.getenv("HOME") .. "/.nvimcache/undodir", backup = false, swapfile = false, writebackup = false,
+    undofile = true, undodir = fn.expand("$HOME/.cache/nvim/undodir"), backup = false, swapfile = false, writebackup = false,
     updatetime     = 150,
     wildignore     = vim.o.wildignore .. "*/tmp/*,*.so,*.swp,*.zip,*.db,*.sqlite,*.bak",
     wildignorecase = true,

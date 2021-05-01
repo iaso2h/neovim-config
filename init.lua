@@ -1,8 +1,8 @@
-local vim = vim
+local cmd = vim.cmd
 
 -- TODO: Migrate to packer.nvim, but it's still unstable yet
-vim.api.nvim_exec([[let $configPath = stdpath('config')]], false)
-vim.api.nvim_exec([[execute "source " . expand('$configPath/vimPlugList.vim')]], false)
+cmd [[let $configPath = stdpath('config')]]
+cmd [[execute "source " . expand('$configPath/vimPlugList.vim')]]
 
 require "core.options"
 require "core.mappings"
