@@ -1,14 +1,17 @@
-local vim = vim
+local cmd = vim.cmd
 local api = vim.api
 
 -- Function {{{
 vim.g.FiletypeCommentDelimiter = {
     vim    = "\"",
     python = "#",
+    sh     = "#",
     zsh    = "#",
+    fish   = "#",
     c      = "\\/\\/",
     cpp    = "\\/\\/",
     json   = "\\/\\/",
+    conf   = "\\/\\/",
     lua    = "--",
 }
 if not vim.g.vscode then
@@ -17,6 +20,8 @@ if not vim.g.vscode then
         python = '\\s\\{-}\\"[^#]\\{-}{{{[^#]*$',
         c      = '\\s\\{-}//.\\{-}{{{.*$',
         cpp    = '\\s\\{-}//.\\{-}{{{.*$',
+        json   = '\\s\\{-}//.\\{-}{{{.*$',
+        conf   = '\\s\\{-}//.\\{-}{{{.*$',
         lua    = '\\s\\{-}--.\\{-}{{{.*$',
         sh     = '\\s\\{-}\\"[^#]\\{-}{{{[^#]*$',
         zsh    = '\\s\\{-}\\"[^#]\\{-}{{{[^#]*$',
@@ -27,12 +32,14 @@ if not vim.g.vscode then
         python = '\\s\\{-}\\"[^#"]\\{-}}}}[^#]*$',
         c      = '\\s\\{-}//.\\{-}}}}.*$',
         cpp    = '\\s\\{-}//.\\{-}}}}.*$',
+        json   = '\\s\\{-}//.\\{-}}}}.*$',
+        conf   = '\\s\\{-}//.\\{-}}}}.*$',
         lua    = '\\s\\{-}--.\\{-}}}}.*$',
         sh     = '\\s\\{-}\\"[^#"]\\{-}}}}[^#]*$',
         zsh    = '\\s\\{-}\\"[^#"]\\{-}}}}[^#]*$',
         fish   = '\\s\\{-}\\"[^#"]\\{-}}}}[^#]*$',
     }
-    api.nvim_exec([[
+    cmd [[
     function! EnhanceFoldExpr()
         let l:line = getline(v:lnum)
         if match(l:line, g:enhanceFoldStartPat[&filetype]) > -1
@@ -43,7 +50,7 @@ if not vim.g.vscode then
             return "="
         endif
     endfunctio
-    ]], false)
+    ]]
 end
 -- }}} Function
 
@@ -74,6 +81,7 @@ if not vim.g.vscode then
     autocmd BufReadPre,BufNewFile *.twig      setlocal filetype=twig.html
     autocmd BufReadPre,BufNewFile *.gitignore setlocal filetype=gitignore
     autocmd BufReadPre,BufNewFile config      setlocal filetype=config
+    autocmd BufRead,BufNewFile    *.rasi      setfiletype css
     autocmd BufWritePost          *.lua,*.vim lua RELOAD()
     augroup END
     ]], false)

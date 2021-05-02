@@ -89,9 +89,9 @@ if !exists('g:vscode')
     " Lua
     Plug 'davisdude/vim-love-docs', {'branch': 'build', 'for': 'lua'}
     Plug 'iaso2h/nlua.nvim', {'branch': 'iaso2h', 'for': 'lua'}
-    Plug 'euclidianAce/BetterLua.vim'
+    Plug 'euclidianAce/BetterLua.vim', {'for': 'lua'}
     " Markdown
-    Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
+    Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'md']}
     Plug 'plasticboy/vim-markdown', {'for': ['markdown', 'md']}
     " Log
     Plug 'MTDL9/vim-log-highlighting', {'for': 'log'}

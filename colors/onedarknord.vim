@@ -1,11 +1,4 @@
-let g:nord_uniform_status_lines = 1
-let g:nord_bold_vertical_split_line = 0
-let g:nord_uniform_diff_background = 1
-let g:nord_cursor_line_number_background = 0
 " let g:nord_bold = 1
-let g:nord_italic = 1
-let g:nord_underline = 1
-let g:nord_italic_comments = 1
 " " One dark
 let g:onedark_terminal_italics = 1
 " }}} Custom highlight
@@ -18,7 +11,7 @@ if version > 580
 endif
 
 let g:colors_name = "onedarknord"
-let s:nord_vim_version="0.15.0"
+let s:nord_vim_version="0.15.1"
 set background=dark
 
 let s:nord0_gui = "#2E3440"
@@ -77,45 +70,28 @@ let s:nord3_gui_brightened = [
             \ "#7b88a1",
             \ ]
 
-if !exists("g:nord_bold")
-    let g:nord_bold = 1
-endif
-
 let s:bold = "bold,"
-if g:nord_bold == 0
-    let s:bold = ""
-endif
+" let s:bold = ""
 
-if !exists("g:nord_italic")
-    if has('win32')
-        let g:nord_italic = 1
-    elseif has("gui_running") || $TERM_ITALICS == "true"
-        let g:nord_italic = 1
-    else
-        let g:nord_italic = 0
-    endif
-endif
-
-let s:italic = "italic,"
-if g:nord_italic == 0
+if has('win32')
+    let g:nord_italic = 1
+    let g:onedark_terminal_italics = 1
+    let s:italic = "italic,"
+elseif has("gui_running") || $TERM_ITALICS == "true"
+    let g:nord_italic = 1
+    let g:onedark_terminal_italics = 1
+    let s:italic = "italic,"
+else
+    let g:nord_italic = 0
+    let g:onedark_terminal_italics = 0
     let s:italic = ""
 endif
 
 let s:underline = "underline,"
-if ! get(g:, "nord_underline", 1)
-    let s:underline = "NONE,"
-endif
+" let s:underline = "NONE,"
 
-let s:italicize_comments = ""
-if exists("g:nord_italic_comments")
-    if g:nord_italic_comments == 1
-        let s:italicize_comments = s:italic
-    endif
-endif
-
-if !exists('g:nord_uniform_status_lines')
-    let g:nord_uniform_status_lines = 0
-endif
+" let s:italicize_comments = ""
+let s:italicize_comments = s:italic
 
 function! s:logWarning(msg)
     echohl WarningMsg
@@ -128,10 +104,6 @@ if exists("g:nord_comment_brightness")
                 \' The comment color brightness has been increased by 10% by default.' .
                 \' Please see https://github.com/arcticicestudio/nord-vim/issues/145 for more details.')
     let g:nord_comment_brightness = 10
-endif
-
-if !exists("g:nord_uniform_diff_background")
-    let g:nord_uniform_diff_background = 0
 endif
 
 if !exists("g:nord_cursor_line_number_background")
@@ -150,7 +122,6 @@ endif
 " Not all terminals support italics properly. If yours does, opt-in.
 " This function is based on one from FlatColor: https://github.com/MaxSt/FlatColor/
 " Which in turn was based on one found in hemisu: https://github.com/noahfrederick/vim-hemisu/
-let g:onedark_terminal_italics = 1
 function! s:h(group, style, ...)
     let s:highlight = a:style
 
@@ -248,15 +219,14 @@ let s:vertsplit = s:colors.vertsplit
 " }}}
 
 " Terminal Colors {{{
-
 let g:terminal_ansi_colors = [
             \ s:black.gui, s:red.gui, s:green.gui, s:yellow.gui,
             \ s:blue.gui, s:purple.gui, s:cyan.gui, s:white.gui,
             \ s:visual_grey.gui, s:dark_red.gui, s:green.gui, s:dark_yellow.gui,
             \ s:blue.gui, s:purple.gui, s:cyan.gui, s:comment_grey.gui
             \]
-
 " }}}
+
 "+---------------+
 "+ UI Components +
 "+---------------+
@@ -297,11 +267,6 @@ call s:hi("TermCursorNC", "", s:nord1_gui, "", s:nord1_term, "", "")
 "+- Vim 8 Terminal Colors -+
 if has('terminal')
     let g:terminal_ansi_colors = [s:nord1_gui, s:nord11_gui, s:nord14_gui, s:nord13_gui, s:nord9_gui, s:nord15_gui, s:nord8_gui, s:nord5_gui, s:nord3_gui, s:nord11_gui, s:nord14_gui, s:nord13_gui, s:nord9_gui, s:nord15_gui, s:nord7_gui, s:nord6_gui]
-
-
-
-
-
 endif
 
 "+- Neovim Terminal Colors -+
@@ -329,11 +294,8 @@ let g:terminal_color_foreground = g:terminal_color_7
 
 "+--- Gutter ---+
 call s:hi("CursorColumn", "", s:nord1_gui, "NONE", s:nord1_term, "", "")
-if g:nord_cursor_line_number_background == 0
-    call s:hi("CursorLineNr", s:nord4_gui, "", "NONE", "", "NONE", "")
-else
-    call s:hi("CursorLineNr", s:nord4_gui, s:nord1_gui, "NONE", s:nord1_term, "NONE", "")
-endif
+call s:hi("CursorLineNr", s:nord4_gui, "", "NONE", "", "NONE", "")
+" call s:hi("CursorLineNr", s:nord4_gui, s:nord1_gui, "NONE", s:nord1_term, "NONE", "")
 call s:hi("Folded", s:nord3_gui, s:nord1_gui, s:nord3_term, s:nord1_term, s:bold, "")
 call s:hi("FoldColumn", s:nord3_gui, s:nord0_gui, s:nord3_term, "NONE", "", "")
 call s:hi("SignColumn", s:nord1_gui, s:nord0_gui, s:nord1_term, "NONE", "", "")
@@ -347,17 +309,14 @@ call s:hi("ErrorMsg", s:nord4_gui, s:nord11_gui, "NONE", s:nord11_term, "", "")
 call s:hi("ModeMsg", s:nord4_gui, "", "", "", "", "")
 call s:hi("MoreMsg", s:nord8_gui, "", s:nord8_term, "", "", "")
 call s:hi("Question", s:nord4_gui, "", "NONE", "", "", "")
-if g:nord_uniform_status_lines == 0
-    call s:hi("StatusLine", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "NONE", "")
-    call s:hi("StatusLineNC", s:nord4_gui, s:nord1_gui, "NONE", s:nord1_term, "NONE", "")
-    call s:hi("StatusLineTerm", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "NONE", "")
-    call s:hi("StatusLineTermNC", s:nord4_gui, s:nord1_gui, "NONE", s:nord1_term, "NONE", "")
-else
-    call s:hi("StatusLine", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "NONE", "")
-    call s:hi("StatusLineNC", s:nord4_gui, s:nord3_gui, "NONE", s:nord3_term, "NONE", "")
-    call s:hi("StatusLineTerm", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "NONE", "")
-    call s:hi("StatusLineTermNC", s:nord4_gui, s:nord3_gui, "NONE", s:nord3_term, "NONE", "")
-endif
+" call s:hi("StatusLine", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "NONE", "")
+" call s:hi("StatusLineNC", s:nord4_gui, s:nord1_gui, "NONE", s:nord1_term, "NONE", "")
+" call s:hi("StatusLineTerm", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "NONE", "")
+" call s:hi("StatusLineTermNC", s:nord4_gui, s:nord1_gui, "NONE", s:nord1_term, "NONE", "")
+call s:hi("StatusLine", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "NONE", "")
+call s:hi("StatusLineNC", s:nord4_gui, s:nord3_gui, "NONE", s:nord3_term, "NONE", "")
+call s:hi("StatusLineTerm", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "NONE", "")
+call s:hi("StatusLineTermNC", s:nord4_gui, s:nord3_gui, "NONE", s:nord3_term, "NONE", "")
 call s:hi("WarningMsg", s:nord0_gui, s:nord13_gui, s:nord1_term, s:nord13_term, "", "")
 call s:hi("WildMenu", s:nord8_gui, s:nord1_gui, s:nord8_term, s:nord1_term, "", "")
 
@@ -372,12 +331,8 @@ call s:hi("TabLineSel", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "N
 
 "+--- Window ---+
 call s:hi("Title", s:nord4_gui, "", "NONE", "", "NONE", "")
-
-if g:nord_bold_vertical_split_line == 0
-    call s:hi("VertSplit", s:nord2_gui, s:nord0_gui, s:nord3_term, "NONE", "NONE", "")
-else
-    call s:hi("VertSplit", s:nord2_gui, s:nord1_gui, s:nord3_term, s:nord1_term, "NONE", "")
-endif
+call s:hi("VertSplit", s:nord2_gui, s:nord0_gui, s:nord3_term, "NONE", "NONE", "")
+" call s:hi("VertSplit", s:nord2_gui, s:nord1_gui, s:nord3_term, s:nord1_term, "NONE", "")
 
 "+----------------------+
 "+ Language Base Groups +
@@ -429,6 +384,20 @@ call s:hi("Todo", s:nord13_gui, "NONE", s:nord13_term, "NONE", "", "") " anythin
 "+ Languages +
 "+-----------+
 " Language-Specific Highlighting {{{
+
+" Diff
+" call s:hi("DiffAdd", s:nord14_gui, s:nord0_gui, s:nord14_term, "NONE", "inverse", "")
+" call s:hi("DiffChange", s:nord13_gui, s:nord0_gui, s:nord13_term, "NONE", "inverse", "")
+" call s:hi("DiffDelete", s:nord11_gui, s:nord0_gui, s:nord11_term, "NONE", "inverse", "")
+" call s:hi("DiffText", s:nord9_gui, s:nord0_gui, s:nord9_term, "NONE", "inverse", "")
+call s:hi("DiffAdd", s:nord14_gui, s:nord1_gui, s:nord14_term, s:nord1_term, "", "")
+call s:hi("DiffChange", s:nord13_gui, s:nord1_gui, s:nord13_term, s:nord1_term, "", "")
+call s:hi("DiffDelete", s:nord11_gui, s:nord1_gui, s:nord11_term, s:nord1_term, "", "")
+call s:hi("DiffText", s:nord9_gui, s:nord1_gui, s:nord9_term, s:nord1_term, "", "")
+" Legacy groups for official git.vim and diff.vim syntax
+hi! link diffAdded DiffAdd
+hi! link diffChanged DiffChange
+hi! link diffRemoved DiffDelete
 
 " CSS
 call s:h("cssAttrComma", { "fg": s:purple })
@@ -1013,22 +982,22 @@ hi rainbowcol7 guifg=#458588
 
 " nvim-telescope/telescope.nvim {{{
 " TODO
-call s:hi("TelescopeSelection",      s:nord8_gui, "", s:nord8_term, "", s:bold, "")
+call s:hi("TelescopeSelection",      s:nord4_gui, s:nord8_gui, "NONE", s:nord8_term, s:bold, "")
 hi! link TelescopeSelectionCaret TelescopeSelection
 call s:hi("TelescopeMultiSelection", s:nord12_gui, "", s:nord12_term, "", "",     "")
 
 " Border highlight groups.
-call s:hi("TelescopeBorder",        s:nord8_gui, "", s:nord8_term, "", "", "")
-call s:hi("TelescopePromptBorder",  s:nord8_gui, "", s:nord8_term, "", "", "")
-call s:hi("TelescopeResultsBorder", s:nord8_gui, "", s:nord8_term, "", "", "")
-call s:hi("TelescopePreviewBorder", s:nord8_gui, "", s:nord8_term, "", "", "")
+call s:hi("TelescopeBorder",        s:nord10_gui, "", s:nord10_term, "", "", "")
+call s:hi("TelescopePromptBorder",  s:nord10_gui, "", s:nord10_term, "", "", "")
+call s:hi("TelescopeResultsBorder", s:nord10_gui, "", s:nord10_term, "", "", "")
+call s:hi("TelescopePreviewBorder", s:nord10_gui, "", s:nord10_term, "", "", "")
 
 " Used for highlighting characters that you match.
 call s:hi("TelescopeMatching", s:nord13_gui, "", s:nord13_term, "", "", "")
 
 " Used for the prompt prefix
-call s:hi("TelescopeNormal", s:nord10_gui, "", s:nord10_term, "", "", "")
-call s:hi("TelescopePromptPrefix", s:nord10_gui, "", s:nord10_term, "", "", "")
+call s:hi("TelescopeNormal",       s:nord4_gui, "", "NONE", "", "", "")
+call s:hi("TelescopePromptPrefix", s:nord4_gui, "", "NONE", "", "", "")
 " }}} nvim-telescope/telescope.nvim
 
 " romgrk/barbar.nvim {{{
@@ -1045,7 +1014,6 @@ call s:hi("BufferVisibleIndex",  "#66738e",    s:nord1_gui, s:nord3_term,  s:nor
 call s:hi("BufferVisibleMod",    "#9B8473",    s:nord1_gui, s:nord13_term, s:nord1_term, "", "")
 call s:hi("BufferVisibleSign",   s:nord8_gui,  s:nord1_gui, s:nord8_term,  s:nord1_term, "", "")
 call s:hi("BufferVisibleTarget", "#ED427C",    s:nord1_gui, s:nord11_term, s:nord1_term, "", "")
-
 
 hi! link BufferInactive       BufferVisible
 hi! link BufferInactiveIcon   BufferVisibleIcon
@@ -1116,15 +1084,15 @@ highlight link TSVariableBuiltin    Special
 " }}} lukas-reineke/indent-blankline.nvim
 
 " glepnir/lspsaga.nvim {{{
-call s:hi("LspSagaBorderTitle",            s:nord4_gui,  "", s:nord1_term,  "", s:bold, "")
-call s:hi("LspSagaDiagnosticBorder",       s:nord8_gui,  "", s:nord8_term,  "", "",     "")
-call s:hi("LspSagaRenameBorder",           s:nord8_gui,  "", s:nord8_term,  "", "",     "")
-call s:hi("LspSagaHoverBorder",            s:nord8_gui,  "", s:nord8_term,  "", "",     "")
-call s:hi("LspSagaSignatureHelpBorder",    s:nord8_gui,  "", s:nord8_term,  "", "",     "")
-call s:hi("LspSagaLspFinderBorder",        s:nord8_gui,  "", s:nord8_term,  "", "",     "")
-call s:hi("LspSagaCodeActionBorder",       s:nord8_gui,  "", s:nord8_term,  "", "",     "")
-call s:hi("LspSagaDefPreviewBorder",       s:nord8_gui,  "", s:nord8_term,  "", "",     "")
-call s:hi("LspSagaAutoPreview",            s:nord8_gui,  "", s:nord8_term,  "", "",     "")
+call s:hi("LspSagaBorderTitle",         s:nord4_gui,  "", "NONE",        "", s:bold, "")
+call s:hi("LspSagaDiagnosticBorder",    s:nord10_gui, "", s:nord10_term, "", "",     "")
+call s:hi("LspSagaRenameBorder",        s:nord10_gui, "", s:nord10_term, "", "",     "")
+call s:hi("LspSagaHoverBorder",         s:nord10_gui, "", s:nord10_term, "", "",     "")
+call s:hi("LspSagaSignatureHelpBorder", s:nord10_gui, "", s:nord10_term, "", "",     "")
+call s:hi("LspSagaLspFinderBorder",     s:nord10_gui, "", s:nord10_term, "", "",     "")
+call s:hi("LspSagaCodeActionBorder",    s:nord10_gui, "", s:nord10_term, "", "",     "")
+call s:hi("LspSagaDefPreviewBorder",    s:nord10_gui, "", s:nord10_term, "", "",     "")
+call s:hi("LspSagaAutoPreview",         s:nord10_gui, "", s:nord10_term, "", "",     "")
 
 call s:hi("LspSagaDiagnosticHeader",       s:nord13_gui, "", s:nord13_term, "", s:bold, "")
 call s:hi("LspSagaFinderSelection",        s:nord13_gui, "", s:nord13_term, "", s:bold, "")
@@ -1132,7 +1100,7 @@ call s:hi("LspSagaDiagnosticHeader",       s:nord13_gui, "", s:nord13_term, "", 
 call s:hi("LspSagaDiagnosticTruncateLine", s:nord10_gui, "", s:nord10_term, "", "",     "")
 call s:hi("LspSagaShTruncateLine",         s:nord10_gui, "", s:nord10_term, "", "",     "")
 call s:hi("LspSagaDocTruncateLine",        s:nord10_gui, "", s:nord10_term, "", "",     "")
-call s:hi("LspSagaCodeActionContent",      s:nord4_gui,  "", s:nord1_term,  "", "",     "")
+call s:hi("LspSagaCodeActionContent",      s:nord4_gui,  "", "NONE",        "", "",     "")
 call s:hi("LspSagaCodeActionTruncateLine", s:nord10_gui, "", s:nord10_term, "", "",     "")
 call s:hi("LspSagaCodeActionTitle",        s:nord13_gui, "", s:nord13_term, "", s:bold, "")
 call s:hi("LspSagaRenamePromptPrefix",     s:nord14_gui, "", s:nord14_term, "", "",     "")
@@ -1145,23 +1113,23 @@ call s:hi("CompeDocumentation", s:nord8_gui,  s:nord2_gui, s:nord8_term, s:nord1
 " }}} hrsh7th/nvim-compe
 
 " kyazdani42/nvim-tree.lua {{{
-call s:hi("NvimTreeFileNew", s:nord14_gui, "", s:nord14_term, "", "", "")
+call s:hi("NvimTreeFileNew",     s:nord14_gui, "", s:nord14_term, "", "", "")
 call s:hi("NvimTreeFileDeleted", s:nord11_gui, "", s:nord11_term, "", "", "")
-call s:hi("NvimTreeRootFolder", s:nord10_gui, "", s:nord10_term, "", "",     "")
-call s:hi("NvimTreeGitDirty", s:nord12_gui, "", s:nord12_term, "", "", "")
+call s:hi("NvimTreeRootFolder",  s:nord10_gui, "", s:nord10_term, "", "", "")
+call s:hi("NvimTreeGitDirty",    s:nord12_gui, "", s:nord12_term, "", "", "")
 hi! link NERDTreeDirSlash Keyword
-call s:hi("NvimTreeImageFile", s:nord13_gui, "", s:nord13_term, "", "",     "")
-call s:hi("NvimTreeFileNew", s:nord14_gui, "", s:nord14_term, "", "", "")
-call s:hi("NvimTreeGitStaged", s:nord7_gui, "", s:nord7_term, "", "", "")
-call s:hi("NvimTreeGitMerge", s:nord12_gui, "", s:nord12_term, "", "", "")
-call s:hi("NvimTreeGitRenamed", s:nord13_gui, "", s:nord13_term, "", "",     "")
+call s:hi("NvimTreeImageFile",  s:nord13_gui, "", s:nord13_term, "", "", "")
+call s:hi("NvimTreeFileNew",    s:nord14_gui, "", s:nord14_term, "", "", "")
+call s:hi("NvimTreeGitStaged",  s:nord7_gui,  "", s:nord7_term,  "", "", "")
+call s:hi("NvimTreeGitMerge",   s:nord12_gui, "", s:nord12_term, "", "", "")
+call s:hi("NvimTreeGitRenamed", s:nord13_gui, "", s:nord13_term, "", "", "")
 hi! link NvimTreeIndentMarker NvimTreeRootFolder
-call s:hi("NvimTreeSymlink", s:nord4_gui, s:nord0_gui, "NONE", "NONE", "", "")
-call s:hi("NvimTreeFolderIcon", s:nord8_gui, "", s:nord8_term, "NONE", "", "")
+call s:hi("NvimTreeSymlink",    s:nord4_gui, s:nord0_gui, "NONE",       "NONE", "", "")
+call s:hi("NvimTreeFolderIcon", s:nord8_gui, "",          s:nord8_term, "NONE", "", "")
 hi! link NvimTreeExecFile Normal
 hi! link NvimTreeFolderName Normal
-call s:hi("NvimTreeSpecialFile", s:nord3_gui_bright, "", s:nord3_term, "", s:italicize_comments, "")
-call s:hi("NvimTreePopup", s:nord15_gui, "", s:nord15_term, "", "", "")
-call s:hi("NvimTreeNormal", s:nord15_gui, "", s:nord15_term, "", "", "")
+call s:hi("NvimTreeSpecialFile", s:nord3_gui_bright, "", s:nord3_term,  "", s:italicize_comments, "")
+call s:hi("NvimTreePopup",       s:nord15_gui,       "", s:nord15_term, "", "",                   "")
+call s:hi("NvimTreeNormal",      s:nord15_gui,       "", s:nord15_term, "", "",                   "")
 " }}} kyazdani42/nvim-tree.lua
 

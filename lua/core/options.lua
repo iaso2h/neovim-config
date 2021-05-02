@@ -22,6 +22,7 @@ local optsLocal = {
     syntax        = "bo",
     tabstop       = "bo",
     textwidth     = "bo",
+    undofile      = "bo",
     concealcursor = "wo",
     conceallevel  = "wo",
     cursorline    = "wo",

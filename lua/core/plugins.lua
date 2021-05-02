@@ -110,10 +110,11 @@ map("v", [[g<C-a>]], [[<Plug>(dial-increment-additional)]])
 map("v", [[g<C-x>]], [[<Plug>(dial-decrement-additional)]])
 -- }}} monaqa/dial.nvim
 -- preservim/nerdcommenter {{{
-vim.g.NERDAltDelims_c = 1
-vim.g.NERDAltDelims_cpp = 1
+vim.g.NERDAltDelims_c          = 1
+vim.g.NERDAltDelims_cpp        = 1
 vim.g.NERDAltDelims_javascript = 1
-vim.g.NERDAltDelims_lua = 0
+vim.g.NERDAltDelims_lua        = 0
+vim.g.NERDAltDelims_conf       = 0
 function M.commentJump(keystroke) -- {{{
 if api.nvim_get_current_line() ~= '' then
     local saveReg = fn.getreg('"')
