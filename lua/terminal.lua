@@ -6,8 +6,8 @@ local M   = {}
 -- File: terminalToggle.vim
 -- Author: iaso2h
 -- Description: Toggle terminal like VS Code
--- Last Modified: 2021-03-23
--- Version: 0.0.3
+-- Last Modified: 2021-05-03
+-- Version: 0.0.4
 
 ----
 -- Function: TerminalToggle Toggle terminal on split windows, support Winodows
@@ -17,7 +17,7 @@ local M   = {}
 
 function M.terminalToggle() -- {{{
     local winCount = fn.winnr("$")
-    local winInfo = fn.getwininfo()
+    local winInfo  = fn.getwininfo()
     if vim.bo.buftype ~= "terminal" then
         require("util").newSplit(require("terminal").openTerminal, {}, "^term.*", false, true)
     else
@@ -56,9 +56,9 @@ function M.openTerminal(newBufNr) -- {{{
         -- Clear the scratch buffer
         cmd("bwipe! " .. newBufNr)
     else                         -- Create new buffer instance
-        if fn.has("win32") then
+        if fn.has("win32") == 1 then
             cmd "terminal powershell"
-        elseif fn.has("unix") then
+        elseif fn.has("unix") == 1 then
             cmd "terminal"
         end
     end

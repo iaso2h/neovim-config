@@ -68,9 +68,9 @@ vim.g.nvim_tree_bindings = {
     ["<Tab>"]          = treeCallback("preview"),
 
     ["n"]              = treeCallback("create"),
-    ["df"]             = treeCallback("remove"),
     ["r"]              = treeCallback("rename"),
     ["<C-r>"]          = treeCallback("full_rename"),
+    ["df"]             = treeCallback("remove"),
     ["dd"]             = treeCallback("cut"),
     ["c"]              = treeCallback("copy"),
     ["p"]              = treeCallback("paste"),

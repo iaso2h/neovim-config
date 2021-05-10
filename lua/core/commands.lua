@@ -81,7 +81,6 @@ if not vim.g.vscode then
     autocmd BufReadPre,BufNewFile *.twig      setlocal filetype=twig.html
     autocmd BufReadPre,BufNewFile *.gitignore setlocal filetype=gitignore
     autocmd BufReadPre,BufNewFile config      setlocal filetype=config
-    autocmd BufRead,BufNewFile    *.rasi      setfiletype css
     autocmd BufWritePost          *.lua,*.vim lua RELOAD()
     augroup END
     ]], false)

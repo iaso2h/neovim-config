@@ -996,8 +996,8 @@ call s:hi("TelescopePreviewBorder", s:nord10_gui, "", s:nord10_term, "", "", "")
 call s:hi("TelescopeMatching", s:nord13_gui, "", s:nord13_term, "", "", "")
 
 " Used for the prompt prefix
-call s:hi("TelescopeNormal",       s:nord4_gui, "", "NONE", "", "", "")
-call s:hi("TelescopePromptPrefix", s:nord4_gui, "", "NONE", "", "", "")
+call s:hi("TelescopeNormal",       s:nord4_gui,  "", "NONE",        "", "", "")
+call s:hi("TelescopePromptPrefix", s:nord14_gui, "", s:nord14_term, "", "", "")
 " }}} nvim-telescope/telescope.nvim
 
 " romgrk/barbar.nvim {{{

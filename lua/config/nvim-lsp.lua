@@ -6,6 +6,8 @@ local map       = require("util").map
 local lspConfig = require('lspconfig')
 local lspStatus = require('lsp-status')
 local M         = {}
+local ex        = function(executable) return fn.executable(executable) == 1 end
+
 
 require("config.nvim-lsp-status").setup()
 
@@ -20,12 +22,14 @@ function M.formatCode(vimMode)
     local fileType = vim.bo.filetype
     if vimMode == "n" then
         if fileType == "lua" then
+            if not ex("lua-format") then return end
             local saveView = fn.winsaveview()
             local flags
             flags = vim.b.luaFormatflags or [[--indent-width=4 --tab-width=4 --continuation-indent-width=4]]
             cmd([[silent %!lua-format % ]] .. flags)
             fn.winrestview(saveView)
         elseif fileType == "json" then
+            if not ex("js-beautify") then return end
             cmd [[silent %!js-beautify %]]
         else
             local saveView = fn.winsaveview()
@@ -41,11 +45,6 @@ end
 map("n", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("n")<cr>]], {"silent"})
 map("v", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("v")<cr>]], {"silent"})
 -- }}} Gerneral format mapping
-
-
-local ex = function(langBin)
-    return fn.executable(langBin) == 1
-end
 
 
 ----
