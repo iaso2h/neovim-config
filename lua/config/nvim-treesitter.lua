@@ -5,11 +5,14 @@ local ts = require 'nvim-treesitter.configs'
 
 ts.setup{
     -- ensure_installed      = "maintained",
-    ensure_installed      = {"c", "cpp", "lua", "json", "bash", "regex", "css", "html", "go", "javascript", "rust", "ruby", "vue", "c_sharp", "typescript"},
-    -- ensure_installed      = {"c", "cpp", "lua", "python", "json", "bash", "regex", "css", "html", "go", "javascript", "rust", "ruby", "vue", "c_sharp", "typescript"},
+    ensure_installed      = {"c", "cpp", "lua", "json", "toml", "python", "bash", "fish", "regex", "css", "html", "go", "javascript", "rust", "ruby", "vue", "c_sharp", "typescript"},
     highlight             = {enable = true},
     indent                = {enable = true},
     -- rainbow               = {enable = true, extended_mode = false},
+    matchup = {
+        enable = true,
+        -- disable = { "c", "ruby" },
+    },
     incremental_selection = { -- {{{
         enable = true,
         keymaps = {

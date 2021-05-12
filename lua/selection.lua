@@ -3,13 +3,6 @@ local cmd = vim.cmd
 local api = vim.api
 local M   = {}
 
-cmd [[
-function! ExitVisual()
-    normal! gv
-    execute "normal! \<esc>"
-endfunction
-]]
-
 function M.oppoSelection() -- {{{
     local curPos         = api.nvim_win_get_cursor(0)
     local startSelectPos = api.nvim_buf_get_mark(0, "<")

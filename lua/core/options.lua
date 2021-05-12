@@ -162,6 +162,7 @@ if fn.has('win32') == 1 then
     end
 elseif fn.has('unix') == 1 then
     local linuxPython = "/usr/bin/python3"
+    api.nvim_set_var("python3_host_prog", linuxPython)
     if fn.executable(linuxPython) == 0 then
         linuxPython = (fn.system('which python3')):gsub("\n+$", "")
         api.nvim_set_var("python3_host_prog", linuxPython)
@@ -178,6 +179,7 @@ if vim.g.neovide then
     vim.g.neovide_cursor_trail_length     = 0.6
     -- vim.g.neovide_cursor_antialiasing     = true
     vim.g.neovide_window_floating_blur    = false
+    vim.g.neovide_transparency            = 1.0
     vim.g.neovide_refresh_rate            = 60
     -- vim.g.neovide_cursor_vfx_mode = "pixiedust"
 end

@@ -131,7 +131,8 @@ if ex("pyright") then
                     diagnosticMode = "openFileOnly",
                     extraPaths = "",
                     typeCheckingMode = "basic",
-                    useLibraryCodeForTypes = false
+                    useLibraryCodeForTypes = false,
+                    diagnosticMode = 'workspace'
                 }
             },
             pyright = {
