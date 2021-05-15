@@ -201,6 +201,12 @@ vim.g.rooter_cd_cmd                                 = "lcd"
 vim.g.rooter_silent_chdir                           = 1
 vim.g.rooter_resolve_links                          = 1
 -- }}} airblade/vim-rooter
+-- nacro90/numb.nvim {{{
+require('numb').setup{
+   show_numbers    = true,  -- Enable 'number' for the window while peeking
+   show_cursorline = true   -- Enable 'cursorline' for the window while peeking
+}
+-- }}} nacro90/numb.nvim
 
 if not vim.g.vscode then -- {{{
     -- luochen1990/rainbow {{{

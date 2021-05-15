@@ -41,7 +41,7 @@
         "body": [
             "int main(int argc, char *argv[])",
             "{",
-            "\t${VISUAL}$0",
+            "\t${STATEMENTS}$0",
             "\treturn 0;",
             "}"
         ],

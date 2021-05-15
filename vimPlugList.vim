@@ -34,6 +34,7 @@ Plug 'AndrewRadev/splitjoin.vim'
 Plug 'mg979/vim-visual-multi'
 Plug 'airblade/vim-rooter'
 " Plug 'AndrewRadev/switch.vim'
+Plug 'nacro90/numb.nvim'
 " }}} Vim enhancement
 if !exists('g:vscode')
     " UI {{{
@@ -49,7 +50,9 @@ if !exists('g:vscode')
     Plug 'luochen1990/rainbow'
     Plug 'szw/vim-maximizer', {'on': 'MaximizerToggle'}
     Plug 'simnalamburt/vim-mundo', {'on': 'MundoToggle'}
-    " Plug 'dm1try/golden_size'
+    if exists("neovide")
+        Plug 'dm1try/golden_size'
+    endif
     " }}} UI
 
     " Tree-sitter {{{

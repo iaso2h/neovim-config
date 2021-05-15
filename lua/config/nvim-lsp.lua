@@ -262,8 +262,9 @@ end
 -- }}} Vimscript
 -- Clangd {{{
 -- https://github.com/llvm/llvm-project/tree/main/clang-tools-extra/clangd
-if ex("clangd") then
-    lspConfig.clangd.setup {
+if ex("clangd") or ex("clangd-11") then
+    if fn.has("win32") == 1 then
+    local cmd
         cmd = {
             "clangd",
             "--all-scopes-completion",
@@ -278,7 +279,26 @@ if ex("clangd") then
             "--pretty",
             "--suggest-missing-includes",
             "--fallback-style=google"
-        },
+        }
+    else
+        cmd = {
+            "clangd-11",
+            "--all-scopes-completion",
+            "--background-index",
+            "--clang-tidy",
+            "--clang-tidy-checks=google-*,llvm-*,clang-analyzer-*, cert-*,performance-*,misc-,modernize-*,-modernize-use-trailing-return-type,concurrency-*,bugprone-*,readability-*,-readability-magic-numbers",
+            "--completion-parse=auto",
+            "--completion-style=detailed",
+            "--cross-file-rename",
+            "--header-insertion=iwyu",
+            "--j=4",
+            "--pretty",
+            "--suggest-missing-includes",
+            "--fallback-style=google"
+        }
+    end
+    lspConfig.clangd.setup {
+        cmd = cmd,
         on_attach = onAttach,
         filetypes = {"c", "cpp", "objc", "objcpp"},
         init_options = {

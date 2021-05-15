@@ -10,6 +10,7 @@ require "core.plugins"
 require "core.commands"
 require "debug"
 require "replace"
+require "compileRun"
 
 -- Build-in plugin {{{
 -- Disable
