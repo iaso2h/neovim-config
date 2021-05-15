@@ -1,4 +1,3 @@
-local vim = vim
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
@@ -71,14 +70,24 @@ end
 
 function M.runCode()
     if vim.bo.modified then cmd "up" end
+    api.nvim_echo({{"\n", "Normal"}}, false, {})
     if vim.bo.filetype == "c" or vim.bo.filetype == "cpp" then
-        cmd [[e]]
+        if fn.has("win32") == 1 then
+            cmd [[!%:p:r]]
+        else
+            cmd [[!%:p:r.out]]
+        end
     elseif vim.bo.filetype == "lua" then
         cmd [[AsyncRun lua %]]
     elseif vim.bo.filetype == "python" then
         cmd(fn.has("win32") == 1 and "AsyncRun python %" or "AsyncRun python3 %")
     end
 end
+
+cmd [[
+command! -nargs=0 Compile lua require("compileRun").compileCode()
+command! -nargs=0 Run     lua require("compileRun").runCode()
+]]
 
 return M
 

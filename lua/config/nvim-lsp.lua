@@ -132,7 +132,6 @@ if ex("pyright") then
                     extraPaths = "",
                     typeCheckingMode = "basic",
                     useLibraryCodeForTypes = false,
-                    diagnosticMode = 'workspace'
                 }
             },
             pyright = {
@@ -262,10 +261,8 @@ end
 -- }}} Vimscript
 -- Clangd {{{
 -- https://github.com/llvm/llvm-project/tree/main/clang-tools-extra/clangd
-if ex("clangd") then
-    lspConfig.clangd.setup {
-        cmd = {
-            "clangd",
+local findClangd = function() -- {{{
+    local cmdStr = {
             "--all-scopes-completion",
             "--background-index",
             "--clang-tidy",
@@ -278,7 +275,32 @@ if ex("clangd") then
             "--pretty",
             "--suggest-missing-includes",
             "--fallback-style=google"
-        },
+        }
+    if fn.has("win32") == 1 then
+        if ex("clangd") then
+            table.insert(cmdStr, 1, "clangd")
+            return cmdStr
+        else
+            return ""
+        end
+    elseif fn.has("unix") == 1 then
+        if ex("clangd-11") then -- The current clangd version. 2021-05-17
+            table.insert(cmdStr, 1, "clangd-11")
+            return cmdStr
+        else
+            local clangdVersion = string.match(fn.system[[apt list --installed | grep -Eo "clangd-.."]], "clangd%-%d%d") -- Query installed clangd on Ubuntu
+            if not nil then return "" end
+            table.insert(cmdStr, 1, clangdVersion)
+            return cmdStr
+        end
+    else
+        return ""
+    end
+end -- }}}
+local clangdCMD = findClangd()
+if clangdCMD ~= "" then
+    lspConfig.clangd.setup {
+        cmd = clangdCMD,
         on_attach = onAttach,
         filetypes = {"c", "cpp", "objc", "objcpp"},
         init_options = {

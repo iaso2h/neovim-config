@@ -28,6 +28,8 @@ Plug 'michaeljsmith/vim-indent-object'
 Plug 'monaqa/dial.nvim'
 if !exists('g:vscode')
     Plug 'preservim/nerdcommenter'
+    Plug 'nacro90/numb.nvim'
+    Plug 'winston0410/range-highlight.nvim'
 endif
 Plug 'mg979/docgen.vim', {'on': 'DocGen'}
 Plug 'AndrewRadev/splitjoin.vim'
@@ -49,7 +51,9 @@ if !exists('g:vscode')
     Plug 'luochen1990/rainbow'
     Plug 'szw/vim-maximizer', {'on': 'MaximizerToggle'}
     Plug 'simnalamburt/vim-mundo', {'on': 'MundoToggle'}
-    " Plug 'dm1try/golden_size'
+    if exists("neovide")
+        Plug 'dm1try/golden_size'
+    endif
     " }}} UI
 
     " Tree-sitter {{{

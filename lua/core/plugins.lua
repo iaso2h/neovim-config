@@ -6,10 +6,13 @@ local M    = {}
 local map  = require("util").map
 local vmap = require("util").vmap
 
+-- Extra config files {{{
+-- General configuration {{{
 require "config.vim-visual-multi"
 require "config.vim-asyncrun"
-
-if not vim.g.vscode then -- {{{
+-- }}} General configuration
+-- Standalone Neovim cilent only {{{
+if not vim.g.vscode then
     require "config.vim-markdown"
     -- require "config.nvim-golden_size"
     require "config.nvim-telescope"
@@ -23,8 +26,11 @@ if not vim.g.vscode then -- {{{
     require "config.nvim-lsp"
     require "config.nvim-comp"
     -- require "config.nvim-gdb"
-end -- }}}
+end
+-- }}} Standalone Neovim cilent only
+-- }}} Extra config files
 
+-- General configuration {{{
 -- michaeljsmith/vim-indent-object {{{
 vim.g.indentLine_char                   = "▏"
 vim.g.indent_blankline_buftype_exclude  = {"terminal"}
@@ -201,8 +207,20 @@ vim.g.rooter_cd_cmd                                 = "lcd"
 vim.g.rooter_silent_chdir                           = 1
 vim.g.rooter_resolve_links                          = 1
 -- }}} airblade/vim-rooter
-
-if not vim.g.vscode then -- {{{
+-- nacro90/numb.nvim {{{
+require('numb').setup{
+   show_numbers    = true,  -- Enable 'number' for the window while peeking
+   show_cursorline = true   -- Enable 'cursorline' for the window while peeking
+}
+-- }}} nacro90/numb.nvim
+-- winston0410/range-highlight.nvim {{{
+require("range-highlight").setup {
+    highlight = "Visual"
+}
+-- }}} winston0410/range-highlight.nvim
+-- }}} General configuration
+-- Standalone Neovim cilent only {{{
+if not vim.g.vscode then
     -- luochen1990/rainbow {{{
     vim.g.rainbow_active = 1
     vim.g.rainbow_conf = {
@@ -437,7 +455,8 @@ if not vim.g.vscode then -- {{{
         default = true
         }
     -- }}} nvim-web-devicons
-end -- }}}
+end
+-- }}} Standalone Neovim cilent only
 
 return M
 
