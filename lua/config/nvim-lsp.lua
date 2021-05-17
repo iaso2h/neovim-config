@@ -132,7 +132,6 @@ if ex("pyright") then
                     extraPaths = "",
                     typeCheckingMode = "basic",
                     useLibraryCodeForTypes = false,
-                    diagnosticMode = 'workspace'
                 }
             },
             pyright = {
@@ -262,43 +261,46 @@ end
 -- }}} Vimscript
 -- Clangd {{{
 -- https://github.com/llvm/llvm-project/tree/main/clang-tools-extra/clangd
-if ex("clangd") or ex("clangd-11") then
+local findClangd = function() -- {{{
+    local cmdStr = {
+            "--all-scopes-completion",
+            "--background-index",
+            "--clang-tidy",
+            "--clang-tidy-checks=google-*,llvm-*,clang-analyzer-*, cert-*,performance-*,misc-,modernize-*,-modernize-use-trailing-return-type,concurrency-*,bugprone-*,readability-*,-readability-magic-numbers",
+            "--completion-parse=auto",
+            "--completion-style=detailed",
+            "--cross-file-rename",
+            "--header-insertion=iwyu",
+            "--j=4",
+            "--pretty",
+            "--suggest-missing-includes",
+            "--fallback-style=google"
+        }
     if fn.has("win32") == 1 then
-    local cmd
-        cmd = {
-            "clangd",
-            "--all-scopes-completion",
-            "--background-index",
-            "--clang-tidy",
-            "--clang-tidy-checks=google-*,llvm-*,clang-analyzer-*, cert-*,performance-*,misc-,modernize-*,-modernize-use-trailing-return-type,concurrency-*,bugprone-*,readability-*,-readability-magic-numbers",
-            "--completion-parse=auto",
-            "--completion-style=detailed",
-            "--cross-file-rename",
-            "--header-insertion=iwyu",
-            "--j=4",
-            "--pretty",
-            "--suggest-missing-includes",
-            "--fallback-style=google"
-        }
+        if ex("clangd") then
+            table.insert(cmdStr, 1, "clangd")
+            return cmdStr
+        else
+            return ""
+        end
+    elseif fn.has("unix") == 1 then
+        if ex("clangd-11") then -- The current clangd version. 2021-05-17
+            table.insert(cmdStr, 1, "clangd-11")
+            return cmdStr
+        else
+            local clangdVersion = string.match(fn.system[[apt list --installed | grep -Eo "clangd-.."]], "clangd%-%d%d") -- Query installed clangd on Ubuntu
+            if not nil then return "" end
+            table.insert(cmdStr, 1, clangdVersion)
+            return cmdStr
+        end
     else
-        cmd = {
-            "clangd-11",
-            "--all-scopes-completion",
-            "--background-index",
-            "--clang-tidy",
-            "--clang-tidy-checks=google-*,llvm-*,clang-analyzer-*, cert-*,performance-*,misc-,modernize-*,-modernize-use-trailing-return-type,concurrency-*,bugprone-*,readability-*,-readability-magic-numbers",
-            "--completion-parse=auto",
-            "--completion-style=detailed",
-            "--cross-file-rename",
-            "--header-insertion=iwyu",
-            "--j=4",
-            "--pretty",
-            "--suggest-missing-includes",
-            "--fallback-style=google"
-        }
+        return ""
     end
+end -- }}}
+local clangdCMD = findClangd()
+if clangdCMD ~= "" then
     lspConfig.clangd.setup {
-        cmd = cmd,
+        cmd = clangdCMD,
         on_attach = onAttach,
         filetypes = {"c", "cpp", "objc", "objcpp"},
         init_options = {

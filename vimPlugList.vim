@@ -28,13 +28,14 @@ Plug 'michaeljsmith/vim-indent-object'
 Plug 'monaqa/dial.nvim'
 if !exists('g:vscode')
     Plug 'preservim/nerdcommenter'
+    Plug 'nacro90/numb.nvim'
+    Plug 'winston0410/range-highlight.nvim'
 endif
 Plug 'mg979/docgen.vim', {'on': 'DocGen'}
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'mg979/vim-visual-multi'
 Plug 'airblade/vim-rooter'
 " Plug 'AndrewRadev/switch.vim'
-Plug 'nacro90/numb.nvim'
 " }}} Vim enhancement
 if !exists('g:vscode')
     " UI {{{
