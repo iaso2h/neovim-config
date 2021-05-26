@@ -1,8 +1,8 @@
 -- File: buffer.lua
 -- Author: iaso2h
 -- Description: Close buffer in a smart way
--- Version: 0.0.11
--- Last Modified: 2021-03-31
+-- Version: 0.0.12
+-- Last Modified: 2021-05-26
 -- BUG: q on startup-log.txt
 local fn = vim.fn
 local cmd = vim.cmd
@@ -56,8 +56,8 @@ local function bwipe(bufNr)
     else
         api.nvim_buf_delete(0, {force = true})
     end
-    if fn.exists("g:bufferline") == 1 then
-        fn['bufferline#update']()
+    if fn.exists("g:bufferline") == 1 and #bufNrTbl ~= 1 then
+        fn['bufferline#update'](false)
     end
 end
 
@@ -278,8 +278,8 @@ function M.wipeOtherBuf() -- {{{
     end
 
     -- Update barbar.nvim tabline
-    if fn.exists("g:bufferline") == 1 then
-        fn['bufferline#update']()
+    if fn.exists("g:bufferline") == 1 and #bufNrTbl ~= 1 then
+        fn['bufferline#update'](true)
     end
 end -- }}}
 

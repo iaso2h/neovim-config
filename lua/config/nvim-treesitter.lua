@@ -8,7 +8,11 @@ ts.setup{
     ensure_installed      = {"c", "cpp", "lua", "json", "toml", "python", "bash", "fish", "regex", "css", "html", "go", "javascript", "rust", "ruby", "vue", "c_sharp", "typescript"},
     highlight             = {enable = true},
     indent                = {enable = true},
-    -- rainbow               = {enable = true, extended_mode = false},
+    rainbow               = {
+        enable = true,
+        extended_mode = false,
+        max_file_lines = 1500,
+    },
     matchup = {
         enable = true,
         -- disable = { "c", "ruby" },

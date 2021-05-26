@@ -93,7 +93,7 @@ end
 -- }}} Auto commands
 
 -- Commands {{{
-api.nvim_exec([[
+cmd [[
 command! -nargs=+ -complete=command  Echo PPmsg strftime('%c') . ": " . <args>
 command! -nargs=+ -complete=command  Redir call luaeval('require("redir").catch(_A)', <q-args>)
 command! -nargs=0 -range ExtractSelection lua require("extractSelection").main(vim.fn.visualmode())
@@ -104,6 +104,6 @@ command! -nargs=0 CD execute "cd " . expand("%:p:h")
 command! -nargs=0 E  up | let g:refreshBufSavView = winsaveview() | e! | call winrestview(g:refreshBufSavView)
 command! -nargs=0 MyVimedit edit    $MYVIMRC
 command! -nargs=0 MyVimsrc  luafile $MYVIMRC
-]], false)
+]]
 -- }}} Commands
 
