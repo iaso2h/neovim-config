@@ -26,6 +26,7 @@ if not vim.g.vscode then
     require "config.nvim-lsp"
     require "config.nvim-comp"
     -- require "config.nvim-gdb"
+    require "config.nvim-todo-comments"
 end
 -- }}} Standalone Neovim cilent only
 -- }}} Extra config files
@@ -214,9 +215,9 @@ require('numb').setup{
 }
 -- }}} nacro90/numb.nvim
 -- winston0410/range-highlight.nvim {{{
-require("range-highlight").setup {
-    highlight = "Visual"
-}
+-- require("range-highlight").setup {
+    -- highlight = "Visual"
+-- }
 -- }}} winston0410/range-highlight.nvim
 -- }}} General configuration
 -- Standalone Neovim cilent only {{{
@@ -258,14 +259,6 @@ if not vim.g.vscode then
         typescript = {"all"},
     }
     -- }}} hrsh7th/vim-vsnip
-    -- romgrk/todoist.nvim {{{
-    vim.g.todo_keywords = {
-        "TODO",
-        "BUG",
-        "NOTE",
-        "DEBUG"
-    }
-    -- }}} romgrk/todoist.nvim
     -- RishabhRD/nvim-cheat.sh {{{
     -- map("n", [[<C-S-l>]], [[:<c-u>Cheat<cr>]], {"silent"})
     -- }}} RishabhRD/nvim-cheat.sh

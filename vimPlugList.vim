@@ -29,7 +29,7 @@ Plug 'monaqa/dial.nvim'
 if !exists('g:vscode')
     Plug 'preservim/nerdcommenter'
     Plug 'nacro90/numb.nvim'
-    Plug 'winston0410/range-highlight.nvim'
+    " Plug 'winston0410/range-highlight.nvim'
 endif
 Plug 'mg979/docgen.vim', {'on': 'DocGen'}
 Plug 'AndrewRadev/splitjoin.vim'
@@ -44,11 +44,11 @@ if !exists('g:vscode')
     Plug 'romgrk/barbar.nvim'
     Plug 'kyazdani42/nvim-web-devicons'
     Plug 'RRethy/vim-hexokinase', {'do': 'make hexokinase'}
-    Plug 'chentau/todolist.nvim'
+    Plug 'folke/todo-comments.nvim'
     Plug 'mhinz/vim-startify'
     Plug 'lukas-reineke/indent-blankline.nvim', {'branch': 'lua'}
     Plug 'kyazdani42/nvim-tree.lua'
-    Plug 'luochen1990/rainbow'
+    " Plug 'luochen1990/rainbow'
     Plug 'szw/vim-maximizer', {'on': 'MaximizerToggle'}
     Plug 'simnalamburt/vim-mundo', {'on': 'MundoToggle'}
     if exists("neovide")
@@ -94,6 +94,7 @@ if !exists('g:vscode')
     Plug 'davisdude/vim-love-docs', {'branch': 'build', 'for': 'lua'}
     Plug 'iaso2h/nlua.nvim', {'branch': 'iaso2h', 'for': 'lua'}
     Plug 'euclidianAce/BetterLua.vim', {'for': 'lua'}
+    Plug 'nanotee/luv-vimdocs', {'for': 'lua'}
     " Markdown
     Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'md']}
     Plug 'plasticboy/vim-markdown', {'for': ['markdown', 'md']}

@@ -42,6 +42,7 @@ function M.formatCode(vimMode)
         fn.winrestview(saveView)
     end
 end
+cmd [[command! -nargs=0 Format lua require("config.nvim-lsp").formatCode("n")]]
 map("n", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("n")<cr>]], {"silent"})
 map("v", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("v")<cr>]], {"silent"})
 -- }}} Gerneral format mapping
@@ -75,7 +76,6 @@ local onAttach  = function(client, bufNr) -- {{{
     end
 
     -- lspsaga.nvim {{{
-    -- BUG: break in new version of newovim
     bmap(bufNr, "n", [[gF]],         [[:lua require("lspsaga.provider").lsp_finder()<cr>]],              {"silent"})
     bmap(bufNr, "n", [[<C-enter>]],  [[:lua require("lspsaga.codeaction").code_action()<cr>]],           {"silent"})
     bmap(bufNr, "v", [[<C-enter>]],  [[:lua require("lspsaga.codeaction").range_code_action()<cr>]],     {"silent"})
@@ -446,14 +446,16 @@ require'lspconfig'.bashls.setup{
 -- }}} LSP config
 
 -- glepnir/lspsaga.nvim {{{
-local saga = require 'lspsaga'
-
-saga.init_lsp_saga {
+require 'lspsaga'.init_lsp_saga {
     use_saga_diagnostic_sign = true,
---    error_sign            = "  ",
---    warn_sign             = " ⚠️ ",
---    hint_sign             = "  ",
---    infor_sign            = "  ",
+    error_sign            = "",
+    warn_sign             = "⚠️",
+    hint_sign             = "",
+    infor_sign            = "",
+    -- error_sign            = "  ",
+    -- warn_sign             = " ⚠️ ",
+    -- hint_sign             = "  ",
+    -- infor_sign            = "  ",
     code_action_prompt = {
         enable        = true,
         sign          = false,
