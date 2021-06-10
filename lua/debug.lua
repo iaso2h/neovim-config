@@ -1,8 +1,7 @@
-local vim = vim
-local fn = vim.fn
+local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
-local M = {}
+local M   = {}
 local map = require("util").map
 
 -- map("v", "<leader>t", [[:lua Print(require('util').visualSelection("string"))<cr>]], {})

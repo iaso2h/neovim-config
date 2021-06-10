@@ -4,11 +4,7 @@ local cmd = vim.cmd
 cmd [[let $configPath = stdpath('config')]]
 cmd [[execute "source " . expand('$configPath/vimPlugList.vim')]]
 
-require "core.options"
-require "core.mappings"
-require "core.plugins"
-require "core.commands"
-require "debug"
+require "core"
 require "replace"
 require "compileRun"
 

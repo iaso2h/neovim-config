@@ -340,6 +340,7 @@ call s:hi("VertSplit", s:nord2_gui, s:nord0_gui, s:nord3_term, "NONE", "NONE", "
 " Syntax Groups (descriptions and ordering from `:h w18`) {{{
 
 call s:h("Comment", {"fg": s:comment_grey, "gui": "italic", "cterm": "italic" }) " any comment
+call s:hi("Conceal", "", "NONE", "", "NONE", "", "")
 call s:h("Constant", {"fg": s:cyan }) " any constant
 call s:h("String", {"fg": s:green }) " a string constant: "this is a string"
 call s:h("Character", {"fg": s:green }) " a character constant: 'c', '\n'
