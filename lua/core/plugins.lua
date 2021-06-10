@@ -216,10 +216,44 @@ require('numb').setup{
 -- }}} nacro90/numb.nvim
 -- winston0410/range-highlight.nvim {{{
 -- require("range-highlight").setup {
-    -- highlight = "Visual"
+    -- highlight = "Visual",
+	-- highlight_with_out_range = {
+        -- d          = true,
+        -- delete     = true,
+        -- m          = true,
+        -- move       = true,
+        -- y          = true,
+        -- yank       = true,
+        -- c          = true,
+        -- change     = true,
+        -- j          = true,
+        -- join       = true,
+        -- ["<"]      = true,
+        -- [">"]      = true,
+        -- s          = true,
+        -- subsititue = true,
+        -- sno        = true,
+        -- snomagic   = true,
+        -- sm         = true,
+        -- smagic     = true,
+        -- ret        = true,
+        -- retab      = true,
+        -- t          = true,
+        -- co         = true,
+        -- copy       = true,
+        -- ce         = true,
+        -- center     = true,
+        -- ri         = true,
+        -- right      = true,
+        -- le         = true,
+        -- left       = true,
+        -- sor        = true,
+        -- sort       = true
+	-- }
 -- }
 -- }}} winston0410/range-highlight.nvim
 -- }}} General configuration
+
 -- Standalone Neovim cilent only {{{
 if not vim.g.vscode then
     -- luochen1990/rainbow {{{
@@ -273,7 +307,7 @@ if not vim.g.vscode then
     map("n", [[<c-u>]], [[:<c-u>MundoToggle<cr>]], {"silent"})
     -- }}} simnalamburt/vim-mundo
     -- iaso2h/hop.nvim {{{
-    require('hop').setup({teasing = true, winblend = 50, keys = 'ghfjdkstyrueiwovbcnxalqozm'})
+    require('hop').setup({keys = 'ghfjdkstyrueiwovbcnxalqozm', perm_method = require'hop.perm'.TermSeqBias, case_insensitive = false})
     map("", [[<leader>f]], [[:lua require("hop").hint_char1()<cr>]], {"silent"})
     map("", [[<leader>F]], [[:lua require("hop").hint_lines()<cr>]], {"silent"})
     -- }}} iaso2h/hop.nvim

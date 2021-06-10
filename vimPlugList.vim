@@ -29,7 +29,7 @@ Plug 'monaqa/dial.nvim'
 if !exists('g:vscode')
     Plug 'preservim/nerdcommenter'
     Plug 'nacro90/numb.nvim'
-    " Plug 'winston0410/range-highlight.nvim'
+    Plug 'winston0410/range-highlight.nvim'
 endif
 Plug 'mg979/docgen.vim', {'on': 'DocGen'}
 Plug 'AndrewRadev/splitjoin.vim'
