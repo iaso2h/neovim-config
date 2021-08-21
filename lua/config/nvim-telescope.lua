@@ -5,78 +5,125 @@ local map     = require("util").map
 local actions = require("telescope.actions")
 
 -- Gloabl customization
+
 require('telescope').setup{
     defaults = {
+        -- TODO:
         vimgrep_arguments = {
             'rg',
+            '--color=never',
             '--no-heading',
             '--with-filename',
             '--line-number',
             '--column',
             '--smart-case'
         },
-        prompt_position    = "bottom",
         prompt_prefix      = ">>> ",
         selection_caret    = "🖝   ",
         entry_prefix       = "    ",
         initial_mode       = "insert",
         selection_strategy = "reset",
         sorting_strategy   = "descending",
+        scroll_strategy    = "cycle",
         layout_strategy    = "horizontal",
-        layout_defaults    = {
-            horizontal = {
-                mirror = false,
-            },
-            vertical = {
-                mirror = true,
-            },
+        layout_config = {
+        horizontal = {
+            mirror = false,
         },
-        file_sorter          = require'telescope.sorters'.get_fzy_sorter,
-        file_ignore_patterns = {'*.sw?','~$*','*.bak','*.o','*.so','*.py[co]'},
-        generic_sorter       = require'telescope.sorters'.get_fzy_sorter,
-        shorten_path         = false,
-        winblend             = 0,
-        width                = 0.75,
-        preview_cutoff       = 120,
-        results_height       = 1,
-        results_width        = 0.8,
-        border               = {},
-        borderchars          = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
-        color_devicons       = true,
-        use_less             = true,
-        set_env              = { ['COLORTERM'] = 'truecolor' }, -- default = nil,
-        file_previewer       = require'telescope.previewers'.vim_buffer_cat.new,
-        grep_previewer       = require'telescope.previewers'.vim_buffer_vimgrep.new,
-        qflist_previewer     = require'telescope.previewers'.vim_buffer_qflist.new,
+        vertical = {
+            mirror = false,
+        },
+        },
+        file_sorter    = require'telescope.sorters'.get_fzy_sorter,
+        generic_sorter = require'telescope.sorters'.get_fzy_sorter,
+        file_ignore_patterns = {'*.sw?','~$*','*.bak', '*.bk', '*.o','*.so','*.py[co]'},
+
+        winblend = 0,
+        border = {},
+        borderchars = {'─', '│', '─', '│', '╭', '╮', '╯', '╰'},
+        color_devicons = true,
+
+        use_less = true,
+        path_display = {},
+        set_env = {COLORTERM = 'truecolor'},
+
+        file_previewer   = require'telescope.previewers'.vim_buffer_cat.new,
+        grep_previewer   = require'telescope.previewers'.vim_buffer_vimgrep.new,
+        qflist_previewer = require'telescope.previewers'.vim_buffer_qflist.new,
 
         -- Developer configurations: Not meant for general override
-        buffer_previewer_maker = require'telescope.previewers'.buffer_previewer_maker,
-        extensions = {
-            fzy_native = {
-            override_generic_sorter = true,
-            override_file_sorter = true,
-            },
-            media_files = {
-                -- defaults to {"png", "jpg", "mp4", "webm", "pdf"}
-                filetypes = {"map4", "png", "webp", "webm", "jpg", "jpeg", "pdf"},
-                find_cmd = "rg"
+        buffer_previewer_maker = require'telescope.previewers'.buffer_previewer_maker
+
+    },
+    pickers = {
+        -- Your special builtin config goes in here
+        buffers = {
+            sort_lastused = true,
+            theme         = "dropdown",
+            previewer     = false,
+            mappings = {
+                i = {
+                    ["<C-n>"]   = actions.move_selection_next,
+                    ["<C-p>"]   = actions.move_selection_previous,
+                    ["<Down>"]  = actions.move_selection_next,
+                    ["<Up>"]    = actions.move_selection_previous,
+
+                    ["<C-c>"]   = actions.close,
+
+                    ["<CR>"]    = actions.select_default + actions.center,
+                    -- ["<C-s>"]   = actions.select_horizontal, -- remap in ftplugin
+                    ["<C-v>"]   = actions.select_vertical,
+                    ["<C-t>"]   = actions.select_tab,
+
+                    ["<Tab>"]   = actions.toggle_selection + actions.move_selection_worse,
+                    ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
+                    ["<C-q>"]   = actions.send_selected_to_qflist + actions.open_qflist,
+                    -- ["<C-l>"]   = actions.complete_tag, -- remap in ftplugin
+
+                    -- ["<A-e>"]   = actions.preview_scrolling_up, -- remap in ftplugin
+                    -- ["<A-d>"]   = actions.preview_scrolling_down, -- remap in ftplugin
+                },
+                n = {
+                    ["<esc>"]   = actions.close,
+                    ["q"]       = actions.close,
+
+                    ["<CR>"]    = actions.select_default + actions.center,
+                    -- ["<C-s>"]   = actions.select_horizontal, -- remap in ftplugin
+                    ["<C-v>"]   = actions.select_vertical,
+                    ["<C-t>"]   = actions.select_tab,
+
+                    ["<Tab>"]   = actions.toggle_selection + actions.move_selection_worse,
+                    ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
+                    ["<C-q>"]   = actions.send_to_qflist + actions.open_qflist,
+                    ["<M-q>"]   = actions.send_selected_to_qflist + actions.open_qflist,
+
+                    ["j"]       = actions.move_selection_next,
+                    ["k"]       = actions.move_selection_previous,
+                    ["<Down>"]  = actions.move_selection_next,
+                    ["<Up>"]    = actions.move_selection_previous,
+
+                    -- ["g"]       = actions.move_to_top, -- remap in ftplugin
+                    -- ["z"]       = actions.move_to_middle, -- remap in ftplugin
+                    -- ["G"]       = actions.move_to_bottom, -- remap in ftplugin
+
+                    -- ["<A-u>"]   = actions.preview_scrolling_up, -- remap in ftplugin
+                    -- ["<A-d>"]   = actions.preview_scrolling_down, -- remap in ftplugin
+                },
             }
         },
-        mapping = {
-            i = {
-                -- Otherwise, just set the mapping to the function that you want it to be.
-                -- ["<A-d>"]     = actions.preview_scrolling_down, -- BUG:
-                -- ["<A-e>"]     = actions.preview_scrolling_up,
-                ["<C-r>"]     = actions.paste_register,
-                ["<C-Space>"] = actions.complete_tag,
-                -- ["<C-S>"] = actions.file_split, -- BUG:
-                -- Add up multiple actions
-                ["<CR>"]      = actions.select_default + actions.center,
-            },
-            n  = {
-                ["<esc>"] = actions.close,
-                ["q"]     = actions.close,
-            }
+        find_files = {
+            theme = "dropdown"
+        }
+    },
+    extensions = {
+        fzy_native = {
+            override_generic_sorter = true,
+            override_file_sorter = true,
+        },
+        media_files = {
+            -- defaults to {"png", "jpg", "mp4", "webm", "pdf"}
+            filetypes = {"map4", "png", "webp", "webm", "jpg", "jpeg", "pdf"},
+            find_cmd  = "rg"
         }
     }
 }
@@ -87,6 +134,7 @@ require('telescope').load_extension('media_files')
 function TelescopePreStart() -- {{{
     cmd[[setlocal wrap number]]
 end -- }}}
+
 -- AutoCommad
 api.nvim_exec([[autocmd User TelescopePreviewerLoaded lua TelescopePreStart()]], false)
 
@@ -95,12 +143,12 @@ cmd[[command! -nargs=0 O lua require('telescope.builtin').oldfiles(require('tele
 
 -- Mappings
 -- BUG: Try to fix crash problem in <C-e> by disable the previewer
-map("n", [[<C-e>]],   [[:lua require('telescope.builtin').find_files(require('telescope.themes').get_dropdown({previewer = false}))<cr>]], {"silent"})
-map("n", [[<C-f>f]],  [[:lua require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown({}))<cr>]],   {"silent"})
-map("n", [[<C-S-f>]], [[:lua require('telescope.builtin').live_grep(require('telescope.themes').get_dropdown({}))<cr>]],                   {"silent"})
-map("n", [[<C-S-b>]], [[:lua require('telescope.builtin').buffers(require('telescope.themes').get_dropdown({}))<cr>]],                     {"silent"})
-map("n", [[<C-S-c>]], [[:lua require('telescope.builtin').commands(require('telescope.themes').get_dropdown({}))<cr>]],                    {"silent"})
-map("n", [[<C-S-p>]], [[:lua require('telescope.builtin').builtin(require('telescope.themes').get_dropdown({}))<cr>]],                     {"silent"})
-map("n", [[<C-S-h>]], [[:lua require('telescope.builtin').help_tags(require('telescope.themes').get_dropdown({}))<cr>]],                   {"silent"})
-map("n", [[<C-S-o>]], [[:lua require('telescope.builtin').current_buffer_tags(require('telescope.themes').get_dropdown({}))<cr>]],         {"silent"})
+map("n", [[<C-h>l]],     [[:lua require('telescope.builtin').builtin()<cr>]],                                                               {"silent"})
+map("n", [[<C-e>]],      [[:lua require('telescope.builtin').find_files(require('telescope.themes').get_dropdown({}))<cr>]],                {"silent"})
+map("n", [[<C-f>f]],     [[:lua require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown({}))<cr>]], {"silent"})
+map("n", [[<C-f>F]],     [[:lua require('telescope.builtin').live_grep(require('telescope.themes').get_dropdown({}))<cr>]],                 {"silent"})
+map("n", [[<C-h>c]],     [[:lua require('telescope.builtin').commands(require('telescope.themes').get_dropdown({}))<cr>]],                  {"silent"})
+map("n", [[<C-h>h]],     [[:lua require('telescope.builtin').help_tags(require('telescope.themes').get_dropdown({}))<cr>]],                 {"silent"})
+map("n", [[<C-h><C-h>]], [[:lua require('telescope.builtin').help_tags(require('telescope.themes').get_dropdown({}))<cr>]],                 {"silent"})
+map("n", [[<C-h>o]],     [[:lua require('telescope.builtin').current_buffer_tags(require('telescope.themes').get_dropdown({}))<cr>]],       {"silent"})
 

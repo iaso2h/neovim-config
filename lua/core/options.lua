@@ -94,11 +94,11 @@ if not vim.g.vscode then
     -- GUI
     cmd [[colorscheme onedarknord]]
     GuiFontSizes = 13
-    if vim.g.neovide ~= nil then
-        vim.o.guifont = "更纱黑体 Mono SC Nerd:h" .. (GuiFontSizes + 5)
-    else
-        vim.o.guifont = "更纱黑体 Mono SC Nerd:h" .. GuiFontSizes
-    end
+    -- if vim.g.neovide ~= nil then
+        -- vim.o.guifont = "更纱黑体 Mono SC Nerd:h" .. (GuiFontSizes + 5)
+    -- else
+        -- vim.o.guifont = "更纱黑体 Mono SC Nerd:h" .. GuiFontSizes
+    -- end
     vim.o.guicursor = "n-v-sm:block,i-c-ci:ver25-Cursor,ve-o-r-cr:hor20"
 end
 -- }}} Basic settings

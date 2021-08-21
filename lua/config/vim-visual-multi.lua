@@ -59,8 +59,8 @@ VMMaps["Select Cursor Down"] = ',j'
 VMMaps["Select Cursor Up"]   = ',k'
 VMMaps['Skip Region']        = '<C-k>'
 VMMaps['Remove Region']      = 'u'
-VMMaps['Select All']         = '<C-S-a>'
-VMMaps['Visual All']         = '<C-S-a>'
+VMMaps['Select All']         = '<leader>d'
+VMMaps['Visual All']         = '<leader>d'
 
 -- Navigaton
 VMMaps['Invert Direction'] = 'o'

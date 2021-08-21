@@ -8,6 +8,11 @@ require "core"
 require "replace"
 require "compileRun"
 
+-- GuiFont = "更纱黑体 Mono SC Nerd"
+GuiFont = "FiraCode Nerd Font"
+GuiFontSize = 12
+vim.o.guifont = GuiFont ..":h" .. GuiFontSize
+
 -- Build-in plugin {{{
 -- Disable
 vim.g.loaded_gzip              = 1

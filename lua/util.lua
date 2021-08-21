@@ -233,9 +233,8 @@ end -- }}}
 function M.tblLoaded(termInclude) -- {{{
     local bufTbl
     if not termInclude then
-        bufTbl = vim.tbl_filter(function(buf)
-            return string.match(buf, "term://") == nil
-        end, vim.split(fn.execute("ls"), '\n', false))
+        bufTbl = vim.tbl_filter(function(buf) return string.match(buf, "term://") == nil end,
+            vim.split(fn.execute("ls"), '\n', false))
         table.remove(bufTbl, 1)
     else
         -- BUG: Execute ls! will incur Neovim built-in LSP complain
@@ -265,7 +264,7 @@ function M.map(mode, lhs, rhs, optsTbl) -- {{{
     else
         local optskeywordTbl = {}
         for _, val in ipairs(optsTbl) do
-            if val ~= "novscode" and val ~= "vscodeonly" then
+            if val ~= "novscode" then
                 optskeywordTbl[val] = true
             end
         end
@@ -281,7 +280,7 @@ end -- }}}
 ----
 function M.vmap(mode, lhs, rhs) -- {{{
     if vim.g.vscode then
-        api.nvim_set_keymap(mode, lhs, rhs, {silent=true})
+        api.nvim_set_keymap(mode, lhs, rhs, {silent = true})
     end
 end -- }}}
 
