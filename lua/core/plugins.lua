@@ -6,12 +6,14 @@ local M    = {}
 local map  = require("util").map
 local vmap = require("util").vmap
 
--- Extra config files {{{
--- General configuration {{{
+-- Module configuration {{{
+
+-- General module {{{
 require "config.vim-visual-multi"
 require "config.vim-asyncrun"
--- }}} General configuration
--- Standalone Neovim cilent only {{{
+-- }}} General module
+
+-- Neovim cilent module {{{
 if not vim.g.vscode then
     require "config.vim-markdown"
     -- require "config.nvim-golden_size"
@@ -28,18 +30,30 @@ if not vim.g.vscode then
     -- require "config.nvim-gdb"
     require "config.nvim-todo-comments"
 end
--- }}} Standalone Neovim cilent only
--- }}} Extra config files
+-- }}} Neovim cilent module
 
--- General configuration {{{
--- michaeljsmith/vim-indent-object {{{
-vim.g.indentLine_char                   = "▏"
-vim.g.indent_blankline_buftype_exclude  = {"terminal"}
-vim.g.indent_blankline_filetype_exclude = {"help", "startify"}
-vim.g.indent_blankline_bufname_exclude  = {"*.md"}
-vim.g.indent_blankline_use_treesitter   = true
-vim.g.indent_blankline_char_highlight   = "SignColumn"
--- }}} michaeljsmith/vim-indent-object
+-- }}} Module configuration
+
+-- Configuration {{{
+
+-- General {{{
+
+-- lukas-reineke/indent-blankline.nvim {{{
+require("indent_blankline").setup{
+    char             = "▏",
+    buftype_exclude  = {"terminal"},
+    filetype_exclude = {"help", "startify", "NvimTree"},
+    bufname_exclude  = {"*.md"},
+    char_highlight   = "SignColumn",
+    use_treesitter                 = true,
+    show_current_context           = true,
+    show_first_indent_level        = false,
+    show_trailing_blankline_indent = true,
+    show_end_of_line               = true,
+    show_foldtext                  = true,
+    strict_tabs                    = true
+}
+-- }}} lukas-reineke/indent-blankline.nvim
 -- tommcdo/vim-exchange {{{
 map("n", [[gx]],  [[<Plug>(Exchange)]])
 map("x", [[X]],   [[<Plug>(Exchange)]])
@@ -123,16 +137,16 @@ vim.g.NERDAltDelims_javascript = 1
 vim.g.NERDAltDelims_lua        = 0
 vim.g.NERDAltDelims_conf       = 0
 function M.commentJump(keystroke) -- {{{
-if api.nvim_get_current_line() ~= '' then
-    local saveReg = fn.getreg('"')
-    if keystroke == "o" then
-        cmd("normal! YpS" .. vim.g.FiletypeCommentDelimiter[vim.bo.filetype] .. " ")
-        elseif keystroke == "O" then
-        cmd("normal! YPS" .. vim.g.FiletypeCommentDelimiter[vim.bo.filetype] .. " ")
+    if api.nvim_get_current_line() ~= '' then
+        local saveReg = fn.getreg('"')
+        if keystroke == "o" then
+            cmd("normal! YpS" .. vim.g.FiletypeCommentDelimiter[vim.bo.filetype] .. " ")
+            elseif keystroke == "O" then
+            cmd("normal! YPS" .. vim.g.FiletypeCommentDelimiter[vim.bo.filetype] .. " ")
+        end
+        fn.setreg('"', saveReg)
+        cmd [[startinsert!]]
     end
-    fn.setreg('"', saveReg)
-    cmd [[startinsert!]]
-end
 end -- }}}
 map("n", [[g<space>o]], [[:lua require("core.plugins").commentJump("o")<cr>]], {"silent"})
 map("n", [[g<space>O]], [[:lua require("core.plugins").commentJump("O")<cr>]], {"silent"})
@@ -252,9 +266,9 @@ require('numb').setup{
 	-- }
 -- }
 -- }}} winston0410/range-highlight.nvim
--- }}} General configuration
+-- }}} General
 
--- Standalone Neovim cilent only {{{
+-- Neovim client {{{
 if not vim.g.vscode then
     -- luochen1990/rainbow {{{
     vim.g.rainbow_active = 1
@@ -304,33 +318,35 @@ if not vim.g.vscode then
     vim.g.mundo_help               = 1
     vim.g.mundo_tree_statusline    = 'Mundo'
     vim.g.mundo_preview_statusline = 'Mundo Preview'
-    map("n", [[<c-u>]], [[:<c-u>MundoToggle<cr>]], {"silent"})
+    map("n", [[<C-W>u]], [[:<c-u>MundoToggle<cr>]], {"silent"})
     -- }}} simnalamburt/vim-mundo
     -- iaso2h/hop.nvim {{{
     require('hop').setup({keys = 'ghfjdkstyrueiwovbcnxalqozm', perm_method = require'hop.perm'.TermSeqBias, case_insensitive = false})
     map("", [[<leader>f]], [[:lua require("hop").hint_char1()<cr>]], {"silent"})
     map("", [[<leader>F]], [[:lua require("hop").hint_lines()<cr>]], {"silent"})
     -- }}} iaso2h/hop.nvim
-    -- Startify {{{
-    vim.g.startify_session_dir  = os.getenv("HOME") .. '/.nvimcache/session'
-    vim.g.startify_padding_left = 20
-    vim.g.startify_lists = {
-        {type = 'files',     header = {string.rep(" ", vim.g.startify_padding_left) .. 'MRU'}            },
-        {type = 'dir',       header = {string.rep(" ", vim.g.startify_padding_left) .. 'MRU ' .. fn.getcwd()}},
-        {type = 'sessions',  header = {string.rep(" ", vim.g.startify_padding_left) .. 'Sessions'}       },
-        {type = 'bookmarks', header = {string.rep(" ", vim.g.startify_padding_left) .. 'Bookmarks'}      },
-    }
-    vim.g.startify_update_oldfiles        = 1
-    vim.g.startify_session_autoload       = 1
-    vim.g.startify_bookmarks              = {{v = fn.expand("$MYVIMRC")}}
-    vim.g.startify_session_before_save    = {'echo "Cleaning up before saving.."' }
-    vim.g.startify_session_persistence    = 1
-    vim.g.startify_session_delete_buffers = 1
-    vim.g.startify_change_to_vcs_root     = 1
-    vim.g.startify_fortune_use_unicode    = 1
-    vim.g.startify_relative_path          = 1
-    vim.g.startify_use_env                = 1
-    -- }}} Startify
+-- Startify {{{
+map("n", [[<C-s>]], [[:<c-u>Startify<cr>]], {"silent", "novscode"})
+map("v", [[<C-s>]], [[:<c-u>Startify<cr>]], {"silent", "novscode"})
+vim.g.startify_session_dir  = os.getenv("HOME") .. '/.nvimcache/session'
+vim.g.startify_padding_left = 20
+vim.g.startify_lists = {
+    {type = 'files',     header = {string.rep(" ", vim.g.startify_padding_left) .. 'MRU'}            },
+    {type = 'dir',       header = {string.rep(" ", vim.g.startify_padding_left) .. 'MRU ' .. fn.getcwd()}},
+    {type = 'sessions',  header = {string.rep(" ", vim.g.startify_padding_left) .. 'Sessions'}       },
+    {type = 'bookmarks', header = {string.rep(" ", vim.g.startify_padding_left) .. 'Bookmarks'}      },
+}
+vim.g.startify_update_oldfiles        = 1
+vim.g.startify_session_autoload       = 1
+vim.g.startify_bookmarks              = {{v = fn.expand("$MYVIMRC")}}
+vim.g.startify_session_before_save    = {'echo "Cleaning up before saving.."' }
+vim.g.startify_session_persistence    = 1
+vim.g.startify_session_delete_buffers = 1
+vim.g.startify_change_to_vcs_root     = 1
+vim.g.startify_fortune_use_unicode    = 1
+vim.g.startify_relative_path          = 1
+vim.g.startify_use_env                = 1
+-- }}} Startify
     -- iaso2h/nlua {{{
     vim.g.nlua_keywordprg_map_key = "<C-S-q>"
     -- }}} iaso2h/nlua
@@ -483,7 +499,9 @@ if not vim.g.vscode then
         }
     -- }}} nvim-web-devicons
 end
--- }}} Standalone Neovim cilent only
+-- }}} Neovim client
+
+-- }}} Configuration
 
 return M
 

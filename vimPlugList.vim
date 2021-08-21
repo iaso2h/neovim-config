@@ -46,13 +46,13 @@ if !exists('g:vscode')
     Plug 'RRethy/vim-hexokinase', {'do': 'make hexokinase'}
     Plug 'folke/todo-comments.nvim'
     Plug 'mhinz/vim-startify'
-    Plug 'lukas-reineke/indent-blankline.nvim', {'branch': 'lua'}
+    Plug 'lukas-reineke/indent-blankline.nvim'
     Plug 'kyazdani42/nvim-tree.lua'
     " Plug 'luochen1990/rainbow'
     Plug 'szw/vim-maximizer', {'on': 'MaximizerToggle'}
     Plug 'simnalamburt/vim-mundo', {'on': 'MundoToggle'}
     if exists("neovide")
-        Plug 'dm1try/golden_size'
+        " Plug 'dm1try/golden_size'
     endif
     " }}} UI
 

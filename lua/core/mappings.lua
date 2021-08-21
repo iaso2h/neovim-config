@@ -9,9 +9,11 @@ local M    = {}
 vim.g.mapleader = " "
 
 -- Change font size
-map("", [[\[]],    [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = "更纱黑体 Mono SC Nerd:h" .. GuiFontSize<cr>]], {"novscode"})
-map("", [=[\]]=],  [[:lua GuiFontSize = GuiFontSize - 1; vim.o.guifont = "更纱黑体 Mono SC Nerd:h" .. GuiFontSize<cr>]], {"novscode"})
-map("", [[<C-0>]], [[:lua GuiFontSize = 13; vim.o.guifont = "更纱黑体 Mono SC Nerd:h13"<cr>]],                           {"novscode"})
+map("", [[<C-->]],  [[:lua GuiFontSize = GuiFontSize - 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<cr>]], {"silent", "novscode"})
+map("", [[<C-=>]],  [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<cr>]], {"silent", "novscode"})
+-- map("", [=[\]]=],  [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<cr>]], {"silent", "novscode"})
+-- map("", [[\[]],    [[:lua GuiFontSize = GuiFontSize - 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<cr>]], {"silent", "novscode"})
+map("", [[<C-0>]], [[:lua GuiFontSize = 13; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<cr>]],              {"silent", "novscode"})
 -- Extraction
 map("",  [[gc]], [[luaeval("require('operator').main(require('extraction').main, false)")]], {"silent", "expr"})
 map("v", [[C]],  [[:lua require("extraction").main({nil, vim.fn.visualmode()})<cr>]],        {"silent"})
@@ -19,7 +21,7 @@ map("v", [[C]],  [[:lua require("extraction").main({nil, vim.fn.visualmode()})<c
 map("",  [[gz]], [[luaeval("require('operator').main(require('zeal').nonglobalQuery, false)")]], {"silent", "expr"})
 map("",  [[gZ]], [[luaeval("require('operator').main(require('zeal').globalQuery, false)")]],    {"silent", "expr"})
 map("v", [[Z]],  [[:lua require("zeal").globalQuery({nil, "v"})<cr>]],                           {"silent"})
-map("",  [[<C-g>]],   [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<cr>]], {"silent", "novscode"})
+map("", [[<C-g>]], [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<cr>]], {"silent", "novscode"})
 -- Tab switcher {{{
 map("n", [[<S-tab>]], [[:lua require("tabSwitcher").main()<cr>]], {"silent", "novscode"})
 -- }}} Tab switcher
@@ -27,6 +29,12 @@ map("n", [[<S-tab>]], [[:lua require("tabSwitcher").main()<cr>]], {"silent", "no
 map("n", [[<F9>]],   [[:lua require("compileRun").compileCode(true)<cr>]], {"noremap", "silent", "novscode"})
 map("n", [[<S-F9>]], [[:lua require("compileRun").runCode(true)<cr>]],     {"noremap", "silent", "novscode"})
 -- Search & Jumping {{{
+-- Disable dj/dk
+map("n", [[dj]], [[<Nop>]])
+map("n", [[dk]], [[<Nop>]])
+-- Inquery word
+map("n", [[<leader>i]], [=[[I]=])
+map("v", [[<leader>i]], [[:lua vim.cmd("g#" .. require("util").visualSelection("string") .. "#nu")<cr>]], {"silent"})
 -- Changelist jumping
 map("n", [[<A-o>]], [[&diff? "mz`z[czz" : "mz`zg;zz"]], {"noremap", "silent", "expr"})
 map("n", [[<A-i>]], [[&diff? "mz`z]czz" : "mz`zg,zz"]], {"noremap", "silent", "expr"})
@@ -55,12 +63,11 @@ map("n", [[<C-n>]], [[:<c-u>new<cr>]], {"silent", "novscode"})
 map("n", [[<C-l>]], [[:lua require("openBrowser").openUrl()<cr>]], {"silent"})
 map("v", [[<C-l>]], [[:lua require("openBrowser").openUrl(require("util").visualSelection("string"))<cr>]], {"silent"})
 -- Interrupt
-map("n", [[<C-A-c>]], [[:<c-u>call interrupt()<cr>]], {"noremap"})
+map("n", [[<C-A-c>]], [[:<c-u>call interrupt()<cr>]], {"noremap", "silent"})
 -- Paragraph & Block navigation
 map("", [[{]], [[:lua require("inclusiveParagraph").main("up")<cr>]],   {"noremap", "silent"})
 map("", [[}]], [[:lua require("inclusiveParagraph").main("down")<cr>]], {"noremap", "silent"})
 -- Line end/start
--- https://github.com/ryanoasis/nerd-fonts)
 map("", [[H]], [[^]])
 map("", [[L]], [[$]])
 -- Non-blank last character
@@ -78,7 +85,8 @@ map("n", [[g<C-cr>]], [[:lua require("trailingUtil").trailingChar("o")<cr>]],  {
 map("n", [[g<S-cr>]], [[:lua require("trailingUtil").trailingChar("O")<cr>]],  {"silent"})
 -- }}} Trailing character
 -- Messages
-vmap("n", [[g>]],    [[:<c-u>messages<cr>]])
+vmap("n", [[g>]], [[:<c-u>messages<cr>]])
+
 map("n", [[g<]],    [[:<c-u>messages<cr>]], {"silent"})
 map("n", [[g>]],    [[:<c-u>Messages<cr>]], {"silent", "novscode"})
 map("n", [[<A-,>]], [[:<c-u>execute 'messages clear<bar>echohl Moremsg<bar>echo "Message clear"<bar>echohl None'<cr>]])
@@ -115,6 +123,7 @@ map("",  [[<A-'>]], [[:<c-u>call ClearReg()<cr>]], {"silent"})
 -- Similar work: https://github.com/ojroques/nvim-bufdel
 map("n", [[q]], [[:lua require("buffer").smartClose("window")<cr>]], {"silent"})
 map("n", [[Q]], [[:lua require("buffer").smartClose("buffer")<cr>]], {"silent"})
+map("n", [[<C-u>]], [[:lua vim.cmd(string.format("e %s", require("buffer").lastClosedFilePath))<cr>]], {"silent"})
 -- Window
 map("",  [[<C-w>v]],   [[:lua require("consistantTab").splitCopy("wincmd v")<cr>]], {"silent", "novscode"})
 map("",  [[<C-w>s]],   [[:lua require("consistantTab").splitCopy("wincmd s")<cr>]], {"silent", "novscode"})
@@ -141,6 +150,7 @@ map("",  [[<leader>z]],       [[:<c-u>call EnhanceFoldHL("No fold marker found",
 map("n", [[dz]],              [[:<c-u>call EnhanceFoldHL("", 800, "EnhanceDelete")<cr>]],        {"silent", "novscode"})
 map("n", [[zd]],              [[:<c-u>call EnhanceFoldHL("", 800, "EnhanceDelete")<cr>]],        {"silent", "novscode"})
 map("n", [[cz]],              [[:<c-u>call EnhanceFoldHL("", 0, "EnhanceChange")<cr>]],          {"silent", "novscode"})
+map("n", [[zc]],              [[:<c-u>call EnhanceFoldHL("", 0, "EnhanceChange")<cr>]],          {"silent", "novscode"})
 map("n", [[g{]],              [[:<c-u>call EnhanceFold(mode(), "{{{")<cr>]],                     {"novscode"})
 map("n", [[g}]],              [[:<c-u>call EnhanceFold(mode(), "}}}")<cr>]],                     {"novscode"})
 map("v", [[g{]],              [[<A-m>z:<c-u>call EnhanceFold(visualmode(), "}}}")<cr>`z]],       {"novscode"})
@@ -163,11 +173,11 @@ map("n", [[<C-v>]], [[p]],                {"noremap", "novscode"})
 map("v", [[<C-v>]], [[<esc>i<C-v><esc>]], {"novscode"})
 map("i", [[<C-v>]], [[<C-r>*]],           {"novscode"})
 
-map("n", [[<C-s>]], [[:<c-u>w<cr>]],      {"novscode"})
-map("v", [[<C-s>]], [[:<c-u>w<cr>]],      {"novscode"})
+-- map("n", [[<C-s>]], [[:<c-u>w<cr>]],      {"novscode"})
+-- map("v", [[<C-s>]], [[:<c-u>w<cr>]],      {"novscode"})
 map("i", [[<C-s>]], [[<C-\><C-o>:w<cr>]], {"novscode"})
 -- }}} <C-z/x/v/s>
--- Saveas
+-- Save as..
 cmd [[command! -nargs=0 Saveas echohl Moremsg | echo "CWD: ".getcwd() | execute input("", "saveas ") | echohl None<cr> | e!]]
 map("",  [[<C-S-s>]], [[:<c-u>Saveas<cr>]],      {"silent", "novscode"})
 map("i", [[<C-S-s>]], [[<C-\><C-o>:Saveas<cr>]], {"silent", "novscode"})
@@ -200,8 +210,8 @@ map("v", [[R]], [[<Plug>InplaceReplaceVisual]])
 map("v", [[<Plug>InplaceReplaceVisual]], [[:lua ReplaceOperator({"visual", "InplaceReplaceVisual"})<cr>]], {"noremap", "silent"})
 map("v", [[<Plug>InplaceReplaceVisual]], [[:lua ReplaceVisualMode()<cr>]],                                 {"noremap", "silent"})
 -- Convert paste
-map("n", [[cP]], [[:lua require("yankPut").convertPut("P")<CR>]])
-map("n", [[cp]], [[:lua require("yankPut").convertPut("p")<CR>]])
+map("n", [[cP]], [[:lua require("yankPut").convertPut("P")<cr>]])
+map("n", [[cp]], [[:lua require("yankPut").convertPut("p")<cr>]])
 -- Mimic the VSCode move/copy line up/down behavior {{{
 -- Move line
 map("i", [[<A-j>]], [[<C-\><C-o>:VSCodeLineMoveDownInsert<cr>]],                 {"silent", "novscode"})
@@ -268,7 +278,7 @@ map("i", [[<C-S-.>]], [[<C-@>]],   {"noremap"})
 map("i", [[<C-BS>]],  [[<C-w>]],   {"noremap"})
 -- Navigation {{{
 map("!", [[<C-a>]], [[<Home>]])
--- Overiide in nvim-comp
+-- Overide in nvim-comp
 -- map("!", [[<C-e>]], [[<End>]])
 map("!", [[<C-h>]], [[<Left>]])
 map("!", [[<C-l>]], [[<Right>]])

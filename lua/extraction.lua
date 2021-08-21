@@ -4,6 +4,7 @@
 -- Version: 0.0.5
 -- Last Modified: 2021-04-05
 -- TODO: change the other var in the same scope
+-- BUG: Visual character mode will remove one extra space
 local vim = vim
 local fn  = vim.fn
 local cmd = vim.cmd
@@ -248,8 +249,9 @@ end -- }}}
 ----
 function M.main(argTbl) -- {{{
     local motionwise = argTbl[1]
-    -- Dosn't support block mode
+    -- Visual block mode is not supported
     if motionwise == "block" then return end
+
     -- opts = opts or {hlGroup="Search", timeout=500}
     local vimMode  = argTbl[2] or "n"
     local lang     = vim.bo.filetype
