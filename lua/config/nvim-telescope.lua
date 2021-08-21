@@ -78,7 +78,7 @@ require('telescope').setup{
                     ["<Tab>"]   = actions.toggle_selection + actions.move_selection_worse,
                     ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
                     ["<C-q>"]   = actions.send_selected_to_qflist + actions.open_qflist,
-                    -- ["<C-l>"]   = actions.complete_tag, -- remap in ftplugin
+                    ["<C-l>"]   = actions.complete_tag, -- remap in ftplugin
 
                     -- ["<A-e>"]   = actions.preview_scrolling_up, -- remap in ftplugin
                     -- ["<A-d>"]   = actions.preview_scrolling_down, -- remap in ftplugin

@@ -77,6 +77,7 @@ vim.g.camelcasemotion_key = ','
 -- vim.g.matchup_matchparen_hi_background = 1
 vim.g.matchup_matchparen_offscreen = {method = 'popup', highlight = 'OffscreenPopup'}
 vim.g.matchup_matchparen_nomode = "i"
+-- Set to 0 to match within strings and comments,
 vim.g.matchup_delim_noskips = 0
 -- Text obeject
 map("x", [[am]],      [[<Plug>(matchup-a%)]])
@@ -87,14 +88,16 @@ map("o", [[im]],      [[<Plug>(matchup-i%)]])
 map("",  [[<C-m>]],   [[<Plug>(matchup-%)]])
 map("",  [[<C-S-m>]], [[<Plug>(matchup-g%)]])
 -- Exclusive
-map("n", [[m]],       [[<Plug>(matchup-]%)]])
-map("x", [[m]],       [[<Plug>(matchup-]%)]])
-map("n", [[M]],       [[<Plug>(matchup-[%)]])
-map("x", [[M]],       [[<Plug>(matchup-[%)]])
+map("n", [[<A-m>]],   [[<Plug>(matchup-]%)]])
+map("x", [[<A-m>]],   [[<Plug>(matchup-]%)]])
+map("n", [[<A-S-m>]], [[<Plug>(matchup-[%)]])
+map("x", [[<A-S-m>]], [[<Plug>(matchup-[%)]])
 -- Highlight
-map("n", [[<leader>m]], [[<plug>(matchup-hi-surround)]])
--- Origin mark
-map("",  [[<A-m>]], [[m]], {"noremap"})
+map("n", [[<leader>m]], [[<Plug>(matchup-hi-surround)]])
+-- Change/Delete surrounds
+vim.g.matchup_surround_enabled = 1
+map("n", [[dsm]], [[<Plug>(matchup-ds%)]])
+map('n', [[csm]], [[<Plug>(matchup-cs%)]])
 -- }}} andymass/vim-matchup
 -- landock/vim-expand-region {{{
 vim.g.expand_region_text_objects = {
@@ -112,11 +115,11 @@ vim.g.expand_region_text_objects = {
 }
 local expand_region_custom_text_objects = {
     ['i,w'] = 1,
-    ['i%'] = 0,
-    ['a]'] = 0,
-    ab = 0,
-    aB = 0,
-    ai = 0
+    ['i%']  = 0,
+    ['a]']  = 0,
+    ['ab']  = 0,
+    ['aB']  = 0,
+    ['ai']  = 0
 }
 fn["expand_region#custom_text_objects"](expand_region_custom_text_objects)
 map("", [[<A-a>]], [[<Plug>(expand_region_expand)]])
@@ -213,58 +216,82 @@ map("n", [["gS"]], [[:<c-u>SplitjoinSplit<cr>]], {"silent"})
 map("n", [["gJ"]], [[:<c-u>SplitjoinJoin<cr>]],  {"silent"})
 -- }}} AndrewRadev/splitjoin.vim
 -- windwp/nvim-autopairs {{{
-require('nvim-autopairs').setup()
+local npairs = require('nvim-autopairs')
+npairs.setup {
+    disable_filetype          = {"TelescopePrompt"},
+    ignored_next_char         = string.gsub([[[%w%%%'%[%"%.] ]],"%s+", ""),
+    enable_moveright          = true,
+    enable_afterquote         = true,  -- add bracket pairs after quote
+    enable_check_bracket_line = true,  -- check bracket in same line
+    check_ts                  = false,
+    fast_wrap = {
+        map         = '<A-p>',
+        chars       = { '{', '[', '(', '"', "'" },
+        pattern     = string.gsub([[ [%'%"%)%>%]%)%}%,] ]], '%s+', ''),
+        end_key     = 'p',
+        keys        = 'qwertyuiopzxcvbnmasdfghjkl',
+        check_comma = true,
+        hightlight  = 'Search'
+    },
+}
+require('nvim-autopairs.completion.compe').setup {
+    map_cr       = false,  -- map <CR> on insert mode, this was implemented by nvim-comp instead
+    map_complete = true,   -- it will auto insert `(` after select function or method item
+    auto_select  = false,  -- auto select first (item)
+}
 -- }}} windwp/nvim-autopairs
 -- airblade/vim-rooter {{{
-vim.g.rooter_patterns                               = {".git", "makefile", "*.sln", "build/env.sh", ".vscode", "^config", "^local"}
 vim.g.rooter_change_directory_for_non_project_files = "current"
-vim.g.rooter_cd_cmd                                 = "lcd"
-vim.g.rooter_silent_chdir                           = 1
-vim.g.rooter_resolve_links                          = 1
+vim.g.rooter_patterns      = {
+    ".git",
+    "makefile",
+    "*.sln",
+    "build/env.sh",
+    ".vscode",
+    "^config",
+    "^local",
+    }
+vim.g.rooter_cd_cmd        = "lcd"
+vim.g.rooter_silent_chdir  = 1
+vim.g.rooter_resolve_links = 1
 -- }}} airblade/vim-rooter
--- nacro90/numb.nvim {{{
-require('numb').setup{
-   show_numbers    = true,  -- Enable 'number' for the window while peeking
-   show_cursorline = true   -- Enable 'cursorline' for the window while peeking
-}
--- }}} nacro90/numb.nvim
 -- winston0410/range-highlight.nvim {{{
--- require("range-highlight").setup {
-    -- highlight = "Visual",
-	-- highlight_with_out_range = {
-        -- d          = true,
-        -- delete     = true,
-        -- m          = true,
-        -- move       = true,
-        -- y          = true,
-        -- yank       = true,
-        -- c          = true,
-        -- change     = true,
-        -- j          = true,
-        -- join       = true,
-        -- ["<"]      = true,
-        -- [">"]      = true,
-        -- s          = true,
-        -- subsititue = true,
-        -- sno        = true,
-        -- snomagic   = true,
-        -- sm         = true,
-        -- smagic     = true,
-        -- ret        = true,
-        -- retab      = true,
-        -- t          = true,
-        -- co         = true,
-        -- copy       = true,
-        -- ce         = true,
-        -- center     = true,
-        -- ri         = true,
-        -- right      = true,
-        -- le         = true,
-        -- left       = true,
-        -- sor        = true,
-        -- sort       = true
-	-- }
--- }
+require("range-highlight").setup {
+    highlight = "Visual",
+    highlight_with_out_range = {
+        d          = true,
+        delete     = true,
+        m          = true,
+        move       = true,
+        y          = true,
+        yank       = true,
+        c          = true,
+        change     = true,
+        j          = true,
+        join       = true,
+        ["<"]      = true,
+        [">"]      = true,
+        s          = true,
+        subsititue = true,
+        sno        = true,
+        snomagic   = true,
+        sm         = true,
+        smagic     = true,
+        ret        = true,
+        retab      = true,
+        t          = true,
+        co         = true,
+        copy       = true,
+        ce         = true,
+        center     = true,
+        ri         = true,
+        right      = true,
+        le         = true,
+        left       = true,
+        sor        = true,
+        sort       = true
+    }
+}
 -- }}} winston0410/range-highlight.nvim
 -- }}} General
 
@@ -321,7 +348,11 @@ if not vim.g.vscode then
     map("n", [[<C-W>u]], [[:<c-u>MundoToggle<cr>]], {"silent"})
     -- }}} simnalamburt/vim-mundo
     -- iaso2h/hop.nvim {{{
-    require('hop').setup({keys = 'ghfjdkstyrueiwovbcnxalqozm', perm_method = require'hop.perm'.TermSeqBias, case_insensitive = false})
+    require('hop').setup{
+        keys             = 'ghfjdkstyrueiwovbcnxalqozm',
+        perm_method      = require'hop.perm'.TermSeqBias,
+        case_insensitive = false
+    }
     map("", [[<leader>f]], [[:lua require("hop").hint_char1()<cr>]], {"silent"})
     map("", [[<leader>F]], [[:lua require("hop").hint_lines()<cr>]], {"silent"})
     -- }}} iaso2h/hop.nvim

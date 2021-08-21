@@ -28,7 +28,7 @@ Plug 'michaeljsmith/vim-indent-object'
 Plug 'monaqa/dial.nvim'
 if !exists('g:vscode')
     Plug 'preservim/nerdcommenter'
-    Plug 'nacro90/numb.nvim'
+    Plug 'winston0410/cmd-parser.nvim'
     Plug 'winston0410/range-highlight.nvim'
 endif
 Plug 'mg979/docgen.vim', {'on': 'DocGen'}

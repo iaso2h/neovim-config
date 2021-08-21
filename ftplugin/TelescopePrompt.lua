@@ -1,4 +1,3 @@
-local map  = require("util").map
 local promptBufNr
 local tbl = vim.tbl_keys(TelescopeGlobalState)
 if tbl[1] == "number" then
@@ -7,20 +6,34 @@ else
     promptBufNr = tbl[2]
 end
 
-vim.api.nvim_buf_set_keymap(promptBufNr, "n", [[<A-e>]], string.format([[:lua require("telescope.actions").preview_scrolling_up(%s)<cr>]],   promptBufNr), {})
-vim.api.nvim_buf_set_keymap(promptBufNr, "n", [[<A-d>]], string.format([[:lua require("telescope.actions").preview_scrolling_down(%s)<cr>]], promptBufNr), {})
-vim.api.nvim_buf_set_keymap(promptBufNr, "i", [[<A-e>]], string.format([[:lua require("telescope.actions").preview_scrolling_up(%s)<cr>]],   promptBufNr), {})
-vim.api.nvim_buf_set_keymap(promptBufNr, "i", [[<A-d>]], string.format([[:lua require("telescope.actions").preview_scrolling_down(%s)<cr>]], promptBufNr), {})
+-- TODO: supoort multiple actions
+if not TelescopeOverrideBufMap then
+    TelescopeOverrideBufMap = function(mode, lhs, actionName)
+        local rhs
 
-vim.api.nvim_buf_set_keymap(promptBufNr, "n", [[<C-s>]], string.format([[:lua require("telescope.actions").select_horizontal(%s)<cr>]], promptBufNr), {})
-vim.api.nvim_buf_set_keymap(promptBufNr, "i", [[<C-s>]], string.format([[:lua require("telescope.actions").select_horizontal(%s)<cr>]], promptBufNr), {})
+        if mode == "i" then
+            rhs = string.format([[<C-\><C-o>:lua require("telescope.actions").%s(%d)<cr>]], actionName, promptBufNr)
+        else
+            rhs = string.format([[:lua require("telescope.actions").%s(%d)<cr>]], actionName, promptBufNr)
+        end
 
+        vim.api.nvim_buf_set_keymap(promptBufNr, mode, lhs, rhs, {silent = true})
+    end
+end
 
-vim.api.nvim_buf_set_keymap(promptBufNr, "n", [[g]], string.format([[:lua require("telescope.actions").move_to_top(%s)<cr>]],    promptBufNr), {})
-vim.api.nvim_buf_set_keymap(promptBufNr, "n", [[z]], string.format([[:lua require("telescope.actions").move_to_middle(%s)<cr>]], promptBufNr), {})
-vim.api.nvim_buf_set_keymap(promptBufNr, "n", [[G]], string.format([[:lua require("telescope.actions").move_to_bottom(%s)<cr>]], promptBufNr), {})
+TelescopeOverrideBufMap("n", [[<A-e>]], "preview_scrolling_up")
+TelescopeOverrideBufMap("n", [[<A-d>]], "preview_scrolling_down")
+TelescopeOverrideBufMap("i", [[<A-e>]], "preview_scrolling_up")
+TelescopeOverrideBufMap("i", [[<A-d>]], "preview_scrolling_down")
 
-vim.api.nvim_buf_set_keymap(promptBufNr, "i", [[<C-l>]], string.format([[:lua require("telescope.actions").complete_tag(%s)<cr>]], promptBufNr), {})
+TelescopeOverrideBufMap("n", [[<C-s>]], "select_horizontal")
+TelescopeOverrideBufMap("i", [[<C-s>]], "select_horizontal")
 
-vim.api.nvim_buf_set_keymap(promptBufNr, "i", [[<C-l>]], string.format([[:lua require("telescope.actions").complete_tag(%s)<cr>]], promptBufNr), {})
+TelescopeOverrideBufMap("n", [[g]], "move_to_top")
+TelescopeOverrideBufMap("i", [[z]], "move_to_middle")
+TelescopeOverrideBufMap("i", [[G]], "move_to_bottom")
+
+TelescopeOverrideBufMap("n", [[g]], "move_to_top")
+TelescopeOverrideBufMap("i", [[z]], "move_to_middle")
+TelescopeOverrideBufMap("i", [[G]], "move_to_bottom")
 

@@ -1,6 +1,4 @@
-local vim  = vim
 local cmd  = vim.cmd
-local api  = vim.api
 local map  = require("util").map
 local vmap = require("util").vmap
 local M    = {}
@@ -21,6 +19,7 @@ map("v", [[C]],  [[:lua require("extraction").main({nil, vim.fn.visualmode()})<c
 map("",  [[gz]], [[luaeval("require('operator').main(require('zeal').nonglobalQuery, false)")]], {"silent", "expr"})
 map("",  [[gZ]], [[luaeval("require('operator').main(require('zeal').globalQuery, false)")]],    {"silent", "expr"})
 map("v", [[Z]],  [[:lua require("zeal").globalQuery({nil, "v"})<cr>]],                           {"silent"})
+-- Print file name
 map("", [[<C-g>]], [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<cr>]], {"silent", "novscode"})
 -- Tab switcher {{{
 map("n", [[<S-tab>]], [[:lua require("tabSwitcher").main()<cr>]], {"silent", "novscode"})
@@ -35,6 +34,9 @@ map("n", [[dk]], [[<Nop>]])
 -- Inquery word
 map("n", [[<leader>i]], [=[[I]=])
 map("v", [[<leader>i]], [[:lua vim.cmd("g#" .. require("util").visualSelection("string") .. "#nu")<cr>]], {"silent"})
+-- Fast mark & resotre
+-- map("n", [[mm]], [[mm]])
+map("n", [[M]], [[`m]])
 -- Changelist jumping
 map("n", [[<A-o>]], [[&diff? "mz`z[czz" : "mz`zg;zz"]], {"noremap", "silent", "expr"})
 map("n", [[<A-i>]], [[&diff? "mz`z]czz" : "mz`zg,zz"]], {"noremap", "silent", "expr"})
@@ -60,8 +62,8 @@ map("n", [[<A-v>]], [[<C-q>]],                                         {"noremap
 -- Scratch file
 map("n", [[<C-n>]], [[:<c-u>new<cr>]], {"silent", "novscode"})
 -- Open/Search in browser
-map("n", [[<C-l>]], [[:lua require("openBrowser").openUrl()<cr>]], {"silent"})
-map("v", [[<C-l>]], [[:lua require("openBrowser").openUrl(require("util").visualSelection("string"))<cr>]], {"silent"})
+map("n", [[gl]], [[:lua require("openBrowser").openUrl()<cr>]], {"silent"})
+map("v", [[gl]], [[:lua require("openBrowser").openUrl(require("util").visualSelection("string"))<cr>]], {"silent"})
 -- Interrupt
 map("n", [[<C-A-c>]], [[:<c-u>call interrupt()<cr>]], {"noremap", "silent"})
 -- Paragraph & Block navigation
@@ -125,19 +127,24 @@ map("n", [[q]], [[:lua require("buffer").smartClose("window")<cr>]], {"silent"})
 map("n", [[Q]], [[:lua require("buffer").smartClose("buffer")<cr>]], {"silent"})
 map("n", [[<C-u>]], [[:lua vim.cmd(string.format("e %s", require("buffer").lastClosedFilePath))<cr>]], {"silent"})
 -- Window
-map("",  [[<C-w>v]],   [[:lua require("consistantTab").splitCopy("wincmd v")<cr>]], {"silent", "novscode"})
-map("",  [[<C-w>s]],   [[:lua require("consistantTab").splitCopy("wincmd s")<cr>]], {"silent", "novscode"})
-map("",  [[<C-w>V]],   [[:only<cr><C-w>v]],                                         {"silent", "novscode"})
-map("",  [[<C-w>S]],   [[:only<cr><C-w>s]],                                         {"silent", "novscode"})
-map("",  [[<C-w>q]],   [[:lua require("buffer").quickfixToggle()<cr>]],             {"silent", "novscode"})
-map("",  [[<C-w>t]],   [[:wincmd T]],                                               {"silent", "novscode"})
-map("i", [[<C-S-w>=]], [[<C-\><C-O>:wincmd =<cr>]],                                 {"silent", "novscode"})
+map("",  [[<C-w>v]], [[:lua require("consistantTab").splitCopy("wincmd v")<cr>]], {"silent", "novscode"})
+map("",  [[<C-w>s]], [[:lua require("consistantTab").splitCopy("wincmd s")<cr>]], {"silent", "novscode"})
+map("",  [[<C-w>V]], [[:only<cr><C-w>v]],                                         {"silent", "novscode"})
+map("",  [[<C-w>S]], [[:only<cr><C-w>s]],                                         {"silent", "novscode"})
+map("",  [[<C-w>q]], [[:lua require("buffer").quickfixToggle()<cr>]],             {"silent", "novscode"})
+map("",  [[<C-w>t]], [[:wincmd T]],                                               {"silent", "novscode"})
+map("n", [[<A-=>]],  [[:<c-u>wincmd +<cr>]],                                      {"silent", "novscode"})
+map("i", [[<A-=>]],  [[<C-\><C-O>:wincmd +<cr>]],                                 {"silent", "novscode"})
+map("n", [[<A-->]],  [[:<c-u>wincmd -<cr>]],                                      {"silent", "novscode"})
+map("i", [[<A-->]],  [[<C-\><C-O>:wincmd -<cr>]],                                 {"silent", "novscode"})
+map("i", [[<C-w>=]], [[<C-\><C-O>:wincmd =<cr>]],                                 {"silent", "novscode"})
+
 -- Buffers
 map("",  [[<C-w>O]], [[:lua require("buffer").wipeOtherBuf()<cr>]], {"silent", "novscode"})
 -- Tab
-map("", [[<A-S-h>]], [[:tabp<cr>]],    {"silent", "novscode"})
-map("", [[<A-S-l>]], [[:tabn<cr>]],    {"silent", "novscode"})
-map("", [[<A-S-o>]], [[:tabonly<cr>]], {"silent", "novscode"})
+map("", [[<A-<>]], [[:tabp<cr>]],     {"silent", "novscode"})
+map("", [[<A->>]], [[:tabn<cr>]],     {"silent", "novscode"})
+-- map("", [[<C-T>o]], [[:tabonly<cr>]], {"silent", "novscode"})
 -- }}} Buffer & Window & Tab
 -- Folding {{{
 map("",  [[[Z]],              [[zk]])
@@ -153,8 +160,8 @@ map("n", [[cz]],              [[:<c-u>call EnhanceFoldHL("", 0, "EnhanceChange")
 map("n", [[zc]],              [[:<c-u>call EnhanceFoldHL("", 0, "EnhanceChange")<cr>]],          {"silent", "novscode"})
 map("n", [[g{]],              [[:<c-u>call EnhanceFold(mode(), "{{{")<cr>]],                     {"novscode"})
 map("n", [[g}]],              [[:<c-u>call EnhanceFold(mode(), "}}}")<cr>]],                     {"novscode"})
-map("v", [[g{]],              [[<A-m>z:<c-u>call EnhanceFold(visualmode(), "}}}")<cr>`z]],       {"novscode"})
-map("v", [[g}]],              [[<A-m>z:<c-u>call EnhanceFold(visualmode(), "}}}")<cr>`z]],       {"novscode"})
+map("v", [[g{]],              [[mz:<c-u>call EnhanceFold(visualmode(), "}}}")<cr>`z]],       {"novscode"})
+map("v", [[g}]],              [[mz:<c-u>call EnhanceFold(visualmode(), "}}}")<cr>`z]],       {"novscode"})
 map("n", [[<leader><Space>]], [[@=(foldlevel('.') ? 'za' : '\<Space>')<cr>]],                    {"noremap", "silent"})
 map("n", [[<S-Space>]],       [[@=(foldlevel('.') ? 'zA' : '\<Space>')<cr>]],                    {"noremap", "silent"})
 for i=0, 9 do map("", string.format("z%d", i), string.format([[:set foldlevel=%d<bar>echohl Moremsg<bar>echo 'Foldlevel set to: %d'<bar>echohl None<cr>]], i, i), {}) end
