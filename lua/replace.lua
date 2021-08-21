@@ -21,7 +21,7 @@ local M   = {}
 
 -- Note: Could use ingo#pos#IsOnOrAfter(), but avoid dependency to ingo-library
 -- for now.
-local function correctRegtype(motionwise, register, regType ,replacement)
+local function correctRegtype(motionwise, register, regType ,replacement) -- {{{
     if motionwise == "block" then
         -- Adaptations for blockwise replace.
         local pasteTextTbl = vim.split(replacement["text"], "\n", false)
@@ -57,9 +57,9 @@ local function correctRegtype(motionwise, register, regType ,replacement)
     end
 
     return 0
-end
+end -- }}}
 
-local function replace(motionwise, register, replacement, curBufNr)
+local function replace(motionwise, register, replacement, curBufNr) -- {{{
     -- With a put in visual mode, the selected text will be replaced with the
     -- contents of the register. This works better than first deleting the
     -- selection into the black-hole register and then doing the insert; as
@@ -144,9 +144,9 @@ local function replace(motionwise, register, replacement, curBufNr)
         api.nvim_echo({{srcReport .. repReport, "MoreMsg"}}, false, {})
     end
 
-end
+end -- }}}
 
-function ReplaceOperator(argTbl)
+function ReplaceOperator(argTbl) -- {{{
     -- TODO
     local opts = {hlGroup = "Search", timeout = 500}
     local curBufNr      = api.nvim_get_current_buf()
@@ -264,9 +264,9 @@ function ReplaceOperator(argTbl)
             cmd [[call visualrepeat#set("\<lt>plug>InplaceReplaceVisual")]]
         end
     end
-end
+end -- }}}
 
-function M.expression()
+function M.expression() -- {{{
     -- Note: Could use
     -- ingo#mapmaker#OpfuncExpression('ReplaceWithRegister#Operator'), but avoid
     -- dependency to ingo-library for now.
@@ -293,16 +293,16 @@ function M.expression()
     -- end
 
     return "g@"
-end
+end -- }}}
 
-function ReplaceVisualMode()
+function ReplaceVisualMode() -- {{{
     vim.g.repeat_count = vim.g.repeat_count or ''
     local vimcmd = api.nvim_exec([[call visualrepeat#reapply#VisualMode(0)]], true)
     if vimcmd ~= "" then
         cmd([[normal!]] .. vimcmd)
     end
     ReplaceOperator({"visual", "InplaceReplaceVisual"})
-end
+end -- }}}
 
 return M
 

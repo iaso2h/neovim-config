@@ -1,4 +1,4 @@
-local fn = vim.fn
+local fn  = vim.fn
 local api = vim.api
 local map = require("util").map
 
@@ -38,51 +38,6 @@ vim.g.vsnip_filetypes = {
     javascriptreact = {"javascript"},
     typescriptreact = {"typescript"}
 }
-
--- Key mapping {{{
-local t = function(str)
-    return api.nvim_replace_termcodes(str, true, true, true)
-end
-
-local checkBackSpace = function()
-    local col = api.nvim_win_get_cursor(0)[2]
-    if col == 0 or api.nvim_get_current_line():sub(col, col):match('%s') then
-        return true
-    else
-        return false
-    end
-end
-
--- Use (s-)tab to:
---- move to prev/next item in completion menuone
---- jump to prev/next snippet's placeholder
-_G.tabComplete = function()
-    -- if vim.fn.pumvisible() == 1 then
-        -- return t "<C-n>"
-    if vim.fn.call("vsnip#available", {1}) == 1 then
-        return t "<Plug>(vsnip-expand-or-jump)"
-    elseif checkBackSpace() then
-        return t "<C-S-]>"
-    else
-        return vim.fn['compe#complete']()
-    end
-end
-_G.sTabComplete = function()
-    -- if vim.fn.pumvisible() == 1 then
-        -- return t "<C-p>"
-    if vim.fn.call("vsnip#jumpable", {-1}) == 1 then
-        return t "<Plug>(vsnip-jump-prev)"
-    else
-        return t "<C-S-[>"
-    end
-end
-
-
-map("i", [[<Tab>]], [[v:lua.tabComplete()]],    {"silent", "expr"})
-map("s", [[<Tab>]], [[v:lua.tabComplete()]],    {"silent", "expr"})
-map("i", [[<S-Tab>]], [[v:lua.sTabComplete()]], {"silent", "expr"})
-map("s", [[<S-Tab>]], [[v:lua.sTabComplete()]], {"silent", "expr"})
--- }}} Key mapping
 -- }}} Snippet
 
 -- hrsh7th/nvim-compe {{{
@@ -94,16 +49,23 @@ require("compe").setup {
     preselect        = 'always',
     throttle_time    = 80,
     source_timeout   = 200,
+    resolve_timeout  = 800;
     incomplete_delay = 400,
     max_abbr_width   = 100,
     max_kind_width   = 100,
     max_menu_width   = 100,
-    documentation    = true,
+    documentation = {
+        border = { '', '' ,'', ' ', '', '', '', ' ' }, -- the border option is the same as `|help nvim_open_win|`
+        winhighlight = "NormalFloat:CompeDocumentation,FloatBorder:CompeDocumentationBorder",
+        max_width = 120,
+        min_width = 60,
+        max_height = math.floor(vim.o.lines * 0.3),
+        min_height = 1,
+    },
 
     source = {
-        omni = false,
-        tags = true,
-        emoji = true,
+        tags  = false,
+        emoji = false,
         path = {
             kind = '  Path',
         },
@@ -113,8 +75,10 @@ require("compe").setup {
         calc     = {
             kind = '  Calc',
         },
+
         nvim_lsp = true,
         nvim_lua = true,
+
         tabnine  = {
             kind = '  Tabnine',
             max_line                 = 1000,
@@ -129,30 +93,31 @@ require("compe").setup {
     },
 }
 -- Confirm key {{{
-local autoPair = require('nvim-autopairs')
-_G.Completion= {}
-vim.g.completion_confirm_key = ""
-Completion.confirm = function()
-    if fn.pumvisible() ~= 0 then
-        if fn.complete_info()["selected"] ~= -1 then
-            fn["compe#confirm"]()
-            return autoPair.esc("<c-y>")
-        else
-            vim.defer_fn(function()
-                fn["compe#confirm"]("<cr>")
-                end, 20)
-            return autoPair.esc("<c-n>")
-        end
-    else
-        return autoPair.check_break_line_char()
-    end
-end
+-- local autoPair = require('nvim-autopairs')
+-- _G.Completion= {}
+-- vim.g.completion_confirm_key = ""
+-- Completion.confirm = function()
+    -- if fn.pumvisible() ~= 0 then
+        -- if fn.complete_info()["selected"] ~= -1 then
+            -- fn["compe#confirm"]()
+            -- return autoPair.esc("<c-y>")
+        -- else
+            -- vim.defer_fn(function()
+                -- fn["compe#confirm"]("<cr>")
+                -- end, 20)
+            -- return autoPair.esc("<c-n>")
+        -- end
+    -- else
+        -- return autoPair.check_break_line_char()
+    -- end
+-- end
 -- }}} Confirm key
+-- map('i', [[<CR>]],      [[v:lua.Completion.confirm()]],                     {"silent", "expr"})
 
-map('i', [[<CR>]],      [[v:lua.Completion.confirm()]],                     {"silent", "expr"})
+map("i", [[<CR>]], [[compe#confirm(luaeval("require 'nvim-autopairs'.autopairs_cr()"))]], {"silent", "expr"})
 map("i", [[<C-e>]],     [[pumvisible() ? compe#close('<C-e>') : "\<End>"]], {"silent", "expr"})
+map("i", [[<C-Space>]], [[pumvisible() ? compe#close('<C-e>') : "\<C-n>"]], {"silent", "expr"})
 map("i", [[<A-e>]],     [[compe#scroll({'delta': +4})]],                    {"silent", "expr"})
 map("i", [[<A-d>]],     [[compe#scroll({'delta': -4})]],                    {"silent", "expr"})
-map("i", [[<C-Space>]], [[pumvisible() ? compe#close('<C-e>') : "\<C-n>"]], {"silent", "expr"})
 -- }}} hrsh7th/nvim-compe
 

@@ -52,7 +52,7 @@ augroup END
     ]], false)
 
 local VMMaps = {}
-VMMaps['Reselect Last']      = 'gm'
+VMMaps['Reselect Last']      = ',m'
 VMMaps['Find Under']         = '<C-d>'
 VMMaps['Visual Add']         = '<C-d>'
 VMMaps["Select Cursor Down"] = ',j'
