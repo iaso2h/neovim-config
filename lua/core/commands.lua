@@ -66,7 +66,7 @@ if not vim.g.vscode then
     autocmd!
     autocmd BufWinEnter          * lua require("cursorRecall").main()
     autocmd BufWritePre          * lua require"util".trimWhiteSpaces(); require"util".trailingEmptyLine()
-    autocmd BufEnter             * set formatoptions=pj1Bml2nwc
+  " autocmd BufEnter             * set formatoptions=pj1Bml2nwc
     autocmd FocusGained,BufEnter * checktime
   " autocmd BufAdd               * lua require("consistantTab").adaptBufTab()
 
@@ -86,7 +86,7 @@ if not vim.g.vscode then
     autocmd BufReadPre,BufNewFile *.twig      setlocal filetype=twig.html
     autocmd BufReadPre,BufNewFile *.gitignore setlocal filetype=gitignore
     autocmd BufReadPre,BufNewFile config      setlocal filetype=config
-    autocmd BufWritePost          *.lua,*.vim lua RELOAD()
+    autocmd BufWritePost          *.lua,*.vim lua Reload()
     augroup END
     ]], false)
 end

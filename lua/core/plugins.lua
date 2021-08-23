@@ -1,13 +1,11 @@
-local vim  = vim
 local fn   = vim.fn
 local cmd  = vim.cmd
 local api  = vim.api
-local M    = {}
 local map  = require("util").map
 local vmap = require("util").vmap
+local M    = {}
 
 -- Module configuration {{{
-
 -- General module {{{
 require "config.vim-visual-multi"
 require "config.vim-asyncrun"
@@ -31,13 +29,10 @@ if not vim.g.vscode then
     require "config.nvim-todo-comments"
 end
 -- }}} Neovim cilent module
-
 -- }}} Module configuration
 
 -- Configuration {{{
-
 -- General {{{
-
 -- lukas-reineke/indent-blankline.nvim {{{
 require("indent_blankline").setup{
     char             = "▏",
@@ -297,22 +292,11 @@ require("range-highlight").setup {
 
 -- Neovim client {{{
 if not vim.g.vscode then
-    -- luochen1990/rainbow {{{
-    vim.g.rainbow_active = 1
-    vim.g.rainbow_conf = {
-        guifgs      = {"Gold", "DarkOrchid3", "RoyalBlue2"},
-        guis        = {""},
-        ctermfgs    = {"yellow", "magenta", "lightblue"},
-        cterms      = {""},
-        operators   = "",
-        parentheses = {"start=/(/ end=/)/ fold", "start=/\\[/ end=/\\]/ fold", "start=/{/ end=/}/ fold"},
-        separately  = {
-            lisp = {
-                guifgs = {'Gold', 'DarkOrchid3', 'RoyalBlue2', 'Firebrick', 'SeaGreen3', 'DarkOrange3'},
-            },
-        }
-    }
-    -- }}} luochen1990/rainbow
+    -- RRethy/vim-hexokinase {{{
+    -- NOTE: Go language compiler is required
+    vim.g.Hexokinase_highlighters = {'backgroundfull'}
+    vim.g.Hexokinase_optInPatterns = 'full_hex,triple_hex,rgb,rgba,hsl,hsla,colour_names'
+    -- RRethy/vim-hexokinase }}}
     -- vim-python/python-syntax {{{
     vim.g.python_highlight_all = 1
     -- }}} vim-python/python-syntax
@@ -356,28 +340,28 @@ if not vim.g.vscode then
     map("", [[<leader>f]], [[:lua require("hop").hint_char1()<cr>]], {"silent"})
     map("", [[<leader>F]], [[:lua require("hop").hint_lines()<cr>]], {"silent"})
     -- }}} iaso2h/hop.nvim
--- Startify {{{
-map("n", [[<C-s>]], [[:<c-u>Startify<cr>]], {"silent", "novscode"})
-map("v", [[<C-s>]], [[:<c-u>Startify<cr>]], {"silent", "novscode"})
-vim.g.startify_session_dir  = os.getenv("HOME") .. '/.nvimcache/session'
-vim.g.startify_padding_left = 20
-vim.g.startify_lists = {
-    {type = 'files',     header = {string.rep(" ", vim.g.startify_padding_left) .. 'MRU'}            },
-    {type = 'dir',       header = {string.rep(" ", vim.g.startify_padding_left) .. 'MRU ' .. fn.getcwd()}},
-    {type = 'sessions',  header = {string.rep(" ", vim.g.startify_padding_left) .. 'Sessions'}       },
-    {type = 'bookmarks', header = {string.rep(" ", vim.g.startify_padding_left) .. 'Bookmarks'}      },
-}
-vim.g.startify_update_oldfiles        = 1
-vim.g.startify_session_autoload       = 1
-vim.g.startify_bookmarks              = {{v = fn.expand("$MYVIMRC")}}
-vim.g.startify_session_before_save    = {'echo "Cleaning up before saving.."' }
-vim.g.startify_session_persistence    = 1
-vim.g.startify_session_delete_buffers = 1
-vim.g.startify_change_to_vcs_root     = 1
-vim.g.startify_fortune_use_unicode    = 1
-vim.g.startify_relative_path          = 1
-vim.g.startify_use_env                = 1
--- }}} Startify
+    -- Startify {{{
+    map("n", [[<C-s>]], [[:<c-u>Startify<cr>]], {"silent", "novscode"})
+    map("v", [[<C-s>]], [[:<c-u>Startify<cr>]], {"silent", "novscode"})
+    vim.g.startify_session_dir  = os.getenv("HOME") .. '/.nvimcache/session'
+    vim.g.startify_padding_left = 20
+    vim.g.startify_lists = {
+        {type = 'files',     header = {string.rep(" ", vim.g.startify_padding_left) .. 'MRU'}            },
+        {type = 'dir',       header = {string.rep(" ", vim.g.startify_padding_left) .. 'MRU ' .. fn.getcwd()}},
+        {type = 'sessions',  header = {string.rep(" ", vim.g.startify_padding_left) .. 'Sessions'}       },
+        {type = 'bookmarks', header = {string.rep(" ", vim.g.startify_padding_left) .. 'Bookmarks'}      },
+    }
+    vim.g.startify_update_oldfiles        = 1
+    vim.g.startify_session_autoload       = 1
+    vim.g.startify_bookmarks              = {{v = fn.expand("$MYVIMRC")}}
+    vim.g.startify_session_before_save    = {'echo "Cleaning up before saving.."' }
+    vim.g.startify_session_persistence    = 1
+    vim.g.startify_session_delete_buffers = 1
+    vim.g.startify_change_to_vcs_root     = 1
+    vim.g.startify_fortune_use_unicode    = 1
+    vim.g.startify_relative_path          = 1
+    vim.g.startify_use_env                = 1
+    -- }}} Startify
     -- iaso2h/nlua {{{
     vim.g.nlua_keywordprg_map_key = "<C-S-q>"
     -- }}} iaso2h/nlua
@@ -531,7 +515,6 @@ vim.g.startify_use_env                = 1
     -- }}} nvim-web-devicons
 end
 -- }}} Neovim client
-
 -- }}} Configuration
 
 return M

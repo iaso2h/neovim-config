@@ -48,7 +48,6 @@ if !exists('g:vscode')
     Plug 'mhinz/vim-startify'
     Plug 'lukas-reineke/indent-blankline.nvim'
     Plug 'kyazdani42/nvim-tree.lua'
-    " Plug 'luochen1990/rainbow'
     Plug 'szw/vim-maximizer', {'on': 'MaximizerToggle'}
     Plug 'simnalamburt/vim-mundo', {'on': 'MundoToggle'}
     if exists("neovide")
@@ -61,6 +60,7 @@ if !exists('g:vscode')
     " Plug 'romgrk/nvim-treesitter-context'
     Plug 'p00f/nvim-ts-rainbow'
     Plug 'nvim-treesitter/nvim-treesitter-textobjects'
+    Plug 'windwp/nvim-ts-autotag'
     " }}} Tree-sitter
 
     " Intellisense {{{
@@ -69,7 +69,7 @@ if !exists('g:vscode')
     Plug 'kabouzeid/nvim-lspinstall'
     Plug 'glepnir/lspsaga.nvim'
     Plug 'hrsh7th/nvim-compe'
-    Plug 'tzachar/compe-tabnine', { 'do': './install.sh' }
+    Plug 'tzachar/compe-tabnine', {'do': './install.sh'}
     Plug 'hrsh7th/vim-vsnip'
     Plug 'hrsh7th/vim-vsnip-integ'
     Plug 'windwp/nvim-ts-autotag'
@@ -91,13 +91,13 @@ if !exists('g:vscode')
     " Python
     Plug 'vim-python/python-syntax'
     " Lua
-    Plug 'davisdude/vim-love-docs', {'branch': 'build', 'for': 'lua'}
-    Plug 'iaso2h/nlua.nvim', {'branch': 'iaso2h', 'for': 'lua'}
+    Plug 'davisdude/vim-love-docs',    {'branch': 'build',  'for': 'lua'}
+    Plug 'iaso2h/nlua.nvim',           {'branch': 'iaso2h', 'for': 'lua'}
     Plug 'euclidianAce/BetterLua.vim', {'for': 'lua'}
-    Plug 'nanotee/luv-vimdocs', {'for': 'lua'}
+    Plug 'nanotee/luv-vimdocs',        {'for': 'lua'}
     " Markdown
-    Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'md']}
-    Plug 'plasticboy/vim-markdown', {'for': ['markdown', 'md']}
+    Plug 'iamcco/markdown-preview.nvim', {'do': { -> mkdp#util#install() }, 'for': ['markdown', 'md']}
+    Plug 'plasticboy/vim-markdown',      {'for': ['markdown', 'md']}
     " Log
     Plug 'MTDL9/vim-log-highlighting', {'for': 'log'}
     " Fish script
@@ -106,15 +106,15 @@ if !exists('g:vscode')
 
     " Debug {{{
     Plug 'kergoth/vim-hilinks'
-    Plug 'dstein64/vim-startuptime', {'on': 'StartupTime'}
-    Plug 'rafcamlet/nvim-luapad', {'on': ['Luapad', 'LuaRun', 'Lua']}
-    Plug 'bfredl/nvim-luadev', {'for': 'lua'}
-    Plug 'iaso2h/vim-scriptease', {'branch': 'ftplugin'}
+    Plug 'dstein64/vim-startuptime', {'on':     'StartupTime'}
+    Plug 'rafcamlet/nvim-luapad',    {'on':     ['Luapad', 'LuaRun', 'Lua']}
+    Plug 'bfredl/nvim-luadev',       {'for':    'lua'}
+    Plug 'iaso2h/vim-scriptease',    {'branch': 'ftplugin'}
     " Plug 'mfussenegger/nvim-dap'
     " Plug 'theHamsta/nvim-dap-virtual-text'
     " Plug 'mfussenegger/nvim-dap-python', {'for': 'python'}
     " Plug 'puremourning/vimspector'
-    Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh' }
+    Plug 'sakhnik/nvim-gdb', {'do': ':!./install.sh'}
     " }}} Debug
 
     " Version control {{{

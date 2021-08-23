@@ -296,7 +296,8 @@ let g:terminal_color_foreground = g:terminal_color_7
 call s:hi("CursorColumn", "", s:nord1_gui, "NONE", s:nord1_term, "", "")
 call s:hi("CursorLineNr", s:nord4_gui, "", "NONE", "", "NONE", "")
 " call s:hi("CursorLineNr", s:nord4_gui, s:nord1_gui, "NONE", s:nord1_term, "NONE", "")
-call s:hi("Folded", s:nord3_gui, s:nord1_gui, s:nord3_term, s:nord1_term, s:bold, "")
+" call s:hi("Folded", s:nord3_gui, s:nord1_gui, s:nord3_term, s:nord1_term, s:bold, "")
+call s:hi("Folded", s:nord3_gui, "#323847", s:nord3_term, s:nord1_term, s:bold, "")
 call s:hi("FoldColumn", s:nord3_gui, s:nord0_gui, s:nord3_term, "NONE", "", "")
 call s:hi("SignColumn", s:nord1_gui, s:nord0_gui, s:nord1_term, "NONE", "", "")
 
@@ -313,10 +314,11 @@ call s:hi("Question", s:nord4_gui, "", "NONE", "", "", "")
 " call s:hi("StatusLineNC", s:nord4_gui, s:nord1_gui, "NONE", s:nord1_term, "NONE", "")
 " call s:hi("StatusLineTerm", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "NONE", "")
 " call s:hi("StatusLineTermNC", s:nord4_gui, s:nord1_gui, "NONE", s:nord1_term, "NONE", "")
-call s:hi("StatusLine", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "NONE", "")
-call s:hi("StatusLineNC", s:nord4_gui, s:nord3_gui, "NONE", s:nord3_term, "NONE", "")
-call s:hi("StatusLineTerm", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "NONE", "")
-call s:hi("StatusLineTermNC", s:nord4_gui, s:nord3_gui, "NONE", s:nord3_term, "NONE", "")
+" NOTE: Use a unified statusline bg color
+call s:hi("StatusLine", s:nord8_gui, s:nord1_gui, s:nord8_term, s:nord3_term, "NONE", "")
+call s:hi("StatusLineNC", s:nord4_gui, s:nord1_gui, "NONE", s:nord3_term, "NONE", "")
+call s:hi("StatusLineTerm", s:nord8_gui, s:nord1_gui, s:nord8_term, s:nord3_term, "NONE", "")
+call s:hi("StatusLineTermNC", s:nord4_gui, s:nord1_gui, "NONE", s:nord3_term, "NONE", "")
 call s:hi("WarningMsg", s:nord0_gui, s:nord13_gui, s:nord1_term, s:nord13_term, "", "")
 call s:hi("WildMenu", s:nord8_gui, s:nord1_gui, s:nord8_term, s:nord1_term, "", "")
 
@@ -342,6 +344,7 @@ call s:hi("VertSplit", s:nord2_gui, s:nord0_gui, s:nord3_term, "NONE", "NONE", "
 call s:h("Comment", {"fg": s:comment_grey, "gui": "italic", "cterm": "italic" }) " any comment
 call s:hi("Conceal", "", "NONE", "", "NONE", "", "")
 call s:h("Constant", {"fg": s:cyan }) " any constant
+call s:hi("Decorator", s:nord12_gui, "", s:nord12_term, "", "", "")
 call s:h("String", {"fg": s:green }) " a string constant: "this is a string"
 call s:h("Character", {"fg": s:green }) " a character constant: 'c', '\n'
 call s:h("Number", {"fg": s:dark_yellow }) " a number constant: 234, 0xff
@@ -379,6 +382,8 @@ call s:h("Ignore", {}) " left blank, hidden
 call s:h("Error", {"fg": s:red }) " any erroneous construct
 call s:h("Parameter", {"fg": s:dark_yellow }) " Function parameter
 call s:hi("Todo", s:nord13_gui, "NONE", s:nord13_term, "NONE", "", "") " anything that needs extra attention; mostly the keywords TODO FIXME and XXX
+hi! link Annotation Decorator
+hi! link Variable   Identifier
 " }}}
 
 "+-----------+
@@ -1006,14 +1011,14 @@ call s:hi("BufferCurrent",       s:nord8_gui,  s:nord3_gui, s:nord8_term,  s:nor
 call s:hi("BufferCurrentIcon",   "",           s:nord3_gui, "",            s:nord3_term, "", "")
 call s:hi("BufferCurrentIndex",  s:nord8_gui,  s:nord3_gui, s:nord8_term,  s:nord3_term, "", "")
 call s:hi("BufferCurrentMod",    s:nord13_gui, s:nord3_gui, s:nord13_term, s:nord3_term, "", "")
-call s:hi("BufferCurrentSign",   s:nord8_gui,  s:nord3_gui, s:nord8_term,  s:nord3_term, "", "")
+call s:hi("BufferCurrentSign",   "#66738e",    s:nord3_gui, s:nord8_term,  s:nord3_term, "", "")
 call s:hi("BufferCurrentTarget", "#FFFFFF",    s:nord3_gui, s:nord10_term, s:nord3_term, "", "")
 
 call s:hi("BufferVisible",       "#66738e",    s:nord1_gui, s:nord3_term,  s:nord1_term, "", "")
 call s:hi("BufferVisibleIcon",   "#66738e",    s:nord1_gui, s:nord3_term,  s:nord1_term, "", "")
 call s:hi("BufferVisibleIndex",  "#66738e",    s:nord1_gui, s:nord3_term,  s:nord1_term, "", "")
 call s:hi("BufferVisibleMod",    "#9B8473",    s:nord1_gui, s:nord13_term, s:nord1_term, "", "")
-call s:hi("BufferVisibleSign",   s:nord8_gui,  s:nord1_gui, s:nord8_term,  s:nord1_term, "", "")
+call s:hi("BufferVisibleSign",   "#66738e",    s:nord1_gui, s:nord8_term,  s:nord1_term, "", "")
 call s:hi("BufferVisibleTarget", "#ED427C",    s:nord1_gui, s:nord11_term, s:nord1_term, "", "")
 
 hi! link BufferInactive       BufferVisible
@@ -1028,56 +1033,58 @@ call s:hi("BufferInactiveTarget", s:nord5_gui,  s:nord1_gui, s:nord5_term,  s:no
 " }}} romgrk/barbar.nvim
 
 " nvim-treesitter/nvim-treesitter {{{
-highlight link TSAnnotation         PreProc
-highlight link TSAttribute          PreProc
-highlight link TSBoolean            Boolean
-highlight link TSCharacter          Character
-highlight link TSComment            Comment
-highlight link TSConditional        Conditional
-highlight link TSConstant           Constant
-highlight link TSConstBuiltin       Special
-highlight link TSConstMacro         Macro
-" highlight link TSConstMacro         Define
-highlight link TSConstructor        Special
-highlight link TSEmphasis           Italic
-highlight link TSError              Error
-highlight link TSException          Exception
-highlight link TSField              Identifier
-highlight link TSFloat              Float
-highlight link TSFunction           Function
-highlight link TSFuncBuiltin        Special
-highlight link TSFuncMacro          Macro
-highlight link TSInclude            Include
-highlight link TSKeyword            Keyword
-highlight link TSKeywordFunction    Keyword
-highlight link TSKeywordOperator    Operator
-highlight link TSLabel              Label
-highlight link TSLiteral            String
-highlight link TSMethod             Function
+hi! link TSConstructor        Function
+hi! link TSAnnotation         Annotation
+hi! link TSAttribute          PreProc
+hi! link TSBoolean            Boolean
+hi! link TSCharacter          Character
+hi! link TSComment            Comment
+hi! link TSConditional        Conditional
+hi! link TSConstant           Constant
+hi! link TSConstBuiltin       Constant
+hi! link TSConstMacro         Macro
+" hi! link TSConstMacro         Define
+hi! link TSEmphasis           Italic
+hi! link TSError              Error
+hi! link TSException          Exception
+hi! link TSField              Identifier
+hi! link TSFloat              Float
+hi! link TSFunction           Function
+hi! link TSFuncBuiltin        Function
+hi! link TSFuncMacro          Function
+hi! link TSInclude            Include
+hi! link TSKeyword            Keyword
+hi! link TSKeywordFunction    Keyword
+hi! link TSKeywordOperator    Operator
+hi! link TSLabel              Label
+hi! link TSLiteral            String
+hi! link TSMethod             Function
 call s:hi("TSNamespace", "#00ffe5", "", s:nord8_term, "", "", "")
-highlight link TSNumber             Number
-highlight link TSOperator           Operator
-highlight link TSParameter          Parameter
-highlight link TSParameterReference Parameter
-highlight link TSProperty           Identifier
-highlight link TSPunctBracket       Delimiter
+hi! link TSNumber             Number
+hi! link TSOperator           Operator
+hi! link TSParameter          Parameter
+hi! link TSParameterReference Parameter
+hi! link TSProperty           Identifier
+hi! link TSPunctBracket       Delimiter
 call s:hi("TSPunctDelimiter", "#A1887F", "NONE", s:nord12_term, "NONE", "", "")
-highlight link TSPunctSpecial       TSPunctDelimiter
-" highlight link TSPunctDelimiter     Delimiter
-" highlight link TSPunctSpecial       Delimiter
-highlight link TSRepeat             Repeat
-highlight link TSString             String
-highlight link TSStringEscape       SpecialChar
-highlight link TSStringRegex        String
-highlight link TSStrong             bold
-highlight link TSTag                Label
-highlight link TSTagDelimiter       Label
-highlight link TSTitle              Title
-highlight link TSType               Type
-highlight link TSTypeBuiltin        Type
-highlight link TSUnderline          Underlined
-highlight link TSURI                Underlined
-highlight link TSVariableBuiltin    Special
+hi! link TSPunctSpecial       TSPunctDelimiter
+" hi! link TSPunctDelimiter     Delimiter
+" hi! link TSPunctSpecial       Delimiter
+hi! link TSRepeat             Repeat
+hi! link TSString             String
+hi! link TSStringEscape       SpecialChar
+hi! link TSStringRegex        SpecialChar
+hi! link TSStrong             Bold
+hi! link TSStucture           Structure
+hi! link TSTag                Label
+hi! link TSTagDelimiter       Label
+hi! link TSTitle              Title
+hi! link TSType               Type
+hi! link TSTypeBuiltin        Type
+hi! link TSUnderline          Underlined
+hi! link TSURI                Underlined
+hi! link TSVariable           Variable
+hi! link TSVariableBuiltin    Keyword
 " }}} nvim-treesitter/nvim-treesitter
 
 " lukas-reineke/indent-blankline.nvim {{{
@@ -1114,23 +1121,65 @@ call s:hi("CompeDocumentation", s:nord8_gui,  s:nord2_gui, s:nord8_term, s:nord1
 " }}} hrsh7th/nvim-compe
 
 " kyazdani42/nvim-tree.lua {{{
-call s:hi("NvimTreeFileNew",     s:nord14_gui, "", s:nord14_term, "", "", "")
-call s:hi("NvimTreeFileDeleted", s:nord11_gui, "", s:nord11_term, "", "", "")
-call s:hi("NvimTreeRootFolder",  s:nord10_gui, "", s:nord10_term, "", "", "")
-call s:hi("NvimTreeGitDirty",    s:nord12_gui, "", s:nord12_term, "", "", "")
-hi! link NERDTreeDirSlash Keyword
-call s:hi("NvimTreeImageFile",  s:nord13_gui, "", s:nord13_term, "", "", "")
-call s:hi("NvimTreeFileNew",    s:nord14_gui, "", s:nord14_term, "", "", "")
-call s:hi("NvimTreeGitStaged",  s:nord7_gui,  "", s:nord7_term,  "", "", "")
-call s:hi("NvimTreeGitMerge",   s:nord12_gui, "", s:nord12_term, "", "", "")
-call s:hi("NvimTreeGitRenamed", s:nord13_gui, "", s:nord13_term, "", "", "")
-hi! link NvimTreeIndentMarker NvimTreeRootFolder
 call s:hi("NvimTreeSymlink",    s:nord4_gui, s:nord0_gui, "NONE",       "NONE", "", "")
-call s:hi("NvimTreeFolderIcon", s:nord8_gui, "",          s:nord8_term, "NONE", "", "")
-hi! link NvimTreeExecFile Normal
-hi! link NvimTreeFolderName Normal
-call s:hi("NvimTreeSpecialFile", s:nord3_gui_bright, "", s:nord3_term,  "", s:italicize_comments, "")
-call s:hi("NvimTreePopup",       s:nord15_gui,       "", s:nord15_term, "", "",                   "")
-call s:hi("NvimTreeNormal",      s:nord15_gui,       "", s:nord15_term, "", "",                   "")
+hi! link NvimTreeFolderName      Normal
+call s:hi("NvimTreeRootFolder", s:nord10_gui, "",          s:nord10_term, "",     "", "")
+hi! link NvimTreeFolderIcon      Normal
+hi! link NvimTreeEmptyFolderName Normal
+call s:hi("NvimTreeOpenedFolderName", s:nord6_gui, s:nord8_gui, s:nord6_term, s:nord8_term, "",       "")
+call s:hi("NvimTreeExecFile",         s:nord4_gui, s:nord0_gui, "NONE",       "",           s:italic, "")
+hi! link NvimTreeOpenedFile   NvimTreeOpenedFolderName
+hi! link NvimTreeSpecialFile  Normal
+hi! link NvimTreeImageFile    Normal
+hi! link NvimTreeMarkdownFile Normal
+hi! link NvimTreeIndentMarker NvimTreeRootFolder
+
+hi! link LspDiagnosticsError       LspDiagnosticsDefaultError
+hi! link LspDiagnosticsWarning     LspDiagnosticsDefaultWarning
+hi! link LspDiagnosticsInformation LspDiagnosticsDefaultInformation
+hi! link LspDiagnosticsHint        LspDiagnosticsDefaultHint
+
+call s:hi("NvimTreeGitDirty",   s:nord13_gui, "", s:nord13_term, "", "", "")
+call s:hi("NvimTreeGitRenamed", s:nord13_gui, "", s:nord13_term, "", "", "")
+call s:hi("NvimTreeGitStaged",  s:nord12_gui, "", s:nord12_term, "", "", "")
+call s:hi("NvimTreeGitMerge",   s:nord15_gui, "", s:nord15_term, "", "", "")
+call s:hi("NvimTreeGitNew",     s:nord14_gui, "", s:nord14_term, "", "", "")
+call s:hi("NvimTreeGitDeleted", s:nord11_gui, "", s:nord11_term, "", "", "")
+hi! NvimTreeFileDirty   NvimTreeGitDirty
+hi! NvimTreeFileRenamed NvimTreeGitRenamed
+hi! NvimTreeFileStaged  NvimTreeGitStaged
+hi! NvimTreeFileMerge   NvimTreeGitMerge
+hi! NvimTreeFileNew     NvimTreeGitNew
+hi! NvimTreeFileDeleted NvimTreeGitDeleted
+
+" call s:hi("NvimTreeSpecialFile", s:nord3_gui_bright, "", s:nord3_term,  "", s:italicize_comments, "")
+" call s:hi("NvimTreePopup",       s:nord4_gui,       "", s:nord4_term, "", "",                   "")
+" call s:hi("NvimTreeNormal",      s:nord4_gui,       "", s:nord4_term, "", "",                   "")
 " }}} kyazdani42/nvim-tree.lua
+
+" Pandoc {{{
+" > vim-pandoc/vim-pandoc-syntax
+call s:hi("pandocDefinitionBlockTerm", s:nord7_gui, "", s:nord7_term, "", s:italic, "")
+call s:hi("pandocTableDelims", s:nord3_gui, "", s:nord3_term, "", "", "")
+hi! link pandocAtxHeader           markdownH1
+hi! link pandocBlockQuote          markdownBlockquote
+hi! link pandocCiteAnchor          Operator
+hi! link pandocCiteKey             pandocReferenceLabel
+hi! link pandocDefinitionBlockMark Operator
+hi! link pandocEmphasis            markdownItalic
+hi! link pandocFootnoteID          pandocReferenceLabel
+hi! link pandocFootnoteIDHead      markdownLinkDelimiter
+hi! link pandocFootnoteIDTail      pandocFootnoteIDHead
+hi! link pandocGridTableDelims     pandocTableDelims
+hi! link pandocGridTableHeader     pandocTableDelims
+hi! link pandocOperator            Operator
+hi! link pandocPipeTableDelims     pandocTableDelims
+hi! link pandocReferenceDefinition pandocReferenceLabel
+hi! link pandocReferenceLabel      markdownLinkText
+hi! link pandocReferenceURL        markdownUrl
+hi! link pandocSimpleTableHeader   pandocAtxHeader
+hi! link pandocStrong              markdownBold
+hi! link pandocTableHeaderWord     pandocAtxHeader
+hi! link pandocUListItemBullet     Operator
+" }}} Pandoc
 

@@ -10,7 +10,7 @@ vim.g.nvim_tree_auto_open              = 0 -- 0 by default, opens the tree when 
 vim.g.nvim_tree_auto_close             = 0 -- 0 by default, closes the tree when it's the last window
 vim.g.nvim_tree_auto_ignore_ft         = {'startify', 'dashboard'} -- empty by default, don't auto open tree on specific filetypes.
 vim.g.nvim_tree_quit_on_open           = 0 -- 0 by default, closes the tree when you open a file
-vim.g.nvim_tree_follow                 = 0 -- 0 by default, this option allows the cursor to be updated when entering a buffer
+vim.g.nvim_tree_follow                 = 1 -- 0 by default, this option allows the cursor to be updated when entering a buffer
 vim.g.nvim_tree_indent_markers         = 0 -- 0 by default, this option shows indent markers when folders are open
 vim.g.nvim_tree_hide_dotfiles          = 0 -- 0 by default, this option hides files and folders starting with a dot `.`
 vim.g.nvim_tree_git_hl                 = 1 -- 0 by default, will enable file highlight for git attributes (can be used without the icons).
@@ -55,10 +55,10 @@ vim.g.nvim_tree_icons = {
     symlink = '',
     git = {
         unstaged  = "",
-        staged    = "",
+        staged    = "",
         unmerged  = "",
         renamed   = "",
-        untracked = "",
+        untracked = "",
         deleted   = "",
         ignored   = "◌"
     },
@@ -84,21 +84,24 @@ vim.g.nvim_tree_icons = {
 -- Keymappings {{{
 -- Integration with barbar.nvim
 local view  = require "nvim-tree.view"
-local lib   = require "nvim-tree.view"
 local state = require "bufferline.state"
+M.closeNvimTree = function()
+    state.set_offset(0)
+    view.close()
+end
 M.toggle = function()
     if view.win_open() then
         state.set_offset(0)
         view.close()
     else
-        state.set_offset(40, '')
-
         if vim.g.nvim_tree_follow == 1 then
-            M.find_file(true)
+            require("nvim-tree").find_file(true)
         end
         if not view.win_open() then
-            lib.open()
+            require("nvim-tree.lib").open()
         end
+
+        state.set_offset(40, '')
     end
 end
 
@@ -108,7 +111,7 @@ map("n", [[<C-w>e]], [[:lua require("config.nvim-tree").toggle()<cr>]], {"silent
 -- map("n", [[<leader>n]], [[:NvimTreeFindFile<CR>]], {"noremap"})
 
 -- NOTE: Update in shortcut sheet
-vim.g.nvim_tree_disable_keybindings = 0
+vim.g.nvim_tree_disable_default_keybindings = 1
 local cb = require'nvim-tree.config'.nvim_tree_callback
 vim.g.nvim_tree_bindings = {
     {key = {"<CR>", "o", "<2-LeftMouse>"}, cb = cb("edit")},
@@ -132,6 +135,7 @@ vim.g.nvim_tree_bindings = {
     {key = "gr",                           cb = cb("rename")},
     {key = "dd",                           cb = cb("cut")},
     {key = "yy",                           cb = cb("copy")},
+    {key = "Y",                            cb = cb("copy")},
     {key = "p",                            cb = cb("paste")},
     {key = "yn",                           cb = cb("copy_name")},
     {key = "yp",                           cb = cb("copy_path")},
@@ -140,7 +144,7 @@ vim.g.nvim_tree_bindings = {
     {key = "]g",                           cb = cb("next_git_item")},
     {key = "u",                            cb = cb("parent_node")},
     {key = "U",                            cb = cb("dir_up")},
-    {key = "q",                            cb = cb("close")},
+    {key = "q",                            cb = [[:lua require("config.nvim-tree").closeNvimTree()<cr>]]},
     {key = "?",                            cb = cb("toggle_help")}
 }
 -- }}} Keymappings

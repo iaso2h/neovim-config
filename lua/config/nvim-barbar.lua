@@ -1,8 +1,12 @@
--- TODO: Update highlight color?
+-- File: nvim-barbar
+-- Author: iaso2h
+-- Description: barbar.nvim configuration
+-- Version: 0.0.8
+-- Last Modified: 2021-08-22
 local cmd = vim.cmd
 local fn  = vim.fn
-local M   = {}
 local map = require("util").map
+local M   = {}
 
 function M.bufferSwitcher(CMD)
     local fileType = vim.bo.filetype
@@ -76,8 +80,8 @@ vim.g.bufferline = {
     -- If false, will use nvim-web-devicons colors
     icon_custom_colors = false,
     -- Configure icons on the bufferline.
-    icon_separator_active   = '▎',
-    icon_separator_inactive = '▎',
+    icon_separator_active   = '▏',
+    icon_separator_inactive = '▏',
     icon_close_tab          = '✕',
     icon_close_tab_modified = '●',
     icon_pinned             = '車',

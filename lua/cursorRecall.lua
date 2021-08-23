@@ -54,7 +54,8 @@ function M.main()
 
     if fn.foldclosed('.') ~= -1 then
         -- Cursor was inside a fold; open it
-        cmd 'normal! zv'
+        cmd 'normal! zx'
+        cmd 'normal! zA'
     end
 end
 

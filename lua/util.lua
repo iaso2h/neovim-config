@@ -4,7 +4,20 @@ local api = vim.api
 local vim = vim
 local M = {}
 
-function Print(...) print(vim.inspect(...)) end
+function _G.Print(...)
+    local objects = {}
+    for i = 1, select('#', ...) do
+        local v = select(i, ...)
+        table.insert(objects, vim.inspect(v))
+    end
+
+    print(table.concat(objects, '\n'))
+    return ...
+end
+
+function _G.t(str)
+    return api.nvim_replace_termcodes(str, true, true, true)
+end
 
 ----
 -- Function: Vim2Lua___
@@ -148,12 +161,11 @@ function Vim2Lua(mode) -- {{{
 end -- }}}
 
 ----
--- Function: RELOAD Reload lua module path
+-- Function: _G.Reload: Reload lua module path
 --
 -- @param module: string value of module name, use current lua file name when nil is provided
--- @return: Return 0 when failed, otherwise return require(module)
 ----
-function RELOAD(module) -- {{{
+function _G.Reload(module) -- {{{
     if vim.bo.filetype == "lua" then
         -- Lua {{{
         local luaModule

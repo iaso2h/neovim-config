@@ -4,6 +4,7 @@
 -- Version: 0.0.12.5
 -- Last Modified: 2021/03/31
 -- TODO: Disable == when indentation is eauql
+-- TODO: Support multiple linewise conversion
 
 local vim = vim
 local fn = vim.fn
