@@ -1,11 +1,16 @@
-if has("unix")
-    Guifont! Sarasa Mono SC Nerd:h14
-elseif has("win32")
-    Guifont! 更纱黑体 Mono SC Nerd:h13
+if exists(':GuiTabline')
+    GuiTabline 0
 endif
-GuiPopupmenu v:false
-GuiTabline v:false
+
+if exists(':GuiPopupmenu')
+    GuiPopupmenu 0
+endif
+
+if exists(':GuiScrollBar')
+    GuiScrollBar 0
+endif
+
 if has(":GuiRenderLigatures")
-    GuiRenderLigatures v:true
+    GuiRenderLigatures 1
 endif
 

@@ -48,7 +48,8 @@ local opts = {
     fileencodings  = "utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1",
     diffopt        = "context:10000,filler,closeoff,vertical,algorithm:patience",
     fileignorecase = true,
-    fillchars      = "fold:-,vert:╎",
+    -- fillchars      = "fold:-,vert:╎",
+    fillchars      = "fold:-,vert:▏",
     foldcolumn = "auto:4", signcolumn = "auto:4", foldmethod = "expr", foldexpr = "EnhanceFoldExpr()",
     gdefault       = true,
     hidden         = true,
@@ -57,7 +58,7 @@ local opts = {
     listchars      = "tab:>-,precedes:❮,extends:❯,trail:-,nbsp:%,eol:↴",
     langmenu       = "en",
     lazyredraw     = true,
-    matchpairs     = vim.o.matchpairs .. ",\":\",<:>,《:》,（:）,【:】,“:”,‘:’",
+    matchpairs     = vim.o.matchpairs .. ",<:>,《:》,（:）,【:】,“:”,‘:’",
     mouse          = "a",
     joinspaces     = false,
     number         = true,
@@ -93,7 +94,13 @@ if not vim.g.vscode then
 
     -- GUI
     cmd [[colorscheme onedarknord]]
-    GuiFontSizes = 13
+    GuiFont = "UbuntuMono Nerd Font"
+    -- GuiFont = "Sarasa Mono SC Nerd"
+    -- GuiFont = "FiraCode Nerd Font"
+    GuiFontSize        = 14
+    GuiFontSizeDefault = GuiFontSize
+    vim.o.guifont = GuiFont ..":h" .. GuiFontSize
+
     -- if vim.g.neovide ~= nil then
         -- vim.o.guifont = "更纱黑体 Mono SC Nerd:h" .. (GuiFontSizes + 5)
     -- else

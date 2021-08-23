@@ -54,7 +54,7 @@ map("v", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("v")<cr>]], {"s
 -- @param client: ___
 -- @param bufNr:  ___
 ----
-local onAttach  = function(client, bufNr) -- {{{
+local onAttach = function(client, bufNr) -- {{{
     -- lspStatus.on_attach(client)
 
     -- Mappings
@@ -65,7 +65,7 @@ local onAttach  = function(client, bufNr) -- {{{
     bmap(bufNr, "n", [=[gR]=],         [[:lua vim.lsp.buf.references()<cr>]],                                 {"silent"})
     bmap(bufNr, "n", [=[<leader>wa]=], [[:lua vim.lsp.buf.add_workspace_folder()<cr>]],                       {"silent"})
     bmap(bufNr, "n", [=[<leader>wr]=], [[:lua vim.lsp.buf.remove_workspace_folder()<cr>]],                    {"silent"})
-    bmap(bufNr, "n", [=[<leader>wl]=], [[:lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<cr>]], {"silent"})
+    bmap(bufNr, "n", [=[<leader>wl]=], [[:lua Print(vim.lsp.buf.list_workspace_folders())<cr>]], {"silent"})
     bmap(bufNr, "n", [=[<leader>e]=],  [[:lua vim.lsp.diagnostic.set_loclist()<cr>]],                         {"silent"})
 
     -- Override existing mapping if lsp support
@@ -111,7 +111,7 @@ end -- }}}
 -- Setup() function: https://github.com/neovim/nvim-lspconfig#setup-function
 -- Individual configuration: https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md
 local checkExt = function(langServer)
-    return vim.fn.has('win32') == 1 and langServer .. ".cmd" or langServer
+    return fn.has('win32') == 1 and langServer .. ".cmd" or langServer
 end
 
 -- Python {{{
@@ -161,29 +161,24 @@ elseif fn.has("unix") == 1 then
 elseif fn.has('win32') == 1 then
     systemName = "Windows"
 else
-    print("Unsupported system for sumneko")
+    api.nvim_echo({{"Unsupported system for sumneko", "WarningMsg"}}, true, {})
 end
 
-local findSumnekoLua = function()
-    if fn.has("win32") == 1 then
-        sumneko_root_path = fn.glob("~/.vscode/extensions/sumneko.lua*", 0, 1)
-        if not next(sumneko_root_path) then
-            api.nvim_echo({{"Sumneko not found", "WarningMsg"}}, true, {})
-            return
-        end
+if fn.has("win32") == 1 then
+    sumneko_root_path = fn.glob("~/.vscode/extensions/sumneko.lua*", 0, 1)
+    if not next(sumneko_root_path) then
+        api.nvim_echo({{"Sumneko not found", "WarningMsg"}}, true, {})
+        return
+    end
 
-        sumneko_root_path = sumneko_root_path[#sumneko_root_path] .. "/server"
-        sumneko_binary = sumneko_root_path .. "/bin/".. systemName .. "/lua-language-server" .. binaryExt[systemName]
-    elseif fn.has("unix") == 1 then
-        sumneko_binary = fn.glob("~/.config/nvim/lsp/lua-language-server/bin/Linux/lua-language-server")
-        if fn.executable(sumneko_binary) == 1 then
-            sumneko_root_path = fn.glob("~/.config/nvim/lsp/lua-language-server")
-        end
+    sumneko_root_path = sumneko_root_path[#sumneko_root_path] .. "/server"
+    sumneko_binary = sumneko_root_path .. "/bin/".. systemName .. "/lua-language-server" .. binaryExt[systemName]
+elseif fn.has("unix") == 1 then
+    sumneko_binary = fn.glob("~/.config/nvim/lsp/lua-language-server/bin/Linux/lua-language-server")
+    if fn.executable(sumneko_binary) == 1 then
+        sumneko_root_path = fn.glob("~/.config/nvim/lsp/lua-language-server")
     end
 end
-
-
-findSumnekoLua()
 
 if sumneko_root_path then
     require("lspconfig").sumneko_lua.setup {
@@ -206,7 +201,7 @@ if sumneko_root_path then
                 },
                 workspace = {
                     library = {
-                        [fn.expand('$VIMRUNTIME/lua')] = true,
+                        [fn.expand('$VIMRUNTIME/lua')]         = true,
                         [fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
                     },
                     -- maxPreload = 2000,
