@@ -1145,12 +1145,12 @@ call s:hi("NvimTreeGitStaged",  s:nord12_gui, "", s:nord12_term, "", "", "")
 call s:hi("NvimTreeGitMerge",   s:nord15_gui, "", s:nord15_term, "", "", "")
 call s:hi("NvimTreeGitNew",     s:nord14_gui, "", s:nord14_term, "", "", "")
 call s:hi("NvimTreeGitDeleted", s:nord11_gui, "", s:nord11_term, "", "", "")
-hi! NvimTreeFileDirty   NvimTreeGitDirty
-hi! NvimTreeFileRenamed NvimTreeGitRenamed
-hi! NvimTreeFileStaged  NvimTreeGitStaged
-hi! NvimTreeFileMerge   NvimTreeGitMerge
-hi! NvimTreeFileNew     NvimTreeGitNew
-hi! NvimTreeFileDeleted NvimTreeGitDeleted
+hi! link NvimTreeFileDirty   NvimTreeGitDirty
+hi! link NvimTreeFileRenamed NvimTreeGitRenamed
+hi! link NvimTreeFileStaged  NvimTreeGitStaged
+hi! link NvimTreeFileMerge   NvimTreeGitMerge
+hi! link NvimTreeFileNew     NvimTreeGitNew
+hi! link NvimTreeFileDeleted NvimTreeGitDeleted
 
 " call s:hi("NvimTreeSpecialFile", s:nord3_gui_bright, "", s:nord3_term,  "", s:italicize_comments, "")
 " call s:hi("NvimTreePopup",       s:nord4_gui,       "", s:nord4_term, "", "",                   "")

@@ -274,13 +274,13 @@ function M.map(mode, lhs, rhs, optsTbl) -- {{{
     if not next(optsTbl) then
         api.nvim_set_keymap(mode, lhs, rhs, optsTbl)
     else
-        local optskeywordTbl = {}
+        local optsKeywordTbl = {}
         for _, val in ipairs(optsTbl) do
             if val ~= "novscode" then
-                optskeywordTbl[val] = true
+                optsKeywordTbl[val] = true
             end
         end
-        api.nvim_set_keymap(mode, lhs, rhs, optskeywordTbl)
+        api.nvim_set_keymap(mode, lhs, rhs, optsKeywordTbl)
     end
 end -- }}}
 ----
@@ -314,11 +314,11 @@ function M.bmap(bufNr, mode, lhs, rhs, optsTbl) -- {{{
     if not next(optsTbl) then
         api.nvim_buf_set_keymap(bufNr, mode, lhs, rhs, optsTbl)
     else
-        local optskeywordTbl = {}
+        local optKeywordTbl = {}
         for _, val in ipairs(optsTbl) do
-            optskeywordTbl[val] = true
+            optKeywordTbl[val] = true
         end
-        api.nvim_buf_set_keymap(bufNr, mode, lhs, rhs, optskeywordTbl)
+        api.nvim_buf_set_keymap(bufNr, mode, lhs, rhs, optKeywordTbl)
     end
 end -- }}}
 
@@ -675,8 +675,8 @@ function M.newSplit(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
     -- }}} Create new windows based on various window count
 end -- }}}
 
-function M.isFloatWin()
-     return api.nvim_win_get_config(api.nvim_get_current_win()).relative ~= ''
+function _G.isFloatWin()
+     return api.nvim_win_get_config(0).relative ~= ''
 end
 
 return M

@@ -71,8 +71,6 @@ if !exists('g:vscode')
     Plug 'hrsh7th/nvim-compe'
     Plug 'tzachar/compe-tabnine', {'do': './install.sh'}
     Plug 'hrsh7th/vim-vsnip'
-    Plug 'hrsh7th/vim-vsnip-integ'
-    Plug 'windwp/nvim-ts-autotag'
     Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
     Plug 'nvim-lua/lsp-status.nvim'
     " }}} Intellisense
@@ -81,15 +79,13 @@ if !exists('g:vscode')
     Plug 'nvim-lua/popup.nvim'
     Plug 'nvim-lua/plenary.nvim'
     Plug 'nvim-telescope/telescope.nvim'
-    Plug 'fhill2/telescope-ultisnips.nvim'
     Plug 'nvim-telescope/telescope-symbols.nvim'
     Plug 'nvim-telescope/telescope-fzy-native.nvim'
-    Plug 'nvim-telescope/telescope-media-files.nvim'
     " }}} Telescope
 
     " Language {{{
     " Python
-    Plug 'vim-python/python-syntax'
+    Plug 'vim-python/python-syntax', {'for': ['python', 'py']}
     " Lua
     Plug 'davisdude/vim-love-docs',    {'branch': 'build',  'for': 'lua'}
     Plug 'iaso2h/nlua.nvim',           {'branch': 'iaso2h', 'for': 'lua'}

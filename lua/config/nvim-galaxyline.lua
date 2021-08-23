@@ -1,4 +1,5 @@
 -- TODO: fix terminal mode
+-- TODO: fix help
 -- File: nvim-galaxyline
 -- Author: iaso2h
 -- Description: Statusline configuration
