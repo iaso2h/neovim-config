@@ -120,18 +120,12 @@ require('telescope').setup{
     extensions = {
         fzy_native = {
             override_generic_sorter = true,
-            override_file_sorter = true,
-        },
-        media_files = {
-            -- defaults to {"png", "jpg", "mp4", "webm", "pdf"}
-            filetypes = {"map4", "png", "webp", "webm", "jpg", "jpeg", "pdf"},
-            find_cmd  = "rg"
+            override_file_sorter    = true,
         }
     }
 }
 
 require('telescope').load_extension('fzy_native')
-require('telescope').load_extension('media_files')
 
 function TelescopePreStart() -- {{{
     cmd[[setlocal wrap number]]

@@ -1,7 +1,7 @@
 -- File: buffer.lua
 -- Author: iaso2h
 -- Description: A few of buffer-related utilities
--- Version: 0.0.15
+-- Version: 0.0.16
 -- Last Modified: 2021-08-23
 -- BUG: q on startup-log.txt
 local fn   = vim.fn
@@ -196,7 +196,7 @@ function M.smartClose(type) -- {{{
                     api.nvim_win_close(curWinID, true)
                 else
                     smartCloseBuf()
-                    if #winIDTbl > 1 then api.nvim_win_close(curWinID, true) end
+                    if #winIDTbl > 1 and api.nvim_win_is_valid(curWinID) then api.nvim_win_close(curWinID, true) end
                 end
                 -- }}} nofile buffer, treated like standard buffer
             elseif curBufType == "terminal" then
@@ -208,7 +208,7 @@ function M.smartClose(type) -- {{{
         else
             -- Close window containing buffer {{{
             if curBufName == "" then
-                if api.nvim_win_get_config(0)['relative'] ~= '' then
+                if util.isFloatWin then
                     -- Close floating window
                     api.nvim_win_close(curWinID, true)
                 else

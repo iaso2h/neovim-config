@@ -1,6 +1,7 @@
 local fn  = vim.fn
 local api = vim.api
 local map = require("util").map
+local M   = {}
 
 -- LSP completion icon {{{
 require('vim.lsp.protocol').CompletionItemKind = {
@@ -38,6 +39,52 @@ vim.g.vsnip_filetypes = {
     javascriptreact = {"javascript"},
     typescriptreact = {"typescript"}
 }
+vim.g.vsnip_snippet_dir = fn.expand("$configPath/snippets")
+vim.g.vsnip_filetypes = {
+    javascriptreact = {"javascript"},
+    typescriptreact = {"typescript"}
+}
+
+-- Key mapping {{{
+local checkBackSpace = function()
+    local col = api.nvim_win_get_cursor(0)[2]
+    if col == 0 or api.nvim_get_current_line():sub(col, col):match('%s') then
+        return true
+    else
+        return false
+    end
+end
+
+-- Use (s-)tab to:
+--- move to prev/next item in completion menuone
+--- jump to prev/next snippet's placeholder
+_G.tabComplete = function()
+    -- if vim.fn.pumvisible() == 1 then
+        -- return t "<C-n>"
+    if vim.fn["vsnip#available"](1) == 1 then
+        return t "<Plug>(vsnip-expand-or-jump)"
+    elseif checkBackSpace() then
+        return t "<C-S-]>"
+    else
+        return vim.fn['compe#complete']()
+    end
+end
+_G.sTabComplete = function()
+    -- if vim.fn.pumvisible() == 1 then
+        -- return t "<C-p>"
+    if vim.fn["vsnip#jumpable"](-1) == 1 then
+        return t "<Plug>(vsnip-jump-prev)"
+    else
+        return t "<C-S-[>"
+    end
+end
+
+
+map("i", [[<Tab>]], [[v:lua.tabComplete()]],    {"silent", "expr"})
+map("s", [[<Tab>]], [[v:lua.tabComplete()]],    {"silent", "expr"})
+map("i", [[<S-Tab>]], [[v:lua.sTabComplete()]], {"silent", "expr"})
+map("s", [[<S-Tab>]], [[v:lua.sTabComplete()]], {"silent", "expr"})
+-- }}} Key mapping
 -- }}} Snippet
 
 -- hrsh7th/nvim-compe {{{
@@ -117,7 +164,7 @@ require("compe").setup {
 map("i", [[<CR>]], [[compe#confirm(luaeval("require 'nvim-autopairs'.autopairs_cr()"))]], {"silent", "expr"})
 map("i", [[<C-e>]],     [[pumvisible() ? compe#close('<C-e>') : "\<End>"]], {"silent", "expr"})
 map("i", [[<C-Space>]], [[pumvisible() ? compe#close('<C-e>') : "\<C-n>"]], {"silent", "expr"})
-map("i", [[<A-e>]],     [[compe#scroll({'delta': +4})]],                    {"silent", "expr"})
-map("i", [[<A-d>]],     [[compe#scroll({'delta': -4})]],                    {"silent", "expr"})
+map("i", [[<A-d>]],     [[compe#scroll({'delta': +4})]],                    {"silent", "expr"})
+map("i", [[<A-e>]],     [[compe#scroll({'delta': -4})]],                    {"silent", "expr"})
 -- }}} hrsh7th/nvim-compe
 
