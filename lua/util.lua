@@ -4,7 +4,7 @@ local api = vim.api
 local vim = vim
 local M = {}
 
-function _G.Print(...)
+function Print(...)
     local objects = {}
     for i = 1, select('#', ...) do
         local v = select(i, ...)
@@ -165,7 +165,7 @@ end -- }}}
 --
 -- @param module: string value of module name, use current lua file name when nil is provided
 ----
-function _G.Reload(module) -- {{{
+function Reload(module) -- {{{
     if vim.bo.filetype == "lua" then
         -- Lua {{{
         local luaModule
@@ -227,7 +227,7 @@ function M.addJumpMotion(key, reservedCount) -- {{{
         local saveCount = vim.v.count
         if saveCount ~= 0 then
             cmd [[normal! mz`z]]
-            for i = 1, saveCount do cmd("normal! " .. key) end
+            for _ = 1, saveCount do cmd("normal! " .. key) end
         else
             cmd("normal! " .. key)
         end

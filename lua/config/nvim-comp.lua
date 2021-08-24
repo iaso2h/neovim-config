@@ -162,7 +162,7 @@ require("compe").setup {
 -- map('i', [[<CR>]],      [[v:lua.Completion.confirm()]],                     {"silent", "expr"})
 
 map("i", [[<CR>]], [[compe#confirm(luaeval("require 'nvim-autopairs'.autopairs_cr()"))]], {"silent", "expr"})
-map("i", [[<C-e>]],     [[pumvisible() ? compe#close('<C-e>') : "\<End>"]], {"silent", "expr"})
+-- map("i", [[<C-e>]],     [[pumvisible() ? compe#close('<C-e>') : "\<End>"]], {"silent", "expr"})
 map("i", [[<C-Space>]], [[pumvisible() ? compe#close('<C-e>') : "\<C-n>"]], {"silent", "expr"})
 map("i", [[<A-d>]],     [[compe#scroll({'delta': +4})]],                    {"silent", "expr"})
 map("i", [[<A-e>]],     [[compe#scroll({'delta': -4})]],                    {"silent", "expr"})

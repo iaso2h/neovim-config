@@ -4,7 +4,6 @@
 -- Version: 0.0.8
 -- Last Modified: 2021-08-22
 local cmd = vim.cmd
-local fn  = vim.fn
 local map = require("util").map
 local M   = {}
 
@@ -12,7 +11,7 @@ function M.bufferSwitcher(CMD)
     local fileType = vim.bo.filetype
     local bufType  = vim.bo.buftype
     -- call origin vim command "bp/bn" when barbar.nvim does not support
-    if vim.tbl_contains(require("galaxyline").short_line_list, fileType) or bufType == "terminal" or bufType == "help" or bufType == "nofile" or bufType == "nowrite" then
+    if vim.tbl_contains(require("galaxyline").short_line_list, fileType) or bufType == "terminal" or bufType == "help" or bufType == "nowrite" then
         cmd(CMD)
     else
         if CMD == "bp" then
@@ -80,9 +79,9 @@ vim.g.bufferline = {
     -- If false, will use nvim-web-devicons colors
     icon_custom_colors = false,
     -- Configure icons on the bufferline.
-    icon_separator_active   = '▏',
-    icon_separator_inactive = '▏',
-    icon_close_tab          = '✕',
+    icon_separator_active   = '▍',
+    icon_separator_inactive = '',
+    icon_close_tab          = '✕ ',
     icon_close_tab_modified = '●',
     icon_pinned             = '車',
 	-- If true, new buffers appear at the end of the list. Default is to
@@ -106,6 +105,10 @@ vim.g.bufferline = {
     -- Sets the maximum padding width with which to surround each tab
     maximum_padding = 4
 }
+
+if os.getenv("TERM") then
+    vim.g.bufferline.icon_separator_active = '▎'
+end
 
 return M
 

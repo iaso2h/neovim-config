@@ -1,9 +1,6 @@
--- TODO: fix terminal mode
--- TODO: fix help
 -- File: nvim-galaxyline
 -- Author: iaso2h
 -- Description: Statusline configuration
--- Version: 0.0.8
 -- Last Modified: 2021-08-22
 local fn  = vim.fn
 local api = vim.api
@@ -144,7 +141,20 @@ gls.left[2] = {
         provider = function()
             local fileType = vim.bo.filetype
             if fileType == "help" then
-                return bufTypeIcons[fileType] .. fileType:upper() .. " "
+                vimMode = fn.mode()
+
+                if vimMode == "c" then
+                        api.nvim_command(string.format(
+                        "hi GalaxyViMode guibg=%s guifg=%s",
+                        mode_colors[vimMode],
+                        colors.blue))
+                else
+                    api.nvim_command(string.format(
+                        "hi GalaxyViMode guibg=%s guifg=%s",
+                        mode_colors[vimMode],
+                        colors.white))
+                end
+                return bufTypeIcons[fileType] .. fileType:upper()
             else
                 vimMode = fn.mode()
 
@@ -169,7 +179,7 @@ gls.left[2] = {
                 end
             end
         end,
-        highlight = {colors.blue, colors.bg, 'bold'}
+        highlight = {colors.white, colors.cyan, 'bold'}
     }
 }
 
@@ -361,8 +371,8 @@ gls.right[1] = { -- {{{
             return string.format(' %s %s ', icon, vim.bo.filetype)
         end,
         separator           = separator_right,
-        separator_highlight = {colors.bright_bg1, colors.bg},
-        highlight           = {colors.fg, colors.bright_bg1},
+        separator_highlight = {colors.bright_bg2, colors.bg},
+        highlight           = {colors.white, colors.bright_bg2},
         condition           = hasFileType
     }
 }
@@ -388,8 +398,8 @@ gls.right[3] = {
     LineInfo = {
         provider            = 'LineColumn',
         separator           = '| ',
-        separator_highlight = {colors.fg, colors.bright_bg1},
-        highlight           = {colors.fg, colors.bright_bg1}
+        separator_highlight = {colors.white, colors.bright_bg2},
+        highlight           = {colors.white, colors.bright_bg2}
     }
 }
 
@@ -398,8 +408,8 @@ gls.right[4] = {
     PerCent = {
         provider            = 'LinePercent',
         separator           = '|',
-        separator_highlight = {colors.fg, colors.bright_bg1},
-        highlight           = {colors.fg, colors.bright_bg1}
+        separator_highlight = {colors.white, colors.bright_bg2},
+        highlight           = {colors.white, colors.bright_bg2}
     }
 }
 

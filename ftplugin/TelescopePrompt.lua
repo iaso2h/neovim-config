@@ -12,12 +12,13 @@ if not TelescopeOverrideBufMap then
         end
 
         if mode == "i" then
-            rhs = string.format([[<C-\><C-o>:lua require("telescope.actions").%s(%d)<cr>]], actionName, promptBufNr)
+            rhs = string.match(actionName, "<") and actionName or
+                string.format([[<C-\><C-o>:lua require("telescope.actions").%s(%d)<cr>]], actionName, promptBufNr)
         else
             rhs = string.format([[:lua require("telescope.actions").%s(%d)<cr>]], actionName, promptBufNr)
         end
 
-        vim.api.nvim_buf_set_keymap(promptBufNr, mode, lhs, rhs, {silent = true})
+        vim.api.nvim_buf_set_keymap(promptBufNr, mode, lhs, rhs, {silent = true, noremap = true})
     end
 end
 
@@ -30,17 +31,15 @@ TelescopeOverrideBufMap("n", [[<C-s>]], "select_horizontal")
 TelescopeOverrideBufMap("i", [[<C-s>]], "select_horizontal")
 
 TelescopeOverrideBufMap("n", [[g]], "move_to_top")
-TelescopeOverrideBufMap("i", [[z]], "move_to_middle")
-TelescopeOverrideBufMap("i", [[G]], "move_to_bottom")
+TelescopeOverrideBufMap("n", [[z]], "move_to_middle")
+TelescopeOverrideBufMap("n", [[G]], "move_to_bottom")
 
-TelescopeOverrideBufMap("n", [[g]], "move_to_top")
-TelescopeOverrideBufMap("i", [[z]], "move_to_middle")
-TelescopeOverrideBufMap("i", [[G]], "move_to_bottom")
-
-TelescopeOverrideBufMap("i", [[<C-l>]], "complete_tag")
+TelescopeOverrideBufMap("i", [[<C-]>]], "complete_tag")
 
 TelescopeOverrideBufMap("i", [[<C-j>]], "cycle_history_next")
 TelescopeOverrideBufMap("i", [[<C-k>]], "cycle_history_prev")
 
 TelescopeOverrideBufMap("i", [[<C-d>]], "<Del>")
+
+TelescopeOverrideBufMap("i", [[<C-u>]], "<C-u>")
 

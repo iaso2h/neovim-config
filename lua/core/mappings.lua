@@ -38,18 +38,16 @@ map("n", [[dk]], [[<Nop>]])
 map("n", [[<leader>i]], [=[[I]=])
 map("v", [[<leader>i]], [[:lua vim.cmd("g#" .. require("util").visualSelection("string") .. "#nu")<cr>]], {"silent"})
 -- Fast mark & resotre
--- map("n", [[mm]], [[mm]])
 map("n", [[M]], [[`m]])
 -- Changelist jumping
-map("n", [[<A-o>]], [[&diff? "mz`z[czz" : "mz`zg;zz"]], {"noremap", "silent", "expr"})
-map("n", [[<A-i>]], [[&diff? "mz`z]czz" : "mz`zg,zz"]], {"noremap", "silent", "expr"})
-map("n", [[<C-o>]], [[<C-o>zz]])
-map("n", [[<C-i>]], [[<C-i>zz]])
+map("n", [[<A-o>]], [[:lua require("historyHop").main("changelist", -1)<cr>]], {"silent"})
+map("n", [[<A-i>]], [[:lua require("historyHop").main("changelist", 1)<cr>]],  {"silent"})
+-- map("n", [[<C-o>]], [[:lua require("historyHop").main("jumplist", -1)<cr>]],   {"silent"})
+-- map("n", [[<C-i>]], [[:lua require("historyHop").main("jumplist", 1)<cr>]],    {"silent"})
 map("n", [[j]], [[:lua require("util").addJumpMotion("j", true)<cr>]], {"silent"})
 map("n", [[k]], [[:lua require("util").addJumpMotion("k", true)<cr>]], {"silent"})
 map("v", [[*]], [[mz`z:<c-u>execute "/" . luaeval('require("util").visualSelection("string")')<cr>]], {"noremap", "silent"})
 map("v", [[#]], [[mz`z:<c-u>execute "?" . luaeval('require("util").visualSelection("string")')<cr>]], {"noremap", "silent"})
--- map("v", [[#]], [[mz`z:<c-u>execute "?" . VisualSelection("string")<cr>]], {"noremap", "silent"})
 map("v", [[/]], [[*]])
 map("v", [[?]], [[#]])
 -- Regex very magic
@@ -125,7 +123,6 @@ map("i", [[<C-'>]],     [[<C-\><C-o>:reg<cr>]],        {"silent"})
 map("",  [[<leader>']], [[:<c-u>call ClearReg()<cr>]], {"silent"})
 -- Buffer & Window & Tab{{{
 -- Smart quit
--- Similar work: https://github.com/ojroques/nvim-bufdel
 map("n", [[q]],     [[:lua require("buffer").smartClose("window")<cr>]], {"silent"})
 map("n", [[Q]],     [[:lua require("buffer").smartClose("buffer")<cr>]], {"silent"})
 map("n", [[<C-u>]], [[:lua require("buffer").restoreClosedBuf()<cr>]],   {"silent"})
@@ -164,6 +161,7 @@ map("n", [[zd]],              [[:<c-u>call EnhanceFoldHL("", 800, "EnhanceDelete
 map("n", [[cz]],              [[:<c-u>call EnhanceFoldHL("", 0, "EnhanceChange")<cr>]],          {"silent", "novscode"})
 map("n", [[zc]],              [[:<c-u>call EnhanceFoldHL("", 0, "EnhanceChange")<cr>]],          {"silent", "novscode"})
 -- TODO: Check whether target line is a comment or not
+-- api.nvim_echo({{"text", "Normal"}}, true, {})
 map("n", [[g{]],              [[:<c-u>call EnhanceFold(mode(), "{{{")<cr>]],           {"novscode"})
 map("n", [[g}]],              [[:<c-u>call EnhanceFold(mode(), "}}}")<cr>]],           {"novscode"})
 map("v", [[g{]],              [[mz:<c-u>call EnhanceFold(visualmode(), "}}}")<cr>`z]], {"novscode"})
@@ -262,8 +260,8 @@ map("t", [[<A-h>]],      [[<A-n><A-h>]])
 map("t", [[<A-l>]],      [[<A-n><A-l>]])
 map("t", [[<A-S-h>]],    [[<A-n><A-S-h>]])
 map("t", [[<A-S-l>]],    [[<A-n><A-S-l>]])
-map("t", [[<C-BS>]],     [[<C-w>]],                                 { "noremap"})
-map("t", [[<C-r>]],      [['\<A-n>"' . nr2char(getchar()) . 'pi']], { "expr"})
+map("t", [[<C-BS>]],     [[<C-w>]],                                 {"noremap"})
+map("t", [[<C-r>]],      [['\<A-n>"' . nr2char(getchar()) . 'pi']], {"expr"})
 map("t", [[<C-w>k]],     [[<A-n><C-w>k]])
 map("t", [[<C-w>j]],     [[<A-n><C-w>j]])
 map("t", [[<C-w>h]],     [[<A-n><C-w>h]])
@@ -280,6 +278,8 @@ map("t", [[<C-w>K]],     [[<A-n><C-w>K:startinsert<cr>]], {"silent"})
 -- TODO: Split terminal in new instance
 -- }}} Mode: Terminal
 -- Mode: Commandline & Insert {{{
+map("i", [[<C-k>]], [[pumvisible() ? "\<C-e>\<Up>" : "\<Up>"]],     {"expr"})
+map("i", [[<C-j>]], [[pumvisible() ? "\<C-e>\<Down>" : "\<Down>"]], {"expr"})
 map("i", [[<C-cr>]],  [[<esc>o]],  {"novscode"})
 map("i", [[<S-cr>]],  [[<esc>O]],  {"novscode"})
 map("i", [[jj]],      [[<esc>`^]], {"noremap", "novscode"})
@@ -292,15 +292,13 @@ map("i", [[<C-BS>]],  [[<C-w>]],   {"noremap"})
 map("i", [[<S-Tab>]], [[<C-d>]], {"noremap"})
 -- Navigation {{{
 map("!", [[<C-a>]], [[<Home>]])
--- Override in nvim-comp
--- map("!", [[<C-e>]], [[<End>]])
+map("!", [[<C-e>]], [[<End>]])
 map("!", [[<C-h>]], [[<Left>]])
 map("!", [[<C-l>]], [[<Right>]])
-map("!", [[<C-j>]], [[<Down>]])
-map("!", [[<C-k>]], [[<Up>]])
 map("!", [[<C-b>]], [[<C-Left>]])
 map("!", [[<C-w>]], [[<C-Right>]])
 map("!", [[<C-h>]], [[<Left>]])
+map("!", [[<C-u>]], [[<C-u>]], {"noremap"})
 -- }}} Navigation
 -- RemoveLastPathComponent() {{{
 cmd [[
@@ -314,6 +312,8 @@ function! RemoveLastPathComponent()
 endfunction
 ]]
 -- }}} RemoveLastPathComponent()
+map("c", [[<C-j>]],   [[<Down>]])
+map("c", [[<C-k>]],   [[<Up>]])
 map("c", [[<C-BS>]],  [[<C-\>e(RemoveLastPathComponent())<cr>]])
 map("c", [[<C-S-l>]], [[<C-d>]], {"noremap"})
 map("c", [[<C-d>]],   [[<Del>]])

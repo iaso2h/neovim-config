@@ -42,7 +42,7 @@ require("indent_blankline").setup{
     char_highlight   = "SignColumn",
     use_treesitter                 = true,
     show_current_context           = true,
-    show_first_indent_level        = false,
+    show_first_indent_level        = true,
     show_trailing_blankline_indent = true,
     show_end_of_line               = true,
     show_foldtext                  = true,
@@ -374,7 +374,7 @@ if not vim.g.vscode then
     map("n", [[<leader>t]], [[:Vista!!<cr>]], {"silent"})
     -- }}} liuchengxu/vista.vim
     -- airblade/vim-gitgutter {{{
-    if fn.has('win32') == 1 then vim.g.gitgutter_git_executable = "D:/Git/bin/git.exe" end
+    -- if fn.has('win32') == 1 then vim.g.gitgutter_git_executable = "D:/Git/bin/git.exe" end
     vim.g.gitgutter_map_keys = 0
     vim.g.gitgutter_sign_priority = 10
     vim.g.gitgutter_preview_win_floating = 1
@@ -403,13 +403,7 @@ if not vim.g.vscode then
     -- }}} rafcamlet/nvim-luapad
     -- rhysd/git-messenger.vim {{{
     vim.g.git_messenger_date_format = "%Y-%m-%d %X"
-    api.nvim_exec([["
-    function! SetupGitMessengerPopup() abort
-        nmap <buffer> <C-o> o
-        nmap <buffer> <C-i> O
-    endfunction
-    autocmd FileType gitmessengerpopup call SetupGitMessengerPopup()
-    "]], false)
+    map("n", [[<C-w>g]], [[:lua vim.cmd"GitMessenger"]], {"silent", "nowait"})
     -- }}} rhysd/git-messenger.vim
     -- nvim-web-devicons {{{
     require'nvim-web-devicons'.setup {

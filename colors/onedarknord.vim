@@ -3,6 +3,7 @@
 let g:onedark_terminal_italics = 1
 " }}} Custom highlight
 
+
 if version > 580
     hi clear
     if exists("syntax_on")
@@ -70,27 +71,9 @@ let s:nord3_gui_brightened = [
             \ "#7b88a1",
             \ ]
 
-let s:bold = "bold,"
-" let s:bold = ""
-
-if has('win32')
-    let g:nord_italic = 1
-    let g:onedark_terminal_italics = 1
-    let s:italic = "italic,"
-elseif has("gui_running") || $TERM_ITALICS == "true"
-    let g:nord_italic = 1
-    let g:onedark_terminal_italics = 1
-    let s:italic = "italic,"
-else
-    let g:nord_italic = 0
-    let g:onedark_terminal_italics = 0
-    let s:italic = ""
-endif
-
+let s:bold      = "bold,"
+let s:italic    = "italic,"
 let s:underline = "underline,"
-" let s:underline = "NONE,"
-
-" let s:italicize_comments = ""
 let s:italicize_comments = s:italic
 
 function! s:logWarning(msg)
@@ -105,15 +88,6 @@ if exists("g:nord_comment_brightness")
                 \' Please see https://github.com/arcticicestudio/nord-vim/issues/145 for more details.')
     let g:nord_comment_brightness = 10
 endif
-
-if !exists("g:nord_cursor_line_number_background")
-    let g:nord_cursor_line_number_background = 0
-endif
-
-if !exists("g:nord_bold_vertical_split_line")
-    let g:nord_bold_vertical_split_line = 0
-endif
-
 
 if !exists("g:onedark_termcolors")
     let g:onedark_termcolors = 256
@@ -175,7 +149,6 @@ function! s:hi(group, guifg, guibg, ctermfg, ctermbg, attr, guisp)
 endfunction
 
 let s:overrides = get(g:, "onedark_color_overrides", {})
-
 let s:colors = {
             \ "red": get(s:overrides, "red", { "gui": "#E06C75", "cterm": "204", "cterm16": "1" }),
             \ "dark_red": get(s:overrides, "dark_red", { "gui": "#BE5046", "cterm": "196", "cterm16": "9" }),
@@ -343,7 +316,7 @@ call s:hi("VertSplit", s:nord2_gui, s:nord0_gui, s:nord3_term, "NONE", "NONE", "
 
 call s:h("Comment", {"fg": s:comment_grey, "gui": "italic", "cterm": "italic" }) " any comment
 call s:hi("Conceal", "", "NONE", "", "NONE", "", "")
-call s:h("Constant", {"fg": s:cyan }) " any constant
+call s:h("Constant", {"fg": s:dark_yellow }) " any constant
 call s:hi("Decorator", s:nord12_gui, "", s:nord12_term, "", "", "")
 call s:h("String", {"fg": s:green }) " a string constant: "this is a string"
 call s:h("Character", {"fg": s:green }) " a character constant: 'c', '\n'
@@ -356,8 +329,8 @@ call s:h("Function", {"fg": s:blue }) " function name (also: methods for classes
 call s:h("Statement", {"fg": s:purple, "gui": "italic", "cterm": "italic" }) " any statement
 call s:h("Conditional", {"fg": s:purple, "gui": "italic", "cterm": "italic" }) " if, then, else, endif, switch, etc.
 call s:h("Repeat", {"fg": s:purple, "gui": "italic", "cterm": "italic" }) " for, do, while, etc.
-call s:h("Label", {"fg": s:purple }) " case, default, etc.
-call s:h("Operator", {"fg": s:purple }) " sizeof", "+", "*", etc.
+call s:h("Label", {"fg": s:red }) " case, default, etc.
+call s:hi("Operator", s:nord4_gui, "", "NONE", "", "NONE", "") " sizeof", "+", "*", etc.
 call s:h("Keyword", {"fg": s:purple }) " any other keyword
 call s:h("Exception", {"fg": s:purple, "gui": "italic", "cterm": "italic" }) " try, catch, throw
 call s:h("PreProc", {"fg": s:yellow }) " generic Preprocessor
@@ -369,7 +342,8 @@ call s:hi("Macro", "#7E57C2", "NONE", s:nord15_term, "NONE", "", "")
 call s:h("PreCondit", {"fg": s:yellow }) " preprocessor #if, #else, #endif, etc.
 call s:h("Type", {"fg": s:yellow }) " int, long, char, etc.
 call s:h("StorageClass", {"fg": s:yellow }) " static, register, volatile, etc.
-call s:h("Structure", {"fg": s:yellow }) " struct, union, enum, etc.
+" call s:h("Structure", {"fg": s:cyan }) " struct, union, enum, etc.
+call s:hi("Structure", "#00ffe5", "", "NONE", "", s:bold, "")
 call s:h("Typedef", {"fg": s:yellow }) " A typedef
 call s:h("Special", {"fg": s:blue }) " any special symbol
 call s:h("SpecialChar", {"fg": s:dark_yellow }) " special character in a constant
@@ -406,129 +380,129 @@ hi! link diffChanged DiffChange
 hi! link diffRemoved DiffDelete
 
 " CSS
-call s:h("cssAttrComma", { "fg": s:purple })
-call s:h("cssAttributeSelector", { "fg": s:green })
-call s:h("cssBraces", { "fg": s:white })
-call s:h("cssClassName", { "fg": s:dark_yellow })
-call s:h("cssClassNameDot", { "fg": s:dark_yellow })
-call s:h("cssDefinition", { "fg": s:purple })
-call s:h("cssFontAttr", { "fg": s:dark_yellow })
-call s:h("cssFontDescriptor", { "fg": s:purple })
-call s:h("cssFunctionName", { "fg": s:blue })
-call s:h("cssIdentifier", { "fg": s:blue })
-call s:h("cssImportant", { "fg": s:purple })
-call s:h("cssInclude", { "fg": s:white })
-call s:h("cssIncludeKeyword", { "fg": s:purple })
-call s:h("cssMediaType", { "fg": s:dark_yellow })
-call s:h("cssProp", { "fg": s:white })
-call s:h("cssPseudoClassId", { "fg": s:dark_yellow })
-call s:h("cssSelectorOp", { "fg": s:purple })
-call s:h("cssSelectorOp2", { "fg": s:purple })
-call s:h("cssTagName", { "fg": s:red })
+" call s:h("cssAttrComma", { "fg": s:purple })
+" call s:h("cssAttributeSelector", { "fg": s:green })
+" call s:h("cssBraces", { "fg": s:white })
+" call s:h("cssClassName", { "fg": s:dark_yellow })
+" call s:h("cssClassNameDot", { "fg": s:dark_yellow })
+" call s:h("cssDefinition", { "fg": s:purple })
+" call s:h("cssFontAttr", { "fg": s:dark_yellow })
+" call s:h("cssFontDescriptor", { "fg": s:purple })
+" call s:h("cssFunctionName", { "fg": s:blue })
+" call s:h("cssIdentifier", { "fg": s:blue })
+" call s:h("cssImportant", { "fg": s:purple })
+" call s:h("cssInclude", { "fg": s:white })
+" call s:h("cssIncludeKeyword", { "fg": s:purple })
+" call s:h("cssMediaType", { "fg": s:dark_yellow })
+" call s:h("cssProp", { "fg": s:white })
+" call s:h("cssPseudoClassId", { "fg": s:dark_yellow })
+" call s:h("cssSelectorOp", { "fg": s:purple })
+" call s:h("cssSelectorOp2", { "fg": s:purple })
+" call s:h("cssTagName", { "fg": s:red })
 
 " Fish Shell
 call s:h("fishKeyword", { "fg": s:purple })
 call s:h("fishConditional", { "fg": s:purple })
 
 " Go
-call s:h("goDeclaration", { "fg": s:purple })
-call s:h("goBuiltins", { "fg": s:cyan })
-call s:h("goFunctionCall", { "fg": s:blue })
-call s:h("goVarDefs", { "fg": s:red })
-call s:h("goVarAssign", { "fg": s:red })
-call s:h("goVar", { "fg": s:purple })
-call s:h("goConst", { "fg": s:purple })
-call s:h("goType", { "fg": s:yellow })
-call s:h("goTypeName", { "fg": s:yellow })
-call s:h("goDeclType", { "fg": s:cyan })
-call s:h("goTypeDecl", { "fg": s:purple })
+" call s:h("goDeclaration", { "fg": s:purple })
+" call s:h("goBuiltins", { "fg": s:cyan })
+" call s:h("goFunctionCall", { "fg": s:blue })
+" call s:h("goVarDefs", { "fg": s:red })
+" call s:h("goVarAssign", { "fg": s:red })
+" call s:h("goVar", { "fg": s:purple })
+" call s:h("goConst", { "fg": s:purple })
+" call s:h("goType", { "fg": s:yellow })
+" call s:h("goTypeName", { "fg": s:yellow })
+" call s:h("goDeclType", { "fg": s:cyan })
+" call s:h("goTypeDecl", { "fg": s:purple })
 
 " HTML (keep consistent with Markdown, below)
-call s:h("htmlArg", { "fg": s:dark_yellow })
-call s:h("htmlBold", { "fg": s:dark_yellow, "gui": "bold", "cterm": "bold" })
-call s:h("htmlEndTag", { "fg": s:white })
-call s:h("htmlH1", { "fg": s:red })
-call s:h("htmlH2", { "fg": s:red })
-call s:h("htmlH3", { "fg": s:red })
-call s:h("htmlH4", { "fg": s:red })
-call s:h("htmlH5", { "fg": s:red })
-call s:h("htmlH6", { "fg": s:red })
-call s:h("htmlItalic", { "fg": s:purple, "gui": "italic", "cterm": "italic" })
-call s:h("htmlLink", { "fg": s:cyan, "gui": "underline", "cterm": "underline" })
-call s:h("htmlSpecialChar", { "fg": s:dark_yellow })
-call s:h("htmlSpecialTagName", { "fg": s:red })
-call s:h("htmlTag", { "fg": s:white })
-call s:h("htmlTagN", { "fg": s:red })
-call s:h("htmlTagName", { "fg": s:red })
-call s:h("htmlTitle", { "fg": s:white })
+" call s:h("htmlArg", { "fg": s:dark_yellow })
+" call s:h("htmlBold", { "fg": s:dark_yellow, "gui": "bold", "cterm": "bold" })
+" call s:h("htmlEndTag", { "fg": s:white })
+" call s:h("htmlH1", { "fg": s:red })
+" call s:h("htmlH2", { "fg": s:red })
+" call s:h("htmlH3", { "fg": s:red })
+" call s:h("htmlH4", { "fg": s:red })
+" call s:h("htmlH5", { "fg": s:red })
+" call s:h("htmlH6", { "fg": s:red })
+" call s:h("htmlItalic", { "fg": s:purple, "gui": "italic", "cterm": "italic" })
+" call s:h("htmlLink", { "fg": s:cyan, "gui": "underline", "cterm": "underline" })
+" call s:h("htmlSpecialChar", { "fg": s:dark_yellow })
+" call s:h("htmlSpecialTagName", { "fg": s:red })
+" call s:h("htmlTag", { "fg": s:white })
+" call s:h("htmlTagN", { "fg": s:red })
+" call s:h("htmlTagName", { "fg": s:red })
+" call s:h("htmlTitle", { "fg": s:white })
 
 " JavaScript
-call s:h("javaScriptBraces", { "fg": s:white })
-call s:h("javaScriptFunction", { "fg": s:purple })
-call s:h("javaScriptIdentifier", { "fg": s:purple })
-call s:h("javaScriptNull", { "fg": s:dark_yellow })
-call s:h("javaScriptNumber", { "fg": s:dark_yellow })
-call s:h("javaScriptRequire", { "fg": s:cyan })
-call s:h("javaScriptReserved", { "fg": s:purple })
+" call s:h("javaScriptBraces", { "fg": s:white })
+" call s:h("javaScriptFunction", { "fg": s:purple })
+" call s:h("javaScriptIdentifier", { "fg": s:purple })
+" call s:h("javaScriptNull", { "fg": s:dark_yellow })
+" call s:h("javaScriptNumber", { "fg": s:dark_yellow })
+" call s:h("javaScriptRequire", { "fg": s:cyan })
+" call s:h("javaScriptReserved", { "fg": s:purple })
 " https://github.com/pangloss/vim-javascript
-call s:h("jsArrowFunction", { "fg": s:purple })
-call s:h("jsClassKeyword", { "fg": s:purple })
-call s:h("jsClassMethodType", { "fg": s:purple })
-call s:h("jsDocParam", { "fg": s:blue })
-call s:h("jsDocTags", { "fg": s:purple })
-call s:h("jsExport", { "fg": s:purple })
-call s:h("jsExportDefault", { "fg": s:purple })
-call s:h("jsExtendsKeyword", { "fg": s:purple })
-call s:h("jsFrom", { "fg": s:purple })
-call s:h("jsFuncCall", { "fg": s:blue })
-call s:h("jsFunction", { "fg": s:purple })
-call s:h("jsGenerator", { "fg": s:yellow })
-call s:h("jsGlobalObjects", { "fg": s:yellow })
-call s:h("jsImport", { "fg": s:purple })
-call s:h("jsModuleAs", { "fg": s:purple })
-call s:h("jsModuleWords", { "fg": s:purple })
-call s:h("jsModules", { "fg": s:purple })
-call s:h("jsNull", { "fg": s:dark_yellow })
-call s:h("jsOperator", { "fg": s:purple })
-call s:h("jsStorageClass", { "fg": s:purple })
-call s:h("jsSuper", { "fg": s:red })
-call s:h("jsTemplateBraces", { "fg": s:dark_red })
-call s:h("jsTemplateVar", { "fg": s:green })
-call s:h("jsThis", { "fg": s:red })
-call s:h("jsUndefined", { "fg": s:dark_yellow })
+" call s:h("jsArrowFunction", { "fg": s:purple })
+" call s:h("jsClassKeyword", { "fg": s:purple })
+" call s:h("jsClassMethodType", { "fg": s:purple })
+" call s:h("jsDocParam", { "fg": s:blue })
+" call s:h("jsDocTags", { "fg": s:purple })
+" call s:h("jsExport", { "fg": s:purple })
+" call s:h("jsExportDefault", { "fg": s:purple })
+" call s:h("jsExtendsKeyword", { "fg": s:purple })
+" call s:h("jsFrom", { "fg": s:purple })
+" call s:h("jsFuncCall", { "fg": s:blue })
+" call s:h("jsFunction", { "fg": s:purple })
+" call s:h("jsGenerator", { "fg": s:yellow })
+" call s:h("jsGlobalObjects", { "fg": s:yellow })
+" call s:h("jsImport", { "fg": s:purple })
+" call s:h("jsModuleAs", { "fg": s:purple })
+" call s:h("jsModuleWords", { "fg": s:purple })
+" call s:h("jsModules", { "fg": s:purple })
+" call s:h("jsNull", { "fg": s:dark_yellow })
+" call s:h("jsOperator", { "fg": s:purple })
+" call s:h("jsStorageClass", { "fg": s:purple })
+" call s:h("jsSuper", { "fg": s:red })
+" call s:h("jsTemplateBraces", { "fg": s:dark_red })
+" call s:h("jsTemplateVar", { "fg": s:green })
+" call s:h("jsThis", { "fg": s:red })
+" call s:h("jsUndefined", { "fg": s:dark_yellow })
 " https://github.com/othree/yajs.vim
-call s:h("javascriptArrowFunc", { "fg": s:purple })
-call s:h("javascriptClassExtends", { "fg": s:purple })
-call s:h("javascriptClassKeyword", { "fg": s:purple })
-call s:h("javascriptDocNotation", { "fg": s:purple })
-call s:h("javascriptDocParamName", { "fg": s:blue })
-call s:h("javascriptDocTags", { "fg": s:purple })
-call s:h("javascriptEndColons", { "fg": s:white })
-call s:h("javascriptExport", { "fg": s:purple })
-call s:h("javascriptFuncArg", { "fg": s:white })
-call s:h("javascriptFuncKeyword", { "fg": s:purple })
-call s:h("javascriptIdentifier", { "fg": s:red })
-call s:h("javascriptImport", { "fg": s:purple })
-call s:h("javascriptMethodName", { "fg": s:white })
-call s:h("javascriptObjectLabel", { "fg": s:white })
-call s:h("javascriptOpSymbol", { "fg": s:cyan })
-call s:h("javascriptOpSymbols", { "fg": s:cyan })
-call s:h("javascriptPropertyName", { "fg": s:green })
-call s:h("javascriptTemplateSB", { "fg": s:dark_red })
-call s:h("javascriptVariable", { "fg": s:purple })
+" call s:h("javascriptArrowFunc", { "fg": s:purple })
+" call s:h("javascriptClassExtends", { "fg": s:purple })
+" call s:h("javascriptClassKeyword", { "fg": s:purple })
+" call s:h("javascriptDocNotation", { "fg": s:purple })
+" call s:h("javascriptDocParamName", { "fg": s:blue })
+" call s:h("javascriptDocTags", { "fg": s:purple })
+" call s:h("javascriptEndColons", { "fg": s:white })
+" call s:h("javascriptExport", { "fg": s:purple })
+" call s:h("javascriptFuncArg", { "fg": s:white })
+" call s:h("javascriptFuncKeyword", { "fg": s:purple })
+" call s:h("javascriptIdentifier", { "fg": s:red })
+" call s:h("javascriptImport", { "fg": s:purple })
+" call s:h("javascriptMethodName", { "fg": s:white })
+" call s:h("javascriptObjectLabel", { "fg": s:white })
+" call s:h("javascriptOpSymbol", { "fg": s:cyan })
+" call s:h("javascriptOpSymbols", { "fg": s:cyan })
+" call s:h("javascriptPropertyName", { "fg": s:green })
+" call s:h("javascriptTemplateSB", { "fg": s:dark_red })
+" call s:h("javascriptVariable", { "fg": s:purple })
 
 " JSON
-call s:h("jsonCommentError", { "fg": s:white })
-call s:h("jsonKeyword", { "fg": s:red })
-call s:h("jsonBoolean", { "fg": s:dark_yellow })
-call s:h("jsonNumber", { "fg": s:dark_yellow })
-call s:h("jsonQuote", { "fg": s:white })
-call s:h("jsonMissingCommaError", { "fg": s:red, "gui": "reverse" })
-call s:h("jsonNoQuotesError", { "fg": s:red, "gui": "reverse" })
-call s:h("jsonNumError", { "fg": s:red, "gui": "reverse" })
-call s:h("jsonString", { "fg": s:green })
-call s:h("jsonStringSQError", { "fg": s:red, "gui": "reverse" })
-call s:h("jsonSemicolonError", { "fg": s:red, "gui": "reverse" })
+" call s:h("jsonCommentError", { "fg": s:white })
+" call s:h("jsonKeyword", { "fg": s:red })
+" call s:h("jsonBoolean", { "fg": s:dark_yellow })
+" call s:h("jsonNumber", { "fg": s:dark_yellow })
+" call s:h("jsonQuote", { "fg": s:white })
+" call s:h("jsonMissingCommaError", { "fg": s:red, "gui": "reverse" })
+" call s:h("jsonNoQuotesError", { "fg": s:red, "gui": "reverse" })
+" call s:h("jsonNumError", { "fg": s:red, "gui": "reverse" })
+" call s:h("jsonString", { "fg": s:green })
+" call s:h("jsonStringSQError", { "fg": s:red, "gui": "reverse" })
+" call s:h("jsonSemicolonError", { "fg": s:red, "gui": "reverse" })
 
 " LESS
 call s:h("lessVariable", { "fg": s:purple })
@@ -577,6 +551,7 @@ call s:h("perlSubName",{ "fg": s:yellow })
 call s:h("perlVarPlain",{ "fg": s:blue })
 
 " PHP
+" -- NOTE: can be replace by treesitter
 call s:h("phpVarSelector", { "fg": s:red })
 call s:h("phpOperator", { "fg": s:white })
 call s:h("phpParent", { "fg": s:white })
@@ -597,24 +572,24 @@ call s:h("phpSuperglobals", { "fg": s:red })
 call s:h("phpConstants", { "fg": s:dark_yellow })
 
 " Ruby
-call s:h("rubyBlockParameter", { "fg": s:red})
-call s:h("rubyBlockParameterList", { "fg": s:red })
-call s:h("rubyClass", { "fg": s:purple})
-call s:h("rubyConstant", { "fg": s:yellow})
-call s:h("rubyControl", { "fg": s:purple })
-call s:h("rubyEscape", { "fg": s:red})
-call s:h("rubyFunction", { "fg": s:blue})
-call s:h("rubyGlobalVariable", { "fg": s:red})
-call s:h("rubyInclude", { "fg": s:blue})
-call s:h("rubyIncluderubyGlobalVariable", { "fg": s:red})
-call s:h("rubyInstanceVariable", { "fg": s:red})
-call s:h("rubyInterpolation", { "fg": s:cyan })
-call s:h("rubyInterpolationDelimiter", { "fg": s:red })
-call s:h("rubyInterpolationDelimiter", { "fg": s:red})
-call s:h("rubyRegexp", { "fg": s:cyan})
-call s:h("rubyRegexpDelimiter", { "fg": s:cyan})
-call s:h("rubyStringDelimiter", { "fg": s:green})
-call s:h("rubySymbol", { "fg": s:cyan})
+" call s:h("rubyBlockParameter", { "fg": s:red})
+" call s:h("rubyBlockParameterList", { "fg": s:red })
+" call s:h("rubyClass", { "fg": s:purple})
+" call s:h("rubyConstant", { "fg": s:yellow})
+" call s:h("rubyControl", { "fg": s:purple })
+" call s:h("rubyEscape", { "fg": s:red})
+" call s:h("rubyFunction", { "fg": s:blue})
+" call s:h("rubyGlobalVariable", { "fg": s:red})
+" call s:h("rubyInclude", { "fg": s:blue})
+" call s:h("rubyIncluderubyGlobalVariable", { "fg": s:red})
+" call s:h("rubyInstanceVariable", { "fg": s:red})
+" call s:h("rubyInterpolation", { "fg": s:cyan })
+" call s:h("rubyInterpolationDelimiter", { "fg": s:red })
+" call s:h("rubyInterpolationDelimiter", { "fg": s:red})
+" call s:h("rubyRegexp", { "fg": s:cyan})
+" call s:h("rubyRegexpDelimiter", { "fg": s:cyan})
+" call s:h("rubyStringDelimiter", { "fg": s:green})
+" call s:h("rubySymbol", { "fg": s:cyan})
 
 " Sass
 " https://github.com/tpope/vim-haml
@@ -655,9 +630,9 @@ call s:h("texCite", { "fg": s:blue })
 call s:h("texRefZone", { "fg": s:blue })
 
 " TypeScript
-call s:h("typescriptReserved", { "fg": s:purple })
-call s:h("typescriptEndColons", { "fg": s:white })
-call s:h("typescriptBraces", { "fg": s:white })
+" call s:h("typescriptReserved", { "fg": s:purple })
+" call s:h("typescriptEndColons", { "fg": s:white })
+" call s:h("typescriptBraces", { "fg": s:white })
 
 " XML
 call s:h("xmlAttrib", { "fg": s:dark_yellow })
@@ -1007,11 +982,11 @@ call s:hi("TelescopePromptPrefix", s:nord14_gui, "", s:nord14_term, "", "", "")
 " }}} nvim-telescope/telescope.nvim
 
 " romgrk/barbar.nvim {{{
-call s:hi("BufferCurrent",       s:nord8_gui,  s:nord3_gui, s:nord8_term,  s:nord3_term, "", "")
+call s:hi("BufferCurrent",       s:nord4_gui,  s:nord3_gui, "NONE",        s:nord3_term, "", "")
 call s:hi("BufferCurrentIcon",   "",           s:nord3_gui, "",            s:nord3_term, "", "")
-call s:hi("BufferCurrentIndex",  s:nord8_gui,  s:nord3_gui, s:nord8_term,  s:nord3_term, "", "")
+call s:hi("BufferCurrentIndex",  s:nord3_gui,  s:nord3_gui, "NONE",        s:nord3_term, "", "")
 call s:hi("BufferCurrentMod",    s:nord13_gui, s:nord3_gui, s:nord13_term, s:nord3_term, "", "")
-call s:hi("BufferCurrentSign",   "#66738e",    s:nord3_gui, s:nord8_term,  s:nord3_term, "", "")
+call s:hi("BufferCurrentSign",   s:nord8_gui,  s:nord3_gui, s:nord8_term,  s:nord3_term, "", "")
 call s:hi("BufferCurrentTarget", "#FFFFFF",    s:nord3_gui, s:nord10_term, s:nord3_term, "", "")
 
 call s:hi("BufferVisible",       "#66738e",    s:nord1_gui, s:nord3_term,  s:nord1_term, "", "")
@@ -1033,62 +1008,73 @@ call s:hi("BufferInactiveTarget", s:nord5_gui,  s:nord1_gui, s:nord5_term,  s:no
 " }}} romgrk/barbar.nvim
 
 " nvim-treesitter/nvim-treesitter {{{
-hi! link TSConstructor        Function
-hi! link TSAnnotation         Annotation
-hi! link TSAttribute          PreProc
-hi! link TSBoolean            Boolean
-hi! link TSCharacter          Character
-hi! link TSComment            Comment
-hi! link TSConditional        Conditional
-hi! link TSConstant           Constant
-hi! link TSConstBuiltin       Constant
-hi! link TSConstMacro         Macro
-" hi! link TSConstMacro         Define
-hi! link TSEmphasis           Italic
-hi! link TSError              Error
-hi! link TSException          Exception
-hi! link TSField              Identifier
-hi! link TSFloat              Float
-hi! link TSFunction           Function
-hi! link TSFuncBuiltin        Function
-hi! link TSFuncMacro          Function
-hi! link TSInclude            Include
-hi! link TSKeyword            Keyword
-hi! link TSKeywordFunction    Keyword
-hi! link TSKeywordOperator    Operator
-hi! link TSLabel              Label
-hi! link TSLiteral            String
-hi! link TSMethod             Function
-call s:hi("TSNamespace", "#00ffe5", "", s:nord8_term, "", "", "")
-hi! link TSNumber             Number
-hi! link TSOperator           Operator
-hi! link TSParameter          Parameter
-hi! link TSParameterReference Parameter
-hi! link TSProperty           Identifier
-hi! link TSPunctBracket       Delimiter
+hi!  link TSAnnotation         Annotation
+call s:h("TSAttribute", {"fg": s:cyan})
+hi!  link TSBoolean            Boolean
+hi!  link TSCharacter          Character
+hi!  link TSComment            Comment
+hi!  link TSConditional        Conditional
+hi!  link TSConstant           Constant
+hi!  link TSConstBuiltin       Constant
+hi!  link TSConstMacro         Macro
+
+" call s:h("TSConstructor", {"fg": s:yellow})
+call s:hi("TSConstructor", "#00ffe5", "", "NONE", "", s:bold, "")
+call s:hi("TSEmphasis", s:nord4_gui, "", "NONE", "", s:bold, "")
+call s:hi("TSEnviroment", s:nord4_gui, "", "NONE", "", "", "")
+call s:hi("TSEnviromentName", s:nord4_gui, "", "NONE", "", "", "")
+hi!  link TSError              Error
+hi!  link TSException          Exception
+call s:hi("TSField", s:nord8_gui, "", "NONE", s:nord8_term, "", "")
+hi!  link TSFloat              Float
+hi!  link TSFunction           Function
+call s:h("TSFuncBuiltin", {"fg": s:cyan})
+call s:hi("TSFuncMacro", s:nord4_gui, "", "NONE", "", "NONE", "")
+hi!  link TSInclude            Include
+hi!  link TSKeyword            Keyword
+hi!  link TSKeywordFunction    Keyword
+hi!  link TSKeywordOperator    Keyword
+hi!  link TSLabel              Label
+hi!  link TSLiteral            String
+call s:hi("TSMath", s:nord4_gui, "", "NONE", "", "", "")
+hi!  link TSMethod             Function
+hi!  link TSNamespace          Structure
+" call s:hi("TSNamespace", s:nord4_gui, "", "NONE", "", "NONE", "")
+call s:hi("TSNone", s:nord4_gui, "", "NONE", "", "NONE", "")
+hi!  link TSNumber             Number
+call s:hi("TSNote", s:nord4_gui, "", "NONE", "", "", "")
+hi!  link TSOperator           Operator
+call s:h("TSParameter", {"fg": s:yellow})
+call s:hi("TSParameterReference", s:nord4_gui, "", "NONE", "", "NONE", "")
+call s:hi("TSProperty", "#c4a7e7", "", "NONE", "", "NONE", "")
 call s:hi("TSPunctDelimiter", "#A1887F", "NONE", s:nord12_term, "NONE", "", "")
-hi! link TSPunctSpecial       TSPunctDelimiter
-" hi! link TSPunctDelimiter     Delimiter
-" hi! link TSPunctSpecial       Delimiter
-hi! link TSRepeat             Repeat
-hi! link TSString             String
-hi! link TSStringEscape       SpecialChar
-hi! link TSStringRegex        SpecialChar
-hi! link TSStrong             Bold
-hi! link TSStucture           Structure
-hi! link TSTag                Label
-hi! link TSTagDelimiter       Label
-hi! link TSTitle              Title
-hi! link TSType               Type
-hi! link TSTypeBuiltin        Type
-hi! link TSUnderline          Underlined
-hi! link TSURI                Underlined
-hi! link TSVariable           Variable
-hi! link TSVariableBuiltin    Keyword
+call s:hi("TSPunctBracket", s:nord4_gui, "", "NONE", "", "NONE", "")
+hi!  link TSPunctSpecial       TSPunctDelimiter
+hi!  link TSRepeat             Repeat
+hi!  link TSString             String
+hi!  link TSStringRegex        SpecialChar
+call s:h("TSStringEscape", {"fg": s:cyan})
+hi!  link TSStucture           Structure
+call s:h("TSSymbol", {"fg": s:cyan})
+hi!  link TSTag                Label
+hi!  link TSTagDelimiter       Label
+call s:hi("TSText", s:nord4_gui, "", "NONE", "", "NONE", "")
+call s:hi("TSTextReference", s:nord4_gui, "", "NONE", "", "", "")
+hi!  link TSTitle              Title
+hi!  link TSType               Type
+call s:h("TSTypeBuiltin", {"fg": s:dark_yellow})
+hi!  link TSUnderline          Underlined
+hi!  link TSURI                Underlined
+hi!  link TSVariable           Variable
+call s:h("TSVariableBuiltin", {"fg": s:yellow})
+hi!  link TSWarning WarningMsg
+hi!  link TSDanger ErrorMsg
+
 " }}} nvim-treesitter/nvim-treesitter
 
 " lukas-reineke/indent-blankline.nvim {{{
-" hi! link indent-blankline SignColorm
+hi! link IndentBlanklineChar SignColorm
+call s:hi("IndentBlanklineContextChar", s:nord8_gui, "", s:nord8_term, "", "", "")
 " }}} lukas-reineke/indent-blankline.nvim
 
 " glepnir/lspsaga.nvim {{{
@@ -1123,7 +1109,7 @@ call s:hi("CompeDocumentation", s:nord8_gui,  s:nord2_gui, s:nord8_term, s:nord1
 " kyazdani42/nvim-tree.lua {{{
 call s:hi("NvimTreeSymlink",    s:nord4_gui, s:nord0_gui, "NONE",       "NONE", "", "")
 hi! link NvimTreeFolderName      Normal
-call s:hi("NvimTreeRootFolder", s:nord10_gui, "",          s:nord10_term, "",     "", "")
+call s:hi("NvimTreeRootFolder", s:nord10_gui, "",          s:nord10_term, "",     s:bold, "")
 hi! link NvimTreeFolderIcon      Normal
 hi! link NvimTreeEmptyFolderName Normal
 call s:hi("NvimTreeOpenedFolderName", s:nord6_gui, s:nord8_gui, s:nord6_term, s:nord8_term, "",       "")

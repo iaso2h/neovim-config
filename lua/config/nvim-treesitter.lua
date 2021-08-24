@@ -26,7 +26,7 @@ ts.setup{
         extended_mode  = true,
         max_file_lines = nil,
         colors         = {
-            "#ffd700",
+            "#2E8B57",
             "#7a28a3",
             "#3a5eca",
         }
