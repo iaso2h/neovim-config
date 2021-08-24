@@ -1,8 +1,8 @@
 -- File: openBrowser
 -- Author: iaso2h
 -- Description: Open url link in browser
--- Version: 0.0.3
--- Last Modified: 2021-08-20
+-- Version: 0.0.4
+-- Last Modified: 2021-08-24
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
@@ -11,7 +11,13 @@ local M   = {}
 function M.openUrl(selectText)
     -- Normal mode with no selected text provided
     if not selectText then
-        local regex = vim.regex [[[a-z]*:\/\/[^ >,;]*]]
+        local regex
+        if string.match(fn.expand("%:t"), "vimPlugList.vim") then
+            regex = vim.regex [[Plug \zs'.\{-}\/.\{-}']]
+        else
+            regex = vim.regex [=[[a-z]*:\/\/[^ >,;]*]=]
+        end
+
         local urlStart
         local urlEnd
         local curLine = api.nvim_get_current_line()
@@ -19,7 +25,13 @@ function M.openUrl(selectText)
 
         if not urlStart then return end
 
-        local url = string.sub(curLine, urlStart + 1, urlEnd)
+        local url
+        if string.match(fn.expand("%:t"), "vimPlugList.vim") then
+            url = "https://github.com/" .. string.sub(curLine, urlStart + 2, urlEnd - 1)
+            Print(url)
+        else
+            url = string.sub(curLine, urlStart + 1, urlEnd)
+        end
 
         -- Create highlight {{{
         local curPos   = api.nvim_win_get_cursor(0)

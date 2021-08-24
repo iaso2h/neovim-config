@@ -1,21 +1,21 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.0.12.5
--- Last Modified: 2021/03/31
+-- Version: 0.0.13
+-- Last Modified: 2021-08-24
 -- TODO: Disable == when indentation is eauql
--- TODO: Support multiple linewise conversion
 
-local vim = vim
-local fn = vim.fn
-local cmd = vim.cmd
-local api = vim.api
-local M = {}
-local util = require("util")
+local fn       = vim.fn
+local cmd      = vim.cmd
+local api      = vim.api
+local util     = require("util")
 local operator = require("operator")
+local M = {}
 
 function M.VSCodeLineMove(vimMode, direction) -- {{{
     if not vim.bo.modifiable then return end
+    if fn.foldclosed('.') ~= -1 then return end
+
     local curWinID = api.nvim_get_current_win()
     local cursorPos = api.nvim_win_get_cursor(curWinID)
     local curIndent = fn.indent(cursorPos[1])
@@ -83,6 +83,8 @@ end -- }}}
 -- VSCode yank line {{{
 function M.VSCodeLineYank(vimMode, direction)
     if not vim.bo.modifiable then return end
+    if fn.foldclosed('.') ~= -1 then return end
+
     util.saveReg()
 
     -- Duplication {{{
@@ -219,6 +221,7 @@ end -- }}}
 
 function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
     if not vim.bo.modifiable then return end
+
     opts = opts or {hlGroup="Search", timeout=500}
     local regType   = fn.getregtype()
     local curLine   = api.nvim_get_current_line()
@@ -324,25 +327,29 @@ end --  }}}
 
 function M.convertPut(pasteCMD, opts) --  {{{
     if not vim.bo.modifiable then return end
+    if fn.foldclosed('.') ~= -1 then return end
+
     opts = opts or {hlGroup="Search", timeout=500}
     local curBufNr = api.nvim_get_current_buf()
     local curWinID = api.nvim_get_current_win()
     local cursorPos   = api.nvim_win_get_cursor(curWinID)
     local regType = fn.getregtype()
-    local saveRegContent = fn.getreg(vim.v.register, 1)
+    local savRegContent = fn.getreg(vim.v.register, 1)
     local curLine = api.nvim_get_current_line()
     local cursorNS      = api.nvim_create_namespace("inplacePutCursor")
     local cursorExtmark = api.nvim_buf_set_extmark(curBufNr, cursorNS, cursorPos[1] - 1, cursorPos[2], {})
 
     -- Convert register content
     if regType == "v" or regType == "c" then
-        fn.setreg(vim.v.register, saveRegContent, "V")
+        fn.setreg(vim.v.register, savRegContent, "V")
     elseif regType == "V" or regType == "l" then
-        fn.setreg(vim.v.register, saveRegContent:match("^%s*(.-)%s*$"), "v")
+        local filterStr = string.gsub(savRegContent, "\n%s+", " ")
+        filterStr       = string.gsub(filterStr, "\n", "")
+        filterStr       = string.gsub(filterStr, "^%s+", "")
+        fn.setreg(vim.v.register, filterStr, "v")
     else
         return
     end
-
     -- Execute EX command
     if vim.v.count ~= 0 then
         for _=0, vim.v.count do
@@ -407,7 +414,7 @@ function M.convertPut(pasteCMD, opts) --  {{{
     api.nvim_buf_clear_namespace(curBufNr, cursorNS, 0, -1)
 
     -- Restore register content
-    fn.setreg(vim.v.register, saveRegContent, regType)
+    fn.setreg(vim.v.register, savRegContent, regType)
 end --  }}}
 
 function M.lastYankPut(hlType) -- {{{

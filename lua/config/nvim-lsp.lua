@@ -216,8 +216,8 @@ if sumneko_root_path then
                         [fn.expand('$VIMRUNTIME/lua')]         = true,
                         [fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
                     },
-                    -- maxPreload = 2000,
-                    -- preloadFileSize = 1000,
+                    maxPreload      = 10000,
+                    preloadFileSize = 10000,
                     ignoreDir = {".vscode", ".git"}
                 },
                 -- Do not send telemetry data containing a randomized but unique identifier

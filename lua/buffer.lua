@@ -1,6 +1,7 @@
 -- File: buffer.lua
 -- Author: iaso2h
 -- Description: A few of buffer-related utilities
+-- Similar Work: https://github.com/ojroques/nvim-bufdel
 -- Version: 0.0.16
 -- Last Modified: 2021-08-23
 -- BUG: q on startup-log.txt
@@ -228,7 +229,10 @@ function M.smartClose(type) -- {{{
                         end
                     end
                     if bufInstance == 0 or bufInstance > 1 then
-                        api.nvim_win_close(curWinID, true)
+                        if api.nvim_win_is_valid(curWinID) then
+                            local ok, _ = pcall(api.nvim_win_close, curWinID, true)
+                            if not ok then api.nvim_echo({{_, "ErrorMsg"}}, true, {}) end
+                        end
                     else -- 1 buffer instance
                         -- Return 0 when false is evaluated
                         if not saveModified(curBufNr) then

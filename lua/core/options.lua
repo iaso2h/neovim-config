@@ -1,4 +1,3 @@
-local vim = vim
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
@@ -93,6 +92,8 @@ if not vim.g.vscode then
 
 
     -- GUI
+    -- cmd [[colorscheme rose-pine]]
+    -- vim.g.rose_pine_variant = 'moon'
     cmd [[colorscheme onedarknord]]
     GuiFont = "UbuntuMono Nerd Font"
     -- GuiFont = "Sarasa Mono SC Nerd"

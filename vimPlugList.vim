@@ -89,7 +89,6 @@ if !exists('g:vscode')
     " Lua
     Plug 'davisdude/vim-love-docs',    {'branch': 'build',  'for': 'lua'}
     Plug 'iaso2h/nlua.nvim',           {'branch': 'iaso2h', 'for': 'lua'}
-    Plug 'euclidianAce/BetterLua.vim', {'for': 'lua'}
     Plug 'nanotee/luv-vimdocs',        {'for': 'lua'}
     " Markdown
     Plug 'iamcco/markdown-preview.nvim', {'do': { -> mkdp#util#install() }, 'for': ['markdown', 'md']}
@@ -97,14 +96,13 @@ if !exists('g:vscode')
     " Log
     Plug 'MTDL9/vim-log-highlighting', {'for': 'log'}
     " Fish script
-    Plug 'dag/vim-fish', {'for': 'fish'}
+    Plug 'NovaDev94/vim-fish', {'for': 'fish'}
     " }}} Language
 
     " Debug {{{
-    Plug 'kergoth/vim-hilinks'
-    Plug 'dstein64/vim-startuptime', {'on':     'StartupTime'}
-    Plug 'rafcamlet/nvim-luapad',    {'on':     ['Luapad', 'LuaRun', 'Lua']}
-    Plug 'bfredl/nvim-luadev',       {'for':    'lua'}
+    Plug 'bfredl/nvim-luadev',       {'for': 'lua'}
+    Plug 'rafcamlet/nvim-luapad',    {'on': ['Luapad', 'LuaRun', 'Lua']}
+    Plug 'dstein64/vim-startuptime', {'on': 'StartupTime'}
     Plug 'iaso2h/vim-scriptease',    {'branch': 'ftplugin'}
     " Plug 'mfussenegger/nvim-dap'
     " Plug 'theHamsta/nvim-dap-virtual-text'
@@ -118,6 +116,7 @@ if !exists('g:vscode')
     Plug 'airblade/vim-gitgutter'
     " Plug 'lewis6991/gitsigns.nvim'
     Plug 'rhysd/git-messenger.vim', {'on': ['GitMessenger', '<Plug>(git-messenger)']}
+    " Plug 'sindrets/diffview.nvim',
     " }}} Version control
 
     " Misc {{{
