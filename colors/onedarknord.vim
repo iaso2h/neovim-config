@@ -213,7 +213,7 @@ call s:hi("ColorColumn", "", s:nord1_gui, "NONE", s:nord1_term, "", "")
 call s:hi("NonText", s:nord2_gui, "", s:nord3_term, "", "", "")
 call s:hi("Cursor", "#000000", "#FFFFFF", "",s:nord6_term, "", "")
 call s:hi("CursorLine", "", s:nord1_gui, "NONE", s:nord1_term, "NONE", "")
-call s:hi("Error", s:nord4_gui, s:nord11_gui, "", s:nord11_term, "", "")
+" call s:hi("Error", s:nord4_gui, s:nord11_gui, "", s:nord11_term, "", "")
 call s:hi("iCursor", s:nord0_gui, s:nord4_gui, "", "NONE", "", "")
 call s:hi("LineNr", s:nord3_gui, "NONE", s:nord3_term, "NONE", "", "")
 call s:hi("MatchParen", s:nord8_gui, s:nord3_gui_bright, s:nord8_term, s:nord3_term, "", "")
@@ -314,7 +314,8 @@ call s:hi("VertSplit", s:nord2_gui, s:nord0_gui, s:nord3_term, "NONE", "NONE", "
 "+----------------------+
 " Syntax Groups (descriptions and ordering from `:h w18`) {{{
 
-call s:h("Comment", {"fg": s:comment_grey, "gui": "italic", "cterm": "italic" }) " any comment
+" call s:h("Comment", {"fg": s:comment_grey, "gui": "italic", "cterm": "italic" }) " any comment
+call s:hi("Comment", s:nord3_gui, "", s:nord12_term, "", s:italic, "") " any comment
 call s:hi("Conceal", "", "NONE", "", "NONE", "", "")
 call s:h("Constant", {"fg": s:dark_yellow }) " any constant
 call s:hi("Decorator", s:nord12_gui, "", s:nord12_term, "", "", "")
@@ -353,7 +354,8 @@ call s:h("SpecialComment", {"fg": s:comment_grey }) " special things inside a co
 call s:h("Debug", {}) " debugging statements
 call s:h("Underlined", {"gui": "underline", "cterm": "underline" }) " text that stands out, HTML links
 call s:h("Ignore", {}) " left blank, hidden
-call s:h("Error", {"fg": s:red }) " any erroneous construct
+" call s:h("Error", {"fg": s:red }) " any erroneous construct
+call s:h("Error", {"fg": s:red, "gui": "bold"}) " any erroneous construct
 call s:h("Parameter", {"fg": s:dark_yellow }) " Function parameter
 call s:hi("Todo", s:nord13_gui, "NONE", s:nord13_term, "NONE", "", "") " anything that needs extra attention; mostly the keywords TODO FIXME and XXX
 hi! link Annotation Decorator
@@ -915,6 +917,7 @@ highlight EasyMotionTarget2Second guibg=#ED427C guifg=white
 highlight HopNextKey guibg=white guifg=black
 highlight HopNextKey1 guibg=#ED427C guifg=white
 highlight HopNextKey2 guibg=#ED427C guifg=white
+call s:hi("HopUnmatched", s:nord7_gui, "", s:nord7_term, "", s:italic, "")
 " }}} phaazon/hop.nvim
 
 
@@ -952,13 +955,13 @@ hi! VMMono        ctermbg=131 ctermfg=235 guibg=#88c0d0 guifg=white
 " }}} mg979/vim-visual-multi-multi
 
 " p00f/nvim-ts-rainbow {{{
-hi rainbowcol1 guifg=Gold
-hi rainbowcol2 guifg=DarkOrchid3
-hi rainbowcol3 guifg=RoyalBlue2
-hi rainbowcol4 guifg=Firebrick
-hi rainbowcol5 guifg=SeaGreen3
-hi rainbowcol6 guifg=DarkOrange3
-hi rainbowcol7 guifg=#458588
+" hi rainbowcol1 guifg=#cc7000
+" hi rainbowcol2 guifg=DarkOrchid3
+" hi rainbowcol3 guifg=RoyalBlue2
+" hi rainbowcol4 guifg=Firebrick
+" hi rainbowcol5 guifg=SeaGreen3
+" hi rainbowcol6 guifg=DarkOrange3
+" hi rainbowcol7 guifg=#458588
 " }}} p00f/nvim-ts-rainbow
 
 " nvim-telescope/telescope.nvim {{{
@@ -1023,7 +1026,6 @@ call s:hi("TSConstructor", "#00ffe5", "", "NONE", "", s:bold, "")
 call s:hi("TSEmphasis", s:nord4_gui, "", "NONE", "", s:bold, "")
 call s:hi("TSEnviroment", s:nord4_gui, "", "NONE", "", "", "")
 call s:hi("TSEnviromentName", s:nord4_gui, "", "NONE", "", "", "")
-hi!  link TSError              Error
 hi!  link TSException          Exception
 call s:hi("TSField", s:nord8_gui, "", "NONE", s:nord8_term, "", "")
 hi!  link TSFloat              Float
@@ -1043,7 +1045,8 @@ hi!  link TSNamespace          Structure
 call s:hi("TSNone", s:nord4_gui, "", "NONE", "", "NONE", "")
 hi!  link TSNumber             Number
 call s:hi("TSNote", s:nord4_gui, "", "NONE", "", "", "")
-hi!  link TSOperator           Operator
+" hi!  link TSOperator           Operator
+call s:hi("TSOperator", "#A1887F", "NONE", s:nord12_term, "NONE", "", "")
 call s:h("TSParameter", {"fg": s:yellow})
 call s:hi("TSParameterReference", s:nord4_gui, "", "NONE", "", "NONE", "")
 call s:hi("TSProperty", "#c4a7e7", "", "NONE", "", "NONE", "")
@@ -1067,8 +1070,10 @@ hi!  link TSUnderline          Underlined
 hi!  link TSURI                Underlined
 hi!  link TSVariable           Variable
 call s:h("TSVariableBuiltin", {"fg": s:yellow})
-hi!  link TSWarning WarningMsg
-hi!  link TSDanger ErrorMsg
+hi!  link TSWarning            WarningMsg
+" call s:hi("TSError", s:nord4_gui, s:nord11_gui, "", s:nord11_term, s:bold, "")
+hi!  link TSError             Error
+hi!  link TSDanger             ErrorMsg
 
 " }}} nvim-treesitter/nvim-treesitter
 

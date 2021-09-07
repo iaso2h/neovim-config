@@ -1,4 +1,3 @@
-local vim = vim
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
@@ -6,7 +5,7 @@ local M   = {}
 
 cmd [[
 function! LuaExprCallback(...)
-    return luaeval("Opfunc(_A)", a:000)
+    return v:lua.Opfunc(a:000)
 endfunction
 ]]
 

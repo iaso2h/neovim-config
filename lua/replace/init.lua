@@ -10,7 +10,6 @@ local operator = require "operator"
 --   The VIM LICENSE applies to this script; see ':help copyright'.
 --
 -- Maintainer:	Ingo Karkat <ingo@karkat.de>
-local vim = vim
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
@@ -22,6 +21,7 @@ local M   = {}
 -- Note: Could use ingo#pos#IsOnOrAfter(), but avoid dependency to ingo-library
 -- for now.
 local function correctRegtype(motionwise, register, regType ,replacement) -- {{{
+    local ok, _
     if motionwise == "block" then
         -- Adaptations for blockwise replace.
         local pasteTextTbl = vim.split(replacement["text"], "\n", false)
@@ -146,7 +146,7 @@ local function replace(motionwise, register, replacement, curBufNr) -- {{{
 
 end -- }}}
 
-function ReplaceOperator(argTbl) -- {{{
+function M.replaceOperator(argTbl) -- {{{
     -- TODO
     local opts = {hlGroup = "Search", timeout = 500}
     local curBufNr      = api.nvim_get_current_buf()
@@ -270,7 +270,7 @@ function M.expression() -- {{{
     -- Note: Could use
     -- ingo#mapmaker#OpfuncExpression('ReplaceWithRegister#Operator'), but avoid
     -- dependency to ingo-library for now.
-    Opfunc = ReplaceOperator
+    Opfunc = M.replaceOperator
     vim.o.opfunc = "LuaExprCallback"
 
     if not vim.o.modifiable or vim.o.readonly then
@@ -295,13 +295,13 @@ function M.expression() -- {{{
     return "g@"
 end -- }}}
 
-function ReplaceVisualMode() -- {{{
+function M.replaceVisualMode() -- {{{
     vim.g.repeat_count = vim.g.repeat_count or ''
     local vimcmd = api.nvim_exec([[call visualrepeat#reapply#VisualMode(0)]], true)
     if vimcmd ~= "" then
         cmd([[normal!]] .. vimcmd)
     end
-    ReplaceOperator({"visual", "InplaceReplaceVisual"})
+    M.replaceOperator({"visual", "InplaceReplaceVisual"})
 end -- }}}
 
 return M

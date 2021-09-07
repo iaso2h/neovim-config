@@ -1,8 +1,8 @@
-local fn  = vim.fn
-local api = vim.api
-local map = require("util").map
-local M   = {}
+local M = {}
 
+M.setup = function()
+
+local fn  = vim.fn
 -- LSP completion icon {{{
 require('vim.lsp.protocol').CompletionItemKind = {
     '  Text',           -- Text
@@ -44,50 +44,13 @@ vim.g.vsnip_filetypes = {
     javascriptreact = {"javascript"},
     typescriptreact = {"typescript"}
 }
-
--- Key mapping {{{
-local checkBackSpace = function()
-    local col = api.nvim_win_get_cursor(0)[2]
-    if col == 0 or api.nvim_get_current_line():sub(col, col):match('%s') then
-        return true
-    else
-        return false
-    end
 end
 
--- Use (s-)tab to:
---- move to prev/next item in completion menuone
---- jump to prev/next snippet's placeholder
-_G.tabComplete = function()
-    -- if vim.fn.pumvisible() == 1 then
-        -- return t "<C-n>"
-    if vim.fn["vsnip#available"](1) == 1 then
-        return t "<Plug>(vsnip-expand-or-jump)"
-    elseif checkBackSpace() then
-        return t "<C-S-]>"
-    else
-        return vim.fn['compe#complete']()
-    end
-end
-_G.sTabComplete = function()
-    -- if vim.fn.pumvisible() == 1 then
-        -- return t "<C-p>"
-    if vim.fn["vsnip#jumpable"](-1) == 1 then
-        return t "<Plug>(vsnip-jump-prev)"
-    else
-        return t "<C-S-[>"
-    end
-end
-
-
-map("i", [[<Tab>]], [[v:lua.tabComplete()]],    {"silent", "expr"})
-map("s", [[<Tab>]], [[v:lua.tabComplete()]],    {"silent", "expr"})
-map("i", [[<S-Tab>]], [[v:lua.sTabComplete()]], {"silent", "expr"})
-map("s", [[<S-Tab>]], [[v:lua.sTabComplete()]], {"silent", "expr"})
--- }}} Key mapping
 -- }}} Snippet
 
 -- hrsh7th/nvim-compe {{{
+M.config = function()
+
 require("compe").setup {
     enabled          = true,
     autocomplete     = true,
@@ -139,32 +102,58 @@ require("compe").setup {
         },
     },
 }
--- Confirm key {{{
--- local autoPair = require('nvim-autopairs')
--- _G.Completion= {}
--- vim.g.completion_confirm_key = ""
--- Completion.confirm = function()
-    -- if fn.pumvisible() ~= 0 then
-        -- if fn.complete_info()["selected"] ~= -1 then
-            -- fn["compe#confirm"]()
-            -- return autoPair.esc("<c-y>")
-        -- else
-            -- vim.defer_fn(function()
-                -- fn["compe#confirm"]("<cr>")
-                -- end, 20)
-            -- return autoPair.esc("<c-n>")
-        -- end
-    -- else
-        -- return autoPair.check_break_line_char()
-    -- end
--- end
--- }}} Confirm key
--- map('i', [[<CR>]],      [[v:lua.Completion.confirm()]],                     {"silent", "expr"})
 
-map("i", [[<CR>]], [[compe#confirm(luaeval("require 'nvim-autopairs'.autopairs_cr()"))]], {"silent", "expr"})
+local fn  = vim.fn
+local api = vim.api
+
+-- map("i", [[<CR>]], [[compe#confirm(luaeval("require 'nvim-autopairs'.autopairs_cr()"))]], {"silent", "expr"})
 -- map("i", [[<C-e>]],     [[pumvisible() ? compe#close('<C-e>') : "\<End>"]], {"silent", "expr"})
-map("i", [[<C-Space>]], [[pumvisible() ? compe#close('<C-e>') : "\<C-n>"]], {"silent", "expr"})
+map("i", [[<C-Space>]], [[pumvisible() ? compe#close('<C-e>') : "\<C-n>"]], {"noremap", "silent", "expr"})
 map("i", [[<A-d>]],     [[compe#scroll({'delta': +4})]],                    {"silent", "expr"})
 map("i", [[<A-e>]],     [[compe#scroll({'delta': -4})]],                    {"silent", "expr"})
--- }}} hrsh7th/nvim-compe
+local checkBackSpace = function()
+    local col = api.nvim_win_get_cursor(0)[2]
+    if col == 0 or api.nvim_get_current_line():sub(col, col):match('%s') then
+        return true
+    else
+        return false
+    end
+end
+
+-- Use (s-)tab to:
+--- move to prev/next item in completion menuone
+--- jump to prev/next snippet's placeholder
+_G.tabComplete = function()
+    if vim.fn["vsnip#available"](1) == 1 then
+        return t "<Plug>(vsnip-expand-or-jump)"
+    elseif checkBackSpace() then
+        return t "<C-S-]>"
+    else
+        return vim.fn['compe#complete']()
+    end
+end
+_G.sTabComplete = function()
+    if vim.fn["vsnip#jumpable"](-1) == 1 then
+        return t "<Plug>(vsnip-jump-prev)"
+    else
+        return t "<C-S-[>"
+    end
+end
+
+
+map("i", [[<Tab>]], [[v:lua.tabComplete()]],    {"silent", "expr"})
+map("s", [[<Tab>]], [[v:lua.tabComplete()]],    {"silent", "expr"})
+map("i", [[<S-Tab>]], [[v:lua.sTabComplete()]], {"silent", "expr"})
+map("s", [[<S-Tab>]], [[v:lua.sTabComplete()]], {"silent", "expr"})
+
+require('nvim-autopairs.completion.compe').setup {
+    map_cr       = false,  -- map <CR> on insert mode, this was implemented by nvim-comp instead
+    map_complete = true,   -- it will auto insert `(` after select function or method item
+    auto_select  = false,  -- auto select first (item)
+}
+
+-- }}} Key mapping
+end
+
+return M
 

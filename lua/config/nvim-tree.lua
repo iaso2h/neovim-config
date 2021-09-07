@@ -1,5 +1,32 @@
-local map = require("util").map
 local M   = {}
+
+-- Integration with barbar.nvim
+M.closeNvimTree = function()
+    local view  = require "nvim-tree.view"
+    local state = require "bufferline.state"
+    state.set_offset(0)
+    view.close()
+end
+
+M.toggle = function()
+    local view  = require "nvim-tree.view"
+    local state = require "bufferline.state"
+    if view.win_open() then
+        state.set_offset(0)
+        view.close()
+    else
+        if vim.g.nvim_tree_follow == 1 then
+            require("nvim-tree").find_file(true)
+        end
+        if not view.win_open() then
+            require("nvim-tree.lib").open()
+        end
+
+        state.set_offset(40, '')
+    end
+end
+
+M.config = function()
 
 -- Basic settings {{{
 vim.g.nvim_tree_side                   = 'left' -- left by default
@@ -82,29 +109,6 @@ vim.g.nvim_tree_icons = {
 -- }}} Icon
 
 -- Keymappings {{{
--- Integration with barbar.nvim
-local view  = require "nvim-tree.view"
-local state = require "bufferline.state"
-M.closeNvimTree = function()
-    state.set_offset(0)
-    view.close()
-end
-M.toggle = function()
-    if view.win_open() then
-        state.set_offset(0)
-        view.close()
-    else
-        if vim.g.nvim_tree_follow == 1 then
-            require("nvim-tree").find_file(true)
-        end
-        if not view.win_open() then
-            require("nvim-tree.lib").open()
-        end
-
-        state.set_offset(40, '')
-    end
-end
-
 map("n", [[<C-w>e]], [[:lua require("config.nvim-tree").toggle()<cr>]], {"silent"})
 -- map("n", [[<C-w>e]], [[:lua require("nvim-tree").toggle()<cr>]], {"silent"})
 -- map("n", [[<leader>r]], [[:NvimTreeRefresh<CR>]], {"noremap"})
@@ -148,6 +152,9 @@ vim.g.nvim_tree_bindings = {
     {key = "?",                            cb = cb("toggle_help")}
 }
 -- }}} Keymappings
+
+
+end
 
 return M
 

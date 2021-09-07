@@ -1,13 +1,6 @@
-local cmd = vim.cmd
-
--- TODO: Migrate to packer.nvim, but it's still unstable yet
-cmd [[let $configPath = stdpath('config')]]
-cmd [[execute "source " . expand('$configPath/vimPlugList.vim')]]
-
-require "core"
-require "replace"
-require "compileRun"
-
+-- cmd [[let $configPath = stdpath('config')]]
+-- cmd [[execute "source " . expand('$configPath/vimPlugList.vim')]]
+--
 -- Build-in plugin {{{
 -- Disable
 vim.g.loaded_gzip              = 1
@@ -45,4 +38,7 @@ if not vim.g.vscode then
     vim.g.msql_sql_query = 1
 end
 -- }}} Build-in plugin
+
+require "util"
+require "core"
 

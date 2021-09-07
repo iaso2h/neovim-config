@@ -84,10 +84,6 @@ function M.runCode()
     end
 end
 
-cmd [[
-command! -nargs=0 Compile lua require("compileRun").compileCode()
-command! -nargs=0 Run     lua require("compileRun").runCode()
-]]
 
 return M
 

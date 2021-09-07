@@ -5,6 +5,7 @@
 -- Version: 0.0.16
 -- Last Modified: 2021-08-23
 -- BUG: q on startup-log.txt
+-- TODO: check for prompt
 local fn   = vim.fn
 local cmd  = vim.cmd
 local api  = vim.api

@@ -1,7 +1,6 @@
-local fn = vim.fn
+local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
-local vim = vim
 local M = {}
 
 function Print(...)
@@ -161,18 +160,20 @@ function Vim2Lua(mode) -- {{{
 end -- }}}
 
 ----
--- Function: _G.Reload: Reload lua module path
+-- Function: Reload: Reload lua module path
 --
 -- @param module: string value of module name, use current lua file name when nil is provided
 ----
 function Reload(module) -- {{{
+    local configPath = fn.stdpath("config")
+
     if vim.bo.filetype == "lua" then
         -- Lua {{{
         local luaModule
         if not module then
             module = vim.fn.expand("%:p")
-            local luaModulePath = vim.api.nvim_eval(
-                                      "expand('$configPath' . '/lua')")
+            -- TODO: reload module
+            local luaModulePath = configPath .. "/lua"
             if string.match(module, luaModulePath) then
                 local sep
                 if fn.has("win32") == 1 then
@@ -183,31 +184,54 @@ function Reload(module) -- {{{
 
                 luaModule = ((string.gsub(string.sub(string.gsub(fn.expand("%:p:r"),
                                 luaModulePath, ""), 2), sep, ".")))
+
+                -- In case where module are not loaded
+                if package.loaded[luaModule] == nil then return end
+
                 package.loaded[luaModule] = nil
                 api.nvim_echo({{"Reload: " .. module, "Normal"}}, true, {})
-                require(luaModule)
+                local fallback = require(luaModule)
+
+                -- Call the config func
+                if type(fallback) == "function" then
+                    fallback()
+                elseif type(fallback) == "table" then
+                    for _, funcName in ipairs{"config", "setup"} do
+                        if vim.tbl_contains(vim.tbl_keys(fallback), funcName) then
+                            local literalFunc = string.format([[require("%s").%s()]], luaModule, funcName)
+                            loadstring(literalFunc)()
+                        end
+                    end
+                end
+                -- Recompile packages for lua/core/plugins.lua
+                if module == fn.stdpath("config") .. "/lua/core/plugins.lua" then
+                    local answerCD = fn.confirm("Recompile packages?", "&Yes\n&No")
+                    if answerCD == 1 then
+                        cmd [[PackerSync]]
+                    end
+                end
             end
         else
             if package.loaded[module] then
                 package.loaded[module] = nil
                 api.nvim_echo({{"Reload: " .. module, "Normal"}}, true, {})
                 require(module)
+
             end
         end
         -- }}} Lua
     else
         -- Vim {{{
         module = fn.expand("%:p")
-        if module == api.nvim_eval("expand('$configPath/init.vim')") then
+        if module == configPath .. "/init.vim" then
             cmd("source " .. module)
             cmd "redraw!"
             cmd "AirlineRefresh"
             api.nvim_echo({{"Reload: " .. module, "Normal"}}, true, {})
-        elseif module == api.nvim_eval("expand('$configPath/vimPlugList.vim')") then
+        elseif module == configPath .. "/vimPlugList.vim" then
             cmd("source " .. module)
             api.nvim_echo({{"Reload: " .. module, "Normal"}}, true, {})
-        elseif fn.expand("%:p:h") ==
-            api.nvim_eval("expand('$configPath/plugins')") then
+        elseif fn.expand("%:p:h") == configPath .. "/plugins" then
             cmd("source " .. module)
             api.nvim_echo({{"Reload: " .. module, "Normal"}}, true, {})
         end
@@ -266,7 +290,7 @@ end -- }}}
 -- the fourth argument of nvim_set_keymap as the key name of value pairs, and
 -- the value is true
 ----
-function M.map(mode, lhs, rhs, optsTbl) -- {{{
+function _G.map(mode, lhs, rhs, optsTbl) -- {{{
     optsTbl = optsTbl or {}
     if vim.tbl_contains(optsTbl, "novscode") and vim.g.vscode then
         return
@@ -290,7 +314,7 @@ end -- }}}
 -- @param lhs:     Same as nvim_set_keymap
 -- @param rhs:     Same as nvim_set_keymap
 ----
-function M.vmap(mode, lhs, rhs) -- {{{
+function _G.vmap(mode, lhs, rhs) -- {{{
     if vim.g.vscode then
         api.nvim_set_keymap(mode, lhs, rhs, {silent = true})
     end
@@ -309,7 +333,7 @@ end -- }}}
 -- the value is true
 ----
 
-function M.bmap(bufNr, mode, lhs, rhs, optsTbl) -- {{{
+function _G.bmap(bufNr, mode, lhs, rhs, optsTbl) -- {{{
     optsTbl = optsTbl or {}
     if not next(optsTbl) then
         api.nvim_buf_set_keymap(bufNr, mode, lhs, rhs, optsTbl)
@@ -406,6 +430,7 @@ end
 -- }}} Match enhance
 
 function M.trailingEmptyLine() -- {{{
+    if vim.bo.modified == false then return end
     if api.nvim_buf_get_lines(0, -2, -1, false)[1] ~= "" then
         local saveView = fn.winsaveview()
         cmd('keepjumps normal! Go')
@@ -428,6 +453,8 @@ end -- }}}
 -- @return:       return table of trimmed string, otherwise return 0
 ----
 function M.trimWhiteSpaces(strTbl, silent, trimSuffix) -- {{{
+    if vim.bo.modified == false then return end
+
     if not strTbl then
         local saveView = fn.winsaveview()
         silent = silent or 1

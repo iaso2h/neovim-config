@@ -10,4 +10,5 @@
 *temp*
 *.snippets
 lsp/
+/lua/packer_compiled.lua
 

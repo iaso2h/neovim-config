@@ -1,17 +1,70 @@
-local fn         = vim.fn
-local api        = vim.api
-local cmd        = vim.cmd
-local lsp        = vim.lsp
-local bmap       = require("util").bmap
-local map        = require("util").map
-local lspConfig  = require("lspconfig")
-local lspStatus  = require("lsp-status")
-local lspInstall = require("lspinstall")
-local M          = {}
-local ex         = function(executable) return fn.executable(executable) == 1 end
+local M = {servers = {}}
 
+M.ex = function(executable) return vim.fn.executable(executable) == 1 end
 
-require("config.nvim-lsp-status").setup()
+M.formatCode = function(vimMode)
+    if not vim.bo.modified then return end
+
+    cmd "up"
+    local cmd      = vim.cmd
+    local fn       = vim.fn
+    local fileType = vim.bo.filetype
+    if vimMode == "n" then
+        if fileType == "lua" then
+            if not M.ex("lua-format") then return end
+            local saveView = fn.winsaveview()
+            local flags
+            flags = vim.b.luaFormatflags or [[--indent-width=4 --tab-width=4 --continuation-indent-width=4]]
+            cmd([[silent %!lua-format % ]] .. flags)
+            fn.winrestview(saveView)
+        elseif fileType == "json" then
+            if not M.ex("js-beautify") then return end
+            cmd [[silent %!js-beautify %]]
+        else
+            local saveView = fn.winsaveview()
+            cmd [[normal vae=]]
+            fn.winrestview(saveView)
+        end
+    else
+        local saveView = fn.winsaveview()
+        cmd [[normal! gv=]]
+        fn.winrestview(saveView)
+    end
+end
+
+-- kabouzeid/nvim-lspinstall {{{
+M.setupServers = function()
+    local lspInstall = require("lspinstall")
+
+    lspInstall.setup()
+    -- Get all installed servers
+    local servers = lspInstall.installed_servers()
+
+    local config
+    for _, server in pairs(servers) do
+        if vim.tbl_contains(vim.tbl_keys(require("config.nvim-lsp").servers), server) then
+            config = vim.tbl_extend("force", {}, require("config.nvim-lsp").makeBasicConfig(), require("config.nvim-lsp").servers[server])
+        end
+
+        if config then
+            require("lspconfig")[server].setup(config)
+        end
+    end
+end
+-- }}} kabouzeid/nvim-lspinstall
+
+M.makeBasicConfig = function()
+    local snippetCapabilities = vim.lsp.protocol.make_client_capabilities()
+    snippetCapabilities.textDocument.completion.completionItem.snippetSupport = true
+    -- local capabilities = vim.tbl_deep_extend("keep", {}, lspStatus.capabilities, snippetCapabilities)
+
+    return {
+        -- enable snippet support
+        capabilities = snippetCapabilities,
+        -- map buffer local keybindings when the language server attaches
+        on_attach    = require("config.nvim-lsp").onAttach
+    }
+end
 
 ----
 -- Function: onAttach :Mappings or commands need to be loaded when specific LSP is attach
@@ -19,9 +72,7 @@ require("config.nvim-lsp-status").setup()
 -- @param client: language-server client
 -- @param bufNr: buffer number
 ----
-local onAttach = function(client, bufNr) -- {{{
-    -- lspStatus.on_attach(client)
-
+M.onAttach = function(client, bufNr) -- {{{
     -- Mappings
     bmap(bufNr, "n", [=[gD]=],         [[:lua vim.lsp.buf.declaration()<cr>]],                                {"silent"})
     bmap(bufNr, "n", [=[gd]=],         [[:lua vim.lsp.buf.definition()<cr>]],                                 {"silent"})
@@ -65,65 +116,34 @@ local onAttach = function(client, bufNr) -- {{{
 
     -- Set autocommands conditional on server_capabilities
     if client.resolved_capabilities.document_highlight then
-    vim.api.nvim_exec([[
+    vim.cmd[[
     augroup lspDocumentHighlight
         autocmd! * <buffer>
         autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
         autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
     augroup END
-    ]], false)
+    ]]
     end
 end -- }}}
 
+----
+-- Function: M.config: Find and setup configuration for each LSP, including keymaps
+----
+M.config = function()
 
-local makeBasicConfig = function() -- {{{
-    local snippetCapabilities = lsp.protocol.make_client_capabilities()
-    snippetCapabilities.textDocument.completion.completionItem.snippetSupport = true
-    local capabilities = vim.tbl_deep_extend("keep", {}, lspStatus.capabilities, snippetCapabilities)
-
-    return {
-        -- enable snippet support
-        capabilities = capabilities,
-        -- map buffer local keybindings when the language server attaches
-        on_attach    = onAttach,
-    }
-end -- }}}
+local fn         = vim.fn
+local api        = vim.api
+local lspConfig  = require("lspconfig")
 
 -- Format mapping {{{
-function M.formatCode(vimMode)
-    cmd "up"
-    local fileType = vim.bo.filetype
-    if vimMode == "n" then
-        if fileType == "lua" then
-            if not ex("lua-format") then return end
-            local saveView = fn.winsaveview()
-            local flags
-            flags = vim.b.luaFormatflags or [[--indent-width=4 --tab-width=4 --continuation-indent-width=4]]
-            cmd([[silent %!lua-format % ]] .. flags)
-            fn.winrestview(saveView)
-        elseif fileType == "json" then
-            if not ex("js-beautify") then return end
-            cmd [[silent %!js-beautify %]]
-        else
-            local saveView = fn.winsaveview()
-            cmd [[normal vae=]]
-            fn.winrestview(saveView)
-        end
-    else
-        local saveView = fn.winsaveview()
-        cmd [[normal! gv=]]
-        fn.winrestview(saveView)
-    end
-end
-cmd [[command! -nargs=0 Format lua require("config.nvim-lsp").formatCode("n")]]
+vim.cmd [[command! -nargs=0 Format lua require("config.nvim-lsp").formatCode("n")]]
 map("n", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("n")<cr>]], {"silent"})
 map("v", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("v")<cr>]], {"silent"})
 -- }}} Format mapping
 
--- LSP config {{{
+-- LSP override config {{{
 -- Setup() function: https://github.com/neovim/nvim-lspconfig#setup-function
 -- Individual configuration: https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md
-local setups = {}
 local checkExt = function(serverExec)
     return fn.has('win32') == 1 and serverExec .. ".cmd" or serverExec
 end
@@ -134,8 +154,8 @@ end
 -- https://github.com/microsoft/pyright/blob/master/docs/configuration.md
 -- https://github.com/microsoft/pyright/blob/96871bec5a427048fead499ab151be87b7baf023/packages/vscode-pyright/package.json
 
-if ex("pyright-langserver") then
-    setups.python = {
+if require("config.nvim-lsp").ex("pyright-langserver") then
+    require("config.nvim-lsp").servers.python = {
         cmd       = {checkExt("pyright-langserver"), "--stdio" },
         settings  = {
             python = {
@@ -182,20 +202,19 @@ if fn.has("win32") == 1 then
     sumneko_root_path = fn.glob("~/.vscode/extensions/sumneko.lua*", 0, 1)
     if not next(sumneko_root_path) then
         api.nvim_echo({{"Sumneko not found", "WarningMsg"}}, true, {})
-        return
     end
 
     sumneko_root_path = sumneko_root_path[#sumneko_root_path] .. "/server"
     sumneko_binary = sumneko_root_path .. "/bin/".. systemName .. "/lua-language-server" .. binaryExt[systemName]
 elseif fn.has("unix") == 1 then
     sumneko_binary = fn.glob("~/.config/nvim/lsp/lua-language-server/bin/Linux/lua-language-server")
-    if fn.executable(sumneko_binary) == 1 then
+    if require("config.nvim-lsp").ex(sumneko_binary) then
         sumneko_root_path = fn.glob("~/.config/nvim/lsp/lua-language-server")
     end
 end
 
 if sumneko_root_path then
-    setups.lua = {
+    require("config.nvim-lsp").servers.lua = {
         cmd = {sumneko_binary, "-E", sumneko_root_path .. "/main.lua"};
         settings = {
             Lua = {
@@ -235,8 +254,8 @@ vim.g.markdown_fenced_languages = {
       'vim',
       'help'
 }
-if ex("vim-language-server") then
-    setups.vim = {
+if require("config.nvim-lsp").ex("vim-language-server") then
+    require("config.nvim-lsp").servers.vim = {
         cmd = {checkExt("vim-language-server"), "--stdio"},
         init_options = {
             isNeovim = true,
@@ -278,14 +297,14 @@ local findClangd = function() -- {{{
             "--fallback-style=google"
         }
     if fn.has("win32") == 1 then
-        if ex("clangd") then
+        if require("config.nvim-lsp").ex("clangd") then
             table.insert(cmdStr, 1, "clangd")
             return cmdStr
         else
             return ""
         end
     elseif fn.has("unix") == 1 then
-        if ex("clangd-12") then -- The current clangd version. 2021-08-23
+        if require("config.nvim-lsp").ex("clangd-11") then -- The current clangd version. 2021-08-23
             table.insert(cmdStr, 1, "clangd-11")
             return cmdStr
         else
@@ -300,7 +319,7 @@ local findClangd = function() -- {{{
 end -- }}}
 local clangdCMD = findClangd()
 if clangdCMD ~= "" then
-    setups.clangd = {
+    require("config.nvim-lsp").servers.clangd = {
         cmd = clangdCMD,
         init_options = {
             -- capabilities         = {},
@@ -321,7 +340,7 @@ end
 -- }}} Clangd
 -- CCLS {{{
 -- https://github.com/MaskRay/ccls
--- if ex("ccls") then
+-- if require("config.nvim-lsp").ex("ccls") then
     -- lspConfig.ccls.setup {
         -- cmd = {"ccls"},
         -- on_attach = onAttach,
@@ -352,8 +371,8 @@ end
 -- JSON {{{
 -- https://github.com/hrsh7th/vscode-langservers-extracted
 -- npm i -g vscode-langservers-extracted
-if ex("vscode-json-languageserver") then
-    setups.json = {
+if require("config.nvim-lsp").ex("vscode-json-languageserver") then
+    require("config.nvim-lsp").servers.json = {
         cmd = {checkExt("vscode-json-languageserver"), "--stdio"},
         commands = {
             Format = {
@@ -368,13 +387,13 @@ end
 -- HTML {{{
 -- https://github.com/hrsh7th/vscode-langservers-extracted
 -- npm i -g vscode-langservers-extracted
-if ex("html-languageserver") then
-    setups.html = {
+if require("config.nvim-lsp").ex("html-languageserver") then
+    require("config.nvim-lsp").servers.html = {
         cmd = {checkExt("html-languageserver"), "--stdio"},
         init_options = {
             configurationSection = { "html", "css", "javascript" },
             embeddedLanguages = {
-                css = true,
+                css        = true,
                 javascript = true
             },
         },
@@ -384,8 +403,8 @@ end
 -- TypeScript {{{
 -- https://github.com/theia-ide/typescript-language-server
 -- npm install -g typescript typescript-language-server
-if ex("typescript-language-server") then
-    setups.typescript = {
+if require("config.nvim-lsp").ex("typescript-language-server") then
+    require("config.nvim-lsp").servers.typescript = {
         cmd = {checkExt("typescript-language-server"), "--stdio"},
     }
 end
@@ -393,8 +412,8 @@ end
 -- YAML {{{
 -- https://github.com/redhat-developer/yaml-language-server#readme
 -- yarn global add yaml-language-server
-if ex("yaml-language-server") then
-    setups.yaml = {
+if require("config.nvim-lsp").ex("yaml-language-server") then
+    require("config.nvim-lsp").servers.yaml = {
         cmd = {checkExt("yaml-language-server"), "--stdio"},
     }
 end
@@ -402,90 +421,29 @@ end
 -- CSS {{{
 -- https://github.com/hrsh7th/vscode-langservers-extracted
 -- npm i -g vscode-langservers-extracted
-if ex("vscode-css-language-server") then
-    setups.css = {
+if require("config.nvim-lsp").ex("vscode-css-language-server") then
+    require("config.nvim-lsp").servers.css = {
         cmd = {checkExt("vscode-css-language-server"), "--stdio"},
     }
 end
 -- }}} CSS
 -- Bash {{{
 -- https://github.com/mads-hartmann/bash-language-server
-if ex("bash-language-server") then
-    setups.bash = {
+if require("config.nvim-lsp").ex("bash-language-server") then
+    require("config.nvim-lsp").servers.bash = {
         cmd = {checkExt("bash-language-server"), "start"}
     }
 end
+
 -- }}} Bash
--- }}} LSP config
+-- }}} LSP override config
 
--- glepnir/lspsaga.nvim {{{
-require("lspsaga").init_lsp_saga {
-    use_saga_diagnostic_sign = true,
-    error_sign            = "",
-    warn_sign             = "⚠️",
-    hint_sign             = "",
-    infor_sign            = "",
-    dianostic_header_icon = '   ',
-    code_action_icon = ' ',
-    code_action_prompt = {
-        enable        = true,
-        sign          = false,
-        sign_priority = 20,
-        virtual_text  = true,
-    },
-    finder_definition_icon = '  ',
-    finder_reference_icon  = '  ',
-    max_preview_lines = 10,
-    finder_action_keys = {
-        open = 'o', vsplit = '<C-v>',split = '<C-s>',quit = 'q',scroll_down = '<A-d>', scroll_up = '<A-e>'
-    },
-    code_action_keys = {
-        quit = 'q',exec = '<CR>'
-    },
-    rename_action_keys = {
-        quit = '<C-c>',exec = '<CR>'
-    },
-    definition_preview_icon = '  ',
-    border_style = "round",
-    rename_prompt_prefix = '>>>',
-    -- server_filetype_map = {}
-}
--- }}} glepnir/lspsaga.nvim
+require("config.nvim-lsp").setupServers()
 
--- kabouzeid/nvim-lspinstall {{{
-
-local setup_servers = function()
-    lspInstall.setup()
-    -- Override configs
-    local setupLangs = vim.tbl_keys(setups)
-    -- Get all installed servers
-    local servers = lspInstall.installed_servers()
-    -- Add manually
-    -- table.insert(servers, {serverName})
-
-    local config
-    for _, server in pairs(servers) do
-        if vim.tbl_contains(setupLangs, server) then
-            config = vim.tbl_extend("keep", {}, makeBasicConfig(), setups[server])
-        end
-
-        if config then
-            lspConfig[server].setup(config)
-        end
-    end
 end
 
-setup_servers()
 
--- Automatically reload after `:LspInstall <server>` so we don't have to restart neovim
-lspInstall.post_install_hook = function ()
-    setup_servers() -- reload installed servers
-    cmd "bufdo e" -- this triggers the FileType autocmd that starts the server
-end
--- }}} kabouzeid/nvim-lspinstall
-cmd [[
-command! -nargs=0 LspInstalled lua Print(require("lspinstall").installed_servers())
-]]
+
 
 return M
 

@@ -12,8 +12,8 @@ function M.openUrl(selectText)
     -- Normal mode with no selected text provided
     if not selectText then
         local regex
-        if string.match(fn.expand("%:t"), "vimPlugList.vim") then
-            regex = vim.regex [[Plug \zs'.\{-}\/.\{-}']]
+        if fn.expand("%:p") == fn.stdpath("config") .. "/lua/core/plugins.lua" then
+            regex = vim.regex [[use \zs'.\{-}\/.\{-}']]
         else
             regex = vim.regex [=[[a-z]*:\/\/[^ >,;]*]=]
         end
@@ -26,9 +26,8 @@ function M.openUrl(selectText)
         if not urlStart then return end
 
         local url
-        if string.match(fn.expand("%:t"), "vimPlugList.vim") then
+        if fn.expand("%:p") == fn.stdpath("config") .. "/lua/core/plugins.lua" then
             url = "https://github.com/" .. string.sub(curLine, urlStart + 2, urlEnd - 1)
-            Print(url)
         else
             url = string.sub(curLine, urlStart + 1, urlEnd)
         end
@@ -55,8 +54,10 @@ function M.openUrl(selectText)
         if fn.has('win32') == 1 then
             fn.system("explorer " .. selectText)
         elseif fn.has('unix') == 1 then
-            return
-            fn.system("xdg-open '" .. selectText .. "'")
+            if fn.expand("%:p") == fn.stdpath("config") .. "/lua/core/plugins.lua" then
+                selectText = "https://github.com/" .. selectText
+            end
+                fn.system("xdg-open '" .. selectText .. "'")
         end
     end
 end

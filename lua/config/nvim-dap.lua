@@ -1,7 +1,6 @@
 local vim = vim
 local fn  = vim.fn
 local api = vim.api
-local map = require("util").map
 local dap = require("dap")
 local M = {}
 

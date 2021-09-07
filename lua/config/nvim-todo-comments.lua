@@ -1,5 +1,6 @@
 -- NOTE: ripgrep is quired
-require("todo-comments").setup {
+return function()
+require("todo-comments").setup{
     signs = true, -- show icons in the signs column
     -- keywords recognized as todo comments
     keywords = {
@@ -34,7 +35,7 @@ require("todo-comments").setup {
     colors = {
         error   = { "LspDiagnosticsDefaultError",       "ErrorMsg",   "#DC2626" },
         warning = { "LspDiagnosticsDefaultWarning",     "WarningMsg", "#FBBF24" },
-        info    = { "LspDiagnosticsDefaultInformation", "#2563EB" },
+        info    = { "LspDiagnosticsDefaultWarning", "#2563EB" },
         hint    = { "LspDiagnosticsDefaultHint",        "#10B981" },
         default = { "Identifier",                       "#7C3AED" },
     },
@@ -53,4 +54,5 @@ require("todo-comments").setup {
         -- pattern = [[\b(KEYWORDS)\b]], -- match without the extra colon. You'll likely get false positives
     },
 }
+end
 

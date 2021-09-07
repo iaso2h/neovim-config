@@ -20,6 +20,7 @@ function M.cycleCase() -- {{{
         M.CMDList = vim.deepcopy(M.defaultCMDList)
     end
     local firstCMD = table.remove(M.CMDList, 1)
+    -- BUG:
     cmd("silent " .. firstCMD)
     api.nvim_echo({{string.format("\nSwitch to %s", firstCMD), "MoreMsg"}}, false, {})
 
