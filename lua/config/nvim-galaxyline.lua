@@ -2,6 +2,8 @@
 -- Author: iaso2h
 -- Description: Statusline configuration
 -- Last Modified: 2021-08-22
+return function()
+
 local fn  = vim.fn
 local api = vim.api
 
@@ -352,15 +354,15 @@ gls.left[16] = {
     -- }
 -- }
 
-gls.mid[3] = {
-    lspMsg = {
-        provider  = require("config.nvim-lsp-status").lspMsg,
-        condition = function()
-            return vim.lsp.buf.server_ready() and condition.hide_in_width()
-        end,
-        highlight = {colors.blue, colors.bg}
-    }
-}
+-- gls.mid[3] = {
+--  lspMsg = {
+    --    provider  = require("config.nvim-lsp-status").lspMsg,
+    --  condition = function()
+        --    return vim.lsp.buf.server_ready() and condition.hide_in_width()
+        -- end,
+        -- highlight = {colors.blue, colors.bg}
+    -- }
+-- }
 -- }}} Mid
 
 gls.right[1] = { -- {{{
@@ -491,4 +493,6 @@ gls.short_line_left[7] = {
         highlight = {colors.blue, colors.bg}
     }
 } --- }}}
+
+end
 

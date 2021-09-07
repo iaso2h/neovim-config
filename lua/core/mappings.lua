@@ -1,6 +1,4 @@
 local cmd  = vim.cmd
-local map  = require("util").map
-local vmap = require("util").vmap
 local M    = {}
 
 -- First thing first
@@ -27,9 +25,6 @@ map("", [[<C-g>]], [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " ðŸ–
 -- Tab switcher {{{
 map("n", [[<S-Tab>]], [[:lua require("tabSwitcher").main()<cr>]], {"silent", "novscode"})
 -- }}} Tab switcher
--- Compile & run
-map("n", [[<F9>]],   [[:lua require("compileRun").compileCode(true)<cr>]], {"noremap", "silent", "novscode"})
-map("n", [[<S-F9>]], [[:lua require("compileRun").runCode(true)<cr>]],     {"noremap", "silent", "novscode"})
 -- Search & Jumping {{{
 -- Disable dj/dk
 map("n", [[dj]], [[<Nop>]])
@@ -91,7 +86,6 @@ map("n", [[g<S-CR>]], [[:lua require("trailingUtil").trailingChar("O")<cr>]],  {
 vmap("n", [[g>]], [[:<c-u>messages<cr>]])
 
 map("n", [[g<]],        [[:<c-u>messages<cr>]], {"silent"})
-map("n", [[g>]],        [[:<c-u>Messages<cr>]], {"silent", "novscode"})
 map("n", [[<leader>,    ]],                     [[:<c-u>execute 'messages clear<bar>echohl Moremsg<bar>echo "Message clear"<bar>echohl None'<cr>]])
 map("n", [[<leader>.]], [[:<c-u>execute 'messages clear<bar>echohl Moremsg<bar>echo "Message clear"<bar>echohl None'<cr>]])
 -- Pageup/Pagedown
@@ -107,7 +101,6 @@ vmap("i", [[<A-d>]], [[<C-o>:call VSCodeCall("cursorPageDown")<cr>]])
 vmap("v", [[<A-e>]], [[<C-b>]])
 vmap("v", [[<A-d>]], [[<C-f>]])
 -- Macro
--- <C-q> has been mapped to COC showDoc
 map("n", [[<A-q>]], [[q]], {"noremap"})
 -- Register
 -- ClearReg() {{{
@@ -118,8 +111,7 @@ function! ClearReg()
 endfunction
 ]]
 -- }}} ClearReg()
-map("",  [[<C-'>]],     [[:<c-u>reg<cr>]],             {"silent"})
-map("i", [[<C-'>]],     [[<C-\><C-o>:reg<cr>]],        {"silent"})
+map("",  [[<C-q>]],     [[:<c-u>reg<cr>]],             {"silent"})
 map("",  [[<leader>']], [[:<c-u>call ClearReg()<cr>]], {"silent"})
 -- Buffer & Window & Tab{{{
 -- Smart quit
@@ -205,21 +197,14 @@ map("n", [[gP]], [[gp]])
 map("n", [[<leader>p]], [["0p]])
 map("n", [[<leader>P]], [["0P]])
 -- Inplace yank
-map("n", [[Y]], [[yy]])
-map("",  [[y]], [[luaeval("require('operator').main(require('yankPut').inplaceYank, false, nil)")]], {"silent", "expr"})
+map("", [[Y]], [[yy]])
+map("", [[y]], [[luaeval("require('operator').main(require('yankPut').inplaceYank, false, nil)")]], {"silent", "expr"})
 -- Inplace put
 map("n", [[p]], [[:lua require("yankPut").inplacePut("n", "p")<cr>]], {"silent"})
 map("v", [[p]], [[:lua require("yankPut").inplacePut("v", "p")<cr>]], {"silent"})
 map("n", [[P]], [[:lua require("yankPut").inplacePut("n", "P")<cr>]], {"silent"})
 map("v", [[P]], [[:lua require("yankPut").inplacePut("v", "P")<cr>]], {"silent"})
 -- Inplace replace
--- Repeat not defined in visual mode, but enabled through visualrepeat.vim.
-map("n", [[gr]],  [[luaeval("require('replace').expression()")]], {"silent", "expr"})
-map("n", [[grr]], [[<Plug>InplaceReplaceLine]])
-map("n", [[<Plug>InplaceReplaceLine]], [[:<c-u>execute 'normal! V' . v:count1 . "_\<lt>Esc>"<bar> lua ReplaceOperator({"visual", "InplaceReplaceLine"})<cr>]], {"noremap", "silent"})
-map("v", [[R]], [[<Plug>InplaceReplaceVisual]])
-map("v", [[<Plug>InplaceReplaceVisual]], [[:lua ReplaceOperator({"visual", "InplaceReplaceVisual"})<cr>]], {"noremap", "silent"})
-map("v", [[<Plug>InplaceReplaceVisual]], [[:lua ReplaceVisualMode()<cr>]],                                 {"noremap", "silent"})
 -- Convert paste
 map("n", [[cP]], [[:lua require("yankPut").convertPut("P")<cr>]])
 map("n", [[cp]], [[:lua require("yankPut").convertPut("p")<cr>]])

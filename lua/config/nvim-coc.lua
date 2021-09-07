@@ -2,11 +2,9 @@
 -- Author: iaso2h
 -- Description: settings to control coc.nvim and coc plugin's behaviors
 -- Last Modified: 2021-03-23
-local vim = vim
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
-local map = require("util").map
 local M   = {}
 
 -- Extensions {{{

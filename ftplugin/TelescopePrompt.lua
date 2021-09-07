@@ -1,4 +1,8 @@
 -- TODO: supoort multiple actions
+
+vim.cmd[[setlocal wrap number]]
+
+
 if not TelescopeOverrideBufMap then
     TelescopeOverrideBufMap = function(mode, lhs, actionName)
         local promptBufNr

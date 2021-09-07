@@ -3,6 +3,8 @@
 -- Description: Enhnace origin fold feature, mainly focus on markder fold method
 -- Version: 0.0.1
 -- TODO: Better [z and [Z algorithm
+-- TODO: Open all fold when cursor is on a fold-closed line
+-- TODO: Support [z/]z in visual mode
 -- Last Modified: 2021-02-09 then
 local fn = vim.fn
 local cmd = vim.cmd

@@ -1,4 +1,5 @@
-local vim = vim
+return function()
+
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
@@ -48,7 +49,7 @@ vim.g.mkdp_echo_preview_url = 0
 -- default is empty
 -- TODO
 vim.g.mkdp_browserfunc = 'vim.g.OpenUrl'
-api.nvim_exec([[
+cmd [[
 function! OpenUrl(url)
     if has('win32')
         execute("!chrome " . url)
@@ -56,7 +57,7 @@ function! OpenUrl(url)
         execute("!open '" . url . "'")
     endif
 endfunctio
-]], false)
+]]
 -- options for markdown render
 -- mkivim.t. markdown-it options for render
 -- katex: katex options for math
@@ -72,17 +73,17 @@ endfunctio
 -- content_editable: if enable content editable for preview page, defaulvim.t. vim.v.false
 -- disable_filename: if disable filename header for preview page, defaulvim.t. 0
 vim.g.mkdp_preview_options = {
-    mkit =                {},
-    katex =               {},
-    uml =                 {},
-    maid =                {},
+    mkit                = {},
+    katex               = {},
+    uml                 = {},
+    maid                = {},
     disable_sync_scroll = 1,
-    sync_scroll_type =    'middle',
-    hide_yaml_meta =      1,
-    sequence_diagrams =   {},
-    flowchart_diagrams =  {},
-    content_editable =    false,
-    disable_filename =    0
+    sync_scroll_type    = 'middle',
+    hide_yaml_meta      = 1,
+    sequence_diagrams   = {},
+    flowchart_diagrams  = {},
+    content_editable    = false,
+    disable_filename    = 0
 }
 
 -- use a custom markdown style must be absolute path
@@ -120,16 +121,18 @@ vim.g.markdown_fenced_languages = {
 }
 vim.g.vim_markdown_follow_anchor = 1
 vim.g.vim_markdown_no_default_key_mappings = 1
-api.nvim_exec([=[
+cmd [=[
 augroup MarkdownFile
     autocmd!
-    autocmd FileType markdown nmap <buffer> [[    <Plug>Markdown_MoveToPreviousHeader
-    autocmd FileType markdown nmap <buffer> ]]    <Plug>Markdown_MoveToNextHeader
-    autocmd FileType markdown nmap <buffer> [c    <Plug>Markdown_MoveToCurHeader
-    autocmd FileType markdown nmap <buffer> [p    <Plug>Markdown_MoveToParentHeader
-    autocmd FileType markdown nmap <buffer> <C-l> <Plug>Markdown_OpenUrlUnderCursor
-    autocmd FileType markdown nmap <buffer> gl    <Plug>Markdown_EditUrlUnderCursor
+    autocmd FileType markdown nmap <buffer> [[ <Plug>Markdown_MoveToPreviousHeader
+    autocmd FileType markdown nmap <buffer> ]] <Plug>Markdown_MoveToNextHeader
+    autocmd FileType markdown nmap <buffer> [c <Plug>Markdown_MoveToCurHeader
+    autocmd FileType markdown nmap <buffer> [p <Plug>Markdown_MoveToParentHeader
+    autocmd FileType markdown nmap <buffer> gl <Plug>Markdown_OpenUrlUnderCursor
+    autocmd FileType markdown nmap <buffer> gL <Plug>Markdown_EditUrlUnderCursor
 augroup EN
-]=], false)
+]=]
 -- }}} plasticboy/vim-markdown
+
+end
 

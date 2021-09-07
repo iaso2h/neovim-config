@@ -1,7 +1,8 @@
+return function()
+
 local fn      = vim.fn
 local cmd     = vim.cmd
 local api     = vim.api
-local map     = require("util").map
 local actions = require("telescope.actions")
 
 -- Gloabl customization
@@ -127,13 +128,6 @@ require('telescope').setup{
 
 require('telescope').load_extension('fzy_native')
 
-function TelescopePreStart() -- {{{
-    cmd[[setlocal wrap number]]
-end -- }}}
-
--- AutoCommad
-api.nvim_exec([[autocmd User TelescopePreviewerLoaded lua TelescopePreStart()]], false)
-
 -- Command
 cmd[[command! -nargs=0 O lua require('telescope.builtin').oldfiles(require('telescope.themes').get_dropdown({}))]]
 
@@ -147,4 +141,6 @@ map("n", [[<C-h>c]],     [[:lua require('telescope.builtin').commands(require('t
 map("n", [[<C-h>h]],     [[:lua require('telescope.builtin').help_tags(require('telescope.themes').get_dropdown({}))<cr>]],                 {"silent"})
 map("n", [[<C-h><C-h>]], [[:lua require('telescope.builtin').help_tags(require('telescope.themes').get_dropdown({}))<cr>]],                 {"silent"})
 map("n", [[<C-h>o]],     [[:lua require('telescope.builtin').current_buffer_tags(require('telescope.themes').get_dropdown({}))<cr>]],       {"silent"})
+
+end
 
