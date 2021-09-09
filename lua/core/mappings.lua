@@ -12,6 +12,8 @@ if not os.getenv("TERM") then
     -- map("", [[\[]],    [[:lua GuiFontSize = GuiFontSize - 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<cr>]], {"silent", "novscode"})
     map("", [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<cr>]],              {"silent", "novscode"})
 end
+-- HistoryStartup
+map("n", [[<C-s>]], [[:lua require("historyStartup").display()<cr>]], {"silent"})
 -- Extraction
 map("",  [[gc]], [[luaeval("require('operator').main(require('extraction').main, false)")]], {"silent", "expr"})
 map("v", [[C]],  [[:lua require("extraction").main({nil, vim.fn.visualmode()})<cr>]],        {"silent"})
@@ -135,6 +137,8 @@ map("n", [[<C-w>o]], [[:lua require("buffer").closeOtherWin()<cr>]],            
 
 -- Buffers
 map("",  [[<C-w>O]], [[:lua require("buffer").wipeOtherBuf()<cr>]], {"silent", "novscode"})
+map("n", [[<A-h>]],  [[:<c-u>bp<cr>]],                              {"silent"})
+map("n", [[<A-l>]],  [[:<c-u>bn<cr>]],                              {"silent"})
 -- Tab
 map("", [[<A-C-h>]],    [[:<c-u>tabp<cr>]],    {"silent", "novscode"})
 map("", [[<A-C-l>]],    [[:<c-u>tabn<cr>]],    {"silent", "novscode"})

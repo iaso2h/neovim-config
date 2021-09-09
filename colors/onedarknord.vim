@@ -278,11 +278,11 @@ call s:hi("SignColumn", s:nord1_gui, s:nord0_gui, s:nord1_term, "NONE", "", "")
 call s:hi("Directory", s:nord8_gui, "", s:nord8_term, "NONE", "", "")
 
 "+--- Prompt/Status ---+
-call s:hi("EndOfBuffer", s:nord1_gui, "", s:nord1_term, "NONE", "", "")
-call s:hi("ErrorMsg", s:nord4_gui, s:nord11_gui, "NONE", s:nord11_term, "", "")
-call s:hi("ModeMsg", s:nord4_gui, "", "", "", "", "")
-call s:hi("MoreMsg", s:nord8_gui, "", s:nord8_term, "", "", "")
-call s:hi("Question", s:nord4_gui, "", "NONE", "", "", "")
+call s:hi("EndOfBuffer", s:nord1_gui, "",           s:nord1_term, "NONE",        "",       "")
+call s:hi("ErrorMsg",    s:nord4_gui, s:nord11_gui, "NONE",       s:nord11_term, "",       "")
+call s:hi("ModeMsg",     s:nord4_gui, "",           "",           "",            s:bold,   "")
+call s:hi("MoreMsg",     s:nord8_gui, "",           s:nord8_term, "",            s:bold,   "")
+call s:hi("Question",    s:nord8_gui, "",           s:nord8_term, "",            s:italic, "")
 " call s:hi("StatusLine", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "NONE", "")
 " call s:hi("StatusLineNC", s:nord4_gui, s:nord1_gui, "NONE", s:nord1_term, "NONE", "")
 " call s:hi("StatusLineTerm", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, "NONE", "")
@@ -315,7 +315,7 @@ call s:hi("VertSplit", s:nord2_gui, s:nord0_gui, s:nord3_term, "NONE", "NONE", "
 " Syntax Groups (descriptions and ordering from `:h w18`) {{{
 
 " call s:h("Comment", {"fg": s:comment_grey, "gui": "italic", "cterm": "italic" }) " any comment
-call s:hi("Comment", s:nord3_gui, "", s:nord12_term, "", s:italic, "") " any comment
+call s:hi("Comment", s:nord3_gui, "", s:nord1_term, "", s:italic, "") " any comment
 call s:hi("Conceal", "", "NONE", "", "NONE", "", "")
 call s:h("Constant", {"fg": s:dark_yellow }) " any constant
 call s:hi("Decorator", s:nord12_gui, "", s:nord12_term, "", "", "")
@@ -344,7 +344,7 @@ call s:h("PreCondit", {"fg": s:yellow }) " preprocessor #if, #else, #endif, etc.
 call s:h("Type", {"fg": s:yellow }) " int, long, char, etc.
 call s:h("StorageClass", {"fg": s:yellow }) " static, register, volatile, etc.
 " call s:h("Structure", {"fg": s:cyan }) " struct, union, enum, etc.
-call s:hi("Structure", "#00ffe5", "", "NONE", "", s:bold, "")
+call s:hi("Structure", "#00ffe5", "", "NONE", "", "", "")
 call s:h("Typedef", {"fg": s:yellow }) " A typedef
 call s:h("Special", {"fg": s:blue }) " any special symbol
 call s:h("SpecialChar", {"fg": s:dark_yellow }) " special character in a constant
@@ -657,17 +657,17 @@ call s:h("xmlTagName", { "fg": s:red })
 
 " Coc
 " > neoclide/coc
-call s:hi("CocWarningHighlight", s:nord13_gui, "",                 s:nord13_term, "",           "undercurl", "")
-call s:hi("CocErrorHighlight",   s:nord11_gui, "",                 s:nord11_term, "",           "undercurl", "")
-call s:hi("CocWarningSign",      s:nord13_gui, "",                 s:nord13_term, "",           "",          "")
-call s:hi("CocErrorSign",        s:nord11_gui, "",                 s:nord11_term, "",           "",          "")
-call s:hi("CocInfoSign",         s:nord8_gui,  "",                 s:nord8_term,  "",           "",          "")
-call s:hi("CocHintSign",         s:nord13_gui, "",                 s:nord13_term, "",           "",          "")
-call s:hi("CocHighlightText",    "",           s:nord3_gui_bright, "",            s:nord3_term, "",          "")
-call s:hi("CocWarningFloat",     s:nord13_gui, s:nord2_gui,        s:nord13_term, s:nord1_term, "",          "")
-call s:hi("CocErrorFloat",       s:nord11_gui, s:nord2_gui,        s:nord11_term, s:nord1_term, "",          "")
-call s:hi("CocInfoFloat",        s:nord8_gui,  s:nord2_gui,        s:nord8_term,  s:nord1_term, "",          "")
-call s:hi("CocHintFloat",        s:nord10_gui, s:nord2_gui,        s:nord10_term, s:nord1_term, "",          "")
+" call s:hi("CocWarningHighlight", s:nord13_gui, "",                 s:nord13_term, "",           "undercurl", "")
+" call s:hi("CocErrorHighlight",   s:nord11_gui, "",                 s:nord11_term, "",           "undercurl", "")
+" call s:hi("CocWarningSign",      s:nord13_gui, "",                 s:nord13_term, "",           "",          "")
+" call s:hi("CocErrorSign",        s:nord11_gui, "",                 s:nord11_term, "",           "",          "")
+" call s:hi("CocInfoSign",         s:nord8_gui,  "",                 s:nord8_term,  "",           "",          "")
+" call s:hi("CocHintSign",         s:nord13_gui, "",                 s:nord13_term, "",           "",          "")
+" call s:hi("CocHighlightText",    "",           s:nord3_gui_bright, "",            s:nord3_term, "",          "")
+" call s:hi("CocWarningFloat",     s:nord13_gui, s:nord2_gui,        s:nord13_term, s:nord1_term, "",          "")
+" call s:hi("CocErrorFloat",       s:nord11_gui, s:nord2_gui,        s:nord11_term, s:nord1_term, "",          "")
+" call s:hi("CocInfoFloat",        s:nord8_gui,  s:nord2_gui,        s:nord8_term,  s:nord1_term, "",          "")
+" call s:hi("CocHintFloat",        s:nord10_gui, s:nord2_gui,        s:nord10_term, s:nord1_term, "",          "")
 
 " Nvim LSP
 " > neovim/nvim-lsp
@@ -689,17 +689,17 @@ call s:hi("LspReferenceWrite",                  "",           s:nord3_gui, "NONE
 
 " GitGutter
 " > airblade/vim-gitgutter
-call s:hi("GitGutterAdd", s:nord14_gui, "", s:nord14_term, "", "", "")
-call s:hi("GitGutterChange", s:nord13_gui, "", s:nord13_term, "", "", "")
-call s:hi("GitGutterChangeDelete", s:nord11_gui, "", s:nord11_term, "", "", "")
-call s:hi("GitGutterDelete", s:nord11_gui, "", s:nord11_term, "", "", "")
+" call s:hi("GitGutterAdd", s:nord14_gui, "", s:nord14_term, "", "", "")
+" call s:hi("GitGutterChange", s:nord13_gui, "", s:nord13_term, "", "", "")
+" call s:hi("GitGutterChangeDelete", s:nord11_gui, "", s:nord11_term, "", "", "")
+" call s:hi("GitGutterDelete", s:nord11_gui, "", s:nord11_term, "", "", "")
 
 " Signify
 " > mhinz/vim-signify
-call s:hi("SignifySignAdd", s:nord14_gui, "", s:nord14_term, "", "", "")
-call s:hi("SignifySignChange", s:nord13_gui, "", s:nord13_term, "", "", "")
-call s:hi("SignifySignChangeDelete", s:nord11_gui, "", s:nord11_term, "", "", "")
-call s:hi("SignifySignDelete", s:nord11_gui, "", s:nord11_term, "", "", "")
+" call s:hi("SignifySignAdd", s:nord14_gui, "", s:nord14_term, "", "", "")
+" call s:hi("SignifySignChange", s:nord13_gui, "", s:nord13_term, "", "", "")
+" call s:hi("SignifySignChangeDelete", s:nord11_gui, "", s:nord11_term, "", "", "")
+" call s:hi("SignifySignDelete", s:nord11_gui, "", s:nord11_term, "", "", "")
 
 " fugitive.vim
 " > tpope/vim-fugitive
@@ -754,27 +754,27 @@ call s:hi("gitcommitSelectedFile", s:nord14_gui, "", s:nord14_term, "", "", "")
 
 " vim-indent-guides
 " > nathanaelkane/vim-indent-guides
-call s:hi("IndentGuidesEven", "", s:nord1_gui, "", s:nord1_term, "", "")
-call s:hi("IndentGuidesOdd", "", s:nord2_gui, "", s:nord3_term, "", "")
+" call s:hi("IndentGuidesEven", "", s:nord1_gui, "", s:nord1_term, "", "")
+" call s:hi("IndentGuidesOdd", "", s:nord2_gui, "", s:nord3_term, "", "")
 
 " vim-plug
 " > junegunn/vim-plug
-call s:hi("plugDeleted", s:nord11_gui, "", "", s:nord11_term, "", "")
+" call s:hi("plugDeleted", s:nord11_gui, "", "", s:nord11_term, "", "")
 
 " vim-signature
 " > kshenoy/vim-signature
-call s:hi("SignatureMarkText", s:nord8_gui, "", s:nord8_term, "", "", "")
+" call s:hi("SignatureMarkText", s:nord8_gui, "", s:nord8_term, "", "", "")
 
 " vim-startify
 " > mhinz/vim-startify
-call s:hi("StartifyFile", s:nord6_gui, "", s:nord6_term, "", "", "")
-call s:hi("StartifyFooter", s:nord7_gui, "", s:nord7_term, "", "", "")
-call s:hi("StartifyHeader", s:nord8_gui, "", s:nord8_term, "", "", "")
-call s:hi("StartifyNumber", s:nord7_gui, "", s:nord7_term, "", "", "")
-call s:hi("StartifyPath", s:nord8_gui, "", s:nord8_term, "", "", "")
-call s:hi("StartifyBracket", s:nord6_gui, "", s:nord6_term, "", "", "")
-call s:hi("StartifySlash", s:nord15_gui, "", s:nord15_term, "", "", "")
-call s:hi("StartifySpecial", s:nord3_gui_bright, "", s:nord3_term, "", s:italicize_comments, "")
+" call s:hi("StartifyFile", s:nord6_gui, "", s:nord6_term, "", "", "")
+" call s:hi("StartifyFooter", s:nord7_gui, "", s:nord7_term, "", "", "")
+" call s:hi("StartifyHeader", s:nord8_gui, "", s:nord8_term, "", "", "")
+" call s:hi("StartifyNumber", s:nord7_gui, "", s:nord7_term, "", "", "")
+" call s:hi("StartifyPath", s:nord8_gui, "", s:nord8_term, "", "", "")
+" call s:hi("StartifyBracket", s:nord6_gui, "", s:nord6_term, "", "", "")
+" call s:hi("StartifySlash", s:nord15_gui, "", s:nord15_term, "", "", "")
+" call s:hi("StartifySpecial", s:nord3_gui_bright, "", s:nord3_term, "", s:italicize_comments, "")
 
 "+--- Languages ---+
 " Haskell
@@ -785,55 +785,55 @@ hi! link haskellPragma haskellPreProc
 
 " JavaScript
 " > pangloss/vim-javascript
-call s:hi("jsGlobalNodeObjects", s:nord8_gui, "", s:nord8_term, "", s:italic, "")
-hi! link jsBrackets Delimiter
-hi! link jsFuncCall Function
-hi! link jsFuncParens Delimiter
-hi! link jsThis Keyword
-hi! link jsNoise Delimiter
-hi! link jsPrototype Keyword
-hi! link jsRegexpString SpecialChar
+" call s:hi("jsGlobalNodeObjects", s:nord8_gui, "", s:nord8_term, "", s:italic, "")
+" hi! link jsBrackets Delimiter
+" hi! link jsFuncCall Function
+" hi! link jsFuncParens Delimiter
+" hi! link jsThis Keyword
+" hi! link jsNoise Delimiter
+" hi! link jsPrototype Keyword
+" hi! link jsRegexpString SpecialChar
 
 " TypeScript
 " > HerringtonDarkholme/yats.vim
-call s:hi("typescriptBOMWindowMethod", s:nord8_gui, "", s:nord8_term, "", s:italic, "")
-call s:hi("typescriptClassName", s:nord7_gui, "", s:nord7_term, "", "", "")
-call s:hi("typescriptDecorator", s:nord12_gui, "", s:nord12_term, "", "", "")
-call s:hi("typescriptInterfaceName", s:nord7_gui, "", s:nord7_term, "", s:bold, "")
-call s:hi("typescriptRegexpString", s:nord13_gui, "", s:nord13_term, "", "", "")
+" call s:hi("typescriptBOMWindowMethod", s:nord8_gui, "", s:nord8_term, "", s:italic, "")
+" call s:hi("typescriptClassName", s:nord7_gui, "", s:nord7_term, "", "", "")
+" call s:hi("typescriptDecorator", s:nord12_gui, "", s:nord12_term, "", "", "")
+" call s:hi("typescriptInterfaceName", s:nord7_gui, "", s:nord7_term, "", s:bold, "")
+" call s:hi("typescriptRegexpString", s:nord13_gui, "", s:nord13_term, "", "", "")
 " TypeScript JSX
-call s:hi("tsxAttrib", s:nord7_gui, "", s:nord7_term, "", "", "")
-hi! link typescriptOperator Operator
-hi! link typescriptBinaryOp Operator
-hi! link typescriptAssign Operator
-hi! link typescriptMember Identifier
-hi! link typescriptDOMStorageMethod Identifier
-hi! link typescriptArrowFuncArg Identifier
-hi! link typescriptGlobal typescriptClassName
-hi! link typescriptBOMWindowProp Function
-hi! link typescriptArrowFuncDef Function
-hi! link typescriptAliasDeclaration Function
-hi! link typescriptPredefinedType Type
-hi! link typescriptTypeReference typescriptClassName
-hi! link typescriptTypeAnnotation Structure
-hi! link typescriptDocNamedParamType SpecialComment
-hi! link typescriptDocNotation Keyword
-hi! link typescriptDocTags Keyword
-hi! link typescriptImport Keyword
-hi! link typescriptExport Keyword
-hi! link typescriptTry Keyword
-hi! link typescriptVariable Keyword
-hi! link typescriptBraces Normal
-hi! link typescriptObjectLabel Normal
-hi! link typescriptCall Normal
-hi! link typescriptClassHeritage typescriptClassName
-hi! link typescriptFuncTypeArrow Structure
-hi! link typescriptMemberOptionality Structure
-hi! link typescriptNodeGlobal typescriptGlobal
-hi! link typescriptTypeBrackets Structure
-hi! link tsxEqual Operator
-hi! link tsxIntrinsicTagName htmlTag
-hi! link tsxTagName tsxIntrinsicTagName
+" call s:hi("tsxAttrib", s:nord7_gui, "", s:nord7_term, "", "", "")
+" hi! link typescriptOperator Operator
+" hi! link typescriptBinaryOp Operator
+" hi! link typescriptAssign Operator
+" hi! link typescriptMember Identifier
+" hi! link typescriptDOMStorageMethod Identifier
+" hi! link typescriptArrowFuncArg Identifier
+" hi! link typescriptGlobal typescriptClassName
+" hi! link typescriptBOMWindowProp Function
+" hi! link typescriptArrowFuncDef Function
+" hi! link typescriptAliasDeclaration Function
+" hi! link typescriptPredefinedType Type
+" hi! link typescriptTypeReference typescriptClassName
+" hi! link typescriptTypeAnnotation Structure
+" hi! link typescriptDocNamedParamType SpecialComment
+" hi! link typescriptDocNotation Keyword
+" hi! link typescriptDocTags Keyword
+" hi! link typescriptImport Keyword
+" hi! link typescriptExport Keyword
+" hi! link typescriptTry Keyword
+" hi! link typescriptVariable Keyword
+" hi! link typescriptBraces Normal
+" hi! link typescriptObjectLabel Normal
+" hi! link typescriptCall Normal
+" hi! link typescriptClassHeritage typescriptClassName
+" hi! link typescriptFuncTypeArrow Structure
+" hi! link typescriptMemberOptionality Structure
+" hi! link typescriptNodeGlobal typescriptGlobal
+" hi! link typescriptTypeBrackets Structure
+" hi! link tsxEqual Operator
+" hi! link tsxIntrinsicTagName htmlTag
+" hi! link tsxTagName tsxIntrinsicTagName
 
 " Markdown
 " > plasticboy/vim-markdown
@@ -880,7 +880,7 @@ hi! link VimwikiList markdownListMarker
 
 " YAML
 " > stephpy/vim-yaml
-call s:hi("yamlKey", s:nord7_gui, "", s:nord7_term, "", "", "")
+" call s:hi("yamlKey", s:nord7_gui, "", s:nord7_term, "", "", "")
 
 " Git Highlighting {{{
 call s:h("gitcommitComment", { "fg": s:comment_grey })
@@ -907,45 +907,45 @@ hi link gitcommitUnmergedArrow gitcommitUnmergedFile
 " }}}
 "
 " EasyMotion {{{
-highlight EasyMotionTarget guibg=white guifg=black
-highlight link EasyMotionShade  Comment
-highlight EasyMotionTarget2First guibg=#ED427C guifg=white
-highlight EasyMotionTarget2Second guibg=#ED427C guifg=white
+" highlight EasyMotionTarget guibg=white guifg=black
+" highlight link EasyMotionShade  Comment
+" highlight EasyMotionTarget2First guibg=#ED427C guifg=white
+" highlight EasyMotionTarget2Second guibg=#ED427C guifg=white
 " }}} EasyMotion
 
 " phaazon/hop.nvim {{{
-highlight HopNextKey guibg=white guifg=black
-highlight HopNextKey1 guibg=#ED427C guifg=white
-highlight HopNextKey2 guibg=#ED427C guifg=white
-call s:hi("HopUnmatched", s:nord7_gui, "", s:nord7_term, "", s:italic, "")
+call s:hi("HopNextKey",   "#FFFFFF",   "#000000", "",           "", "", "")
+call s:hi("HopNextKey1",  "#ED427C",   "#FFFFFF", "",           "", "", "")
+call s:hi("HopNextKey2",  "#ED427C",   "#FFFFFF", "",           "", "", "")
+call s:hi("HopUnmatched", s:nord3_gui, "",        s:nord1_term, "", "", "")
 " }}} phaazon/hop.nvim
 
 
 " " the color of the cursorline
 " highlight def Lf_hl_cursorline guifg=Yellow guibg=NONE gui=NONE ctermfg=226 ctermbg=NONE cterm=NONE
-call s:hi("Lf_hl_cursorline", s:nord8_gui, "", s:nord8_term, "", "", "")
+" call s:hi("Lf_hl_cursorline", s:nord8_gui, "", s:nord8_term, "", "", "")
 
-call s:hi("Lf_hl_match", s:nord9_gui, "", s:nord9_term, "", "", "")
+" call s:hi("Lf_hl_match", s:nord9_gui, "", s:nord9_term, "", "", "")
 " " the color of matching character
 " highlight def Lf_hl_match  guifg=SpringGreen guibg=NONE gui=bold ctermfg=85 ctermbg=NONE cterm=bold
 
 " the color of matching character in `And mode`
-call s:hi("Lf_hl_match01", s:nord9_gui, "", s:nord9_term, "", "", "")
-call s:hi("Lf_hl_match02", s:nord14_gui, "", s:nord14_term, "", "", "")
-call s:hi("Lf_hl_match03", s:nord11_gui, "", s:nord11_term, "", "", "")
-call s:hi("Lf_hl_match04", s:nord15_gui, "", s:nord15_term, "", "", "")
-call s:hi("Lf_hl_matchRefine", s:nord13_gui, "", s:nord13_term, "", "", "")
+" call s:hi("Lf_hl_match01", s:nord9_gui, "", s:nord9_term, "", "", "")
+" call s:hi("Lf_hl_match02", s:nord14_gui, "", s:nord14_term, "", "", "")
+" call s:hi("Lf_hl_match03", s:nord11_gui, "", s:nord11_term, "", "", "")
+" call s:hi("Lf_hl_match04", s:nord15_gui, "", s:nord15_term, "", "", "")
+" call s:hi("Lf_hl_matchRefine", s:nord13_gui, "", s:nord13_term, "", "", "")
 
 " " the color of matching character in nameOnly mode when ';' is typed
 " highlight def Lf_hl_matchRefine gui=bold guifg=Magenta cterm=bold ctermfg=201
 
-" Sandwich {{{
+" machakann/vim-sandwich {{{
 hi! link OperatorSandwichAdd    Search
 hi! link OperatorSandwichBuns   Search
 hi! link OperatorSandwichChange Search
 hi! link OperatorSandwichDelete Search
 hi! link OperatorSandwichAddrcc Search
-" }}} Sandwich
+" }}} machakann/vim-sandwich
 
 " mg979/vim-visual-multi-multi {{{
 hi! VMExtend      ctermbg=239 guibg=#434C5E
@@ -953,16 +953,6 @@ hi! VMCursor      ctermbg=245 ctermfg=24  guibg=#8a8a8a guifg=black
 hi! VMInsert      ctermbg=239 guibg=#8a8a8a
 hi! VMMono        ctermbg=131 ctermfg=235 guibg=#88c0d0 guifg=white
 " }}} mg979/vim-visual-multi-multi
-
-" p00f/nvim-ts-rainbow {{{
-" hi rainbowcol1 guifg=#cc7000
-" hi rainbowcol2 guifg=DarkOrchid3
-" hi rainbowcol3 guifg=RoyalBlue2
-" hi rainbowcol4 guifg=Firebrick
-" hi rainbowcol5 guifg=SeaGreen3
-" hi rainbowcol6 guifg=DarkOrange3
-" hi rainbowcol7 guifg=#458588
-" }}} p00f/nvim-ts-rainbow
 
 " nvim-telescope/telescope.nvim {{{
 " TODO
@@ -1022,7 +1012,7 @@ hi!  link TSConstBuiltin       Constant
 hi!  link TSConstMacro         Macro
 
 " call s:h("TSConstructor", {"fg": s:yellow})
-call s:hi("TSConstructor", "#00ffe5", "", "NONE", "", s:bold, "")
+call s:hi("TSConstructor", "#00ffe5", "", "NONE", "", "", "")
 call s:hi("TSEmphasis", s:nord4_gui, "", "NONE", "", s:bold, "")
 call s:hi("TSEnviroment", s:nord4_gui, "", "NONE", "", "", "")
 call s:hi("TSEnviromentName", s:nord4_gui, "", "NONE", "", "", "")
@@ -1174,3 +1164,16 @@ hi! link pandocTableHeaderWord     pandocAtxHeader
 hi! link pandocUListItemBullet     Operator
 " }}} Pandoc
 
+" lewis6991/gitsigns.nvim {{{
+call s:hi("GitSignsAdd",    s:nord14_gui, "", s:nord14_term, "", "", "")
+call s:hi("GitSignsChange", s:nord13_gui, "", s:nord13_term, "", "", "")
+call s:hi("GitSignsDelete", s:nord11_gui, "", s:nord11_term, "", "", "")
+" }}} lewis6991/gitsigns.nvim
+
+" HistoryStartup {{{
+call s:hi("HistoryStartupCreate",   s:nord10_gui, "", s:nord10_term, "", s:bold,   "")
+call s:hi("HistoryStartupFileRoot", s:nord8_gui,  "", s:nord8_term,  "", s:italic, "")
+" }}} HistoryStartup
+"
+"
+"

@@ -11,24 +11,26 @@ local M   = {}
 function M.openUrl(selectText)
     -- Normal mode with no selected text provided
     if not selectText then
-        local regex
-        if fn.expand("%:p") == fn.stdpath("config") .. "/lua/core/plugins.lua" then
-            regex = vim.regex [[use \zs'.\{-}\/.\{-}']]
-        else
-            regex = vim.regex [=[[a-z]*:\/\/[^ >,;]*]=]
-        end
-
+        local url
         local urlStart
         local urlEnd
         local curLine = api.nvim_get_current_line()
-        urlStart, urlEnd = regex:match_str(curLine)
-
-        if not urlStart then return end
-
-        local url
         if fn.expand("%:p") == fn.stdpath("config") .. "/lua/core/plugins.lua" then
-            url = "https://github.com/" .. string.sub(curLine, urlStart + 2, urlEnd - 1)
-        else
+            urlStart, urlEnd = vim.regex [[use \zs'.\{-}']]:match_str(curLine)
+            if urlStart then -- vim plugin links
+                url = "https://github.com/" .. string.sub(curLine, urlStart + 2, urlEnd - 1)
+            else -- configuration file
+                urlStart, urlEnd = vim.regex [=[config.\{-}conf.\{-}\zs".\{-}"]=]:match_str(curLine)
+                if not urlStart then return end
+                return cmd(string.format("e %s/lua/config/%s.lua",
+                    fn.stdpath("config"),
+                    string.sub(curLine, urlStart + 2, urlEnd - 1)
+                ))
+            end
+
+        else -- Normal https link
+            urlStart, urlEnd = vim.regex [=[[a-z]*:\/\/[^ >,;]*]=]:match_str(curLine)
+            if not urlStart then return end
             url = string.sub(curLine, urlStart + 1, urlEnd)
         end
 

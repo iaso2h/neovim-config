@@ -10,6 +10,12 @@ if not ok then
     vim.api.nvim_echo({{_, "ErrorMsg"}}, true, {})
 end
 
+ok, _ = pcall(require, "core.commands")
+if not ok then
+    vim.api.nvim_echo({{"Commands config loaded unsuccessfully", "ErrorMsg"}}, true, {})
+    vim.api.nvim_echo({{_, "ErrorMsg"}}, true, {})
+end
+
 vim.defer_fn(function()
     local ok, _ = pcall(require, "core.plugins")
     if not ok then
@@ -17,11 +23,4 @@ vim.defer_fn(function()
         vim.api.nvim_echo({{_, "ErrorMsg"}}, true, {})
     end
 end, 0)
-
-
-ok, _ = pcall(require, "core.commands")
-if not ok then
-    vim.api.nvim_echo({{"Commands config loaded unsuccessfully", "ErrorMsg"}}, true, {})
-    vim.api.nvim_echo({{_, "ErrorMsg"}}, true, {})
-end
 

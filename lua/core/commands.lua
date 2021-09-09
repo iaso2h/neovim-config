@@ -64,6 +64,8 @@ if not vim.g.vscode then
     api.nvim_exec([[
     augroup fileType
     autocmd!
+    autocmd VimEnter             * nested lua require("historyStartup").display()
+
     autocmd BufWinEnter          * lua require("cursorRecall").main()
     autocmd BufWritePre          * lua require"util".trimWhiteSpaces(); require"util".trailingEmptyLine()
   " autocmd BufEnter             * set formatoptions=pj1Bml2nwc
@@ -102,6 +104,7 @@ command! -nargs=0 TrimWhiteSpaces call TrimWhiteSpaces(0)
 command! -nargs=0 PS terminal powershell
 command! -nargs=0 CD execute "cd " . expand("%:p:h")
 command! -nargs=0 E  up | let g:refreshBufSavView = winsaveview() | e! | call winrestview(g:refreshBufSavView)
+command! -nargs=0 O  browse oldfiles
 command! -nargs=0 MyVimedit edit    $MYVIMRC
 command! -nargs=0 MyVimsrc  luafile $MYVIMRC
 ]]

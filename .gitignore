@@ -1,14 +1,16 @@
-/.vim/
+.vim/
+.idea/
+.vscode/
+.ccls-cache/
+.netrwhist
+dein/
+pack/
+lsp/
+
+plugin/packer_compiled.lua
 *.bk
 *~
 *.py
-/.idea/
-/dein/
-.netrwhist
-.vscode/
-.ccls-cache/
 *temp*
 *.snippets
-lsp/
-/lua/packer_compiled.lua
 

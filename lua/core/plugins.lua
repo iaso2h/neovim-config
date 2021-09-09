@@ -1,18 +1,24 @@
 local fn   = vim.fn
 local cmd  = vim.cmd
 local M    = {}
-local installPath  = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
-local configPath   = fn.stdpath("config")
-local configModule = function(moduleString) return require(string.format("config.%s", moduleString)) end
+local conf       = function(moduleString) return require(string.format("config.%s", moduleString)) end
+local packerPath = fn.stdpath("data") .. "site/pack/packer/start/packer.nvim"
+local packer = require("packer")
 -- VSCodeLoaded = vim.fn.exists('g:vscode') == 0
 -- local nonVSCode    = function() return VSCodeLoaded end
 
-if fn.empty(fn.glob(installPath)) > 0 then
-  fn.system{"git", "clone", "https://github.com/wbthomason/packer.nvim", installPath}
-  cmd "packadd packer.nvim"
+if fn.empty(fn.glob(packerPath)) > 0 then
+    fn.system{"git", "clone", "https://github.com/wbthomason/packer.nvim", packerPath}
 end
+
 cmd "packadd packer.nvim"
-require("packer").startup(function(use, use_rocks)
+
+packer.init{
+    package_root = vim.fn.stdpath("config") .. "/pack",
+    compile_path = vim.fn.stdpath("config") .. "/plugin/packer_compiled.lua"
+}
+
+packer.startup(function(use, use_rocks)
     -- NOTE: https://github.com/wbthomason/packer.nvim#specifying-plugins
     -- use {
     -- 'myusername/example',        -- The plugin location string
@@ -47,7 +53,6 @@ require("packer").startup(function(use, use_rocks)
     -- requiring a string which matches one of these patterns, the plugin will be loaded.
     -- }
 
-    -- First thing first
     use 'wbthomason/packer.nvim'
 
     -- Vim enhancement {{{
@@ -59,9 +64,8 @@ require("packer").startup(function(use, use_rocks)
     }
     use {
         'skywind3000/asyncrun.vim',
-        -- -- NOTE: test config
         cmd    = {"AsyncRun", "AsyncStop"},
-        config = configModule "vim-asyncrun"
+        config = conf "vim-asyncrun"
     }
     use {
         'bkad/camelcasemotion',
@@ -70,8 +74,15 @@ require("packer").startup(function(use, use_rocks)
     use 'antoinemadec/FixCursorHold.nvim'
     use {
         'landock/vim-expand-region',
+        event    = "BufRead",
         requires = "camelcasemotion",
-        setup    = function()
+        -- keys     = {
+            -- {"n", [[<A-a>]]},
+            -- {"v", [[<A-a>]]},
+            -- {"n", [[<A-s>]]},
+            -- {"v", [[<A-s>]]},
+        -- },
+        config   = function()
             vim.g.expand_region_text_objects = {
                 ['iw'] = 0,
                 ['iW'] = 0,
@@ -93,8 +104,6 @@ require("packer").startup(function(use, use_rocks)
                 ['aB']  = 0,
                 ['ai']  = 0
             }
-        end,
-        config = function()
             vim.fn["expand_region#custom_text_objects"](vim.g.expand_region_custom_text_objects)
             map("", [[<A-a>]], [[<Plug>(expand_region_expand)]])
             map("", [[<A-s>]], [[<Plug>(expand_region_shrink)]])
@@ -170,8 +179,8 @@ require("packer").startup(function(use, use_rocks)
                 perm_method      = require'hop.perm'.TermSeqBias,
                 case_insensitive = false
             }
-            map("", [[<leader>f]], [[:lua require("hop").hint_char1()<cr>]], {"silent"})
-            map("", [[<leader>F]], [[:lua require("hop").hint_lines()<cr>]], {"silent"})
+            map("", [[<leader>f]], [[<cmd>lua require("hop").hint_char1()<cr>]], {"silent"})
+            map("", [[<leader>F]], [[<cmd>lua require("hop").hint_lines()<cr>]], {"silent"})
         end
         }
     use {
@@ -232,7 +241,7 @@ require("packer").startup(function(use, use_rocks)
             {"o", "iq"},
             {"o", "aq"},
         },
-        config = configModule "vim-sandwich"
+        config = conf "vim-sandwich"
     }
     use {
         'junegunn/vim-easy-align',
@@ -269,7 +278,6 @@ require("packer").startup(function(use, use_rocks)
         }
     }
     use {
-    -- NOTE: test config
         'monaqa/dial.nvim',
         keys = {
             {"n", [[<leader><C-a>]]},
@@ -312,11 +320,11 @@ require("packer").startup(function(use, use_rocks)
             ",j", ",k", ",m",
             "<leader>d", "<C-d>"
         },
-        config = configModule "vim-visual-multi".config()
+        config = conf "vim-visual-multi".config()
     }
     use {
         'airblade/vim-rooter',
-        -- event  = "BufRead",
+        event  = "BufRead",
         config = function()
             vim.g.rooter_change_directory_for_non_project_files = "current"
             vim.g.rooter_patterns = {
@@ -336,14 +344,16 @@ require("packer").startup(function(use, use_rocks)
     -- use 'AndrewRadev/switch.vim'
     use {
         'windwp/nvim-autopairs',
-        config   = function()
+        module_pattern = "nvim-autopairs.*",
+        after          = "nvim-treesitter",
+        config         = function()
             require('nvim-autopairs').setup {
                 disable_filetype          = {"TelescopePrompt"},
                 ignored_next_char         = string.gsub([[[%w%%%'%[%"%.] ]],"%s+", ""),
                 enable_moveright          = true,
                 enable_afterquote         = true,  -- add bracket pairs after quote
                 enable_check_bracket_line = true,  -- check bracket in same line
-                check_ts                  = false,
+                check_ts                  = true,
                 fast_wrap = {
                     map         = '<A-p>',
                     chars       = { '{', '[', '(', '"', "'" },
@@ -398,7 +408,7 @@ require("packer").startup(function(use, use_rocks)
             {"n", [[g<space>u]]},
             {"v", [[g<space>u]]},
         },
-        config = configModule "vim-nerdcommenter".config,
+        config = conf "vim-nerdcommenter".config,
     }
     use {
         "winston0410/cmd-parser.nvim",
@@ -406,7 +416,6 @@ require("packer").startup(function(use, use_rocks)
     }
     use {
         'winston0410/range-highlight.nvim',
-        -- TODO: bring back Ctrl-Backspace for cmap
         event    = "CmdwinEnter",
         requires = "cmd-parser.nvim",
         config = function()
@@ -604,18 +613,19 @@ require("packer").startup(function(use, use_rocks)
     }
     use {
         'glepnir/galaxyline.nvim',
+        event    = "BufRead",
         requires = "nvim-web-devicons",
-        config   = configModule "nvim-galaxyline"
+        config   = conf "nvim-galaxyline"
     }
     use {
         'romgrk/barbar.nvim',
+        event    = "BufRead",
         requires = "nvim-web-devicons",
-        setup    = configModule "nvim-barbar".setup,
-        config   = configModule "nvim-barbar".config,
+        setup    = conf "nvim-barbar".setup,
+        config   = conf "nvim-barbar".config,
     }
     use {
     'RRethy/vim-hexokinase',
-        -- NOTE: Go language compiler is required
         run    = "make hexokinase",
         setup  = function()
             vim.g.Hexokinase_highlighters = {'backgroundfull'}
@@ -626,42 +636,19 @@ require("packer").startup(function(use, use_rocks)
         'folke/todo-comments.nvim',
         event    = "BufRead",
         requires = "nvim-web-devicons",
-        config   = configModule "nvim-todo-comments"
+        config   = conf "nvim-todo-comments"
     }
-    -- TODO: deprecated startify
-    use {
-        'mhinz/vim-startify',
-        setup  = function()
-            local fn = vim.fn
-            vim.g.startify_session_dir  = os.getenv("HOME") .. '/.nvimcache/session'
-            vim.g.startify_padding_left = 20
-            vim.g.startify_lists = {
-                {type = 'files',     header = {string.rep(" ", vim.g.startify_padding_left) .. 'MRU'}            },
-                {type = 'dir',       header = {string.rep(" ", vim.g.startify_padding_left) .. 'MRU ' .. fn.getcwd()}},
-                {type = 'sessions',  header = {string.rep(" ", vim.g.startify_padding_left) .. 'Sessions'}       },
-                {type = 'bookmarks', header = {string.rep(" ", vim.g.startify_padding_left) .. 'Bookmarks'}      },
-            }
-            vim.g.startify_update_oldfiles        = 1
-            vim.g.startify_session_autoload       = 1
-            vim.g.startify_bookmarks              = {{v = fn.expand("$MYVIMRC")}}
-            vim.g.startify_session_before_save    = {'echo "Cleaning up before saving.."' }
-            vim.g.startify_session_persistence    = 1
-            vim.g.startify_session_delete_buffers = 1
-            vim.g.startify_change_to_vcs_root     = 1
-            vim.g.startify_fortune_use_unicode    = 1
-            vim.g.startify_relative_path          = 1
-            vim.g.startify_use_env                = 1
-        end,
-        config = function()
-            map("n", [[<C-s>]], [[:<c-u>Startify<cr>]], {"silent"})
-            map("v", [[<C-s>]], [[:<c-u>Startify<cr>]], {"silent"})
-        end
-    }
+    -- use {
+        -- 'xiyaowong/OldfilesStartupScreen.nvim',
+        -- config   = function()
+            -- map("", [[<C-s>]], [[:lua require('OldfilesStartupScreen').display()<cr>]], {"silent"})
+        -- end
+    -- }
     use {
         'kyazdani42/nvim-tree.lua',
         keys     = {"<C-w>e"},
         requires = "nvim-web-devicons",
-        config   = configModule "nvim-tree".config
+        config   = conf "nvim-tree".config
     }
     -- use 'dm1try/golden_size'
     -- }}} UI
@@ -674,7 +661,12 @@ require("packer").startup(function(use, use_rocks)
         config = function()
             require("nvim-treesitter.configs").setup{
                 -- ensure_installed = "maintained",
-                ensure_installed = {"c", "cpp", "cmake", "lua", "json", "toml", "python", "bash", "fish", "regex", "css", "html", "go", "javascript", "rust", "ruby", "vue", "c_sharp", "typescript", "comment"},
+                ensure_installed = {
+                    "c", "cpp", "cmake", "lua", "json", "toml", "python",
+                    "bash", "fish", "ruby", "regex", "css", "html", "go",
+                    "javascript", "rust", "vue", "c_sharp", "typescript",
+                    "comment"
+                },
                 highlight        = {enable = true},
                 indent           = {enable = true},
                 incremental_selection = {
@@ -793,7 +785,7 @@ require("packer").startup(function(use, use_rocks)
     use {
         'neovim/nvim-lspconfig',
         event  = "BufRead",
-        config = configModule "nvim-lsp".config
+        config = conf "nvim-lsp".config
     }
     use {
         'kabouzeid/nvim-lspinstall',
@@ -813,14 +805,9 @@ require("packer").startup(function(use, use_rocks)
         end
     }
     use {
-        'folke/lua-dev.nvim',
-        module  = "lua-dev",
-        rquires = "nvim-lspconfig",
-    }
-    use {
         'glepnir/lspsaga.nvim',
-        rquires = "nvim-lspconfig",
-        config  = function()
+        after  = "nvim-lspconfig",
+        config = function()
             require("lspsaga").init_lsp_saga {
                 use_saga_diagnostic_sign = true,
                 error_sign            = "",
@@ -890,7 +877,7 @@ require("packer").startup(function(use, use_rocks)
                     toggle_fold    = "<Leader><Space>", -- toggle fold of current file
 
                     previous       = "k",            -- preview item
-                    next           = "j"             -- next item
+                    next           = ""             -- next item
                 },
 
                 indent_lines = false, -- add an indent guide below the fold icons
@@ -924,25 +911,39 @@ require("packer").startup(function(use, use_rocks)
         end
     }
     use {
-        'hrsh7th/nvim-compe',
+        'hrsh7th/nvim-cmp',
         event    = "InsertEnter",
-        setup    = configModule "nvim-comp".setup,
-        config   = configModule "nvim-comp".config,
-        requries = "nvim-autopairs"
+        requires = {
+            "nvim-autopairs",
+
+            {"hrsh7th/cmp-nvim-lsp", module = "cmp_nvim_lsp"},
+            {"hrsh7th/cmp-nvim-lua", module = "cmp_nvim_lua"},
+            {"hrsh7th/cmp-buffer",   module = "cmp_buffer"},
+            {"f3fora/cmp-spell",     module = "cmp-spell"},
+            {"hrsh7th/cmp-path",     module = "cmp_path"},
+            {"hrsh7th/cmp-vsnip",    module = "cmp_vsnip"},
+            {
+                "tzachar/cmp-tabnine",
+                -- BUG: it override lsp suggestion in some situations
+                disable = true,
+                run    = "./install.sh",
+                after  = "nvim-cmp",
+                config = function()
+                    require('cmp_tabnine.config'):setup{
+                        max_num_results = 20;
+                        max_lines       = 1000;
+                        sort            = true;
+                    }
+                end
+            },
+        },
+        config = conf "nvim-cmp"
     }
-    -- use {
-        -- 'tzachar/compe-tabnine',
-        -- diasble  = true,
-        -- run      = "./install.sh",
-        -- event    = "InsertEnter",
-        -- requires = "nvim-compe",
-    -- }
-    -- use 'hrsh7th/vim-vsnip-integ'
     use {
         'hrsh7th/vim-vsnip',
-        event    = "InsertCharPre",
-        requires = "nvim-compe",
-        setup    = function()
+        event = "InsertCharPre",
+        after = "nvim-cmp",
+        setup = function()
             vim.g.vsnip_snippet_dir   = vim.fn.expand('$configPath/snippets')
             vim.g.vsnip_extra_mapping = false
             vim.g.vsnip_filetypes     = {
@@ -961,7 +962,15 @@ require("packer").startup(function(use, use_rocks)
             }
         end
     }
-    -- -- use 'nvim-lua/lsp-status.nvim'
+    use {
+        'folke/lua-dev.nvim',
+        commit  = "e958850",
+        module  = "lua-dev",
+        rquires = {
+            "nvim-lspconfig",
+            "nvim-cmp"
+        },
+    }
     -- }}} Intellisense
     -- Telescope {{{
     use {
@@ -971,6 +980,7 @@ require("packer").startup(function(use, use_rocks)
     use {
         'nvim-telescope/telescope.nvim',
         module   = "telescope",
+        event    = "BufRead",
         keys     = {
             [[<C-h>l]],   [[<C-e>]],
             [[<C-f>f]],   [[<C-f>F]],
@@ -978,13 +988,14 @@ require("packer").startup(function(use, use_rocks)
             [[<C-h><C-h>, [[<C-h>o]],
         },
         cmd      = "Telescope",
-        requires = { "plenary.nvim",
+        requires = {
+            "plenary.nvim",
             { "nvim-telescope/telescope-fzy-native.nvim",
                 run = "make -C deps/fzy-lua-native",
                 -- opt = true,
             },
         },
-        config = configModule "nvim-telescope"
+        config = conf "nvim-telescope"
     }
     use {
         'nvim-telescope/telescope-symbols.nvim',
@@ -1007,9 +1018,8 @@ require("packer").startup(function(use, use_rocks)
         ft     = 'vim',
         keys   = {"zS", "g>"},
         cmd    = {
-            "PP", "Runtime", "Disarm", "Scriptnames",
-            "Messages", "Verbose", "Time", "Breakadd",
-            "Vedit", "Vsplit"
+            "PP", "PPmsg", "Runtime", "Disarm", "Scriptnames", "Messages",
+            "Verbose", "Time", "Breakadd", "Vopen", "Vedit", "Vsplit"
         },
         config = function()
             map("n", [[g>]], [[:<c-u>Messages<cr>]], {"silent", "novscode"})
@@ -1020,7 +1030,7 @@ require("packer").startup(function(use, use_rocks)
     -- use 'mfussenegger/nvim-dap-python', {'for': 'python'}
     -- use 'puremourning/vimspector'
     -- use 'sakhnik/nvim-gdb', {'do': ':!./install.sh'}
-    -- }}} Debug end)
+    -- }}} Debug end
     -- Language support {{{
     -- Lua
     use {
@@ -1038,53 +1048,40 @@ require("packer").startup(function(use, use_rocks)
     }
     use {
         'nanotee/luv-vimdocs',
-        ft   = "lua"
+        ft = "lua"
     }
     -- Markdown
     use {
         'iamcco/markdown-preview.nvim',
-        run  = function() vim.fn["mkdp#util#install"]() end,
-        ft   = {'markdown', 'md'}
+        run = function() vim.fn["mkdp#util#install"]() end,
+        ft  = {'markdown', 'md'}
     }
     use {
         'plasticboy/vim-markdown',
         ft     = {'markdown', 'md'},
-        config = configModule "vim-markdown"
+        config = conf "vim-markdown"
     }
     -- Log
     use {
         'MTDL9/vim-log-highlighting',
-        ft   = "log"
+        ft = "log"
     }
     -- Fish script
     use {
         'NovaDev94/vim-fish',
-        ft   = "fish"
+        ft = "fish"
     }
     -- }}} Language support
     -- Version control {{{
     use {
         'tpope/vim-fugitive',
-        cmd  = {"Git"}
+        cmd = {"Git"}
     }
     use {
-        'airblade/vim-gitgutter',
+        'lewis6991/gitsigns.nvim',
         event  = "BufRead",
-        config = function()
-            vim.g.gitgutter_map_keys             = 0
-            vim.g.gitgutter_sign_priority        = 10
-            vim.g.gitgutter_preview_win_floating = 1
-            map("n", [[]h]], [[<Plug>(GitGutterNextHunk)]])
-            map("n", [[[h]], [[<Plug>(GitGutterPrevHunk)]])
-            map("o", [[ih]], [[<Plug>(GitGutterTextObjectInnerPending)]])
-            map("o", [[ah]], [[<Plug>(GitGutterTextObjectOuterPending)]])
-            map("x", [[ih]], [[<Plug>(GitGutterTextObjectInnerVisual)]])
-            map("x", [[ah]], [[<Plug>(GitGutterTextObjectOuterVisual)]])
-        end
+        config = conf "nvim-gitsigns"
     }
-    -- use {
-        -- 'lewis6991/gitsigns.nvim',
-    -- }
     use {
         'rhysd/git-messenger.vim',
         -- cmd = {"GitMessenger", "<use>(git-messenger)"},
@@ -1118,75 +1115,6 @@ require("packer").startup(function(use, use_rocks)
     }
     -- }}} Knowlege
 end)
--- Module configuration {{{
--- Neovim cilent module {{{
--- if not vim.g.vscode then
-    -- require "config.vim-markdown"
-    -- require "config.nvim-golden_size"
-    -- require "config.nvim-telescope"
-    -- require "config.nvim-treesitter"
-    -- require "config.nvim-dap"
-    -- require "config.nvim-gitsigns"
-    -- require "config.nvim-coc"
-    -- require "config.nvim-lsp"
-    -- require "config.nvim-comp"
-    -- require "config.nvim-completion"
-    -- require "config.nvim-gdb"
--- end
--- }}} Neovim cilent module
--- }}} Module configuration
-
--- Configuration {{{
--- General {{{
--- }}} General
-
--- Neovim client {{{
--- if not vim.g.vscode then
-    -- vim-python/python-syntax {{{
-    -- vim.g.python_highlight_all = 1
-    -- }}} vim-python/python-syntax
-    -- RishabhRD/nvim-cheat.sh {{{
-    -- map("n", [[<C-S-l>]], [[:<c-u>Cheat<cr>]], {"silent"})
-    -- }}} RishabhRD/nvim-cheat.sh
-    -- iaso2h/nlua {{{
-    -- vim.g.nlua_keywordprg_map_key = "<C-S-q>"
-    -- }}} iaso2h/nlua
-    -- airblade/vim-gitgutter {{{
-    -- if fn.has('win32') == 1 then vim.g.gitgutter_git_executable = "D:/Git/bin/git.exe" end
-    -- vim.g.gitgutter_map_keys = 0
-    -- vim.g.gitgutter_sign_priority = 10
-    -- vim.g.gitgutter_preview_win_floating = 0
-    -- map("n", [[]h]], [[<Plug>(GitGutterNextHunk)]])
-    -- map("n", [[[h]], [[<Plug>(GitGutterPrevHunk)]])
-    -- map("o", [[ih]], [[<Plug>(GitGutterTextObjectInnerPending)]])
-    -- map("o", [[ah]], [[<Plug>(GitGutterTextObjectOuterPending)]])
-    -- map("x", [[ih]], [[<Plug>(GitGutterTextObjectInnerVisual)]])
-    -- map("x", [[ah]], [[<Plug>(GitGutterTextObjectOuterVisual)]])
-    -- }}} airblade/vim-gitgutter
-    -- rafcamlet/nvim-luapad {{{
-    -- BUG: Cannot find nvim-luapad???
-    -- require("luapad").config{
-        -- count_limit     = 150000,
-        -- error_indicator = true,
-        -- eval_on_move    = true,
-        -- error_highlight = 'WarningMsg',
-        -- on_init         = function()
-            -- print 'Hello from Luapad!'
-        -- end,
-        -- context = {
-            -- the_answer = 42,
-            -- shout = function(str) return(string.upper(str) .. '!') end
-        -- }
-    -- }
-    -- }}} rafcamlet/nvim-luapad
-    -- rhysd/git-messenger.vim {{{
-    -- vim.g.git_messenger_date_format = "%Y-%m-%d %X"
-    -- map("n", [[<C-w>g]], [[:lua vim.cmd"GitMessenger"]], {"silent", "nowait"})
-    -- }}} rhysd/git-messenger.vim
--- end
--- }}} Neovim client
--- }}} Configuration
 
 return M
-
 
