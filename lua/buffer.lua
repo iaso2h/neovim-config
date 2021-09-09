@@ -2,7 +2,7 @@
 -- Author: iaso2h
 -- Description: A few of buffer-related utilities
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.16
+-- Version: 0.0.17
 -- Last Modified: 2021-08-23
 -- BUG: q on startup-log.txt
 -- TODO: check for prompt
@@ -62,7 +62,7 @@ local function bwipe(bufNr)
         end
     end
 
-    if fn.exists("g:bufferline") == 1 and #bufNrTbl ~= 1 then
+    if package.loaded['bufferline#update'] and fn.exists("g:bufferline") == 1 and #bufNrTbl ~= 1 then
         fn['bufferline#update'](true)
     end
 end
@@ -262,6 +262,8 @@ end
 -- @return: 0
 ----
 function M.wipeOtherBuf() -- {{{
+    if vim.o.buftype ~= "" then return end
+
     -- Check whether call from Nvim Tree
     local nvimTreeCall
     winIDTbl = api.nvim_list_wins()
@@ -333,7 +335,7 @@ function M.wipeOtherBuf() -- {{{
     end
 
     -- Update barbar.nvim tabline
-    if fn.exists("g:bufferline") == 1 and #bufNrTbl ~= 1 then
+    if package.loaded['bufferline#update'] and fn.exists("g:bufferline") == 1 and #bufNrTbl ~= 1 then
         fn['bufferline#update'](true)
     end
 end -- }}}
@@ -363,7 +365,7 @@ end
 -- Function: M.closeOtherWin: Close other windows with nvim tree open checking
 ----
 M.closeOtherWin = function()
-    if require("nvim-tree.view").win_open() then
+    if package.loaded["nvim-tree.view"] and require("nvim-tree.view").win_open() then
         require("bufferline.state").set_offset(0)
         require("nvim-tree.view").close()
     end

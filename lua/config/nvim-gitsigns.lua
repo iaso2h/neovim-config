@@ -1,68 +1,70 @@
-require('gitsigns').setup {
+return function ()
+
+require('gitsigns').setup{
     signs = {
-        add = {
-            hl = 'GitSignsAdd',
-            text = '│',
-            numhl = 'GitSignsAddNr',
-            linehl = 'GitSignsAddLn'
-        },
-        change = {
-            hl = 'GitSignsChange',
-            text = '│',
-            numhl = 'GitSignsChangeNr',
-            linehl = 'GitSignsChangeLn'
-        },
-        delete = {
-            hl = 'GitSignsDelete',
-            text = '_',
-            numhl = 'GitSignsDeleteNr',
-            linehl = 'GitSignsDeleteLn'
-        },
-        topdelete = {
-            hl = 'GitSignsDelete',
-            text = '‾',
-            numhl = 'GitSignsDeleteNr',
-            linehl = 'GitSignsDeleteLn'
-        },
-        changedelete = {
-            hl = 'GitSignsChange',
-            text = '~',
-            numhl = 'GitSignsChangeNr',
-            linehl = 'GitSignsChangeLn'
-        }
+        add          = {hl = 'GitSignsAdd'   , text = '🮈', numhl='GitSignsAddNr'   , linehl='GitSignsAddLn'},
+        change       = {hl = 'GitSignsChange', text = '🮈', numhl='GitSignsChangeNr', linehl='GitSignsChangeLn'},
+        delete       = {hl = 'GitSignsDelete', text = '🮈', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn'},
+        topdelete    = {hl = 'GitSignsDelete', text = '🮈', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn'},
+        changedelete = {hl = 'GitSignsChange', text = '🮈', numhl='GitSignsChangeNr', linehl='GitSignsChangeLn'},
     },
-    numhl = false,
-    linehl = false,
-    keymaps = {
+    signcolumn = true,  -- Toggle with `:Gitsigns toggle_signs`
+    numhl      = false, -- Toggle with `:Gitsigns toggle_numhl`
+    linehl     = false, -- Toggle with `:Gitsigns toggle_linehl`
+    word_diff  = false, -- Toggle with `:Gitsigns toggle_word_diff`
+    keymaps    = {
         -- Default keymap options
         noremap = true,
-        buffer = true,
 
-        ['n ]h'] = {
-            expr = true,
-            "&diff ? ']c' : '<cmd>lua require\"gitsigns\".next_hunk()<cr>'"
-        },
-        ['n [h'] = {
-            expr = true,
-            "&diff ? '[c' : '<cmd>lua require\"gitsigns\".prev_hunk()<cr>'"
-        },
+        ['n ]h'] = {expr = true, "&diff ? ']h' : '<cmd>lua require\"gitsigns.actions\".next_hunk()<CR>'"},
+        ['n [h'] = {expr = true, "&diff ? '[h' : '<cmd>lua require\"gitsigns.actions\".prev_hunk()<CR>'"},
 
-        ['n <leader>gs'] = ':lua require"gitsigns".stage_hunk()<cr>',
-        ['n <leader>gu'] = ':lua require"gitsigns".undo_stage_hunk()<cr>',
-        ['n <leader>gr'] = ':lua require"gitsigns".reset_hunk()<cr>',
-        ['n <leader>gR'] = ':lua require"gitsigns".reset_buffer()<cr>',
-        ['n <leader>gp'] = ':lua require"gitsigns".preview_hunk()<cr>',
-        ['n <leader>gb'] = ':lua require"gitsigns".blame_line()<cr>',
+        ['n <C-h>s'] = '<cmd>lua require"gitsigns".stage_hunk()<CR>',
+        ['v <C-h>s'] = '<cmd>lua require"gitsigns".stage_hunk({vim.fn.line("."), vim.fn.line("v")})<CR>',
+        ['n <C-h>u'] = '<cmd>lua require"gitsigns".undo_stage_hunk()<CR>',
+        ['n <C-h>r'] = '<cmd>lua require"gitsigns".reset_hunk()<CR>',
+        ['v <C-h>r'] = '<cmd>lua require"gitsigns".reset_hunk({vim.fn.line("."), vim.fn.line("v")})<CR>',
+        ['n <C-h>R'] = '<cmd>lua require"gitsigns".reset_buffer()<CR>',
+        ['n <C-h>p'] = '<cmd>lua require"gitsigns".preview_hunk()<CR>',
+        ['n <C-h>b'] = '<cmd>lua require"gitsigns".blame_line(true)<CR>',
+        ['n <C-h>S'] = '<cmd>lua require"gitsigns".stage_buffer()<CR>',
+        ['n <C-h>U'] = '<cmd>lua require"gitsigns".reset_buffer_index()<CR>',
 
         -- Text objects
-        ['o ih'] = ':<C-U>lua require"gitsigns".text_object()<cr>',
-        ['x ih'] = ':<C-U>lua require"gitsigns".text_object()<cr>'
+        ['o ih'] = ':<C-U>lua require"gitsigns.actions".select_hunk()<CR>',
+        ['x ih'] = ':<C-U>lua require"gitsigns.actions".select_hunk()<CR>'
     },
-    watch_index = {interval = 1000},
-    sign_priority = 6,
-    update_debounce = 100,
+    watch_index = {
+        interval     = 1000,
+        follow_files = true
+    },
+    attach_to_untracked     = true,
+    current_line_blame      = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
+    current_line_blame_opts = {
+        virt_text     = true,
+        virt_text_pos = 'eol', -- 'eol' | 'overlay' | 'right_align'
+        delay         = 1000,
+    },
+    current_line_blame_formatter_opts = {
+        relative_time = false
+    },
+    sign_priority    = 6,
+    update_debounce  = 100,
     status_formatter = nil, -- Use default
-    use_decoration_api = true,
-    use_internal_diff = false -- If luajit is present
+    max_file_length  = 40000,
+    preview_config   = {
+        -- Options passed to nvim_open_win
+        border   = 'none',
+        style    = 'minimal',
+        relative = 'cursor',
+        row      = 0,
+        col      = 1
+    },
+    use_internal_diff = true,  -- If vim.diff or luajit is present
+    yadm              = {
+        enable = false
+    },
 }
+
+end
 

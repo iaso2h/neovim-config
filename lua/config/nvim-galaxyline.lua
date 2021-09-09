@@ -13,6 +13,7 @@ local gls       = gl.section
 local condition = require("galaxyline.condition")
 -- local extension = require("galaxyline.provider_extensions")
 
+vim.api.nvim_set_option("laststatus", 2)
 gl.short_line_list = {
     "LuaTree", "vista", "dbui", "startify", "term", "fugitive", "fugitiveblame",
     "plug", "coc-explorer", "Mundo", "MundoDiff", "vim-plug", "qf", "NvimTree",
@@ -354,22 +355,13 @@ gls.left[16] = {
     -- }
 -- }
 
--- gls.mid[3] = {
---  lspMsg = {
-    --    provider  = require("config.nvim-lsp-status").lspMsg,
-    --  condition = function()
-        --    return vim.lsp.buf.server_ready() and condition.hide_in_width()
-        -- end,
-        -- highlight = {colors.blue, colors.bg}
-    -- }
--- }
 -- }}} Mid
 
 gls.right[1] = { -- {{{
     FileFormat = {
         provider = function()
             if not condition.buffer_not_empty() then return '' end
-            local icon = fileFormatIcons[vim.bo.fileformat] or ''
+            local icon = fileFormatIcons[vim.bo.fileformat] or ' '
             return string.format(' %s %s ', icon, vim.bo.filetype)
         end,
         separator           = separator_right,

@@ -18,6 +18,9 @@ function _G.t(str)
     return api.nvim_replace_termcodes(str, true, true, true)
 end
 
+function _G.ex(exec) return fn.executable(exec) == 1 end
+
+
 ----
 -- Function: Vim2Lua___
 --
@@ -204,7 +207,7 @@ function Reload(module) -- {{{
                     end
                 end
                 -- Recompile packages for lua/core/plugins.lua
-                if module == fn.stdpath("config") .. "/lua/core/plugins.lua" then
+                if module == configPath .. "/lua/core/plugins.lua" then
                     local answerCD = fn.confirm("Recompile packages?", "&Yes\n&No")
                     if answerCD == 1 then
                         cmd [[PackerSync]]
@@ -228,12 +231,13 @@ function Reload(module) -- {{{
             cmd "redraw!"
             cmd "AirlineRefresh"
             api.nvim_echo({{"Reload: " .. module, "Normal"}}, true, {})
-        elseif module == configPath .. "/vimPlugList.vim" then
-            cmd("source " .. module)
-            api.nvim_echo({{"Reload: " .. module, "Normal"}}, true, {})
         elseif fn.expand("%:p:h") == configPath .. "/plugins" then
             cmd("source " .. module)
             api.nvim_echo({{"Reload: " .. module, "Normal"}}, true, {})
+        elseif string.match(fn.expand("%:p:h"), configPath .. "/colors") then
+            local colorscheme = fn.expand("%:t:r")
+            cmd("colorscheme " .. colorscheme)
+            api.nvim_echo({{"Colorscheme: " .. colorscheme, "Normal"}}, true, {})
         end
         -- }}} Vim
     end
