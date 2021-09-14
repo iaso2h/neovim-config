@@ -12,7 +12,7 @@ return function()
 
     cmd [[runtime macros/sandwich/keymap/surround.vim]]
 
-    map("n", [[gs]], [[ys]])
+    map("n", [[gs]], [[ys]], "Add surround")
     map("x", [[iq]], [[<Plug>(textobj-sandwich-literal-query-i)]])
     map("x", [[aq]], [[<Plug>(textobj-sandwich-literal-query-a)]])
     map("o", [[iq]], [[<Plug>(textobj-sandwich-literal-query-i)]])
@@ -22,7 +22,6 @@ return function()
     fn["operator#sandwich#set"]('replace', 'all', 'hi_duration', 1000)
 
     -- mode
-    -- NOTE: cannot use table.insert( on vim.g metadata
     local recipes = {
         {buns = {[[\s\+]], [[\s\+]]}, regex = 1, kind = {'delete', 'replace', 'query'}, input = {' '}},
 

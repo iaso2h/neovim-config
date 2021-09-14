@@ -13,11 +13,10 @@ local gls       = gl.section
 local condition = require("galaxyline.condition")
 -- local extension = require("galaxyline.provider_extensions")
 
-vim.api.nvim_set_option("laststatus", 2)
 gl.short_line_list = {
     "LuaTree", "vista", "dbui", "startify", "term", "fugitive", "fugitiveblame",
     "plug", "coc-explorer", "Mundo", "MundoDiff", "vim-plug", "qf", "NvimTree",
-    "dap-repl"
+    "dap-repl", "HistoryStartup", ""
 }
 
 -- TODO support qf and statify

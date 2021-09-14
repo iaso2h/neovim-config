@@ -105,8 +105,9 @@ packer.startup(function(use, use_rocks)
                 ['ai']  = 0
             }
             vim.fn["expand_region#custom_text_objects"](vim.g.expand_region_custom_text_objects)
-            map("", [[<A-a>]], [[<Plug>(expand_region_expand)]])
-            map("", [[<A-s>]], [[<Plug>(expand_region_shrink)]])
+            map("", [[<A-a>]], [[<Plug>(expand_region_expand)]], "Expand region")
+            map("", [[<A-s>]], [[<Plug>(expand_region_shrink)]], "Shrink region")
+            pcall(cmd, [[unmap _]])
         end
     }
     use {
@@ -122,8 +123,8 @@ packer.startup(function(use, use_rocks)
             vim.g.camelsnek_no_fun_allowed             = 1
             vim.g.camelsnek_iskeyword_overre           = 0
             map("v", [[<A-c>]],   [[:call CaseSwitcher()<cr>]],                               {"silent"})
-            map("n", [[<A-c>]],   [[:lua require("caseSwitcher").cycleCase()<cr>]],           {"silent"})
-            map("n", [[<A-S-c>]], [[:lua require("caseSwitcher").cycleDefaultCMDList()<cr>]], {"silent"})
+            map("n", [[<A-c>]],   [[:lua require("caseSwitcher").cycleCase()<cr>]],           {"silent"}, "Cycle cases")
+            map("n", [[<A-S-c>]], [[:lua require("caseSwitcher").cycleDefaultCMDList()<cr>]], {"silent"}, "Cycle cases reset")
         end,
     }
     use {
@@ -138,7 +139,6 @@ packer.startup(function(use, use_rocks)
             -- vim.g.matchup_matchparen_hi_surround_always = 1
             -- vim.g.matchup_matchparen_hi_background = 1
             -- vim.g.matchup_matchparen_offscreen = {method = 'popup', highlight = 'OffscreenPopup'}
-            -- TODO: Highlight
             -- In favor of Neovim Treesitter context display
             vim.g.matchup_matchparen_offscreen  = {}
             vim.g.matchup_matchparen_nomode     = "i"
@@ -150,15 +150,15 @@ packer.startup(function(use, use_rocks)
             map("o", [[am]],      [[<Plug>(matchup-a%)]])
             map("o", [[im]],      [[<Plug>(matchup-i%)]])
             -- Inclusive
-            map("",  [[<C-m>]],   [[<Plug>(matchup-%)]])
-            map("",  [[<C-S-m>]], [[<Plug>(matchup-g%)]])
+            map("",  [[<C-m>]],   [[<Plug>(matchup-%)]], "Matchup forward inclusive")
+            map("",  [[<C-S-m>]], [[<Plug>(matchup-g%)]], "Matchup backward inclusive")
             -- Exclusive
-            map("n", [[<A-m>]],   [[<Plug>(matchup-]%)]])
+            map("n", [[<A-m>]],   [[<Plug>(matchup-]%)]], "Matchup forward exclusive")
             map("x", [[<A-m>]],   [[<Plug>(matchup-]%)]])
-            map("n", [[<A-S-m>]], [[<Plug>(matchup-[%)]])
+            map("n", [[<A-S-m>]], [[<Plug>(matchup-[%)]], "Matchup backward exclusive")
             map("x", [[<A-S-m>]], [[<Plug>(matchup-[%)]])
             -- Highlight
-            map("n", [[<leader>m]], [[<Plug>(matchup-hi-surround)]])
+            map("n", [[<leader>m]], [[<Plug>(matchup-hi-surround)]], "Highlight Matchup")
             -- Change/Delete surrounds
             vim.g.matchup_surround_enabled = 1
             map("n", [[dsm]], [[<Plug>(matchup-ds%)]])
@@ -179,8 +179,8 @@ packer.startup(function(use, use_rocks)
                 perm_method      = require'hop.perm'.TermSeqBias,
                 case_insensitive = false
             }
-            map("", [[<leader>f]], [[<cmd>lua require("hop").hint_char1()<cr>]], {"silent"})
-            map("", [[<leader>F]], [[<cmd>lua require("hop").hint_lines()<cr>]], {"silent"})
+            map("", [[<leader>f]], [[<cmd>lua require("hop").hint_char1()<cr>]], {"silent"}, "Hop char")
+            map("", [[<leader>F]], [[<cmd>lua require("hop").hint_lines()<cr>]], {"silent"}, "Hop line")
         end
         }
     use {
@@ -193,8 +193,8 @@ packer.startup(function(use, use_rocks)
             command! -nargs=0 Run     lua require("compileRun").runCode()
             ]]
 
-            map("n", [[<F9>]],   [[:lua require("compileRun").compileCode(true)<cr>]], {"noremap", "silent", "novscode"})
-            map("n", [[<S-F9>]], [[:lua require("compileRun").runCode(true)<cr>]],     {"noremap", "silent", "novscode"})
+            map("n", [[<F9>]],   [[:lua require("compileRun").compileCode(true)<cr>]], {"noremap", "silent", "novscode"}, "Compile code")
+            map("n", [[<S-F9>]], [[:lua require("compileRun").runCode(true)<cr>]],     {"noremap", "silent", "novscode"}, "Run code")
         end
     }
     use {
@@ -207,9 +207,9 @@ packer.startup(function(use, use_rocks)
         },
         config = function()
             -- Repeat not defined in visual mode, but enabled through visualrepeat.vim.
-            -- TODO: repeat mode not working
-            map("n", [[gr]],  [[luaeval("require('replace').expression()")]], {"silent", "expr"})
-            map("n", [[grr]], [[<Plug>InplaceReplaceLine]])
+            -- TODO: repeat mode not working for linewise mode
+            map("n", [[gr]],  [[luaeval("require('replace').expression()")]], {"silent", "expr"}, "Replace operator")
+            map("n", [[grr]], [[<Plug>InplaceReplaceLine]], "Replace current line")
             map("n", [[<Plug>InplaceReplaceLine]], [[:<c-u>execute 'normal! V' . v:count1 . "_\<lt>Esc>"<bar> lua require("replace").replaceOperator({"visual", "InplaceReplaceLine"})<cr>]], {"noremap", "silent"})
             map("v", [[R]], [[<Plug>InplaceReplaceVisual]])
             map("v", [[<Plug>InplaceReplaceVisual]], [[:lua require("replace").replaceOperator({"visual", "InplaceReplaceVisual"})<cr>]], {"noremap", "silent"})
@@ -223,13 +223,12 @@ packer.startup(function(use, use_rocks)
             {"x", [[X]]},
         },
         config = function()
-            map("n", [[gx]],  [[<Plug>(Exchange)]])
+            map("n", [[gx]],  [[<Plug>(Exchange)]], "Exchange operator")
             map("x", [[X]],   [[<Plug>(Exchange)]])
-            map("n", [[gxc]], [[<Plug>(ExchangeClear)]])
-            map("n", [[gxx]], [[<Plug>(ExchangeLine)]])
+            map("n", [[gxc]], [[<Plug>(ExchangeClear)]], "Exchange highlight clear")
+            map("n", [[gxx]], [[<Plug>(ExchangeLine)]], "Exchange current line")
         end,
     }
-    -- -- use 'inkarkat/vim-ReplaceWithRegister'
     -- TODO: complement plugin key mappings from other plugin for lazy-loading.
     use {
         'machakann/vim-sandwich',
@@ -260,7 +259,7 @@ packer.startup(function(use, use_rocks)
                 }
             }
             map("v", [[A]],  [[<Plug>(EasyAlign)]])
-            map("n", [[ga]], [[<Plug>(EasyAlign)]])
+            map("n", [[ga]], [[<Plug>(EasyAlign)]], "Align operator")
         end
     }
     use {
@@ -288,8 +287,8 @@ packer.startup(function(use, use_rocks)
             {"v", [[<leader>g<C-x>]]},
         },
         config = function()
-            map("n", [[<leader><C-a>]],  [[<Plug>(dial-increment)]])
-            map("n", [[<leader><C-x>]],  [[<Plug>(dial-decrement)]])
+            map("n", [[<leader><C-a>]],  [[<Plug>(dial-increment)]], "Dial up")
+            map("n", [[<leader><C-x>]],  [[<Plug>(dial-decrement)]], "Dial down")
             map("v", [[<leader><C-a>]],  [[<Plug>(dial-increment)]])
             map("v", [[<leader><C-x>]],  [[<Plug>(dial-decrement)]])
             map("v", [[<leader>g<C-a>]], [[<Plug>(dial-increment-additional)]])
@@ -299,9 +298,9 @@ packer.startup(function(use, use_rocks)
     use {
         'mg979/docgen.vim',
         cmd    = "DocGen",
-        keys   = ",d",
+        keys   = {{"n", "dg"}},
         config = function()
-            map("n", [[,d]], [[:<c-u>DocGen<cr>]])
+            map("n", [[dg]], [[:<c-u>DocGen<cr>]], "Document function")
         end
     }
     use {
@@ -310,16 +309,13 @@ packer.startup(function(use, use_rocks)
         config = function()
             vim.g.splitjoin_align = 1
             vim.g.splitjoin_curly_brace_padding = 0
-            map("n", [["gS"]], [[:<c-u>SplitjoinSplit<cr>]], {"silent"})
-            map("n", [["gJ"]], [[:<c-u>SplitjoinJoin<cr>]],  {"silent"})
+            map("n", [["gS"]], [[:<c-u>SplitjoinSplit<cr>]], {"silent"}, "Smart split")
+            map("n", [["gJ"]], [[:<c-u>SplitjoinJoin<cr>]],  {"silent"}, "Smart join")
         end
     }
     use {
         'mg979/vim-visual-multi',
-        keys   = {
-            ",j", ",k", ",m",
-            "<leader>d", "<C-d>"
-        },
+        keys   = {",j", ",k", ",m", ",a", ",d"},
         config = conf "vim-visual-multi".config()
     }
     use {
@@ -369,8 +365,6 @@ packer.startup(function(use, use_rocks)
     use {
         'preservim/nerdcommenter',
         keys = {
-            {"n", [[g<space>]]},
-            {"v", [[g<space>]]},
             {"v", [[<A-/>]]},
             {"n", [[<A-/>]]},
             {"n", [[g<space>o]]},
@@ -486,7 +480,7 @@ packer.startup(function(use, use_rocks)
         },
         cmd    = "MaximizerToggle",
         config = function()
-            map("",  [[<C-w>m]], [[:MaximizerToggle<cr>]],      {"silent"})
+            map("",  [[<C-w>m]], [[:MaximizerToggle<cr>]],      {"silent"}, "Maximize window")
             map("t", [[<C-w>m]], [[<A-n>:MaximizerToggle<cr>]], {"silent"})
         end
     }
@@ -498,7 +492,7 @@ packer.startup(function(use, use_rocks)
             vim.g.mundo_help               = 1
             vim.g.mundo_tree_statusline    = 'Mundo'
             vim.g.mundo_preview_statusline = 'Mundo Preview'
-            map("n", [[<C-W>u]], [[:<c-u>MundoToggle<cr>]], {"silent"})
+            map("n", [[<C-W>u]], [[:<c-u>MundoToggle<cr>]], {"silent"}, "Open Mundo")
         end
     }
     -- }}} Vim enhancement
@@ -921,10 +915,9 @@ packer.startup(function(use, use_rocks)
             {"hrsh7th/cmp-buffer",   module = "cmp_buffer"},
             {"f3fora/cmp-spell",     module = "cmp-spell"},
             {"hrsh7th/cmp-path",     module = "cmp_path"},
-            {"hrsh7th/cmp-vsnip",    module = "cmp_vsnip"},
+            {"hrsh7th/cmp-vsnip",    after  = "nvim-cmp"},
             {
                 "tzachar/cmp-tabnine",
-                -- BUG: it override lsp suggestion in some situations
                 disable = true,
                 run    = "./install.sh",
                 after  = "nvim-cmp",
@@ -944,7 +937,7 @@ packer.startup(function(use, use_rocks)
         event = "InsertCharPre",
         after = "nvim-cmp",
         setup = function()
-            vim.g.vsnip_snippet_dir   = vim.fn.expand('$configPath/snippets')
+            vim.g.vsnip_snippet_dir   = vim.fn.stdpath("config") .. "/snippets"
             vim.g.vsnip_extra_mapping = false
             vim.g.vsnip_filetypes     = {
                 txt        = {"all"},
@@ -954,11 +947,11 @@ packer.startup(function(use, use_rocks)
                 python     = {"all"},
                 c          = {"all"},
                 cpp        = {"all"},
-                javascript = {"all"},
+                javascript = {"all", "typescirpt"},
                 json       = {"all"},
                 html       = {"all"},
                 css        = {"all"},
-                typescript = {"all"},
+                typescript = {"all", "javascript"},
             }
         end
     }
@@ -999,7 +992,7 @@ packer.startup(function(use, use_rocks)
     }
     use {
         'nvim-telescope/telescope-symbols.nvim',
-        keys     = [[<C-h>h]],
+        module   = "telescope",
         requires = "telescope.nvim"
     }
     -- }}} Telescope
@@ -1016,13 +1009,19 @@ packer.startup(function(use, use_rocks)
         'iaso2h/vim-scriptease',
         branch = 'ftplugin',
         ft     = 'vim',
-        keys   = {"zS", "g>"},
+        keys   = {
+            {"n", "zS",},
+            {"n", "g>"}
+        },
         cmd    = {
             "PP", "PPmsg", "Runtime", "Disarm", "Scriptnames", "Messages",
             "Verbose", "Time", "Breakadd", "Vopen", "Vedit", "Vsplit"
         },
         config = function()
-            map("n", [[g>]], [[:<c-u>Messages<cr>]], {"silent", "novscode"})
+            map("n", [[g>]], [[:<c-u>Messages<cr>]], {"silent", "novscode"}, "Messages in quickfix")
+            whichKeyDoc({"zS", "Show syntax highlighting groups"})
+            whichKeyDoc({"g=", "Eval operator"})
+            whichKeyDoc({"g==", "Eval current line"})
         end
     }
     -- use 'mfussenegger/nvim-dap'
@@ -1082,13 +1081,15 @@ packer.startup(function(use, use_rocks)
         event  = "BufRead",
         config = conf "nvim-gitsigns"
     }
+    -- TODO: deprecated
     use {
         'rhysd/git-messenger.vim',
+        disable = true,
         -- cmd = {"GitMessenger", "<use>(git-messenger)"},
         keys   = "<C-w>g",
         config = function()
             vim.g.git_messenger_date_format = "%Y-%m-%d %X"
-            map("n", [[<C-w>g]], [[:lua vim.cmd"GitMessenger"]], {"silent", "nowait"})
+            map("n", [[<C-w>g]], [[:lua vim.cmd"GitMessenger"]], {"silent", "nowait"}, "Git messenger")
         end
     }
     -- use {
@@ -1097,6 +1098,12 @@ packer.startup(function(use, use_rocks)
     -- }}} Version control
     -- Knowlege {{{
     -- TODO: highlight
+    use {
+        'folke/which-key.nvim',
+        disable = true,
+        event   = "VimEnter",
+        config  = conf "nvim-which-key"
+    }
     use {
         'RishabhRD/popfix',
         module_pattern = "popfix.*",

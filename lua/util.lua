@@ -1,7 +1,7 @@
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
-local M = {}
+local M = {whichKeyDocs = {}}
 
 function Print(...)
     local objects = {}
@@ -177,6 +177,7 @@ function Reload(module) -- {{{
             module = vim.fn.expand("%:p")
             -- TODO: reload module
             local luaModulePath = configPath .. "/lua"
+            -- Configuration module for packer.nvim
             if string.match(module, luaModulePath) then
                 local sep
                 if fn.has("win32") == 1 then
@@ -205,6 +206,7 @@ function Reload(module) -- {{{
                             loadstring(literalFunc)()
                         end
                     end
+                else
                 end
                 -- Recompile packages for lua/core/plugins.lua
                 if module == configPath .. "/lua/core/plugins.lua" then
@@ -285,20 +287,36 @@ function M.tblLoaded(termInclude) -- {{{
 end -- }}}
 
 ----
--- Function: M.map wrap around the nvim_set_keymap, and accept the fouth argument as table
+-- Function: _G.map wrap around the nvim_set_keymap, and accept the fouth argument as table
 --
--- @param mode:    Same as nvim_set_keymap
--- @param lhs:     Same as nvim_set_keymap
--- @param rhs:     Same as nvim_set_keymap
+-- @param mode:    Same as vim.api.nvim_set_keymap()
+-- @param lhs:     Same as vim.api.nvim_set_keymap()
+-- @param rhs:     Same as vim.api.nvim_set_keymap()
 -- @param optsTbl: Table value contain string elements that will be pass into_
 -- the fourth argument of nvim_set_keymap as the key name of value pairs, and
 -- the value is true
+-- @param doc:     String. Key documentation
+--
 ----
-function _G.map(mode, lhs, rhs, optsTbl) -- {{{
+function _G.map(mode, lhs, rhs, optsTbl, doc) -- {{{
     optsTbl = optsTbl or {}
-    if vim.tbl_contains(optsTbl, "novscode") and vim.g.vscode then
+    if vim.g.vscode and vim.tbl_contains(optsTbl, "novscode") then
         return
     end
+    if type(optsTbl) == "string" then
+        doc = optsTbl
+        optsTbl = {}
+    end
+    -- Disable whichkey temporarily
+    -- Register key documentation
+    -- if doc then
+        -- if not WhichKeyDocRegistered then
+            -- M.whichKeyDocs[lhs] = doc
+        -- else
+            -- require("which-key").register{lhs = doc}
+        -- end
+    -- end
+
     if not next(optsTbl) then
         api.nvim_set_keymap(mode, lhs, rhs, optsTbl)
     else
@@ -312,11 +330,11 @@ function _G.map(mode, lhs, rhs, optsTbl) -- {{{
     end
 end -- }}}
 ----
--- Function: M.vmap wrap around the nvim_set_keymap. This is for VS Code only!
+-- Function: _G.vmap wrap around the nvim_set_keymap. This is for VS Code only!
 --
--- @param mode:    Same as nvim_set_keymap
--- @param lhs:     Same as nvim_set_keymap
--- @param rhs:     Same as nvim_set_keymap
+-- @param mode:    Same as vim.api.nvim_set_keymap()
+-- @param lhs:     Same as vim.api.nvim_set_keymap()
+-- @param rhs:     Same as vim.api.nvim_set_keymap()
 ----
 function _G.vmap(mode, lhs, rhs) -- {{{
     if vim.g.vscode then
@@ -326,19 +344,32 @@ end -- }}}
 
 
 ----
--- Function: M.bmap wrap around the nvim_set_keymap, and accept the fouth argument as table
+-- Function: _G.bmap wrap around the nvim_set_keymap, and accept the fouth argument as table
 --
--- @param bufNr:   Same as nvim_buf_set_keymap
--- @param mode:    Same as nvim_buf_set_keymap
--- @param lhs:     Same as nvim_buf_set_keymap
--- @param rhs:     Same as nvim_buf_set_keymap
+-- @param bufNr:   Same as vim.api.nvim_buf_set_keymap()
+-- @param mode:    Same as vim.api.nvim_buf_set_keymap()
+-- @param lhs:     Same as vim.api.nvim_buf_set_keymap()
+-- @param rhs:     Same as vim.api.nvim_buf_set_keymap()
 -- @param optsTbl: Table value contain string elements that will be pass into_
 -- the fourth argument of nvim_set_keymap as the key name of value pairs, and
 -- the value is true
+-- @param doc:     String. Key documentation
 ----
 
-function _G.bmap(bufNr, mode, lhs, rhs, optsTbl) -- {{{
+function _G.bmap(bufNr, mode, lhs, rhs, optsTbl, doc) -- {{{
     optsTbl = optsTbl or {}
+    if type(optsTbl) == "string" then
+        doc = optsTbl
+        optsTbl = {}
+    end
+    -- Register key documentation
+    if doc then
+        if not WhichKeyDocRegistered then
+            M.whichKeyDocs[lhs] = doc
+        else
+            require("which-key").register{lhs = doc}
+        end
+    end
     if not next(optsTbl) then
         api.nvim_buf_set_keymap(bufNr, mode, lhs, rhs, optsTbl)
     else
@@ -706,8 +737,17 @@ function M.newSplit(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
     -- }}} Create new windows based on various window count
 end -- }}}
 
-function _G.isFloatWin()
-     return api.nvim_win_get_config(0).relative ~= ''
+function _G.isFloatWin(winID)
+    if not winID then
+        return api.nvim_win_get_config(0).relative ~= ''
+    else
+        return api.nvim_win_get_config(winID).relative ~= ''
+    end
+end
+
+-- dummy
+function _G.whichKeyDoc(docs)
+    return
 end
 
 return M

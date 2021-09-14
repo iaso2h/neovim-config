@@ -22,12 +22,11 @@ M.bufferSwitcher = function(CMD)
 end
 
 M.config = function()
-    vim.api.nvim_set_option("showtabline", 2)
-    map("n", [[<A-h>]], [[:lua require("config.nvim-barbar").bufferSwitcher("bp")<cr>]], {"silent"})
-    map("n", [[<A-l>]], [[:lua require("config.nvim-barbar").bufferSwitcher("bn")<cr>]], {"silent"})
+    map("n", [[<A-h>]], [[:lua require("config.nvim-barbar").bufferSwitcher("bp")<cr>]], {"silent"}, "Previous buffer")
+    map("n", [[<A-l>]], [[:lua require("config.nvim-barbar").bufferSwitcher("bn")<cr>]], {"silent"}, "Next buffer")
 
-    map("n", [[<A-S-h>]], [[:BufferMovePrevious<CR>]], {"silent"})
-    map("n", [[<A-S-l>]], [[:BufferMoveNext<cr>]],     {"silent"})
+    map("n", [[<A-S-h>]], [[:BufferMovePrevious<CR>]], {"silent"}, "Buffer move previous")
+    map("n", [[<A-S-l>]], [[:BufferMoveNext<cr>]],     {"silent"}, "Buffer move next")
 
     -- Goto buffer in position...
     map("n", [[<A-1>]], [[:BufferGoto 1<cr>]],           {"silent"})
