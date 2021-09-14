@@ -61,7 +61,7 @@ end
 
 -- Auto commands {{{
 if not vim.g.vscode then
-    api.nvim_exec([[
+    cmd[[
     augroup fileType
     autocmd!
     autocmd VimEnter             * nested lua require("historyStartup").display()
@@ -69,7 +69,8 @@ if not vim.g.vscode then
     autocmd BufWinEnter          * lua require("cursorRecall").main()
     autocmd BufWritePre          * lua require"util".trimWhiteSpaces(); require"util".trailingEmptyLine()
   " autocmd BufEnter             * set formatoptions=pj1Bml2nwc
-    autocmd FocusGained,BufEnter * checktime
+    autocmd BufEnter             * lua require("historyStartup").deleteBuf()
+  " autocmd FocusGained,BufEnter * checktime
   " autocmd BufAdd               * lua require("consistantTab").adaptBufTab()
 
     autocmd BufEnter             term://* startinsert
@@ -90,7 +91,7 @@ if not vim.g.vscode then
     autocmd BufReadPre,BufNewFile config      setlocal filetype=config
     autocmd BufWritePost          *.lua,*.vim lua Reload()
     augroup END
-    ]], false)
+    ]]
 end
 -- }}} Auto commands
 

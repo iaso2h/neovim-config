@@ -1,3 +1,4 @@
+-- TODO: tabnine priority
 return function()
     local completionItemKind = {
         -- Sarasa Mono Nerd
@@ -86,6 +87,7 @@ return function()
                 vim.fn["vsnip#anonymous"](args.body)
             end,
         },
+        preselect = cmp.PreselectMode.Item,
         documentation = {
             border = "none",
         },
@@ -96,28 +98,28 @@ return function()
             ['<C-n>'] = cmp.mapping.select_next_item(),
             ['<Tab>'] = cmp.mapping(function(fallback)
                 if vim.fn.pumvisible() == 1 then
-                    vim.fn.feedkeys(t"<C-S-]>")
+                    vim.api.nvim_feedkeys(t"<C-t>", "n", true)
                 elseif vim.fn['vsnip#available']() == 1 then
-                    vim.fn.feedkeys(t"<Plug>(vsnip-expand-or-ump)")
+                    vim.api.nvim_feedkeys(t"<Plug>(vsnip-expand-or-jump)", "", true)
                 else
                     fallback()
                 end
             end, {"i", "s"}),
             ['<S-Tab>'] = cmp.mapping(function(fallback)
                 if vim.fn.pumvisible() == 1 then
-                    vim.fn.feedkeys(t"<C-S-[>")
+                    vim.api.nvim_feedkeys(t"<C-d>", "n", true)
                 elseif vim.fn['vsnip#available']() == 1 then
-                    vim.fn.feedkeys(t"<Plug>(vsnip-jump-prev)")
+                    vim.api.nvim_feedkeys(t"<Plug>(vsnip-jump-prev)", "", true)
                 else
                     fallback()
                 end
             end, {"i", "s"}),
             ['<C-Space>'] = function(fallback)
+                -- cmp.mapping.complete()
                 if vim.fn.pumvisible() == 1 then
-                    -- vim.fn.feedkeys(t"<C-e>")
-                    cmp.mapping.complete()
-                else
                     cmp.abort()
+                else
+                    vim.api.nvim_feedkeys(t"<C-n>", "n", true)
                 end
             end,
             -- ['<C-e>'] = cmp.mapping.close(),
@@ -125,12 +127,12 @@ return function()
                 if vim.fn.pumvisible() == 1 then
                     cmp.abort()
                 end
-                vim.fn.feedkeys(t"<End>")
+                vim.api.nvim_feedkeys(t"<End>", "n", true)
             end,
             ['<CR>']  = cmp.mapping.confirm{
                 select   = true,
                 behavior = cmp.ConfirmBehavior.Replace,
-            }
+            },
         },
         keyword_length   = 2,
         default_behavior = cmp.ConfirmBehavior.Replace,

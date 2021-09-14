@@ -1,4 +1,4 @@
-local M   = {}
+local M   = {VMMaps}
 
 M.VM_Start = function()
     map("i", [[<C-BS>]],    [[<C-\><C-o>db]])
@@ -51,14 +51,14 @@ M.config = function() -- {{{
 
     local VMMaps = {}
     VMMaps['Reselect Last']      = ',m'
-    VMMaps['Find Under']         = '<C-d>'
-    VMMaps['Visual Add']         = '<C-d>'
+    VMMaps['Find Under']         = ',d'
+    VMMaps['Visual Add']         = ',d'
     VMMaps["Select Cursor Down"] = ',j'
     VMMaps["Select Cursor Up"]   = ',k'
     VMMaps['Skip Region']        = '<C-k>'
     VMMaps['Remove Region']      = 'u'
-    VMMaps['Select All']         = '<leader>d'
-    VMMaps['Visual All']         = '<leader>d'
+    VMMaps['Select All']         = ',a'
+    VMMaps['Visual All']         = ',a'
 
     -- Navigaton
     VMMaps['Invert Direction'] = 'o'
@@ -77,6 +77,20 @@ M.config = function() -- {{{
     VMMaps['Run Macro']     = ',@'
     VMMaps['Show Register'] = ',"'
     vim.g.VM_maps = VMMaps
+
+    -- local invertMaps = {}
+    -- for _, doc in ipairs(VMMaps) do
+        -- invertMaps[VMMaps[doc]] = doc
+    -- end
+
+    -- local prefixMaps = {[","] = {name = "+Visual Multi mode"}}
+    -- for _, keymap in ipairs(vim.tbl_values(VMMaps)) do
+        -- if string.sub(keymap, 1, 1) == "," then
+            -- local suffixMaps = string.sub(keymap, 2, #keymap)
+            -- prefixMaps[","][suffixMaps] = invertMaps[keymap]
+        -- end
+    -- end
+    -- whichKeyDoc(prefixMaps)
 end -- }}}
 
 return M

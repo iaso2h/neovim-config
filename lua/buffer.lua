@@ -62,7 +62,7 @@ local function bwipe(bufNr)
         end
     end
 
-    if package.loaded['bufferline#update'] and fn.exists("g:bufferline") == 1 and #bufNrTbl ~= 1 then
+    if fn.exists("g:bufferline") == 1 and #bufNrTbl ~= 1 then
         fn['bufferline#update'](true)
     end
 end
@@ -185,6 +185,7 @@ function M.smartClose(type) -- {{{
     curBufNr   = api.nvim_get_current_buf()
     curBufType = vim.o.buftype
     curWinID   = api.nvim_get_current_win()
+    -- TODO: check relative window
     winIDTbl   = api.nvim_list_wins()
     bufNrTbl   = vim.tbl_map(function(buf)
         return tonumber(string.match(buf, "%d+"))
@@ -335,31 +336,11 @@ function M.wipeOtherBuf() -- {{{
     end
 
     -- Update barbar.nvim tabline
-    if package.loaded['bufferline#update'] and fn.exists("g:bufferline") == 1 and #bufNrTbl ~= 1 then
+    if fn.exists("g:bufferline") == 1 and #bufNrTbl ~= 1 then
         fn['bufferline#update'](true)
     end
 end -- }}}
 
-local hideCursorFileTypeTbl = {
-    "NvimTree",
-    "qf",
-    "startify",
-    "coc-explorer"
-}
-local hideCursorStatus = false
--- TODO: hide cursor in specific buffer type
-function M.hideCursor()
-    local fileType = vim.bo.filetype
-    if vim.tbl_contains(hideCursorFileTypeTbl, fileType) then
-        cmd "hi! Cursor guifg=black guibg=bg=white ctermbg=15"
-        vim.o.guicursor = "n-v-sm:block,i-c-ci:ver25-Cursor,ve-o-r-cr:hor20"
-        hideCursorStatus = true
-    end
-    if hideCursorStatus then
-        cmd "hi! Cursor guibg=#3B4252"
-        vim.o.guicursor = "v-sm:block,v-i-c-ci:ver25-Cursor,ve-o-r-cr:hor20"
-    end
-end
 
 ----
 -- Function: M.closeOtherWin: Close other windows with nvim tree open checking
