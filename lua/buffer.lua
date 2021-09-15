@@ -56,13 +56,13 @@ local function bwipe(bufNr)
         api.nvim_buf_delete(bufNr, {force = true})
     else
         api.nvim_buf_delete(0, {force = true})
-        if vim.bo.filetype == "NvimTree" and fn.exists("g:bufferline") == 1 then
+        if vim.bo.filetype == "NvimTree" and vim.g.bufferline then
             require "bufferline.state".set_offset(0)
             return
         end
     end
 
-    if fn.exists("g:bufferline") == 1 and #bufNrTbl ~= 1 then
+    if vim.g.bufferline and #bufNrTbl ~= 1 then
         fn['bufferline#update'](true)
     end
 end
@@ -78,7 +78,7 @@ end
 ----
 local function smartCloseBuf(checkBuftype) -- {{{
     -- Check if called from Nvim Tree
-    if vim.bo.filetype == "NvimTree" and fn.exists("g:bufferline") == 1 then
+    if vim.bo.filetype == "NvimTree" and vim.g.bufferline then
         require "bufferline.state".set_offset(0)
         cmd "wincmd q"
         return
@@ -336,7 +336,7 @@ function M.wipeOtherBuf() -- {{{
     end
 
     -- Update barbar.nvim tabline
-    if fn.exists("g:bufferline") == 1 and #bufNrTbl ~= 1 then
+    if vim.g.bufferline then
         fn['bufferline#update'](true)
     end
 end -- }}}

@@ -16,8 +16,11 @@ local M   = {}
 ----
 
 function M.terminalToggle() -- {{{
-    local winCount = fn.winnr("$")
-    local winInfo  = fn.getwininfo()
+    local winTbl            = api.nvim_list_wins()
+    local winNonRelativeTbl = vim.tbl_filter(function(winID) return vim.api.nvim_win_get_config(winID).relative == "" end, winTbl)
+    local winCount          = #winNonRelativeTbl
+    local winInfo           = fn.getwininfo()
+
     if vim.bo.buftype ~= "terminal" then
         require("util").newSplit(require("terminal").openTerminal, {}, "^term.*", false, true)
     else
@@ -56,9 +59,9 @@ function M.openTerminal(newBufNr) -- {{{
         -- Clear the scratch buffer
         cmd("bwipe! " .. newBufNr)
     else                         -- Create new buffer instance
-        if fn.has("win32") == 1 then
+        if jit.os == "Windows" then
             cmd "terminal powershell"
-        elseif fn.has("unix") == 1 then
+        elseif jit.os == "Linux" then
             cmd "terminal"
         end
     end

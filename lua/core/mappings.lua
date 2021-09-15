@@ -86,7 +86,6 @@ map("n", [[g<S-CR>]], [[:lua require("trailingUtil").trailingChar("O")<cr>]],  {
 vmap("n", [[g>]], [[:<c-u>messages<cr>]])
 
 map("n", [[g<]],        [[:<c-u>messages<cr>]], {"silent"}, "Messages in prompt")
--- TODO
 map("n", [[<leader>,]], [[:<c-u>execute 'messages clear<bar>echohl Moremsg<bar>echo "Message clear"<bar>echohl None'<cr>]])
 map("n", [[<leader>.]], [[:<c-u>execute 'messages clear<bar>echohl Moremsg<bar>echo "Message clear"<bar>echohl None'<cr>]], "Clear messages")
 -- Pageup/Pagedown

@@ -147,7 +147,7 @@ map("v", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("v")<cr>]], {"s
 -- Setup() function: https://github.com/neovim/nvim-lspconfig#setup-function
 -- Individual configuration: https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md
 local checkExt = function(serverExec)
-    return fn.has('win32') == 1 and serverExec .. ".cmd" or serverExec
+    return jit.os == "Windows" and serverExec .. ".cmd" or serverExec
 end
 
 -- Python {{{
@@ -257,14 +257,14 @@ local findClangd = function() -- {{{
             "--suggest-missing-includes",
             "--fallback-style=google"
         }
-    if fn.has("win32") == 1 then
+    if jit.os == "Windows" then
         if ex("clangd") then
             table.insert(cmdStr, 1, "clangd")
             return cmdStr
         else
             return ""
         end
-    elseif fn.has("unix") == 1 then
+    elseif jit.os == "Linux" then
         if ex("clangd-11") then -- The current clangd version. 2021-08-23
             table.insert(cmdStr, 1, "clangd-11")
             return cmdStr
@@ -299,36 +299,6 @@ if clangdCMD ~= "" then
     }
 end
 -- }}} Clangd
--- CCLS {{{
--- https://github.com/MaskRay/ccls
--- if ex("ccls") then
-    -- lspConfig.ccls.setup {
-        -- cmd = {"ccls"},
-        -- on_attach = onAttach,
-        -- filetypes = {"c", "cpp", "objc", "objcpp"},
-        -- init_options = {
-            -- -- capabilities = capabilities,
-            -- compilationDatabaseDirectory = "",
-            -- clang = {
-                -- excludeArgs = {"-frounding-math"},
-                -- -- TODO linux
-                -- resourceDir = fn.has("win32") == 1 and "D:/LLVM/lib/clang/11.1.0" or ""
-            -- },
-            -- completion = {
-                -- caseSensitivity = 1
-            -- },
-            -- diagnostics = {
-                -- blacklist = {
-                -- }
-            -- },
-            -- index = {
-                -- threads = 2,
-            -- },
-        -- },
-        -- root_dir = lspConfig.util.root_pattern(".git", "compile_commands.json", "compile_flags.txt", "build", "README.md", "makefile"),
-    -- }
--- end
--- }}} CCLS
 if ex("vscode-json-language-server") then
     M.servers.json = {
         cmd = {checkExt("vscode-json-language-server"), "--stdio"},

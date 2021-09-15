@@ -649,34 +649,20 @@ end
 -- @return: 0
 ----
 function M.newSplit(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
-    local winInfo = fn.getwininfo()
+    local winIDTbl            = api.nvim_list_wins()
+    local winIDNonRelativeTbl = vim.tbl_filter(function(winID) return vim.api.nvim_win_get_config(winID).relative == "" end, winIDTbl)
+    local nonSplitFileTypeTbl = {"coc-explorer", "qf", "NvimTree"}
 
-    -- Filter out invalid window of which height is 1
-    local winCount = 0
-    for _, tbl in ipairs(winInfo) do if tbl["height"] ~= 1 then winCount = winCount + 1 end end
+    local curWinID  = api.nvim_get_current_win()
+    local winInfo   = fn.getwininfo()
+    local winLayout = fn.winlayout()
+    -- UbuntuMono
+    local width2height   = 0.1978
+    local height2width   = 5.0566
 
-    -- Check existence of special nonsplitfiletype
-    local nonSplitFileTypeTbl   = {"coc-explorer", "qf"}
-    local nonSplitFileTypeCheck = false
-    local bufFileTypeTbl = {}
-    for _, winTbl in ipairs(winInfo) do
-        bufFileTypeTbl[#bufFileTypeTbl + 1] = api.nvim_buf_get_option(winTbl["bufnr"], "filetype")
-    end
-    for _, fileType in ipairs(bufFileTypeTbl) do
-        if vim.tbl_contains(nonSplitFileTypeTbl, fileType) then
-            nonSplitFileTypeCheck = true
-        end
-    end
-    -- Do not split on special window
-    if winCount ~= 1 and vim.tbl_contains(nonSplitFileTypeTbl, vim.bo.filetype) then cmd "wincmd w" end
-
-    local width2height   = 0.3678
-    local height2width   = 2.7188
     local ui             = api.nvim_list_uis()[1]
     local screenWidth    = ui.width
     local screenHeight   = ui.height
-    local curWinID       = api.nvim_get_current_win()
-    local winLayout      = fn.winlayout()
 
     -- Store windows ID for position restoration
     M.newSplitLastBufNr = curWinID
@@ -689,59 +675,51 @@ function M.newSplit(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
             matchResult = string.match(api.nvim_buf_get_name(api.nvim_win_get_buf(tbl["winid"])), bufnamePat)
             if matchResult then
                 cmd(string.format("%dwincmd w", tbl["winnr"]))
-                return 0
+                return
             end
         end
     end -- }}}
 
-    -- Create new windows based on various window count {{{
-    if winCount == 1 then -- {{{
+    if #winIDNonRelativeTbl == 1 then
         if screenWidth <= screenHeight * height2width then
             return newWin(func, funcArgList, bufListed, scratchBuf, "row", height2width, width2height)
         else
             return newWin(func, funcArgList, bufListed, scratchBuf, "col", height2width, width2height)
-        end -- }}}
-    elseif winCount == 2 then -- {{{
-        if not nonSplitFileTypeCheck then cmd "wincmd w" end
-        return newWin(func, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height) -- }}}
-    elseif winCount == 3 then -- {{{
-        if not nonSplitFileTypeCheck then
-            for _, layoutTbl in ipairs(winLayout[2]) do
-                local winID = layoutTbl[2]
-                if type(winID) == "number" then
-                    if winID ~= curWinID then
-                        for _, winTbl in ipairs(winInfo) do
-                            if winTbl["winid"] == winID then
-                                cmd(string.format("%dwincmd w", winTbl["winnr"]))
-                                return newWin(func, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
-                            end
-                        end
-                    end
-                    return newWin(func, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
-                end
-            end
-        else
-            while vim.tbl_contains(nonSplitFileTypeTbl, vim.bo.filetype) or api.nvim_get_current_win() == curWinID do
-                cmd "wincmd w"
-            end
-            if #winLayout[2] == 2 then
-                return newWin(func, funcArgList, bufListed, scratchBuf, "col", height2width, width2height)
-            else
-                return newWin(func, funcArgList, bufListed, scratchBuf, "row", height2width, width2height)
-            end
-        end -- }}}
+        end
     else -- {{{
-        if winCount > 4 then cmd "only" end
-        return newWin(func, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
+
+        local newSplitChk = false
+
+        -- Do not split on special window
+        if vim.tbl_contains(nonSplitFileTypeTbl, vim.bo.filetype) then
+            winLayout[1] = winLayout[1] == "row" and "col" or "row"
+            cmd "wincmd W"
+        end
+
+        repeat
+            cmd "wincmd W"
+            if not vim.tbl_contains(nonSplitFileTypeTbl, vim.bo.filetype) and
+                vim.tbl_contains(winIDNonRelativeTbl, api.nvim_get_current_win()) then
+
+                newWin(func, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
+                newSplitChk = true
+            end
+        until api.nvim_get_current_win() ~= curWinID
+
+        -- In case of new win never had been created
+        if not newSplitChk then
+            cmd "wincmd W"
+            cmd "wincmd W"
+            return newWin(func, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
+        end
     end -- }}}
-    -- }}} Create new windows based on various window count
 end -- }}}
 
 function _G.isFloatWin(winID)
     if not winID then
-        return api.nvim_win_get_config(0).relative ~= ''
+        return api.nvim_win_get_config(0).relative ~= ""
     else
-        return api.nvim_win_get_config(winID).relative ~= ''
+        return api.nvim_win_get_config(winID).relative ~= ""
     end
 end
 

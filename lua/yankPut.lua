@@ -1,9 +1,8 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.0.13
--- Last Modified: 2021-08-24
--- TODO: Disable == when indentation is eauql
+-- Version: 0.1.0
+-- Last Modified: 2021-09-15
 
 local fn       = vim.fn
 local cmd      = vim.cmd
@@ -22,61 +21,24 @@ function M.VSCodeLineMove(vimMode, direction) -- {{{
     if vimMode == "n" then
         if direction == "down" then
             local nextIndent = fn.indent(cursorPos[1] + 1)
-            if nextIndent == curIndent or nextIndent == 0 then
-                cmd [[m .+1]]
-            else
-                cmd [[m .+1]]
-                if api.nvim_eval("&equalprg") == "" then cmd [[normal! ==]] end
+            cmd [[m .+1]]
+            if not (nextIndent == curIndent or nextIndent == 0) then
+                if vim.o.equalprg == "" then cmd [[normal! ==]] end
             end
         elseif direction == "up" then
             local previousIndent = fn.indent(cursorPos[1] - 1)
-            if previousIndent == curIndent or previousIndent == 0 then
-                cmd [[m .-2]]
-            else
-                cmd [[m .-2]]
-                if api.nvim_eval("&equalprg") == "" then cmd [[normal! ==]] end
+            cmd [[m .-2]]
+            if not (previousIndent == curIndent or previousIndent == 0) then
+                if vim.o.equalprg == "" then cmd [[normal! ==]] end
             end
         end
     elseif vimMode == "v" then
-        local curWinInfo = fn.getwininfo(curWinID)
-        local changeWinInfo
         if direction == "down" then
-            local selectEnd = api.nvim_buf_get_mark(0, ">")
-            local endAdjacentIndent = fn.indent(selectEnd[1] + 1)
-            if endAdjacentIndent == curIndent or endAdjacentIndent == 0 then
-                cmd [['<,'>m '>+1]]
-                cmd [[normal! gv]]
-            else
-                cmd [['<,'>m '>+1]]
-                if api.nvim_eval("&equalprg") == "" then
-                    cmd [[normal! gv=]]
-                    changeWinInfo = fn.getwininfo(curWinID)
-                    if changeWinInfo["topline"] == curWinInfo["topline"] and changeWinInfo["botline"] == curWinInfo["botline"] then
-                        cmd [[normal! gv]]
-                    end
-                else
-                    cmd [[normal! gv]]
-                end
-            end
+            cmd [['<,'>m '>+1]]
         elseif direction == "up" then
-            local selectStart = api.nvim_buf_get_mark(0, "<")
-            local startAdjacentIndent = fn.indent(selectStart[1] - 1)
-            if startAdjacentIndent == curIndent or startAdjacentIndent == 0 then
-                cmd [['<,'>m '<-2]]
-                cmd [[normal! gv]]
-            else
-                cmd [['<,'>m '<-2]]
-                if api.nvim_eval("&equalprg") == "" then
-                    cmd [[normal! gv=]]
-                    changeWinInfo = fn.getwininfo(curWinID)
-                    if changeWinInfo["topline"] == curWinInfo["topline"] and changeWinInfo["botline"] == curWinInfo["botline"] then
-                        cmd [[normal! gv]]
-                    end
-                else
-                    cmd [[normal! gv]]
-                end
-            end
+            cmd [['<,'>m '<-2]]
         end
+        cmd [[normal! gv]]
     end
 end -- }}}
 
@@ -91,9 +53,9 @@ function M.VSCodeLineYank(vimMode, direction)
     if string.lower(vimMode) == "v" then
         cmd [[normal! gv]]
         -- Visual mode {{{
-        local cursor = api.nvim_win_get_cursor(0)
+        local cursor      = api.nvim_win_get_cursor(0)
         local selectStart = api.nvim_buf_get_mark(0, "<")
-        local selectEnd = api.nvim_buf_get_mark(0, ">")
+        local selectEnd   = api.nvim_buf_get_mark(0, ">")
         cmd(string.format("%d,%dyank", selectStart[1], selectEnd[1]))
         if direction == "up" then
             if cursor[1] == selectStart[1] then
@@ -136,6 +98,8 @@ function M.VSCodeLineYank(vimMode, direction)
             api.nvim_win_set_cursor(0, {cursor[1] + 1, cursor[2]})
         end
         -- }}} Normal mode
+    else
+        cmd [[normal gv]]
     end
     -- }}} Duplication
 
@@ -228,8 +192,6 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
     local curBufNr  = api.nvim_get_current_buf()
     local curWinID  = api.nvim_get_current_win()
     local cursorPos = api.nvim_win_get_cursor(curWinID)
-    local curIndent = fn.indent(cursorPos[1])
-    local adjacentLineIndent
 
     -- Use extmark to track strating cursor position in normal mode
     local cursorNS
@@ -240,11 +202,6 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
     end
 
     if regType == "V" or regType == "l" then
-        if pasteCMD == "P" then
-            adjacentLineIndent = fn.indent(cursorPos[1] - 1)
-        else
-            adjacentLineIndent = fn.indent(cursorPos[1] + 1)
-        end
         M.lastPutLinewise = true
     else
         M.lastPutLinewise = false
@@ -277,16 +234,9 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
     M.inplacePutNewContentExtmark = api.nvim_buf_set_extmark(curBufNr, M.inplacePutNewContentNS,
                     pos1[1], pos1[2], {end_line = pos2[1], end_col = pos2[2]})
 
-    if regType == "V" or regType == "l" then
-        if curIndent ~= 0 and adjacentLineIndent ~= 0 and curIndent ~= adjacentLineIndent and api.nvim_eval("&equalprg") == "" then
-            api.nvim_win_set_cursor(curWinID, {pos1[1] + 1, pos1[2]})
-            cmd "normal! V"
-            api.nvim_win_set_cursor(curWinID, {pos2[1] + 1, pos2[2]})
-            cmd "normal! ="
-        end
-    else
+    if regType == "v" then
         -- Format current line if new paste content consists a single line
-        if api.nvim_eval("&equalprg") == "" then
+        if vim.o.equalprg == "" then
             local match = string.match(curLine, '%w')
             if not match then cmd [[normal! ==]] end
         end
