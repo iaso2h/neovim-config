@@ -2,7 +2,7 @@
 -- Author: iaso2h
 -- Description: A few of buffer-related utilities
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.17
+-- Version: 0.0.18
 -- Last Modified: 2021-08-23
 -- BUG: q on startup-log.txt
 -- TODO: check for prompt
@@ -270,7 +270,7 @@ function M.wipeOtherBuf() -- {{{
     winIDTbl = api.nvim_list_wins()
     if vim.bo.filetype == "NvimTree" then
         if #winIDTbl == 2 then
-            cmd [[wincmd w]]
+            cmd [[noautocmd wincmd w]]
             nvimTreeCall = true
         else
             return
@@ -332,7 +332,7 @@ function M.wipeOtherBuf() -- {{{
 
     -- Change focus back to Nvim Tree
     if nvimTreeCall then
-        cmd [[wincmd w]]
+        cmd [[noautocmd wincmd w]]
     end
 
     -- Update barbar.nvim tabline
@@ -350,7 +350,7 @@ M.closeOtherWin = function()
         require("bufferline.state").set_offset(0)
         require("nvim-tree.view").close()
     end
-    vim.cmd("wincmd o")
+    vim.cmd("noautocmd wincmd o")
 end
 
 M.restoreClosedBuf = function()

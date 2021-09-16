@@ -1,3 +1,8 @@
+-- File: historyStartup
+-- Author: iaso2h
+-- Description: Startup page with oldfiles
+-- Version: 0.0.4
+-- Last Modified: 2021-09-16
 local api = vim.api
 local fn  = vim.fn
 local cmd = vim.cmd
@@ -23,22 +28,21 @@ M.display = function()
     -- -- TODO: alert warning
     -- if vim.fn.line2byte("$") ~= -1 then return end
 
+    curWin = api.nvim_get_current_win()
     if api.nvim_buf_is_valid(1) then
         M.curBuf = 1
     else
-        M.curBuf = api.nvim_create_buf(true, true)
-        if M.curBuf then
+        -- BUG:
+        -- M.curBuf = api.nvim_create_buf(true, true)
+
+        -- if M.curBuf == 0 then
             cmd [[noautocmd enew]]
             M.curBuf = api.nvim_get_current_buf()
-        end
+        -- end
     end
 
-    if api.nvim_buf_is_valid(M.curBuf - 1) and api.nvim_buf_get_option(M.curBuf - 1, "modified") == false then
-        api.nvim_buf_delete(M.curBuf - 1, {force = true})
-    end
+    api.nvim_win_set_buf(curWin, M.curBuf)
 
-
-    curWin = api.nvim_get_current_win()
     if api.nvim_list_wins() ~= 1 then cmd [[silent! wincmd o]] end
 
     api.nvim_buf_set_option(M.curBuf, "modifiable", true)
@@ -61,7 +65,6 @@ M.display = function()
         )
     end
 
-    api.nvim_win_set_buf(curWin, M.curBuf)
 end
 
 M.do_map = function(key)

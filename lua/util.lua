@@ -610,9 +610,9 @@ function M.splitExist()
     local ui        = api.nvim_list_uis()[1]
     -- Based on vim.o.guifont = "更纱黑体 Mono SC Nerd:h13"
     if fn.has("win32") == 1 then
-        if winCount == 2 and 232/2 < ui["width"] then cmd [[wincmd L]] end
+        if winCount == 2 and 232/2 < ui["width"] then cmd [[noautocmd wincmd L]] end
     elseif fn.has("unix") == 1 then
-        if winCount == 2 and 284/2 < ui["width"] then cmd [[wincmd L]] end
+        if winCount == 2 and 284/2 < ui["width"] then cmd [[noautocmd wincmd L]] end
     end
 end
 
@@ -693,11 +693,11 @@ function M.newSplit(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
         -- Do not split on special window
         if vim.tbl_contains(nonSplitFileTypeTbl, vim.bo.filetype) then
             winLayout[1] = winLayout[1] == "row" and "col" or "row"
-            cmd "wincmd W"
+            cmd "noautocmd wincmd W"
         end
 
         repeat
-            cmd "wincmd W"
+            cmd "noautocmd wincmd W"
             if not vim.tbl_contains(nonSplitFileTypeTbl, vim.bo.filetype) and
                 vim.tbl_contains(winIDNonRelativeTbl, api.nvim_get_current_win()) then
 
@@ -708,8 +708,8 @@ function M.newSplit(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
 
         -- In case of new win never had been created
         if not newSplitChk then
-            cmd "wincmd W"
-            cmd "wincmd W"
+            cmd "noautocmd wincmd W"
+            cmd "noautocmd wincmd W"
             return newWin(func, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
         end
     end -- }}}

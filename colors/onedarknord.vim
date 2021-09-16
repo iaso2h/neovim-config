@@ -315,7 +315,7 @@ call s:hi("VertSplit", s:nord2_gui, s:nord0_gui, s:nord3_term, "NONE", "NONE", "
 " Syntax Groups (descriptions and ordering from `:h w18`) {{{
 
 " call s:h("Comment", {"fg": s:comment_grey, "gui": "italic", "cterm": "italic" }) " any comment
-call s:hi("Comment", s:nord3_gui, "", s:nord1_term, "", s:italic, "") " any comment
+call s:hi("Comment", s:nord3_gui_bright, "", s:nord1_term, "", s:italic, "") " any comment
 call s:hi("Conceal", "", "NONE", "", "NONE", "", "")
 call s:h("Constant", {"fg": s:dark_yellow }) " any constant
 call s:hi("Decorator", s:nord12_gui, "", s:nord12_term, "", "", "")
@@ -914,10 +914,10 @@ hi link gitcommitUnmergedArrow gitcommitUnmergedFile
 " }}} EasyMotion
 
 " phaazon/hop.nvim {{{
-call s:hi("HopNextKey",   "#FFFFFF",   "#000000", "",           "", "", "")
-call s:hi("HopNextKey1",  "#ED427C",   "#FFFFFF", "",           "", "", "")
-call s:hi("HopNextKey2",  "#ED427C",   "#FFFFFF", "",           "", "", "")
-call s:hi("HopUnmatched", s:nord3_gui, "",        s:nord1_term, "", "", "")
+call s:hi("HopNextKey",   "#000000",   "#FFFFFF", "",           "", s:bold, "")
+call s:hi("HopNextKey1",  "#FFFFFF",   "#ED427C", "",           "", s:bold, "")
+call s:hi("HopNextKey2",  "#FFFFFF",   "#ED427C", "",           "", s:bold, "")
+call s:hi("HopUnmatched", s:nord3_gui, "",        s:nord1_term, "", "",     "")
 " }}} phaazon/hop.nvim
 
 
@@ -1174,6 +1174,9 @@ call s:hi("GitSignsDelete", s:nord11_gui, "", s:nord11_term, "", "", "")
 call s:hi("HistoryStartupCreate",   s:nord10_gui, "", s:nord10_term, "", s:bold,   "")
 call s:hi("HistoryStartupFileRoot", s:nord8_gui,  "", s:nord8_term,  "", s:italic, "")
 " }}} HistoryStartup
+"
+"
+"
 "
 "
 "

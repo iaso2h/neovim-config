@@ -48,7 +48,7 @@ packer.startup(function(use, use_rocks)
     -- fn = string or list          -- Specifies functions which load this plugin.
     -- cond = string, function, or list of strings/functions,   -- Specifies a conditional test to load this plugin
     -- module = string or list      -- Specifies Lua module names for require. When requiring a string which starts
-                                -- -- with one of these module names, the plugin will be loaded.
+                                    -- with one of these module names, the plugin will be loaded.
     -- module_pattern = string/list -- Specifies Lua pattern of Lua module names for require. When
     -- requiring a string which matches one of these patterns, the plugin will be loaded.
     -- }
@@ -184,6 +184,14 @@ packer.startup(function(use, use_rocks)
         end
         }
     use {
+        fn.stdpath("config") .. "/lua/fixScrollUp",
+        keys = {"<C-e>", "<C-d>"},
+        config = function()
+            map("",  [[<C-e>]], [[<C-y>]], {"noremap", "novscode"}, "Scroll Up")
+            map("",  [[<C-d>]], [[<C-e>]], {"noremap", "novscode"}, "Scroll Down")
+        end
+    }
+    use {
         fn.stdpath("config") .. "/lua/compileRun",
         cmd  = {"Run", "Compile"},
         keys = {"F9", "S-F9"},
@@ -201,7 +209,6 @@ packer.startup(function(use, use_rocks)
         fn.stdpath("config") .. "/lua/replace",
         keys = {
             {"n", "gr"},
-            {"o", "gr"},
             {"n", "grr"},
             {"v", "R"},
         },
@@ -229,7 +236,6 @@ packer.startup(function(use, use_rocks)
             map("n", [[gxx]], [[<Plug>(ExchangeLine)]], "Exchange current line")
         end,
     }
-    -- TODO: complement plugin key mappings from other plugin for lazy-loading.
     use {
         'machakann/vim-sandwich',
         keys = {
@@ -237,8 +243,6 @@ packer.startup(function(use, use_rocks)
             {"n", "gs"},
             {"n", "cs"},
             {"n", "ds"},
-            {"o", "iq"},
-            {"o", "aq"},
         },
         config = conf "vim-sandwich"
     }
@@ -264,17 +268,6 @@ packer.startup(function(use, use_rocks)
     }
     use {
         'michaeljsmith/vim-indent-object',
-        keys = {
-            {"o", "ii"},
-            {"o", "ai"},
-        }
-    }
-    use {
-        fn.stdpath("config") .. "/vim/textObjectAll",
-        keys = {
-            -- {"o", "ie"},
-            {"o", "ae"},
-        }
     }
     use {
         'monaqa/dial.nvim',
@@ -606,7 +599,7 @@ packer.startup(function(use, use_rocks)
         'joshdick/onedark.vim',
     }
     use {
-        'glepnir/galaxyline.nvim',
+        'sindrets/galaxyline.nvim',
         event    = "BufRead",
         requires = "nvim-web-devicons",
         config   = conf "nvim-galaxyline"
@@ -647,7 +640,6 @@ packer.startup(function(use, use_rocks)
     -- use 'dm1try/golden_size'
     -- }}} UI
     -- Treesitter {{{
-    -- TODO: https://github.com/abecodes/tabout.nvim
     use {
         'nvim-treesitter/nvim-treesitter',
         run    = ":TSUpdate",
@@ -678,10 +670,9 @@ packer.startup(function(use, use_rocks)
             }
         end
     }
-    -- TODO: highlight
     use {
         'romgrk/nvim-treesitter-context',
-        event    = "BufRead",
+        after    = "nvim-treesitter",
         requires = "nvim-treesitter",
         config   = function()
             require'treesitter-context'.setup{
@@ -692,7 +683,7 @@ packer.startup(function(use, use_rocks)
     }
     use {
         'p00f/nvim-ts-rainbow',
-        event    = "BufRead",
+        after    = "nvim-treesitter",
         requires = "nvim-treesitter",
         config   = function()
             require("nvim-treesitter.configs").setup{
@@ -711,7 +702,7 @@ packer.startup(function(use, use_rocks)
     }
     use {
         'nvim-treesitter/nvim-treesitter-textobjects',
-        event    = "BufRead",
+        after    = "nvim-treesitter",
         requires = "nvim-treesitter",
         config   = function()
             require("nvim-treesitter.configs").setup{
@@ -763,13 +754,51 @@ packer.startup(function(use, use_rocks)
     }
     use {
         'windwp/nvim-ts-autotag',
-        event    = "BufRead",
+        after    = "nvim-treesitter",
         requires = "nvim-treesitter",
         config   = function()
             require'nvim-treesitter.configs'.setup {
                 autotag = {
                     enable = true,
                 }
+            }
+        end
+    }
+    use {
+        'abecodes/tabout.nvim',
+        after    = "nvim-treesitter",
+        requires = "nvim-treesitter",
+        config   = function()
+            require('tabout').setup {
+                -- key to trigger tabout, set to an empty string to disable
+                tabkey           = '',
+                -- key to trigger backwards tabout, set to an empty string to disable
+                backwards_tabkey = '',
+                -- shift content if tab out is not possible
+                act_as_tab       = true,
+                -- reverse shift content if tab out is not possible (if your keyboard/terminal supports <S-Tab>)
+                act_as_shift_tab = true,
+                -- well ...
+                enable_backwards = true,
+                -- if the tabkey is used in a completion pum
+                completion       = true,
+                tabouts          = {
+                    {open = "'",  close = "'"},
+                    {open = '"',  close = '"'},
+                    {open = '`',  close = '`'},
+                    {open = '(',  close = ')'},
+                    {open = '[',  close = ']'},
+                    {open = '{',  close = '}'},
+                    {open = '<',  close = '>'},
+                    {open = '《', close = '》'},
+                    {open = '「', close = '」'},
+                    {open = '【', close = '】'},
+                    {open = '“',  close = '”'},
+                },
+                --[[ if the cursor is at the beginning of a filled element it will rather tab out than shift the content ]]
+                ignore_beginning = true,
+                -- tabout will ignore these filetypes
+                exclude = {}
             }
         end
     }
@@ -1071,31 +1100,21 @@ packer.startup(function(use, use_rocks)
         ft = "fish"
     }
     -- }}} Language support
-    -- Version control {{{
-    use {
-        'tpope/vim-fugitive',
-        cmd = {"Git"}
-    }
+    -- Source control {{{
     use {
         'lewis6991/gitsigns.nvim',
         event  = "BufRead",
         config = conf "nvim-gitsigns"
     }
-    -- TODO: deprecated
+    -- TODO: highlight
     use {
-        'rhysd/git-messenger.vim',
-        disable = true,
-        -- cmd = {"GitMessenger", "<use>(git-messenger)"},
-        keys   = "<C-w>g",
-        config = function()
-            vim.g.git_messenger_date_format = "%Y-%m-%d %X"
-            map("n", [[<C-w>g]], [[:lua vim.cmd"GitMessenger"]], {"silent", "nowait"}, "Git messenger")
-        end
+        'rhysd/conflict-marker.vim',
+        keys = "}x, ]x, cb, co, cn, cb",
     }
     -- use {
         -- 'sindrets/diffview.nvim',
     -- }
-    -- }}} Version control
+    -- }}} Source control
     -- Knowlege {{{
     -- TODO: highlight
     use {

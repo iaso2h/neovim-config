@@ -89,14 +89,13 @@ map("n", [[g<]],        [[:<c-u>messages<cr>]], {"silent"}, "Messages in prompt"
 map("n", [[<leader>,]], [[:<c-u>execute 'messages clear<bar>echohl Moremsg<bar>echo "Message clear"<bar>echohl None'<cr>]])
 map("n", [[<leader>.]], [[:<c-u>execute 'messages clear<bar>echohl Moremsg<bar>echo "Message clear"<bar>echohl None'<cr>]], "Clear messages")
 -- Pageup/Pagedown
-map("", [[<C-e>]], [[<C-y>]],      {"noremap",   "novscode"}, "Scroll Up")
-map("", [[<C-d>]], [[<C-e>]],      {"noremap",   "novscode"}, "Scroll Down")
-map("", [[<A-e>]], [[<PageUp>]],   {"novscode"}, "PageUp")
-map("", [[<A-d>]], [[<PageDown>]], {"novscode"}, "PageDown")
-map("t", [[<A-e>]], [[<C-\><C-n><PageUp>]])
-map("t", [[<A-d>]], [[<C-\><C-n><PageDown>]])
 map("t", [[<C-e>]], [[<C-\><C-n><C-y>]])
 map("t", [[<C-d>]], [[<C-\><C-n><C-d>]])
+
+map("",  [[<A-e>]], [[<PageUp>]],   {"novscode"}, "PageUp")
+map("",  [[<A-d>]], [[<PageDown>]], {"novscode"}, "PageDown")
+map("t", [[<A-e>]], [[<C-\><C-n><PageUp>]])
+map("t", [[<A-d>]], [[<C-\><C-n><PageDown>]])
 
 vmap("n", [[<A-e>]], [[:<c-u>call VSCodeCall("cursorPageUp")<cr>]])
 vmap("n", [[<A-d>]], [[:<c-u>call VSCodeCall("cursorPageDown")<cr>]])
@@ -251,6 +250,7 @@ map("n", [[g\]], [[mz:s#\/#\\\\#e<cr>:noh<cr>g`z]], {"noremap", "silent"}, [[Con
 -- Mode: Terminal {{{
 map("t", [[<A-n>]],      [[<C-\><C-n>]])
 map("n", [[<C-`>]],      [[:lua require("terminal").terminalToggle()<cr>]],      {"silent"}, "Terminal toggle")
+map("n", [[<leader>t]],  [[:lua require("terminal").terminalToggle()<cr>]],      {"silent"}, "Terminal toggle")
 map("t", [[<C-`>]],      [[<A-n>:lua require("terminal").terminalToggle()<cr>]], {"silent"})
 map("t", [[<A-h>]],      [[<A-n><A-h>]])
 map("t", [[<A-l>]],      [[<A-n><A-l>]])

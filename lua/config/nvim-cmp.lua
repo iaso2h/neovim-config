@@ -92,29 +92,29 @@ return function()
             border = "none",
         },
         mapping = {
-            ['<A-e>'] = cmp.mapping.scroll_docs(-4),
-            ['<A-d>'] = cmp.mapping.scroll_docs(4),
-            ['<C-p>'] = cmp.mapping.select_prev_item(),
-            ['<C-n>'] = cmp.mapping.select_next_item(),
-            ['<Tab>'] = cmp.mapping(function(fallback)
-                if vim.fn.pumvisible() == 1 then
-                    vim.api.nvim_feedkeys(t"<C-t>", "n", true)
-                elseif vim.fn['vsnip#available']() == 1 then
+            ["<A-e>"] = cmp.mapping.scroll_docs(-4),
+            ["<A-d>"] = cmp.mapping.scroll_docs(4),
+            ["<C-p>"] = cmp.mapping.select_prev_item(),
+            ["<C-n>"] = cmp.mapping.select_next_item(),
+            ["<Tab>"] = cmp.mapping(function(fallback)
+                if vim.fn.pumvisible() == 0 then
+                    vim.api.nvim_feedkeys(t"<Plug>(Tabout)", "", true)
+                elseif vim.fn["vsnip#available"]() == 1 then
                     vim.api.nvim_feedkeys(t"<Plug>(vsnip-expand-or-jump)", "", true)
                 else
                     fallback()
                 end
             end, {"i", "s"}),
-            ['<S-Tab>'] = cmp.mapping(function(fallback)
-                if vim.fn.pumvisible() == 1 then
-                    vim.api.nvim_feedkeys(t"<C-d>", "n", true)
-                elseif vim.fn['vsnip#available']() == 1 then
+            ["<S-Tab>"] = cmp.mapping(function(fallback)
+                if vim.fn.pumvisible() == 0 then
+                    vim.api.nvim_feedkeys(t"<Plug>(TaboutBack)", "", true)
+                elseif vim.fn["vsnip#available"]() == 1 then
                     vim.api.nvim_feedkeys(t"<Plug>(vsnip-jump-prev)", "", true)
                 else
                     fallback()
                 end
             end, {"i", "s"}),
-            ['<C-Space>'] = function(fallback)
+            ["<C-Space>"] = function(fallback)
                 -- cmp.mapping.complete()
                 if vim.fn.pumvisible() == 1 then
                     cmp.abort()
@@ -122,14 +122,14 @@ return function()
                     vim.api.nvim_feedkeys(t"<C-n>", "n", true)
                 end
             end,
-            -- ['<C-e>'] = cmp.mapping.close(),
-            ['<C-e>'] = function(fallback)
+            -- ["<C-e>"] = cmp.mapping.close(),
+            ["<C-e>"] = function(fallback)
                 if vim.fn.pumvisible() == 1 then
                     cmp.abort()
                 end
                 vim.api.nvim_feedkeys(t"<End>", "n", true)
             end,
-            ['<CR>']  = cmp.mapping.confirm{
+            ["<CR>"]  = cmp.mapping.confirm{
                 select   = true,
                 behavior = cmp.ConfirmBehavior.Replace,
             },
