@@ -10,14 +10,20 @@ if not os.getenv("TERM") then
     map("", [[<C-=>]], [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<cr>]],    {"silent", "novscode"}, "Decrease font size")
     map("", [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<cr>]], {"silent", "novscode"}, "Restore font size")
 end
+-- InterestingWord
+map("n", [[gw]],        [[luaeval("require('operator').main(require('interestingWord').colorWord, false)")]], {"expr"}, "Highlight interesting word...")
+map("v", [[W]],         [[:lua require("interestingWord").colorWord(require("operator").vMotion())<cr>]],     {},       "Highlight selected as interesting word")
+map("n", [[gww]],       [[:lua require("interestingWord").reapplyColor()<cr>]], {}, "Recolor last interesting word...")
+map("n", [[<leader>w]], [[:lua require("interestingWord").clearColor()<cr>]],   {}, "Clear interesting word...")
+map("n", [[<leader>W]], [[:lua require("interestingWord").restoreColor()<cr>]], {}, "Restore interesting word...")
 -- HistoryStartup
 map("n", [[<C-s>]], [[:lua require("historyStartup").display()<cr>]], {"silent"}, "Enter HistoryStartup")
 -- Extraction
-map("",  [[gc]], [[luaeval("require('operator').main(require('extraction').main, true)")]], {"silent", "expr"}, "Extract...")
+map("n", [[gc]], [[luaeval("require('operator').main(require('extraction').main, true)")]], {"silent", "expr"}, "Extract...")
 map("v", [[C]],  [[:lua require("extraction").main(require("operator").vMotion())<cr>]],    {"silent"})
 -- Zeal query
-map("",  [[gz]], [[luaeval("require('operator').main(require('zeal').zeal,       false)")]], {"silent", "expr"}, "Zeal look up...")
-map("",  [[gZ]], [[luaeval("require('operator').main(require('zeal').zealGlobal, false)")]], {"silent", "expr"}, "Zeal look up... universally")
+map("n", [[gz]], [[luaeval("require('operator').main(require('zeal').zeal,       false)")]], {"silent", "expr"}, "Zeal look up...")
+map("n", [[gZ]], [[luaeval("require('operator').main(require('zeal').zealGlobal, false)")]], {"silent", "expr"}, "Zeal look up... universally")
 map("v", [[Z]],  [[:lua require("zeal").zealGlobal(require("operator").vMotion())<cr>]],     {"silent"})
 -- Print file name
 map("", [[<C-g>]], [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<cr>]], {"silent", "novscode"}, "Display file info")
@@ -40,8 +46,8 @@ map("n", [[<A-i>]], [[:lua require("historyHop").main("changelist", 1)<cr>]],  {
 -- map("n", [[<C-i>]], [[:lua require("historyHop").main("jumplist", 1)<cr>]],    {"silent"})
 map("n", [[j]], [[:lua require("util").addJump("j", true)<cr>]], {"silent"})
 map("n", [[k]], [[:lua require("util").addJump("k", true)<cr>]], {"silent"})
-map("v", [[*]], [[mz`z:<c-u>execute "/" . luaeval('require("util").visualSelection("string")')<cr>]], {"noremap", "silent"})
-map("v", [[#]], [[mz`z:<c-u>execute "?" . luaeval('require("util").visualSelection("string")')<cr>]], {"noremap", "silent"})
+map("v", [[*]], [[mz`z:<c-u>execute "/" . escape(luaeval('require("util").visualSelection("string")'), '\')<cr>]], {"noremap", "silent"})
+map("v", [[#]], [[mz`z:<c-u>execute "?" . escape(luaeval('require("util").visualSelection("string")'), '\')<cr>]], {"noremap", "silent"})
 map("v", [[/]], [[*]])
 map("v", [[?]], [[#]])
 -- Regex very magic

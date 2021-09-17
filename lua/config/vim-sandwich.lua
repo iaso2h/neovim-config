@@ -22,22 +22,22 @@ return function()
     fn["operator#sandwich#set"]('replace', 'all', 'hi_duration', 1000)
 
     -- mode
-    local recipes = {
+    vim.g["sandwich#recipes"] = {
         {buns = {[[\s\+]], [[\s\+]]}, regex = 1, kind = {'delete', 'replace', 'query'}, input = {' '}},
 
         {buns = {'', ''}, action = {'add'}, motionwise = {'line'}, linewise = 1, input = {t"<CR>"}},
 
         {buns = {'^$', '^$'}, regex = 1, linewise = 1, input = {t"<CR>"}},
 
-        {buns = {'<', '>'}, expand_range = 0},
+        {buns = {'<', '>'}, expand_range = 0, input = {'>', 'a'}},
 
         {buns = {'"', '"'}, quoteescape = 1, expand_range = 0, nesting = 0, linewise = 0},
         {buns = {"'", "'"}, quoteescape = 1, expand_range = 0, nesting = 0, linewise = 0},
         {buns = {"`", "`"}, quoteescape = 1, expand_range = 0, nesting = 0, linewise = 0},
 
-        {buns = {'{', '}'}, nesting = 1, skip_break = 1},
-        {buns = {'{', '}'}, nesting = 1},
-        {buns = {'(', ')'}, nesting = 1},
+        {buns = {'{', '}'}, nesting = 1, skip_break = 1, input = {'{', '}'}},
+        {buns = {'[', ']'}, nesting = 1, skip_break = 1, input = {'[', ']'}},
+        {buns = {'(', ')'}, nesting = 1, input = {'(', ')'}},
 
         {buns = 'sandwich#magicchar#t#tag()',     listexpr = 1, kind = {'add'},     action = {'add'}, input = {'t', 'T'}},
         {buns = 'sandwich#magicchar#t#tag()',     listexpr = 1, kind = {'replace'}, action = {'add'}, input = {'T'}},
@@ -45,9 +45,11 @@ return function()
 
         {buns = {'sandwich#magicchar#f#fname()', '")"'}, kind = {'add', 'replace'}, action = {'add'}, expr = 1, input = {'f'}},
 
+        -- tag {{{
         {external = {t"<Plug>(textobj-sandwich-tag-i)",       t"<Plug>(textobj-sandwich-tag-a)"},      noremap = 0, kind = {'delete',  'textobj'}, expr_filter = {'operator#sandwich#kind() !=# "replace"'}, input = {'t', 'T'}, linewise = 1},
         {external = {t"<Plug>(textobj-sandwich-tag-i)",       t"<Plug>(textobj-sandwich-tag-a)"},      noremap = 0, kind = {'replace', 'query'},   expr_filter = {'operator#sandwich#kind() ==# "replace"'}, input = {'T'}},
         {external = {t"<Plug>(textobj-sandwich-tagname-i)",   t"<Plug>(textobj-sandwich-tagname-a)"},  noremap = 0, kind = {'replace', 'textobj'}, expr_filter = {'operator#sandwich#kind() ==# "replace"'}, input = {'t'}},
+        -- }}} tag
 
         {external = {t"<Plug>(textobj-sandwich-function-ip)", t"<Plug>(textobj-sandwich-function-i)"}, noremap = 0, kind = {'delete', 'replace', 'query'}, input = {'f'}},
         {external = {t"<Plug>(textobj-sandwich-function-ap)", t"<Plug>(textobj-sandwich-function-a)"}, noremap = 0, kind = {'delete', 'replace', 'query'}, input = {'F'}},
@@ -68,8 +70,6 @@ return function()
             linewise = 2,
         }
     }
-
-    vim.g["sandwich#recipes"] = recipes
 
     cmd [[
     function! FolderMaker()

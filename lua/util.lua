@@ -729,10 +729,104 @@ function _G.isFloatWin(winID)
     end
 end
 
+
+----
+-- Function: _G.tbl_remove: Remove value from list-liked lua table
+--
+-- @param tbl:          List-liked table
+-- @param srcVal:       Srouce value to be look up and removed
+-- @param removeAllChk: Boolean value, default is true. Whether to remove the
+--                      all values or not
+-- @param cnt:          Integer value, default is 1. Determine how many value
+--                      o be removed when firstOnlyChk is false
+-- @return: Integer, table or nil. idx of the value. idx of table will be return when there are more
+--          than one idx to be return. nil will be return when no idx found
+----
+ _G.tbl_remove = function(tbl, srcVal, removeAllChk, cnt)
+    if not next(tbl) then return vim.notify("Empty table is not allowed", vim.log.levels.ERROR) end
+    if not vim.tbl_islist(tbl) then return vim.notify("Key-value pair table is not allowed", vim.log.levels.ERROR) end
+
+    removeAllChk = removeAllChk or false
+    cnt = cnt or 1
+    if not removeAllChk then
+        for idx, val in ipairs(tbl) do
+            if val == srcVal then
+                tbl[idx] = nil
+                return idx
+            end
+        end
+
+    else
+        local removeCount = 0
+        local idxTbl = {}
+        for idx, val in ipairs(tbl) do
+            if val == srcVal then
+                tbl[idx] = nil
+                removeCount = removeCount + 1
+                idxTbl[#idxTbl+1] = idx
+            end
+            if removeCount == cnt then return idxTbl end
+        end
+
+    end
+
+    -- return nil when not idx found
+    return nil
+end
+
+
+----
+-- Function: _G.tbl_replace: Replace value1 inside list-liked table with value2
+--
+-- @param tbl:       List-liked table of which value to be replaced
+-- @param repVal:    Value to replace with
+-- @param srcVal:    Source value to be replaced
+-- @param repAllChk: Boolean value, default is true. Whether to replace all value or not
+-- @param cnt:       Integer value, default is 1. Determine how many srcVal
+--                   will be replaced
+-- @param alertOnFail: Boolean value, default is false. Whether to alert when
+-- replace failed
+-- @return: nil
+----
+_G.tbl_replace = function(tbl, repVal, srcVal, repAllChk, cnt, alertOnFail)
+    repAllChk = repAllChk or true
+    cnt = cnt or 1
+    alertOnFail = alertOnFail or false
+
+    local idx = tbl_remove(tbl, srcVal, repAllChk, cnt)
+    if not idx then
+        if alertOnFail then
+            return vim.notify("Source value instance not found", vim.log.levels.WARN)
+        else
+            return
+        end
+    end
+    local repCnt = 0
+    if type(idx) == "table" then
+        for _, index in ipairs(idx) do
+            tbl[index] = repVal
+            if repAllChk then
+                repCnt = repCnt + 1
+                if repCnt == cnt then return end
+            end
+        end
+    else
+        -- Bacause when table with one element have its very only element
+        -- set to nil, the table will also became nil
+        if idx == 1 then
+            tbl = {repVal}
+        else
+            tbl[idx] = repVal
+        end
+    end
+
+end
+
 -- dummy
-function _G.whichKeyDoc(docs)
+_G.whichKeyDoc = function(docs)
     return
 end
+
 
 return M
 

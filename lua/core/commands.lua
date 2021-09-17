@@ -89,6 +89,7 @@ if not vim.g.vscode then
     autocmd BufReadPre,BufNewFile *.twig      setlocal filetype=twig.html
     autocmd BufReadPre,BufNewFile *.gitignore setlocal filetype=gitignore
     autocmd BufReadPre,BufNewFile config      setlocal filetype=config
+    " Related work: https://github.com/RRethy/nvim-sourcerer
     autocmd BufWritePost          *.lua,*.vim lua Reload()
     augroup END
     ]]
