@@ -3,7 +3,7 @@ local cmd  = vim.cmd
 local M    = {}
 local conf       = function(moduleString) return require(string.format("config.%s", moduleString)) end
 local packerPath = fn.stdpath("data") .. "site/pack/packer/start/packer.nvim"
-local packer = require("packer")
+local packer     = require("packer")
 -- VSCodeLoaded = vim.fn.exists('g:vscode') == 0
 -- local nonVSCode    = function() return VSCodeLoaded end
 
@@ -71,7 +71,12 @@ packer.startup(function(use, use_rocks)
         'bkad/camelcasemotion',
         setup = [[vim.g.camelcasemotion_key = ',']],
     }
-    use 'antoinemadec/FixCursorHold.nvim'
+    use {
+        'antoinemadec/FixCursorHold.nvim',
+        setup = function()
+            vim.g.cursorhold_updatetime = 100
+        end
+    }
     use {
         'landock/vim-expand-region',
         event    = "BufRead",
@@ -651,7 +656,7 @@ packer.startup(function(use, use_rocks)
                     "c", "cpp", "cmake", "lua", "json", "toml", "python",
                     "bash", "fish", "ruby", "regex", "css", "html", "go",
                     "javascript", "rust", "vue", "c_sharp", "typescript",
-                    "comment"
+                    "comment", "query"
                 },
                 highlight        = {enable = true},
                 indent           = {enable = true},
@@ -667,6 +672,37 @@ packer.startup(function(use, use_rocks)
                 matchup = {
                     enable = true,
                 },
+            }
+
+            map("n", [[<A-S-a>]], [[gnn]])
+            map("v", [[<A-S-a>]], [[grn]])
+            map("",  [[<A-S-s>]], [[grm]])
+        end
+    }
+    use {
+        'nvim-treesitter/playground',
+        requires = "nvim-treesitter",
+        cmd      = "TSPlaygroundToggle",
+        config   = function()
+            require "nvim-treesitter.configs".setup {
+                playground = {
+                    enable          = true,
+                    disable         = {},
+                    updatetime      = 25,    -- Debounced time for highlighting nodes in the playground from source code
+                    persist_queries = false, -- Whether the query persists across vim sessions
+                    keybindings     = {
+                        toggle_query_editor       = 'o',
+                        toggle_hl_groups          = 'i',
+                        toggle_injected_languages = 't',
+                        toggle_anonymous_nodes    = 'a',
+                        toggle_language_display   = 'I',
+                        focus_language            = 'f',
+                        unfocus_language          = 'F',
+                        update                    = 'R',
+                        goto_node                 = '<cr>',
+                        show_help                 = '?',
+                    },
+                }
             }
         end
     }
@@ -746,10 +782,6 @@ packer.startup(function(use, use_rocks)
                     },
                 },
             }
-
-            map("n", [[<A-S-a>]], [[gnn]])
-            map("v", [[<A-S-a>]], [[grn]])
-            map("",  [[<A-S-s>]], [[grm]])
         end
     }
     use {
@@ -992,6 +1024,15 @@ packer.startup(function(use, use_rocks)
             "nvim-lspconfig",
             "nvim-cmp"
         },
+    }
+    use {
+        'RRethy/vim-illuminate',
+        module  = "illuminate",
+        rquires = "nvim-lspconfig",
+        setup   = function()
+            vim.g.Illuminate_ftblacklist = {"nerdtree", "NvimTree"}
+            vim.g.Illuminate_delay = 100
+        end
     }
     -- }}} Intellisense
     -- Telescope {{{

@@ -169,6 +169,7 @@ end -- }}}
 ----
 function Reload(module) -- {{{
     local configPath = fn.stdpath("config")
+    if not string.match(fn.expand("%:p"), configPath) then return end
 
     if vim.bo.filetype == "lua" then
         -- Lua {{{
@@ -245,24 +246,29 @@ function Reload(module) -- {{{
     end
 
 end -- }}}
-
-----
--- Function: M.addJumpMotion add jump location in jumplist before execute specified key
+-- Function: M.addJump: Add jump location in jumplist before execute specified key
 --
--- @param key:           keystroke in normal mode
--- @param reservedCount: boolean value. Number count will be considered when true is provided
+-- @param action:        Keystroke string or function
+-- @param reservedCount: Boolean value. Number count will be considered when true is provided
+-- @param funArg:        Optional funArg
 ----
-function M.addJumpMotion(key, reservedCount) -- {{{
-    if reservedCount then
-        local saveCount = vim.v.count
-        if saveCount ~= 0 then
-            cmd [[normal! mz`z]]
-            for _ = 1, saveCount do cmd("normal! " .. key) end
+function M.addJump(action, reservedCount, funArg) -- {{{
+    if type(action) == "string" then
+        cmd [[normal! mz`z]]
+        if reservedCount then
+            local saveCount = vim.v.count
+            if saveCount ~= 0 then
+                for _ = 1, saveCount do cmd("normal! " .. action) end
+            else
+                cmd("normal! " .. action)
+            end
         else
-            cmd("normal! " .. key)
+            cmd("normal! " .. action)
         end
-    else
-        cmd("normal! " .. key)
+    elseif type(action) == "function" then
+        if not funArg then return end
+        cmd [[normal! mz`z]]
+        action(funArg)
     end
 end -- }}}
 

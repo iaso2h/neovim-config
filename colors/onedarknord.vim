@@ -1174,9 +1174,6 @@ call s:hi("GitSignsDelete", s:nord11_gui, "", s:nord11_term, "", "", "")
 call s:hi("HistoryStartupCreate",   s:nord10_gui, "", s:nord10_term, "", s:bold,   "")
 call s:hi("HistoryStartupFileRoot", s:nord8_gui,  "", s:nord8_term,  "", s:italic, "")
 " }}} HistoryStartup
-"
-"
-"
-"
-"
-"
+
+hi! link illuminatedWord LspReferenceWrite
+
