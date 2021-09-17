@@ -13,13 +13,12 @@ end
 -- HistoryStartup
 map("n", [[<C-s>]], [[:lua require("historyStartup").display()<cr>]], {"silent"}, "Enter HistoryStartup")
 -- Extraction
-map("",  [[gc]], [[luaeval("require('operator').main(require('extraction').main, false)")]], {"silent", "expr"}, "Extract...")
-map("v", [[C]],  [[:lua require("extraction").main({nil, vim.fn.visualmode()})<cr>]],        {"silent"})
+map("",  [[gc]], [[luaeval("require('operator').main(require('extraction').main, true)")]], {"silent", "expr"}, "Extract...")
+map("v", [[C]],  [[:lua require("extraction").main(require("operator").vMotion())<cr>]],    {"silent"})
 -- Zeal query
--- TODO: refactor operator
-map("",  [[gz]], [[luaeval("require('operator').main(require('zeal').nonglobalQuery, false)")]], {"silent", "expr"}, "Zeal look up...")
-map("",  [[gZ]], [[luaeval("require('operator').main(require('zeal').globalQuery, false)")]],    {"silent", "expr"}, "Zeal look up... universally")
-map("v", [[Z]],  [[:lua require("zeal").globalQuery({nil, "v"})<cr>]],                           {"silent"})
+map("",  [[gz]], [[luaeval("require('operator').main(require('zeal').zeal,       false)")]], {"silent", "expr"}, "Zeal look up...")
+map("",  [[gZ]], [[luaeval("require('operator').main(require('zeal').zealGlobal, false)")]], {"silent", "expr"}, "Zeal look up... universally")
+map("v", [[Z]],  [[:lua require("zeal").zealGlobal(require("operator").vMotion())<cr>]],     {"silent"})
 -- Print file name
 map("", [[<C-g>]], [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<cr>]], {"silent", "novscode"}, "Display file info")
 -- Tab switcher {{{
@@ -79,7 +78,7 @@ map("n", [[g"]],      [[:lua require("trailingUtil").trailingChar("\"")<cr>]], {
 map("n", [[g']],      [[:lua require("trailingUtil").trailingChar("'")<cr>]],  {"silent"}, "Trail '")
 map("n", [[g)]],      [[:lua require("trailingUtil").trailingChar(")")<cr>]],  {"silent"}, "Trail )")
 map("n", [[g(]],      [[:lua require("trailingUtil").trailingChar("(")<cr>]],  {"silent"}, "Trail (")
-map("n", [[g<CR>]],   [[:lua require("trailingUtil").trailingChar("o")<cr>]],  {"silent"}, "Add new line below")
+map("n", [[g<C-CR>]], [[:lua require("trailingUtil").trailingChar("o")<cr>]],  {"silent"}, "Add new line below")
 map("n", [[g<S-CR>]], [[:lua require("trailingUtil").trailingChar("O")<cr>]],  {"silent"}, "Add new line above")
 -- }}} Trailing character
 -- Messages
@@ -208,7 +207,7 @@ map("n", [[<leader>p]], [["0p]], "Put after from register 0")
 map("n", [[<leader>P]], [["0P]], "Put after from register 0")
 -- Inplace yank
 map("", [[Y]], [[yy]], "Yank line")
-map("", [[y]], [[luaeval("require('operator').main(require('yankPut').inplaceYank, false, nil)")]], {"silent", "expr"}, "Yank operator")
+map("", [[y]], [[luaeval("require('operator').main(require('yankPut').inplaceYank, false)")]], {"silent", "expr"}, "Yank operator")
 -- Inplace put
 map("n", [[p]], [[:lua require("yankPut").inplacePut("n", "p")<cr>]], {"silent"}, "Put after")
 map("v", [[p]], [[:lua require("yankPut").inplacePut("v", "p")<cr>]], {"silent"})
@@ -274,15 +273,15 @@ map("t", [[<C-w>K]],     [[<A-n><C-w>K:startinsert<cr>]], {"silent"})
 -- TODO: Split terminal in new instance
 -- }}} Mode: Terminal
 -- Mode: Commandline & Insert {{{
-map("i", [[<C-k>]], [[pumvisible() ? "\<C-e>\<Up>" : "\<Up>"]],     {"expr"})
-map("i", [[<C-j>]], [[pumvisible() ? "\<C-e>\<Down>" : "\<Down>"]], {"expr"})
-map("i", [[<C-cr>]],  [[<esc>o]],  {"novscode"})
-map("i", [[<S-cr>]],  [[<esc>O]],  {"novscode"})
-map("i", [[jj]],      [[<esc>`^]], {"noremap", "novscode"})
-map("i", [[<C-d>]],   [[<Del>]],   {"novscode"})
-map("i", [[<C-.>]],   [[<C-a>]],   {"noremap"})
-map("i", [[<C-BS>]],  [[<C-w>]],   {"noremap"})
-map("i", [[<C-y>]],   [[pumvisible() ? "\<C-e>\<C-y>" : "\<C-y>"]], {"noremap", "expr", "novscode"})
+map("i", [[<C-k>]],  [[pumvisible() ? "\<C-e>\<Up>" : "\<Up>"]],     {"expr"})
+map("i", [[<C-j>]],  [[pumvisible() ? "\<C-e>\<Down>" : "\<Down>"]], {"expr"})
+map("i", [[<C-CR>]], [[pumvisible() ? "\<C-e>\<CR>" : "\<CR>"]],     {"expr", "novscode"})
+map("i", [[<S-CR>]], [[<ESC>O]],  {"novscode"})
+map("i", [[jj]],     [[<ESC>`^]], {"noremap", "novscode"})
+map("i", [[<C-d>]],  [[<Del>]],   {"novscode"})
+map("i", [[<C-.>]],  [[<C-a>]],   {"noremap"})
+map("i", [[<C-BS>]], [[<C-w>]],   {"noremap"})
+map("i", [[<C-y>]],  [[pumvisible() ? "\<C-e>\<C-y>" : "\<C-y>"]], {"noremap", "expr", "novscode"})
 -- Outdent
 map("i", [[<S-Tab>]], [[<C-d>]], {"noremap"})
 -- Navigation {{{

@@ -1,28 +1,30 @@
-local vim = vim
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
 local M   = {}
-local globalCheck
+local zealGlobalChk
 
-local function query(argTble)
+local function lookUp(argTble)
     if fn.executable("zeal") ~= 1 then
         api.nvim_echo({{"Zeal not found on Path", "ErrorMsg"}}, true, {})
     end
 
     -- local opts     = {hlGroup="Search", timeout=500}
-    local curWinID = api.nvim_get_current_win()
     -- local curBufNr = api.nvim_get_current_buf()
-    -- local motionwise = argTble[1]
-    local vimMode  = argTble[2] or "n"
-    local content  = globalCheck and "zeal " or "zeal " .. vim.bo.filetype .. ":"
-    local operator = require("operator")
+    local motionwise = argTble[1]
+    local vimMode    = argTble[2]
+    if motionwise == "block" or motionwise == "line" then return end
+
+    local command
+    local content
+    local curWinID = api.nvim_get_current_win()
     local cursorPos
     local pos1
     local pos2
 
+    -- Get content {{{
     if vimMode == "n" then
-        cursorPos = operator.cursorPos
+        cursorPos = require("operator").cursorPos
         pos1 = api.nvim_buf_get_mark(0, "[")
         pos2 = api.nvim_buf_get_mark(0, "]")
         api.nvim_win_set_cursor(0, pos1)
@@ -35,14 +37,33 @@ local function query(argTble)
         pos1      = api.nvim_buf_get_mark(0, "<")
         pos2      = api.nvim_buf_get_mark(0, ">")
     end
-    content = content .. require("util").visualSelection("string")
+    content = require("util").visualSelection("string")
+    -- }}} Get content
 
-    -- fn.system(content)
-    fn.jobstart(content)
+    cmd "echohl MoreMsg"
+    local answer = fn.confirm("Save modification?",
+        ">>> &Zeal\n&Goldendict\nch&Eat\n&TL;DR\n&Cancel", 5, "Question")
+    cmd "echohl None"
+    if answer == 1 then
+        command = zealGlobalChk and "zeal " or string.format("zeal %s:", vim.bo.filetype)
+        fn.jobstart(command .. content)
+    elseif answer == 2 then
+        command = "goldendict "
+        fn.jobstart(command .. content)
+    elseif answer == 3 then
+        cmd(string.format("Cheat %s %s", vim.bo.filetype, content))
+    elseif answer == 4 then
+        -- TODO:
+        -- Print(fn.system(string.format("tldr %s %s", vim.bo.filetype, content)))
+    else
+        return
+    end
+    -- Print(execStr)
+    -- do return end
 
-    -- Change to 0,0 based index
-    pos1 = {pos1[1] - 1, pos1[2]}
-    pos2 = {pos2[1] - 1, pos2[2]}
+    -- -- Change to 0,0 based index
+    -- pos1 = {pos1[1] - 1, pos1[2]}
+    -- pos2 = {pos2[1] - 1, pos2[2]}
 
     -- Create highlight {{{
     -- local zealHLNS = api.nvim_create_namespace('zealQuery')
@@ -63,15 +84,15 @@ local function query(argTble)
     api.nvim_win_set_cursor(curWinID, cursorPos)
 end
 
-function M.globalQuery(argTbl)
-    globalCheck = true
-    query(argTbl)
+function M.zealGlobal(argTbl)
+    zealGlobalChk = true
+    lookUp(argTbl)
 end
 
 
-function M.nonglobalQuery(argTbl)
-    globalCheck = false
-    query(argTbl)
+function M.zeal(argTbl)
+    zealGlobalChk = false
+    lookUp(argTbl)
 end
 
 return M

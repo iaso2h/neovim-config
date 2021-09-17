@@ -4,7 +4,9 @@ local M   = {}
 
 cmd [[
 function! LuaExprCallback(...)
-    return v:lua.Opfunc(a:000)
+    let l:args = deepcopy(a:000)
+    call add(l:args, mode())
+    return v:lua.Opfunc(l:args)
 endfunction
 ]]
 
@@ -29,6 +31,19 @@ function M.main(func, checkModifiable)
     M.cursorPos = api.nvim_win_get_cursor(0)
     vim.o.opfunc = "LuaExprCallback"
     return "g@"
+end
+
+function M.vMotion()
+    local lastVisual = vim.fn.visualmode()
+    local motionwise
+    if lastVisual == "v" then
+        motionwise = "char"
+    elseif lastVisual == "V" then
+        motionwise = "line"
+    elseif lastVisual == "\22" then
+        motionwise = "block"
+    end
+    return {motionwise, lastVisual}
 end
 
 return M

@@ -253,7 +253,7 @@ function M.main(argTbl) -- {{{
     if motionwise == "block" then return end
 
     -- opts = opts or {hlGroup="Search", timeout=500}
-    local vimMode  = argTbl[2] or "n"
+    local vimMode  = argTbl[2]
     local lang     = vim.bo.filetype
     local CWD      = fn.getcwd()
     local curWinID = api.nvim_get_current_win()
