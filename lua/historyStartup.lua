@@ -43,7 +43,14 @@ M.display = function()
 
     api.nvim_win_set_buf(curWin, M.curBuf)
 
-    if api.nvim_list_wins() ~= 1 then cmd [[silent! wincmd o]] end
+    -- Always close all the other windows
+    if api.nvim_list_wins() ~= 1 then
+        if package.loaded["nvim-tree.view"] and require("nvim-tree.view").win_open() then
+            require("bufferline.state").set_offset(0)
+            require("nvim-tree.view").close()
+        end
+        vim.cmd("noautocmd wincmd o")
+    end
 
     api.nvim_buf_set_option(M.curBuf, "modifiable", true)
     api.nvim_buf_set_option(M.curBuf, "bufhidden",  "hide")

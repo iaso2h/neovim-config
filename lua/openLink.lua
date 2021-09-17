@@ -1,34 +1,49 @@
 -- File: openBrowser
 -- Author: iaso2h
 -- Description: Open url link in browser
--- Version: 0.0.4
--- Last Modified: 2021-08-24
+-- Version: 0.0.5
+-- Last Modified: 2021-09-17
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
 local M   = {}
 
-function M.openUrl(selectText)
+function M.main(selectText)
     -- Normal mode with no selected text provided
     if not selectText then
         local url
         local urlStart
         local urlEnd
-        local curLine = api.nvim_get_current_line()
+        local curLine
+
         if fn.expand("%:p") == fn.stdpath("config") .. "/lua/core/plugins.lua" then
-            urlStart, urlEnd = vim.regex [[use \zs'.\{-}']]:match_str(curLine)
-            if urlStart then -- vim plugin links
+            local curPos  = api.nvim_win_get_cursor(0)
+            local lines   = api.nvim_buf_get_lines(0, curPos[1] - 2, curPos[1], false)
+            local prevLine = lines[1]
+            curLine = lines[2]
+
+            if string.match(prevLine, "use%s+{") then
+                -- match: "userName/repository"
+                urlStart, urlEnd = vim.regex [['.\{-}']]:match_str(curLine)
                 url = "https://github.com/" .. string.sub(curLine, urlStart + 2, urlEnd - 1)
-            else -- configuration file
+            elseif string.match(curLine, [[use%s+['"]%w]]) then
+                -- match: use "userName/repository"
+                urlStart, urlEnd = vim.regex [[use \zs'.\{-}']]:match_str(curLine)
+                url = "https://github.com/" .. string.sub(curLine, urlStart + 2, urlEnd - 1)
+            elseif string.match(curLine, [[config%s+=%s+conf]]) then
+                -- match: config = conf "moduleName"
                 urlStart, urlEnd = vim.regex [=[config.\{-}conf.\{-}\zs".\{-}"]=]:match_str(curLine)
+
+                -- End parsing
                 if not urlStart then return end
+
                 return cmd(string.format("e %s/lua/config/%s.lua",
                     fn.stdpath("config"),
                     string.sub(curLine, urlStart + 2, urlEnd - 1)
                 ))
             end
-
         else -- Normal https link
+            curLine = api.nvim_get_current_line()
             urlStart, urlEnd = vim.regex [=[[a-z]*:\/\/[^ >,;]*]=]:match_str(curLine)
             if not urlStart then return end
             url = string.sub(curLine, urlStart + 1, urlEnd)
@@ -53,22 +68,14 @@ function M.openUrl(selectText)
         end, opts["timeout"])
     -- Visual mode with selected text provided
     else
-        if fn.has('win32') == 1 then
+        if jit.os == "Windows" then
             fn.system("explorer " .. selectText)
-        elseif fn.has('unix') == 1 then
+        elseif jit.os == "Linux" then
             if fn.expand("%:p") == fn.stdpath("config") .. "/lua/core/plugins.lua" then
                 selectText = "https://github.com/" .. selectText
             end
                 fn.system("xdg-open '" .. selectText .. "'")
         end
-    end
-end
-
-function M.openInBrowser(str)
-    if fn.has('win32') == 1 then
-        fn.system("explorer \"? " .. str .. "\"")
-    elseif fn.has('unix') == 1 then
-        fn.system("xdg-open '" .. str .. "'")
     end
 end
 

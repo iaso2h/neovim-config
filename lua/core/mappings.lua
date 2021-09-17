@@ -58,8 +58,8 @@ map("n", [[<A-v>]], [[<C-q>]],                                         {"noremap
 -- Scratch file
 map("n", [[<C-n>]], [[:<c-u>new<cr>]], {"silent", "novscode"}, "New buffer")
 -- Open/Search in browser
-map("n", [[gl]], [[:lua require("openBrowser").openUrl()<cr>]], {"silent"}, "Open link")
-map("v", [[gl]], [[:lua require("openBrowser").openUrl(require("util").visualSelection("string"))<cr>]], {"silent"})
+map("n", [[gl]], [[:lua require("openLink").main()<cr>]], {"silent"}, "Open link")
+map("v", [[gl]], [[:lua require("openLink").main(require("util").visualSelection("string"))<cr>]], {"silent"})
 -- Interrupt
 map("n", [[<C-A-c>]], [[:<c-u>call interrupt()<cr>]], {"noremap", "silent"}, "Interrupt")
 -- Paragraph & Block navigation

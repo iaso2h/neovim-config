@@ -47,17 +47,7 @@ vim.g.mkdp_echo_preview_url = 0
 -- a custom vim function name to open preview page
 -- this function will receive url as param
 -- default is empty
--- TODO
-vim.g.mkdp_browserfunc = 'vim.g.OpenUrl'
-cmd [[
-function! OpenUrl(url)
-    if has('win32')
-        execute("!chrome " . url)
-    elseif has('unix')
-        execute("!open '" . url . "'")
-    endif
-endfunctio
-]]
+vim.g.mkdp_browserfunc = [[require("openLink").main]]
 -- options for markdown render
 -- mkivim.t. markdown-it options for render
 -- katex: katex options for math
