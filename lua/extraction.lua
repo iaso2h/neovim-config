@@ -52,7 +52,7 @@ end
 ----
 local joinRHS = function(lang, rhs)
     local lines = vim.split(rhs, "\n", true)
-    lines = util.trimWhiteSpaces(lines, false, true)
+    lines = util.trimSpaces(lines, false, true)
     -- TODO remove line suffix like ";" in c, cpp language when concatenate the line
     return table.concat(lines, " ")
 end

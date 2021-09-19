@@ -17,6 +17,7 @@ function M.main(selectText)
         local curLine
 
         if fn.expand("%:p") == fn.stdpath("config") .. "/lua/core/plugins.lua" then
+            -- Support for jumping to neovim plugin in github.com
             local curPos  = api.nvim_win_get_cursor(0)
             local lines   = api.nvim_buf_get_lines(0, curPos[1] - 2, curPos[1], false)
             local prevLine = lines[1]
@@ -42,10 +43,29 @@ function M.main(selectText)
                     string.sub(curLine, urlStart + 2, urlEnd - 1)
                 ))
             end
-        else -- Normal https link
+        elseif vim.bo.filetype == "packer" then
+            -- Support for jumping to related github commit in packer buffer
+            curLine = api.nvim_get_current_line()
+            urlStart, urlEnd = vim.regex [=[Updated \zs.\{-}\/.\{-}\ze:]=]:match_str(curLine)
+
+            if not urlStart then return end
+
+            url = "https://github.com/" .. string.sub(curLine, urlStart + 1, urlEnd)
+
+            local commitStart, commitEnd = vim.regex [=[\.\.\zs.\{7}$]=]:match_str(curLine)
+
+            if not urlStart then return vim.notify("Capturing commit string failed", vim.log.levels.ERROR) end
+
+            url = url .. string.format([[/commit/%s]], string.sub(curLine, commitStart + 1, commitEnd))
+
+            urlEnd = commitEnd
+        else
+            -- Support for opening normal http[s] link
             curLine = api.nvim_get_current_line()
             urlStart, urlEnd = vim.regex [=[[a-z]*:\/\/[^ >,;]*]=]:match_str(curLine)
+
             if not urlStart then return end
+
             url = string.sub(curLine, urlStart + 1, urlEnd)
         end
 

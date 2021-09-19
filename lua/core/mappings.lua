@@ -32,8 +32,11 @@ map("n", [[<S-Tab>]], [[:lua require("tabSwitcher").main()<cr>]], {"silent", "no
 -- }}} Tab switcher
 -- Search & Jumping {{{
 -- Disable dj/dk
+-- Delete
+-- In case of mistouching
 map("n", [[dj]], [[<Nop>]])
 map("n", [[dk]], [[<Nop>]])
+map("n", [[d<Space>]], [[:<c-u>call setline(".", "")<cr>]], {"silent"})
 -- Inquery word
 map("n", [[<leader>i]], [=[[I]=], "Inquery word under cursor")
 map("v", [[<leader>i]], [[:lua vim.cmd("g#" .. require("util").visualSelection("string") .. "#nu")<cr>]], {"silent"})

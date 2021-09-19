@@ -381,130 +381,10 @@ hi! link diffAdded DiffAdd
 hi! link diffChanged DiffChange
 hi! link diffRemoved DiffDelete
 
-" CSS
-" call s:h("cssAttrComma", { "fg": s:purple })
-" call s:h("cssAttributeSelector", { "fg": s:green })
-" call s:h("cssBraces", { "fg": s:white })
-" call s:h("cssClassName", { "fg": s:dark_yellow })
-" call s:h("cssClassNameDot", { "fg": s:dark_yellow })
-" call s:h("cssDefinition", { "fg": s:purple })
-" call s:h("cssFontAttr", { "fg": s:dark_yellow })
-" call s:h("cssFontDescriptor", { "fg": s:purple })
-" call s:h("cssFunctionName", { "fg": s:blue })
-" call s:h("cssIdentifier", { "fg": s:blue })
-" call s:h("cssImportant", { "fg": s:purple })
-" call s:h("cssInclude", { "fg": s:white })
-" call s:h("cssIncludeKeyword", { "fg": s:purple })
-" call s:h("cssMediaType", { "fg": s:dark_yellow })
-" call s:h("cssProp", { "fg": s:white })
-" call s:h("cssPseudoClassId", { "fg": s:dark_yellow })
-" call s:h("cssSelectorOp", { "fg": s:purple })
-" call s:h("cssSelectorOp2", { "fg": s:purple })
-" call s:h("cssTagName", { "fg": s:red })
-
 " Fish Shell
 call s:h("fishKeyword", { "fg": s:purple })
 call s:h("fishConditional", { "fg": s:purple })
 
-" Go
-" call s:h("goDeclaration", { "fg": s:purple })
-" call s:h("goBuiltins", { "fg": s:cyan })
-" call s:h("goFunctionCall", { "fg": s:blue })
-" call s:h("goVarDefs", { "fg": s:red })
-" call s:h("goVarAssign", { "fg": s:red })
-" call s:h("goVar", { "fg": s:purple })
-" call s:h("goConst", { "fg": s:purple })
-" call s:h("goType", { "fg": s:yellow })
-" call s:h("goTypeName", { "fg": s:yellow })
-" call s:h("goDeclType", { "fg": s:cyan })
-" call s:h("goTypeDecl", { "fg": s:purple })
-
-" HTML (keep consistent with Markdown, below)
-" call s:h("htmlArg", { "fg": s:dark_yellow })
-" call s:h("htmlBold", { "fg": s:dark_yellow, "gui": "bold", "cterm": "bold" })
-" call s:h("htmlEndTag", { "fg": s:white })
-" call s:h("htmlH1", { "fg": s:red })
-" call s:h("htmlH2", { "fg": s:red })
-" call s:h("htmlH3", { "fg": s:red })
-" call s:h("htmlH4", { "fg": s:red })
-" call s:h("htmlH5", { "fg": s:red })
-" call s:h("htmlH6", { "fg": s:red })
-" call s:h("htmlItalic", { "fg": s:purple, "gui": "italic", "cterm": "italic" })
-" call s:h("htmlLink", { "fg": s:cyan, "gui": "underline", "cterm": "underline" })
-" call s:h("htmlSpecialChar", { "fg": s:dark_yellow })
-" call s:h("htmlSpecialTagName", { "fg": s:red })
-" call s:h("htmlTag", { "fg": s:white })
-" call s:h("htmlTagN", { "fg": s:red })
-" call s:h("htmlTagName", { "fg": s:red })
-" call s:h("htmlTitle", { "fg": s:white })
-
-" JavaScript
-" call s:h("javaScriptBraces", { "fg": s:white })
-" call s:h("javaScriptFunction", { "fg": s:purple })
-" call s:h("javaScriptIdentifier", { "fg": s:purple })
-" call s:h("javaScriptNull", { "fg": s:dark_yellow })
-" call s:h("javaScriptNumber", { "fg": s:dark_yellow })
-" call s:h("javaScriptRequire", { "fg": s:cyan })
-" call s:h("javaScriptReserved", { "fg": s:purple })
-" https://github.com/pangloss/vim-javascript
-" call s:h("jsArrowFunction", { "fg": s:purple })
-" call s:h("jsClassKeyword", { "fg": s:purple })
-" call s:h("jsClassMethodType", { "fg": s:purple })
-" call s:h("jsDocParam", { "fg": s:blue })
-" call s:h("jsDocTags", { "fg": s:purple })
-" call s:h("jsExport", { "fg": s:purple })
-" call s:h("jsExportDefault", { "fg": s:purple })
-" call s:h("jsExtendsKeyword", { "fg": s:purple })
-" call s:h("jsFrom", { "fg": s:purple })
-" call s:h("jsFuncCall", { "fg": s:blue })
-" call s:h("jsFunction", { "fg": s:purple })
-" call s:h("jsGenerator", { "fg": s:yellow })
-" call s:h("jsGlobalObjects", { "fg": s:yellow })
-" call s:h("jsImport", { "fg": s:purple })
-" call s:h("jsModuleAs", { "fg": s:purple })
-" call s:h("jsModuleWords", { "fg": s:purple })
-" call s:h("jsModules", { "fg": s:purple })
-" call s:h("jsNull", { "fg": s:dark_yellow })
-" call s:h("jsOperator", { "fg": s:purple })
-" call s:h("jsStorageClass", { "fg": s:purple })
-" call s:h("jsSuper", { "fg": s:red })
-" call s:h("jsTemplateBraces", { "fg": s:dark_red })
-" call s:h("jsTemplateVar", { "fg": s:green })
-" call s:h("jsThis", { "fg": s:red })
-" call s:h("jsUndefined", { "fg": s:dark_yellow })
-" https://github.com/othree/yajs.vim
-" call s:h("javascriptArrowFunc", { "fg": s:purple })
-" call s:h("javascriptClassExtends", { "fg": s:purple })
-" call s:h("javascriptClassKeyword", { "fg": s:purple })
-" call s:h("javascriptDocNotation", { "fg": s:purple })
-" call s:h("javascriptDocParamName", { "fg": s:blue })
-" call s:h("javascriptDocTags", { "fg": s:purple })
-" call s:h("javascriptEndColons", { "fg": s:white })
-" call s:h("javascriptExport", { "fg": s:purple })
-" call s:h("javascriptFuncArg", { "fg": s:white })
-" call s:h("javascriptFuncKeyword", { "fg": s:purple })
-" call s:h("javascriptIdentifier", { "fg": s:red })
-" call s:h("javascriptImport", { "fg": s:purple })
-" call s:h("javascriptMethodName", { "fg": s:white })
-" call s:h("javascriptObjectLabel", { "fg": s:white })
-" call s:h("javascriptOpSymbol", { "fg": s:cyan })
-" call s:h("javascriptOpSymbols", { "fg": s:cyan })
-" call s:h("javascriptPropertyName", { "fg": s:green })
-" call s:h("javascriptTemplateSB", { "fg": s:dark_red })
-" call s:h("javascriptVariable", { "fg": s:purple })
-
-" JSON
-" call s:h("jsonCommentError", { "fg": s:white })
-" call s:h("jsonKeyword", { "fg": s:red })
-" call s:h("jsonBoolean", { "fg": s:dark_yellow })
-" call s:h("jsonNumber", { "fg": s:dark_yellow })
-" call s:h("jsonQuote", { "fg": s:white })
-" call s:h("jsonMissingCommaError", { "fg": s:red, "gui": "reverse" })
-" call s:h("jsonNoQuotesError", { "fg": s:red, "gui": "reverse" })
-" call s:h("jsonNumError", { "fg": s:red, "gui": "reverse" })
-" call s:h("jsonString", { "fg": s:green })
-" call s:h("jsonStringSQError", { "fg": s:red, "gui": "reverse" })
-" call s:h("jsonSemicolonError", { "fg": s:red, "gui": "reverse" })
 
 " LESS
 call s:h("lessVariable", { "fg": s:purple })
@@ -552,46 +432,6 @@ call s:h("perlStatementStorage", { "fg": s:purple })
 call s:h("perlSubName",{ "fg": s:yellow })
 call s:h("perlVarPlain",{ "fg": s:blue })
 
-" PHP
-" -- NOTE: can be replace by treesitter
-call s:h("phpVarSelector", { "fg": s:red })
-call s:h("phpOperator", { "fg": s:white })
-call s:h("phpParent", { "fg": s:white })
-call s:h("phpMemberSelector", { "fg": s:white })
-call s:h("phpType", { "fg": s:purple })
-call s:h("phpKeyword", { "fg": s:purple })
-call s:h("phpClass", { "fg": s:yellow })
-call s:h("phpUseClass", { "fg": s:white })
-call s:h("phpUseAlias", { "fg": s:white })
-call s:h("phpInclude", { "fg": s:purple })
-call s:h("phpClassExtends", { "fg": s:green })
-call s:h("phpDocTags", { "fg": s:white })
-call s:h("phpFunction", { "fg": s:blue })
-call s:h("phpFunctions", { "fg": s:cyan })
-call s:h("phpMethodsVar", { "fg": s:dark_yellow })
-call s:h("phpMagicConstants", { "fg": s:dark_yellow })
-call s:h("phpSuperglobals", { "fg": s:red })
-call s:h("phpConstants", { "fg": s:dark_yellow })
-
-" Ruby
-" call s:h("rubyBlockParameter", { "fg": s:red})
-" call s:h("rubyBlockParameterList", { "fg": s:red })
-" call s:h("rubyClass", { "fg": s:purple})
-" call s:h("rubyConstant", { "fg": s:yellow})
-" call s:h("rubyControl", { "fg": s:purple })
-" call s:h("rubyEscape", { "fg": s:red})
-" call s:h("rubyFunction", { "fg": s:blue})
-" call s:h("rubyGlobalVariable", { "fg": s:red})
-" call s:h("rubyInclude", { "fg": s:blue})
-" call s:h("rubyIncluderubyGlobalVariable", { "fg": s:red})
-" call s:h("rubyInstanceVariable", { "fg": s:red})
-" call s:h("rubyInterpolation", { "fg": s:cyan })
-" call s:h("rubyInterpolationDelimiter", { "fg": s:red })
-" call s:h("rubyInterpolationDelimiter", { "fg": s:red})
-" call s:h("rubyRegexp", { "fg": s:cyan})
-" call s:h("rubyRegexpDelimiter", { "fg": s:cyan})
-" call s:h("rubyStringDelimiter", { "fg": s:green})
-" call s:h("rubySymbol", { "fg": s:cyan})
 
 " Sass
 " https://github.com/tpope/vim-haml
@@ -631,10 +471,6 @@ call s:h("texSpecialChar", { "fg": s:dark_yellow })
 call s:h("texCite", { "fg": s:blue })
 call s:h("texRefZone", { "fg": s:blue })
 
-" TypeScript
-" call s:h("typescriptReserved", { "fg": s:purple })
-" call s:h("typescriptEndColons", { "fg": s:white })
-" call s:h("typescriptBraces", { "fg": s:white })
 
 " XML
 call s:h("xmlAttrib", { "fg": s:dark_yellow })
@@ -643,31 +479,6 @@ call s:h("xmlTag", { "fg": s:red })
 call s:h("xmlTagName", { "fg": s:red })
 
 " }}}
-
-"+----------------+
-"+ Plugin Support +
-"+----------------+
-"+--- UI ---+
-" ALE
-" > w0rp/ale
-" call s:hi("ALEWarningSign", s:nord13_gui, "", s:nord13_term, "", "", "")
-" call s:hi("ALEErrorSign" , s:nord11_gui, "", s:nord11_term, "", "", "")
-" call s:hi("ALEWarning" , s:nord13_gui, "", s:nord13_term, "", "undercurl", "")
-" call s:hi("ALEError" , s:nord11_gui, "", s:nord11_term, "", "undercurl", "")
-
-" Coc
-" > neoclide/coc
-" call s:hi("CocWarningHighlight", s:nord13_gui, "",                 s:nord13_term, "",           "undercurl", "")
-" call s:hi("CocErrorHighlight",   s:nord11_gui, "",                 s:nord11_term, "",           "undercurl", "")
-" call s:hi("CocWarningSign",      s:nord13_gui, "",                 s:nord13_term, "",           "",          "")
-" call s:hi("CocErrorSign",        s:nord11_gui, "",                 s:nord11_term, "",           "",          "")
-" call s:hi("CocInfoSign",         s:nord8_gui,  "",                 s:nord8_term,  "",           "",          "")
-" call s:hi("CocHintSign",         s:nord13_gui, "",                 s:nord13_term, "",           "",          "")
-" call s:hi("CocHighlightText",    "",           s:nord3_gui_bright, "",            s:nord3_term, "",          "")
-" call s:hi("CocWarningFloat",     s:nord13_gui, s:nord2_gui,        s:nord13_term, s:nord1_term, "",          "")
-" call s:hi("CocErrorFloat",       s:nord11_gui, s:nord2_gui,        s:nord11_term, s:nord1_term, "",          "")
-" call s:hi("CocInfoFloat",        s:nord8_gui,  s:nord2_gui,        s:nord8_term,  s:nord1_term, "",          "")
-" call s:hi("CocHintFloat",        s:nord10_gui, s:nord2_gui,        s:nord10_term, s:nord1_term, "",          "")
 
 " Nvim LSP
 " > neovim/nvim-lsp
@@ -687,94 +498,6 @@ call s:hi("LspReferenceWrite",                  "",           s:nord3_gui, "NONE
 " LspDiagnosticsVirtualTextInformation
 " LspDiagnosticsVirtualTextHint
 
-" GitGutter
-" > airblade/vim-gitgutter
-" call s:hi("GitGutterAdd", s:nord14_gui, "", s:nord14_term, "", "", "")
-" call s:hi("GitGutterChange", s:nord13_gui, "", s:nord13_term, "", "", "")
-" call s:hi("GitGutterChangeDelete", s:nord11_gui, "", s:nord11_term, "", "", "")
-" call s:hi("GitGutterDelete", s:nord11_gui, "", s:nord11_term, "", "", "")
-
-" Signify
-" > mhinz/vim-signify
-" call s:hi("SignifySignAdd", s:nord14_gui, "", s:nord14_term, "", "", "")
-" call s:hi("SignifySignChange", s:nord13_gui, "", s:nord13_term, "", "", "")
-" call s:hi("SignifySignChangeDelete", s:nord11_gui, "", s:nord11_term, "", "", "")
-" call s:hi("SignifySignDelete", s:nord11_gui, "", s:nord11_term, "", "", "")
-
-" fugitive.vim
-" > tpope/vim-fugitive
-call s:hi("gitcommitDiscardedFile", s:nord11_gui, "", s:nord11_term, "", "", "")
-call s:hi("gitcommitUntrackedFile", s:nord11_gui, "", s:nord11_term, "", "", "")
-call s:hi("gitcommitSelectedFile", s:nord14_gui, "", s:nord14_term, "", "", "")
-
-" davidhalter/jedi-vim
-" call s:hi("jediFunction", s:nord4_gui, s:nord3_gui, "", s:nord3_term, "", "")
-" call s:hi("jediFat", s:nord8_gui, s:nord3_gui, s:nord8_term, s:nord3_term, s:underline.s:bold, "")
-
-" " NERDTree
-" " > scrooloose/nerdtree
-" call s:hi("NERDTreeExecFile", s:nord7_gui, "", s:nord7_term, "", "", "")
-" hi! link NERDTreeDirSlash Keyword
-" hi! link NERDTreeHelp Comment
-
-" " CtrlP
-" " > ctrlpvim/ctrlp.vim
-" hi! link CtrlPMatch Keyword
-" hi! link CtrlPBufferHid Normal
-
-" " vim-clap
-" " > liuchengxu/vim-clap
-" call s:hi("ClapDir", s:nord4_gui, "", "", "", "", "")
-" call s:hi("ClapDisplay", s:nord4_gui, s:nord1_gui, "", s:nord1_term, "", "")
-" call s:hi("ClapFile", s:nord4_gui, "", "", "NONE", "", "")
-" call s:hi("ClapMatches", s:nord8_gui, "", s:nord8_term, "", "", "")
-" call s:hi("ClapNoMatchesFound", s:nord13_gui, "", s:nord13_term, "", "", "")
-" call s:hi("ClapSelected", s:nord7_gui, "", s:nord7_term, "", s:bold, "")
-" call s:hi("ClapSelectedSign", s:nord9_gui, "", s:nord9_term, "", "", "")
-
-" let s:clap_matches = [
-            " \ [s:nord8_gui,  s:nord8_term] ,
-            " \ [s:nord9_gui,  s:nord9_term] ,
-            " \ [s:nord10_gui, s:nord10_term] ,
-            " \ ]
-" for s:nord_clap_match_i in range(1,12)
-    " let clap_match_color = s:clap_matches[s:nord_clap_match_i % len(s:clap_matches) - 1]
-    " call s:hi("ClapMatches" . s:nord_clap_match_i, clap_match_color[0], "", clap_match_color[1], "", "", "")
-    " call s:hi("ClapFuzzyMatches" . s:nord_clap_match_i, clap_match_color[0], "", clap_match_color[1], "", "", "")
-" endfor
-" unlet s:nord_clap_match_i
-
-" hi! link ClapCurrentSelection PmenuSel
-" hi! link ClapCurrentSelectionSign ClapSelectedSign
-" hi! link ClapInput Pmenu
-" hi! link ClapPreview Pmenu
-" hi! link ClapProviderAbout ClapDisplay
-" hi! link ClapProviderColon Type
-" hi! link ClapProviderId Type
-
-" vim-indent-guides
-" > nathanaelkane/vim-indent-guides
-" call s:hi("IndentGuidesEven", "", s:nord1_gui, "", s:nord1_term, "", "")
-" call s:hi("IndentGuidesOdd", "", s:nord2_gui, "", s:nord3_term, "", "")
-
-" vim-plug
-" > junegunn/vim-plug
-" call s:hi("plugDeleted", s:nord11_gui, "", "", s:nord11_term, "", "")
-
-" vim-signature
-" > kshenoy/vim-signature
-" call s:hi("SignatureMarkText", s:nord8_gui, "", s:nord8_term, "", "", "")
-
-" vim-startify
-" > mhinz/vim-startify
-" call s:hi("StartifyFile", s:nord6_gui, "", s:nord6_term, "", "", "")
-" call s:hi("StartifyFooter", s:nord7_gui, "", s:nord7_term, "", "", "")
-" call s:hi("StartifyHeader", s:nord8_gui, "", s:nord8_term, "", "", "")
-" call s:hi("StartifyNumber", s:nord7_gui, "", s:nord7_term, "", "", "")
-" call s:hi("StartifyPath", s:nord8_gui, "", s:nord8_term, "", "", "")
-" call s:hi("StartifyBracket", s:nord6_gui, "", s:nord6_term, "", "", "")
-" call s:hi("StartifySlash", s:nord15_gui, "", s:nord15_term, "", "", "")
-" call s:hi("StartifySpecial", s:nord3_gui_bright, "", s:nord3_term, "", s:italicize_comments, "")
 
 "+--- Languages ---+
 " Haskell
@@ -783,57 +506,6 @@ call s:hi("haskellPreProc", s:nord10_gui, "", s:nord10_term, "", "", "")
 call s:hi("haskellType", s:nord7_gui, "", s:nord7_term, "", "", "")
 hi! link haskellPragma haskellPreProc
 
-" JavaScript
-" > pangloss/vim-javascript
-" call s:hi("jsGlobalNodeObjects", s:nord8_gui, "", s:nord8_term, "", s:italic, "")
-" hi! link jsBrackets Delimiter
-" hi! link jsFuncCall Function
-" hi! link jsFuncParens Delimiter
-" hi! link jsThis Keyword
-" hi! link jsNoise Delimiter
-" hi! link jsPrototype Keyword
-" hi! link jsRegexpString SpecialChar
-
-" TypeScript
-" > HerringtonDarkholme/yats.vim
-" call s:hi("typescriptBOMWindowMethod", s:nord8_gui, "", s:nord8_term, "", s:italic, "")
-" call s:hi("typescriptClassName", s:nord7_gui, "", s:nord7_term, "", "", "")
-" call s:hi("typescriptDecorator", s:nord12_gui, "", s:nord12_term, "", "", "")
-" call s:hi("typescriptInterfaceName", s:nord7_gui, "", s:nord7_term, "", s:bold, "")
-" call s:hi("typescriptRegexpString", s:nord13_gui, "", s:nord13_term, "", "", "")
-" TypeScript JSX
-" call s:hi("tsxAttrib", s:nord7_gui, "", s:nord7_term, "", "", "")
-" hi! link typescriptOperator Operator
-" hi! link typescriptBinaryOp Operator
-" hi! link typescriptAssign Operator
-" hi! link typescriptMember Identifier
-" hi! link typescriptDOMStorageMethod Identifier
-" hi! link typescriptArrowFuncArg Identifier
-" hi! link typescriptGlobal typescriptClassName
-" hi! link typescriptBOMWindowProp Function
-" hi! link typescriptArrowFuncDef Function
-" hi! link typescriptAliasDeclaration Function
-" hi! link typescriptPredefinedType Type
-" hi! link typescriptTypeReference typescriptClassName
-" hi! link typescriptTypeAnnotation Structure
-" hi! link typescriptDocNamedParamType SpecialComment
-" hi! link typescriptDocNotation Keyword
-" hi! link typescriptDocTags Keyword
-" hi! link typescriptImport Keyword
-" hi! link typescriptExport Keyword
-" hi! link typescriptTry Keyword
-" hi! link typescriptVariable Keyword
-" hi! link typescriptBraces Normal
-" hi! link typescriptObjectLabel Normal
-" hi! link typescriptCall Normal
-" hi! link typescriptClassHeritage typescriptClassName
-" hi! link typescriptFuncTypeArrow Structure
-" hi! link typescriptMemberOptionality Structure
-" hi! link typescriptNodeGlobal typescriptGlobal
-" hi! link typescriptTypeBrackets Structure
-" hi! link tsxEqual Operator
-" hi! link tsxIntrinsicTagName htmlTag
-" hi! link tsxTagName tsxIntrinsicTagName
 
 " Markdown
 " > plasticboy/vim-markdown
@@ -878,9 +550,6 @@ hi! link VimwikiHeaderChar markdownHeadingDelimiter
 hi! link VimwikiHR Keyword
 hi! link VimwikiList markdownListMarker
 
-" YAML
-" > stephpy/vim-yaml
-" call s:hi("yamlKey", s:nord7_gui, "", s:nord7_term, "", "", "")
 
 " Git Highlighting {{{
 call s:h("gitcommitComment", { "fg": s:comment_grey })
@@ -905,13 +574,6 @@ hi link gitcommitDiscardedArrow gitcommitDiscardedFile
 hi link gitcommitSelectedArrow gitcommitSelectedFile
 hi link gitcommitUnmergedArrow gitcommitUnmergedFile
 " }}}
-"
-" EasyMotion {{{
-" highlight EasyMotionTarget guibg=white guifg=black
-" highlight link EasyMotionShade  Comment
-" highlight EasyMotionTarget2First guibg=#ED427C guifg=white
-" highlight EasyMotionTarget2Second guibg=#ED427C guifg=white
-" }}} EasyMotion
 
 " phaazon/hop.nvim {{{
 call s:hi("HopNextKey",   "#000000",   "#FFFFFF", "",           "", s:bold, "")
@@ -920,24 +582,6 @@ call s:hi("HopNextKey2",  "#FFFFFF",   "#ED427C", "",           "", s:bold, "")
 call s:hi("HopUnmatched", s:nord3_gui, "",        s:nord1_term, "", "",     "")
 " }}} phaazon/hop.nvim
 
-
-" " the color of the cursorline
-" highlight def Lf_hl_cursorline guifg=Yellow guibg=NONE gui=NONE ctermfg=226 ctermbg=NONE cterm=NONE
-" call s:hi("Lf_hl_cursorline", s:nord8_gui, "", s:nord8_term, "", "", "")
-
-" call s:hi("Lf_hl_match", s:nord9_gui, "", s:nord9_term, "", "", "")
-" " the color of matching character
-" highlight def Lf_hl_match  guifg=SpringGreen guibg=NONE gui=bold ctermfg=85 ctermbg=NONE cterm=bold
-
-" the color of matching character in `And mode`
-" call s:hi("Lf_hl_match01", s:nord9_gui, "", s:nord9_term, "", "", "")
-" call s:hi("Lf_hl_match02", s:nord14_gui, "", s:nord14_term, "", "", "")
-" call s:hi("Lf_hl_match03", s:nord11_gui, "", s:nord11_term, "", "", "")
-" call s:hi("Lf_hl_match04", s:nord15_gui, "", s:nord15_term, "", "", "")
-" call s:hi("Lf_hl_matchRefine", s:nord13_gui, "", s:nord13_term, "", "", "")
-
-" " the color of matching character in nameOnly mode when ';' is typed
-" highlight def Lf_hl_matchRefine gui=bold guifg=Magenta cterm=bold ctermfg=201
 
 " machakann/vim-sandwich {{{
 hi! link OperatorSandwichAdd    Search

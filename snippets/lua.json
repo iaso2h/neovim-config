@@ -188,15 +188,13 @@
             "pcall"
         ],
         "body": [
-            "local ok, err = pcall(${1:your_function})",
-            "if not ok then",
-            "\thandler(${2:ok, err})",
-            "${3:else",
-            "\tsuccess(${4:ok, err})",
-            "}end"
+            "local ok, msg = pcall(${1:func}, ${2:args})",
+            "${3:if not ok then vim.notify(msg, vim.log.levels.ERROR)} end",
+            "${4:\thandler(ok, err)\nelse\n\tsuccess(ok, err)\nend}"
         ],
         "description": "pcall statement"
     },
+
     "local": {
         "prefix": [
             "local"

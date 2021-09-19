@@ -6,6 +6,7 @@
 -- Last Modified: 2021-08-23
 -- BUG: q on startup-log.txt
 -- TODO: check for prompt
+-- TODO: Add situation: one window with buffer, one window with special buffer
 local fn   = vim.fn
 local cmd  = vim.cmd
 local api  = vim.api
@@ -142,7 +143,7 @@ local function smartCloseBuf(checkBuftype) -- {{{
                     local execMsg
                     execBool, execMsg = pcall(api.nvim_set_current_win, winID)
                     if not execBool then
-                        api.nvim_echo({{execMsg, "ErrorMsg"}}, true, {})
+                        vim.notify(execMsg, vim.log.levels.ERROR)
                     end
 
                     -- Switch to alternative buffer or previous buffer before wiping buffer
@@ -232,8 +233,8 @@ function M.smartClose(type) -- {{{
                     end
                     if bufInstance == 0 or bufInstance > 1 then
                         if api.nvim_win_is_valid(curWinID) then
-                            local ok, _ = pcall(api.nvim_win_close, curWinID, true)
-                            if not ok then api.nvim_echo({{_, "ErrorMsg"}}, true, {}) end
+                            local ok, msg = pcall(api.nvim_win_close, curWinID, true)
+                            if not ok then vim.notify(msg, vim.log.levels.ERROR) end
                         end
                     else -- 1 buffer instance
                         -- Return 0 when false is evaluated

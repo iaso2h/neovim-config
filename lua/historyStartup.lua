@@ -3,6 +3,7 @@
 -- Description: Startup page with oldfiles
 -- Version: 0.0.4
 -- Last Modified: 2021-09-16
+-- TODO: mapping
 local api = vim.api
 local fn  = vim.fn
 local cmd = vim.cmd

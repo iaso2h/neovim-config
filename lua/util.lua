@@ -498,10 +498,10 @@ end -- }}}
 -- @param strTbl: Table of source string need to be trimmed. If no table
 --        provided, the whole buffer will be trimmed instead.
 -- @param silent: Boolean, default is true. Set this to true to not show trimming result
--- @param trimSuffix: set to true to trim the suffix as well
+-- @param prefix: set to true to trim the suffix as well
 -- @return:       return table of trimmed string, otherwise return 0
 ----
-function M.trimSpaces(strTbl, silent, trimSuffix) -- {{{
+function M.trimSpaces(strTbl, silent, prefix) -- {{{
     if type(TrimSpacesChk) == "nil" then
         TrimSpacesChk = TrimSpacesChk or true
     end
@@ -523,7 +523,7 @@ function M.trimSpaces(strTbl, silent, trimSuffix) -- {{{
         end
         fn.winrestview(saveView)
     elseif next(strTbl) then
-        if trimSuffix then
+        if prefix then
             strTbl = vim.tbl_map(function(str)
                 return fn.substitute(str, "^\\s\\+", "", "")
             end, strTbl)
@@ -833,6 +833,127 @@ _G.tbl_replace = function(tbl, repVal, srcVal, repAllChk, cnt, alertOnFail)
         end
     end
 
+end
+
+||||||| parent of 9621a88... fixup! Small fiddling
+
+----
+-- Function: _G.tbl_merge: Concanate two or more list like table
+--
+-- @param ...: Table
+----
+_G.tbl_merge = function(...)
+    local tblConcanated = {}
+    for i = 1, select('#', ...) do
+        local tbl = select(i, ...)
+        if not vim.tbl_islist(tbl) then
+            return vim.notify("Only list-liked table allowed", vim.log.levels.ERROR)
+        end
+        if next(tbl) then
+            for index, value in ipairs(tbl) do
+                tblConcanated[#tblConcanated+1] = value
+            end
+        end
+    end
+    return tblConcanated
+end
+
+
+----
+-- Function: _G.luaRHS: Let you write rhs of mapping in a comafortable way
+
+-- Before:
+            -- map("n", [[<Plug>ReplaceCurLine]], [[:lua vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register); require("replace").replaceSave(); if require("replace").regType == "=" then vim.g.ReplaceExpr = vim.fn.getreg("=") end; vim.cmd("norm! V" .. vim.v.count1 .. "_" .. "<lt>Esc>"); require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>]], {"silent"})
+
+-- After:
+            -- map("n", [[<Plug>ReplaceCurLine]],
+                -- luaRHS[[
+                -- :lua vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register);
+
+                -- require("replace").replaceSave();
+                -- if require("replace").regType == "=" then
+                    -- vim.g.ReplaceExpr = vim.fn.getreg("=")
+                -- end;
+
+                -- vim.cmd("norm! V" .. vim.v.count1 .. "_" .. "<lt>Esc>");
+
+                -- require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>
+                -- ]],
+                -- {"silent"})
+--
+-- @param str: RHS mapping
+-- @return: nil
+----
+_G.luaRHS = function(str)
+    if type(str) ~= "string" then return vim.notify("Expected string value.", vim.log.levels.ERROR) end
+
+    local strTbl = vim.split(str, "\n", false)
+    strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
+        local concnStr = string.gsub(table.concat(strTbl, " "), "%s+", " ")
+
+    return tostring(
+        concnStr:sub(1, 1) == " " and
+        concnStr:sub(2, -1) or concnStr:sub(1, -1))
+end
+
+
+----
+-- Function: _G.tbl_merge: Concatenate two or more list like table
+--
+-- @param ... Table
+----
+_G.tbl_merge = function(...)
+    local tblConcanated = {}
+    for i = 1, select('#', ...) do
+        local tbl = select(i, ...)
+        if not vim.tbl_islist(tbl) then
+            return vim.notify("Only list-liked table allowed", vim.log.levels.ERROR)
+        end
+        if next(tbl) then
+            for index, value in ipairs(tbl) do
+                tblConcanated[#tblConcanated+1] = value
+            end
+        end
+    end
+    return tblConcanated
+end
+
+
+----
+-- Function: _G.luaRHS: Let you write rhs of mapping in a comafortable way
+
+-- Before:
+            -- map("n", [[<Plug>ReplaceCurLine]], [[:lua vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register); require("replace").replaceSave(); if require("replace").regType == "=" then vim.g.ReplaceExpr = vim.fn.getreg("=") end; vim.cmd("norm! V" .. vim.v.count1 .. "_" .. "<lt>Esc>"); require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>]], {"silent"})
+
+-- After:
+            -- map("n", [[<Plug>ReplaceCurLine]],
+                -- luaRHS[[
+                -- :lua vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register);
+
+                -- require("replace").replaceSave();
+                -- if require("replace").regType == "=" then
+                    -- vim.g.ReplaceExpr = vim.fn.getreg("=")
+                -- end;
+
+                -- vim.cmd("norm! V" .. vim.v.count1 .. "_" .. "<lt>Esc>");
+
+                -- require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>
+                -- ]],
+                -- {"silent"})
+--
+-- @param str: RHS mapping
+-- @return: nil
+----
+_G.luaRHS = function(str)
+    if type(str) ~= "string" then return vim.notify("Expected string value.", vim.log.levels.ERROR) end
+
+    local strTbl = vim.split(str, "\n", false)
+    strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
+        local concnStr = string.gsub(table.concat(strTbl, " "), "%s+", " ")
+
+    return tostring(
+        concnStr:sub(1, 1) == " " and
+        concnStr:sub(2, -1) or concnStr:sub(1, -1))
 end
 
 -- dummy

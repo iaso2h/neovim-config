@@ -60,9 +60,8 @@ return function()
     cmp.setup{
         sources = {
             {name = "nvim_lsp"},
-            -- {name = "nvim_lua"},
+            {name = "nvim_lua"},
             {name = "buffer"},
-            {name = "spell"},
             {name = "path"},
             {name = "vsnip"},
             {name = "cmp_tabnine"},
@@ -74,7 +73,6 @@ return function()
                     nvim_lsp    = "[LSP]",
                     nvim_lua    = "[Lua]",
                     buffer      = "[Buffer]",
-                    spell       = "[Spell]",
                     path        = "[Path]",
                     vsnip       = "[VSnip]",
                     cmp_tabnine = "[Tabnine]",
@@ -97,19 +95,23 @@ return function()
             ["<C-p>"] = cmp.mapping.select_prev_item(),
             ["<C-n>"] = cmp.mapping.select_next_item(),
             ["<Tab>"] = cmp.mapping(function(fallback)
-                if vim.fn.pumvisible() == 0 then
+                if package.loaded["neogen"] and require("neogen").jumpable() then
+                    vim.api.nvim_feedkeys(t[[<cmd>lua require("neogen").jump_next()<CR>]], "", true)
+                elseif vim.fn["vsnip#jumpable"](1) == 1 then
+                    -- NOTE: maybe use "<Plug>(vsnip-jump-or-expand)" instead when cmp support <tab>
+                    -- key to expand snippet provided by LSP?
+                    vim.api.nvim_feedkeys(t"<Plug>(vsnip-jump-next)", "", true)
+                elseif vim.fn.pumvisible() == 0 then
                     vim.api.nvim_feedkeys(t"<Plug>(Tabout)", "", true)
-                elseif vim.fn["vsnip#available"]() == 1 then
-                    vim.api.nvim_feedkeys(t"<Plug>(vsnip-expand-or-jump)", "", true)
                 else
                     fallback()
                 end
             end, {"i", "s"}),
             ["<S-Tab>"] = cmp.mapping(function(fallback)
-                if vim.fn.pumvisible() == 0 then
-                    vim.api.nvim_feedkeys(t"<Plug>(TaboutBack)", "", true)
-                elseif vim.fn["vsnip#available"]() == 1 then
+                if vim.fn["vsnip#jumpable"](-1) == 1 then
                     vim.api.nvim_feedkeys(t"<Plug>(vsnip-jump-prev)", "", true)
+                elseif vim.fn.pumvisible() == 0 then
+                    vim.api.nvim_feedkeys(t"<Plug>(TaboutBack)", "", true)
                 else
                     fallback()
                 end

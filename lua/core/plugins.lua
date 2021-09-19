@@ -52,6 +52,9 @@ packer.startup(function(use, use_rocks)
     -- module_pattern = string/list -- Specifies Lua pattern of Lua module names for require. When
     -- requiring a string which matches one of these patterns, the plugin will be loaded.
     -- }
+    -- BUG: Sometime the appearing sequence of "keys" and "cmd" inside use()
+    -- func will take a significant effect on whether a plugin can be lazy
+    -- loaded or not
 
     use 'wbthomason/packer.nvim'
 
@@ -73,20 +76,13 @@ packer.startup(function(use, use_rocks)
     }
     use {
         'antoinemadec/FixCursorHold.nvim',
-        setup = function()
-            vim.g.cursorhold_updatetime = 100
-        end
+        setup = [[vim.g.cursorhold_updatetime = 100]]
     }
+    -- TODO: deprecated
     use {
         'landock/vim-expand-region',
         event    = "BufRead",
         requires = "camelcasemotion",
-        -- keys     = {
-            -- {"n", [[<A-a>]]},
-            -- {"v", [[<A-a>]]},
-            -- {"n", [[<A-s>]]},
-            -- {"v", [[<A-s>]]},
-        -- },
         config   = function()
             vim.g.expand_region_text_objects = {
                 ['iw'] = 0,
@@ -112,7 +108,7 @@ packer.startup(function(use, use_rocks)
             vim.fn["expand_region#custom_text_objects"](vim.g.expand_region_custom_text_objects)
             map("", [[<A-a>]], [[<Plug>(expand_region_expand)]], "Expand region")
             map("", [[<A-s>]], [[<Plug>(expand_region_shrink)]], "Shrink region")
-            pcall(cmd, [[unmap _]])
+            pcall(vim.cmd, [[unmap _]])
         end
     }
     use {
@@ -127,9 +123,9 @@ packer.startup(function(use, use_rocks)
             vim.g.camelsnek_alternative_camel_commands = 1
             vim.g.camelsnek_no_fun_allowed             = 1
             vim.g.camelsnek_iskeyword_overre           = 0
-            map("v", [[<A-c>]],   [[:call CaseSwitcher()<cr>]],                               {"silent"})
-            map("n", [[<A-c>]],   [[:lua require("caseSwitcher").cycleCase()<cr>]],           {"silent"}, "Cycle cases")
-            map("n", [[<A-S-c>]], [[:lua require("caseSwitcher").cycleDefaultCMDList()<cr>]], {"silent"}, "Cycle cases reset")
+            map("v", [[<A-c>]],   [[:call CaseSwitcher()<CR>]],                               {"silent"})
+            map("n", [[<A-c>]],   [[:lua require("caseSwitcher").cycleCase()<CR>]],           {"silent"}, "Cycle cases")
+            map("n", [[<A-S-c>]], [[:lua require("caseSwitcher").cycleDefaultCMDList()<CR>]], {"silent"}, "Cycle cases reset")
         end,
     }
     use {
@@ -184,8 +180,8 @@ packer.startup(function(use, use_rocks)
                 perm_method      = require'hop.perm'.TermSeqBias,
                 case_insensitive = false
             }
-            map("", [[<leader>f]], [[<cmd>lua require("hop").hint_char1()<cr>]], {"silent"}, "Hop char")
-            map("", [[<leader>F]], [[<cmd>lua require("hop").hint_lines()<cr>]], {"silent"}, "Hop line")
+            map("", [[<leader>f]], [[<cmd>lua require("hop").hint_char1()<CR>]], {"silent"}, "Hop char")
+            map("", [[<leader>F]], [[<cmd>lua require("hop").hint_lines()<CR>]], {"silent"}, "Hop line")
         end
         }
     use {
@@ -201,13 +197,13 @@ packer.startup(function(use, use_rocks)
         cmd  = {"Run", "Compile"},
         keys = {"F9", "S-F9"},
         config = function()
-            cmd [[
+            vim.cmd [[
             command! -nargs=0 Compile lua require("compileRun").compileCode()
             command! -nargs=0 Run     lua require("compileRun").runCode()
             ]]
 
-            map("n", [[<F9>]],   [[:lua require("compileRun").compileCode(true)<cr>]], {"noremap", "silent", "novscode"}, "Compile code")
-            map("n", [[<S-F9>]], [[:lua require("compileRun").runCode(true)<cr>]],     {"noremap", "silent", "novscode"}, "Run code")
+            map("n", [[<F9>]],   [[:lua require("compileRun").compileCode(true)<CR>]], {"noremap", "silent", "novscode"}, "Compile code")
+            map("n", [[<S-F9>]], [[:lua require("compileRun").runCode(true)<CR>]],     {"noremap", "silent", "novscode"}, "Run code")
         end
     }
     use {
@@ -228,6 +224,7 @@ packer.startup(function(use, use_rocks)
             map("v", [[<Plug>InplaceReplaceVisual]], [[:lua require("replace").replaceVisualMode()<cr>]],                                 {"noremap", "silent"})
         end
     }
+
     use {
         'tommcdo/vim-exchange',
         keys = {
@@ -294,12 +291,28 @@ packer.startup(function(use, use_rocks)
         end
     }
     use {
-        'mg979/docgen.vim',
-        cmd    = "DocGen",
-        keys   = {{"n", "dg"}},
-        config = function()
-            map("n", [[dg]], [[:<c-u>DocGen<cr>]], "Document function")
-        end
+        'danymat/neogen',
+        requires = {"nvim-treesitter", "nvim-cmp"},
+        keys     = "dg",
+        config   = function()
+            require("neogen").setup {
+                enabled = true,
+                languages = {
+                    lua = {
+                        template = {
+                            annotation_convention = "emmylua"
+                        }
+                    },
+                    python = {
+                        template = {
+                            annotation_convention = "google_docstrings"
+                        }
+                    }
+                }
+            }
+
+            map("n", [[dg]], [[:lua require("neogen").generate()<CR>]], {"silent"})
+        end,
     }
     use {
         'AndrewRadev/splitjoin.vim',
@@ -307,8 +320,8 @@ packer.startup(function(use, use_rocks)
         config = function()
             vim.g.splitjoin_align = 1
             vim.g.splitjoin_curly_brace_padding = 0
-            map("n", [["gS"]], [[:<c-u>SplitjoinSplit<cr>]], {"silent"}, "Smart split")
-            map("n", [["gJ"]], [[:<c-u>SplitjoinJoin<cr>]],  {"silent"}, "Smart join")
+            map("n", [["gS"]], [[:<c-u>SplitjoinSplit<CR>]], {"silent"}, "Smart split")
+            map("n", [["gJ"]], [[:<c-u>SplitjoinJoin<CR>]],  {"silent"}, "Smart join")
         end
     }
     use {
@@ -403,14 +416,9 @@ packer.startup(function(use, use_rocks)
         config = conf "vim-nerdcommenter".config,
     }
     use {
-        "winston0410/cmd-parser.nvim",
-        event = "CmdwinEnter",
-    }
-    use {
         'winston0410/range-highlight.nvim',
-        event    = "CmdwinEnter",
-        requires = "cmd-parser.nvim",
-        config = function()
+        requires = "winston0410/cmd-parser.nvim",
+        config   = function()
             require("range-highlight").setup {
                 highlight = "Visual",
                 highlight_with_out_range = {
@@ -478,19 +486,19 @@ packer.startup(function(use, use_rocks)
         },
         cmd    = "MaximizerToggle",
         config = function()
-            map("",  [[<C-w>m]], [[:MaximizerToggle<cr>]],      {"silent"}, "Maximize window")
-            map("t", [[<C-w>m]], [[<A-n>:MaximizerToggle<cr>]], {"silent"})
+            map("",  [[<C-w>m]], [[:MaximizerToggle<CR>]],      {"silent"}, "Maximize window")
+            map("t", [[<C-w>m]], [[<A-n>:MaximizerToggle<CR>]], {"silent"})
         end
     }
     use {
         'simnalamburt/vim-mundo',
-        keys   = "<C-w>u",
         cmd    = "MundoToggle",
+        keys   = "<C-w>u",
         config = function()
             vim.g.mundo_help               = 1
             vim.g.mundo_tree_statusline    = 'Mundo'
             vim.g.mundo_preview_statusline = 'Mundo Preview'
-            map("n", [[<C-W>u]], [[:<c-u>MundoToggle<cr>]], {"silent"}, "Open Mundo")
+            map("n", [[<C-W>u]], [[:<c-u>MundoToggle<CR>]], {"silent"}, "Open Mundo")
         end
     }
     -- }}} Vim enhancement
@@ -620,8 +628,8 @@ packer.startup(function(use, use_rocks)
     'RRethy/vim-hexokinase',
         run    = "make hexokinase",
         setup  = function()
-            vim.g.Hexokinase_highlighters = {'backgroundfull'}
-            vim.g.Hexokinase_optInPatterns = 'full_hex,triple_hex,rgb,rgba,hsl,hsla,colour_names'
+            vim.g.Hexokinase_highlighters = {"backgroundfull"}
+            vim.g.Hexokinase_optInPatterns = "full_hex,triple_hex,rgb,rgba,hsl,hsla"
         end
     }
     use {
@@ -630,19 +638,12 @@ packer.startup(function(use, use_rocks)
         requires = "nvim-web-devicons",
         config   = conf "nvim-todo-comments"
     }
-    -- use {
-        -- 'xiyaowong/OldfilesStartupScreen.nvim',
-        -- config   = function()
-            -- map("", [[<C-s>]], [[:lua require('OldfilesStartupScreen').display()<cr>]], {"silent"})
-        -- end
-    -- }
     use {
         'kyazdani42/nvim-tree.lua',
         keys     = {"<C-w>e"},
         requires = "nvim-web-devicons",
         config   = conf "nvim-tree".config
     }
-    -- use 'dm1try/golden_size'
     -- }}} UI
     -- Treesitter {{{
     use {
@@ -656,7 +657,7 @@ packer.startup(function(use, use_rocks)
                     "c", "cpp", "cmake", "lua", "json", "toml", "python",
                     "bash", "fish", "ruby", "regex", "css", "html", "go",
                     "javascript", "rust", "vue", "c_sharp", "typescript",
-                    "comment", "query"
+                    "comment", "query", "yaml"
                 },
                 highlight        = {enable = true},
                 indent           = {enable = true},
@@ -699,7 +700,7 @@ packer.startup(function(use, use_rocks)
                         focus_language            = 'f',
                         unfocus_language          = 'F',
                         update                    = 'R',
-                        goto_node                 = '<cr>',
+                        goto_node                 = '<CR>',
                         show_help                 = '?',
                     },
                 }
@@ -788,13 +789,7 @@ packer.startup(function(use, use_rocks)
         'windwp/nvim-ts-autotag',
         after    = "nvim-treesitter",
         requires = "nvim-treesitter",
-        config   = function()
-            require'nvim-treesitter.configs'.setup {
-                autotag = {
-                    enable = true,
-                }
-            }
-        end
+        config   = [[require"nvim-treesitter.configs".setup {autotag = {enable = true}}]]
     }
     use {
         'abecodes/tabout.nvim',
@@ -834,7 +829,6 @@ packer.startup(function(use, use_rocks)
             }
         end
     }
-    -- TODO: use 'bryall/contextprint.nvim'
     -- }}} Treesitter
     -- Intellisense {{{
     use {
@@ -851,7 +845,7 @@ packer.startup(function(use, use_rocks)
             -- Automatically reload after `:LspInstall <server>` so we don't have to restart neovim
             require("lspinstall").post_install_hook = function ()
                 require("config.nvim-lsp").setupServers()
-                cmd "bufdo e"
+                vim.cmd "bufdo e"
             end
 
             vim.cmd [[
@@ -952,6 +946,7 @@ packer.startup(function(use, use_rocks)
             }
         end
     }
+    -- TODO: highlight
     use {
         'folke/lsp-colors.nvim',
         rquires = "nvim-lspconfig",
@@ -972,9 +967,8 @@ packer.startup(function(use, use_rocks)
             "nvim-autopairs",
 
             {"hrsh7th/cmp-nvim-lsp", module = "cmp_nvim_lsp"},
-            {"hrsh7th/cmp-nvim-lua", module = "cmp_nvim_lua"},
+            {"hrsh7th/cmp-nvim-lua", module = "cmp_nvim_lua", disable = true},
             {"hrsh7th/cmp-buffer",   module = "cmp_buffer"},
-            {"f3fora/cmp-spell",     module = "cmp-spell"},
             {"hrsh7th/cmp-path",     module = "cmp_path"},
             {"hrsh7th/cmp-vsnip",    after  = "nvim-cmp"},
             {
@@ -995,9 +989,9 @@ packer.startup(function(use, use_rocks)
     }
     use {
         'hrsh7th/vim-vsnip',
-        event = "InsertCharPre",
-        after = "nvim-cmp",
-        setup = function()
+        event  = "InsertCharPre",
+        after  = "nvim-cmp",
+        config = function()
             vim.g.vsnip_snippet_dir   = vim.fn.stdpath("config") .. "/snippets"
             vim.g.vsnip_extra_mapping = false
             vim.g.vsnip_filetypes     = {
@@ -1043,14 +1037,14 @@ packer.startup(function(use, use_rocks)
     use {
         'nvim-telescope/telescope.nvim',
         module   = "telescope",
-        event    = "BufRead",
+        -- event    = "BufRead",
+        cmd      = "Telescope",
         keys     = {
-            [[<C-h>l]],   [[<C-e>]],
+            [[<C-h>l]],   [[<C-h>e]],
             [[<C-f>f]],   [[<C-f>F]],
             [[<C-h>c]],   [[<C-h>h]],
             [[<C-h><C-h>, [[<C-h>o]],
         },
-        cmd      = "Telescope",
         requires = {
             "plenary.nvim",
             { "nvim-telescope/telescope-fzy-native.nvim",
@@ -1073,25 +1067,51 @@ packer.startup(function(use, use_rocks)
     }
     use {
         'dstein64/vim-startuptime',
-        cmd  = "StartupTime"
+        cmd    = "StartupTime",
+        config = [[vim.g.startuptime_tries = 20]]
     }
     use {
         'iaso2h/vim-scriptease',
         branch = 'ftplugin',
         ft     = 'vim',
-        keys   = {
-            {"n", "zS",},
-            {"n", "g>"}
-        },
         cmd    = {
             "PP", "PPmsg", "Runtime", "Disarm", "Scriptnames", "Messages",
             "Verbose", "Time", "Breakadd", "Vopen", "Vedit", "Vsplit"
         },
+        keys   = {
+            {"n", "zS",},
+            {"n", "g>"}
+        },
         config = function()
-            map("n", [[g>]], [[:<c-u>Messages<cr>]], {"silent", "novscode"}, "Messages in quickfix")
+            map("n", [[g>]], [[:<c-u>Messages<CR>]], {"silent", "novscode"}, "Messages in quickfix")
             whichKeyDoc({"zS", "Show syntax highlighting groups"})
             whichKeyDoc({"g=", "Eval operator"})
             whichKeyDoc({"g==", "Eval current line"})
+        end
+    }
+    use {
+        'gaelph/logsitter.nvim',
+        requires = "nvim-treesitter",
+        after    = "nvim-treesitter",
+        module   = "logsitter",
+        cmd      = "Logsitter",
+        setup    = [=[map("n", [[<leader>lg]], [[:lua require("logsitter").log(vim.bo.filetype)<CR>]=]
+    }
+    use {
+        'bryall/contextprint.nvim',
+        disable  = true,
+        requires = "nvim-treesitter",
+        after    = "nvim-treesitter",
+        module   = "contextprint",
+        config   = function()
+            require('contextprint').setup{
+                separator_char = "#",
+                lua = {
+                    separator = "#",
+                    log = function(contents) return string.format([[Print("%s")]], contents) end
+                }
+            }
+        map("n", [[<leader>L]], [[:lua require("contextprint").add_statement()<CR>]])
         end
     }
     -- use 'mfussenegger/nvim-dap'
@@ -1111,9 +1131,7 @@ packer.startup(function(use, use_rocks)
         'iaso2h/nlua.nvim',
         branch = "iaso2h",
         ft     = "lua",
-        config = function()
-            vim.g.nlua_keywordprg_map_key = "<C-S-q>"
-        end
+        config = [[vim.g.nlua_keywordprg_map_key = "<C-S-q>"]]
     }
     use {
         'nanotee/luv-vimdocs',
@@ -1122,7 +1140,7 @@ packer.startup(function(use, use_rocks)
     -- Markdown
     use {
         'iamcco/markdown-preview.nvim',
-        run = function() vim.fn["mkdp#util#install"]() end,
+        run = [=[vim.fn["mkdp#util#install"]]=],
         ft  = {'markdown', 'md'}
     }
     use {
