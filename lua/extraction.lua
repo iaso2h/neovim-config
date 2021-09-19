@@ -240,17 +240,21 @@ end -- }}}
 
 
 ----
--- Function: M.main :Main function to start the extraction for creating either
+-- Function: M.operator :Main function to start the extraction for creating either
 -- new variable or new file
 --
 -- @param argTbl: argTbl[1] is the string value of motionwise, which is return
 -- when g@ is called
 -- @return: 0
 ----
-function M.main(argTbl) -- {{{
+function M.operator(argTbl) -- {{{
     local motionwise = argTbl[1]
     -- Visual block mode is not supported
     if motionwise == "block" then return end
+    if not vim.o.modifiable or vim.o.readonly then
+        vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
+        return ""
+    end
 
     -- opts = opts or {hlGroup="Search", timeout=500}
     local vimMode  = argTbl[2]

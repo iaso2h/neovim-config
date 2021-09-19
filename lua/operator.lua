@@ -11,14 +11,14 @@ endfunction
 ]]
 
 ----
--- Function: M.main
+-- Function: M.expression
 --
 -- @param func:            lua function object
 -- @param checkModifiable: expected boolean value. When this is set to True,
 -- function will abort when the modifiable option is off
 -- @return: string value "g@" when successful
 ----
-function M.main(func, checkModifiable)
+function M.expression(func, checkModifiable)
     if checkModifiable then
         if not vim.o.modifiable or vim.o.readonly then
             api.nvim_echo({{"Cannot make changes", "MoreMsg"}}, true, {})
