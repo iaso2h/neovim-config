@@ -48,7 +48,7 @@ if not vim.g.vscode then
         else
             return "="
         endif
-    endfunctio
+    endfunction
 
     function! ExitVisual()
         normal! gv
@@ -114,3 +114,4 @@ command! -nargs=0 TrimSpacesToggle        lua  if type(TrimSpacesChk) == "nil" t
 command! -nargs=0 TrailingEmptyLineToggle lua  if type(TrailEmptyLineChk) == "nil" then TrailEmptyLineChk = TrailEmptyLineChk or true end; TrailEmptyLineChk = not TrailEmptyLineChk; vim.api.nvim_echo({{string.format("%s",TrailEmptyLineChk), "Moremsg"}}, false, {})
 ]]
 -- }}} Commands
+--

@@ -15,7 +15,7 @@ function Print(...)
 end
 
 function _G.t(str)
-    return api.nvim_replace_termcodes(str, true, true, true)
+    return api.nvim_replace_termcodes(str, true, false, true)
 end
 
 function _G.ex(exec) return fn.executable(exec) == 1 end
@@ -535,17 +535,20 @@ function M.trimSpaces(strTbl, silent, prefix) -- {{{
 end -- }}}
 
 ----
--- Function: M.saveReg will save the quote registers and unnamed registers
+-- Function: M.saveReg will save the star registers, plus and unnamed registers
 -- independantly, restoreReg can be accessed after saveReg is called
 ----
 function M.saveReg() -- {{{
     local unnamed     = fn.getreg('"', 1)
     local unnamedType = fn.getregtype('"')
-    local quote       = fn.getreg('*', 1)
-    local quoteType   = fn.getregtype('*')
+    local star        = fn.getreg('*', 1)
+    local starType    = fn.getregtype('*')
+    local plus        = fn.getreg('+', 1)
+    local plusType    = fn.getregtype('+')
     M.restoreReg = function()
         fn.setreg('"', unnamed, unnamedType)
-        fn.setreg('*', quote, quoteType)
+        fn.setreg('*', star,    starType)
+        fn.setreg('+', plus,    plusType)
         vim.defer_fn(function() M.restoreReg = nil end, 1000)
     end
 end -- }}}
@@ -580,7 +583,8 @@ end -- }}}
 ----
 -- Function: M.posDist Caculate the distance from pos1 to pos2
 --
--- @param pos1:    {line, col} like table value contain {1, 0} based number
+-- @param pos1:    {line, col} like table value contain {1, 0} based number.
+--                 Can be retrieved by calling vim.api.nvim_buf_get_mark()
 -- @param pos2:    Same as pos1
 -- @param bias:    Bias number. Default value: 1
 -- @param baisIdx: Bias index, possible value: 1 or 2. Default value: 1
@@ -901,6 +905,67 @@ end
 -- Function: _G.tbl_merge: Concatenate two or more list like table
 --
 -- @param ... Table
+----
+_G.tbl_merge = function(...)
+    local tblConcanated = {}
+    for i = 1, select('#', ...) do
+        local tbl = select(i, ...)
+        if not vim.tbl_islist(tbl) then
+            return vim.notify("Only list-liked table allowed", vim.log.levels.ERROR)
+        end
+        if next(tbl) then
+            for index, value in ipairs(tbl) do
+                tblConcanated[#tblConcanated+1] = value
+            end
+        end
+    end
+    return tblConcanated
+end
+
+
+----
+-- Function: _G.luaRHS: Let you write rhs of mapping in a comafortable way
+
+-- Before:
+            -- map("n", [[<Plug>ReplaceCurLine]], [[:lua vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register); require("replace").replaceSave(); if require("replace").regType == "=" then vim.g.ReplaceExpr = vim.fn.getreg("=") end; vim.cmd("norm! V" .. vim.v.count1 .. "_" .. "<lt>Esc>"); require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>]], {"silent"})
+
+-- After:
+            -- map("n", [[<Plug>ReplaceCurLine]],
+                -- luaRHS[[
+                -- :lua vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register);
+
+                -- require("replace").replaceSave();
+                -- if require("replace").regType == "=" then
+                    -- vim.g.ReplaceExpr = vim.fn.getreg("=")
+                -- end;
+
+                -- vim.cmd("norm! V" .. vim.v.count1 .. "_" .. "<lt>Esc>");
+
+                -- require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>
+                -- ]],
+                -- {"silent"})
+--
+-- @param str: RHS mapping
+-- @return: nil
+----
+_G.luaRHS = function(str)
+    if type(str) ~= "string" then return vim.notify("Expected string value.", vim.log.levels.ERROR) end
+
+    local strTbl = vim.split(str, "\n", false)
+    strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
+        local concnStr = string.gsub(table.concat(strTbl, " "), "%s+", " ")
+
+    return tostring(
+        concnStr:sub(1, 1) == " " and
+        concnStr:sub(2, -1) or concnStr:sub(1, -1))
+end
+
+||||||| parent of 404bc20... Implement replace.nvim in lua way
+
+----
+-- Function: _G.tbl_merge: Concanate two or more list like table
+--
+-- @param ...: Table
 ----
 _G.tbl_merge = function(...)
     local tblConcanated = {}

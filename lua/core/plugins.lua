@@ -214,14 +214,73 @@ packer.startup(function(use, use_rocks)
             {"v", "R"},
         },
         config = function()
-            -- Repeat not defined in visual mode, but enabled through visualrepeat.vim.
-            -- TODO: repeat mode not working for linewise mode
-            map("n", [[gr]],  [[luaeval("require('replace').expression()")]], {"silent", "expr"}, "Replace operator")
-            map("n", [[grr]], [[<Plug>InplaceReplaceLine]], "Replace current line")
-            map("n", [[<Plug>InplaceReplaceLine]], [[:<c-u>execute 'normal! V' . v:count1 . "_\<lt>Esc>"<bar> lua require("replace").replaceOperator({"visual", "InplaceReplaceLine"})<cr>]], {"noremap", "silent"})
-            map("v", [[R]], [[<Plug>InplaceReplaceVisual]])
-            map("v", [[<Plug>InplaceReplaceVisual]], [[:lua require("replace").replaceOperator({"visual", "InplaceReplaceVisual"})<cr>]], {"noremap", "silent"})
-            map("v", [[<Plug>InplaceReplaceVisual]], [[:lua require("replace").replaceVisualMode()<cr>]],                                 {"noremap", "silent"})
+            map("n", [[<Plug>ReplaceOperator]],
+                [[luaeval("require('replace').expr()")]],
+                {"silent", "expr"}
+            )
+
+            -- TODO: Test needed
+            map("n", [[<Plug>ReplaceExpr]],
+                [[:<C-u>let g:ReplaceExpr=getreg("=")<Bar>exec "norm!" . v:count1 . "."<CR>]],
+                {"silent"}
+            )
+
+            map("n", [[<Plug>ReplaceCurLine]],
+                luaRHS[[
+                :lua require("replace").replaceSave();
+
+                vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register);
+
+                if require("replace").regType == "=" then
+                    vim.g.ReplaceExpr = vim.fn.getreg("=")
+                end;
+
+                vim.cmd("norm! V" .. vim.v.count1 .. "_" .. vim.api.nvim_replace_termcodes("<lt>Esc>", true, true, true));
+
+                require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>
+                ]],
+                {"noremap", "silent"})
+
+            map("v", [[<Plug>ReplaceVisual]],
+                luaRHS[[
+                :lua require("replace").replaceSave();
+
+                vim.fn["repeat#setreg"](t"<Plug>ReplaceVisual", vim.v.register);
+
+                if require("replace").regType == "=" then
+                    vim.g.ReplaceExpr = vim.fn.getreg("=")
+                end;
+
+                require("replace").operator(
+                    tbl_merge(
+                        require("operator").vMotion(),
+                        {"<Plug>ReplaceVisual"}
+                    ))<CR>
+                ]],
+                {"noremap", "silent"})
+            map("n", [[<Plug>ReplaceVisual]],
+                luaRHS[[
+                :lua require("replace").replaceSave();
+
+                vim.fn["repeat#setreg"](t"<Plug>ReplaceVisual", vim.v.register);
+
+                if require("replace").regType == "=" then
+                    vim.g.ReplaceExpr = vim.fn.getreg("=")
+                end;
+
+                vim.cmd("norm! " .. require("replace").replaceVisualMode()
+
+                require("replace").operator(
+                    tbl_merge(
+                        require("operator").vMotion(),
+                        {"<Plug>ReplaceVisual"}
+                    ))<CR>
+                ]],
+                {"noremap", "silent"})
+
+            map("n", [[gr]],  [[<Plug>ReplaceOperator]])
+            map("n", [[grr]], [[<Plug>ReplaceCurLine]])
+            map("v", [[R]],   [[<Plug>ReplaceVisual]])
         end
     }
 

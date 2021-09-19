@@ -1,310 +1,368 @@
-local operator = require "operator"
--- ReplaceWithRegister.vim: Replace text with the contents of a register.
---
--- DEPENDENCIE
---   - ingo-library.vim plugin (optional)
---   - repeat.vim (vimscript #2136) plugin (optional)
---   - visualrepeat.vim (vimscript #3848) plugin (optional)
---
--- Copyrighvim.t. (C) 2011-2020 Ingo Karkat
---   The VIM LICENSE applies to this script; see ':help copyright'.
---
 -- Maintainer:	Ingo Karkat <ingo@karkat.de>
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
-local preFunc
-local posFunc
-local cursorPos
 local M   = {}
+local restoreOption
+local operator = require "operator"
 
--- Note: Could use ingo#pos#IsOnOrAfter(), but avoid dependency to ingo-library
--- for now.
-local function correctRegtype(motionwise, register, regType ,replacement) -- {{{
-    local ok, _
-    if motionwise == "block" then
-        -- Adaptations for blockwise replace.
-        local pasteTextTbl = vim.split(replacement["text"], "\n", false)
-        local pasteLineNr  = #pasteTextTbl
-        if regType == 'v' or (regType == 'V' and pasteLineNr == 1) then
+
+----
+-- Function: warnRead Warn when buffer is not modifiable
+--
+-- @return: return true when buffer is readonly
+----
+local warnRead = function()
+    if not vim.o.modifiable or vim.o.readonly then
+        vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
+        return false
+    end
+    return true
+end
+
+----
+-- Function: _G.replaceSave
+-- https://github.com/tpope/vim-repeat/blob/master/autoload/repeat.vim
+-- This function is used for preserving the vim.v.register value in case that
+-- it's cleared during file modification
+----
+M.replaceSave = function()
+    M.regType   = vim.v.register
+    M.count     = vim.v.count1
+end
+
+----
+-- Function: saveOption:Store vim options before perform any replacement----
+----
+local saveOption = function() -- {{{
+    local saveClipboard
+    local saveSelection
+
+    -- BUG: somehow it will triger xclipboard warning
+    -- if api.nvim_get_option("clipboard") ~= "" then
+
+        -- saveClipboard = vim.o.clipboard
+        -- -- Avoid clobbering the selection and clipboard registers.
+        -- vim.o.clipboard = ""
+    -- end
+
+    if api.nvim_get_option("selection") ~= "inclusive" then
+        saveSelection = vim.o.clipboard
+        -- Avoid clobbering the selection and clipboard registers.
+        vim.o.selection = "inclusive"
+    end
+
+    if saveClipboard or saveSelection then
+        restoreOption = function()
+            if saveSelection then vim.o.selection = saveSelection end
+            if saveClipboard then vim.o.clipboard = saveClipboard end
+        end
+    end
+end -- }}}
+
+----
+-- Function: matchRegtype: Match the motionType type with register type
+--
+-- @param motionType: String. Motion type by which how the operator perform.
+--                    Can be "line", "char" or "block"
+-- @param vimMode:    String. Vim mode. See: `:help mode()`
+-- @param reg:        Table. Contain name, type, content of v:register
+--                    Can be "line", "char" or "block"
+-- @param pos:        Table. Contain start and end position of operator movement
+-- @return:           Boolean. Return true when mataching successfully,
+--                    otherwise return false
+----
+local matchRegType = function(motionType, vimMode, reg, pos) -- {{{
+    -- NOTE:"\<C-v>" for vimMode in vimscript is evaluated as "\22" in lua, which represents blockwise motion
+    -- NOTE:"\0261" in vimscript is evaluated as "\0221" in lua, which represents blockwise-vusal register
+    if motionType == "block" and vimMode == "\22" then
+        -- Adapt register for blockwise replace.
+        local lines    = vim.split(reg.content, "\n", false)
+        local linesCnt = #lines
+
+        if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
             -- If the register contains just a single line, temporarily duplicate
             -- the line to match the height of the blockwise selection.
-            local height = replacement["startPos"][1] - replacement["endPos"][1] + 1
+            local height = pos.startPos[1] - pos.endPos[1] + 1
             if height > 1 then
-                local convertReg = vim.split(replacement["text"], "\n", false)
-                for _=1, height - 1 do
-                    local copyReg = convertReg
-                    convertReg = vim.list_extend(convertReg, copyReg)
+                local linesConcn = {}
+                for _ = 1, height, 1 do
+                    linesConcn = tbl_merge(linesConcn, lines)
                 end
-                fn.retreg(register, table.concat(convertReg, "\n"))
-                return 1
+
+                fn.setreg(reg.name, table.concat(linesConcn, "\n"), "b")
+                return true
             end
-        elseif regType == 'V' and pasteLineNr > 1 then
+        elseif reg.type == "V" and linesCnt > 1 then
             -- If the register contains multiple lines, paste as blockwise. then
-            fn.retreg(register, '', [[a\<C-v>]])
-            return 1
+            fn.setreg(reg.name, "", "b")
+            return true
+        else
+            -- No need to changed register when the register type is already blockwise
+            return false
         end
-    elseif regType == 'V' and string.match(replacement["text"], "\n$") then
+    elseif reg.type == "v" and vimMode == "V" then
+        -- Prepend indents to the char type register to match the same indent
+        -- of the first visual selected line
+        local indent = fn.indent(pos.startPos[1])
+        if indent ~=0 then
+            fn.setreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
+        end
+    elseif reg.type == "V" and string.match(reg.content, "\n$") then
         -- Our custom operator is characterwise, even in the
         -- ReplaceWithRegisterLine variant, in order to be able to replace less
         -- than entire lines (i.e. characterwise yanks).
-        -- So there's a mismatch when the replacement text is a linewise yank,
+        -- So there"s a mismatch when the replacement text is a linewise yank,
         -- and the replacement would put an additional newline to the end.
         -- To fix that, we temporarily remove the trailing newline character from
         -- the register contents and set the register type to characterwise yank.
-        fn.setreg(register, replacement["text"]:sub(1, #replacement["text"] - 1), 'v')
-        return 1
+        if motionType == "line" then
+            fn.setreg(reg.name, string.sub(reg.content, 1, -2), "V")
+        else
+            fn.setreg(reg.name, vim.trim(reg.content), "v")
+        end
+        return true
     end
 
-    return 0
+    return false
 end -- }}}
 
-local function replace(motionwise, register, replacement, curBufNr) -- {{{
-    -- With a put in visual mode, the selected text will be replaced with the
-    -- contents of the register. This works better than first deleting the
-    -- selection into the black-hole register and then doing the insert; as
-    -- "d" + "i/a" has issues at the end-of-the line (especially with blockwise
-    -- selections, where "v_o" can put the cursor at either end), and the "c"
-    -- commands has issues with multiple insertion on blockwise selection and
-    -- autoindenting.
+----
+-- Function: replace___: Replace text by manipulating visual selection and put
+--
+-- @param motionType: String. Motion type by which how the operator perform.
+--                    Can be "line", "char" or "block"
+-- @param vimMode:    String. Vim mode. See: `:help mode()`
+-- @param reg:        Table. Contain name, type, content of v:register
+--                    Can be "line", "char" or "block"
+-- @param pos:        Table. Contain start and end position of operator movement
+-- @param curBufNr:   Ineger. Buffer handler(number)
+----
+local replace = function(motionType, vimMode, reg, pos, curBufNr) -- {{{
     -- With a put in visual mode, the previously selected text is put in the
     -- unnamed register, so we need to save and restore that.
+    reg.name = reg.name == [["]] and "" or [["]] .. reg.name
 
-    -- Note: Must not use ""p; this somehow replaces the selection with itself?!
-    replacement["register"] = register == '"' and '' or '"' .. register
-
-    -- if register == '=' then
-        -- -- Cannot evaluate the expression register within a function; unscoped
-        -- -- variables do not refer to the global scope. Therefore, evaluation
-        -- -- happened earlier in the mappings.
-        -- -- To get the expression result into the buffer, we use the unnamed
-        -- -- register; this will be restored, anyway.
-        -- fn.setreg('"', vim.g.ReplaceWithRegisterExpr)
-        -- -- TODO
-        -- correctForRegtype(motionwise, '"', fn.getregtype('"'), vim.g.ReplaceWithRegisterExpr)
-        -- -- Must not clean up the global temp variable to allow command
-        -- -- repetition.
-        -- -- local pasteRegister = ''
-    -- end
-
-    local newContentStart
-    local newContentEnd
-    if motionwise == 'visual' then
-        cmd("silent normal! gv" .. replacement["register"] .. "p")
-        newContentStart  = api.nvim_buf_get_mark(0, "[")
-        newContentEnd    = api.nvim_buf_get_mark(0, "]")
-        -- Create extmark to track position of new content
-        require("yankPut").inplacePutNewContentNS      = api.nvim_create_namespace("inplacePutNewContent")
-        require("yankPut").inplacePutNewContentExtmark = api.nvim_buf_set_extmark(curBufNr,
-                                                    require("yankPut").inplacePutNewContentNS,
-                                                    newContentStart[1] - 1,
-                                                    newContentStart[2],
-                                                    {end_line = newContentEnd[1] - 1,
-                                                        end_col = newContentEnd[2]})
-        api.nvim_win_set_cursor(0, api.nvim_buf_get_mark(0, "["))
-        cmd("normal! v")
-        api.nvim_win_set_cursor(0, api.nvim_buf_get_mark(0, "]"))
-        cmd("normal! =")
+    if vimMode ~= "n" then
+        cmd(string.format("norm! gv%sp", reg.name))
     else
-        -- TODO
-        -- replacement["mode"]     = fn.visualmode()
-
-        api.nvim_win_set_cursor(0, replacement["startPos"])
-        local visualCMD
-        if motionwise == "line" then
-            visualCMD = "V"
+        if pos.startPos[1] > pos.endPos[1] or (pos.startPos[1] == pos.endPos[1] and pos.startPos[2] > pos.endPos[2]) then
+            -- This's the scenario where startpos is fall behind endpos
+            cmd(string.format("norm! %sP", reg.name))
         else
-            visualCMD = "v"
-        end
-        cmd("normal! " .. visualCMD)
-        api.nvim_win_set_cursor(0, replacement["endPos"])
-        cmd('normal!' .. replacement["register"] .. "p")
-        newContentStart  = api.nvim_buf_get_mark(0, "[")
-        newContentEnd    = api.nvim_buf_get_mark(0, "]")
-        -- Create extmark to track position of new content
-        require("yankPut").inplacePutNewContentNS      = api.nvim_create_namespace("inplacePutNewContent")
-        require("yankPut").inplacePutNewContentExtmark = api.nvim_buf_set_extmark(curBufNr,
-                                                    require("yankPut").inplacePutNewContentNS,
-                                                    newContentStart[1] - 1,
-                                                    newContentStart[2],
-                                                    {end_line = newContentEnd[1] - 1,
-                                                        end_col = newContentEnd[2]})
+            -- This's the most common case
+            local visualCMD = motionType == "line" and "V" or "v"
 
-        -- TODO
-        -- silent! call('ingo#selection#Set', l:save_visualarea)
+            api.nvim_win_set_cursor(0, pos.startPos)
+            cmd("norm! " .. visualCMD)
+            api.nvim_win_set_cursor(0, pos.endPos)
+            cmd("norm!" .. reg.name .. "p")
+        end
+
     end
 
+    -- Create extmark to track position of new content
+    local repStart   = api.nvim_buf_get_mark(0, "[")
+    local repEnd     = api.nvim_buf_get_mark(0, "]")
+    local repNS      = api.nvim_create_namespace("inplacePutNewContent")
+    local repExtmark = api.nvim_buf_set_extmark(curBufNr, repNS,
+                                                repStart[1] - 1, repStart[2],
+                                                {
+                                                    end_line = repEnd[1] - 1,
+                                                    end_col  = repEnd[2]
+                                                })
+    -- Inplace-replaced new can be retieved from 'gp' mapping, same as the inplace-put
+    require("yankPut").inplacePutNewContentNS      = repNS
+    require("yankPut").inplacePutNewContentExtmark = repExtmark
     -- Report change in Neovim statusbar
-    local srcLineCount = replacement["endPos"][1] - replacement["startPos"][1] + 1
-    local repLineCount = newContentEnd[1] - newContentStart[1] + 1
-    if srcLineCount >= vim.o.report or repLineCount >= vim.o.report then
-        local srcReport = string.format("Replaced %d line%s", srcLineCount, srcLineCount == 1 and "" or "s")
-        local repReport = srcLineCount == repLineCount and '' or
-            string.format(" with %d line%s", repLineCount, repLineCount == 1 and "" or "s")
+    local srcLinesCnt = pos.endPos[1] - pos.startPos[1] + 1
+    local repLineCnt  = repEnd[1] - repStart[1] + 1
+    if srcLinesCnt >= vim.o.report or repLineCnt >= vim.o.report then
+        local srcReport = string.format("Replaced %d line%s", srcLinesCnt, srcLinesCnt == 1 and "" or "s")
+        local repReport = srcLinesCnt == repLineCnt and '' or
+            string.format(" with %d line%s", repLineCnt, repLineCnt == 1 and "" or "s")
+
         api.nvim_echo({{srcReport .. repReport, "MoreMsg"}}, false, {})
     end
 
+    return {
+        namespace = repNS,
+        extmark   = repExtmark
+    }
 end -- }}}
 
-function M.replaceOperator(argTbl) -- {{{
-    -- TODO
+
+function M.operator(args) -- {{{
+    if not warnRead() then return end
+
+    local motionType = args[1]
+    local vimMode    = args[2]
     local opts = {hlGroup = "Search", timeout = 500}
-    local curBufNr      = api.nvim_get_current_buf()
-    local motionwise      = argTbl[1]
-    local register      = vim.v.register
-    local regType       = fn.getregtype(register)
-    local saveClipboard = vim.o.clipboard
-    vim.o.clipboard     = "" -- Avoid clobbering the selection and clipboard registers.
-    local replacement   = {}
-    replacement["text"] = fn.getreg(register, 1) -- Expression evaluation inside function context may cause errors, therefore get unevaluated expression when register == '='.
-    -- DEBUG:
-    -- Print(argTbl)
 
-    -- DEBUG:
+    local curBufNr = api.nvim_get_current_buf()
+    local pos
+    local reg
 
-    if motionwise == "visual" then
-        cursorPos = api.nvim_win_get_cursor(0)
-        replacement["startPos"]  = api.nvim_buf_get_mark(0, "<")
-        replacement["endPos"]    = api.nvim_buf_get_mark(0, ">")
-        -- Not sure this has any relationship with modifiable
-        -- api.nvim_buf_set_lines(0, cursorPos[1] - 1, cursorPos[1], false, {api.nvim_get_current_line()})
+    -- Saving {{{
+    -- Save cursor position
+    -- Because Visual Line Mode the cursor will place at the first column once
+    -- entering commandline mode. Therefor "gv" is exectued here to retrieve it.
+    if #args ~= 4 and vimMode == "V" then
+        cmd([[norm! gvmz]] .. api.nvim_replace_termcodes("<lt>Esc>", true, true, true))
+        -- M.cursorPos = api.nvim_win_get_cursor(0)
+        M.cursorPos = api.nvim_buf_get_mark(curBufNr, "z")
     else
-        -- Execute preceding functoin when modifiable is off
-        if preFunc then
-            preFunc()
-            preFunc = nil
-        end
-        replacement["startPos"] = api.nvim_buf_get_mark(0, "[")
-        replacement["endPos"]   = api.nvim_buf_get_mark(0, "]")
+        M.cursorPos = api.nvim_win_get_cursor(0)
     end
-
-    -- Save registers
+    -- Save registers and vim options
     require("util").saveReg()
+    saveOption()
+    -- }}} Saving
 
-    local isCorrected = correctRegtype(motionwise, register, regType, replacement)
-
-    replace(motionwise, register, replacement, curBufNr)
-
-    -- Add hightlight
-    -- Restoration
-    vim.o.clipboard = saveClipboard
-    if isCorrected then
-        -- Undo the temporary change of the register.
-        -- Note: This doesn't cause trouble for the read-only registers :, .,
-        -- %, # and =, because their regtype is always 'v'.
-        fn.setreg(register, replacement["text"], regType)
+    if M.regType == "=" then
+        -- To get the expression result into the buffer, we use the unnamed
+        -- register; this will be restored, anyway.
+        fn.setreg('"', vim.g.ReplaceExpr)
+        reg = {
+            name    = '"',
+            type    = fn.getregtype(M.regType),
+            content = vim.g.ReplaceExpr
+        }
     else
-        require("util").restoreReg()
+        reg = {
+            name    = M.regType,
+            type    = fn.getregtype(M.regType),
+            content = fn.getreg(vim.v.register, 1)
+        }
     end
+
+    if vimMode ~= "n" then
+        pos = {
+            startPos = api.nvim_buf_get_mark(0, "<"),
+            endPos   = api.nvim_buf_get_mark(0, ">")
+        }
+    else
+        pos = {
+            startPos = api.nvim_buf_get_mark(0, "["),
+            endPos   = api.nvim_buf_get_mark(0, "]")
+        }
+    end
+
+    -- Match the motionType type with register type
+    local ok, regChanged = pcall(matchRegType, motionType, vimMode, reg, pos)
+    if not ok then vim.notify(regChanged, vim.log.levels.ERROR) end
+
+    -- Replace with new content
+    local ok, replaced = pcall(replace, motionType, vimMode, reg, pos, curBufNr)
+    if not ok then vim.notify(replaced, vim.log.levels.ERROR) end
 
     -- Create highlight {{{
-    local replaceHLNS = api.nvim_create_namespace("inplaceReplaceHL")
-    api.nvim_buf_clear_namespace(curBufNr, replaceHLNS, 0, -1)
+    local repHLNS = api.nvim_create_namespace("inplaceReplaceHL")
+    api.nvim_buf_clear_namespace(curBufNr, repHLNS, 0, -1)
 
-    local newContentResExtmark = api.nvim_buf_get_extmark_by_id(curBufNr,
-                                    require("yankPut").inplacePutNewContentNS,
-                                    require("yankPut").inplacePutNewContentExtmark,
+    local repExtmark = api.nvim_buf_get_extmark_by_id(curBufNr,
+                                    replaced.namespace,
+                                    replaced.extmark,
                                     {details = true})
-    local newContentResStart = {newContentResExtmark[1], newContentResExtmark[2]}
-    local newContentResEnd   = {newContentResExtmark[3]["end_row"], newContentResExtmark[3]["end_col"]}
+    local repStart = {repExtmark[1], repExtmark[2]}
+    local repEnd   = {repExtmark[3]["end_row"], repExtmark[3]["end_col"]}
 
-    local region = vim.region(curBufNr, newContentResStart, newContentResEnd,
-    regType, vim.o.selection == "inclusive" and true or false)
+    local region = vim.region(curBufNr, repStart, repEnd, reg.type, true)
     for lineNr, cols in pairs(region) do
-        api.nvim_buf_add_highlight(curBufNr, replaceHLNS, opts["hlGroup"], lineNr, cols[1], cols[2])
+        api.nvim_buf_add_highlight(curBufNr, repHLNS, opts["hlGroup"], lineNr, cols[1], cols[2])
     end
 
     vim.defer_fn(function()
-        api.nvim_buf_clear_namespace(curBufNr, replaceHLNS, 0, -1)
+        api.nvim_buf_clear_namespace(curBufNr, repHLNS, 0, -1)
     end, opts["timeout"])
     -- }}} Create highlight
 
-    -- Restore cursor {{{
-    -- Use extmark to track the new position of newContentStart after executing_
-    -- formaprg in some cases
-    -- Skip when it's called from repeat key
-    if motionwise ~= "visual" then
-        if cursorPos then
-            if cursorPos[2] > newContentResEnd[2] then
-                -- In cases where then size of the new text content is less than the
-                -- size of the origin text content
-                api.nvim_win_set_cursor(0, {cursorPos[1], newContentResStart[2]})
+    -- Restoration {{{
+    -- Registers restoration. Because in ReplaceCurLine, vim.v.register has been changed
+    -- before operator() is called
+    if #args ~= 4 then require("util").restoreReg() end
+    fn.setreg(reg.name, reg.content, reg.type)
+
+    -- Options restoration
+    if vim.is_callable(restoreOption) then restoreOption() end
+
+    -- Curosr position restoration. Use extmark to track the new position of
+    -- newContentStart after executing formaprg in some cases
+    if vimMode == "n" then
+        if M.cursorPos then
+            if M.cursorPos[2] > repEnd[2] then
+                -- In cases the text length of new text content is shorter
+                -- than the one of origin text
+                api.nvim_win_set_cursor(0, {M.cursorPos[1], repStart[2]})
             else
-                api.nvim_win_set_cursor(0, cursorPos)
+                api.nvim_win_set_cursor(0, M.cursorPos)
             end
 
-            cursorPos = nil
         else
-            api.nvim_win_set_cursor(0, {newContentResStart[1] + 1, newContentResStart[2]})
+            -- Fallback placing
+            api.nvim_win_set_cursor(0, {repStart[1] + 1, repStart[2]})
         end
     else
-        -- newContentStart directly
-        -- TODO: Retrieve cursor at starting position
-
-        -- Place cursor at non-blank position
-        local newContentFirstLine = api.nvim_buf_get_lines(0, newContentResStart[1], newContentResStart[1] + 1, false)[1]
-        api.nvim_win_set_cursor(0, {newContentResStart[1] + 1, newContentResStart[2]})
-        if string.sub(newContentFirstLine, 1, 1) == " " then cmd "normal! w" end
-    end
-    -- }}} Restore cursor
-
-    M.argTbl = argTbl
-    -- if argTbl[1] == "visual" then
-        -- cmd [[call repeat#set("\<plug>InplaceReplaceLine", v:count)]]
-    -- end
-
-    if #argTbl >= 2 then
-        -- Store as Global value for call luaeval() in Vimscript
-        M.argTbl = argTbl
-
-        if argTbl[2] == "InplaceReplaceLine" then
-            cmd [[call repeat#set("\<lt>plug>InplaceReplaceLine", v:count)]]
-        elseif argTbl[2] == "InplaceReplaceVisual" then
-            cmd [[call repeat#set("\<lt>plug>InplaceReplaceVisual")]]
-            cmd [[call visualrepeat#set("\<lt>plug>InplaceReplaceVisual")]]
+        local firstNewLine = api.nvim_get_current_line()
+        local newCol = #firstNewLine == 0 and 1 or #firstNewLine
+        if M.cursorPos[2] + 1 >= newCol then
+            api.nvim_win_set_cursor(0, {repStart[1] + 1, newCol - 1})
+        else
+            api.nvim_win_set_cursor(0, {repStart[1] + 1, M.cursorPos[2]})
         end
+        -- If the preserved cursor position is at the white space position of
+        -- the new content line, move one word foreward
+        -- TODO: check situation that executing a "w" command might get cursor
+        -- into next line
+        -- if string.match(newPosthen, "%s") then
+            -- cmd "norm! w"
+        -- end
     end
+    -- }}} Restoration
+
+    -- Mapping repeating {{{
+    if #args > 2 then
+        if #args == 4 then
+            -- ReplaceCurLine
+            fn["repeat#set"](t(args[3]), M.count)
+        else
+            -- VisualChar
+            -- VisualLine
+            fn["repeat#set"](t(args[3]))
+        end
+    elseif M.regType == "=" then
+        fn["repeat#set"](t"<Plug>ReplaceExpr")
+    end
+    -- Visual repeating
+    fn["visualrepeat#set"](t"<Plug>ReplaceVisual")
+    -- }}} Mapping repeating
+
 end -- }}}
 
-function M.expression() -- {{{
-    -- Note: Could use
-    -- ingo#mapmaker#OpfuncExpression('ReplaceWithRegister#Operator'), but avoid
-    -- dependency to ingo-library for now.
-    Opfunc = M.replaceOperator
+
+function M.expr() -- {{{
+    -- TODO: Detect virutal edit
+    if not warnRead() then return "" end
+
+    M.replaceSave()
+
+    Opfunc = M.operator
     vim.o.opfunc = "LuaExprCallback"
 
-    if not vim.o.modifiable or vim.o.readonly then
-        -- Probe for "Cannot make changes" error and readonly warning via a no-op
-        -- dummy modification. then
-        -- In the case of a nomodifiable buffer, Vim will abort the normal mode then
-        -- command chain, discard the g@, and thus not invoke the operatorfunc.
-        preFunc = function ()
-            api.nvim_buf_set_lines(0, cursorPos[1] - 1, cursorPos[1], false, {api.nvim_get_current_line()})
-        end
-    end
+    -- Preserving cursor position as its position will changed once the
+    -- vim.o.opfunc() being called
+    M.cursorPos = api.nvim_win_get_cursor(0)
 
-    cursorPos = api.nvim_win_get_cursor(0)
-
-
-    -- TODO
-    -- if vim.v.register == '=' then
-        -- -- Must evaluate the expression register outside of a function.
-        -- keys = [[:let g:ReplaceWithRegisterExpr = getreg('=')\<CR>]] .. keys
-    -- end
-
-    return "g@"
+    -- Evaluate the expression register outside of a function. Because
+    -- unscoped variables do not refer to the global scope. Therefore,
+    -- evaluation happened earlier in the mappings.
+    return M.regType == "=" and [[:let g:ReplaceExpr = getreg("=")<CR>g@]] or "g@"
 end -- }}}
 
+
 function M.replaceVisualMode() -- {{{
-    vim.g.repeat_count = vim.g.repeat_count or ''
-    local vimcmd = api.nvim_exec([[call visualrepeat#reapply#VisualMode(0)]], true)
-    if vimcmd ~= "" then
-        cmd([[normal!]] .. vimcmd)
-    end
-    M.replaceOperator({"visual", "InplaceReplaceVisual"})
+    return fn["visualrepeat#reapply#VisualMode"](0)
 end -- }}}
 
 return M
-
--- vim: set ts=4 sts=4 sw=4 expandtab
 
