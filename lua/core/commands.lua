@@ -1,5 +1,4 @@
 local cmd = vim.cmd
-local api = vim.api
 
 -- Function {{{
 vim.g.FiletypeCommentDelimiter = {
@@ -67,7 +66,7 @@ if not vim.g.vscode then
     autocmd VimEnter             * nested lua require("historyStartup").display()
 
     autocmd BufWinEnter          * lua require("cursorRecall").main()
-    autocmd BufWritePre          * lua require"util".trimWhiteSpaces(); require"util".trailingEmptyLine()
+    autocmd BufWritePre          * lua require"util".trimSpaces(); require"util".trailingEmptyLine()
   " autocmd BufEnter             * set formatoptions=pj1Bml2nwc
     autocmd BufEnter             * lua require("historyStartup").deleteBuf()
   " autocmd FocusGained,BufEnter * checktime
@@ -102,13 +101,16 @@ command! -nargs=+ -complete=command  Echo PPmsg strftime('%c') . ": " . <args>
 command! -nargs=+ -complete=command  Redir call luaeval('require("redir").catch(_A)', <q-args>)
 command! -nargs=0 -range ExtractSelection lua require("extractSelection").main(vim.fn.visualmode())
 command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | setl norevins
-command! -nargs=0 TrimWhiteSpaces call TrimWhiteSpaces(0)
 command! -nargs=0 PS terminal powershell
 command! -nargs=0 CD execute "cd " . expand("%:p:h")
 command! -nargs=0 E  up | let g:refreshBufSavView = winsaveview() | e! | call winrestview(g:refreshBufSavView)
 command! -nargs=0 O  browse oldfiles
+
 command! -nargs=0 MyVimedit edit    $MYVIMRC
 command! -nargs=0 MyVimsrc  luafile $MYVIMRC
+
+command! -nargs=0 TrimSpaces              call TrimSpaces()
+command! -nargs=0 TrimSpacesToggle        lua  if type(TrimSpacesChk) == "nil" then TrimSpacesChk = TrimSpacesChk or true end; TrimSpacesChk = not TrimSpacesChk; vim.api.nvim_echo({{string.format("%s",TrimSpacesChk), "Moremsg"}}, false, {})
+command! -nargs=0 TrailingEmptyLineToggle lua  if type(TrailEmptyLineChk) == "nil" then TrailEmptyLineChk = TrailEmptyLineChk or true end; TrailEmptyLineChk = not TrailEmptyLineChk; vim.api.nvim_echo({{string.format("%s",TrailEmptyLineChk), "Moremsg"}}, false, {})
 ]]
 -- }}} Commands
-

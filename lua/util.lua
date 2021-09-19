@@ -470,8 +470,15 @@ function M.matchAllStrPos(expr, pat)
 end
 -- }}} Match enhance
 
+-- TODO:
 function M.trailingEmptyLine() -- {{{
+    if type(TrailEmptyLineChk) == "nil" then
+        TrailEmptyLineChk = TrailEmptyLineChk or true
+    end
+    if not TrailEmptyLineChk then return end
+
     if vim.bo.modified == false then return end
+
     if api.nvim_buf_get_lines(0, -2, -1, false)[1] ~= "" then
         local saveView = fn.winsaveview()
         cmd('keepjumps normal! Go')
@@ -480,7 +487,7 @@ function M.trailingEmptyLine() -- {{{
 end -- }}}
 
 ----
--- Function: TrimWhiteSpaces Trim all trailing white spaces in the current
+-- Function: TrimSpaces Trim all trailing white spaces in the current
 -- buffer or in the given string table
 --
 -- @param silent: non-zero value will show trimming result when complete
@@ -488,18 +495,24 @@ end -- }}}
 ----
 -- Function: M.trimWhiteSpaces :Trim all trailing white spaces in current buffer
 --
--- @param strTbl: Lua table of source string need to be trimmed
--- @param silent: Non-zero value will show trimming result when complete
+-- @param strTbl: Table of source string need to be trimmed. If no table
+--        provided, the whole buffer will be trimmed instead.
+-- @param silent: Boolean, default is true. Set this to true to not show trimming result
 -- @param trimSuffix: set to true to trim the suffix as well
 -- @return:       return table of trimmed string, otherwise return 0
 ----
-function M.trimWhiteSpaces(strTbl, silent, trimSuffix) -- {{{
+function M.trimSpaces(strTbl, silent, trimSuffix) -- {{{
+    if type(TrimSpacesChk) == "nil" then
+        TrimSpacesChk = TrimSpacesChk or true
+    end
+    if not TrimSpacesChk then return end
+
     if vim.bo.modified == false then return end
 
     if not strTbl then
         local saveView = fn.winsaveview()
-        silent = silent or 1
-        if silent == 1 then
+        silent = silent or true
+        if silent then
             cmd [[keeppatterns %s#\s\+$##e]]
         else
             cmd [[keeppatterns %s#\s\+$##e]]
