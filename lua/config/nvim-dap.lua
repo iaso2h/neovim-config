@@ -23,7 +23,7 @@ map("n", [[<leader>dro]],    [[:lua require('dap').repl.open()<cr>]],           
 map("n", [[<leader>drl]],    [[:lua require('dap').repl.run_last()<cr>`]],              {"silent"})
 
 map("n", [[<F12>]], [[:lua require('dap-python').test_method()<cr>]],          {"silent"})
-map("v", [[<F5>]],  [[<esc>:lua require('dap-python').debug_selection()<cr>]], {"silent"})
+map("x", [[<F5>]],  [[<esc>:lua require('dap-python').debug_selection()<cr>]], {"silent"})
 -- }}} General mappings
 
 fn.sign_define('DapBreakpoint', {text='⏺️', texthl='Error', linehl='', numhl='Error'})

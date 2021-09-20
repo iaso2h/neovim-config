@@ -123,7 +123,7 @@ packer.startup(function(use, use_rocks)
             vim.g.camelsnek_alternative_camel_commands = 1
             vim.g.camelsnek_no_fun_allowed             = 1
             vim.g.camelsnek_iskeyword_overre           = 0
-            map("v", [[<A-c>]],   [[:call CaseSwitcher()<CR>]],                               {"silent"})
+            map("x", [[<A-c>]],   [[:call CaseSwitcher()<CR>]],                               {"silent"})
             map("n", [[<A-c>]],   [[:lua require("caseSwitcher").cycleCase()<CR>]],           {"silent"}, "Cycle cases")
             map("n", [[<A-S-c>]], [[:lua require("caseSwitcher").cycleDefaultCMDList()<CR>]], {"silent"}, "Cycle cases reset")
         end,
@@ -211,7 +211,7 @@ packer.startup(function(use, use_rocks)
         keys = {
             {"n", "gr"},
             {"n", "grr"},
-            {"v", "R"},
+            {"x", "R"},
         },
         config = function()
             map("n", [[<Plug>ReplaceOperator]],
@@ -235,13 +235,13 @@ packer.startup(function(use, use_rocks)
                     vim.g.ReplaceExpr = vim.fn.getreg("=")
                 end;
 
-                vim.cmd("norm! V" .. vim.v.count1 .. "_" .. vim.api.nvim_replace_termcodes("<lt>Esc>", true, true, true));
+                vim.cmd("norm! V" .. vim.v.count1 .. "_" .. t"<lt>Esc>");
 
                 require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>
                 ]],
                 {"noremap", "silent"})
 
-            map("v", [[<Plug>ReplaceVisual]],
+            map("x", [[<Plug>ReplaceVisual]],
                 luaRHS[[
                 :lua require("replace").replaceSave();
 
@@ -268,7 +268,7 @@ packer.startup(function(use, use_rocks)
                     vim.g.ReplaceExpr = vim.fn.getreg("=")
                 end;
 
-                vim.cmd("norm! " .. require("replace").replaceVisualMode()
+                vim.cmd("norm! " .. require("replace").replaceVisualMode())
 
                 require("replace").operator(
                     tbl_merge(
@@ -280,7 +280,7 @@ packer.startup(function(use, use_rocks)
 
             map("n", [[gr]],  [[<Plug>ReplaceOperator]])
             map("n", [[grr]], [[<Plug>ReplaceCurLine]])
-            map("v", [[R]],   [[<Plug>ReplaceVisual]])
+            map("x", [[R]],   [[<Plug>ReplaceVisual]])
         end
     }
 
@@ -323,7 +323,7 @@ packer.startup(function(use, use_rocks)
                     ignore_groups = {"String"}
                 }
             }
-            map("v", [[A]],  [[<Plug>(EasyAlign)]])
+            map("x", [[A]],  [[<Plug>(EasyAlign)]])
             map("n", [[ga]], [[<Plug>(EasyAlign)]], "Align operator")
         end
     }
@@ -343,16 +343,16 @@ packer.startup(function(use, use_rocks)
         config = function()
             map("n", [[<leader><C-a>]],  [[<Plug>(dial-increment)]], "Dial up")
             map("n", [[<leader><C-x>]],  [[<Plug>(dial-decrement)]], "Dial down")
-            map("v", [[<leader><C-a>]],  [[<Plug>(dial-increment)]])
-            map("v", [[<leader><C-x>]],  [[<Plug>(dial-decrement)]])
-            map("v", [[<leader>g<C-a>]], [[<Plug>(dial-increment-additional)]])
-            map("v", [[<leader>g<C-x>]], [[<Plug>(dial-decrement-additional)]])
+            map("x", [[<leader><C-a>]],  [[<Plug>(dial-increment)]])
+            map("x", [[<leader><C-x>]],  [[<Plug>(dial-decrement)]])
+            map("x", [[<leader>g<C-a>]], [[<Plug>(dial-increment-additional)]])
+            map("x", [[<leader>g<C-x>]], [[<Plug>(dial-decrement-additional)]])
         end
     }
     use {
         'danymat/neogen',
         requires = {"nvim-treesitter", "nvim-cmp"},
-        keys     = "dg",
+        keys     = {{"n", "dg"}},
         config   = function()
             require("neogen").setup {
                 enabled = true,
@@ -371,16 +371,20 @@ packer.startup(function(use, use_rocks)
             }
 
             map("n", [[dg]], [[:lua require("neogen").generate()<CR>]], {"silent"})
+            pcall(cmd, "xunmap dg")
         end,
     }
     use {
         'AndrewRadev/splitjoin.vim',
-        keys   = {"gS", "gJ"},
+        keys   = {
+            {"n", "gS"},
+            {"n", "gJ"}
+        },
         config = function()
             vim.g.splitjoin_align = 1
             vim.g.splitjoin_curly_brace_padding = 0
-            map("n", [["gS"]], [[:<c-u>SplitjoinSplit<CR>]], {"silent"}, "Smart split")
-            map("n", [["gJ"]], [[:<c-u>SplitjoinJoin<CR>]],  {"silent"}, "Smart join")
+            map("n", [["gS"]], [[:<C-u>SplitjoinSplit<CR>]], {"silent"}, "Smart split")
+            map("n", [["gJ"]], [[:<C-u>SplitjoinJoin<CR>]],  {"silent"}, "Smart join")
         end
     }
     use {
@@ -410,9 +414,8 @@ packer.startup(function(use, use_rocks)
     -- use 'AndrewRadev/switch.vim'
     use {
         'windwp/nvim-autopairs',
-        module_pattern = "nvim-autopairs.*",
-        after          = "nvim-treesitter",
-        config         = function()
+        require = "nvim-treesitter",
+        config  = function()
             require('nvim-autopairs').setup {
                 disable_filetype          = {"TelescopePrompt"},
                 ignored_next_char         = string.gsub([[[%w%%%'%[%"%.] ]],"%s+", ""),
@@ -552,12 +555,12 @@ packer.startup(function(use, use_rocks)
     use {
         'simnalamburt/vim-mundo',
         cmd    = "MundoToggle",
-        keys   = "<C-w>u",
+        keys   = {{"n", "<C-w>u"}},
         config = function()
             vim.g.mundo_help               = 1
             vim.g.mundo_tree_statusline    = 'Mundo'
             vim.g.mundo_preview_statusline = 'Mundo Preview'
-            map("n", [[<C-W>u]], [[:<c-u>MundoToggle<CR>]], {"silent"}, "Open Mundo")
+            map("n", [[<C-W>u]], [[:<C-u>MundoToggle<CR>]], {"silent"}, "Open Mundo")
         end
     }
     -- }}} Vim enhancement
@@ -670,6 +673,7 @@ packer.startup(function(use, use_rocks)
     use {
         'joshdick/onedark.vim',
     }
+    -- TODO: deprecated
     use {
         'sindrets/galaxyline.nvim',
         event    = "BufRead",
@@ -677,11 +681,13 @@ packer.startup(function(use, use_rocks)
         config   = conf "nvim-galaxyline"
     }
     use {
-        'romgrk/barbar.nvim',
+        -- 'romgrk/barbar.nvim',
+        'akinsho/bufferline.nvim',
         event    = "BufRead",
         requires = "nvim-web-devicons",
-        setup    = conf "nvim-barbar".setup,
-        config   = conf "nvim-barbar".config,
+        -- setup    = conf "nvim-barbar".setup,
+        -- config   = conf "nvim-barbar".config,
+        config   = conf "nvim-bufferline"
     }
     use {
     'RRethy/vim-hexokinase',
@@ -699,7 +705,7 @@ packer.startup(function(use, use_rocks)
     }
     use {
         'kyazdani42/nvim-tree.lua',
-        keys     = {"<C-w>e"},
+        keys     = {{"n", "<C-w>e"}},
         requires = "nvim-web-devicons",
         config   = conf "nvim-tree".config
     }
@@ -708,7 +714,7 @@ packer.startup(function(use, use_rocks)
     use {
         'nvim-treesitter/nvim-treesitter',
         run    = ":TSUpdate",
-        event  = "BufRead",
+        -- event  = "BufRead",
         config = function()
             require("nvim-treesitter.configs").setup{
                 -- ensure_installed = "maintained",
@@ -735,7 +741,7 @@ packer.startup(function(use, use_rocks)
             }
 
             map("n", [[<A-S-a>]], [[gnn]])
-            map("v", [[<A-S-a>]], [[grn]])
+            map("x", [[<A-S-a>]], [[grn]])
             map("",  [[<A-S-s>]], [[grm]])
         end
     }
@@ -771,9 +777,9 @@ packer.startup(function(use, use_rocks)
         after    = "nvim-treesitter",
         requires = "nvim-treesitter",
         config   = function()
-            require'treesitter-context'.setup{
-                enable   = true,  -- Enable this plugin (Can be enabled/disabled later via commands)
-                throttle = true,  -- Throttles plugin updates (may improve performance)
+            require("treesitter-context").setup{
+                enable   = true,   -- Enable this plugin (Can be enabled/disabled later via commands)
+                throttle = false,  -- Throttles plugin updates (may improve performance)
             }
         end
     }
@@ -912,6 +918,7 @@ packer.startup(function(use, use_rocks)
             ]]
         end
     }
+    -- TODO: deprecated
     use {
         'glepnir/lspsaga.nvim',
         after  = "nvim-lspconfig",
@@ -925,7 +932,7 @@ packer.startup(function(use, use_rocks)
                 dianostic_header_icon = "   ",
                 code_action_icon      = " ",
                 code_action_prompt    = {
-                    enable        = true,
+                    enable        = false,
                     sign          = false,
                     sign_priority = 20,
                     virtual_text  = true,
@@ -1021,6 +1028,7 @@ packer.startup(function(use, use_rocks)
     }
     use {
         'hrsh7th/nvim-cmp',
+        module   = "cmp",
         event    = "InsertEnter",
         requires = {
             "nvim-autopairs",
@@ -1099,10 +1107,10 @@ packer.startup(function(use, use_rocks)
         -- event    = "BufRead",
         cmd      = "Telescope",
         keys     = {
-            [[<C-h>l]],   [[<C-h>e]],
-            [[<C-f>f]],   [[<C-f>F]],
-            [[<C-h>c]],   [[<C-h>h]],
-            [[<C-h><C-h>, [[<C-h>o]],
+            {"n", [[<C-h>l]]},     {"n", [[<C-h>e]]},
+            {"n", [[<C-f>f]]},     {"n", [[<C-f>F]]},
+            {"n", [[<C-h>c]]},     {"n", [[<C-h>h]]},
+            {"n", [[<C-h><C-h>]]}, {"n", [[<C-h>o]]},
         },
         requires = {
             "plenary.nvim",
@@ -1142,7 +1150,7 @@ packer.startup(function(use, use_rocks)
             {"n", "g>"}
         },
         config = function()
-            map("n", [[g>]], [[:<c-u>Messages<CR>]], {"silent", "novscode"}, "Messages in quickfix")
+            map("n", [[g>]], [[:<C-u>Messages<CR>]], {"silent", "novscode"}, "Messages in quickfix")
             whichKeyDoc({"zS", "Show syntax highlighting groups"})
             whichKeyDoc({"g=", "Eval operator"})
             whichKeyDoc({"g==", "Eval current line"})
@@ -1227,7 +1235,8 @@ packer.startup(function(use, use_rocks)
     -- TODO: highlight
     use {
         'rhysd/conflict-marker.vim',
-        keys = "}x, ]x, cb, co, cn, cb",
+        disable = true,
+        keys    = "}x, ]x, cb, co, cn, cb",
     }
     -- use {
         -- 'sindrets/diffview.nvim',

@@ -1,10 +1,13 @@
--- Maintainer:	Ingo Karkat <ingo@karkat.de>
+-- File: init
+-- Author: iaso2h
+-- Description: Heavily inspired Ingo Karkat's work. Replace text with register
+-- Version: 0.0.4
+-- Last Modified: 2021-09-21
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
 local M   = {}
 local restoreOption
-local operator = require "operator"
 
 
 ----
@@ -49,13 +52,13 @@ local saveOption = function() -- {{{
     if api.nvim_get_option("selection") ~= "inclusive" then
         saveSelection = vim.o.clipboard
         -- Avoid clobbering the selection and clipboard registers.
-        vim.o.selection = "inclusive"
+        vim.opt.selection = "inclusive"
     end
 
     if saveClipboard or saveSelection then
         restoreOption = function()
-            if saveSelection then vim.o.selection = saveSelection end
-            if saveClipboard then vim.o.clipboard = saveClipboard end
+            if saveSelection then vim.opt.selection = saveSelection end
+            if saveClipboard then vim.opt.clipboard = saveClipboard end
         end
     end
 end -- }}}
@@ -75,6 +78,7 @@ end -- }}}
 local matchRegType = function(motionType, vimMode, reg, pos) -- {{{
     -- NOTE:"\<C-v>" for vimMode in vimscript is evaluated as "\22" in lua, which represents blockwise motion
     -- NOTE:"\0261" in vimscript is evaluated as "\0221" in lua, which represents blockwise-vusal register
+    -- TODO: match the same indent for grr with regtype is "V"
     if motionType == "block" and vimMode == "\22" then
         -- Adapt register for blockwise replace.
         local lines    = vim.split(reg.content, "\n", false)
@@ -117,6 +121,18 @@ local matchRegType = function(motionType, vimMode, reg, pos) -- {{{
         -- To fix that, we temporarily remove the trailing newline character from
         -- the register contents and set the register type to characterwise yank.
         if motionType == "line" then
+            -- TODO: Only support one line reindent, multiline support needed
+            if str_count(reg.content, "\n") == 1 then
+                local _, regIndent = string.find(reg.content, "^%s*")
+                local bufferIndent = fn.indent(pos.startPos[1])
+                local reindentCnt = bufferIndent - regIndent
+                -- TODO: Need to test with real tab character indent, not soft tab indent
+                if reindentCnt < 0 then
+                    reg.content = string.gsub(reg.content, "^" .. string.rep(" ", math.abs(reindentCnt), ""))
+                elseif reindentCnt > 0 then
+                    reg.content = string.rep(" ", reindentCnt) .. reg.content
+                end
+            end
             fn.setreg(reg.name, string.sub(reg.content, 1, -2), "V")
         else
             fn.setreg(reg.name, vim.trim(reg.content), "v")

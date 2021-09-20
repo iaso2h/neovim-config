@@ -17,10 +17,10 @@ goldenSize.set_ignore_callbacks({
     {goldenSize.ignore_by_window_flag},  -- default one, ignore windows with w:ignore_gold_size=1
 })
 
-api.nvim_exec([[
+vim.cmd [[
 augroup ignoreGoldenSize
 autocmd!
 autocmd FileType coc-explorer let w:ignore_gold_size=1
 augroup END
-]], false)
+]]
 

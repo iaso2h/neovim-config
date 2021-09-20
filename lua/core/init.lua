@@ -1,26 +1,14 @@
-local ok, _ = pcall(require, "core.options")
-if not ok then
-    vim.api.nvim_echo({{"Options config loaded unsuccessfully", "ErrorMsg"}}, true, {})
-    vim.api.nvim_echo({{_, "ErrorMsg"}}, true, {})
-end
+local ok, msg = pcall(require, "core.options")
+if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 
-ok, _ = pcall(require, "core.commands")
-if not ok then
-    vim.api.nvim_echo({{"Commands config loaded unsuccessfully", "ErrorMsg"}}, true, {})
-    vim.api.nvim_echo({{_, "ErrorMsg"}}, true, {})
-end
+ok, msg = pcall(require, "core.commands")
+if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 
 vim.defer_fn(function()
-    local ok, _ = pcall(require, "core.plugins")
-    if not ok then
-        vim.api.nvim_echo({{"Plugins config loaded unsuccessfully", "ErrorMsg"}}, true, {})
-        vim.api.nvim_echo({{_, "ErrorMsg"}}, true, {})
-    end
+    local ok1, msg1 = pcall(require, "core.plugins")
+    if not ok1 then vim.notify(msg1, vim.log.levels.ERROR) end
 end, 0)
 
-ok, _ = pcall(require, "core.mappings")
-if not ok then
-    vim.api.nvim_echo({{"Mappings config loaded unsuccessfully", "ErrorMsg"}}, true, {})
-    vim.api.nvim_echo({{_, "ErrorMsg"}}, true, {})
-end
+ok, msg = pcall(require, "core.mappings")
+if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 

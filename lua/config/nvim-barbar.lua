@@ -1,8 +1,3 @@
--- File: nvim-barbar
--- Author: iaso2h
--- Description: barbar.nvim configuration
--- Version: 0.0.8
--- Last Modified: 2021-08-22
 local M   = {}
 
 M.bufferSwitcher = function(CMD)
@@ -22,42 +17,42 @@ M.bufferSwitcher = function(CMD)
 end
 
 M.config = function()
-    map("n", [[<A-h>]], [[:lua require("config.nvim-barbar").bufferSwitcher("bp")<cr>]], {"silent"}, "Previous buffer")
-    map("n", [[<A-l>]], [[:lua require("config.nvim-barbar").bufferSwitcher("bn")<cr>]], {"silent"}, "Next buffer")
+    map("n", [[<A-h>]], [[:lua require("config.nvim-barbar").bufferSwitcher("bp")<CR>]], {"silent"}, "Previous buffer")
+    map("n", [[<A-l>]], [[:lua require("config.nvim-barbar").bufferSwitcher("bn")<CR>]], {"silent"}, "Next buffer")
 
     map("n", [[<A-S-h>]], [[:BufferMovePrevious<CR>]], {"silent"}, "Buffer move previous")
-    map("n", [[<A-S-l>]], [[:BufferMoveNext<cr>]],     {"silent"}, "Buffer move next")
+    map("n", [[<A-S-l>]], [[:BufferMoveNext<CR>]],     {"silent"}, "Buffer move next")
 
     -- Goto buffer in position...
-    map("n", [[<A-1>]], [[:BufferGoto 1<cr>]],           {"silent"})
-    map("n", [[<A-2>]], [[:BufferGoto 2<cr>]],           {"silent"})
-    map("n", [[<A-3>]], [[:BufferGoto 3<cr>]],           {"silent"})
-    map("n", [[<A-4>]], [[:BufferGoto 4<cr>]],           {"silent"})
-    map("n", [[<A-5>]], [[:BufferGoto 5<cr>]],           {"silent"})
-    map("n", [[<A-6>]], [[:BufferGoto 6<cr>]],           {"silent"})
-    map("n", [[<A-7>]], [[:BufferGoto 7<cr>]],           {"silent"})
-    map("n", [[<A-8>]], [[:BufferGoto 8<cr>]],           {"silent"})
-    map("n", [[<A-9>]], [[:BufferLast<cr>]],             {"silent"})
-    map("t", [[<A-1>]], [[<C-\><C-n>:BufferGoto 1<cr>]], {"silent"})
-    map("t", [[<A-2>]], [[<C-\><C-n>:BufferGoto 2<cr>]], {"silent"})
-    map("t", [[<A-3>]], [[<C-\><C-n>:BufferGoto 3<cr>]], {"silent"})
-    map("t", [[<A-4>]], [[<C-\><C-n>:BufferGoto 4<cr>]], {"silent"})
-    map("t", [[<A-5>]], [[<C-\><C-n>:BufferGoto 5<cr>]], {"silent"})
-    map("t", [[<A-6>]], [[<C-\><C-n>:BufferGoto 6<cr>]], {"silent"})
-    map("t", [[<A-7>]], [[<C-\><C-n>:BufferGoto 7<cr>]], {"silent"})
-    map("t", [[<A-8>]], [[<C-\><C-n>:BufferGoto 8<cr>]], {"silent"})
-    map("t", [[<A-9>]], [[<C-\><C-n>:BufferLast<cr>]],   {"silent"})
+    map("n", [[<A-1>]], [[:BufferGoto 1<CR>]],           {"silent"})
+    map("n", [[<A-2>]], [[:BufferGoto 2<CR>]],           {"silent"})
+    map("n", [[<A-3>]], [[:BufferGoto 3<CR>]],           {"silent"})
+    map("n", [[<A-4>]], [[:BufferGoto 4<CR>]],           {"silent"})
+    map("n", [[<A-5>]], [[:BufferGoto 5<CR>]],           {"silent"})
+    map("n", [[<A-6>]], [[:BufferGoto 6<CR>]],           {"silent"})
+    map("n", [[<A-7>]], [[:BufferGoto 7<CR>]],           {"silent"})
+    map("n", [[<A-8>]], [[:BufferGoto 8<CR>]],           {"silent"})
+    map("n", [[<A-9>]], [[:BufferLast<CR>]],             {"silent"})
+    map("t", [[<A-1>]], [[<C-\><C-n>:BufferGoto 1<CR>]], {"silent"})
+    map("t", [[<A-2>]], [[<C-\><C-n>:BufferGoto 2<CR>]], {"silent"})
+    map("t", [[<A-3>]], [[<C-\><C-n>:BufferGoto 3<CR>]], {"silent"})
+    map("t", [[<A-4>]], [[<C-\><C-n>:BufferGoto 4<CR>]], {"silent"})
+    map("t", [[<A-5>]], [[<C-\><C-n>:BufferGoto 5<CR>]], {"silent"})
+    map("t", [[<A-6>]], [[<C-\><C-n>:BufferGoto 6<CR>]], {"silent"})
+    map("t", [[<A-7>]], [[<C-\><C-n>:BufferGoto 7<CR>]], {"silent"})
+    map("t", [[<A-8>]], [[<C-\><C-n>:BufferGoto 8<CR>]], {"silent"})
+    map("t", [[<A-9>]], [[<C-\><C-n>:BufferLast<CR>]],   {"silent"})
 
     -- Magic buffer-picking mode
-    map("n", [[<leader>b]], [[:BufferPick<cr>]], {"silent"})
+    map("n", [[<leader>b]], [[:BufferPick<CR>]], {"silent"})
 
     -- Sort by...
-    map("n", [[gbd]], [[:BufferOrderByDirectory<cr>]],    {"silent"})
-    map("n", [[gbl]], [[:BufferOrderByLanguage<cr>]],     {"silent"})
-    map("n", [[gbb]], [[:BufferOrderByBufferNumber<cr>]], {"silent"})
-    map("n", [[gbw]], [[:BufferOrderByWindowNumber<cr>]], {"silent"})
+    map("n", [[gbd]], [[:BufferOrderByDirectory<CR>]],    {"silent"})
+    map("n", [[gbl]], [[:BufferOrderByLanguage<CR>]],     {"silent"})
+    map("n", [[gbb]], [[:BufferOrderByBufferNumber<CR>]], {"silent"})
+    map("n", [[gbw]], [[:BufferOrderByWindowNumber<CR>]], {"silent"})
     -- Pin buffer
-    -- map("n", [[<A-p>]], [[:BufferPin<cr>]], {"silent"})
+    -- map("n", [[<A-p>]], [[:BufferPin<CR>]], {"silent"})
 
     -- Other:
     -- :BarbarEnable - enables barbar (enabled by default)
@@ -87,7 +82,7 @@ M.setup = function()
         icon_pinned             = '車',
         -- If true, new buffers appear at the end of the list. Default is to
         -- open after the current buffer.
-        insert_at_end = false,
+        insert_at_end = true,
         -- Enable/disable close button
         closable = true,
         -- Enables/disable clickable tabs

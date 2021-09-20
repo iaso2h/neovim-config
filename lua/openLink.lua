@@ -27,13 +27,13 @@ function M.main(selectText)
                 -- match: "userName/repository"
                 urlStart, urlEnd = vim.regex [['.\{-}']]:match_str(curLine)
                 url = "https://github.com/" .. string.sub(curLine, urlStart + 2, urlEnd - 1)
-            elseif string.match(curLine, [[use%s+['"]%w]]) then
+            elseif string.match(curLine, [==[use%s+['"]]==]) then
                 -- match: use "userName/repository"
                 urlStart, urlEnd = vim.regex [[use \zs'.\{-}']]:match_str(curLine)
                 url = "https://github.com/" .. string.sub(curLine, urlStart + 2, urlEnd - 1)
-            elseif string.match(curLine, [[config%s+=%s+conf]]) then
+            elseif string.match(curLine, [==[conf%s+['"]]==]) then
                 -- match: config = conf "moduleName"
-                urlStart, urlEnd = vim.regex [=[config.\{-}conf.\{-}\zs".\{-}"]=]:match_str(curLine)
+                urlStart, urlEnd = vim.regex [=[conf\s\+\zs".*"]=]:match_str(curLine)
 
                 -- End parsing
                 if not urlStart then return end

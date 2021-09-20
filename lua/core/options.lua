@@ -24,7 +24,7 @@ o.clipboard = "unnamed,unnamedplus"
 
 o.cmdheight  = 2
 o.shortmess  = "clxTI"
-o.timeoutlen = 500
+o.timeoutlen = 750
 
 o.complete    = ".,w,b,u,t,kspell,i,d,t"
 o.completeopt = "menuone,noselect,noinsert"

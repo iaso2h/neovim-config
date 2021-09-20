@@ -75,46 +75,46 @@ end -- }}}
 ----
 M.onAttach = function(client, bufNr) -- {{{
     require("illuminate").on_attach(client)
-    bmap(bufNr, "n", [[<A-n>]],   [[:lua require("util").addJump(require("illuminate").next_reference, false, {wrap = true})<cr>]],                 {"silent"})
-    bmap(bufNr, "n", [[<A-S-n>]], [[:lua require("util").addJump(require("illuminate").next_reference, false, {reverse = true, wrap = true})<cr>]], {"silent"})
+    bmap(bufNr, "n", [[<A-n>]],   [[:lua require("util").addJump(require("illuminate").next_reference, false, {wrap = true})<CR>]],                 {"silent"})
+    bmap(bufNr, "n", [[<A-S-n>]], [[:lua require("util").addJump(require("illuminate").next_reference, false, {reverse = true, wrap = true})<CR>]], {"silent"})
     -- Mappings
-    bmap(bufNr, "n", [=[gD]=],         [[:lua vim.lsp.buf.declaration()<cr>]],                   {"silent"})
-    bmap(bufNr, "n", [=[gd]=],         [[:lua vim.lsp.buf.definition()<cr>]],                    {"silent"})
-    bmap(bufNr, "n", [=[<leader>D]=],  [[:lua vim.lsp.buf.type_definition()<cr>]],               {"silent"})
-    bmap(bufNr, "n", [=[gi]=],         [[:lua vim.lsp.buf.implementation()<cr>]],                {"silent"})
-    bmap(bufNr, "n", [=[gR]=],         [[:lua vim.lsp.buf.references()<cr>]],                    {"silent"})
-    -- bmap(bufNr, "n", [=[<leader>wa]=], [[:lua vim.lsp.buf.add_workspace_folder()<cr>]],          {"silent"})
-    -- bmap(bufNr, "n", [=[<leader>wr]=], [[:lua vim.lsp.buf.remove_workspace_folder()<cr>]],       {"silent"})
-    -- bmap(bufNr, "n", [=[<leader>wl]=], [[:lua Print(vim.lsp.buf.list_workspace_folders())<cr>]], {"silent"})
-    bmap(bufNr, "n", [=[<leader>e]=],  [[:lua vim.lsp.diagnostic.set_loclist()<cr>]],            {"silent"})
+    bmap(bufNr, "n", [=[gD]=],         [[:lua vim.lsp.buf.declaration()<CR>]],                   {"silent"})
+    bmap(bufNr, "n", [=[gd]=],         [[:lua vim.lsp.buf.definition()<CR>]],                    {"silent"})
+    bmap(bufNr, "n", [=[<leader>D]=],  [[:lua vim.lsp.buf.type_definition()<CR>]],               {"silent"})
+    bmap(bufNr, "n", [=[gi]=],         [[:lua vim.lsp.buf.implementation()<CR>]],                {"silent"})
+    bmap(bufNr, "n", [=[gR]=],         [[:lua vim.lsp.buf.references()<CR>]],                    {"silent"})
+    -- bmap(bufNr, "n", [=[<leader>wa]=], [[:lua vim.lsp.buf.add_workspace_folder()<CR>]],          {"silent"})
+    -- bmap(bufNr, "n", [=[<leader>wr]=], [[:lua vim.lsp.buf.remove_workspace_folder()<CR>]],       {"silent"})
+    -- bmap(bufNr, "n", [=[<leader>wl]=], [[:lua Print(vim.lsp.buf.list_workspace_folders())<CR>]], {"silent"})
+    bmap(bufNr, "n", [=[<leader>e]=],  [[:lua vim.lsp.diagnostic.set_loclist()<CR>]],            {"silent"})
 
     -- Override existing mapping if lsp support
     if client.resolved_capabilities.document_formatting then
-        bmap(bufNr, "n", [=[<A-f>]=], [[:lua vim.lsp.buf.formatting()<cr>]],       {"silent"})
+        bmap(bufNr, "n", [=[<A-f>]=], [[:lua vim.lsp.buf.formatting()<CR>]],       {"silent"})
     elseif client.resolved_capabilities.document_range_formatting then
-        bmap(bufNr, "n", [=[<A-f]=],  [[:lua vim.lsp.buf.range_formatting()<cr>]], {"silent"})
+        bmap(bufNr, "n", [=[<A-f]=],  [[:lua vim.lsp.buf.range_formatting()<CR>]], {"silent"})
     end
 
     -- lspsaga.nvim {{{
-    bmap(bufNr, "n", [[<C-enter>]],  [[:lua require("lspsaga.codeaction").code_action()<cr>]],           {"silent"})
-    bmap(bufNr, "v", [[<C-enter>]],  [[:lua require("lspsaga.codeaction").range_code_action()<cr>]],     {"silent"})
-    bmap(bufNr, "n", [[gf]],         [[:lua require("lspsaga.provider").lsp_finder()<cr>]],              {"silent"})
-    bmap(bufNr, "n", [[K]],          [[:lua vim.lsp.buf.hover()<cr>]],                                   {"silent"})
-    bmap(bufNr, "n", [[<C-p>]],      [[:lua vim.lsp.buf.signature_help()<cr>]],                          {"silent"})
-    bmap(bufNr, "n", [[<leader>r]],  [[:lua require("lspsaga.rename").rename()<cr>]],                    {"silent"})
-    bmap(bufNr, "n", [[<leader>gd]], [[:lua require("lspsaga.provider").preview_definition()<cr>]],      {"silent"})
-    bmap(bufNr, "n", [[<leader>E]],  [[:lua require("lspsaga.diagnostic").show_line_diagnostics()<cr>]], {"silent"})
+    bmap(bufNr, "n", [[<C-enter>]],  [[:lua require("lspsaga.codeaction").code_action()<CR>]],           {"silent"})
+    bmap(bufNr, "x", [[<C-enter>]],  [[:lua require("lspsaga.codeaction").range_code_action()<CR>]],     {"silent"})
+    bmap(bufNr, "n", [[gf]],         [[:lua require("lspsaga.provider").lsp_finder()<CR>]],              {"silent"})
+    bmap(bufNr, "n", [[K]],          [[:lua vim.lsp.buf.hover()<CR>]],                                   {"silent"})
+    bmap(bufNr, "n", [[<C-p>]],      [[:lua vim.lsp.buf.signature_help()<CR>]],                          {"silent"})
+    bmap(bufNr, "n", [[<leader>r]],  [[:lua require("lspsaga.rename").rename()<CR>]],                    {"silent"})
+    bmap(bufNr, "n", [[<leader>gd]], [[:lua require("lspsaga.provider").preview_definition()<CR>]],      {"silent"})
+    bmap(bufNr, "n", [[<leader>E]],  [[:lua require("lspsaga.diagnostic").show_line_diagnostics()<CR>]], {"silent"})
 
-    bmap(bufNr, "n", [[[e]], [[:lua require("lspsaga.diagnostic").lsp_jump_diagnostic_prev()<cr>]],                     {"silent"})
-    bmap(bufNr, "n", [[]e]], [[:lua require("lspsaga.diagnostic").lsp_jump_diagnostic_next()<cr>]],                     {"silent"})
-    bmap(bufNr, "n", [[[E]], [[:lua require("lspsaga.diagnostic").lsp_jump_diagnostic_prev({severity = "Error"})<cr>]], {"silent"})
-    bmap(bufNr, "n", [[]E]], [[:lua require("lspsaga.diagnostic").lsp_jump_diagnostic_next({severity = "Error"})<cr>]], {"silent"})
+    bmap(bufNr, "n", [[[e]], [[:lua require("lspsaga.diagnostic").lsp_jump_diagnostic_prev()<CR>]],                     {"silent"})
+    bmap(bufNr, "n", [[]e]], [[:lua require("lspsaga.diagnostic").lsp_jump_diagnostic_next()<CR>]],                     {"silent"})
+    bmap(bufNr, "n", [[[E]], [[:lua require("lspsaga.diagnostic").lsp_jump_diagnostic_prev({severity = "Error"})<CR>]], {"silent"})
+    bmap(bufNr, "n", [[]E]], [[:lua require("lspsaga.diagnostic").lsp_jump_diagnostic_next({severity = "Error"})<CR>]], {"silent"})
 
 
     -- BUG: floating scroll not working in lspsage
     -- bmap(bufNr, "n", [[<A-d>]], [[v:lua.isFloatWin() ? luaeval('require("lspsaga.action").smart_scroll_with_saga(1)') : "\<PageDown>"]], {"expr"})
     -- bmap(bufNr, "n", [[<A-e>]], [[v:lua.isFloatWin() ? luaeval('require("lspsaga.action").smart_scroll_with_saga(-1)') : "\<PageUp>"]],  {"expr"})
-    -- bmap(bufNr, "n", [[<A-e>]], [[:lua require("lspsaga.action").smart_scroll_with_saga(-1)<cr>]],  {"silent", "expr"})
+    -- bmap(bufNr, "n", [[<A-e>]], [[:lua require("lspsaga.action").smart_scroll_with_saga(-1)<CR>]],  {"silent", "expr"})
     -- }}} lspsaga.nvim
 end -- }}}
 
@@ -129,8 +129,8 @@ local M          = require("config.nvim-lsp")
 
 -- Format mapping {{{
 vim.cmd [[command! -nargs=0 Format lua require("config.nvim-lsp").formatCode("n")]]
-map("n", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("n")<cr>]], {"silent"})
-map("v", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("v")<cr>]], {"silent"})
+map("n", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("n")<CR>]], {"silent"})
+map("x", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("v")<CR>]], {"silent"})
 -- }}} Format mapping
 
 -- LSP override config {{{

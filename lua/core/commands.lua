@@ -60,6 +60,7 @@ end
 
 -- Auto commands {{{
 if not vim.g.vscode then
+    -- TODO: Monitor file changed and prevent fold close
     cmd[[
     augroup fileType
     autocmd!
@@ -101,10 +102,11 @@ command! -nargs=+ -complete=command  Echo PPmsg strftime('%c') . ": " . <args>
 command! -nargs=+ -complete=command  Redir call luaeval('require("redir").catch(_A)', <q-args>)
 command! -nargs=0 -range ExtractSelection lua require("extractSelection").main(vim.fn.visualmode())
 command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | setl norevins
-command! -nargs=0 PS terminal powershell
-command! -nargs=0 CD execute "cd " . expand("%:p:h")
-command! -nargs=0 E  up | let g:refreshBufSavView = winsaveview() | e! | call winrestview(g:refreshBufSavView)
-command! -nargs=0 O  browse oldfiles
+command! -nargs=0 PS     terminal powershell
+command! -nargs=0 CD     execute "cd " . expand("%:p:h")
+command! -nargs=0 E      up | let g:refreshBufSavView = winsaveview() | e! | call winrestview(g:refreshBufSavView)
+command! -nargs=0 O      browse oldfiles
+command! -nargs=0 Dofile lua dofile(vim.fn.expand("%:p"))
 
 command! -nargs=0 MyVimedit edit    $MYVIMRC
 command! -nargs=0 MyVimsrc  luafile $MYVIMRC
@@ -114,4 +116,4 @@ command! -nargs=0 TrimSpacesToggle        lua  if type(TrimSpacesChk) == "nil" t
 command! -nargs=0 TrailingEmptyLineToggle lua  if type(TrailEmptyLineChk) == "nil" then TrailEmptyLineChk = TrailEmptyLineChk or true end; TrailEmptyLineChk = not TrailEmptyLineChk; vim.api.nvim_echo({{string.format("%s",TrailEmptyLineChk), "Moremsg"}}, false, {})
 ]]
 -- }}} Commands
---
+

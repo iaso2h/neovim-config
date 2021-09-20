@@ -43,13 +43,10 @@ local getPrefix = function(lang, lhs)
 end
 
 
-----
--- Function: joinRHS join string table based on language
---
--- @param lang: Coding language
--- @param rhs:  String value contain RHS content
--- @return:     Concatenated string
-----
+--- Join string table based on language
+--- @param lang String. Coding language
+--- @param rhs String. RHS of language expression
+--- @return Concatenated string
 local joinRHS = function(lang, rhs)
     local lines = vim.split(rhs, "\n", true)
     lines = util.trimSpaces(lines, false, true)

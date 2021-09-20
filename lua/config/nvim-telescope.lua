@@ -132,14 +132,14 @@ require('telescope').load_extension('fzy_native')
 cmd[[command! -nargs=0 O lua require('telescope.builtin').oldfiles(require('telescope.themes').get_dropdown{})]]
 
 -- Mappings
-map("n", [[<C-h>l]],     [[:lua require('telescope.builtin').builtin(require('telescope.themes').get_dropdown{previewer = false})<cr>]],  {"silent"})
-map("n", [[<C-h>e]],     [[:lua require('telescope.builtin').find_files(require('telescope.themes').get_dropdown{})<cr>]],                {"silent"})
-map("n", [[<C-f>f]],     [[:lua require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown{})<cr>]], {"silent"})
-map("n", [[<C-f>F]],     [[:lua require('telescope.builtin').live_grep(require('telescope.themes').get_dropdown{})<cr>]],                 {"silent"})
-map("n", [[<C-h>c]],     [[:lua require('telescope.builtin').commands(require('telescope.themes').get_dropdown{})<cr>]],                  {"silent"})
-map("n", [[<C-h>h]],     [[:lua require('telescope.builtin').help_tags(require('telescope.themes').get_dropdown{})<cr>]],                 {"silent"})
-map("n", [[<C-h><C-h>]], [[:lua require('telescope.builtin').help_tags(require('telescope.themes').get_dropdown{})<cr>]],                 {"silent"})
-map("n", [[<C-h>o]],     [[:lua require('telescope.builtin').current_buffer_tags(require('telescope.themes').get_dropdown{})<cr>]],       {"silent"})
+map("n", [[<C-h>l]],     [[:lua require('telescope.builtin').builtin(require('telescope.themes').get_dropdown{previewer = false})<CR>]],  {"silent"})
+map("n", [[<C-h>e]],     [[:lua require('telescope.builtin').find_files(require('telescope.themes').get_dropdown{})<CR>]],                {"silent"})
+map("n", [[<C-f>f]],     [[:lua require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown{})<CR>]], {"silent"})
+map("n", [[<C-f>F]],     [[:lua require('telescope.builtin').live_grep(require('telescope.themes').get_dropdown{})<CR>]],                 {"silent"})
+map("n", [[<C-h>c]],     [[:lua require('telescope.builtin').commands(require('telescope.themes').get_dropdown{})<CR>]],                  {"silent"})
+map("n", [[<C-h>h]],     [[:lua require('telescope.builtin').help_tags(require('telescope.themes').get_dropdown{})<CR>]],                 {"silent"})
+map("n", [[<C-h><C-h>]], [[:lua require('telescope.builtin').help_tags(require('telescope.themes').get_dropdown{})<CR>]],                 {"silent"})
+map("n", [[<C-h>o]],     [[:lua require('telescope.builtin').current_buffer_tags(require('telescope.themes').get_dropdown{})<CR>]],       {"silent"})
 
 end
 

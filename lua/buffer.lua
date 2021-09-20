@@ -7,6 +7,7 @@
 -- BUG: q on startup-log.txt
 -- TODO: check for prompt
 -- TODO: Add situation: one window with buffer, one window with special buffer
+-- TODO: Add whitelist
 local fn   = vim.fn
 local cmd  = vim.cmd
 local api  = vim.api
@@ -57,13 +58,13 @@ local function bwipe(bufNr)
         api.nvim_buf_delete(bufNr, {force = true})
     else
         api.nvim_buf_delete(0, {force = true})
-        if vim.bo.filetype == "NvimTree" and vim.g.bufferline then
+        if vim.bo.filetype == "NvimTree" and package.loaded["bufferline.state"] then
             require "bufferline.state".set_offset(0)
             return
         end
     end
 
-    if vim.g.bufferline and #bufNrTbl ~= 1 then
+    if package.loaded["bufferline.state"] and #bufNrTbl ~= 1 then
         fn['bufferline#update'](true)
     end
 end
@@ -79,7 +80,7 @@ end
 ----
 local function smartCloseBuf(checkBuftype) -- {{{
     -- Check if called from Nvim Tree
-    if vim.bo.filetype == "NvimTree" and vim.g.bufferline then
+    if vim.bo.filetype == "NvimTree" and package.loaded["bufferline.state"] then
         require "bufferline.state".set_offset(0)
         cmd "wincmd q"
         return
@@ -337,7 +338,7 @@ function M.wipeOtherBuf() -- {{{
     end
 
     -- Update barbar.nvim tabline
-    if vim.g.bufferline then
+    if package.loaded["bufferline.state"] then
         fn['bufferline#update'](true)
     end
 end -- }}}
@@ -348,7 +349,9 @@ end -- }}}
 ----
 M.closeOtherWin = function()
     if package.loaded["nvim-tree.view"] and require("nvim-tree.view").win_open() then
-        require("bufferline.state").set_offset(0)
+        if package.loaded["bufferline.state"] then
+            require("bufferline.state").set_offset(0)
+        end
         require("nvim-tree.view").close()
     end
     vim.cmd("noautocmd wincmd o")

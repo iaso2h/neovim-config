@@ -31,8 +31,8 @@ require('gitsigns').setup{
         ['n <C-h>U'] = '<cmd>lua require"gitsigns".reset_buffer_index()<CR>',
 
         -- Text objects
-        ['o ih'] = ':<C-U>lua require"gitsigns.actions".select_hunk()<CR>',
-        ['x ih'] = ':<C-U>lua require"gitsigns.actions".select_hunk()<CR>'
+        ['o ih'] = ':<C-u>lua require"gitsigns.actions".select_hunk()<CR>',
+        ['x ih'] = ':<C-u>lua require"gitsigns.actions".select_hunk()<CR>'
     },
     watch_index = {
         interval     = 1000,

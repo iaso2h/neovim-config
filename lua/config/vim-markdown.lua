@@ -1,8 +1,6 @@
 return function()
 
-local fn  = vim.fn
 local cmd = vim.cmd
-local api = vim.api
 
 -- iamcco/markdown-preview.nvim {{{
 -- set to 1, nvim will open the preview window after entering the markdown buffer

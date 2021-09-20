@@ -15,7 +15,7 @@ function Print(...)
 end
 
 function _G.t(str)
-    return api.nvim_replace_termcodes(str, true, false, true)
+    return api.nvim_replace_termcodes(str, true, true, true)
 end
 
 function _G.ex(exec) return fn.executable(exec) == 1 end
@@ -165,82 +165,74 @@ end -- }}}
 ----
 -- Function: Reload: Reload lua module path
 --
--- @param module: string value of module name, use current lua file name when nil is provided
+-- @param module: String value of module path
 ----
 function Reload(module) -- {{{
     local configPath = fn.stdpath("config")
+    local modulePath = configPath .. "/lua"
+
+    -- Config path only
     if not string.match(fn.expand("%:p"), configPath) then return end
 
-    if vim.bo.filetype == "lua" then
-        -- Lua {{{
-        local luaModule
+    if vim.bo.filetype == "lua" then -- Lua {{{
+        local moduleFull
+
         if not module then
-            module = vim.fn.expand("%:p")
-            -- TODO: reload module
-            local luaModulePath = configPath .. "/lua"
-            -- Configuration module for packer.nvim
-            if string.match(module, luaModulePath) then
-                local sep
-                if fn.has("win32") == 1 then
-                    sep = "\\"
+            -- Not Specific module path is provided, use full path instead
+            moduleFull = vim.fn.expand("%:p")
+            local rootTailPath = vim.fn.expand("%:r:t")
+            local _, luaDirEnd = string.find(rootTailPath, "lua/")
+
+            if string.match(moduleFull, modulePath) then
+                -- Reload module under: ~/.config/nvim/lua
+                local sep = jit.os == "Windows" and "\\" or "/"
+                rootTailPath = string.sub(rootTailPath, luaDirEnd + 1, -1):gsub(sep, ".")
+                if rootTailPath:match("init") then
+                    -- Check subfold module
+                    module = rootTailPath:sub(1, -6)
                 else
-                    sep = "/"
-                end
-
-                luaModule = ((string.gsub(string.sub(string.gsub(fn.expand("%:p:r"),
-                                luaModulePath, ""), 2), sep, ".")))
-
-                -- In case where module are not loaded
-                if package.loaded[luaModule] == nil then return end
-
-                package.loaded[luaModule] = nil
-                api.nvim_echo({{"Reload: " .. module, "Normal"}}, true, {})
-                local fallback = require(luaModule)
-
-                -- Call the config func
-                if type(fallback) == "function" then
-                    fallback()
-                elseif type(fallback) == "table" then
-                    for _, funcName in ipairs{"config", "setup"} do
-                        if vim.tbl_contains(vim.tbl_keys(fallback), funcName) then
-                            local literalFunc = string.format([[require("%s").%s()]], luaModule, funcName)
-                            loadstring(literalFunc)()
-                        end
-                    end
-                else
-                end
-                -- Recompile packages for lua/core/plugins.lua
-                if module == configPath .. "/lua/core/plugins.lua" then
-                    local answerCD = fn.confirm("Recompile packages?", "&Yes\n&No")
-                    if answerCD == 1 then
-                        cmd [[PackerSync]]
-                    end
+                    module = rootTailPath
                 end
             end
-        else
-            if package.loaded[module] then
-                package.loaded[module] = nil
-                api.nvim_echo({{"Reload: " .. module, "Normal"}}, true, {})
-                require(module)
 
-            end
+        end
+
+        -- In case where module are not loaded
+        if not package.loaded[module] then return end
+
+        -- Reload and capture possible fallback function
+        package.loaded[module] = nil
+        local fallback = require(module)
+
+        -- Call the config func if it's callable
+        if type(fallback) == "function" then
+            fallback()
+        elseif type(fallback) == "table" then
+            pcall(fallback.config)
+            pcall(fallback.setup)
+        end
+
+        vim.notify(
+            string.format("Reload package[%s] at: %s", module, moduleFull),
+            vim.log.levels.INFO)
+
+        -- Further steps needed to take to recompile packages for lua/core/plugins.lua
+        if moduleFull == configPath .. "/lua/core/plugins.lua" then
+
+            local answerCD = fn.confirm("Recompile packages?", "&Yes\n&No")
+            if answerCD == 1 then return cmd [[PackerSync]] end
         end
         -- }}} Lua
-    else
-        -- Vim {{{
+    else -- Vim {{{
+        -- Module path is always full path in VimL
         module = fn.expand("%:p")
-        if module == configPath .. "/init.vim" then
+        if module == configPath .. "/init.vim" or string.match(module, configPath .. "/plugins") then
             cmd("source " .. module)
-            cmd "redraw!"
-            cmd "AirlineRefresh"
-            api.nvim_echo({{"Reload: " .. module, "Normal"}}, true, {})
-        elseif fn.expand("%:p:h") == configPath .. "/plugins" then
-            cmd("source " .. module)
-            api.nvim_echo({{"Reload: " .. module, "Normal"}}, true, {})
+            vim.notify(string.format("Reload: %s", module), vim.log.levels.INFO)
         elseif string.match(fn.expand("%:p:h"), configPath .. "/colors") then
             local colorscheme = fn.expand("%:t:r")
             cmd("colorscheme " .. colorscheme)
-            api.nvim_echo({{"Colorscheme: " .. colorscheme, "Normal"}}, true, {})
+            vim.notify(string.format("Colorscheme: %s", colorscheme), vim.log.levels.INFO)
         end
         -- }}} Vim
     end
@@ -254,10 +246,10 @@ end -- }}}
 ----
 function M.addJump(action, reservedCount, funArg) -- {{{
     if type(action) == "string" then
-        cmd [[normal! mz`z]]
         if reservedCount then
             local saveCount = vim.v.count
             if saveCount ~= 0 then
+                cmd [[normal! mz`z]]
                 for _ = 1, saveCount do cmd("normal! " .. action) end
             else
                 cmd("normal! " .. action)
@@ -334,6 +326,11 @@ function _G.map(mode, lhs, rhs, optsTbl, doc) -- {{{
         end
         api.nvim_set_keymap(mode, lhs, rhs, optsKeywordTbl)
     end
+
+    -- Disable select mapping for keymapping like R,C,A,S,X
+    if string.match(lhs, "[A-Z]") and mode == "" then
+        api.nvim_del_keymap("s", lhs)
+    end
 end -- }}}
 ----
 -- Function: _G.vmap wrap around the nvim_set_keymap. This is for VS Code only!
@@ -345,6 +342,11 @@ end -- }}}
 function _G.vmap(mode, lhs, rhs) -- {{{
     if vim.g.vscode then
         api.nvim_set_keymap(mode, lhs, rhs, {silent = true})
+    end
+
+    -- Disable select mapping for keymapping like R,C,A,S,X
+    if string.match(lhs, "[A-Z]") and mode == "" then
+        api.nvim_del_keymap("s", lhs)
     end
 end -- }}}
 
@@ -470,18 +472,18 @@ function M.matchAllStrPos(expr, pat)
 end
 -- }}} Match enhance
 
--- TODO:
 function M.trailingEmptyLine() -- {{{
+    if vim.bo.modified == false then return end
+
     if type(TrailEmptyLineChk) == "nil" then
         TrailEmptyLineChk = TrailEmptyLineChk or true
     end
     if not TrailEmptyLineChk then return end
 
-    if vim.bo.modified == false then return end
-
     if api.nvim_buf_get_lines(0, -2, -1, false)[1] ~= "" then
         local saveView = fn.winsaveview()
-        cmd('keepjumps normal! Go')
+        cmd('keepjumps normal! G')
+        api.nvim_put({""}, "l", true, false)
         fn.winrestview(saveView)
     end
 end -- }}}
@@ -563,7 +565,6 @@ function M.visualSelection(returnType) -- {{{
     local lines = api.nvim_buf_get_lines(0, selectStart[1] - 1, selectEnd[1],
                                          false)
     if #lines == 0 then
-        print("0");
         return {""}
     end
     -- Needed to remove the last character to make it match the visual selction
@@ -839,7 +840,6 @@ _G.tbl_replace = function(tbl, repVal, srcVal, repAllChk, cnt, alertOnFail)
 
 end
 
-||||||| parent of 9621a88... fixup! Small fiddling
 
 ----
 -- Function: _G.tbl_merge: Concanate two or more list like table
@@ -900,125 +900,8 @@ _G.luaRHS = function(str)
         concnStr:sub(2, -1) or concnStr:sub(1, -1))
 end
 
-
-----
--- Function: _G.tbl_merge: Concatenate two or more list like table
---
--- @param ... Table
-----
-_G.tbl_merge = function(...)
-    local tblConcanated = {}
-    for i = 1, select('#', ...) do
-        local tbl = select(i, ...)
-        if not vim.tbl_islist(tbl) then
-            return vim.notify("Only list-liked table allowed", vim.log.levels.ERROR)
-        end
-        if next(tbl) then
-            for index, value in ipairs(tbl) do
-                tblConcanated[#tblConcanated+1] = value
-            end
-        end
-    end
-    return tblConcanated
-end
-
-
-----
--- Function: _G.luaRHS: Let you write rhs of mapping in a comafortable way
-
--- Before:
-            -- map("n", [[<Plug>ReplaceCurLine]], [[:lua vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register); require("replace").replaceSave(); if require("replace").regType == "=" then vim.g.ReplaceExpr = vim.fn.getreg("=") end; vim.cmd("norm! V" .. vim.v.count1 .. "_" .. "<lt>Esc>"); require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>]], {"silent"})
-
--- After:
-            -- map("n", [[<Plug>ReplaceCurLine]],
-                -- luaRHS[[
-                -- :lua vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register);
-
-                -- require("replace").replaceSave();
-                -- if require("replace").regType == "=" then
-                    -- vim.g.ReplaceExpr = vim.fn.getreg("=")
-                -- end;
-
-                -- vim.cmd("norm! V" .. vim.v.count1 .. "_" .. "<lt>Esc>");
-
-                -- require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>
-                -- ]],
-                -- {"silent"})
---
--- @param str: RHS mapping
--- @return: nil
-----
-_G.luaRHS = function(str)
-    if type(str) ~= "string" then return vim.notify("Expected string value.", vim.log.levels.ERROR) end
-
-    local strTbl = vim.split(str, "\n", false)
-    strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
-        local concnStr = string.gsub(table.concat(strTbl, " "), "%s+", " ")
-
-    return tostring(
-        concnStr:sub(1, 1) == " " and
-        concnStr:sub(2, -1) or concnStr:sub(1, -1))
-end
-
-||||||| parent of 404bc20... Implement replace.nvim in lua way
-
-----
--- Function: _G.tbl_merge: Concanate two or more list like table
---
--- @param ...: Table
-----
-_G.tbl_merge = function(...)
-    local tblConcanated = {}
-    for i = 1, select('#', ...) do
-        local tbl = select(i, ...)
-        if not vim.tbl_islist(tbl) then
-            return vim.notify("Only list-liked table allowed", vim.log.levels.ERROR)
-        end
-        if next(tbl) then
-            for index, value in ipairs(tbl) do
-                tblConcanated[#tblConcanated+1] = value
-            end
-        end
-    end
-    return tblConcanated
-end
-
-
-----
--- Function: _G.luaRHS: Let you write rhs of mapping in a comafortable way
-
--- Before:
-            -- map("n", [[<Plug>ReplaceCurLine]], [[:lua vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register); require("replace").replaceSave(); if require("replace").regType == "=" then vim.g.ReplaceExpr = vim.fn.getreg("=") end; vim.cmd("norm! V" .. vim.v.count1 .. "_" .. "<lt>Esc>"); require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>]], {"silent"})
-
--- After:
-            -- map("n", [[<Plug>ReplaceCurLine]],
-                -- luaRHS[[
-                -- :lua vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register);
-
-                -- require("replace").replaceSave();
-                -- if require("replace").regType == "=" then
-                    -- vim.g.ReplaceExpr = vim.fn.getreg("=")
-                -- end;
-
-                -- vim.cmd("norm! V" .. vim.v.count1 .. "_" .. "<lt>Esc>");
-
-                -- require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>
-                -- ]],
-                -- {"silent"})
---
--- @param str: RHS mapping
--- @return: nil
-----
-_G.luaRHS = function(str)
-    if type(str) ~= "string" then return vim.notify("Expected string value.", vim.log.levels.ERROR) end
-
-    local strTbl = vim.split(str, "\n", false)
-    strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
-        local concnStr = string.gsub(table.concat(strTbl, " "), "%s+", " ")
-
-    return tostring(
-        concnStr:sub(1, 1) == " " and
-        concnStr:sub(2, -1) or concnStr:sub(1, -1))
+_G.str_count = function(str, pattern)
+    return select(2, string.gsub(str, pattern, ""))
 end
 
 -- dummy

@@ -35,6 +35,6 @@ if not vim.g.vscode then
 end
 -- }}} Build-in plugin
 
-require "util"
+local ok, msg = pcall(require, "util"); if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 require "core"
 
