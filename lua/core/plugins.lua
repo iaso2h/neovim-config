@@ -1246,9 +1246,11 @@ packer.startup(function(use, use_rocks)
         disable = true,
         keys    = "}x, ]x, cb, co, cn, cb",
     }
-    -- use {
-        -- 'sindrets/diffview.nvim',
-    -- }
+    use {
+        'sindrets/diffview.nvim',
+        config = conf "nvim-diffview",
+        cmd = "DiffviewOpen"
+    }
     -- }}} Source control
     -- Knowlege {{{
     -- TODO: highlight
