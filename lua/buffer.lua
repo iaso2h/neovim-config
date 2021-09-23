@@ -8,6 +8,7 @@
 -- TODO: check for prompt
 -- TODO: Add situation: one window with buffer, one window with special buffer
 -- TODO: Add whitelist
+-- BUG: Q on new buffer
 local fn   = vim.fn
 local cmd  = vim.cmd
 local api  = vim.api

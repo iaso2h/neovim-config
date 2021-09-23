@@ -60,7 +60,10 @@ packer.startup(function(use, use_rocks)
 
     -- Vim enhancement {{{
     use 'inkarkat/vim-visualrepeat'
-    use 'tpope/vim-repeat'
+    use {
+        'iaso2h/vim-repeat',
+        lock = true
+    }
     use {
         'tpope/vim-eunuch',
         cmd = {"Delete", "Unlink", "Remove", "Move", "Rename", "Chmod", "Mkdir", "Cfind", "Lfind", "Clocate", "Llocate", "SudoEdit", "SudoWrite", "Wall", "W"}
@@ -207,7 +210,15 @@ packer.startup(function(use, use_rocks)
         end
     }
     use {
+        'inkarkat/vim-ReplaceWithRegister',
+        disable = true,
+        config  = function()
+                map("x", "R", "gr")
+            end
+    }
+    use {
         fn.stdpath("config") .. "/lua/replace",
+        disable = false,
         keys = {
             {"n", "gr"},
             {"n", "grr"},
@@ -215,7 +226,7 @@ packer.startup(function(use, use_rocks)
         },
         config = function()
             map("n", [[<Plug>ReplaceOperator]],
-                [[luaeval("require('replace').expr()")]],
+                luaRHS[[luaeval("require('replace').expr()")]],
                 {"silent", "expr"}
             )
 
@@ -235,9 +246,7 @@ packer.startup(function(use, use_rocks)
                     vim.g.ReplaceExpr = vim.fn.getreg("=")
                 end;
 
-                vim.cmd("norm! V" .. vim.v.count1 .. "_" .. t"<lt>Esc>");
-
-                require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>
+                require("replace").operator{"line", "V", "<Plug>ReplaceCurLine", true}<CR>
                 ]],
                 {"noremap", "silent"})
 
@@ -251,11 +260,9 @@ packer.startup(function(use, use_rocks)
                     vim.g.ReplaceExpr = vim.fn.getreg("=")
                 end;
 
-                require("replace").operator(
-                    tbl_merge(
-                        require("operator").vMotion(),
-                        {"<Plug>ReplaceVisual"}
-                    ))<CR>
+                local vMotion = require("operator").vMotion(false);
+                table.insert(vMotion, "<Plug>ReplaceVisual");
+                require("replace").operator(vMotion)<CR>
                 ]],
                 {"noremap", "silent"})
             map("n", [[<Plug>ReplaceVisual]],
@@ -268,13 +275,11 @@ packer.startup(function(use, use_rocks)
                     vim.g.ReplaceExpr = vim.fn.getreg("=")
                 end;
 
-                vim.cmd("norm! " .. require("replace").replaceVisualMode())
+                vim.cmd("norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0));
 
-                require("replace").operator(
-                    tbl_merge(
-                        require("operator").vMotion(),
-                        {"<Plug>ReplaceVisual"}
-                    ))<CR>
+                local vMotion = require("operator").vMotion(false);
+                table.insert(vMotion, "<Plug>ReplaceVisual");
+                require("replace").operator(vMotion)<CR>
                 ]],
                 {"noremap", "silent"})
 
@@ -479,6 +484,7 @@ packer.startup(function(use, use_rocks)
     }
     use {
         'winston0410/range-highlight.nvim',
+        disable  = true,
         requires = "winston0410/cmd-parser.nvim",
         config   = function()
             require("range-highlight").setup {
@@ -778,8 +784,8 @@ packer.startup(function(use, use_rocks)
         requires = "nvim-treesitter",
         config   = function()
             require("treesitter-context").setup{
-                enable   = true,   -- Enable this plugin (Can be enabled/disabled later via commands)
-                throttle = false,  -- Throttles plugin updates (may improve performance)
+                enable   = true,  -- Enable this plugin (Can be enabled/disabled later via commands)
+                throttle = true,  -- Throttles plugin updates (may improve performance)
             }
         end
     }
@@ -1111,6 +1117,7 @@ packer.startup(function(use, use_rocks)
             {"n", [[<C-f>f]]},     {"n", [[<C-f>F]]},
             {"n", [[<C-h>c]]},     {"n", [[<C-h>h]]},
             {"n", [[<C-h><C-h>]]}, {"n", [[<C-h>o]]},
+            {"n", [[<C-h>b]]}
         },
         requires = {
             "plenary.nvim",
@@ -1154,6 +1161,7 @@ packer.startup(function(use, use_rocks)
             whichKeyDoc({"zS", "Show syntax highlighting groups"})
             whichKeyDoc({"g=", "Eval operator"})
             whichKeyDoc({"g==", "Eval current line"})
+
         end
     }
     use {

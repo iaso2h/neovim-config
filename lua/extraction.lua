@@ -240,21 +240,28 @@ end -- }}}
 -- Function: M.operator :Main function to start the extraction for creating either
 -- new variable or new file
 --
--- @param argTbl: argTbl[1] is the string value of motionwise, which is return
--- when g@ is called
--- @return: 0
+-- @param args Argument table {motionType, vimMode, plugMap}
+--        motionType: String. Motion type by which how the operator perform.
+--                    Can be "line", "char" or "block"
+--        vimMode:    String. Vim mode. See: `:help mode()`
+--        plugMap:    String. eg: <Plug>myplug
+--        vimMode    String. Vim mode. See: `:help mode()`
+-- @return: nil
 ----
-function M.operator(argTbl) -- {{{
-    local motionwise = argTbl[1]
+function M.operator(args) -- {{{
+    local motionType = args[1]
     -- Visual block mode is not supported
-    if motionwise == "block" then return end
+    if motionType == "block" or motionType == "line" then
+        return vim.notify("Blockwise is not supported", vim.log.levels.WARN)
+    end
     if not vim.o.modifiable or vim.o.readonly then
-        vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
-        return ""
+        return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
     end
 
     -- opts = opts or {hlGroup="Search", timeout=500}
-    local vimMode  = argTbl[2]
+    local vimMode  = args[2]
+    local operator = require("operator")
+    local plugMap  = vimMode == "n" and operator.plugMap or args[3]
     local lang     = vim.bo.filetype
     local CWD      = fn.getcwd()
     local curWinID = api.nvim_get_current_win()
@@ -270,10 +277,10 @@ function M.operator(argTbl) -- {{{
         cmd [[echohl Moremsg]]
         newID = fn.input("Variable Name: ")
         cmd [[echohl None]]
-        if newID == "" then return end -- Sanity check
+        if newID == "" then return end -- User abort
     elseif vimMode == "V" then
         -- Check CWD {{{
-        if fn.has('win32') == 1 then
+        if jit.os == "Windows" then
             -- Check file cwd
             local newCWD = fn.expand("%:p:h")
             if CWD ~= newCWD then

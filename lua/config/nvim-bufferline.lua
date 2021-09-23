@@ -274,7 +274,7 @@ require("bufferline").setup {
     } -- }}}
 }
 
-map("n", [[<leader>b]], [[:<C-u>BufferLinePick<CR>]], {"silent"})
+-- map("n", [[<leader>b]], [[:<C-u>BufferLinePick<CR>]], {"silent"})
 map("n", [[<A-1>]], [[:lua require("bufferline").go_to_buffer(1)<CR>]], {"silent"})
 map("n", [[<A-2>]], [[:lua require("bufferline").go_to_buffer(2)<CR>]], {"silent"})
 map("n", [[<A-3>]], [[:lua require("bufferline").go_to_buffer(3)<CR>]], {"silent"})

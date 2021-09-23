@@ -2,7 +2,7 @@
 -- Author: iaso2h
 -- Description: Hihglight word in differernt random colors, heavily inspired
 --              by https://github.com/lfv89/vim-interestingwords/blob/master/plugin/interestingwords.vim
--- Version: 0.0.2
+-- Version: 0.0.3
 -- Last Modified: 2021-09-18
 -- TODO: implement do repeat
 local fn  = vim.fn
@@ -127,49 +127,64 @@ end
 
 
 ----
--- Function: M.colorWord: This the function where g@ function call in normal
+-- Function: M.operator: This the function where g@ function call in normal
 --                        mode and visual mode to start adding the
 --                        highlighting to interesting words
 --
--- @param args: Table value of {motionwise, vimMode}
--- @param opts: Table value contain option configurations
+-- @param args Argument table {motionType, vimMode, plugMap}
+--        motionType: String. Motion type by which how the operator perform.
+--                    Can be "line", "char" or "block"
+--        vimMode:    String. Vim mode. See: `:help mode()`
+--        plugMap:    String. eg: <Plug>myplug
+--        vimMode:    String. Vim mode. See: `:help mode()`
 -- @return: nil
 ----
-M.colorWord = function(args, opts)
-    opts = opts or defaultOpts
-    local motionwise = args[1]
+M.operator = function(args)
+    local opts = opts or defaultOpts
+    local motionType = args[1]
     -- Only support characterwise
-    if motionwise == "block" or motionwise == "line" then return vim.notify("Blockwise or linewise is not supported", vim.log.levels.WARN) end
+    if motionType == "block" or motionType == "line" then
+        return vim.notify(string.format("%swise is not supported", motionType), vim.log.levels.WARN)
+    end
 
     local vimMode = args[2]
-    local pos1
-    local pos2
-    local cursorPos
-    local word
+    local operator = require("operator")
+    local plugMap  = vimMode == "n" and operator.plugMap or args[3]
     local curWinID = api.nvim_get_current_win()
+
+    local posStart
+    local posEnd
+    local word
     -- Get content {{{
     if vimMode == "n" then
-        cursorPos = require("operator").cursorPos
-        pos1 = api.nvim_buf_get_mark(0, "[")
-        pos2 = api.nvim_buf_get_mark(0, "]")
-        api.nvim_win_set_cursor(0, pos1)
+        posStart = api.nvim_buf_get_mark(0, "[")
+        posEnd   = api.nvim_buf_get_mark(0, "]")
+        api.nvim_win_set_cursor(curWinID, posStart)
         cmd "normal! v"
-        api.nvim_win_set_cursor(0, pos2)
+        api.nvim_win_set_cursor(curWinID, posEnd)
         cmd "normal! v"
     else
-        cmd "normal! gv"
-        cursorPos = api.nvim_win_get_cursor(0)
-        pos1      = api.nvim_buf_get_mark(0, "<")
-        pos2      = api.nvim_buf_get_mark(0, ">")
+        cmd("normal! gv" .. t"<Esc>")
+        posStart = api.nvim_buf_get_mark(0, "<")
+        posEnd   = api.nvim_buf_get_mark(0, ">")
     end
     word = fn.escape(require("util").visualSelection("string"), [[\]])
 
     -- }}} Store word info
 
     applyColor(word, opts, curWinID)
+    -- Restore cursor position
+    if vimMode == "n" and not require("util").withinRegion(operator.cursorPos, posStart, posEnd) then
+        return
+    else
+        api.nvim_win_set_cursor(curWinID, operator.cursorPos)
+    end
 
-    -- restor cursor position
-    api.nvim_win_set_cursor(0, cursorPos)
+    -- Dot repeat
+    if vimMode ~= "n" then
+        fn["repeat#set"](t(plugMap))
+        fn["visualrepeat#set"](t(plugMap))
+    end
     -- }}} Get content
 end
 

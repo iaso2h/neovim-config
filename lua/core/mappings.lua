@@ -10,22 +10,124 @@ if not os.getenv("TERM") then
     map("", [[<C-=>]], [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent", "novscode"}, "Decrease font size")
     map("", [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent", "novscode"}, "Restore font size")
 end
--- InterestingWord
-map("n", [[gw]],        [[luaeval("require('operator').expression(require('interestingWord').colorWord, false)")]], {"expr"}, "Highlight interesting word...")
-map("x", [[W]],         [[:lua require("interestingWord").colorWord(require("operator").vMotion())<CR>]],           {},       "Highlight selected as interesting word")
-map("n", [[gww]],       [[:lua require("interestingWord").reapplyColor()<CR>]], {}, "Recolor last interesting word...")
-map("n", [[<leader>w]], [[:lua require("interestingWord").clearColor()<CR>]],   {}, "Clear interesting word...")
-map("n", [[<leader>W]], [[:lua require("interestingWord").restoreColor()<CR>]], {}, "Restore interesting word...")
+-- Run selected
+map("x", [[gM]], luaRHS[[:lua vim.cmd(
+    string.format("lua %s",
+        luaRHS(require("util").visualSelection("string"))
+    )
+)<CR>]],
+{"silent"})
+-- TODO: Pass selection to commandline
+-- map("x", [[<C-s>]], luaRHS[[:lua vim.cmd(
+    -- string.format("lua %s",
+        -- luaRHS(require("util").visualSelection("string"))
+    -- )
+-- )],
+-- {"silent"})
+-- Interesting word {{{
+map("n", [[<Plug>InterestingWordOperator]],
+luaRHS[[luaeval("
+    require('operator').expr(
+        require('interestingWord').operator,
+        false,
+        '<Plug>InterestingWordOperator')
+    ")
+]], {"expr", "silent"})
+map("x", [[<Plug>InterestingWordVisual]],
+luaRHS[[:lua
+    vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisual", vim.v.register);
+
+    local vMotion = require("operator").vMotion(true);
+    table.insert(vMotion, "<Plug>InterestingWordVisual")
+    require("interestingWord").operator(vMotion)<CR>]],
+{"silent"})
+map("n", [[<Plug>InterestingWordVisual]],
+luaRHS[[:lua
+    vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisual", vim.v.register);
+    vim.cmd("norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
+
+    local vMotion = require("operator").vMotion(true);
+    table.insert(vMotion, "<Plug>InterestingWordVisual")
+    require("interestingWord").operator(vMotion)<CR>]],
+{"silent"})
+map("n", [[gw]],        [[<Plug>InterestingWordOperator]], "Highlight interesting word...")
+map("x", [[W]],         [[<Plug>InterestingWordVisual]],   "Highlight selected as interesting word")
+map("n", [[gww]],       [[:lua require("interestingWord").reapplyColor()<CR>]], "Recolor last interesting word...")
+map("n", [[<leader>w]], [[:lua require("interestingWord").clearColor()<CR>]],   "Clear interesting word...")
+map("n", [[<leader>W]], [[:lua require("interestingWord").restoreColor()<CR>]], "Restore interesting word...")
+-- }}} Interesting word
+-- Zeal query {{{
+map("n", [[<Plug>ZealOperator]],
+luaRHS[[luaeval(
+    "require('operator').expr(
+        require('zeal').zeal,
+        false,
+        '<Plug>ZealOperator')
+    ")
+]],
+{"silent", "expr"}, "Zeal look up...")
+map("n", [[<Plug>ZealOperatorGlobal]],
+luaRHS[[luaeval(
+    "require('operator').expr{
+        require('zeal').zealGlobal,
+        false,
+        '<Plug>ZealOperatorGlobal'}
+    ")
+]],
+{"silent", "expr"}, "Zeal look up... universally")
+map("x", [[<Plug>ZealVisual]],
+luaRHS[[:lua
+    vim.fn["repeat#setreg"](t"<Plug>ZealVisual", vim.v.register);
+
+    local vMotion = require("operator").vMotion(true);
+    table.insert(vMotion, "<Plug>ZealVisual")
+    require("zeal").zeal(vMotion)<CR>]],
+{"silent"}, "Zeal look up selected")
+map("n", [[<Plug>ZealVisual]],
+luaRHS[[:lua
+    vim.fn["repeat#setreg"](t"<Plug>ZealVisual", vim.v.register);
+    vim.cmd("norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
+
+    local vMotion = require("operator").vMotion(true);
+    table.insert(vMotion, "<Plug>ZealVisual")
+    require("zeal").zeal(vMotion)<CR>]],
+{"silent"}, "Zeal look up selected")
+map("n", [[gz]], [[<Plug>ZealOperator]],       "Zeal look up...")
+map("n", [[gZ]], [[<Plug>ZealOperatorGlobal]], "Zeal look up...universally")
+map("x", [[Z]],  [[<Plug>ZealVisual]])
+-- }}} Zeal query
 -- HistoryStartup
 map("n", [[<C-s>]], [[:lua require("historyStartup").display()<CR>]], {"silent"}, "Enter HistoryStartup")
 -- Extraction
-map("n", [[gc]], [[luaeval("require('operator').expression(require('extraction').operator, true)")]], {"silent", "expr"}, "Extract...")
-map("x", [[C]],  [[:lua require("extraction").operator(require("operator").vMotion())<CR>]],          {"silent"})
--- Zeal query
-map("n", [[gz]], [[luaeval("require('operator').expression(require('zeal').zeal,       false)")]], {"silent", "expr"}, "Zeal look up...")
-map("n", [[gZ]], [[luaeval("require('operator').expression(require('zeal').zealGlobal, false)")]], {"silent", "expr"}, "Zeal look up... universally")
-map("x", [[Z]],  [[:lua require("zeal").zealGlobal(require("operator").vMotion())<CR>]],           {"silent"})
--- Print file name
+map("n", [[<Plug>Extract]],
+luaRHS[[luaeval(
+    "require('operator').expr(
+        require('extraction').operator,
+        false,
+        '<Plug>Extract')
+    ")
+]],
+{"silent", "expr"}, "Extract...")
+map("x", [[<Plug>ExtractVisual]],
+luaRHS[[:lua
+    vim.fn["repeat#setreg"](t"<Plug>ExtractVisual", vim.v.register);
+
+    local vMotion = require("operator").vMotion(true);
+    table.insert(vMotion, "<Plug>ExtractVisual")
+    require("extraction").operator(vMotion)<CR>]],
+{"silent"}, "Extract selected")
+map("n", [[<Plug>ExtractVisual]],
+luaRHS[[:lua
+    vim.fn["repeat#setreg"](t"<Plug>ExtractVisual", vim.v.register);
+    vim.cmd("norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
+
+    local vMotion = require("operator").vMotion(true);
+    table.insert(vMotion, "<Plug>ExtractVisual")
+    require("extraction").operator(vMotion)<CR>]],
+{"silent"}, "Extract selected")
+map("n", [[gc]], [[<Plug>Extract]])
+map("x", [[C]],  [[<Plug>ExtractVisual]])
+-- Print file info
 map("", [[<C-g>]], [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<CR>]], {"silent", "novscode"}, "Display file info")
 -- Tab switcher {{{
 map("n", [[<S-Tab>]], [[:lua require("tabSwitcher").main()<CR>]], {"silent", "novscode"}, "Change tab size")
@@ -36,7 +138,6 @@ map("n", [[<S-Tab>]], [[:lua require("tabSwitcher").main()<CR>]], {"silent", "no
 map("n", [[dj]], [[<Nop>]])
 map("n", [[dk]], [[<Nop>]])
 map("n", [[d<Space>]], [[:<C-u>call setline(".", "")<CR>]],  {"silent"})
-map("n", [[dd]],       [[:d<CR>]],                           {"silent",  "nowait"})
 -- Inquery word
 map("n", [[<leader>i]], [=[[I]=], "Inquery word under cursor")
 map("x", [[<leader>i]], [[:lua vim.cmd("g#" .. require("util").visualSelection("string") .. "#nu")<CR>]], {"silent"})
@@ -211,8 +312,11 @@ map("n", [[gP]], [[gp]], "Select last put")
 map("n", [[<leader>p]], [["0p]], "Put after from register 0")
 map("n", [[<leader>P]], [["0P]], "Put after from register 0")
 -- Inplace yank
+map("", [[<Plug>InplaceYank]],
+[[luaeval("require('operator').expr(require('yankPut').inplaceYank, false, '<Plug>InplaceYank')")]],
+{"expr", "silent"}, "Yank operator")
+map("", [[y]], [[<Plug>InplaceYank]], "Yank operator")
 map("", [[Y]], [[yy]], "Yank line")
-map("", [[y]], [[luaeval("require('operator').expression(require('yankPut').inplaceYank, false)")]], {"silent", "expr"}, "Yank operator")
 -- Inplace put
 map("n", [[p]], [[:lua require("yankPut").inplacePut("n", "p")<CR>]], {"silent"}, "Put after")
 map("x", [[p]], [[:lua require("yankPut").inplacePut("v", "p")<CR>]], {"silent"})

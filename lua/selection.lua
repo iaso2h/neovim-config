@@ -15,7 +15,7 @@ function M.oppoSelection() -- {{{
         api.nvim_win_set_cursor(0, startSelectPos)
         return
     end
-    local closerToEnd = require("util").posDist(startSelectPos, curPos) > require("util").posDist(endSelectPos, curPos) and true or false
+    local closerToEnd = require("util").posDist(startSelectPos, curPos) > require("util").posDist(endSelectPos, curPos)
     if closerToEnd then
         local endSelectLen = #api.nvim_buf_get_lines(0, endSelectPos[1] - 1, endSelectPos[1], false)[1]
         if endSelectLen < endSelectPos[2] then

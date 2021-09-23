@@ -1,8 +1,8 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.0
--- Last Modified: 2021-09-15
+-- Version: 0.1.1
+-- Last Modified: 2021-09-21
 
 local fn       = vim.fn
 local cmd      = vim.cmd
@@ -107,36 +107,45 @@ function M.VSCodeLineYank(vimMode, direction)
 end
 -- }}} VSCode yank line
 
-function M.inplaceYank(argTbl) -- {{{
+--- Yank text without moving cursor. Also comes with yanked area highlighted
+--- @param args Argument table {motionType, vimMode, plugMap}
+---        motionType: String. Motion type by which how the operator perform.
+---                    Can be "line", "char" or "block"
+---        vimMode:    String. Vim mode. See: `:help mode()`
+---        plugMap:    String. eg: <Plug>myplug
+---        vimMode    String. Vim mode. See: `:help mode()`
+function M.inplaceYank(args) -- {{{
     -- TODO add opts
     -- opts = opts or {hlGroup="Search", timeout=500}
     local opts = {hlGroup="Search", timeout=500}
-    local motionwise = argTbl[1]
+    local motionType = args[1]
+    local vimMode    = args[2]
+    local plugMap    = operator.plugMap
     local curWinID = api.nvim_get_current_win()
     local curBufNr = api.nvim_get_current_buf()
-    local pos1 = api.nvim_buf_get_mark(0, "[")
-    local pos2 = api.nvim_buf_get_mark(0, "]")
+    local posStart = api.nvim_buf_get_mark(0, "[")
+    local posEnd   = api.nvim_buf_get_mark(0, "]")
 
     -- Change position info to (0,0) index based
-    if motionwise == "line" then
-        pos1 = {pos1[1] - 1, 0}
-        -- Get the exact end position to avoid surprising pos2 value like {88, 2147483647}
-        local lines = #api.nvim_buf_get_lines(0, pos2[1] - 1, pos2[1], false)[1]
+    if motionType == "line" then
+        posStart = {posStart[1] - 1, 0}
+        -- Get the exact end position to avoid surprising posEnd value like {88, 2147483647}
+        local lines = #api.nvim_buf_get_lines(0, posEnd[1] - 1, posEnd[1], false)[1]
         if lines ~= 0 then
-            pos2 = {pos2[1] - 1, lines - 1}
+            posEnd = {posEnd[1] - 1, lines - 1}
         else
             -- Avoid negative col index
-            pos2 = {pos2[1] - 1, lines}
+            posEnd = {posEnd[1] - 1, lines}
         end
     else
-        pos1 = {pos1[1] - 1, pos1[2]}
-        pos2 = {pos2[1] - 1, pos2[2]}
+        posStart = {posStart[1] - 1, posStart[2]}
+        posEnd = {posEnd[1] - 1, posEnd[2]}
     end
 
-    if motionwise == "char" then
+    if motionType == "char" then
         cmd [[normal! g`[vg`]y]]
         M.lastYankLinewise = false
-    elseif motionwise == "line" then
+    elseif motionType == "line" then
         cmd [[normal! g`[Vg`]y]]
         M.lastYankLinewise = true
     else
@@ -148,7 +157,7 @@ function M.inplaceYank(argTbl) -- {{{
     local yankHLNS = api.nvim_create_namespace('inplaceYankHL')
     api.nvim_buf_clear_namespace(curBufNr, yankHLNS, 0, -1)
 
-    local region = vim.region(curBufNr, pos1, pos2, fn.getregtype(),
+    local region = vim.region(curBufNr, posStart, posEnd, fn.getregtype(),
         vim.o.selection == "inclusive" and true or false)
     for lineNr, cols in pairs(region) do
         api.nvim_buf_add_highlight(curBufNr, yankHLNS, opts["hlGroup"], lineNr, cols[1], cols[2])
@@ -167,20 +176,23 @@ function M.inplaceYank(argTbl) -- {{{
         M.lastYankNS = api.nvim_create_namespace('lastYank')
     end
     if not M.lastYankExtmark then
-        M.lastYankExtmark = api.nvim_buf_set_extmark(curBufNr, M.lastYankNS, pos1[1],
-                                                    pos1[2], {
-                                                        end_line = pos2[1],
-                                                        end_col = pos2[2]
+        M.lastYankExtmark = api.nvim_buf_set_extmark(curBufNr, M.lastYankNS, posStart[1],
+                                                    posStart[2], {
+                                                        end_line = posEnd[1],
+                                                        end_col = posEnd[2]
                                                     })
     else
-        M.lastYankExtmark = api.nvim_buf_set_extmark(curBufNr, M.lastYankNS, pos1[1],
-                                                    pos1[2], {
-                                                        end_line = pos2[1],
-                                                        end_col = pos2[2],
+        M.lastYankExtmark = api.nvim_buf_set_extmark(curBufNr, M.lastYankNS, posStart[1],
+                                                    posStart[2], {
+                                                        end_line = posEnd[1],
+                                                        end_col = posEnd[2],
                                                         id = M.lastYankExtmark
                                                     })
     end
 
+    if vimMode ~= "n" then
+        fn["visualrepeat#set"](t(plugMap))
+    end
 end -- }}}
 
 function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
@@ -222,17 +234,17 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
     end
 
     -- Position of new created content
-    local pos1 = api.nvim_buf_get_mark(curBufNr, "[")
-    local pos2 = api.nvim_buf_get_mark(curBufNr, "]")
+    local posStart = api.nvim_buf_get_mark(curBufNr, "[")
+    local posEnd = api.nvim_buf_get_mark(curBufNr, "]")
     -- Change to 0-based for extmark creation
-    pos1 = {pos1[1] - 1, pos1[2]}
-    pos2 = {pos2[1] - 1, pos2[2]}
+    posStart = {posStart[1] - 1, posStart[2]}
+    posEnd = {posEnd[1] - 1, posEnd[2]}
 
     -- Format new created content when possible {{{
     -- Create extmark to track position of new content
     M.inplacePutNewContentNS      = api.nvim_create_namespace("inplacePutNewContent")
     M.inplacePutNewContentExtmark = api.nvim_buf_set_extmark(curBufNr, M.inplacePutNewContentNS,
-                    pos1[1], pos1[2], {end_line = pos2[1], end_col = pos2[2]})
+                    posStart[1], posStart[2], {end_line = posEnd[1], end_col = posEnd[2]})
 
     if regType == "v" then
         -- Format current line if new paste content consists a single line
@@ -289,6 +301,10 @@ function M.convertPut(pasteCMD, opts) --  {{{
     local cursorNS      = api.nvim_create_namespace("inplacePutCursor")
     local cursorExtmark = api.nvim_buf_set_extmark(curBufNr, cursorNS, cursorPos[1] - 1, cursorPos[2], {})
 
+    -- TODO: when convert a V-regtype register int characterwise mode. Always
+    -- check new content whether is comment or not. And preserve a additional
+    -- spece for comment
+
     -- Convert register content
     if regType == "v" or regType == "c" then
         fn.setreg(vim.v.register, savRegContent, "V")
@@ -310,22 +326,22 @@ function M.convertPut(pasteCMD, opts) --  {{{
     end
 
     -- Position of new created content
-    local pos1 = api.nvim_buf_get_mark(curBufNr, "[")
-    local pos2 = api.nvim_buf_get_mark(curBufNr, "]")
+    local posStart = api.nvim_buf_get_mark(curBufNr, "[")
+    local posEnd = api.nvim_buf_get_mark(curBufNr, "]")
     -- Change to 0-based for extmark creation
-    pos1 = {pos1[1] - 1, pos1[2]}
-    pos2 = {pos2[1] - 1, pos2[2]}
+    posStart = {posStart[1] - 1, posStart[2]}
+    posEnd = {posEnd[1] - 1, posEnd[2]}
 
     -- Format new created content when possible {{{
     -- Create extmark to track position of new content
     M.inplacePutNewContentNS      = api.nvim_create_namespace("inplacePutNewContent")
     M.inplacePutNewContentExtmark = api.nvim_buf_set_extmark(curBufNr, M.inplacePutNewContentNS,
-                pos1[1], pos1[2], {end_line = pos2[1], end_col = pos2[2]})
+                posStart[1], posStart[2], {end_line = posEnd[1], end_col = posEnd[2]})
 
     if regType == "v" or regType == "c" then
-        api.nvim_win_set_cursor(curWinID, {pos1[1] + 1, pos1[2]})
+        api.nvim_win_set_cursor(curWinID, {posStart[1] + 1, posStart[2]})
         cmd "normal! V"
-        api.nvim_win_set_cursor(curWinID, {pos2[1] + 1, pos2[2]})
+        api.nvim_win_set_cursor(curWinID, {posEnd[1] + 1, posEnd[2]})
         cmd "normal! ="
         M.lastPutLinewise = true
         -- Change to 0-based for extmark creation
@@ -369,7 +385,6 @@ end --  }}}
 
 function M.lastYankPut(hlType) -- {{{
     -- Create jump location in jumplist
-
     cmd [[normal! mz`z]]
 
     local curBufNr = api.nvim_get_current_buf()

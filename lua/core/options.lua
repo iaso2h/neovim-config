@@ -5,8 +5,8 @@ local o   = vim.opt
 
 -- let &path.="src/include,/usr/include/AL,"
 if ex("rg") then
-    o.grepprg    = "rg --vimgrep"
-    o.grepformat = "%f:%l:%c:%m"
+    o.grepprg    = "rg --vimgrep --smart-case"
+    -- o.grepformat = "%f:%l:%c:%m"
 end
 
 -- Basic settings {{{

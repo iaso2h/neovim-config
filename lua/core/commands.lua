@@ -68,7 +68,6 @@ if not vim.g.vscode then
 
     autocmd BufWinEnter          * lua require("cursorRecall").main()
     autocmd BufWritePre          * lua require"util".trimSpaces(); require"util".trailingEmptyLine()
-  " autocmd BufEnter             * set formatoptions=pj1Bml2nwc
     autocmd BufEnter             * lua require("historyStartup").deleteBuf()
   " autocmd FocusGained,BufEnter * checktime
   " autocmd BufAdd               * lua require("consistantTab").adaptBufTab()
@@ -110,6 +109,8 @@ command! -nargs=0 Dofile lua dofile(vim.fn.expand("%:p"))
 
 command! -nargs=0 MyVimedit edit    $MYVIMRC
 command! -nargs=0 MyVimsrc  luafile $MYVIMRC
+
+command! -nargs=? Near -<args>,+<args>p | -<args>
 
 command! -nargs=0 TrimSpaces              call TrimSpaces()
 command! -nargs=0 TrimSpacesToggle        lua  if type(TrimSpacesChk) == "nil" then TrimSpacesChk = TrimSpacesChk or true end; TrimSpacesChk = not TrimSpacesChk; vim.api.nvim_echo({{string.format("%s",TrimSpacesChk), "Moremsg"}}, false, {})

@@ -140,6 +140,7 @@ map("n", [[<C-h>c]],     [[:lua require('telescope.builtin').commands(require('t
 map("n", [[<C-h>h]],     [[:lua require('telescope.builtin').help_tags(require('telescope.themes').get_dropdown{})<CR>]],                 {"silent"})
 map("n", [[<C-h><C-h>]], [[:lua require('telescope.builtin').help_tags(require('telescope.themes').get_dropdown{})<CR>]],                 {"silent"})
 map("n", [[<C-h>o]],     [[:lua require('telescope.builtin').current_buffer_tags(require('telescope.themes').get_dropdown{})<CR>]],       {"silent"})
+map("n", [[<C-h>b]],     [[:lua require('telescope.builtin').buffers(require('telescope.themes').get_dropdown{})<CR>]],                   {"silent"})
 
 end
 

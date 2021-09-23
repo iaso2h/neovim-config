@@ -1,12 +1,13 @@
 -- File: init
 -- Author: iaso2h
 -- Description: Heavily inspired Ingo Karkat's work. Replace text with register
--- Version: 0.0.4
+-- Version: 0.0.5
 -- Last Modified: 2021-09-21
-local fn  = vim.fn
-local cmd = vim.cmd
-local api = vim.api
-local M   = {}
+local fn   = vim.fn
+local cmd  = vim.cmd
+local api  = vim.api
+local M    = {}
+local util = require("util")
 local restoreOption
 
 
@@ -23,12 +24,9 @@ local warnRead = function()
     return true
 end
 
-----
--- Function: _G.replaceSave
--- https://github.com/tpope/vim-repeat/blob/master/autoload/repeat.vim
--- This function is used for preserving the vim.v.register value in case that
--- it's cleared during file modification
-----
+---  https://github.com/tpope/vim-repeat/blob/master/autoload/repeat.vim
+---  This function is used for preserving the vim.v.register value in case that
+---  it's cleared during the file modification
 M.replaceSave = function()
     M.regType   = vim.v.register
     M.count     = vim.v.count1
@@ -122,13 +120,14 @@ local matchRegType = function(motionType, vimMode, reg, pos) -- {{{
         -- the register contents and set the register type to characterwise yank.
         if motionType == "line" then
             -- TODO: Only support one line reindent, multiline support needed
-            if str_count(reg.content, "\n") == 1 then
+            local lineCnt = str_count(reg.content, "\n")
+            if lineCnt == 1 then
                 local _, regIndent = string.find(reg.content, "^%s*")
                 local bufferIndent = fn.indent(pos.startPos[1])
                 local reindentCnt = bufferIndent - regIndent
                 -- TODO: Need to test with real tab character indent, not soft tab indent
                 if reindentCnt < 0 then
-                    reg.content = string.gsub(reg.content, "^" .. string.rep(" ", math.abs(reindentCnt), ""))
+                    reg.content = string.gsub(reg.content, "^" .. string.rep(" ", math.abs(reindentCnt)), "")
                 elseif reindentCnt > 0 then
                     reg.content = string.rep(" ", reindentCnt) .. reg.content
                 end
@@ -198,7 +197,7 @@ local replace = function(motionType, vimMode, reg, pos, curBufNr) -- {{{
         local repReport = srcLinesCnt == repLineCnt and '' or
             string.format(" with %d line%s", repLineCnt, repLineCnt == 1 and "" or "s")
 
-        api.nvim_echo({{srcReport .. repReport, "MoreMsg"}}, false, {})
+        api.nvim_echo({{srcReport .. repReport, "Normal"}}, false, {})
     end
 
     return {
@@ -207,32 +206,46 @@ local replace = function(motionType, vimMode, reg, pos, curBufNr) -- {{{
     }
 end -- }}}
 
-
+--- This function will be called when g@ is evaluated by Neovim
+--- @param args table of argument: {motionType, vimMode, plugMap}
+---        motionType: String. Motion type by which how the operator perform.
+---                    Can be "line", "char" or "block"
+---        vimMode:    String. Vim mode. See: `:help mode()`
+---        plugMap:    String. eg: <Plug>myplug
 function M.operator(args) -- {{{
     if not warnRead() then return end
 
     local motionType = args[1]
     local vimMode    = args[2]
+    local plugMap    = args[3]
     local opts = {hlGroup = "Search", timeout = 500}
 
     local curBufNr = api.nvim_get_current_buf()
     local pos
     local reg
-
     -- Saving {{{
-    -- Save cursor position
-    -- Because Visual Line Mode the cursor will place at the first column once
-    -- entering commandline mode. Therefor "gv" is exectued here to retrieve it.
-    if #args ~= 4 and vimMode == "V" then
-        cmd([[norm! gvmz]] .. api.nvim_replace_termcodes("<lt>Esc>", true, true, true))
-        -- M.cursorPos = api.nvim_win_get_cursor(0)
-        M.cursorPos = api.nvim_buf_get_mark(curBufNr, "z")
-    else
-        M.cursorPos = api.nvim_win_get_cursor(0)
-    end
     -- Save registers and vim options
-    require("util").saveReg()
+    util.saveReg()
     saveOption()
+
+    -- Save cusor position
+    if vimMode ~= "n" then
+        if vimMode == "V"  then
+            if #args ~= 4 then
+                -- Because Visual Line Mode the cursor will place at the first column once
+                -- entering commandline mode. Therefor "gv" is exectued here to retrieve it.
+                -- Somehow the below command sequence cannot produce the effect of retrieving:
+                -- vim.cmd[[:lua vim.cmd([[norm! gv]] .. t"<Esc>"); Print(vim.api.nvim_win_get_cursor(0))]]
+                cmd([[norm! gvmz]] .. t"<Esc>")
+                M.cursorPos = api.nvim_buf_get_mark(curBufNr, "z")
+            else
+                M.cursorPos = api.nvim_win_get_cursor(0)
+                vim.cmd("norm! V" .. vim.v.count1 .. "_" .. t"<Esc>");
+            end
+        elseif vimMode ~= "V" then
+            M.cursorPos = api.nvim_win_get_cursor(0)
+        end
+    end
     -- }}} Saving
 
     if M.regType == "=" then
@@ -254,19 +267,20 @@ function M.operator(args) -- {{{
 
     if vimMode ~= "n" then
         pos = {
-            startPos = api.nvim_buf_get_mark(0, "<"),
-            endPos   = api.nvim_buf_get_mark(0, ">")
+            startPos = api.nvim_buf_get_mark(curBufNr, "<"),
+            endPos   = api.nvim_buf_get_mark(curBufNr, ">")
         }
     else
         pos = {
-            startPos = api.nvim_buf_get_mark(0, "["),
-            endPos   = api.nvim_buf_get_mark(0, "]")
+            startPos = api.nvim_buf_get_mark(curBufNr, "["),
+            endPos   = api.nvim_buf_get_mark(curBufNr, "]")
         }
     end
 
     -- Match the motionType type with register type
     local ok, regChanged = pcall(matchRegType, motionType, vimMode, reg, pos)
     if not ok then vim.notify(regChanged, vim.log.levels.ERROR) end
+
 
     -- Replace with new content
     local ok, replaced = pcall(replace, motionType, vimMode, reg, pos, curBufNr)
@@ -294,33 +308,29 @@ function M.operator(args) -- {{{
     -- }}} Create highlight
 
     -- Restoration {{{
-    -- Registers restoration. Because in ReplaceCurLine, vim.v.register has been changed
-    -- before operator() is called
-    if #args ~= 4 then require("util").restoreReg() end
+    util.restoreReg()
     fn.setreg(reg.name, reg.content, reg.type)
 
     -- Options restoration
-    if vim.is_callable(restoreOption) then restoreOption() end
+    if vim.is_callable(restoreOption) then restoreOption(); restoreOption = nil end
 
-    -- Curosr position restoration. Use extmark to track the new position of
-    -- newContentStart after executing formaprg in some cases
+    -- Cursor restoration
     if vimMode == "n" then
-        if M.cursorPos then
+        if util.withinRegion(M.cursorPos, pos.startPos, pos.endPos) then
+            -- In cases the text length of new text content is shorter
+            -- than the one of origin text
             if M.cursorPos[2] > repEnd[2] then
-                -- In cases the text length of new text content is shorter
-                -- than the one of origin text
-                api.nvim_win_set_cursor(0, {M.cursorPos[1], repStart[2]})
+                api.nvim_win_set_cursor(0, {repStart[1] + 1, repEnd[2]})
             else
-                api.nvim_win_set_cursor(0, M.cursorPos)
+                api.nvim_win_set_cursor(0, {repStart[1] + 1, M.cursorPos[2]})
             end
-
         else
-            -- Fallback placing
-            api.nvim_win_set_cursor(0, {repStart[1] + 1, repStart[2]})
         end
     else
         local firstNewLine = api.nvim_get_current_line()
         local newCol = #firstNewLine == 0 and 1 or #firstNewLine
+        -- In cases the text length of new text content is shorter
+        -- than the one of origin text
         if M.cursorPos[2] + 1 >= newCol then
             api.nvim_win_set_cursor(0, {repStart[1] + 1, newCol - 1})
         else
@@ -340,19 +350,19 @@ function M.operator(args) -- {{{
     if #args > 2 then
         if #args == 4 then
             -- ReplaceCurLine
-            fn["repeat#set"](t(args[3]), M.count)
+            fn["repeat#set"](t(plugMap), M.count)
         else
             -- VisualChar
             -- VisualLine
-            fn["repeat#set"](t(args[3]))
+            fn["repeat#set"](t(plugMap))
         end
     elseif M.regType == "=" then
         fn["repeat#set"](t"<Plug>ReplaceExpr")
     end
     -- Visual repeating
     fn["visualrepeat#set"](t"<Plug>ReplaceVisual")
-    -- }}} Mapping repeating
 
+    -- }}} visualrepeat visualrepeat1
 end -- }}}
 
 
@@ -375,10 +385,6 @@ function M.expr() -- {{{
     return M.regType == "=" and [[:let g:ReplaceExpr = getreg("=")<CR>g@]] or "g@"
 end -- }}}
 
-
-function M.replaceVisualMode() -- {{{
-    return fn["visualrepeat#reapply#VisualMode"](0)
-end -- }}}
 
 return M
 

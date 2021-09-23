@@ -222,6 +222,7 @@ function Reload(module) -- {{{
             local answerCD = fn.confirm("Recompile packages?", "&Yes\n&No")
             if answerCD == 1 then return cmd [[PackerSync]] end
         end
+        return
         -- }}} Lua
     else -- Vim {{{
         -- Module path is always full path in VimL
@@ -314,17 +315,28 @@ function _G.map(mode, lhs, rhs, optsTbl, doc) -- {{{
             -- require("which-key").register{lhs = doc}
         -- end
     -- end
-
-    if not next(optsTbl) then
-        api.nvim_set_keymap(mode, lhs, rhs, optsTbl)
-    else
-        local optsKeywordTbl = {}
+    local optsKeyValTbl = {}
+    if next(optsTbl) then
         for _, val in ipairs(optsTbl) do
             if val ~= "novscode" then
-                optsKeywordTbl[val] = true
+                optsKeyValTbl[val] = true
             end
         end
-        api.nvim_set_keymap(mode, lhs, rhs, optsKeywordTbl)
+    end
+    -- Do not use "v" to map select mode inplicit
+    if mode == "v" then
+        vim.notify(
+            string.format([=[Please use "x" to map [[%s]] for [[%s]] instead]=], lhs, rhs),
+            vim.log.levels.WARN)
+        mode = "x"
+    end
+
+    local ok, msg = pcall(api.nvim_set_keymap, mode, lhs, rhs, optsKeyValTbl)
+    if not ok then
+        vim.notify(
+            string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhs),
+            vim.log.levels.ERROR)
+        return vim.notify(msg, vim.log.levels.ERROR)
     end
 
     -- Disable select mapping for keymapping like R,C,A,S,X
@@ -476,7 +488,7 @@ function M.trailingEmptyLine() -- {{{
     if vim.bo.modified == false then return end
 
     if type(TrailEmptyLineChk) == "nil" then
-        TrailEmptyLineChk = TrailEmptyLineChk or true
+        TrailEmptyLineChk = TrailEmptyLineChk or false
     end
     if not TrailEmptyLineChk then return end
 
@@ -604,6 +616,28 @@ function M.posDist(pos1, pos2, bias, baisIdx)
         colDist  = (pos1[2] - pos2[2])^2 * bias
     end
     return lineDist + colDist
+end
+
+function M.withinRegion(pos, regionStart, regionEnd)
+    if pos[1] < regionStart[1] or pos[1] > regionEnd[1] then
+        return false
+    else
+        if pos[1] == regionStart[1] then
+            if pos[2] < regionStart[2] then
+                return false
+            else
+                return true
+            end
+        elseif pos[2] == regionEnd[2] then
+            if pos[2] > regionEnd[2] then
+                return false
+            else
+                return true
+            end
+        else
+            return true
+        end
+    end
 end
 
 -- Convert UTF-8 hex code to character
@@ -899,6 +933,20 @@ _G.luaRHS = function(str)
         concnStr:sub(1, 1) == " " and
         concnStr:sub(2, -1) or concnStr:sub(1, -1))
 end
+
+
+_G.vimRHS = function(str)
+    if type(str) ~= "string" then return vim.notify("Expected string value.", vim.log.levels.ERROR) end
+
+    local strTbl = vim.split(str, "\n", false)
+    strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
+        local concnStr = string.gsub(table.concat(strTbl, "<Bar> "), "%s+", " ")
+
+    return tostring(
+        concnStr:sub(1, 1) == " " and
+        concnStr:sub(2, -1) or concnStr:sub(1, -1))
+end
+
 
 _G.str_count = function(str, pattern)
     return select(2, string.gsub(str, pattern, ""))
