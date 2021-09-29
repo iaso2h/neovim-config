@@ -1,4 +1,4 @@
-local M   = {VMMaps}
+local M   = {}
 
 M.VM_Start = function()
     map("i", [[<C-BS>]],    [[<C-\><C-o>db]])
@@ -13,8 +13,17 @@ M.VM_Exit = function()
     map("n", [[<C-p>]],     [[<C-p>]],    {"noremap"})
 end
 
-M.config = function() -- {{{
-    local cmd = vim.cmd
+M.config = function()
+    vim.cmd [[
+    augroup VmStartMapping
+        autocmd!
+        autocmd User visual_multi_start lua require("config.vim-visual-multi").VM_Start()
+        autocmd User visual_multi_exit  lua require("config.vim-visual-multi").VM_Exit()
+    augroup END
+    ]]
+end
+
+M.setup = function() -- {{{
     vim.g.VM_default_mappings               = 0
     vim.g.VM_silent_exit                    = 1
     vim.g.VM_quit_after_leaving_insert_mode = 1
@@ -41,13 +50,6 @@ M.config = function() -- {{{
     -- To remap any key to normal! commands. Example:
     vim.g.VM_custom_noremaps = {["=="] = "==", ["<<"] = "<<", [">>"] = ">>"}
 
-    cmd [[
-    augroup VmStartMapping
-        autocmd!
-        autocmd User visual_multi_start lua require("config.vim-visual-multi").VM_Start()
-        autocmd User visual_multi_exit  lua require("config.vim-visual-multi").VM_Exit()
-    augroup END
-        ]]
 
     local VMMaps = {}
     VMMaps['Reselect Last']      = ',m'

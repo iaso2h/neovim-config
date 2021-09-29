@@ -175,17 +175,19 @@ function Reload(module) -- {{{
     local configPath = fn.stdpath("config")
     local modulePath = configPath .. "/lua"
 
+    local moduleFull = vim.fn.expand("%:p")
     -- Config path only
-    if not string.match(fn.expand("%:p"), configPath) then return end
+    if not string.match(moduleFull, configPath) then return end
 
     if vim.bo.filetype == "lua" then -- Lua {{{
-        local moduleFull
 
         if not module then
             -- Not Specific module path is provided, use full path instead
-            moduleFull = vim.fn.expand("%:p")
             local rootTailPath = vim.fn.expand("%:r:t")
             local _, luaDirEnd = string.find(rootTailPath, "lua/")
+            if not luaDirEnd then
+                return vim.notify(string.format([[Failed to find index of "lua/" in "%s"]], rootTailPath),
+                            vim.log.levels.ERROR)
 
             if string.match(moduleFull, modulePath) then
                 -- Reload module under: ~/.config/nvim/lua

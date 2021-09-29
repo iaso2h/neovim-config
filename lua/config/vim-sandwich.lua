@@ -1,4 +1,12 @@
-return function()
+local M = {}
+
+M.setup = function()
+    vim.g.sandwich_no_default_key_mappings          = 1
+    vim.g.operator_sandwich_no_default_key_mappings = 1
+    vim.g.textobj_sandwich_no_default_key_mappings  = 1
+end
+
+M.config = function()
     local fn  = vim.fn
     local cmd = vim.cmd
     vim.g["sandwich#magicchar#f#patterns"] = {
@@ -10,9 +18,11 @@ return function()
         },
     }
 
-    cmd [[runtime macros/sandwich/keymap/surround.vim]]
+    map("n", [[gs]], [[<Plug>(operator-sandwich-add)]], "Add surround")
+    map("x", [[S]], [[<Plug>(operator-sandwich-add)]])
+    map("n", [[ds]], [[<Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)]], "Delete surround")
+    map("n", [[cs]], [[<Plug>(operator-sandwich-replace)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)]], "Change surround")
 
-    map("n", [[gs]], [[ys]], "Add surround")
     map("x", [[iq]], [[<Plug>(textobj-sandwich-literal-query-i)]])
     map("x", [[aq]], [[<Plug>(textobj-sandwich-literal-query-a)]])
     map("o", [[iq]], [[<Plug>(textobj-sandwich-literal-query-i)]])
@@ -21,7 +31,7 @@ return function()
     fn["operator#sandwich#set"]('add',     'all', 'hi_duration', 1000)
     fn["operator#sandwich#set"]('replace', 'all', 'hi_duration', 1000)
 
-    -- mode
+-- Recipes {{{
     vim.g["sandwich#recipes"] = {
         {buns = {[[\s\+]], [[\s\+]]}, regex = 1, kind = {'delete', 'replace', 'query'}, input = {' '}},
 
@@ -70,6 +80,7 @@ return function()
             linewise = 2,
         }
     }
+-- }}} Recipes
 
     cmd [[
     function! FolderMaker()
@@ -85,3 +96,4 @@ return function()
 
 end
 
+return M

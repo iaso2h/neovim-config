@@ -58,6 +58,7 @@ packer.startup{
     use 'wbthomason/packer.nvim'
 
     -- Vim enhancement {{{
+    use 'nathom/filetype.nvim'
     use 'inkarkat/vim-visualrepeat'
     use {
         'iaso2h/vim-repeat',
@@ -133,9 +134,9 @@ packer.startup{
     }
     use {
         'andymass/vim-matchup',
-        after  = "nvim-treesitter",
-        event  = "BufRead",
-        config = function()
+        require = "nvim-treesitter",
+        event   = "WinScrolled",
+        config  = function()
             vim.g.matchup_mappings_enabled      = 0
             vim.g.matchup_matchparen_deferred   = 1
             vim.g.matchup_matchparen_pumvisible = 0
@@ -302,7 +303,8 @@ packer.startup{
             {"n", "cs"},
             {"n", "ds"},
         },
-        config = conf "vim-sandwich"
+        setup  = conf "vim-sandwich".setup,
+        config = conf "vim-sandwich".config
     }
     use {
         'junegunn/vim-easy-align',
@@ -368,7 +370,7 @@ packer.startup{
             }
 
             map("n", [[dg]], [[:lua require("neogen").generate()<CR>]], {"silent"})
-            pcall(cmd, "xunmap dg")
+            pcall(vim.api.nvim_del_keymap, "dg")
         end,
     }
     use {
@@ -387,7 +389,8 @@ packer.startup{
     use {
         'mg979/vim-visual-multi',
         keys   = {",j", ",k", ",m", ",a", ",d"},
-        config = conf "vim-visual-multi".config()
+        setup  = conf("vim-visual-multi").setup,
+        config = conf("vim-visual-multi").config
     }
     use {
         'airblade/vim-rooter',
@@ -418,7 +421,7 @@ packer.startup{
                 ignored_next_char         = string.gsub([[[%w%%%'%[%"%.] ]],"%s+", ""),
                 enable_moveright          = true,
                 enable_afterquote         = true,  -- add bracket pairs after quote
-                enable_check_bracket_line = true,  -- check bracket in same line
+                enable_check_bracket_line = false,  -- check bracket in same line
                 check_ts                  = true,
                 fast_wrap = {
                     map         = '<A-p>',
@@ -472,7 +475,8 @@ packer.startup{
             {"n", [[g<space>u]]},
             {"v", [[g<space>u]]},
         },
-        config = conf "vim-nerdcommenter".config,
+        setup  = [[vim.api.nvim_set_var("NERDCreateDefaultMappings", 0)]],
+        config = conf("vim-nerdcommenter").config,
     }
     use {
         'winston0410/range-highlight.nvim',
@@ -519,8 +523,9 @@ packer.startup{
     }
     use {
         'lukas-reineke/indent-blankline.nvim',
-        after  = "nvim-treesitter",
-        config = function()
+        require = "nvim-treesitter",
+        event   = "BufRead",
+        config  = function()
             require("indent_blankline").setup{
                 char             = "▏",
                 buftype_exclude  = {"terminal"},
@@ -674,7 +679,7 @@ packer.startup{
     }
     -- TODO: deprecated
     use {
-        'sindrets/galaxyline.nvim',
+        'NTBBloodbath/galaxyline.nvim',
         event    = "BufRead",
         requires = "nvim-web-devicons",
         config   = conf "nvim-galaxyline"
@@ -703,24 +708,23 @@ packer.startup{
         'kyazdani42/nvim-tree.lua',
         keys     = {{"n", "<C-w>e"}},
         requires = "nvim-web-devicons",
-        config   = conf "nvim-tree".config
+        config   = conf "nvim-tree"
     }
     -- }}} UI
     -- Treesitter {{{
     use {
         'nvim-treesitter/nvim-treesitter',
         run    = ":TSUpdate",
-        -- event  = "BufRead",
         config = function()
             require("nvim-treesitter.configs").setup{
                 -- ensure_installed = "maintained",
                 ensure_installed = {
-                    "c", "cpp", "cmake", "lua", "json", "toml", "python",
-                    "bash", "fish", "ruby", "regex", "css", "html", "go",
-                    "javascript", "rust", "vue", "c_sharp", "typescript",
+                    "c", "cpp", "cmake", "lua", "json", "toml",
+                    "python", "bash", "fish", "ruby", "regex", "css", "html",
+                    "go", "javascript", "rust", "vue", "c_sharp", "typescript",
                     "comment", "query", "yaml"
                 },
-                highlight        = {enable = true},
+                highlight        = {enable = true, additional_vim_regex_highlighting = false},
                 indent           = {enable = true},
                 incremental_selection = {
                     enable  = true,
@@ -775,8 +779,8 @@ packer.startup{
     }
     use {
         'romgrk/nvim-treesitter-context',
-        after    = "nvim-treesitter",
         requires = "nvim-treesitter",
+        event    = "WinScrolled",
         config   = function()
             require("treesitter-context").setup{
                 enable   = true,  -- Enable this plugin (Can be enabled/disabled later via commands)
@@ -786,7 +790,7 @@ packer.startup{
     }
     use {
         'p00f/nvim-ts-rainbow',
-        after    = "nvim-treesitter",
+        event    = "BufRead",
         requires = "nvim-treesitter",
         config   = function()
             require("nvim-treesitter.configs").setup{
@@ -805,7 +809,7 @@ packer.startup{
     }
     use {
         'nvim-treesitter/nvim-treesitter-textobjects',
-        after    = "nvim-treesitter",
+        event    = "BufRead",
         requires = "nvim-treesitter",
         config   = function()
             require("nvim-treesitter.configs").setup{
@@ -853,13 +857,13 @@ packer.startup{
     }
     use {
         'windwp/nvim-ts-autotag',
-        after    = "nvim-treesitter",
         requires = "nvim-treesitter",
-        config   = [[require"nvim-treesitter.configs".setup {autotag = {enable = true}}]]
+        ft       = {"html", "javascript", "javascriptreact", "typescriptreact", "svelte", "vue"},
+        config   = [[require("nvim-treesitter.configs").setup {autotag = {enable = true}}]]
     }
     use {
         'abecodes/tabout.nvim',
-        after    = "nvim-treesitter",
+        event    = "InsertEnter",
         requires = "nvim-treesitter",
         config   = function()
             require('tabout').setup {
@@ -900,7 +904,7 @@ packer.startup{
     use {
         'neovim/nvim-lspconfig',
         event  = "BufRead",
-        config = conf "nvim-lsp".config
+        config = conf("nvim-lsp").config
     }
     use {
         'kabouzeid/nvim-lspinstall',
@@ -922,8 +926,9 @@ packer.startup{
     -- TODO: deprecated
     use {
         'glepnir/lspsaga.nvim',
-        after  = "nvim-lspconfig",
-        config = function()
+        event   = "BufRead",
+        require = "nvim-lspconfig",
+        config  = function()
             require("lspsaga").init_lsp_saga {
                 use_saga_diagnostic_sign = true,
                 error_sign            = "",
@@ -1044,7 +1049,6 @@ packer.startup{
     use {
         'hrsh7th/vim-vsnip',
         event  = "InsertCharPre",
-        after  = "nvim-cmp",
         config = function()
             vim.g.vsnip_snippet_dir   = vim.fn.stdpath("config") .. "/snippets"
             vim.g.vsnip_extra_mapping = false
@@ -1091,7 +1095,7 @@ packer.startup{
     use {
         'nvim-telescope/telescope.nvim',
         module   = "telescope",
-        -- event    = "BufRead",
+        event    = "BufRead",
         cmd      = "Telescope",
         keys     = {
             {"n", [[<C-h>l]]},     {"n", [[<C-h>e]]},

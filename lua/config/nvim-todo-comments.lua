@@ -10,8 +10,8 @@ require("todo-comments").setup{
             alt   = { "FIXME", "BUG", "FIXIT", "FIX", "ISSUE" }, -- a set of other keywords that all map to this FIX keywords
             -- signs = false, -- configure signs for some keywords individually
         },
-        TODO = { icon = " ", color = "info" },
-        HACK = { icon = " ", color = "warning" },
+        TODO = { icon = " ", color = "warning" },
+        HACK = { icon = " ", color = "error" },
         WARN = { icon = " ", color = "warning", alt = { "WARNING", "XXX" } },
         PERF = { icon = " ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
         NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
@@ -33,11 +33,11 @@ require("todo-comments").setup{
     -- list of named colors where we try to extract the guifg from the
     -- list of hilight groups or use the hex color if hl not found as a fallback
     colors = {
-        error   = { "LspDiagnosticsDefaultError",       "ErrorMsg",   "#DC2626" },
-        warning = { "LspDiagnosticsDefaultWarning",     "WarningMsg", "#FBBF24" },
-        info    = { "LspDiagnosticsDefaultWarning", "#2563EB" },
-        hint    = { "LspDiagnosticsDefaultHint",        "#10B981" },
-        default = { "Identifier",                       "#7C3AED" },
+        error   = { "DiagnosticError", "ErrorMsg",   "#DC2626" },
+        warning = { "DiagnosticWarn",  "WarningMsg", "#FBBF24" },
+        info    = { "DiagnosticInfo",  "#2563EB" },
+        hint    = { "DiagnosticHint",  "#10B981" },
+        default = { "Identifier",      "#7C3AED" },
     },
     search = {
         command = "rg",
@@ -54,5 +54,9 @@ require("todo-comments").setup{
         -- pattern = [[\b(KEYWORDS)\b]], -- match without the extra colon. You'll likely get false positives
     },
 }
+
+vim.cmd [[command! -nargs=0 TodoTelescope Telescope todo-comments todo theme=ivy]]
+map("n", [[<C-f>t]], [[:<C-u>TodoTelescope<CR>]])
+
 end
 
