@@ -29,6 +29,24 @@ luaRHS[[luaeval("
         '<Plug>InterestingWordOperator')
     ")
 ]], {"expr", "silent"})
+||||||| parent of 169650e... Add visual substitution
+-- TODO: Pass selection to commandline
+-- map("x", [[<C-s>]], luaRHS[[:lua vim.cmd(
+    -- string.format("lua %s",
+        -- luaRHS(require("util").visualSelection("string"))
+    -- )
+-- )],
+-- {"silent"})
+-- Interesting word {{{
+map("n", [[<Plug>InterestingWordOperator]],
+luaRHS[[luaeval("
+    require('operator').expr(
+        require('interestingWord').operator,
+        false,
+        '<Plug>InterestingWordOperator')
+    ")
+]], {"expr", "silent"})
+map("x", [[<C-s>]], [[:lua require("selection").visualSub()<CR>]])
 map("x", [[<Plug>InterestingWordVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisual", vim.v.register);
@@ -122,7 +140,8 @@ luaRHS[[:lua
     require("extraction").operator(vMotion)<CR>]],
 {"silent"}, "Extract selected")
 map("n", [[gc]], [[<Plug>Extract]])
-map("x", [[C]],  [[<Plug>ExtractVisual]])
+-- TODO: implement with visualreapet?
+map("x", [[C]],  [[visualmode() == '^V' ? "Di" : "\<Plug>ExtractVisual"]], {"expr"})
 -- Print file info
 map("n", [[<C-g>]],
 [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<CR>]],
