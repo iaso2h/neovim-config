@@ -160,11 +160,11 @@ M.operator = function(args)
         posStart = api.nvim_buf_get_mark(0, "[")
         posEnd   = api.nvim_buf_get_mark(0, "]")
         api.nvim_win_set_cursor(curWinID, posStart)
-        cmd "normal! v"
+        cmd "noa normal! v"
         api.nvim_win_set_cursor(curWinID, posEnd)
-        cmd "normal! v"
+        cmd "noa normal! v"
     else
-        cmd("normal! gv" .. t"<Esc>")
+        cmd("noa normal! gv" .. t"<Esc>")
         posStart = api.nvim_buf_get_mark(0, "<")
         posEnd   = api.nvim_buf_get_mark(0, ">")
     end
@@ -206,7 +206,7 @@ M.reapplyColor = function(opts)
 
     local guifg, guibgNew = randomGUI()
     tbl_replace(M.guibgs, guibgNew, guibg, false, 1, true)
-    cmd(string.format("hi! %s guifg=%s guibg=%s gui=%s", hlGroup, guifg, guibgNew, opts.guiStyle))
+    cmd(string.format("noa hi! %s guifg=%s guibg=%s gui=%s", hlGroup, guifg, guibgNew, opts.guiStyle))
     M.hlIDs[curWinID][lastWord]["guibg"] = guibgNew
 end
 
@@ -221,10 +221,10 @@ end
 M.clearColor = function()
     local curWinID = api.nvim_get_current_win()
     if not M.hlIDs[curWinID] then
-        cmd "echohl MoreMsg"
+        cmd "noa echohl MoreMsg"
         local answer = fn.confirm("There're no match set in thisi window, do you want perform a clearmatch() anyway?",
             ">>> &Yes\n&No", 2, "Question")
-        cmd "echohl None"
+        cmd "noa echohl None"
         if answer == 1 then
             return fn.clearmatches()
         else

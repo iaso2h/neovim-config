@@ -17,14 +17,6 @@ map("x", [[gM]], luaRHS[[:lua vim.cmd(
     )
 )<CR>]],
 {"silent"})
--- TODO: Pass selection to commandline
--- map("x", [[<C-s>]], luaRHS[[:lua vim.cmd(
-    -- string.format("lua %s",
-        -- luaRHS(require("util").visualSelection("string"))
-    -- )
--- )],
--- {"silent"})
--- Interesting word {{{
 map("n", [[<Plug>InterestingWordOperator]],
 luaRHS[[luaeval("
     require('operator').expr(
@@ -44,7 +36,7 @@ luaRHS[[:lua
 map("n", [[<Plug>InterestingWordVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisual", vim.v.register);
-    vim.cmd("norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
+    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
 
     local vMotion = require("operator").vMotion(true);
     table.insert(vMotion, "<Plug>InterestingWordVisual")
@@ -86,7 +78,7 @@ luaRHS[[:lua
 map("n", [[<Plug>ZealVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>ZealVisual", vim.v.register);
-    vim.cmd("norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
+    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
 
     local vMotion = require("operator").vMotion(true);
     table.insert(vMotion, "<Plug>ZealVisual")
@@ -119,7 +111,7 @@ luaRHS[[:lua
 map("n", [[<Plug>ExtractVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>ExtractVisual", vim.v.register);
-    vim.cmd("norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
+    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
 
     local vMotion = require("operator").vMotion(true);
     table.insert(vMotion, "<Plug>ExtractVisual")
@@ -142,7 +134,7 @@ map("n", [[dk]], [[<Nop>]])
 map("n", [[d<Space>]], [[:<C-u>call setline(".", "")<CR>]],  {"silent"})
 -- Inquery word
 map("n", [[<leader>i]], [=[[I]=], "Inquery word under cursor")
-map("x", [[<leader>i]], [[:lua vim.cmd("g#" .. require("util").visualSelection("string") .. "#nu")<CR>]], {"silent"})
+map("x", [[<leader>i]], [[:lua vim.cmd("noa g#" .. require("util").visualSelection("string") .. "#nu")<CR>]], {"silent"})
 -- Fast mark & resotre
 map("n", [[M]], [[`m]], "Restore mark M")
 -- Changelist jumping

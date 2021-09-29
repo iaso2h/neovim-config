@@ -23,13 +23,13 @@ function M.VSCodeLineMove(vimMode, direction) -- {{{
             local nextIndent = fn.indent(cursorPos[1] + 1)
             cmd [[m .+1]]
             if not (nextIndent == curIndent or nextIndent == 0) then
-                if vim.o.equalprg == "" then cmd [[normal! ==]] end
+                if vim.o.equalprg == "" then cmd [[noautocmd normal! ==]] end
             end
         elseif direction == "up" then
             local previousIndent = fn.indent(cursorPos[1] - 1)
             cmd [[m .-2]]
             if not (previousIndent == curIndent or previousIndent == 0) then
-                if vim.o.equalprg == "" then cmd [[normal! ==]] end
+                if vim.o.equalprg == "" then cmd [[noautocmd normal! ==]] end
             end
         end
     elseif vimMode == "v" then
@@ -38,7 +38,7 @@ function M.VSCodeLineMove(vimMode, direction) -- {{{
         elseif direction == "up" then
             cmd [['<,'>m '<-2]]
         end
-        cmd [[normal! gv]]
+        cmd [[noautocmd normal! gv]]
     end
 end -- }}}
 
@@ -51,36 +51,36 @@ function M.VSCodeLineYank(vimMode, direction)
 
     -- Duplication {{{
     if string.lower(vimMode) == "v" then
-        cmd [[normal! gv]]
+        cmd [[noautocmd normal! gv]]
         -- Visual mode {{{
         local cursor      = api.nvim_win_get_cursor(0)
         local selectStart = api.nvim_buf_get_mark(0, "<")
         local selectEnd   = api.nvim_buf_get_mark(0, ">")
-        cmd(string.format("%d,%dyank", selectStart[1], selectEnd[1]))
+        cmd(string.format("noautocmd %d,%dyank", selectStart[1], selectEnd[1]))
         if direction == "up" then
             if cursor[1] == selectStart[1] then
-                cmd [[put!]]
+                cmd [[noautocmd put!]]
                 api.nvim_win_set_cursor(0, selectEnd)
             else
-                cmd [[put]]
+                cmd [[noautocmd put]]
                 api.nvim_win_set_cursor(0, selectStart)
             end
 
-            cmd([[normal! ]] .. vimMode)
+            cmd([[noautocmd normal! ]] .. vimMode)
             api.nvim_win_set_cursor(0, cursor)
         elseif direction == "down" then
             if cursor[1] == selectStart[1] then
-                cmd [[put!]]
+                cmd [[noautocmd put!]]
                 api.nvim_win_set_cursor(0, {
                     selectEnd[1] + selectEnd[1] - selectStart[1] + 1,
                     selectEnd[2]
                 })
             else
-                cmd [[put]]
+                cmd [[noautocmd put]]
                 api.nvim_win_set_cursor(0, {selectEnd[1] + 1, selectStart[2]})
             end
 
-            cmd([[normal! ]] .. vimMode)
+            cmd([[noautocmd normal! ]] .. vimMode)
             api.nvim_win_set_cursor(0, {
                 cursor[1] + selectEnd[1] - selectStart[1] + 1, cursor[2]
             })
@@ -89,17 +89,15 @@ function M.VSCodeLineYank(vimMode, direction)
     elseif vimMode == "n" then
         -- Normal mode {{{
         local cursor = api.nvim_win_get_cursor(0)
-        cmd [[yank]]
+        cmd [[noautocmd yank]]
         if direction == "up" then
-            cmd [[put!]]
+            cmd [[noautocmd put!]]
             api.nvim_win_set_cursor(0, cursor)
         elseif direction == "down" then
-            cmd [[put]]
+            cmd [[noautocmd put]]
             api.nvim_win_set_cursor(0, {cursor[1] + 1, cursor[2]})
         end
         -- }}} Normal mode
-    else
-        cmd [[normal gv]]
     end
     -- }}} Duplication
 
@@ -108,12 +106,12 @@ end
 -- }}} VSCode yank line
 
 --- Yank text without moving cursor. Also comes with yanked area highlighted
---- @param args Argument table {motionType, vimMode, plugMap}
----        motionType: String. Motion type by which how the operator perform.
+--- @param args table {motionType, vimMode, plugMap}
+---        motionType string Motion type by which how the operator perform.
 ---                    Can be "line", "char" or "block"
----        vimMode:    String. Vim mode. See: `:help mode()`
----        plugMap:    String. eg: <Plug>myplug
----        vimMode    String. Vim mode. See: `:help mode()`
+---        vimMode    string Vim mode. See: `:help mode()`
+---        plugMap    string eg: <Plug>myplug
+---        vimMode    string Vim mode. See: `:help mode()`
 function M.inplaceYank(args) -- {{{
     -- TODO add opts
     -- opts = opts or {hlGroup="Search", timeout=500}
@@ -143,13 +141,13 @@ function M.inplaceYank(args) -- {{{
     end
 
     if motionType == "char" then
-        cmd [[normal! g`[vg`]y]]
+        cmd [[noautocmd normal! g`[vg`]y]]
         M.lastYankLinewise = false
     elseif motionType == "line" then
-        cmd [[normal! g`[Vg`]y]]
+        cmd [[noautocmd normal! g`[Vg`]y]]
         M.lastYankLinewise = true
     else
-        cmd [[normal! gvy]]
+        cmd [[noautocmd normal! gvy]]
         M.lastYankLinewise = false
     end
 
@@ -223,14 +221,14 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
     if vimMode == "n" then
         if vim.v.count ~= 0 then
             for _=0, vim.v.count do
-                cmd("normal! \"" .. vim.v.register .. pasteCMD)
+                cmd("noautocmd normal! \"" .. vim.v.register .. pasteCMD)
             end
         else
-            cmd("normal! \"" .. vim.v.register .. pasteCMD)
+            cmd("noautocmd normal! \"" .. vim.v.register .. pasteCMD)
         end
     else
 
-        cmd("normal! gv\"" .. vim.v.register .. pasteCMD)
+        cmd("noautocmd normal! gv\"" .. vim.v.register .. pasteCMD)
     end
 
     -- Position of new created content
@@ -243,6 +241,7 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
     -- Format new created content when possible {{{
     -- Create extmark to track position of new content
     M.inplacePutNewContentNS      = api.nvim_create_namespace("inplacePutNewContent")
+    -- BUG: can be out of scope
     M.inplacePutNewContentExtmark = api.nvim_buf_set_extmark(curBufNr, M.inplacePutNewContentNS,
                     posStart[1], posStart[2], {end_line = posEnd[1], end_col = posEnd[2]})
 
@@ -250,7 +249,7 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
         -- Format current line if new paste content consists a single line
         if vim.o.equalprg == "" then
             local match = string.match(curLine, '%w')
-            if not match then cmd [[normal! ==]] end
+            if not match then cmd [[noautocmd normal! ==]] end
         end
     end
     -- }}} Format new created content when possible
@@ -319,10 +318,10 @@ function M.convertPut(pasteCMD, opts) --  {{{
     -- Execute EX command
     if vim.v.count ~= 0 then
         for _=0, vim.v.count do
-            cmd("normal! \"" .. vim.v.register .. pasteCMD)
+            cmd("noautocmd normal! \"" .. vim.v.register .. pasteCMD)
         end
     else
-        cmd("normal! \"" .. vim.v.register .. pasteCMD)
+        cmd("noautocmd normal! \"" .. vim.v.register .. pasteCMD)
     end
 
     -- Position of new created content
@@ -340,15 +339,15 @@ function M.convertPut(pasteCMD, opts) --  {{{
 
     if regType == "v" or regType == "c" then
         api.nvim_win_set_cursor(curWinID, {posStart[1] + 1, posStart[2]})
-        cmd "normal! V"
+        cmd "noautocmd normal! V"
         api.nvim_win_set_cursor(curWinID, {posEnd[1] + 1, posEnd[2]})
-        cmd "normal! ="
+        cmd "noautocmd normal! ="
         M.lastPutLinewise = true
         -- Change to 0-based for extmark creation
     elseif regType == "V" or regType == "l" then
         -- Format current line if new paste content consists a single line
         local match = string.match(curLine, '%w')
-        if not match then cmd [[normal! ==]] end
+        if not match then cmd [[noautocmd normal! ==]] end
         M.lastPutLinewise = false
     end
     -- }}} Format new created content when possible
@@ -418,21 +417,21 @@ function M.lastYankPut(hlType) -- {{{
     if startDist < endDist then
         if linewise then
             api.nvim_win_set_cursor(curWinID, selectEnd)
-            cmd [[normal! V]]
+            cmd [[noautocmd normal! V]]
             api.nvim_win_set_cursor(curWinID, {selectStart[1], cursor[2]})
         else
             api.nvim_win_set_cursor(curWinID, selectEnd)
-            cmd [[normal! v]]
+            cmd [[noautocmd normal! v]]
             api.nvim_win_set_cursor(curWinID, selectStart)
         end
     else
         if linewise then
             api.nvim_win_set_cursor(curWinID, selectStart)
-            cmd [[normal! V]]
+            cmd [[noautocmd normal! V]]
             api.nvim_win_set_cursor(curWinID, {selectEnd[1], cursor[2]})
         else
             api.nvim_win_set_cursor(curWinID, selectStart)
-            cmd [[normal! v]]
+            cmd [[noautocmd normal! v]]
             api.nvim_win_set_cursor(curWinID, selectEnd)
         end
     end

@@ -8,6 +8,7 @@ local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
 local M   = {}
+-- BUG:
 
 M.timer = {}
 M.defaultCMDList = {"Camel", "Snake", "Pascal", "Snakecaps"}
@@ -21,7 +22,7 @@ function M.cycleCase() -- {{{
     end
     local firstCMD = table.remove(M.CMDList, 1)
     -- BUG:
-    cmd("silent " .. firstCMD)
+    cmd("noa silent " .. firstCMD)
     api.nvim_echo({{string.format("\nSwitch to %s", firstCMD), "MoreMsg"}}, false, {})
 
     api.nvim_win_set_cursor(0, cursorPos)

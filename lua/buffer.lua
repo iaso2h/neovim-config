@@ -32,12 +32,12 @@ local bufNrTbl
 local function saveModified(bufNr) -- {{{
     if not api.nvim_buf_is_valid(bufNr) then return true end
     if api.nvim_buf_get_option(bufNr, "modified") then
-        cmd "echohl MoreMsg"
+        cmd "noa echohl MoreMsg"
         local answer = fn.confirm("Save modification?",
                                   ">>> &Save\n&Discard\n&Cancel", 3, "Question")
-        cmd "echohl None"
+        cmd "noa echohl None"
         if answer == 1 then
-            cmd "update"
+            cmd "noa update"
             return true
         elseif answer == 2 then
             return true
@@ -273,7 +273,7 @@ function M.wipeOtherBuf() -- {{{
     winIDTbl = api.nvim_list_wins()
     if vim.bo.filetype == "NvimTree" then
         if #winIDTbl == 2 then
-            cmd [[noautocmd wincmd w]]
+            cmd [[noa wincmd w]]
             nvimTreeCall = true
         else
             return
@@ -335,7 +335,7 @@ function M.wipeOtherBuf() -- {{{
 
     -- Change focus back to Nvim Tree
     if nvimTreeCall then
-        cmd [[noautocmd wincmd w]]
+        cmd [[noa wincmd w]]
     end
 
     -- Update barbar.nvim tabline
@@ -355,7 +355,7 @@ M.closeOtherWin = function()
         end
         require("nvim-tree.view").close()
     end
-    vim.cmd("noautocmd wincmd o")
+    vim.cmd("noa wincmd o")
 end
 
 M.restoreClosedBuf = function()

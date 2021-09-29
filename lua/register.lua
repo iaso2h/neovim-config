@@ -23,13 +23,13 @@ M.insertPrompt = function()
     -- TODO: Custom register completion prompt
     local regexAll = vim.regex(M.all)
     local reg
-    cmd [[noautocmd reg]]
+    cmd [[noa reg]]
 
-    cmd [[echohl Moremsg]]
+    cmd [[noa echohl Moremsg]]
     repeat
         reg = fn.input("Register: ")
     until (#reg == 1 and regexAll:match_str(reg)) or vim.notify("    Invalid register name", vim.log.levels.ERROR)
-    cmd [[echohl None]]
+    cmd [[noa echohl None]]
 
     -- local regContent = reg == "=" and fn.getreg(reg, 1) or fn.getreg(reg, 0)
     local regType = fn.getregtype(reg)

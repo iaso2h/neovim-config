@@ -37,7 +37,7 @@ M.display = function()
         -- M.curBuf = api.nvim_create_buf(true, true)
 
         -- if M.curBuf == 0 then
-            cmd [[noautocmd enew]]
+            cmd [[noa enew]]
             M.curBuf = api.nvim_get_current_buf()
         -- end
     end
@@ -46,11 +46,7 @@ M.display = function()
 
     -- Always close all the other windows
     if api.nvim_list_wins() ~= 1 then
-        if package.loaded["nvim-tree.view"] and require("nvim-tree.view").win_open() then
-            require("bufferline.state").set_offset(0)
-            require("nvim-tree.view").close()
-        end
-        vim.cmd("noautocmd wincmd o")
+        require("buffer").closeOtherWin()
     end
 
     api.nvim_buf_set_option(M.curBuf, "modifiable", true)

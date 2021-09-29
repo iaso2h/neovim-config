@@ -159,19 +159,19 @@ local replace = function(motionType, vimMode, reg, pos, curBufNr) -- {{{
     reg.name = reg.name == [["]] and "" or [["]] .. reg.name
 
     if vimMode ~= "n" then
-        cmd(string.format("norm! gv%sp", reg.name))
+        cmd(string.format("noa norm! gv%sp", reg.name))
     else
         if pos.startPos[1] > pos.endPos[1] or (pos.startPos[1] == pos.endPos[1] and pos.startPos[2] > pos.endPos[2]) then
             -- This's the scenario where startpos is fall behind endpos
-            cmd(string.format("norm! %sP", reg.name))
+            cmd(string.format("noa norm! %sP", reg.name))
         else
             -- This's the most common case
             local visualCMD = motionType == "line" and "V" or "v"
 
             api.nvim_win_set_cursor(0, pos.startPos)
-            cmd("norm! " .. visualCMD)
+            cmd("noa norm! " .. visualCMD)
             api.nvim_win_set_cursor(0, pos.endPos)
-            cmd("norm!" .. reg.name .. "p")
+            cmd("noa norm!" .. reg.name .. "p")
         end
 
     end
@@ -236,11 +236,11 @@ function M.operator(args) -- {{{
                 -- entering commandline mode. Therefor "gv" is exectued here to retrieve it.
                 -- Somehow the below command sequence cannot produce the effect of retrieving:
                 -- vim.cmd[[:lua vim.cmd([[norm! gv]] .. t"<Esc>"); Print(vim.api.nvim_win_get_cursor(0))]]
-                cmd([[norm! gvmz]] .. t"<Esc>")
+                cmd([[noa norm! gvmz]] .. t"<Esc>")
                 M.cursorPos = api.nvim_buf_get_mark(curBufNr, "z")
             else
                 M.cursorPos = api.nvim_win_get_cursor(0)
-                vim.cmd("norm! V" .. vim.v.count1 .. "_" .. t"<Esc>");
+                vim.cmd("noa norm! V" .. vim.v.count1 .. "_" .. t"<Esc>");
             end
         elseif vimMode ~= "V" then
             M.cursorPos = api.nvim_win_get_cursor(0)
@@ -341,7 +341,7 @@ function M.operator(args) -- {{{
         -- TODO: check situation that executing a "w" command might get cursor
         -- into next line
         -- if string.match(newPosthen, "%s") then
-            -- cmd "norm! w"
+            -- cmd "noa norm! w"
         -- end
     end
     -- }}} Restoration

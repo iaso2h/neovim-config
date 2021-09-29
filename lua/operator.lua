@@ -50,7 +50,7 @@ function M.vMotion(saveCursorChk)
         -- entering commandline mode. Therefor "gv" is exectued here to retrieve it.
         motionType = "line"
         if saveCursorChk then
-            cmd([[norm! gvmz]] .. t"<Esc>")
+            cmd([[noa norm! gvmz]] .. t"<Esc>")
             M.cursorPos = api.nvim_buf_get_mark(0, "z")
         end
     elseif visualMode == "\22" then

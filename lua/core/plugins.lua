@@ -111,6 +111,7 @@ packer.startup{
             map("", [[<A-a>]], [[<Plug>(expand_region_expand)]], "Expand region")
             map("", [[<A-s>]], [[<Plug>(expand_region_shrink)]], "Shrink region")
             pcall(vim.cmd, [[unmap _]])
+            pcall(vim.cmd, [[noa unmap _]])
         end
     }
     use {
@@ -266,7 +267,7 @@ packer.startup{
                     vim.g.ReplaceExpr = vim.fn.getreg("=")
                 end;
 
-                vim.cmd("norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0));
+                vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0));
 
                 local vMotion = require("operator").vMotion(false);
                 table.insert(vMotion, "<Plug>ReplaceVisual");

@@ -19,9 +19,9 @@ M.main = function(listName, direction)
 
     -- Prevent hop on a fold-closed line
     if fn.foldclosed('.') ~= -1 then
-        cmd [[norm! zAzz]]
+        cmd [[noa norm! zAzz]]
     else
-        cmd [[norm! zz]]
+        cmd [[noa norm! zz]]
     end
 end
 

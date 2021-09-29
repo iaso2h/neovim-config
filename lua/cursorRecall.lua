@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Derived from and simplified:
     -- https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
--- Version: 0.0.1
--- Last Modified: 2021-04-09
+-- Version: 0.0.2
+-- Last Modified: 2021-09-25
 
 local ignoreBuftype = {
         'quickfix',
@@ -18,7 +18,6 @@ local ignoreFiletype = {
 }
 local fn  = vim.fn
 local cmd = vim.cmd
-local api = vim.api
 local M   = {}
 
 
@@ -42,19 +41,19 @@ function M.main()
         -- Last edit pos is set and is < no of lines in buffer
         if winend == buffend then
             -- Last line in buffer is also last line visible
-            cmd 'normal! g`"'
+            cmd 'noa normal! g`"'
         elseif buffend - lastpos > ((winend - winstart) / 2) - 1 then
             -- Center cursor on screen if not at bottom
-            cmd 'normal! g`"zz'
+            cmd 'noa normal! g`"zz'
         else
             -- Otherwise, show as much context as we can
-            cmd "normal! \\G'\"\\<c-e>"
+            cmd "noa normal! \\G'\"\\<c-e>"
         end
     end
 
     if fn.foldclosed('.') ~= -1 then
         -- Cursor was inside a fold; open it
-        cmd 'normal! zA'
+        cmd 'noa normal! zA'
     end
 end
 

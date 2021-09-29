@@ -7,9 +7,9 @@ M.commentJump = function(keystroke) -- {{{
     if api.nvim_get_current_line() ~= '' then
         local saveReg = fn.getreg('"')
         if keystroke == "o" then
-            cmd("normal! YpS" .. vim.g.FiletypeCommentDelimiter[vim.bo.filetype] .. " ")
+            cmd("noa normal! YpS" .. vim.g.FiletypeCommentDelimiter[vim.bo.filetype] .. " ")
         elseif keystroke == "O" then
-            cmd("normal! YPS" .. vim.g.FiletypeCommentDelimiter[vim.bo.filetype] .. " ")
+            cmd("noa normal! YPS" .. vim.g.FiletypeCommentDelimiter[vim.bo.filetype] .. " ")
         end
         fn.setreg('"', saveReg)
         cmd [[startinsert!]]

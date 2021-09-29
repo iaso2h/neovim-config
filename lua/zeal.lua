@@ -34,21 +34,21 @@ local function lookUp(args)
         posStart = api.nvim_buf_get_mark(0, "[")
         posEnd   = api.nvim_buf_get_mark(0, "]")
         api.nvim_win_set_cursor(0, posStart)
-        cmd "normal! v"
+        cmd "noa normal! v"
         api.nvim_win_set_cursor(0, posEnd)
-        cmd "normal! v"
+        cmd "noa normal! v"
     else
-        cmd("normal! gv" .. t"<Esc>")
+        cmd("noa normal! gv" .. t"<Esc>")
         posStart = api.nvim_buf_get_mark(0, "<")
         posEnd   = api.nvim_buf_get_mark(0, ">")
     end
     content = require("util").visualSelection("string")
     -- }}} Get content
 
-    cmd "echohl MoreMsg"
+    cmd "noa echohl MoreMsg"
     local answer = fn.confirm("Save modification?",
         ">>> &Zeal\n&Goldendict\nch&Eat\n&TL;DR\n&Cancel", 5, "Question")
-    cmd "echohl None"
+    cmd "noa echohl None"
     if answer == 1 then
         if fn.executable("zeal") ~= 1 then
             return vim.notify("Zeal not found on environment", vim.log.levels.ERROR)
@@ -62,7 +62,7 @@ local function lookUp(args)
         command = "goldendict "
         fn.jobstart(command .. content)
     elseif answer == 3 then
-        cmd(string.format("Cheat %s %s", vim.bo.filetype, content))
+        cmd(string.format("noa Cheat %s %s", vim.bo.filetype, content))
     elseif answer == 4 then
         -- TODO:
         return

@@ -27,7 +27,7 @@ function M.terminalToggle() -- {{{
         if winCount == 1 then
             cmd [[bp]]
         elseif winCount == 2 then
-            cmd [[wincmd w]]
+            cmd [[noa wincmd w]]
             cmd [[only]]
         else
             cmd [[q]]
@@ -54,7 +54,7 @@ function M.openTerminal(newBufNr) -- {{{
     local termBufOutput = vim.api.nvim_exec("ls! R", true)
     if termBufOutput ~= "" then  -- Buffer instance exist
         local termBufInfo = vim.split(termBufOutput, "\n", true)[1]
-        cmd("b " .. string.match(termBufInfo, "%d+"))
+        cmd("noa b " .. string.match(termBufInfo, "%d+"))
         cmd "startinsert"
         -- Clear the scratch buffer
         cmd("bwipe! " .. newBufNr)
