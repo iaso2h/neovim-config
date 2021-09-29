@@ -1,8 +1,9 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.1
--- Last Modified: 2021-09-21
+-- Version: 0.1.3
+-- Last Modified: 2021-09-29
+-- TODO: trim extra leading spaces for line register while paste them
 
 local fn       = vim.fn
 local cmd      = vim.cmd
@@ -21,22 +22,22 @@ function M.VSCodeLineMove(vimMode, direction) -- {{{
     if vimMode == "n" then
         if direction == "down" then
             local nextIndent = fn.indent(cursorPos[1] + 1)
-            cmd [[m .+1]]
+            pcall(cmd, [[m .+1]])
             if not (nextIndent == curIndent or nextIndent == 0) then
                 if vim.o.equalprg == "" then cmd [[noautocmd normal! ==]] end
             end
         elseif direction == "up" then
             local previousIndent = fn.indent(cursorPos[1] - 1)
-            cmd [[m .-2]]
+            pcall(cmd, [[m .-2]])
             if not (previousIndent == curIndent or previousIndent == 0) then
                 if vim.o.equalprg == "" then cmd [[noautocmd normal! ==]] end
             end
         end
     elseif vimMode == "v" then
         if direction == "down" then
-            cmd [['<,'>m '>+1]]
+            pcall(cmd, [['<,'>m '>+1]])
         elseif direction == "up" then
-            cmd [['<,'>m '<-2]]
+            pcall(cmd, [['<,'>m '<-2]])
         end
         cmd [[noautocmd normal! gv]]
     end
@@ -165,7 +166,10 @@ function M.inplaceYank(args) -- {{{
     api.nvim_win_set_cursor(curWinID, operator.cursorPos)
 
     vim.defer_fn(function()
-        api.nvim_buf_clear_namespace(curBufNr, yankHLNS, 0, -1)
+        -- In case of buffer being deleted
+        if api.nvim_buf_is_valid(curBufNr) then
+            pcall(api.nvim_buf_clear_namespace, curBufNr, yankHLNS, 0, -1)
+        end
     end, opts["timeout"])
     -- }}} Create highlight
 
@@ -272,7 +276,10 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
     end
 
     vim.defer_fn(function()
-        api.nvim_buf_clear_namespace(curBufNr, putHLNS, 0, -1)
+        -- In case of buffer being deleted
+        if api.nvim_buf_is_valid(curBufNr) then
+            pcall(api.nvim_buf_clear_namespace, curBufNr, putHLNS, 0, -1)
+        end
     end, opts["timeout"])
     -- }}} Create highlight
 
@@ -369,7 +376,9 @@ function M.convertPut(pasteCMD, opts) --  {{{
     end
 
     vim.defer_fn(function()
-        api.nvim_buf_clear_namespace(curBufNr, putHLNS, 0, -1)
+        if api.nvim_buf_is_valid(curBufNr) then
+            pcall(api.nvim_buf_clear_namespace, curBufNr, putHLNS, 0, -1)
+        end
     end, opts["timeout"])
     -- }}} Create highlight
 

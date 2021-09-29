@@ -303,7 +303,10 @@ function M.operator(args) -- {{{
     end
 
     vim.defer_fn(function()
-        api.nvim_buf_clear_namespace(curBufNr, repHLNS, 0, -1)
+        -- In case of buffer being deleted
+        if api.nvim_buf_is_valid(curBufNr) then
+            pcall(api.nvim_buf_clear_namespace, curBufNr, repHLNS, 0, -1)
+        end
     end, opts["timeout"])
     -- }}} Create highlight
 
@@ -374,6 +377,7 @@ function M.expr() -- {{{
 
     Opfunc = M.operator
     vim.o.opfunc = "LuaExprCallback"
+    require("operator")
 
     -- Preserving cursor position as its position will changed once the
     -- vim.o.opfunc() being called
