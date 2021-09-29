@@ -745,6 +745,9 @@ packer.startup{
         'nvim-treesitter/playground',
         requires = "nvim-treesitter",
         cmd      = "TSPlaygroundToggle",
+        keys     = {
+                {"n", "gH"}
+            },
         config   = function()
             require "nvim-treesitter.configs".setup {
                 playground = {
@@ -766,6 +769,8 @@ packer.startup{
                     },
                 }
             }
+
+            map("n", [[gH]], [[:<C-u>TSHighlightCapturesUnderCursor<CR>]], {"silent"})
         end
     }
     use {
@@ -1126,47 +1131,41 @@ packer.startup{
         branch = 'ftplugin',
         ft     = 'vim',
         cmd    = {
-            "PP", "PPmsg", "Runtime", "Disarm", "Scriptnames", "Messages",
+            "PP", "Runtime", "Disarm", "Scriptnames", "Messages",
             "Verbose", "Time", "Breakadd", "Vopen", "Vedit", "Vsplit"
         },
         keys   = {
-            {"n", "zS",},
             {"n", "g>"}
         },
-        config = function()
-            map("n", [[g>]], [[:<C-u>Messages<CR>]], {"silent", "novscode"}, "Messages in quickfix")
-            whichKeyDoc({"zS", "Show syntax highlighting groups"})
-            whichKeyDoc({"g=", "Eval operator"})
-            whichKeyDoc({"g==", "Eval current line"})
-
-        end
+        config = conf("vim-scriptease").config
     }
     use {
         'gaelph/logsitter.nvim',
         requires = "nvim-treesitter",
-        after    = "nvim-treesitter",
         module   = "logsitter",
         cmd      = "Logsitter",
         setup    = [=[map("n", [[<leader>lg]], [[:lua require("logsitter").log(vim.bo.filetype)<CR>]=]
     }
     use {
-        'bryall/contextprint.nvim',
-        disable  = true,
-        requires = "nvim-treesitter",
-        after    = "nvim-treesitter",
-        module   = "contextprint",
+        'mfussenegger/nvim-dap',
+        module = "dap",
+        config = conf "nvim-dap".config
+    }
+    use {
+        'rcarriga/nvim-dap-ui',
+        module   = "dap",
+        requires = "nvim-dap",
+        config   = conf "nvim-dap-ui"
+    }
+    use {
+        'jbyuki/one-small-step-for-vimkind',
+        module   = "dap",
+        requires = 'nvim-dap',
         config   = function()
-            require('contextprint').setup{
-                separator_char = "#",
-                lua = {
-                    separator = "#",
-                    log = function(contents) return string.format([[Print("%s")]], contents) end
-                }
-            }
-        map("n", [[<leader>L]], [[:lua require("contextprint").add_statement()<CR>]])
+            vim.cmd [[command! -nargs=0 OSVStop  lua require("osv").stop()]]
+            vim.cmd [[command! -nargs=0 OSVStart lua require("osv").launch()]]
         end
     }
-    -- use 'mfussenegger/nvim-dap'
     -- use 'theHamsta/nvim-dap-virtual-text'
     -- use 'mfussenegger/nvim-dap-python', {'for': 'python'}
     -- use 'puremourning/vimspector'
