@@ -4,8 +4,6 @@ local M    = {}
 local conf       = function(moduleString) return require(string.format("config.%s", moduleString)) end
 local packerPath = fn.stdpath("data") .. "site/pack/packer/start/packer.nvim"
 local packer     = require("packer")
--- VSCodeLoaded = vim.fn.exists('g:vscode') == 0
--- local nonVSCode    = function() return VSCodeLoaded end
 
 if fn.empty(fn.glob(packerPath)) > 0 then
     fn.system{"git", "clone", "https://github.com/wbthomason/packer.nvim", packerPath}
@@ -189,14 +187,6 @@ packer.startup{
         end
         }
     use {
-        fn.stdpath("config") .. "/lua/fixScrollUp",
-        keys = {"<C-e>", "<C-d>"},
-        config = function()
-            map("",  [[<C-e>]], [[<C-y>]], {"noremap", "novscode"}, "Scroll Up")
-            map("",  [[<C-d>]], [[<C-e>]], {"noremap", "novscode"}, "Scroll Down")
-        end
-    }
-    use {
         fn.stdpath("config") .. "/lua/compileRun",
         cmd  = {"Run", "Compile"},
         keys = {"F9", "S-F9"},
@@ -206,8 +196,8 @@ packer.startup{
             command! -nargs=0 Run     lua require("compileRun").runCode()
             ]]
 
-            map("n", [[<F9>]],   [[:lua require("compileRun").compileCode(true)<CR>]], {"noremap", "silent", "novscode"}, "Compile code")
-            map("n", [[<S-F9>]], [[:lua require("compileRun").runCode(true)<CR>]],     {"noremap", "silent", "novscode"}, "Run code")
+            map("n", [[<F9>]],   [[:lua require("compileRun").compileCode(true)<CR>]], {"noremap", "silent"}, "Compile code")
+            map("n", [[<S-F9>]], [[:lua require("compileRun").runCode(true)<CR>]],     {"noremap", "silent"}, "Run code")
         end
     }
     use {
@@ -679,6 +669,7 @@ packer.startup{
     }
     use {
         'joshdick/onedark.vim',
+        disable = true
     }
     -- TODO: deprecated
     use {
@@ -688,12 +679,9 @@ packer.startup{
         config   = conf "nvim-galaxyline"
     }
     use {
-        -- 'romgrk/barbar.nvim',
         'akinsho/bufferline.nvim',
         event    = "BufRead",
         requires = "nvim-web-devicons",
-        -- setup    = conf "nvim-barbar".setup,
-        -- config   = conf "nvim-barbar".config,
         config   = conf "nvim-bufferline"
     }
     use {
@@ -1182,13 +1170,14 @@ packer.startup{
     -- use 'mfussenegger/nvim-dap-python', {'for': 'python'}
     -- use 'puremourning/vimspector'
     -- use 'sakhnik/nvim-gdb', {'do': ':!./install.sh'}
-    -- }}} Debug end
+    -- }}} Debug
     -- Language support {{{
     -- Lua
     use {
         'davisdude/vim-love-docs',
-        branch = "build",
-        ft     = "lua"
+        disable = true,
+        branch  = "build",
+        ft      = "lua"
     }
     use {
         'iaso2h/nlua.nvim',
@@ -1263,6 +1252,7 @@ packer.startup{
     }
     use {
         'DanilaMihailov/vim-tips-wiki',
+        disable = true
     }
     -- }}} Knowlege
     end,

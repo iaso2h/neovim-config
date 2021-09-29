@@ -32,12 +32,13 @@ o.completeopt = "menuone,noselect,noinsert"
 o.conceallevel  = 0
 o.concealcursor = "nc"
 
-o.cpoptions:append"q"
+o.cpoptions:append"q;"
 o.cursorline     = true
 o.diffopt        = "context:10000,filler,closeoff,vertical,algorithm:patience"
 
-o.fileencodings = "utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1"
 o.langmenu      = "en"
+o.fileencodings = "utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1"
+o.modelineexpr  = true
 
 o.fillchars = "fold: ,vert:▏,eob: "
 o.listchars = "tab:>-,precedes:❮,extends:❯,trail:-,nbsp:%,eol:↴"
@@ -61,7 +62,7 @@ o.joinspaces = false
 o.mouse         = "a"
 o.number        = true
 o.ruler         = false
-o.scrolloff     = 10
+o.scrolloff     = 7
 o.showtabline   = 2
 o.showcmd       = false
 o.showmode      = false
@@ -107,50 +108,8 @@ o.guifont = GuiFont ..":h" .. GuiFontSize
 -- end
 o.guicursor = "n-v-sm:block,i-c-ci:ver25-Cursor,ve-o-r-cr:hor20"
 -- }}} Basic settings
--- -- VS Code settings {{{
--- local vscodeOpts = {
-    -- clipboard      = "unnamed,unnamedplus",
-    -- complete       = ".,w,b,u,t,kspell,i,d,t",
-    -- completeopt    = "menuone,noselect,noinsert",
-    -- conceallevel   = 0,
-    -- concealcursor  = "nc",
-    -- cpoptions      = vim.o.cpoptions .. "q",
-    -- cursorline     = true,
-    -- gdefault       = true,
-    -- hidden         = true,
-    -- ignorecase     = true, smartcase = true,
-    -- inccommand     = "nosplit",
-    -- listchars      = "tab:>-,precedes:❮,extends:❯,trail:-,nbsp:%,eol:↴",
-    -- langmenu       = "en",
-    -- lazyredraw     = true,
-    -- mouse          = "a",
-    -- joinspaces     = false,
-    -- path           = vim.o.path .. "**",
-    -- scrolloff      = 10,
-    -- sessionoptions = "buffers,curdir,folds,help,resize,slash,tabpages,winpos,winsize",
-    -- shada          = "!,'100,/100,:100,<100,s100,h",
-    -- showtabline    = 2,
-    -- showbreak      = "↳",
-    -- splitbelow = true, splitright = true, switchbuf = "split",
-    -- termguicolors  = true,
-    -- timeoutlen     = 500,
-    -- updatetime     = 150,
-    -- wildignore     = vim.o.wildignore .. "*/tmp/*,*.so,*.swp,*.zip,*.db,*.sqlite,*.bak",
-    -- wildignorecase = true,
-    -- winhighlight   = "NormalNC:WinNormalNC",
--- }
-
--- if vim.g.vscode then
-    -- for key, val in pairs(vscodeOpts) do
-        -- if optsLocal[key] ~= nil then
-            -- vim[optsLocal[key]][key] = val
-        -- end
-        -- vim["o"][key] = val
-    -- end
--- end
--- -- }}} VS Code settings
 -- OS varied settings {{{
-if fn.has('win32') == 1 then
+if jit.os == "Windows" then
     -- o.shell="powershell"
     -- o.shellquote="shellpipe= shellxquote="
     -- o.shellcmdflag="-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command"
@@ -165,7 +124,7 @@ if fn.has('win32') == 1 then
             api.nvim_err_write("Python path not found\n")
         end
     end
-elseif fn.has('unix') == 1 then
+elseif jit.os == "Linux" then
     local linuxPython = "/usr/bin/python3"
     api.nvim_set_var("python3_host_prog", linuxPython)
     if fn.executable(linuxPython) == 0 then

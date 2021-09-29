@@ -8,6 +8,7 @@ pack/
 lsp/
 
 packer_compiled.lua
+lua/test**
 *.bk
 *~
 *.py
