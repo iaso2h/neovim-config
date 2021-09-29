@@ -10,6 +10,7 @@ if not os.getenv("TERM") then
     map("", [[<C-=>]], [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Decrease font size")
     map("", [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent"}, "Restore font size")
 end
+map("n", [[J]], [[mzJ`z]], {"noremap"})
 -- Run selected
 map("x", [[gM]], luaRHS[[:lua vim.cmd(
     string.format("lua %s",
@@ -144,6 +145,12 @@ map("n", [[<A-i>]], [[:lua require("historyHop").main("changelist", 1)<CR>]],  {
 -- map("n", [[<C-i>]], [[:lua require("historyHop").main("jumplist", 1)<CR>]],    {"silent"})
 map("n", [[j]], [[:lua require("util").addJump("j", true)<CR>]], {"silent"})
 map("n", [[k]], [[:lua require("util").addJump("k", true)<CR>]], {"silent"})
+-- Swap default mapping
+map("n", [[*]],  [[g*]], {"noremap"})
+map("n", [[#]],  [[g#]], {"noremap"})
+map("n", [[g#]], [[#]],  {"noremap"})
+map("n", [[g*]], [[*]],  {"noremap"})
+-- Add visual mode
 map("x", [[*]], [[mz`z:<C-u>execute "/" . escape(luaeval('require("util").visualSelection("string")'), '\')<CR>]], {"noremap", "silent"})
 map("x", [[#]], [[mz`z:<C-u>execute "?" . escape(luaeval('require("util").visualSelection("string")'), '\')<CR>]], {"noremap", "silent"})
 map("x", [[/]], [[*]])
@@ -151,9 +158,11 @@ map("x", [[?]], [[#]])
 -- Regex very magic
 map("n", [[/]], [[/\v]], {"noremap"}, "Search forward")
 map("n", [[?]], [[?\v]], {"noremap"}, "Search backward")
+map("n", [[n]], [[nzzzv]], {"noremap"})
+map("n", [[N]], [[Nzzzv]], {"noremap"})
 -- Disable highlight search & Exit visual mode
-map("n", [[<leader>h]], [[:<C-u>noh<CR>]],               {"silent"}, "Disable highlight")
-map("x", [[<leader>h]], [[:<C-u>call ExitVisual()<CR>]], {"silent"})
+map("n", [[<leader>h]], [[:<C-u>noh<CR>]], {"silent"}, "Disable highlight")
+map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"})
 -- Visual selection
 map("n", [[go]],    [[:lua require("selection").oppoSelection()<CR>]], {"silent"}, "Go to opposite of selection")
 map("n", [[<A-v>]], [[<C-q>]],                                         {"noremap"}, "Visual Block Mode")
@@ -205,7 +214,8 @@ map("t", [[<A-d>]], [[<C-\><C-n><PageDown>]])
 map("n", [[<A-q>]], [[q]], {"noremap"}, "Macro")
 -- Register
 map("",  [[<leader>q]],  [[:lua require("register").clear()<CR>]], {"silent"}, "Clear registers")
-map("",  [[<C-q>]],      [[:<C-u>reg<CR>]],                        {"silent"}, "Registers in prompt")
+map("",  [[<C-q><C-q>]], [[:<C-u>reg<CR>]],                        {"silent"}, "Registers in prompt")
+map("",  [[<C-q>q]],     [[:<C-u>reg<CR>]],                        {"silent"}, "Registers in prompt")
 map("i", [[<C-r><C-r>]], [[<C-\><C-o>:lua require("register").insertPrompt()<CR>]], {"silent"}, "Registers in prompt")
 
 -- Buffer & Window & Tab{{{
@@ -376,6 +386,10 @@ map("i", [[<C-BS>]], [[<C-w>]], {"noremap"})
 map("i", [[<C-y>]],  [[pumvisible() ? "\<C-e>\<C-y>" : "\<C-y>"]], {"noremap", "expr"})
 map("i", [[<A-y>]],  [[<C-x><C-l>]], {"noremap"})
 map("i", [[<C-i>]],  [[pumvisible() ? "\<C-e>\<C-e>" : "\<C-e>"]], {"noremap", "expr"})
+map("i", [[,]], [[,<C-g>u]], {"noremap"})
+map("i", [[.]], [[.<C-g>u]], {"noremap"})
+map("i", [[!]], [[!<C-g>u]], {"noremap"})
+map("i", [[*]], [[*<C-g>u]], {"noremap"})
 -- Outdent
 map("i", [[<S-Tab>]], [[<C-d>]], {"noremap"})
 -- Navigation {{{

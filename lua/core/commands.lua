@@ -49,11 +49,6 @@ if not vim.g.vscode then
             return "="
         endif
     endfunction
-
-    function! ExitVisual()
-        normal! gv
-        execute "normal! \<esc>"
-    endfunction
     ]]
 end
 

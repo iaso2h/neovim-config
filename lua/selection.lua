@@ -26,5 +26,10 @@ function M.oppoSelection() -- {{{
     end
 end -- }}}
 
+M.visualSub = function()
+    local str = require("util").visualSelection("string")
+    api.nvim_feedkeys(string.format(":s#%s", str), "nt", false)
+end
+
 return M
 

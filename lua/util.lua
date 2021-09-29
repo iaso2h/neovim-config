@@ -174,7 +174,6 @@ end -- }}}
 function Reload(module) -- {{{
     local configPath = fn.stdpath("config")
     local modulePath = configPath .. "/lua"
-
     local moduleFull = vim.fn.expand("%:p")
     -- Config path only
     if not string.match(moduleFull, configPath) then return end
@@ -188,6 +187,7 @@ function Reload(module) -- {{{
             if not luaDirEnd then
                 return vim.notify(string.format([[Failed to find index of "lua/" in "%s"]], rootTailPath),
                             vim.log.levels.ERROR)
+            end
 
             if string.match(moduleFull, modulePath) then
                 -- Reload module under: ~/.config/nvim/lua
@@ -582,6 +582,7 @@ function M.visualSelection(returnType) -- {{{
     local selectEnd = api.nvim_buf_get_mark(0, ">")
     local lines = api.nvim_buf_get_lines(0, selectStart[1] - 1, selectEnd[1],
                                          false)
+
     if #lines == 0 then
         return {""}
     end
@@ -591,6 +592,8 @@ function M.visualSelection(returnType) -- {{{
         lines[#lines] = lines[#lines]:sub(1, selectEnd[2] + 1)
         lines[1] = lines[1]:sub(selectStart[2] + 1)
     end
+
+    if returnNormal then cmd("norm! " .. t"<Esc>") end
 
     if returnType == "list" then
         return lines
