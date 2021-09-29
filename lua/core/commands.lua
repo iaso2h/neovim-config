@@ -56,6 +56,19 @@ if not vim.g.vscode then
     endfunction
     ]]
 end
+
+cmd [[
+function! RemoveLastPathComponent()
+    let l:cmdlineBeforeCursor = strpart(getcmdline(), 0, getcmdpos() - 1)
+    let l:cmdlineAfterCursor  = strpart(getcmdline(), getcmdpos() - 1)
+    PP l:cmdlineAfterCursor
+    PP l:cmdlineBeforeCursor
+    let l:cmdlineRoot         = fnamemodify(cmdlineBeforeCursor, ':r')
+    let l:result              = (l:cmdlineBeforeCursor ==# l:cmdlineRoot ? substitute(l:cmdlineBeforeCursor, '\%(\\ \|[\\/]\@!\f\)\+[\\/]\=$\|.$', '', '') : l:cmdlineRoot)
+    call setcmdpos(strlen(l:result) + 1)
+    return l:result . l:cmdlineAfterCursor
+endfunction
+]]
 -- }}} Function
 
 -- Auto commands {{{
@@ -101,7 +114,6 @@ command! -nargs=+ -complete=command  Echo PPmsg strftime('%c') . ": " . <args>
 command! -nargs=+ -complete=command  Redir call luaeval('require("redir").catch(_A)', <q-args>)
 command! -nargs=0 -range ExtractSelection lua require("extractSelection").main(vim.fn.visualmode())
 command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | setl norevins
-command! -nargs=0 PS     terminal powershell
 command! -nargs=0 CD     execute "cd " . expand("%:p:h")
 command! -nargs=0 E      up | let g:refreshBufSavView = winsaveview() | e! | call winrestview(g:refreshBufSavView)
 command! -nargs=0 O      browse oldfiles
@@ -115,6 +127,12 @@ command! -nargs=? Near -<args>,+<args>p | -<args>
 command! -nargs=0 TrimSpaces              call TrimSpaces()
 command! -nargs=0 TrimSpacesToggle        lua  if type(TrimSpacesChk) == "nil" then TrimSpacesChk = TrimSpacesChk or true end; TrimSpacesChk = not TrimSpacesChk; vim.api.nvim_echo({{string.format("%s",TrimSpacesChk), "Moremsg"}}, false, {})
 command! -nargs=0 TrailingEmptyLineToggle lua  if type(TrailEmptyLineChk) == "nil" then TrailEmptyLineChk = TrailEmptyLineChk or true end; TrailEmptyLineChk = not TrailEmptyLineChk; vim.api.nvim_echo({{string.format("%s",TrailEmptyLineChk), "Moremsg"}}, false, {})
+
+command! -nargs=+ -bang Cfilter call v:lua.qFilter(v:true,  <q-args>, <q-bang>)
+command! -nargs=+ -bang Lfilter call v:lua.qFilter(v:false, <q-args>, <q-bang>)
 ]]
+if jit.os == "Windows" then
+    cmd [[command! -nargs=0 PS     terminal powershell]]
+end
 -- }}} Commands
 

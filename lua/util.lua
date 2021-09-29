@@ -9,8 +9,12 @@ function Print(...)
         local v = select(i, ...)
         table.insert(objects, vim.inspect(v))
     end
+    if #objects == 1 and type(objects[1]) == "table" then
+        return require("pprint").print(objects[1])
+    else
+        print(table.concat(objects, '\n'))
+    end
 
-    print(table.concat(objects, '\n'))
     return ...
 end
 
