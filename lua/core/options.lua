@@ -44,7 +44,7 @@ o.listchars = "tab:>-,precedes:❮,extends:❯,trail:-,nbsp:%,eol:↴"
 o.showbreak = "↳"
 
 o.foldcolumn = "auto:4"
-o.signcolumn = "auto:4"
+o.signcolumn = "yes:4"
 o.foldmethod = "expr"
 o.foldexpr   = "EnhanceFoldExpr()"
 

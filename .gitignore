@@ -7,7 +7,7 @@ dein/
 pack/
 lsp/
 
-plugin/packer_compiled.lua
+packer_compiled.lua
 *.bk
 *~
 *.py

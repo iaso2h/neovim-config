@@ -15,10 +15,11 @@ cmd "packadd packer.nvim"
 
 packer.init{
     package_root = vim.fn.stdpath("config") .. "/pack",
-    compile_path = vim.fn.stdpath("config") .. "/plugin/packer_compiled.lua"
+    compile_path = vim.fn.stdpath("config") .. "/lua/packer_compiled.lua"
 }
 
-packer.startup(function(use, use_rocks)
+packer.startup{
+    function(use, use_rocks)
     -- NOTE: https://github.com/wbthomason/packer.nvim#specifying-plugins
     -- use {
     -- 'myusername/example',        -- The plugin location string
@@ -1130,6 +1131,7 @@ packer.startup(function(use, use_rocks)
         cmd    = "StartupTime",
         config = [[vim.g.startuptime_tries = 20]]
     }
+    use 'lewis6991/impatient.nvim'
     use {
         'iaso2h/vim-scriptease',
         branch = 'ftplugin',
@@ -1263,7 +1265,15 @@ packer.startup(function(use, use_rocks)
         'DanilaMihailov/vim-tips-wiki',
     }
     -- }}} Knowlege
-end)
+    end,
+    config = {
+        display = {
+            open_fn = function()
+                return require("packer.util").float{border = "single"}
+            end
+        }
+    }
+}
 
 return M
 
