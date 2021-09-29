@@ -116,7 +116,7 @@ end
 function M.inplaceYank(args) -- {{{
     -- TODO add opts
     -- opts = opts or {hlGroup="Search", timeout=500}
-    local opts = {hlGroup="Search", timeout=500}
+    local opts = {hlGroup="Search", timeout=250}
     local motionType = args[1]
     local vimMode    = args[2]
     local plugMap    = operator.plugMap
@@ -200,7 +200,7 @@ end -- }}}
 function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
     if not vim.bo.modifiable then return end
 
-    opts = opts or {hlGroup="Search", timeout=500}
+    opts = opts or {hlGroup="Search", timeout=250}
     local regType   = fn.getregtype()
     local curLine   = api.nvim_get_current_line()
     local curBufNr  = api.nvim_get_current_buf()
@@ -297,7 +297,7 @@ function M.convertPut(pasteCMD, opts) --  {{{
     if not vim.bo.modifiable then return end
     if fn.foldclosed('.') ~= -1 then return end
 
-    opts = opts or {hlGroup="Search", timeout=500}
+    opts = opts or {hlGroup="Search", timeout=250}
     local curBufNr = api.nvim_get_current_buf()
     local curWinID = api.nvim_get_current_win()
     local cursorPos   = api.nvim_win_get_cursor(curWinID)

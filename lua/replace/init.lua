@@ -219,7 +219,7 @@ function M.operator(args) -- {{{
     local motionType = args[1]
     local vimMode    = args[2]
     local plugMap    = args[3]
-    local opts = {hlGroup = "Search", timeout = 500}
+    local opts = {hlGroup = "Search", timeout = 250}
 
     local curBufNr = api.nvim_get_current_buf()
     local pos
