@@ -91,9 +91,8 @@ o.splitright       = true
 o.switchbuf        = "split"
 
 -- GUI
--- cmd [[colorscheme rose-pine]]
--- vim.g.rose_pine_variant = 'moon'
-cmd [[colorscheme onedarknord]]
+-- cmd [[colorscheme onedarknord]]
+cmd [[colorscheme onenord]]
 GuiFont = "UbuntuMono Nerd Font"
 -- GuiFont = "Sarasa Mono SC Nerd"
 -- GuiFont = "FiraCode Nerd Font"

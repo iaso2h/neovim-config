@@ -1018,20 +1018,6 @@ packer.startup(function(use, use_rocks)
             }
         end
     }
-    -- TODO: highlight
-    use {
-        'folke/lsp-colors.nvim',
-        rquires = "nvim-lspconfig",
-        module  = "nvim-lspconfig",
-        config  = function()
-            require("lsp-colors").setup{
-                Error       = "#db4b4b",
-                Warning     = "#e0af68",
-                Information = "#0db9d7",
-                Hint        = "#10B981"
-        }
-        end
-    }
     use {
         'hrsh7th/nvim-cmp',
         module   = "cmp",
