@@ -81,40 +81,6 @@ packer.startup{
         'antoinemadec/FixCursorHold.nvim',
         setup = [[vim.g.cursorhold_updatetime = 100]]
     }
-    -- TODO: deprecated
-    use {
-        'landock/vim-expand-region',
-        event    = "BufRead",
-        requires = "camelcasemotion",
-        config   = function()
-            vim.g.expand_region_text_objects = {
-                ['iw'] = 0,
-                ['iW'] = 0,
-                ['i"'] = 0,
-                ["i'"] = 0,
-                ['i]'] = 1,
-                ['ib'] = 1,
-                ['iB'] = 1,
-                ['il'] = 0,
-                ['ii'] = 0,
-                ['ip'] = 1,
-                ['ie'] = 0,
-            }
-            vim.g.expand_region_custom_text_objects = {
-                ['i,w'] = 1,
-                ['i%']  = 0,
-                ['a]']  = 0,
-                ['ab']  = 0,
-                ['aB']  = 0,
-                ['ai']  = 0
-            }
-            vim.fn["expand_region#custom_text_objects"](vim.g.expand_region_custom_text_objects)
-            map("", [[<A-a>]], [[<Plug>(expand_region_expand)]], "Expand region")
-            map("", [[<A-s>]], [[<Plug>(expand_region_shrink)]], "Shrink region")
-            pcall(vim.cmd, [[unmap _]])
-            pcall(vim.cmd, [[noa unmap _]])
-        end
-    }
     use {
         'zatchheems/vim-camelsnek',
         cmd  = {"Camel", "Snake", "Pascal", "Snakecaps"},

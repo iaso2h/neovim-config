@@ -161,7 +161,8 @@ local replace = function(motionType, vimMode, reg, pos, curBufNr) -- {{{
     if vimMode ~= "n" then
         cmd(string.format("noa norm! gv%sp", reg.name))
     else
-        if pos.startPos[1] > pos.endPos[1] or (pos.startPos[1] == pos.endPos[1] and pos.startPos[2] > pos.endPos[2]) then
+        -- TODO: tests needed
+        if util.compareDist(pos.startPos, pos.endPos) > 0 then
             -- This's the scenario where startpos is fall behind endpos
             cmd(string.format("noa norm! %sP", reg.name))
         else

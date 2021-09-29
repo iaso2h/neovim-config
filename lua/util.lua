@@ -573,7 +573,7 @@ function M.saveReg() -- {{{
     end
 end -- }}}
 
-function M.visualSelection(returnType) -- {{{
+function M.visualSelection(returnType, returnNormal) -- {{{
     -- Not support blockwise visual mode
     local mode = fn.visualmode()
     if mode == "\22" then return end
@@ -590,11 +590,10 @@ function M.visualSelection(returnType) -- {{{
     if vim.o.selection == "exclusive" then selectEnd[2] = selectEnd[2] - 1 end
     if mode == "v" then
         lines[#lines] = lines[#lines]:sub(1, selectEnd[2] + 1)
-        lines[1] = lines[1]:sub(selectStart[2] + 1)
+        lines[1]      = lines[1]:sub(selectStart[2] + 1)
     end
 
     if returnNormal then cmd("norm! " .. t"<Esc>") end
-
     if returnType == "list" then
         return lines
     elseif returnType == "string" then
@@ -627,25 +626,24 @@ function M.posDist(pos1, pos2, bias, baisIdx)
     return lineDist + colDist
 end
 
+--- Compare the distance from a to b by subtracting them
+--- @param a table list-liked table
+--- @param b table list-liked table
+--- @return number
+function M.compareDist(a, b)
+    return a[1] == b[1] and a[2] - b[2] or a[1] - b[1]
+end
+
+--- Check if pos is whithin a defined region
+--- @param pos table
+--- @param regionStart table
+--- @param regionEnd table
+--- @return boolean
 function M.withinRegion(pos, regionStart, regionEnd)
-    if pos[1] < regionStart[1] or pos[1] > regionEnd[1] then
+    if M.compareDist(pos, regionStart) < 0 or M.compareDist(regionEnd, pos) < 0 then
         return false
     else
-        if pos[1] == regionStart[1] then
-            if pos[2] < regionStart[2] then
-                return false
-            else
-                return true
-            end
-        elseif pos[2] == regionEnd[2] then
-            if pos[2] > regionEnd[2] then
-                return false
-            else
-                return true
-            end
-        else
-            return true
-        end
+        return true
     end
 end
 

@@ -11,6 +11,9 @@ if not os.getenv("TERM") then
     map("", [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent"}, "Restore font size")
 end
 map("n", [[J]], [[mzJ`z]], {"noremap"})
+-- Expand region
+map("n", [[<A-a>]], [[:lua require("expandRegion").expandShrink("n", 1)<CR>]], {"silent"}, "Expand selection")
+map("n", [[<A-s>]], [[:lua require("expandRegion").expandShrink("n", 0)<CR>]], {"silent"}, "Shrink selection")
 -- Run selected
 map("x", [[gM]], luaRHS[[:lua vim.cmd(
     string.format("lua %s",
