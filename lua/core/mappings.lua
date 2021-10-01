@@ -29,14 +29,6 @@ luaRHS[[luaeval("
         '<Plug>InterestingWordOperator')
     ")
 ]], {"expr", "silent"})
-||||||| parent of 169650e... Add visual substitution
--- TODO: Pass selection to commandline
--- map("x", [[<C-s>]], luaRHS[[:lua vim.cmd(
-    -- string.format("lua %s",
-        -- luaRHS(require("util").visualSelection("string"))
-    -- )
--- )],
--- {"silent"})
 -- Interesting word {{{
 map("n", [[<Plug>InterestingWordOperator]],
 luaRHS[[luaeval("
