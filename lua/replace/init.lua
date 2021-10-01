@@ -1,8 +1,8 @@
 -- File: init
 -- Author: iaso2h
 -- Description: Heavily inspired Ingo Karkat's work. Replace text with register
--- Version: 0.0.5
--- Last Modified: 2021-09-21
+-- Version: 0.0.6
+-- Last Modified: 2021-10-01
 local fn   = vim.fn
 local cmd  = vim.cmd
 local api  = vim.api
@@ -67,8 +67,7 @@ end -- }}}
 -- @param motionType: String. Motion type by which how the operator perform.
 --                    Can be "line", "char" or "block"
 -- @param vimMode:    String. Vim mode. See: `:help mode()`
--- @param reg:        Table. Contain name, type, content of v:register
---                    Can be "line", "char" or "block"
+-- @param reg:        Table. see :help getreginfo()
 -- @param pos:        Table. Contain start and end position of operator movement
 -- @return:           Boolean. Return true when mataching successfully,
 --                    otherwise return false
@@ -79,10 +78,10 @@ local matchRegType = function(motionType, vimMode, reg, pos) -- {{{
     -- TODO: match the same indent for grr with regtype is "V"
     if motionType == "block" and vimMode == "\22" then
         -- Adapt register for blockwise replace.
-        local lines    = vim.split(reg.content, "\n", false)
+        local lines    = vim.split(reg.regcontents, "\n", false)
         local linesCnt = #lines
 
-        if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
+        if reg.regtype == "v" or (reg.regtype == "V" and linesCnt == 1) then
             -- If the register contains just a single line, temporarily duplicate
             -- the line to match the height of the blockwise selection.
             local height = pos.startPos[1] - pos.endPos[1] + 1
@@ -95,7 +94,7 @@ local matchRegType = function(motionType, vimMode, reg, pos) -- {{{
                 fn.setreg(reg.name, table.concat(linesConcn, "\n"), "b")
                 return true
             end
-        elseif reg.type == "V" and linesCnt > 1 then
+        elseif reg.regtype == "V" and linesCnt > 1 then
             -- If the register contains multiple lines, paste as blockwise. then
             fn.setreg(reg.name, "", "b")
             return true
@@ -103,14 +102,19 @@ local matchRegType = function(motionType, vimMode, reg, pos) -- {{{
             -- No need to changed register when the register type is already blockwise
             return false
         end
-    elseif reg.type == "v" and vimMode == "V" then
+    elseif reg.regtype == "v" and vimMode == "V" then
         -- Prepend indents to the char type register to match the same indent
         -- of the first visual selected line
         local indent = fn.indent(pos.startPos[1])
-        if indent ~=0 then
-            fn.setreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
+        if indent ~= 0 then
+            fn.setreg(reg.name, string.rep(" ", indent) .. reg.regcontents, reg.regtype)
+            -- local reg = vim.fn.getreginfo('0')
+            -- reg.regcontents = reg.regcontents[1]
+            -- reg.name = '0'
+            -- vim.fn.setreg(reg.name, reg.regcontents, reg.regtype)
+            -- Print(vim.fn.getreginfo('0'))
         end
-    elseif reg.type == "V" and string.match(reg.content, "\n$") then
+    elseif reg.regtype == "V" and string.match(reg.regcontents, "\n$") then
         -- Our custom operator is characterwise, even in the
         -- ReplaceWithRegisterLine variant, in order to be able to replace less
         -- than entire lines (i.e. characterwise yanks).
@@ -120,21 +124,21 @@ local matchRegType = function(motionType, vimMode, reg, pos) -- {{{
         -- the register contents and set the register type to characterwise yank.
         if motionType == "line" then
             -- TODO: Only support one line reindent, multiline support needed
-            local lineCnt = str_count(reg.content, "\n")
+            local lineCnt = str_count(reg.regcontents, "\n")
             if lineCnt == 1 then
-                local _, regIndent = string.find(reg.content, "^%s*")
+                local _, regIndent = string.find(reg.regcontents, "^%s*")
                 local bufferIndent = fn.indent(pos.startPos[1])
-                local reindentCnt = bufferIndent - regIndent
+                local reindentCnt  = bufferIndent - regIndent
                 -- TODO: Need to test with real tab character indent, not soft tab indent
                 if reindentCnt < 0 then
-                    reg.content = string.gsub(reg.content, "^" .. string.rep(" ", math.abs(reindentCnt)), "")
+                    reg.regcontents = string.gsub(reg.regcontents, "^" .. string.rep(" ", math.abs(reindentCnt)), "")
                 elseif reindentCnt > 0 then
-                    reg.content = string.rep(" ", reindentCnt) .. reg.content
+                    reg.regcontents = string.rep(" ", reindentCnt) .. reg.regcontents
                 end
             end
-            fn.setreg(reg.name, string.sub(reg.content, 1, -2), "V")
+            fn.setreg(reg.name, string.sub(reg.regcontents, 1, -2), "V")
         else
-            fn.setreg(reg.name, vim.trim(reg.content), "v")
+            fn.setreg(reg.name, vim.trim(reg.regcontents), "v")
         end
         return true
     end
@@ -143,13 +147,12 @@ local matchRegType = function(motionType, vimMode, reg, pos) -- {{{
 end -- }}}
 
 ----
--- Function: replace___: Replace text by manipulating visual selection and put
+-- Function: replace: Replace text by manipulating visual selection and put
 --
 -- @param motionType: String. Motion type by which how the operator perform.
 --                    Can be "line", "char" or "block"
 -- @param vimMode:    String. Vim mode. See: `:help mode()`
--- @param reg:        Table. Contain name, type, content of v:register
---                    Can be "line", "char" or "block"
+-- @param reg:        Table. see :help getreginfo()
 -- @param pos:        Table. Contain start and end position of operator movement
 -- @param curBufNr:   Ineger. Buffer handler(number)
 ----
@@ -253,18 +256,23 @@ function M.operator(args) -- {{{
         -- To get the expression result into the buffer, we use the unnamed
         -- register; this will be restored, anyway.
         fn.setreg('"', vim.g.ReplaceExpr)
-        reg = {
-            name    = '"',
-            type    = fn.getregtype(M.regType),
-            content = vim.g.ReplaceExpr
-        }
+        reg = fn.getreginfo('"')
+        reg.name = '"'
+        -- reg = {
+            -- name    = '"',
+            -- type    = fn.getregtype(M.regType),
+            -- content = vim.g.ReplaceExpr
+        -- }
     else
-        reg = {
-            name    = M.regType,
-            type    = fn.getregtype(M.regType),
-            content = fn.getreg(vim.v.register, 1)
-        }
+        reg      = fn.getreginfo(M.regType)
+        reg.name = M.regType
+        -- reg = {
+            -- name    = M.regType,
+            -- type    = fn.getregtype(M.regType),
+            -- content = fn.getreg(vim.v.register, 1)
+        -- }
     end
+    reg.regcontents = reg.regcontents[1]
 
     if vimMode ~= "n" then
         pos = {
@@ -298,7 +306,7 @@ function M.operator(args) -- {{{
     local repStart = {repExtmark[1], repExtmark[2]}
     local repEnd   = {repExtmark[3]["end_row"], repExtmark[3]["end_col"]}
 
-    local region = vim.region(curBufNr, repStart, repEnd, reg.type, true)
+    local region = vim.region(curBufNr, repStart, repEnd, reg.regtype, true)
     for lineNr, cols in pairs(region) do
         api.nvim_buf_add_highlight(curBufNr, repHLNS, opts["hlGroup"], lineNr, cols[1], cols[2])
     end
@@ -313,7 +321,7 @@ function M.operator(args) -- {{{
 
     -- Restoration {{{
     util.restoreReg()
-    fn.setreg(reg.name, reg.content, reg.type)
+    fn.setreg(reg.name, reg.regcontents, reg.regtype)
 
     -- Options restoration
     if vim.is_callable(restoreOption) then restoreOption(); restoreOption = nil end
