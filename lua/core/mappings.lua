@@ -12,8 +12,10 @@ if not os.getenv("TERM") then
 end
 map("n", [[J]], [[mzJ`z]], {"noremap"})
 -- Expand region
-map("n", [[<A-a>]], [[:lua require("expandRegion").expandShrink("n", 1)<CR>]], {"silent"}, "Expand selection")
-map("n", [[<A-s>]], [[:lua require("expandRegion").expandShrink("n", 0)<CR>]], {"silent"}, "Shrink selection")
+map("n", [[<A-a>]], [[:lua require("expandRegion").expandShrink("n", 1)<CR>]],  {"silent"}, "Expand selection")
+map("n", [[<A-s>]], [[<Nop>]])
+map("x", [[<A-a>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), 1)<CR>]],  {"silent"})
+map("x", [[<A-s>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), -1)<CR>]], {"silent"})
 -- Run selected
 map("x", [[gM]], luaRHS[[:lua vim.cmd(
     string.format("lua %s",

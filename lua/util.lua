@@ -245,6 +245,7 @@ function Reload(module) -- {{{
     end
 
 end -- }}}
+
 -- Function: M.addJump: Add jump location in jumplist before execute specified key
 --
 -- @param action:        Keystroke string or function
@@ -466,6 +467,7 @@ function M.readInitLua()
     srcF:close()
 end
 
+
 -- Match enhance {{{
 function M.matchAll(expr, pat)
     -- Based on VimL match(), Always return a list
@@ -489,6 +491,7 @@ function M.matchAllStrPos(expr, pat)
     end
 end
 -- }}} Match enhance
+
 
 function M.trailingEmptyLine() -- {{{
     if vim.bo.modified == false then return end
@@ -554,6 +557,7 @@ function M.trimSpaces(strTbl, silent, prefix) -- {{{
     end
 end -- }}}
 
+
 ----
 -- Function: M.saveReg will save the star registers, plus and unnamed registers
 -- independantly, restoreReg can be accessed after saveReg is called
@@ -569,6 +573,7 @@ function M.saveReg() -- {{{
         vim.defer_fn(function() M.restoreReg = nil end, 1000)
     end
 end -- }}}
+
 
 function M.visualSelection(returnType, returnNormal) -- {{{
     -- Not support blockwise visual mode
@@ -598,6 +603,7 @@ function M.visualSelection(returnType, returnNormal) -- {{{
     end
 end -- }}}
 
+
 ----
 -- Function: M.posDist Caculate the distance from pos1 to pos2
 --
@@ -623,13 +629,22 @@ function M.posDist(pos1, pos2, bias, baisIdx)
     return lineDist + colDist
 end
 
+
 --- Compare the distance from a to b by subtracting them
 --- @param a table list-liked table
 --- @param b table list-liked table
 --- @return number
 function M.compareDist(a, b)
+    for idx, val in ipairs({a, b}) do
+        if not vim.tbl_islist(a) then
+            vim.notify(string.format("Argument %s expects list-liked table", idx, type(val)),
+                vim.log.levels.ERROR)
+            return Print(val)
+        end
+    end
     return a[1] == b[1] and a[2] - b[2] or a[1] - b[1]
 end
+
 
 --- Check if pos is whithin a defined region
 --- @param pos table
@@ -643,6 +658,7 @@ function M.withinRegion(pos, regionStart, regionEnd)
         return true
     end
 end
+
 
 -- Convert UTF-8 hex code to character
 function M.u2char(code)
@@ -776,6 +792,7 @@ function M.newSplit(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
         end
     end -- }}}
 end -- }}}
+
 
 function _G.isFloatWin(winID)
     if not winID then
