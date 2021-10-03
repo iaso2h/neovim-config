@@ -158,8 +158,8 @@ map("n", [[M]], [[`m]], "Restore mark M")
 -- Changelist jumping
 map("n", [[<A-o>]], [[:lua require("historyHop").main("changelist", -1)<CR>]], {"silent"}, "Previous change")
 map("n", [[<A-i>]], [[:lua require("historyHop").main("changelist", 1)<CR>]],  {"silent"}, "Next change")
--- map("n", [[<C-o>]], [[:lua require("historyHop").main("jumplist", -1)<CR>]],   {"silent"})
--- map("n", [[<C-i>]], [[:lua require("historyHop").main("jumplist", 1)<CR>]],    {"silent"})
+map("n", [[<C-o>]], [[<C-o>zz]])
+map("n", [[<C-i>]], [[<C-i>zz]])
 map("n", [[j]], [[:lua require("util").addJump("j", true)<CR>]], {"silent"})
 map("n", [[k]], [[:lua require("util").addJump("k", true)<CR>]], {"silent"})
 -- Swap default mapping
@@ -175,8 +175,8 @@ map("x", [[?]], [[#]])
 -- Regex very magic
 map("n", [[/]], [[/\v]], {"noremap"}, "Search forward")
 map("n", [[?]], [[?\v]], {"noremap"}, "Search backward")
-map("n", [[n]], [[nzzzv]], {"noremap"})
-map("n", [[N]], [[Nzzzv]], {"noremap"})
+map("n", [[n]], [[nzzzvhn]], {"noremap"})
+map("n", [[N]], [[NzzzvlN]], {"noremap"})
 -- Disable highlight search & Exit visual mode
 map("n", [[<leader>h]], [[:<C-u>noh<CR>]], {"silent"}, "Disable highlight")
 map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"})
