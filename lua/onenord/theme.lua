@@ -113,7 +113,8 @@ theme.editor =  {
     DiffDelete = {fg = p.n11, bg = p.n1, style = "reverse"},
     DiffText   = {fg = p.n15, bg = p.n1, style = "reverse"},
 
-    Folded       = {fg = p.n8,  bg="#323847", style = "bold"},
+    -- Folded       = {fg = p.n8,  bg="#323847", style = "bold"},
+    Folded       = {fg = p.n8,  bg = p.n1, style = "bold"},
     FoldColumn   = {fg = p.n3},
     ColorColumn  = {bg = p.n1},
     LineNr       = {fg = p.n3},
@@ -263,7 +264,7 @@ theme.lsp = {
     DiagnosticInfo                 = {fg = p.n10},
     DiagnosticUnderlineInfo        = {style = "undercurl", sp = p.n10},
     DiagnosticHint                 = {fg = p.n9 },
-    DiagnosticUnderlineHint        = {style = "undercurl", sp = p.n10},
+    DiagnosticUnderlineHint        = {style = "undercurl", sp = p.n9},
 
     LspDiagnosticsDefaultError         = {link = "DiagnosticError"},
     LspDiagnosticsDefaultWarning       = {link = "DiagnosticWarn"},
@@ -334,8 +335,12 @@ theme.plugins = {
     NvimTreeRootFolder       = {fg    = p.n10, style = "bold"},
     NvimTreeOpenedFolderName = {style = "bold,underline", sp = p.n8},
     NvimTreeOpenedFile       = {link  = "NvimTreeOpenedFolderName"},
-    NvimTreeGitDirty         = {fg    = p.n13},
     NvimTreeGitNew           = {fg    = p.n14},
+    NvimTreeGitDirty         = {fg    = p.n13},
+    NvimTreeGitRenamed       = {fg    = p.n13},
+    NvimTreeGitStaged        = {fg    = p.n12},
+    NvimTreeGitMerge         = {fg    = p.n15},
+    NvimTreeGitDeleted       = {fg    = p.n11},
     NvimTreeImageFile        = {fg    = p.n15},
     NvimTreeExecFile         = {fg    = p.n15},
     NvimTreeSpecialFile      = {fg    = p.n9 , style = "underline", sp = p.n9},
@@ -398,10 +403,10 @@ theme.plugins = {
 
     -- machakann/vim-sandwich
     OperatorSandwichAdd    = {link = "Search"},
+    OperatorSandwichAddrcc = {link = "Search"},
     OperatorSandwichBuns   = {link = "Search"},
     OperatorSandwichChange = {link = "Search"},
     OperatorSandwichDelete = {link = "IncSearch"},
-    OperatorSandwichAddrcc = {link = "Search"},
 
     -- Fern
     -- FernBranchText = {fg = p.n3b},
