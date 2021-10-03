@@ -77,7 +77,7 @@ if not vim.g.vscode then
     autocmd BufWinEnter          * lua require("cursorRecall").main()
     autocmd BufWritePre          * lua require"util".trimSpaces(); require"util".trailingEmptyLine()
     autocmd BufEnter             * lua require("historyStartup").deleteBuf()
-  " autocmd FocusGained,BufEnter * checktime
+    autocmd FocusGained          * checktime
   " autocmd BufAdd               * lua require("consistantTab").adaptBufTab()
 
     autocmd BufEnter             term://* startinsert
@@ -97,7 +97,7 @@ if not vim.g.vscode then
     autocmd BufReadPre,BufNewFile *.gitignore setlocal filetype=gitignore
     autocmd BufReadPre,BufNewFile config      setlocal filetype=config
     " Related work: https://github.com/RRethy/nvim-sourcerer
-    autocmd BufWritePost          *.lua,*.vim lua Reload()
+    autocmd BufWritePost          *.lua,*.vim lua require("reloadConfig").reload()
     augroup END
     ]]
 end
@@ -116,8 +116,6 @@ command! -nargs=0 Dofile lua dofile(vim.fn.expand("%:p"))
 
 command! -nargs=0 MyVimedit edit    $MYVIMRC
 command! -nargs=0 MyVimsrc  luafile $MYVIMRC
-
-command! -nargs=? Near -<args>,+<args>p | -<args>
 
 command! -nargs=0 TrimSpaces              call TrimSpaces()
 command! -nargs=0 TrimSpacesToggle        lua  if type(TrimSpacesChk) == "nil" then TrimSpacesChk = TrimSpacesChk or true end; TrimSpacesChk = not TrimSpacesChk; vim.api.nvim_echo({{string.format("%s",TrimSpacesChk), "Moremsg"}}, false, {})

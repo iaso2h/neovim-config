@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Hihglight word in differernt random colors, heavily inspired
 --              by https://github.com/lfv89/vim-interestingwords/blob/master/plugin/interestingwords.vim
--- Version: 0.0.3
--- Last Modified: 2021-09-18
+-- Version: 0.0.4
+-- Last Modified: 2021-10-01
 -- TODO: implement do repeat
 local fn  = vim.fn
 local cmd = vim.cmd
@@ -111,7 +111,8 @@ end
 local applyColor = function(word, opts, curWinID)
     M.hlIDs[curWinID] = M.hlIDs[curWinID] or {}
 
-    local pattern = opts.ignoreCase and string.format([[\c%s]], word) or string.format([[\C%s]], word)
+    local pattern = opts.ignoreCase and
+        string.format([[\V\c%s]], word) or string.format([[\V\C%s]], word)
     local hlGroup, guibg = getHLGroup(opts, curWinID)
     local hlID    = fn.matchadd(hlGroup, pattern, opts.priority)
 

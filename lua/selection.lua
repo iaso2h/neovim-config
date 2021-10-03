@@ -1,4 +1,6 @@
 local api = vim.api
+local cmd = vim.cmd
+local fn  = vim.fn
 local M   = {}
 
 function M.oppoSelection() -- {{{
@@ -27,9 +29,42 @@ function M.oppoSelection() -- {{{
 end -- }}}
 
 M.visualSub = function()
-    local str = require("util").visualSelection("string")
-    api.nvim_feedkeys(string.format(":s#%s", str), "nt", false)
+    local str = fn.escape(M.getSelect("string"), [[\]] )
+    api.nvim_feedkeys(string.format([[:s#\V%s]], str), "nt", false)
 end
+
+
+-- TODO: grep refactoring
+-- HACK: different behaviors between vim.getpos() and nvim_buf_get_mark() when selection is empty
+M.getSelect = function(returnType, returnNormal) -- {{{
+    -- Not support blockwise visual mode
+    local mode = fn.visualmode()
+    if mode == "\22" then return end
+    -- Return (1,0)-indexed line,col info
+    local selectStart = api.nvim_buf_get_mark(0, "<")
+    local selectEnd = api.nvim_buf_get_mark(0, ">")
+    local lines = api.nvim_buf_get_lines(0, selectStart[1] - 1, selectEnd[1],
+                                         false)
+
+    if #lines == 0 then
+        return {""}
+    end
+    -- Needed to remove the last character to make it match the visual selction
+    if vim.o.selection == "exclusive" then selectEnd[2] = selectEnd[2] - 1 end
+    if mode == "v" then
+        lines[#lines] = lines[#lines]:sub(1, selectEnd[2] + 1)
+        lines[1]      = lines[1]:sub(selectStart[2] + 1)
+    end
+
+    if returnNormal then cmd("norm! " .. t"<Esc>") end
+
+    if returnType == "list" then
+        return lines
+    elseif returnType == "string" then
+        return table.concat(lines, "\n")
+    end
+end -- }}}
+
 
 return M
 

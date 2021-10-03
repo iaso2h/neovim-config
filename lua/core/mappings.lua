@@ -10,6 +10,7 @@ if not os.getenv("TERM") then
     map("", [[<C-=>]], [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Decrease font size")
     map("", [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent"}, "Restore font size")
 end
+map("x", [[&]], [[:lua require("selection").visualSub()<CR>]])
 map("n", [[J]], [[mzJ`z]], {"noremap"})
 -- Expand region
 map("n", [[<A-a>]], [[:lua require("expandRegion").expandShrink("n", 1)<CR>]],  {"silent"}, "Expand selection")
@@ -19,7 +20,7 @@ map("x", [[<A-s>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmod
 -- Run selected
 map("x", [[gM]], luaRHS[[:lua vim.cmd(
     string.format("lua %s",
-        luaRHS(require("util").visualSelection("string"))
+        luaRHS(require("selection").getSelect("string"))
     )
 )<CR>]],
 {"silent"})
@@ -59,7 +60,7 @@ luaRHS[[:lua
     require("interestingWord").operator(vMotion)<CR>]],
 {"silent"})
 map("n", [[gw]],        [[<Plug>InterestingWordOperator]], "Highlight interesting word...")
-map("x", [[W]],         [[<Plug>InterestingWordVisual]],   "Highlight selected as interesting word")
+map("x", [[gw]],        [[<Plug>InterestingWordVisual]],   "Highlight selected as interesting word")
 map("n", [[gww]],       [[:lua require("interestingWord").reapplyColor()<CR>]], "Recolor last interesting word...")
 map("n", [[<leader>w]], [[:lua require("interestingWord").clearColor()<CR>]],   "Clear interesting word...")
 map("n", [[<leader>W]], [[:lua require("interestingWord").restoreColor()<CR>]], "Restore interesting word...")
@@ -151,7 +152,7 @@ map("n", [[dk]], [[<Nop>]])
 map("n", [[d<Space>]], [[:<C-u>call setline(".", "")<CR>]],  {"silent"})
 -- Inquery word
 map("n", [[<leader>i]], [=[[I]=], "Inquery word under cursor")
-map("x", [[<leader>i]], [[:lua vim.cmd("noa g#" .. require("util").visualSelection("string") .. "#nu")<CR>]], {"silent"})
+map("x", [[<leader>i]], [[:lua Print("noa g#\\V" .. vim.fn.escape(require("selection").getSelect("string"), "\\") .. "#number")<CR>]], {"silent"})
 -- Fast mark & resotre
 map("n", [[M]], [[`m]], "Restore mark M")
 -- Changelist jumping
@@ -167,8 +168,8 @@ map("n", [[#]],  [[g#]], {"noremap"})
 map("n", [[g#]], [[#]],  {"noremap"})
 map("n", [[g*]], [[*]],  {"noremap"})
 -- Add visual mode
-map("x", [[*]], [[mz`z:<C-u>execute "/" . escape(luaeval('require("util").visualSelection("string")'), '\')<CR>]], {"noremap", "silent"})
-map("x", [[#]], [[mz`z:<C-u>execute "?" . escape(luaeval('require("util").visualSelection("string")'), '\')<CR>]], {"noremap", "silent"})
+map("x", [[*]], [[mz`z:<C-u>execute "/\\V" . escape(luaeval('require("selection").getSelect("string")'), '\')<CR>]], {"noremap", "silent"})
+map("x", [[#]], [[mz`z:<C-u>execute "?\\V" . escape(luaeval('require("selection").getSelect("string")'), '\')<CR>]], {"noremap", "silent"})
 map("x", [[/]], [[*]])
 map("x", [[?]], [[#]])
 -- Regex very magic
@@ -187,7 +188,7 @@ map("n", [[<A-v>]], [[<C-q>]],                                         {"noremap
 map("n", [[<C-n>]], [[:<C-u>new<CR>]], {"silent"}, "New buffer")
 -- Open/Search in browser
 map("n", [[gl]], [[:lua require("openLink").main()<CR>]], {"silent"}, "Open link")
-map("x", [[gl]], [[:lua require("openLink").main(require("util").visualSelection("string"))<CR>]], {"silent"})
+map("x", [[gl]], [[:lua require("openLink").main(require("selection").getSelect("string"))<CR>]], {"silent"})
 -- Interrupt
 map("n", [[<C-A-c>]], [[:<C-u>call interrupt()<CR>]], {"noremap", "silent"}, "Interrupt")
 -- Paragraph & Block navigation

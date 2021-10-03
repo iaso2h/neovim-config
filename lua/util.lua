@@ -166,85 +166,6 @@ function Vim2Lua(mode) -- {{{
     end
 end -- }}}
 
-----
--- Function: Reload: Reload lua module path
---
--- @param module: String value of module path
-----
-function Reload(module) -- {{{
-    local configPath = fn.stdpath("config")
-    local modulePath = configPath .. "/lua"
-    local moduleFull = vim.fn.expand("%:p")
-    -- Config path only
-    if not string.match(moduleFull, configPath) then return end
-
-    if vim.bo.filetype == "lua" then -- Lua {{{
-
-        if not module then
-            -- Not Specific module path is provided, use full path instead
-            local rootTailPath = vim.fn.expand("%:r:t")
-            local _, luaDirEnd = string.find(rootTailPath, "lua/")
-            if not luaDirEnd then
-                return vim.notify(string.format([[Failed to find index of "lua/" in "%s"]], rootTailPath),
-                            vim.log.levels.ERROR)
-            end
-
-            if string.match(moduleFull, modulePath) then
-                -- Reload module under: ~/.config/nvim/lua
-                local sep = jit.os == "Windows" and "\\" or "/"
-                rootTailPath = string.sub(rootTailPath, luaDirEnd + 1, -1):gsub(sep, ".")
-                if rootTailPath:match("init") then
-                    -- Check subfold module
-                    module = rootTailPath:sub(1, -6)
-                else
-                    module = rootTailPath
-                end
-            end
-
-        end
-
-        -- In case where module are not loaded
-        if not package.loaded[module] then return end
-
-        -- Reload and capture possible fallback function
-        package.loaded[module] = nil
-        local fallback = require(module)
-
-        -- Call the config func if it's callable
-        if type(fallback) == "function" then
-            fallback()
-        elseif type(fallback) == "table" then
-            pcall(fallback.config)
-            pcall(fallback.setup)
-        end
-
-        vim.notify(
-            string.format("Reload package[%s] at: %s", module, moduleFull),
-            vim.log.levels.INFO)
-
-        -- Further steps needed to take to recompile packages for lua/core/plugins.lua
-        if moduleFull == configPath .. "/lua/core/plugins.lua" then
-
-            local answerCD = fn.confirm("Recompile packages?", "&Yes\n&No")
-            if answerCD == 1 then return cmd [[PackerSync]] end
-        end
-        return
-        -- }}} Lua
-    else -- Vim {{{
-        -- Module path is always full path in VimL
-        module = fn.expand("%:p")
-        if module == configPath .. "/init.vim" or string.match(module, configPath .. "/plugins") then
-            cmd("source " .. module)
-            vim.notify(string.format("Reload: %s", module), vim.log.levels.INFO)
-        elseif string.match(fn.expand("%:p:h"), configPath .. "/colors") then
-            local colorscheme = fn.expand("%:t:r")
-            cmd("colorscheme " .. colorscheme)
-            vim.notify(string.format("Colorscheme: %s", colorscheme), vim.log.levels.INFO)
-        end
-        -- }}} Vim
-    end
-
-end -- }}}
 
 -- Function: M.addJump: Add jump location in jumplist before execute specified key
 --
@@ -636,11 +557,7 @@ end
 --- @return number
 function M.compareDist(a, b)
     for idx, val in ipairs({a, b}) do
-        if not vim.tbl_islist(a) then
-            vim.notify(string.format("Argument %s expects list-liked table", idx, type(val)),
-                vim.log.levels.ERROR)
-            return Print(val)
-        end
+        assert(vim.tbl_islist(a), string.format("Argument %s expects list-liked table", idx))
     end
     return a[1] == b[1] and a[2] - b[2] or a[1] - b[1]
 end
@@ -734,9 +651,6 @@ function M.newSplit(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
     local curWinID  = api.nvim_get_current_win()
     local winInfo   = fn.getwininfo()
     local winLayout = fn.winlayout()
-    -- UbuntuMono
-    local width2height   = 0.1978
-    local height2width   = 5.0566
 
     local ui             = api.nvim_list_uis()[1]
     local screenWidth    = ui.width
@@ -816,8 +730,8 @@ end
 --          than one idx to be return. nil will be return when no idx found
 ----
  _G.tbl_remove = function(tbl, srcVal, removeAllChk, cnt)
-    if not next(tbl) then return vim.notify("Empty table is not allowed", vim.log.levels.ERROR) end
-    if not vim.tbl_islist(tbl) then return vim.notify("Key-value pair table is not allowed", vim.log.levels.ERROR) end
+    assert(next(tbl), "Empty table is not allowed")
+    assert(vim.tbl_islist(tbl), "Expect list-liked table")
 
     removeAllChk = removeAllChk or false
     cnt = cnt or 1
@@ -905,16 +819,42 @@ _G.tbl_merge = function(...)
     local tblConcanated = {}
     for i = 1, select('#', ...) do
         local tbl = select(i, ...)
-        if not vim.tbl_islist(tbl) then
-            return vim.notify("Only list-liked table allowed", vim.log.levels.ERROR)
-        end
+        assert(vim.tbl_islist(tbl), "Only list-liked table allowed")
         if next(tbl) then
-            for index, value in ipairs(tbl) do
+            for _, value in ipairs(tbl) do
                 tblConcanated[#tblConcanated+1] = value
             end
         end
     end
     return tblConcanated
+end
+
+
+--- Return the index of specific item in a list-liked table. Only support
+--- number and string for now
+--- @param tbl table list-liked table
+--- @param item number or string
+--- @param idxAll boolean whether to return all the indexes as a table
+--- @return number or table return table when idxAll is true
+_G.tbl_idx = function(tbl, item, idxAll)
+    assert(vim.tbl_islist(tbl), "Expect list-liked table")
+    assert(type(item) == "string" or type(item) == "number", "Only support indexing string or number")
+    local idxTbl = {}
+    for idx, i in ipairs(tbl) do
+        if i == item then
+            if not idxAll then
+                return idx
+            else
+                idxTbl[#idxTbl+1] = idx
+            end
+        end
+    end
+
+    if not idxAll then
+        return nil
+    else
+        return idxTbl
+    end
 end
 
 
@@ -944,7 +884,7 @@ end
 -- @return: nil
 ----
 _G.luaRHS = function(str)
-    if type(str) ~= "string" then return vim.notify("Expected string value.", vim.log.levels.ERROR) end
+    assert(type(str) == "string", "Expected string value")
 
     local strTbl = vim.split(str, "\n", false)
     strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
@@ -957,7 +897,7 @@ end
 
 
 _G.vimRHS = function(str)
-    if type(str) ~= "string" then return vim.notify("Expected string value.", vim.log.levels.ERROR) end
+    assert(type(str) == "string", "Expected string value")
 
     local strTbl = vim.split(str, "\n", false)
     strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
@@ -980,4 +920,3 @@ end
 
 
 return M
-
