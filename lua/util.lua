@@ -484,13 +484,16 @@ end -- }}}
 -- independantly, restoreReg can be accessed after saveReg is called
 ----
 function M.saveReg() -- {{{
-    local unnamed     = fn.getreginfo('"')
-    local star        = fn.getreginfo('*')
-    local plus        = fn.getreginfo('+')
+    local unnamed     = fn.getreg('"', 1)
+    local unnamedType = fn.getregtype('"')
+    local star        = fn.getreg('*', 1)
+    local starType    = fn.getregtype('*')
+    local plus        = fn.getreg('+', 1)
+    local plusType    = fn.getregtype('+')
     M.restoreReg = function()
-        fn.setreg('"', unnamed.regcontents[1], unnamed.regtype)
-        fn.setreg('*', star.regcontents[1], star.regtype)
-        fn.setreg('+', plus.regcontents[1], plus.regtype)
+        fn.setreg('"', unnamed, unnamedType)
+        fn.setreg('*', star,    starType)
+        fn.setreg('+', plus,    plusType)
         vim.defer_fn(function() M.restoreReg = nil end, 1000)
     end
 end -- }}}
