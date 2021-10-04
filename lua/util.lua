@@ -1,6 +1,6 @@
-local fn  = vim.fn
-local cmd = vim.cmd
-local api = vim.api
+local fn   = vim.fn
+local cmd  = vim.cmd
+local api  = vim.api
 local M = {whichKeyDocs = {}}
 
 function Print(...)
@@ -9,11 +9,11 @@ function Print(...)
         local v = select(i, ...)
         table.insert(objects, vim.inspect(v))
     end
-    if #objects == 1 and type(objects[1]) == "table" then
-        return require("pprint").print(objects[1])
-    else
+    -- if #objects == 1 and type(objects) == "table" then
+        -- require("pprint").print(objects)
+    -- else
         print(table.concat(objects, '\n'))
-    end
+    -- end
 
     return ...
 end
@@ -26,7 +26,7 @@ function _G.ex(exec) return fn.executable(exec) == 1 end
 
 
 ----
--- Function: Vim2Lua___
+-- Function: Vim2Lua
 --
 -- @param mode:    string value. "syntax" or "map" mode
 -- @param verbose: boolean value, when set true, all opts keyword will be output in "map" mode
@@ -269,7 +269,14 @@ function _G.map(mode, lhs, rhs, optsTbl, doc) -- {{{
 
     -- Disable select mapping for keymapping like R,C,A,S,X
     if string.match(lhs, "[A-Z]") and mode == "" then
-        api.nvim_del_keymap("s", lhs)
+        return api.nvim_del_keymap("s", lhs)
+    end
+
+    if CoreMappigsStart then
+        if mode == "" then mode = "all" end
+        _G.CoreMappings = _G.CoreMappings or {}
+        CoreMappings[mode] = CoreMappings[mode] or {}
+        CoreMappings[mode][#CoreMappings[mode]+1] = lhs
     end
 end -- }}}
 ----
@@ -478,7 +485,6 @@ function M.trimSpaces(strTbl, silent, prefix) -- {{{
     end
 end -- }}}
 
-
 ----
 -- Function: M.saveReg will save the star registers, plus and unnamed registers
 -- independantly, restoreReg can be accessed after saveReg is called
@@ -560,7 +566,7 @@ end
 --- @return number
 function M.compareDist(a, b)
     for idx, val in ipairs({a, b}) do
-        assert(vim.tbl_islist(a), string.format("Argument %s expects list-liked table", idx))
+        assert(vim.tbl_islist(val), string.format("Argument %s expects list-liked table", idx))
     end
     return a[1] == b[1] and a[2] - b[2] or a[1] - b[1]
 end
@@ -654,6 +660,12 @@ function M.newSplit(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
     local curWinID  = api.nvim_get_current_win()
     local winInfo   = fn.getwininfo()
     local winLayout = fn.winlayout()
+    -- -- UbuntuMono
+    -- local width2height   = 0.1978
+    -- local height2width   = 5.0566
+    -- Delugia
+    local width2height   = 0.4798
+    local height2width   = 2.5523
 
     local ui             = api.nvim_list_uis()[1]
     local screenWidth    = ui.width
@@ -679,7 +691,7 @@ function M.newSplit(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
         if screenWidth <= screenHeight * height2width then
             return newWin(func, funcArgList, bufListed, scratchBuf, "row", height2width, width2height)
         else
-            return newWin(func, funcArgList, bufListed, scratchBuf, "col", height2width, width2height)
+            return newWin(func, funcArgList, bufListed, scratchBuf, "col", height2width - 1., width2height)
         end
     else -- {{{
 

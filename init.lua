@@ -43,3 +43,5 @@ local ok, msg = pcall(require, "util"); if not ok then vim.notify(msg, vim.log.l
 
 require "core"
 require "quickFix"
+
+_G.IsTerm = os.getenv("TERM") or false

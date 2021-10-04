@@ -1,32 +1,150 @@
 -- File: reloadConfig
 -- Author: iaso2h
--- Description: reload lua package or vim file at Neovim configuration folder
--- Version: 0.0.15
--- Last Modified: 2021-10-03
+-- Description: reload lua package or vim file at Neovim configuration directory
+-- Version: 0.0.16
+-- Last Modified: 2021-10-5
 local fn   = vim.fn
+local api  = vim.api
 local cmd  = vim.cmd
 local path = require("plenary.path")
 local loop = vim.loop
 local M    = {}
 
-local notLoadAllDir    = {"~/.config/nvim/lua/core"}
-local notLoadAllDirStr = vim.tbl_map(function(i) return path:new(i):expand() end, notLoadAllDir)
+-- Force files that match those patterns to be treated as individual lua file
+-- module even if they are coming from a the lua directory module
+local forceLoadFileTbl = {"~/.config/nvim/lua/core", "~/.config/nvim/lua/config"}
+local forceLoadFile    = vim.tbl_map(function(i) return path:new(i):expand() end, forceLoadFileTbl)
 
 local configPath    = path:new(fn.stdpath("config"))
 local luaModulePath = configPath:joinpath("lua")
 local sep           = jit.os == "Windows" and "\\" or "/"
 
+--- Escape \ in path string
+--- @param str string
+--- @return string
+local e = function(str)
+    return string.gsub(str, [[\]], [[\\]])
+end
+
+
+local packerCompileQuery = function(...)
+    local answer = fn.confirm("Update packages?", "&Sync\ncom&Pile\n&No", 3)
+
+    if answer == 1 then
+        cmd [[PackerSync]]
+    elseif answer == 2 then
+        cmd [[PackerCompile]]
+    end
+end
+
+
+local luaSetups = {
+    {
+        pathPat = e(luaModulePath:joinpath("core", "mappings.lua").filename),
+        config  = function(...)
+                _G.CoreMappingsLast = vim.deepcopy(CoreMappings)
+                CoreMappings = {}
+                CoreMappigsStart = true
+            end
+    }
+}
+
+
+local luaConfigs = {
+    {
+        -- Call the config func from "<NvimConfig>/lua/config/" if it's callable
+        pathPat = e(luaModulePath:joinpath("config").filename),
+        config  = function(modulePath, callback)
+            local ok, msg
+            if type(callback) == "function" then
+                ok, msg = pcall(callback)
+            elseif type(callback) == "table" then
+                for _, func in ipairs({"config", "setup"}) do
+                    if vim.is_callable(callback[func]) then
+                        ok, msg = pcall(callback.config)
+                    end
+                end
+            end
+
+
+            if not ok then
+                vim.notify("Error detect while calling callback function at: " .. modulePath.filename,
+                    vim.log.levels.ERROR)
+                vim.notify(msg, vim.log.levels.ERROR)
+            end
+            packerCompileQuery()
+        end
+    },
+    {
+        -- Ask whether to compile lua packages for "<NvimConfig> /lua/core/plugins.lua"
+        pathPat = e(luaModulePath:joinpath("core", "plugins.lua").filename),
+        config  = packerCompileQuery
+    },
+    {
+        pathPat = e(luaModulePath:joinpath("onenord").filename),
+        config  = function(...)
+                cmd [[noa silent colorscheme onenord]]
+                api.nvim_feedkeys(t"<CR>", "nt", false)
+            end
+    },
+    {
+        pathPat = e(luaModulePath:joinpath("core", "mappings.lua").filename),
+        config  = function(...)
+                CoreMappigsStart = false
+                local ok, msg
+                for mode, mappings in pairs(CoreMappingsLast) do
+                    for _, mapping in ipairs(mappings) do
+                        if not vim.tbl_contains(CoreMappings[mode], mapping) then
+                            if mode == "all" then mode = "" end
+                            local unmapStr = string.format("%sunmap %s", mode, mapping)
+                            vim.notify(unmapStr)
+                            ok, msg = pcall(api.nvim_del_keymap, mode, mapping)
+                            if not ok then
+                                vim.notify("Failed while executing: " .. unmapStr, vim.log.levels.ERROR)
+                                vim.notify(msg, vim.log.levels.ERROR)
+                            end
+                        end
+                    end
+                end
+            end
+    }
+}
+
+
+--- Call functions before or after reloading specifc lua module
+--- @param modulePath plenary path object
+--- @param callback function the callback return by reloading the lua module
+local luaLoadHook = function(hookDict, modulePath, callback)
+    for _, hook in ipairs(hookDict) do
+        if string.match(modulePath.filename, hook.pathPat) then
+            local ok, msg = pcall(hook.config, modulePath, callback)
+            if not ok then
+                vim.notify("Error occurs while loading lua config for " .. modulePath.filename,
+                    vim.log.levels.ERROR)
+                vim.notify(msg, vim.log.levels.ERROR)
+            end
+            return
+        end
+    end
+end
+
 
 --- Unload lua moldule if it's loaded in table packaga.loaded
 --- @param modulePath plenary path object
+--- @param ignoreLoaded boolean Set this it true will ignore whether the
+---        module is loaded or not
 --- @return string or boolean Return string in lua module in relative
 ---         way if it's already loaded. e.g. "lua.myModule.treesitter"
-local luaUnload = function(modulePath)
+---
+local luaUnload = function(modulePath, ignoreLoaded)
     assert(getmetatable(modulePath) == require("plenary.path"),
         string.format("Expected plenary path object or string, got %s", type(modulePath)))
 
     local fileRelStr = path:new(modulePath.filename):make_relative(luaModulePath.filename)
     local fileRel    = string.gsub(fileRelStr, sep, "."):sub(1, -5)
+
+    if ignoreLoaded then return fileRel end
+
     if not package.loaded[fileRel] then
         return false
     else
@@ -37,10 +155,11 @@ end
 
 
 --- Reload lua module that is a single file
---- @param luaModule string or plenary path object
+--- @param luaModule string or plenary path object Default is string of current file path
 --- @param checkLuaDir boolean Default is true. Set this to true to check whether the other lua
 ---        module in the same directory
-M.luaLoad = function(luaModule, checkLuaDir) -- {{{
+M.luaLoadFile = function(luaModule, checkLuaDir) -- {{{
+    luaModule = luaModule or fn.expand("%:p")
     assert(getmetatable(luaModule) == require("plenary.path") or
         type(luaModule) == "string",
         string.format("Expected plenary path object or string, got %s", type(luaModule)))
@@ -50,28 +169,30 @@ M.luaLoad = function(luaModule, checkLuaDir) -- {{{
     local modulePath
     if type(luaModule) == "string" then
         modulePath = path:new(luaModule)
+        assert(modulePath:is_file(), "Invalid string of file path")
+        assert(string.match(modulePath.filename, e(luaModulePath.filename))
+            and vim.endswith(modulePath.filename, ".lua"), "Unsuppoted file path")
     else
         modulePath = luaModule
-    end
-
-    -- Filter out non-lua path
-    if not vim.endswith(modulePath.filename, ".lua") or
-        not string.match(modulePath.filename, luaModulePath.filename) then
-        return
     end
 
     -- Check other lua module at the same directory
     if checkLuaDir then
         local parentStr = modulePath:parent().filename
-        if not vim.endswith(modulePath.filename, "init.lua") and
-            parentStr ~= luaModulePath.filename then
+        local dirRel = string.gsub(path:new(parentStr):make_relative(luaModulePath.filename), sep, ".")
 
-            return M.luaLoadDir(parentStr)
+        if parentStr ~= luaModulePath.filename and
+        package.loaded[dirRel] and
+        not vim.tbl_contains(forceLoadFile, parentStr) then
+            return M.luaLoadDir(modulePath, parentStr)
         end
     end
 
+    -- Load setup BEFORE reloading for specific module match the given path
+    luaLoadHook(luaSetups, modulePath)
+
     -- Get lua replative module path
-    local fileRel = luaUnload(modulePath)
+    local fileRel = luaUnload(modulePath, type(luaModule) == "string")
 
     if not fileRel then return end
 
@@ -81,69 +202,43 @@ M.luaLoad = function(luaModule, checkLuaDir) -- {{{
         string.format("Reload lua package[%s] at: %s", fileRel, modulePath.filename),
         vim.log.levels.INFO)
 
-    -- Call the config func from "<NvimConfig>/lua/config/" if it's callable
-    local ok,msg
-    if string.match(modulePath.filename, luaModulePath:joinpath("config").filename) then
-        if type(callback) == "function" then
-            ok, msg = pcall(callback)
-        elseif type(callback) == "table" then
-            ok, msg = pcall(callback.config)
-            ok, msg = pcall(callback.setup)
-        end
+    -- Load configuration AFTER reloading for specific module match the given path
+    luaLoadHook(luaConfigs, modulePath, callback)
 
-        if not ok then
-            vim.notify("Error detect while calling callback function at: ", modulePath.filename,
-                vim.log.levels.ERROR)
-            vim.notify(msg, vim.log.levels.ERROR)
-        end
-
-        local answer = fn.confirm("Update packages?", "&Sync\ncom&Pile\n&No", 3)
-        if answer == 1 then
-            return cmd [[PackerSync]]
-        elseif answer == 2 then
-            return cmd [[PackerCompile]]
-        end
-    end
-
-    -- Ask whether to compile lua packages for "<NvimConfig> /lua/core/plugins.lua"
-    if modulePath.filename == luaModulePath:joinpath("core", "plugins.lua").filename then
-        local answer = fn.confirm("Update packages?", "&Sync\ncom&Pile\n&No", 3)
-        if answer == 1 then
-            return cmd [[PackerSync]]
-        elseif answer == 2 then
-            return cmd [[PackerCompile]]
-        end
-    end
 end -- }}}
 
 
 --- Reload lua module that come from a directory
 --- @param dirStr string
-M.luaLoadDir = function(dirStr) -- {{{
+M.luaLoadDir = function(modulePath, dirStr) -- {{{
     assert(type(dirStr) == "string", "Expect string value, got " .. type(dirStr))
 
-    local dir = loop.fs_opendir(dirStr)
+    local dirRel = string.gsub(path:new(dirStr):make_relative(luaModulePath.filename), sep, ".")
+    -- Check whether a directory module is loaded. If it does, analyze the
+    -- whole directory. If it doesn't, then this module might just happend to
+    -- be located at a ordinary directory for the sake of classification.
+    if package.loaded[dirRel] then
+        -- Unload lua diretory module first
+        package.loaded[dirRel] = nil
+    else
+        return M.luaLoadFile(modulePath, false)
+    end
+
     local fileStrs = {}
+    local filePaths
     local fileRels
-    local dirRel
     local tbl
+
+    local dir = loop.fs_opendir(dirStr)
     while true do
         tbl = loop.fs_readdir(dir)
 
         if not tbl then break end
 
-        if tbl[1].name == "init.lua" then
-            -- Unload lua diretory module
-            dirRel = string.gsub(path:new(dirStr):make_relative(luaModulePath.filename),
-                                                    sep, ".")
-            if package.loaded[dirRel] then
-
-                package.loaded[dirRel] = nil
-            else
-                dirRel = nil
-            end
-        elseif tbl and vim.endswith(tbl[1].name, ".lua") and
-            tbl[1].type == "file" then
+        if tbl and vim.endswith(tbl[1].name, ".lua") and
+            tbl[1].type == "file" and
+            not string.match(tbl[1].name, dirRel .. ".lua") and
+            tbl[1].name ~= "init.lua" then
 
             fileStrs[#fileStrs+1] = tbl[1].name
         end
@@ -155,7 +250,7 @@ M.luaLoadDir = function(dirStr) -- {{{
 
     -- Unload all loaded lua file module
     if next(fileStrs) then
-        local filePaths = vim.tbl_map(function (i) return path:new(dirStr):joinpath(i) end, fileStrs)
+        filePaths = vim.tbl_map(function (i) return path:new(dirStr):joinpath(i) end, fileStrs)
         fileRels = vim.tbl_map(luaUnload, filePaths)
     end
 
@@ -169,11 +264,15 @@ M.luaLoadDir = function(dirStr) -- {{{
 
     -- Reload all lua file modules
     if next(fileStrs) then
-        for _, fileRel in ipairs(fileRels) do
+        for idx, fileRel in ipairs(fileRels) do
             require(fileRel)
             vim.notify(
                 string.format("Reload lua package[%s] under: %s%s", fileRel, dirStr, sep),
                 vim.log.levels.INFO)
+
+            if idx == #fileRels then
+                luaLoadHook(luaConfigs, filePaths[idx])
+            end
         end
     end
 end -- }}}
@@ -188,20 +287,18 @@ M.reload = function() -- {{{
     local modulePath  = path:new(fn.expand("%:p"))
 
     -- Config path only
-    if not string.match(modulePath.filename, configPath.filename) then return end
+    if not string.match(modulePath.filename, e(configPath.filename)) then return end
 
     if vim.bo.filetype == "lua" then
         -- Lua {{{
         -- Only load lua module at: ~/.config/nvim/lua
-        if not string.match(modulePath.filename, luaModulePath.filename) then return end
+        if not string.match(modulePath.filename, e(luaModulePath.filename)) then return end
 
-        -- DEBUG:
-        -- modulePath = luaModulePath:joinpath("expandRegion", "treesitter.lua")
-        -- modulePath = luaModulePath:joinpath("core", "plugins.lua")
+        local parentDirStr = modulePath:parent().filename
+        if parentDirStr ~= luaModulePath.filename and
+            not vim.tbl_contains(forceLoadFile, parentDirStr) then
 
-
-        if modulePath:parent().filename ~= luaModulePath.filename then
-            -- The lua module is a folder
+            -- The lua module is a directory
             local parentDirStrs = modulePath:parents()
             -- Filter out valid lua sub module
             for i = tbl_idx(parentDirStrs, luaModulePath.filename), #parentDirStrs do
@@ -211,32 +308,27 @@ M.reload = function() -- {{{
             for _, dirStr in ipairs(parentDirStrs) do
                 -- Do not load directory of module coming from this
                 -- table. load current directory instead
-
-                if vim.tbl_contains(notLoadAllDirStr, dirStr) then
-                    M.luaLoad(modulePath, false)
-                else
-                    M.luaLoadDir(dirStr)
-                end
+                M.luaLoadDir(modulePath, dirStr)
             end
         else
             -- The lua module is a single file
-            M.luaLoad(modulePath)
+            M.luaLoadFile(modulePath, false)
         end
         -- }}} Lua
     else
         -- Vim {{{
         -- Module path is always full path in VimL
         if modulePath.filename == configPath:joinpath("init.vim").filename or
-            string.match(modulePath.filename, configPath:joinpath("plugins").filename) then
+            string.match(modulePath.filename, e(configPath:joinpath("plugins").filename)) then
 
-            cmd("source " .. modulePath)
+            cmd("noa source " .. modulePath)
             vim.notify(string.format("Reload: %s", modulePath), vim.log.levels.INFO)
-        elseif string.match(modulePath.filename, configPath:joinpath("colors").filename) then
+        elseif string.match(modulePath.filename, e(configPath:joinpath("colors").filename)) then
             local colorDirPath = configPath:joinpath("colors")
             local colorRel     = string.sub(
                 path:new(modulePath.filename):make_relative(colorDirPath.filename),
                 1, -5)
-            cmd("colorscheme " .. colorRel)
+            cmd("noa silent! colorscheme " .. colorRel)
             vim.notify(string.format("Colorscheme: %s", colorRel), vim.log.levels.INFO)
         end
         -- }}} Vim

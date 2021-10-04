@@ -112,7 +112,7 @@ command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | se
 command! -nargs=0 CD     execute "cd " . expand("%:p:h")
 command! -nargs=0 E      up | let g:refreshBufSavView = winsaveview() | e! | call winrestview(g:refreshBufSavView)
 command! -nargs=0 O      browse oldfiles
-command! -nargs=0 Dofile lua dofile(vim.fn.expand("%:p"))
+command! -nargs=0 Dofile lua require("reloadConfig").luaLoadFile()
 
 command! -nargs=0 MyVimedit edit    $MYVIMRC
 command! -nargs=0 MyVimsrc  luafile $MYVIMRC

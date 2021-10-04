@@ -29,7 +29,7 @@ function M.oppoSelection() -- {{{
 end -- }}}
 
 M.visualSub = function()
-    local str = fn.escape(M.getSelect("string"), [[\]] )
+    local str = string.gsub(M.getSelect("string"), [[\]], [[\\]])
     api.nvim_feedkeys(string.format([[:s#\V%s]], str), "nt", false)
 end
 
