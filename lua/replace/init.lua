@@ -1,7 +1,7 @@
 -- File: init
 -- Author: iaso2h
 -- Description: Heavily inspired Ingo Karkat's work. Replace text with register
--- Version: 0.0.5
+-- Version: 0.0.6
 -- Last Modified: 2021-09-21
 local fn   = vim.fn
 local cmd  = vim.cmd
@@ -28,6 +28,7 @@ end
 ---  This function is used for preserving the vim.v.register value in case that
 ---  it's cleared during the file modification
 M.replaceSave = function()
+    util.saveReg()
     M.regType   = vim.v.register
     M.count     = vim.v.count1
 end
@@ -107,6 +108,7 @@ local matchRegType = function(motionType, vimMode, reg, pos) -- {{{
         -- Prepend indents to the char type register to match the same indent
         -- of the first visual selected line
         local indent = fn.indent(pos.startPos[1])
+        -- BUG: valiate the spaces in register beforehand
         if indent ~=0 then
             fn.setreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
         end
@@ -225,8 +227,13 @@ function M.operator(args) -- {{{
     local pos
     local reg
     -- Saving {{{
-    -- Save registers and vim options
-    util.saveReg()
+    -- Save vim options
+    if vimMode == "n" then
+        -- This is for expr() only. Other type of replace will do the saving
+        -- part before calling operator(). Saving register in the expr() will
+        -- be ignore when using dot repeat
+        M.replaceSave()
+    end
     saveOption()
 
     -- Save cusor position
@@ -373,8 +380,6 @@ end -- }}}
 function M.expr() -- {{{
     -- TODO: Detect virutal edit
     if not warnRead() then return "" end
-
-    M.replaceSave()
 
     Opfunc = M.operator
     vim.o.opfunc = "LuaExprCallback"
