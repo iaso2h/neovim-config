@@ -35,6 +35,7 @@ local colors = {
     purple     = '#B48EAD',
     magenta    = '#C678DD',
     blue       = '#5E81AC',
+    blue_light = "#81A1C1",
     red        = '#BF616A',
     gray       = '#66738e',
     white      = '#D8DEE9',
@@ -165,19 +166,19 @@ gls.left[2] = {
                         "hi GalaxyViMode guibg=%s guifg=%s",
                         mode_colors[vimMode],
                         colors.blue))
-                    return "  " .. alias[vimMode]
+                    return " " .. alias[vimMode]
                 elseif vimMode == "t" or vimMode == "!" then
                     api.nvim_command(string.format(
                         "hi GalaxyViMode guibg=%s guifg=%s",
                         mode_colors[vimMode],
                         colors.white))
-                    return "  " .. alias[vimMode]
+                    return " " .. alias[vimMode]
                 else
                     api.nvim_command(string.format(
                         "hi GalaxyViMode guibg=%s guifg=%s",
                         mode_colors[vimMode],
                         colors.white))
-                    return "  " .. alias[vimMode]
+                    return " " .. alias[vimMode]
                 end
             end
         end,
@@ -230,7 +231,7 @@ gls.left[6] = {
 if fn.has("unix") == 1 then
     gls.left[7] = {
         GitIcon = {
-            provider  = function() return '  ' end,
+            provider  = function() return ' ' end,
             condition = condition.check_git_workspace,
             separator = ' ',
             separator_highlight = {'NONE',colors.bright_bg1},
@@ -253,7 +254,7 @@ gls.left[9] = {
     DiffAdd = {
         provider  = 'DiffAdd',
         condition = condition.hide_in_width,
-        icon      = ' ',
+        icon      = IsTerm and ' ' or '',
         highlight = {colors.green, colors.bright_bg1}
 }
     }
@@ -261,7 +262,7 @@ gls.left[10] = {
     DiffModified = {
         provider  = 'DiffModified',
         condition = condition.hide_in_width,
-        icon      = ' ',
+        icon      = IsTerm and ' ' or '',
         highlight = {colors.yellow, colors.bright_bg1}
     }
 }
@@ -270,7 +271,7 @@ gls.left[11] = {
     DiffRemove = {
         provider  = 'DiffRemove',
         condition = condition.hide_in_width,
-        icon      = ' ',
+        icon      = IsTerm and ' ' or '',
         highlight = {colors.red, colors.bright_bg1}
     }
 }
@@ -289,15 +290,15 @@ gls.left[12] = {
 gls.left[13] = {
     DiagnosticHint = {
         provider  = 'DiagnosticHint',
-        icon      = '  ',
-        highlight = {colors.yellow,colors.bg},
+        icon      = IsTerm and '  ' or ' ',
+        highlight = {colors.blue_light,colors.bg},
     }
 }
 
 gls.left[14] = {
     DiagnosticInfo = {
         provider  = 'DiagnosticInfo',
-        icon      = '  ',
+        icon      = IsTerm and '  ' or ' ',
         highlight = {colors.blue,colors.bg},
     }
 }
@@ -305,7 +306,7 @@ gls.left[14] = {
 gls.left[15] = {
     DiagnosticWarn = {
         provider  = 'DiagnosticWarn',
-        icon      = '  ',
+        icon      = IsTerm and '  ' or ' ',
         highlight = {colors.yellow, colors.bg}
     }
 }
@@ -313,7 +314,7 @@ gls.left[15] = {
 gls.left[16] = {
     DiagnosticError = {
         provider  = 'DiagnosticError',
-        icon      = '  ',
+        icon      = IsTerm and '  ' or ' ',
         highlight = {colors.red, colors.bg}
     }
 }

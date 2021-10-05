@@ -1,2 +1,11 @@
-vim.cmd[[noa lua require('dap.ext.autocompl').attach()<CR>]]
-vim.api.nvim_buf_set_keymap(0, "n", [[<C-Space>]], [[<C-x><C-o>]], {noremap = true})
+require('dap.ext.autocompl').attach()
+
+vim.api.nvim_buf_set_keymap(0, "i", [[<C-j>]], [[<C-o>:lua require('dap.repl').on_down()<CR>]], {})
+vim.api.nvim_buf_set_keymap(0, "i", [[<C-k>]], [[<C-o>:lua require('dap.repl').on_up()<CR>]], {})
+vim.api.nvim_buf_set_keymap(0, "i", [[<C-Space>]], [[<C-x><C-o>]], {noremap = true})
+vim.api.nvim_buf_set_keymap(0, "i", [[<C-w>j]], [[<C-[><C-w>j]], {})
+vim.api.nvim_buf_set_keymap(0, "i", [[<C-w>k]], [[<C-[><C-w>k]], {})
+vim.api.nvim_buf_set_keymap(0, "i", [[<C-w>h]], [[<C-[><C-w>h]], {})
+vim.api.nvim_buf_set_keymap(0, "i", [[<C-w>l]], [[<C-[><C-w>l]], {})
+vim.api.nvim_buf_set_keymap(0, "i", [[<C-w>s]], [[<C-[><C-w>s]], {})
+vim.api.nvim_buf_set_keymap(0, "i", [[<C-w>v]], [[<C-[><C-w>v]], {})

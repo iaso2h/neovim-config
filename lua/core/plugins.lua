@@ -85,7 +85,7 @@ packer.startup{
         'zatchheems/vim-camelsnek',
         cmd  = {"Camel", "Snake", "Pascal", "Snakecaps"},
         keys = {
-            {"v", [[<A-c>]]},
+            {"x", [[<A-c>]]},
             {"n", [[<A-c>]]},
             {"n", [[<A-S-c>]]},
         },
@@ -101,7 +101,7 @@ packer.startup{
     use {
         'andymass/vim-matchup',
         require = "nvim-treesitter",
-        event   = "WinScrolled",
+        event   = {"CursorHold", "CursorHoldI"},
         config  = function()
             vim.g.matchup_mappings_enabled      = 0
             vim.g.matchup_matchparen_deferred   = 1
@@ -140,9 +140,9 @@ packer.startup{
         'phaazon/hop.nvim',
         keys = {
             {"n", [[<leader>f]]},
-            {"v", [[<leader>f]]},
+            {"x", [[<leader>f]]},
             {"n", [[<leader>F]]},
-            {"v", [[<leader>F]]},
+            {"x", [[<leader>F]]},
         },
         config = function()
             require('hop').setup{
@@ -264,7 +264,7 @@ packer.startup{
     use {
         'machakann/vim-sandwich',
         keys = {
-            {"v", "S"},
+            {"x", "S"},
             {"n", "gs"},
             {"n", "cs"},
             {"n", "ds"},
@@ -275,7 +275,7 @@ packer.startup{
     use {
         'junegunn/vim-easy-align',
         keys = {
-            {"v", "A"},
+            {"x", "A"},
             {"n", "ga"},
         },
         config = function()
@@ -300,10 +300,10 @@ packer.startup{
         keys = {
             {"n", [[<leader><C-a>]]},
             {"n", [[<leader><C-x>]]},
-            {"v", [[<leader><C-a>]]},
-            {"v", [[<leader><C-x>]]},
-            {"v", [[<leader>g<C-a>]]},
-            {"v", [[<leader>g<C-x>]]},
+            {"x", [[<leader><C-a>]]},
+            {"x", [[<leader><C-x>]]},
+            {"x", [[<leader>g<C-a>]]},
+            {"x", [[<leader>g<C-x>]]},
         },
         config = function()
             map("n", [[<leader><C-a>]],  [[<Plug>(dial-increment)]], "Dial up")
@@ -377,21 +377,27 @@ packer.startup{
             vim.g.rooter_resolve_links = 1
         end
     }
-    -- use 'AndrewRadev/switch.vim'
+    use {
+        'AndrewRadev/switch.vim',
+        cmd   = "Switch",
+        setup = function()
+            map("n", [[~]], [[<C-u>:Switch<CR>]], {"silent"})
+        end
+    }
     use {
         'windwp/nvim-autopairs',
         require = "nvim-treesitter",
         config  = function()
             require('nvim-autopairs').setup {
-                disable_filetype          = {"TelescopePrompt"},
+                disable_filetype          = {"TelescopePrompt", "dap-repl"},
                 ignored_next_char         = string.gsub([[[%w%%%'%[%"%.] ]],"%s+", ""),
                 enable_moveright          = true,
-                enable_afterquote         = true,  -- add bracket pairs after quote
+                enable_afterquote         = true,   -- add bracket pairs after quote
                 enable_check_bracket_line = false,  -- check bracket in same line
                 check_ts                  = true,
                 fast_wrap = {
                     map         = '<A-p>',
-                    chars       = { '{', '[', '(', '"', "'" },
+                    chars       = {'{', '[', '(', '"', "'"},
                     pattern     = string.gsub([[ [%'%"%)%>%]%)%}%,] ]], '%s+', ''),
                     end_key     = 'p',
                     keys        = 'qwertyuiopzxcvbnmasdfghjkl',
@@ -404,42 +410,42 @@ packer.startup{
     use {
         'preservim/nerdcommenter',
         keys = {
-            {"v", [[<A-/>]]},
+            {"x", [[<A-/>]]},
             {"n", [[<A-/>]]},
             {"n", [[g<space>o]]},
             {"n", [[g<space>O]]},
 
             {"n", [[g<space><space>]]},
-            {"v", [[g<space><space>]]},
+            {"x", [[g<space><space>]]},
 
             {"n", [[g<space><space>]]},
-            {"v", [[g<space><space>]]},
+            {"x", [[g<space><space>]]},
             {"n", [[g<space>n]]},
-            {"v", [[g<space>n]]},
+            {"x", [[g<space>n]]},
 
             {"n", [[g<space>i]]},
-            {"v", [[g<space>i]]},
+            {"x", [[g<space>i]]},
 
             {"n", [[g<space>s]]},
-            {"v", [[g<space>s]]},
+            {"x", [[g<space>s]]},
 
             {"n", [[g<space>y]]},
-            {"v", [[g<space>y]]},
+            {"x", [[g<space>y]]},
 
             {"n", [[g<space>$]]},
             {"n", [[g<space>A]]},
             {"n", [[g<space>I]]},
 
-            {"v", [[<A-/>]]},
+            {"x", [[<A-/>]]},
             {"n", [[<A-/>]]},
 
             {"n", [[g<space>n]]},
-            {"v", [[g<space>n]]},
+            {"x", [[g<space>n]]},
             {"n", [[g<space>b]]},
-            {"v", [[g<space>b]]},
+            {"x", [[g<space>b]]},
 
             {"n", [[g<space>u]]},
-            {"v", [[g<space>u]]},
+            {"x", [[g<space>u]]},
         },
         setup  = [[vim.api.nvim_set_var("NERDCreateDefaultMappings", 0)]],
         config = conf("vim-nerdcommenter").config,
@@ -512,7 +518,7 @@ packer.startup{
         'szw/vim-maximizer',
         keys = {
             {"n", [[<C-w>m]]},
-            {"v", [[<C-w>m]]},
+            {"x", [[<C-w>m]]},
             {"t", [[<C-w>m]]},
         },
         cmd    = "MaximizerToggle",
@@ -643,7 +649,6 @@ packer.startup{
         'joshdick/onedark.vim',
         disable = true
     }
-    -- TODO: deprecated
     use {
         'NTBBloodbath/galaxyline.nvim',
         event    = "BufRead",
@@ -654,7 +659,7 @@ packer.startup{
         'akinsho/bufferline.nvim',
         event    = "BufRead",
         requires = "nvim-web-devicons",
-        config   = conf "nvim-bufferline"
+        config   = conf "nvim-bufferline".config
     }
     use {
     'RRethy/vim-hexokinase',
@@ -690,7 +695,12 @@ packer.startup{
                     "go", "javascript", "rust", "vue", "c_sharp", "typescript",
                     "comment", "query", "yaml"
                 },
-                highlight        = {enable = true, additional_vim_regex_highlighting = false},
+                highlight        = {
+                    enable = true,
+                    custom_captures = {
+                    },
+                    additional_vim_regex_highlighting = false
+                },
                 indent           = {enable = true},
                 incremental_selection = {
                     enable  = true,
@@ -707,7 +717,7 @@ packer.startup{
             }
 
             map("n", [[<A-S-a>]], [[gnn]])
-            map("x", [[<A-S-a>]], [[grn]])
+            map("x", [[<A-S-a>]], [[grc]])
             map("",  [[<A-S-s>]], [[grm]])
         end
     }
@@ -746,18 +756,34 @@ packer.startup{
     use {
         'romgrk/nvim-treesitter-context',
         requires = "nvim-treesitter",
-        event    = "WinScrolled",
+        event   = {"CursorHold", "CursorHoldI"},
         config   = function()
             require("treesitter-context").setup{
                 enable   = true,  -- Enable this plugin (Can be enabled/disabled later via commands)
                 throttle = true,  -- Throttles plugin updates (may improve performance)
+                patterns = {      -- Match patterns for TS nodes. These get wrapped to match at word boundaries.
+                    -- For all filetypes
+                    -- Note that setting an entry here replaces all other patterns for this entry.
+                    -- By setting the 'default' entry below, you can control which nodes you want to
+                    -- appear in the context window.
+                    default = {
+                        'class',
+                        'function',
+                        'method',
+                        'for',
+                        'while',
+                        'if',
+                        'switch',
+                        'case',
+                    },
+                }
             }
         end
     }
     use {
         'p00f/nvim-ts-rainbow',
-        event    = "BufRead",
         requires = "nvim-treesitter",
+        after    = "nvim-treesitter",
         config   = function()
             require("nvim-treesitter.configs").setup{
                 rainbow = {
@@ -775,7 +801,6 @@ packer.startup{
     }
     use {
         'nvim-treesitter/nvim-treesitter-textobjects',
-        event    = "BufRead",
         requires = "nvim-treesitter",
         config   = function()
             require("nvim-treesitter.configs").setup{
@@ -783,7 +808,7 @@ packer.startup{
                     select = {
                         enable = true,
                         keymaps = {
-                            ["nf"] = "@function.outer",
+                            -- ["nf"] = "@function.outer",
                             ["if"] = "@function.inner",
                             ["ac"] = "@class.outer",
                             ["ic"] = "@class.inner",
@@ -889,43 +914,25 @@ packer.startup{
             ]]
         end
     }
-    -- TODO: deprecated
     use {
-        'glepnir/lspsaga.nvim',
-        event   = "BufRead",
+        'kosayoda/nvim-lightbulb',
         require = "nvim-lspconfig",
+        event   = {"CursorHold", "CursorHoldI"},
         config  = function()
-            require("lspsaga").init_lsp_saga {
-                use_saga_diagnostic_sign = true,
-                error_sign            = "",
-                warn_sign             = "⚠️",
-                hint_sign             = "",
-                infor_sign            = "",
-                dianostic_header_icon = "   ",
-                code_action_icon      = " ",
-                code_action_prompt    = {
-                    enable        = false,
-                    sign          = false,
-                    sign_priority = 20,
-                    virtual_text  = true,
-                },
-                finder_definition_icon = "  ",
-                finder_reference_icon  = "  ",
-                max_preview_lines      = 10,
-                finder_action_keys     = {
-                    open = "o", vsplit = "<C-v>",split = "<C-s>",quit = "q",scroll_down = "<A-d>", scroll_up = "<A-e>"
-                },
-                code_action_keys = {
-                    quit = "q",exec = "<CR>"
-                },
-                rename_action_keys = {
-                    quit = "<C-c>",exec = "<CR>"
-                },
-                definition_preview_icon = "  ",
-                border_style            = "round",
-                rename_prompt_prefix    = ">>>",
-                -- server_filetype_map = {}
-            }
+            vim.cmd [[
+            augroup lightBulb
+            autocmd!
+            autocmd CursorHold,CursorHoldI * lua require('nvim-lightbulb').update_lightbulb{sign={enabled = false,},virtual_text={enabled=true, text = "💡"}}
+            augroup END
+            ]]
+            -- require('nvim-lightbulb').update_lightbulb({
+                -- sign = {
+                    -- enabled = true,
+                    -- },
+                -- virtual_text = {
+                    -- enabled = true, text = "💡"
+                -- }
+            -- })
         end
     }
     use {
@@ -995,7 +1002,7 @@ packer.startup{
             {"hrsh7th/cmp-nvim-lua", module = "cmp_nvim_lua", disable = true},
             {"hrsh7th/cmp-buffer",   module = "cmp_buffer"},
             {"hrsh7th/cmp-path",     module = "cmp_path"},
-            {"hrsh7th/cmp-vsnip",    after  = "nvim-cmp"},
+            {"hrsh7th/cmp-vsnip"},
             {
                 "tzachar/cmp-tabnine",
                 disable = true,
@@ -1048,7 +1055,7 @@ packer.startup{
         module  = "illuminate",
         rquires = "nvim-lspconfig",
         setup   = function()
-            vim.g.Illuminate_ftblacklist = {"nerdtree", "NvimTree"}
+            vim.g.Illuminate_ftblacklist = {"nerdtree", "NvimTree", "qf", "packer"}
             vim.g.Illuminate_delay = 100
         end
     }
@@ -1061,14 +1068,19 @@ packer.startup{
     use {
         'nvim-telescope/telescope.nvim',
         module   = "telescope",
-        event    = "BufRead",
         cmd      = "Telescope",
         keys     = {
-            {"n", [[<C-h>l]]},     {"n", [[<C-h>e]]},
-            {"n", [[<C-f>f]]},     {"n", [[<C-f>F]]},
-            {"n", [[<C-h>c]]},     {"n", [[<C-h>h]]},
-            {"n", [[<C-h><C-h>]]}, {"n", [[<C-h>o]]},
-            {"n", [[<C-h>b]]}
+            {"n", [[<C-f>l]]},  {"n", [[<C-f>E]]},    {"n", [[<C-f>e]]},  {"n", [[<C-f>f]]},
+            {"n", [[<C-f>F]]},  {"n", [[<C-f>w]]},    {"n", [[<C-f>W]]},  {"n", [[<A-C-j>]]},
+            {"n", [[<A-C-k>]]}, {"n", [[<C-h>/]]},    {"n", [[<C-h>v]]},  {"n", [[<C-h>o]]},
+            {"n", [[<C-h>i]]},  {"n", [[<C-h>q]]},    {"n", [[<C-h>m]]},  {"n", [[<C-h>k]]},
+            {"n", [[<C-h>c]]},  {"n", [[<C-h>h]]},    {"n", [[<C-h>H]]},  {"n", [[<C-h>l]]},
+            {"n", [[<C-f>o]]},  {"n", [[<C-f>O]]},    {"n", [[<C-f>gc]]}, {"n", [[<C-f>gC]]},
+            {"n", [[<C-f>gs]]}, {"n", [[<leader>b]]},
+
+            {"n", [[gd]]},        {"n", [[gD]]},     {"n", [[gR]]},     {"n", [[gi]]},
+            {"n", [[<C-f>a]]},    {"n", [[<C-f>o]]}, {"n", [[<C-f>O]]}, {"n", [[<leader>e]]},
+            {"n", [[<leader>E]]},
         },
         requires = {
             "plenary.nvim",
@@ -1093,7 +1105,7 @@ packer.startup{
     use {
         'dstein64/vim-startuptime',
         cmd    = "StartupTime",
-        config = [[vim.g.startuptime_tries = 20]]
+        config = [[vim.g.startuptime_tries = 50]]
     }
     use 'lewis6991/impatient.nvim'
     use {
@@ -1119,19 +1131,18 @@ packer.startup{
     use {
         'mfussenegger/nvim-dap',
         module = "dap",
+        setup  = conf "nvim-dap".setup,
         config = conf "nvim-dap".config
     }
     use {
         'rcarriga/nvim-dap-ui',
-        module   = "dap",
-        requires = "nvim-dap",
-        config   = conf "nvim-dap-ui"
+        config = conf "nvim-dap-ui"
     }
     use {
         'jbyuki/one-small-step-for-vimkind',
-        module   = "dap",
-        requires = 'nvim-dap',
-        config   = function()
+        module = "osv",
+        cmd    = {"OSVStart", "OSVStop"},
+        config = function()
             vim.cmd [[command! -nargs=0 OSVStop  lua require("osv").stop()]]
             vim.cmd [[command! -nargs=0 OSVStart lua require("osv").launch()]]
         end
@@ -1187,7 +1198,6 @@ packer.startup{
         event  = "BufRead",
         config = conf "nvim-gitsigns"
     }
-    -- TODO: highlight
     use {
         'rhysd/conflict-marker.vim',
         disable = true,
@@ -1200,7 +1210,6 @@ packer.startup{
     }
     -- }}} Source control
     -- Knowlege {{{
-    -- TODO: highlight
     use {
         'folke/which-key.nvim',
         disable = true,
@@ -1228,7 +1237,8 @@ packer.startup{
     end,
     config = {
         display = {
-            open_fn = function()
+            prompt_border = 'rounded',
+            open_fn       = function()
                 return require("packer.util").float{border = "single"}
             end
         }

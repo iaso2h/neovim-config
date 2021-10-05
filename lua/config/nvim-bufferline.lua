@@ -1,12 +1,22 @@
-return function()
+local M = {}
+
+
+M.cycleBuf = function(CMD, fallbackCMD)
+    local bufNr = vim.api.nvim_get_current_buf()
+    vim.cmd(CMD)
+    if vim.api.nvim_get_current_buf() == bufNr then vim.cmd(fallbackCMD) end
+end
+
+
+M.config = function()
 
 -- vim.cmd [[hi! BufferLineBuffer guifg=#66738e guibg=#3B4252]]
 require("bufferline").setup {
     options = {
         numbers = function(opts)
-                    -- return string.format("%s.%s.", opts.ordinal, opts.id)
-                    return string.format("%s", opts.ordinal)
-                end,
+            -- return string.format("%s.%s.", opts.ordinal, opts.id)
+            return string.format("%s", opts.ordinal)
+        end,
         close_command        = "bdelete! %d",  -- can be a string | function, see "Mouse actions"
         right_mouse_command  = "bdelete! %d",  -- can be a string | function, see "Mouse actions"
         left_mouse_command   = "buffer %d",    -- can be a string | function, see "Mouse actions"
@@ -285,11 +295,12 @@ map("n", [[<A-7>]], [[:lua require("bufferline").go_to_buffer(7)<CR>]], {"silent
 map("n", [[<A-8>]], [[:lua require("bufferline").go_to_buffer(8)<CR>]], {"silent"})
 map("n", [[<A-9>]], [[:lua require("bufferline").go_to_buffer(9)<CR>]], {"silent"})
 
-map("n", [[<A-h>]], [[:<C-u>BufferLineCyclePrev<CR>]], {"silent"})
-map("n", [[<A-l>]], [[:<C-u>BufferLineCycleNext<CR>]], {"silent"})
+map("n", [[<A-h>]], [[:lua require("config.nvim-bufferline").cycleBuf("BufferLineCyclePrev", "bp")<CR>]], {"silent"})
+map("n", [[<A-l>]], [[:lua require("config.nvim-bufferline").cycleBuf("BufferLineCycleNext", "bn")<CR>]], {"silent"})
 
 map("n", [[<A-S-h>]], [[:<C-u>BufferLineMovePrev<CR>]], {"silent"})
 map("n", [[<A-S-l>]], [[:<C-u>BufferLineMoveNext<CR>]], {"silent"})
 
 end
 
+return M

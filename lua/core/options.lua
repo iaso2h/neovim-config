@@ -24,7 +24,6 @@ o.clipboard = "unnamed,unnamedplus"
 
 o.cmdheight  = 2
 o.shortmess  = "clxTI"
-o.timeoutlen = 750
 
 o.complete    = ".,w,b,u,t,kspell,i,d,t"
 o.completeopt = "menuone,noselect,noinsert"
@@ -45,7 +44,7 @@ o.listchars = "tab:>-,precedes:❮,extends:❯,trail:-,nbsp:%,eol:↴"
 o.showbreak = "↳"
 
 o.foldcolumn = "auto:4"
-o.signcolumn = "yes:4"
+o.signcolumn = "auto:4"
 o.foldmethod = "expr"
 o.foldexpr   = "EnhanceFoldExpr()"
 
@@ -94,10 +93,11 @@ o.switchbuf        = "split"
 -- GUI
 -- cmd [[colorscheme onedarknord]]
 cmd [[colorscheme onenord]]
-GuiFont = "UbuntuMono Nerd Font"
+GuiFont = "Delugia"
+-- GuiFont = "UbuntuMono Nerd Font"
 -- GuiFont = "Sarasa Mono SC Nerd"
 -- GuiFont = "FiraCode Nerd Font"
-GuiFontSize        = 14
+GuiFontSize        = 12
 GuiFontSizeDefault = GuiFontSize
 o.guifont = GuiFont ..":h" .. GuiFontSize
 

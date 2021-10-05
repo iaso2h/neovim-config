@@ -87,7 +87,7 @@ return function()
         },
         preselect = cmp.PreselectMode.Item,
         documentation = {
-            border = "none",
+            border = "rounded",
         },
         mapping = {
             ["<A-e>"] = cmp.mapping.scroll_docs(-4),

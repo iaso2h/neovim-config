@@ -1,3 +1,16 @@
+local fn  = fn
+local cmd = vim.cmd
+local api = vim.api
+local M   = {}
+
+--- Highlight relative row in quickfix with color
+--- @param qfChk boolean whether filter out quickfix or not
+M.highlightRelative = function (qfChk)
+    local alterBufNr = fn.bufnr("#")
+    if not api.nvim_buf_is_valid(alterBufNr) then return end
+    local items = qfChk and fn.getqflist() or fn.getloclist(0)
+    --  TODO: implement with api hihghlight
+end
 -- cfilter.lua: Plugin to filter entries from a quickfix/location list
 -- Last Change: Aug 23, 2018
 -- Maintainer: Yegappan Lakshmanan (yegappan AT yahoo DOT com)
@@ -16,10 +29,14 @@
 --   :Lfilter[!] /{pat}/
 --       Same as :Cfilter but operates on the current location list.
 --
-local lastPat = ""
-
+local lastFilterPat = ""
+--- Filter out quickfix list or locallist by specific pattern
+--- @param qfChk boolean whether filter out quickfix or not
+--- @param pat string pattern to filter out
+--- @param bang string if bang value is "!", then items not matching the
+---        pattern will be preserved
 _G.qFilter = function(qfChk, pat, bang)
-    local items = qfChk and vim.fn.getqflist() or vim.fn.getloclist(0)
+    local items = qfChk and fn.getqflist() or fn.getloclist(0)
 
     local firstChar = string.sub(pat, 1, 1)
     local lastChar  = string.sub(pat, -1, -1)
@@ -27,13 +44,13 @@ _G.qFilter = function(qfChk, pat, bang)
         pat = string.sub(pat, 2, -2)
         if pat == '' then
             -- Use the last search pattern
-            pat = lastPat
+            pat = lastFilterPat
         end
     else
         pat = pat
     end
 
-    if pat == "%" or "#" then pat = vim.fn.expand("#") end
+    if pat == "%" or "#" then pat = fn.expand("#") end
 
     if pat == '' then return end
 
@@ -42,19 +59,19 @@ _G.qFilter = function(qfChk, pat, bang)
     local regex = vim.regex(pat)
     if bang == '!' then
         cond = function(i)
-            return (not regex:match_str(i.text)) and (not regex:match_str(vim.fn.bufname(i.bufnr)))
+            return (not regex:match_str(i.text)) and (not regex:match_str(fn.bufname(i.bufnr)))
         end
     else
         cond = function(i)
-            return regex:match_str(i.text) or regex:match_str(vim.fn.bufname(i.bufnr))
+            return regex:match_str(i.text) or regex:match_str(fn.bufname(i.bufnr))
         end
     end
 
     items = vim.tbl_filter(cond, items)
     if qfChk then
-        vim.fn.setqflist({}, ' ', {items = items})
+        fn.setqflist({}, ' ', {items = items})
     else
-        vim.fn.setloclist(0, {}, ' ', {items = items})
+        fn.setloclist(0, {}, ' ', {items = items})
     end
 end
 

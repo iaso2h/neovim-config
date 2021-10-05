@@ -10,11 +10,11 @@ require("todo-comments").setup{
             alt   = { "FIXME", "BUG", "FIXIT", "FIX", "ISSUE" }, -- a set of other keywords that all map to this FIX keywords
             -- signs = false, -- configure signs for some keywords individually
         },
-        TODO = { icon = " ", color = "warning" },
-        HACK = { icon = " ", color = "error" },
-        WARN = { icon = " ", color = "warning", alt = { "WARNING", "XXX" } },
-        PERF = { icon = " ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
-        NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
+        TODO = { icon = " ", color = "warning" },
+        HACK = { icon = " ", color = "error",   alt = {"UGLY"}},
+        WARN = { icon = " ", color = "warning", alt = {"WARNING", "XXX"} },
+        PERF = { icon = " ", alt   = {"OPTIM", "PERFORMANCE", "OPTIMIZE"} },
+        NOTE = { icon = " ", color = "hint",    alt = {"INFO", "DEBUG"} },
     },
     merge_keywords = true, -- when true, custom keywords will be merged with the defaults
     -- highlighting of the line containing the todo comment
@@ -56,7 +56,8 @@ require("todo-comments").setup{
 }
 
 vim.cmd [[command! -nargs=0 TodoTelescope Telescope todo-comments todo theme=ivy]]
-map("n", [[<C-f>t]], [[:<C-u>TodoTelescope<CR>]])
+map("n", [[<C-f>t]], [[:<C-u>TodoTelescope<CR>]], {"silent"})
+map("n", [[<C-q>t]], [[:<C-u>TodoQuickFix<CR>]],  {"silent"})
 
 end
 

@@ -93,8 +93,9 @@ theme.syntax = {
 -- Editor highlight {{{
 theme.editor =  {
     -- normal text and background color
-    Normal      = {fg = p.n4, bg = p.n0},
-    NormalFloat = {fg = p.n4, bg = p.n1},
+    Normal      = {fg = p.n4,  bg = p.n0},
+    -- vim.api.nvim_open_win
+    NormalFloat = {fg = p.n10, bg = p.n0, style = "bold"},
     TermCursor  = {link = "Normal"},
     -- TermCursorNC
 
@@ -213,7 +214,7 @@ theme.treesitter = {
     TSKeyword            = {link  = "Keyword"},
     TSKeywordFunction    = {link  = "Keyword"},
     TSKeywordOperator    = {link  = "Keyword"},
-    TSKeywordReturn      = {link  = "Keyword"},
+    TSKeywordReturn      = {fg    = p.purple, bg = "#564167", style = "italic"},
     TSLabel              = {link  = "Label"},
     TSMethod             = {link  = "Function"},
     TSNamespace          = {link  = "Structure"},
@@ -251,7 +252,10 @@ theme.treesitter = {
     TSType               = {fg    = p.yellow},
     TSTypeBuiltin        = {link  = "TSType"},
     TSVariable           = {link  = "Identifier"},
-    TSVariableBuiltin    = {fg    = p.cyan}
+    TSVariableBuiltin    = {fg    = p.cyan},
+
+    -- treeSitter-Context
+    TreesitterContext = {bg = p.n1}
 }
 -- }}} TreeSitter highlight
 
@@ -278,6 +282,8 @@ theme.lsp = {
     LspReferenceText  = {bg = p.n3},
     LspReferenceRead  = {bg = p.n3},
     LspReferenceWrite = {bg = p.n3},
+
+    FloatBorder = {link = "NormalFloat"}
 }
 
 
@@ -319,10 +325,10 @@ theme.plugins = {
     GitSignsDeleteLn = {fg = p.n11}, -- diff mode: Deleted line |diff.txt|
 
     -- Telescope
-    TelescopePromptBorder   = {fg = p.n8},
+    TelescopePromptBorder   = {fg = p.n8, style = "bold"},
     TelescopePromptPrefix   = {fg = p.n14},
-    TelescopeResultsBorder  = {fg = p.n9},
-    TelescopePreviewBorder  = {fg = p.n14},
+    TelescopeResultsBorder  = {fg = p.n9, style = "bold"},
+    TelescopePreviewBorder  = {fg = p.n10, style = "bold"},
     TelescopeSelectionCaret = {fg = p.n10},
     TelescopeSelection      = {fg = p.w,  bg = p.n8, style = "bold"},
     TelescopeNormal         = {fg = p.n4, bg = p.n0},
@@ -370,7 +376,7 @@ theme.plugins = {
     LspFloatWinBorder          = {fg = p.n9},
     LspSagaBorderTitle         = {fg = p.n8},
     LspSagaHoverBorder         = {fg = p.n10},
-    LspSagaRenameBorder        = {fg = p.n14},
+    LspSagaRenameBorder        = {fg = p.n10},
     LspSagaDefPreviewBorder    = {fg = p.n14},
     LspSagaCodeActionBorder    = {fg = p.n7},
     LspSagaFinderSelection     = {fg = p.n14},
@@ -430,6 +436,10 @@ theme.plugins = {
     -- LightspeedPendingOpArea          = {style = "strikethrough"},
     -- LightspeedPendingChangeOpArea    = {style = "strikethrough"},
     -- LightspeedCursor                 = {fg = nord.nord7, style = "underline,reverse"},
+
+    -- nvim-lightbulb
+    LightBulbVirtualText = {link = "NormalFloat"},
+    LightBulbFloatWin    = {link = "NormalFloat"},
 }
 
 

@@ -13,6 +13,7 @@ local M   = {}
 local lines = {"< New Buffer >"}
 local curWin
 
+
 M.display = function()
     if fn.argc() > 0 or #vim.v.oldfiles == 1 then
         return
@@ -88,6 +89,7 @@ end
 
 M.deleteBuf = function()
     if not M.curBuf then return end
+
     if api.nvim_buf_is_valid(M.curBuf) then
         api.nvim_buf_delete(M.curBuf, {force = true})
     end

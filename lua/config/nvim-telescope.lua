@@ -4,7 +4,8 @@ local cmd     = vim.cmd
 local actions = require("telescope.actions")
 
 -- Gloabl customization
-local defaultTheme = require('telescope.themes').get_ivy{
+local defaultTheme = {
+-- local defaultTheme = require('telescope.themes').get_ivy{
         -- TODO:
         vimgrep_arguments = {
             'rg',
@@ -16,23 +17,21 @@ local defaultTheme = require('telescope.themes').get_ivy{
             '--smart-case'
         },
         prompt_prefix      = "$ ",
-        selection_caret    = "",
-        entry_prefix       = "    ",
-        initial_mode       = "insert",
-        selection_strategy = "reset",
-        scroll_strategy    = "cycle",
+        selection_caret    = "  ",
+        entry_prefix       = "   ",
+        selection_strategy = "follow",
 
-        -- sorting_strategy   = "descending",
-        -- layout_strategy    = "horizontal",
-        -- layout_config = {
-            -- prompt_position = "top",
-            -- horizontal = {
-                -- mirror = false,
-            -- },
-            -- vertical = {
-                -- mirror = false,
-            -- },
-        -- },
+        sorting_strategy = "ascending",
+        layout_strategy  = "horizontal",
+        layout_config    = {
+            prompt_position = "top",
+            -- -- horizontal = {
+                -- -- mirror = true,
+            -- -- },
+            -- -- vertical = {
+                -- -- mirror = true,
+            -- -- },
+        },
 
         file_sorter    = require("telescope.sorters").get_fzy_sorter,
         generic_sorter = require("telescope.sorters").get_fzy_sorter,
@@ -47,43 +46,51 @@ local defaultTheme = require('telescope.themes').get_ivy{
         path_display = {},
         set_env = {COLORTERM = "truecolor"},
 
-        file_previewer   = require("telescope.previewers").vim_buffer_cat.new,
-        grep_previewer   = require("telescope.previewers").vim_buffer_vimgrep.new,
-        qflist_previewer = require("telescope.previewers").vim_buffer_qflist.new,
-
         -- Developer configurations: Not meant for general override
         buffer_previewer_maker = require("telescope.previewers").buffer_previewer_maker,
 
         mappings = {
             i = {
-                ["<C-n>"]   = actions.move_selection_next,
-                ["<C-p>"]   = actions.move_selection_previous,
-                ["<Down>"]  = actions.move_selection_next,
-                ["<Up>"]    = actions.move_selection_previous,
+                ["<C-u>"]     = false,
+                ["<C-d>"]     = false,
+                ["<C-x>"]     = false,
 
-                ["<C-c>"]   = actions.close,
+                ["<C-n>"]     = actions.move_selection_next,
+                ["<C-p>"]     = actions.move_selection_previous,
+                ["<Down>"]    = actions.move_selection_next,
+                ["<Up>"]      = actions.move_selection_previous,
 
-                ["<CR>"]    = actions.select_default + actions.center,
-                -- ["<C-s>"]   = actions.select_horizontal, -- remap in ftplugin
-                ["<C-v>"]   = actions.select_vertical,
-                ["<C-t>"]   = actions.select_tab,
+                ["<C-c>"]     = actions.close,
 
-                ["<Tab>"]   = actions.toggle_selection + actions.move_selection_worse,
-                ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
-                ["<C-q>"]   = actions.send_selected_to_qflist + actions.open_qflist,
-                -- ["<C-l>"]   = actions.complete_tag, -- remap in ftplugin
-                -- ["<C-j>"]   = actions.cycle_history_next, -- reamap
-                -- ["<C-k>"]   = actions.cycle_history_prev, -- reamap
+                ["<CR>"]      = actions.select_default + actions.center,
+                ["<C-s>"]     = actions.select_horizontal,
+                ["<C-v>"]     = actions.select_vertical,
+                ["<C-t>"]     = actions.select_tab,
 
-                -- ["<A-e>"]   = actions.preview_scrolling_up, -- remap in ftplugin
-                -- ["<A-d>"]   = actions.preview_scrolling_down, -- remap in ftplugin
+                ["<Tab>"]     = actions.toggle_selection + actions.move_selection_worse,
+                ["<S-Tab>"]   = actions.toggle_selection + actions.move_selection_better,
+                ["<C-q>"]     = actions.send_selected_to_qflist + actions.open_qflist,
+                ["<M-q>"]     = actions.send_selected_to_qflist + actions.open_qflist,
+
+                ["<C-Space>"] = actions.complete_tag,
+                ["<C-j>"]     = actions.cycle_history_next,
+                ["<C-k>"]     = actions.cycle_history_prev,
+
+                ["<A-e>"]     = actions.preview_scrolling_up,
+                ["<A-d>"]     = actions.preview_scrolling_down,
             },
             n = {
+                ["<C-u>"]   = false,
+                ["<C-d>"]   = false,
+                ["<C-x>"]   = false,
+                ["<C-j>"]   = false,
+                ["<C-k>"]   = false,
+
                 ["<esc>"]   = actions.close,
                 ["q"]       = actions.close,
 
                 ["<CR>"]    = actions.select_default + actions.center,
-                -- ["<C-s>"]   = actions.select_horizontal, -- remap in ftplugin
+                ["<C-s>"]   = actions.select_horizontal,
                 ["<C-v>"]   = actions.select_vertical,
                 ["<C-t>"]   = actions.select_tab,
 
@@ -97,25 +104,21 @@ local defaultTheme = require('telescope.themes').get_ivy{
                 ["<Down>"]  = actions.move_selection_next,
                 ["<Up>"]    = actions.move_selection_previous,
 
-                -- ["g"]       = actions.move_to_top, -- remap in ftplugin
-                -- ["z"]       = actions.move_to_middle, -- remap in ftplugin
-                -- ["G"]       = actions.move_to_bottom, -- remap in ftplugin
+                ["<A-e>"]   = actions.preview_scrolling_up,
+                ["<A-d>"]   = actions.preview_scrolling_down,
 
-                -- ["<A-u>"]   = actions.preview_scrolling_up, -- remap in ftplugin
-                -- ["<A-d>"]   = actions.preview_scrolling_down, -- remap in ftplugin
+                ["g"]       = actions.move_to_top,
+                ["z"]       = actions.move_to_middle,
+                ["G"]       = actions.move_to_bottom,
             },
         }
     }
 require('telescope').setup{
-    defualts = defaultTheme,
+    defaults = defaultTheme,
     pickers = {
-        -- Your special builtin config goes in here
-        buffers = {
-            sort_lastused = true,
-            theme         = "dropdown",
-            previewer     = false,
+        find_files = {
+            hidden = true,
         },
-
     },
     extensions = {
         fzy_native = {
@@ -128,17 +131,45 @@ require('telescope').setup{
 require('telescope').load_extension('fzy_native')
 
 -- Command
-cmd[[command! -nargs=0 O lua require('telescope.builtin').oldfiles(require('telescope.themes').get_ivy{})]]
-
+cmd[[
+command! -nargs=0 O lua require('telescope.builtin').oldfiles(require('telescope.themes').get_ivy{})
+]]
 -- Mappings
-map("n", [[<C-f>l]],     [[:lua require('telescope.builtin').builtin(require('telescope.themes').get_ivy{previewer = false})<CR>]],  {"silent"})
-map("n", [[<C-f>e]],     [[:lua require('telescope.builtin').find_files(require('telescope.themes').get_ivy{})<CR>]],                {"silent"})
-map("n", [[<C-f>f]],     [[:lua require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_ivy{})<CR>]], {"silent"})
-map("n", [[<C-f>F]],     [[:lua require('telescope.builtin').live_grep(require('telescope.themes').get_ivy{})<CR>]],                 {"silent"})
-map("n", [[<C-f>c]],     [[:lua require('telescope.builtin').commands(require('telescope.themes').get_ivy{})<CR>]],                  {"silent"})
-map("n", [[<C-f>h]],     [[:lua require('telescope.builtin').help_tags(require('telescope.themes').get_ivy{})<CR>]],                 {"silent"})
-map("n", [[<C-f>o]],     [[:lua require('telescope.builtin').current_buffer_tags(require('telescope.themes').get_ivy{})<CR>]],       {"silent"})
-map("n", [[<leader>b]],  [[:lua require('telescope.builtin').buffers(require('telescope.themes').get_ivy{})<CR>]],                   {"silent"})
+map("n", [[<C-f>l]], [[:lua require('telescope.builtin').builtin()<CR>]], {"silent"})
+
+map("n", [[<C-f>E]], [[:lua require('telescope.builtin').find_files({no_ignore=true})<CR>]],  {"silent"})
+map("n", [[<C-f>e]], [[:lua require('telescope.builtin').find_files({no_ignore=false})<CR>]], {"silent"})
+
+map("n", [[<C-f>f]], [[:lua require('telescope.builtin').current_buffer_fuzzy_find()<CR>]], {"silent"})
+map("n", [[<C-f>F]], [[:lua require('telescope.builtin').live_grep()<CR>]],                 {"silent"})
+
+map("n", [[<C-f>w]], [[:lua require('telescope.builtin').grep_string({word_match=false)<CR>]], {"silent"})
+map("n", [[<C-f>W]], [[:lua require('telescope.builtin').grep_string({word_match=true)<CR>]],  {"silent"})
+
+map("c", [[<A-C-j>]], [[<Esc>:lua require('telescope.builtin').command_history()<CR>]], {"silent"})
+-- BUG: keymapping conflict
+map("c", [[<A-C-k>]], [[<Esc>:lua require('telescope.builtin').command_history()<CR>]], {"silent"})
+
+map("n", [[<C-h>/]], [[:lua require('telescope.builtin').search_history()<CR>]], {"silent"})
+map("n", [[<C-h>v]], [[:lua require('telescope.builtin').vim_options()<CR>]],    {"silent"})
+map("n", [[<C-h>o]], [[:lua require('telescope.builtin').jumplist()<CR>]],       {"silent"})
+map("n", [[<C-h>i]], [[:lua require('telescope.builtin').jumplist()<CR>]],       {"silent"})
+map("n", [[<C-h>q]], [[:lua require('telescope.builtin').registers()<CR>]],      {"silent"})
+map("n", [[<C-h>m]], [[:lua require('telescope.builtin').marks()<CR>]],          {"silent"})
+map("n", [[<C-h>k]], [[:lua require('telescope.builtin').keymaps()<CR>]],        {"silent"})
+map("n", [[<C-h>c]], [[:lua require('telescope.builtin').commands()<CR>]],       {"silent"})
+map("n", [[<C-h>h]], [[:lua require('telescope.builtin').help_tags()<CR>]],      {"silent"})
+map("n", [[<C-h>H]], [[:lua require('telescope.builtin').man_pages()<CR>]],      {"silent"})
+map("n", [[<C-h>l]], [[:lua require('telescope.builtin').realoader()<CR>]],      {"silent"})
+
+map("n", [[<C-f>o]], [[:lua require('telescope.builtin').current_buffer_tags()<CR>]], {"silent"})
+map("n", [[<C-f>O]], [[:lua require('telescope.builtin').tags()<CR>]],                {"silent"})
+
+map("n", [[<C-f>gc]], [[:lua require('telescope.builtin').git_bcommits()<CR>]], {"silent"})
+map("n", [[<C-f>gC]], [[:lua require('telescope.builtin').git_commits()<CR>]],  {"silent"})
+map("n", [[<C-f>gs]], [[:lua require('telescope.builtin').git_status()<CR>]],   {"silent"})
+
+map("n", [[<leader>b]], [[:lua require('telescope.builtin').buffers()<CR>]], {"silent"})
 
 end
 

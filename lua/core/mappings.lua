@@ -5,7 +5,7 @@ local M    = {}
 vim.g.mapleader = " "
 
 -- Change font size (GUI client only)
-if not os.getenv("TERM") then
+if not IsTerm then
     map("", [[<C-->]], [[:lua GuiFontSize = GuiFontSize - 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Increase font size")
     map("", [[<C-=>]], [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Decrease font size")
     map("", [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent"}, "Restore font size")
@@ -136,7 +136,8 @@ luaRHS[[:lua
 {"silent"}, "Extract selected")
 map("n", [[gc]], [[<Plug>Extract]])
 -- TODO: implement with visualreapet?
-map("x", [[C]],  [[visualmode() == '^V' ? "Di" : "\<Plug>ExtractVisual"]], {"expr"})
+-- map("x", [[<Plug>fallbackC]], [[:<C-u>norm! gvC<CR>]])
+map("x", [[C]],  [[visualmode() == "^V" ? "" : "\<Plug>ExtractVisual"]], {"expr"})
 -- Print file info
 map("n", [[<C-g>]],
 [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<CR>]],
@@ -152,7 +153,7 @@ map("n", [[dk]], [[<Nop>]])
 map("n", [[d<Space>]], [[:<C-u>call setline(".", "")<CR>]],  {"silent"})
 -- Inquery word
 map("n", [[<leader>i]], [=[[I]=], "Inquery word under cursor")
-map("x", [[<leader>i]], [[:lua Print("noa g#\\V" .. vim.fn.escape(require("selection").getSelect("string"), "\\") .. "#number")<CR>]], {"silent"})
+map("x", [[<leader>i]], [[:lua Print("noa g#\\V" .. string.gsub(require("selection").getSelect("string"), "\\", "\\\\") .. "#number")<CR>]], {"silent"})
 -- Fast mark & resotre
 map("n", [[M]], [[`m]], "Restore mark M")
 -- Changelist jumping
@@ -175,8 +176,8 @@ map("x", [[?]], [[#]])
 -- Regex very magic
 map("n", [[/]], [[/\v]], {"noremap"}, "Search forward")
 map("n", [[?]], [[?\v]], {"noremap"}, "Search backward")
-map("n", [[n]], [[nzzzvhn]], {"noremap"})
-map("n", [[N]], [[NzzzvlN]], {"noremap"})
+map("n", [[n]], [[nzzzv_n]], {"noremap"})
+map("n", [[N]], [[Nzzzv$N]], {"noremap"})
 -- Disable highlight search & Exit visual mode
 map("n", [[<leader>h]], [[:<C-u>noh<CR>]], {"silent"}, "Disable highlight")
 map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"})
@@ -210,10 +211,10 @@ map("n", [[g)]],      [[:lua require("trailingUtil").trailingChar(")")<CR>]],  {
 map("n", [[g(]],      [[:lua require("trailingUtil").trailingChar("(")<CR>]],  {"silent"}, "Trail (")
 map("n", [[g<C-CR>]], [[:lua require("trailingUtil").trailingChar("o")<CR>]],  {"silent"}, "Add new line below")
 map("n", [[g<S-CR>]], [[:lua require("trailingUtil").trailingChar("O")<CR>]],  {"silent"}, "Add new line above")
+map("n", [[g<CR>]],   [[:lua require("breakLine").main()<CR>]],                {"silent"}, "Break line at cursor")
 -- }}} Trailing character
 -- Messages
 
-map("n", [[g<]],        [[:<C-u>messages<CR>]], {"silent"}, "Messages in prompt")
 map("n", [[<leader>,]], [[:<C-u>execute 'messages clear<Bar>echohl Moremsg<Bar>echo "Message clear"<Bar>echohl None'<CR>]])
 map("n", [[<leader>.]], [[:<C-u>execute 'messages clear<Bar>echohl Moremsg<Bar>echo "Message clear"<Bar>echohl None'<CR>]], "Clear messages")
 -- Pageup/Pagedown
@@ -284,6 +285,8 @@ map("n", [[g}]],              [[:<C-u>call EnhanceFold(mode(), "}}}")<CR>]],    
 map("x", [[g{]],              [[mz:<C-u>call EnhanceFold(visualmode(), "}}}")<CR>`z]])
 map("x", [[g}]],              [[mz:<C-u>call EnhanceFold(visualmode(), "}}}")<CR>`z]])
 map("n", [[<leader><Space>]], [[@=(foldlevel('.') ? 'za' : '\<Space>')<CR>]],          {"noremap", "silent"}, "Open fold")
+-- TODO: make <C-Space> snapped to the nearst closed fold even if the cursor
+-- is not on a line with closed fold
 map("n", [[<C-Space>]],       [[@=(foldlevel('.') ? 'zA' : '\<Space>')<CR>]],          {"noremap", "silent"}, "Open fold recursively")
 for i=0, 9 do
     map("",
