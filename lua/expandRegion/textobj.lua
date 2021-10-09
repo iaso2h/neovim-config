@@ -25,8 +25,8 @@ M.compareWithNode = function(selection, tsNode)
     else
         tsNodeRange = ts.getNodeRange(tsNode)
     end
-    return util.compareDist(selection.posStart, tsNodeRange.posStart) == 0 and
-        util.compareDist(selection.posEnd, tsNodeRange.posEnd) == 0
+    return util.compareDist(selection.posStart, tsNodeRange.posStart) == 0
+        and util.compareDist(selection.posEnd, tsNodeRange.posEnd) == 0
 end
 
 
@@ -45,7 +45,7 @@ M.getTextObjSelection = function(textObjTbl, curBufNr, tsNode)
 
         -- Store selection info in a table. e.g.
         -- {textObj = ..., length = ..., content = ..., posStart = ..., posEnd = ...}
-        local selection = {textObj = textObj}
+        local selection = {textObj = textObj, type = "textObj"}
         selection.posStart, selection.posEnd = M.getVisualStartEnd(curBufNr)
         if util.compareDist(selection.posStart, selection.posEnd) == 0 then
             selection.content = ""
@@ -98,11 +98,11 @@ M.getTextObjSelection = function(textObjTbl, curBufNr, tsNode)
         -- Stop parsing text objects when found a treesitter node has the same
         -- selection region
         if tsNode and M.compareWithNode(selection, tsNode) then
-            -- Delete the last duplicate text object since it has the same
-            -- region of the treesitter node. Use treesitter instead.
-            -- Except for string node, because region of string node will wrap
-            -- around the ""(quotation mark), and "inside" method text object
-            -- cannot produce this effect yet.
+            -- Delete the last text object since it has the same region of the
+            -- treesitter node. Use treesitter instead. Except for string node,
+            -- because region of string node will wrap around the ""(quotation
+            -- mark), and "inside" method text object cannot produce this
+            -- effect yet.
             if tsNode:type() ~= "string" then
                 selectionTbl[#selectionTbl] = nil
             end
@@ -123,8 +123,8 @@ M.removeDuplicate = function(tbl)
     local i = 1
     local t = {}
     while i < #tbl do
-        if not(tbl[i].length == tbl[i+1].length and
-            tbl[i].posStart[2] == tbl[i+1].posStart[2]) then
+        if not(tbl[i].length == tbl[i+1].length
+            and tbl[i].posStart[2] == tbl[i+1].posStart[2]) then
 
             t[#t+1] = tbl[i]
         end
@@ -137,7 +137,7 @@ M.removeDuplicate = function(tbl)
 end
 
 
---- Generate a region table contain different types of text object
+--- Generate a region table containing different types of text object
 --- @param opts table option table
 --- @param curBufNr number current buffer number
 --- @param cursorPos table cursor position of current window
