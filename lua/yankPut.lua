@@ -393,7 +393,7 @@ end --  }}}
 
 function M.lastYankPut(hlType) -- {{{
     -- Create jump location in jumplist
-    cmd [[normal! mz`z]]
+    cmd [[normal! m`]]
 
     local curBufNr = api.nvim_get_current_buf()
     local curWinID = api.nvim_get_current_win()

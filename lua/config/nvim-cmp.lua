@@ -89,6 +89,10 @@ return function()
         documentation = {
             border = "rounded",
         },
+        experimental = {
+            ghost_text = true,
+            cusom_menu = true,
+        },
         mapping = {
             ["<A-e>"] = cmp.mapping.scroll_docs(-4),
             ["<A-d>"] = cmp.mapping.scroll_docs(4),
@@ -101,8 +105,9 @@ return function()
                     -- NOTE: maybe use "<Plug>(vsnip-jump-or-expand)" instead when cmp support <tab>
                     -- key to expand snippet provided by LSP?
                     vim.api.nvim_feedkeys(t"<Plug>(vsnip-jump-next)", "", true)
-                elseif vim.fn.pumvisible() == 0 then
-                    vim.api.nvim_feedkeys(t"<Plug>(Tabout)", "", true)
+                -- elseif cmp.visible() then
+                -- else
+                    -- vim.api.nvim_feedkeys(t"<Plug>(Tabout)", "", true)
                 else
                     fallback()
                 end
@@ -110,15 +115,16 @@ return function()
             ["<S-Tab>"] = cmp.mapping(function(fallback)
                 if vim.fn["vsnip#jumpable"](-1) == 1 then
                     vim.api.nvim_feedkeys(t"<Plug>(vsnip-jump-prev)", "", true)
-                elseif vim.fn.pumvisible() == 0 then
-                    vim.api.nvim_feedkeys(t"<Plug>(TaboutBack)", "", true)
+                -- elseif cmp.visible() then
+                -- else
+                    -- vim.api.nvim_feedkeys(t"<Plug>(TaboutBack)", "", true)
                 else
                     fallback()
                 end
             end, {"i", "s"}),
             ["<C-Space>"] = function(fallback)
                 -- cmp.mapping.complete()
-                if vim.fn.pumvisible() == 1 then
+                if cmp.visible() then
                     cmp.abort()
                 else
                     vim.api.nvim_feedkeys(t"<C-n>", "n", true)
@@ -126,7 +132,7 @@ return function()
             end,
             -- ["<C-e>"] = cmp.mapping.close(),
             ["<C-e>"] = function(fallback)
-                if vim.fn.pumvisible() == 1 then
+                if cmp.visible() then
                     cmp.abort()
                 end
                 vim.api.nvim_feedkeys(t"<End>", "n", true)

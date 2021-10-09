@@ -163,7 +163,7 @@ local newVar = function(lang, curWinID, curBufNr, lhs, rhs, extra2VarNS, extra2V
     api.nvim_put({newLine}, "l", false, false)
     api.nvim_win_set_cursor(curWinID, {rhsSrcResEnd[1] + 2, rhsSrcResEnd[2]})
     -- Create record in jumplist
-    cmd [[noa normal! mz`z]]
+    cmd [[noa normal! m`]]
 
     -- Put lhs value after when linebreak character is selected
     if not linebreakSelectCheck then

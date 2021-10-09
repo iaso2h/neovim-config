@@ -1,4 +1,4 @@
-vim.opt.formatoptions = "nmM1pcjlq"
+vim.opt.formatoptions = "nmM12pcjlq"
 
 vim.api.nvim_buf_set_keymap(0, "n", [[gK]],         [[:lua nlua.keyword_program()<cr>]], {silent = true})
 vim.api.nvim_buf_set_keymap(0, "n", [[g==]],        [[<plug>(Luadev-RunLine)]],          {})

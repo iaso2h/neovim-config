@@ -1,4 +1,4 @@
-vim.opt.formatoptions = "nmM1pcjlq"
+vim.opt.formatoptions = "nmM12pcjlq"
 if vim.g.loaded_scriptease then
     local bufNr = vim.api.nvim_get_current_buf()
 

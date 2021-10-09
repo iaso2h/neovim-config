@@ -143,8 +143,8 @@ theme.editor =  {
 
     Pmenu      = {fg = p.n4, bg = p.n2},
     PmenuSel   = {fg = p.w,  bg = p.n8, style = "bold"},
-    PmenuSbar  = {fg = p.n4, bg = p.n2},
-    PmenuThumb = {fg = p.n4, bg = p.n4},
+    PmenuSbar  = {fg = p.n4, bg = p.n3},
+    PmenuThumb = {fg = p.n4, bg = p.n10},
     WildMenu   = {link = "PmenuSel"},
 
 
@@ -203,7 +203,7 @@ theme.treesitter = {
     TSConstBuiltin       = {fg    = p.cyan},
     TSConstMacro         = {link  = "TSConstBuiltin"},
     TSConstructor        = {link  = "Structure"},
-    TSError              = {style = "bold"},
+    TSError              = {style = "bold,undercurl", sp = p.n11},
     TSException          = {link  = "Exception"},
     TSField              = {fg    = p.n8},
     TSFloat              = {link  = "Float"},
@@ -327,7 +327,7 @@ theme.plugins = {
     -- Telescope
     TelescopePromptBorder   = {fg = p.n8, style = "bold"},
     TelescopePromptPrefix   = {fg = p.n14},
-    TelescopeResultsBorder  = {fg = p.n9, style = "bold"},
+    TelescopeResultsBorder  = {fg = p.n8, style = "bold"},
     TelescopePreviewBorder  = {fg = p.n10, style = "bold"},
     TelescopeSelectionCaret = {fg = p.n10},
     TelescopeSelection      = {fg = p.w,  bg = p.n8, style = "bold"},
@@ -440,6 +440,16 @@ theme.plugins = {
     -- nvim-lightbulb
     LightBulbVirtualText = {link = "NormalFloat"},
     LightBulbFloatWin    = {link = "NormalFloat"},
+
+    -- nvim-cmp
+    CmpItemAbbr           = {fg = p.n4},
+    -- CmpItemAbbrDeprecated = {fg = p.n3b, style = "italic"},
+    CmpItemAbbrMatch      = {fg = p.n13, style = "bold"},
+    CmpItemAbbrMatchFuzzy = {link = "CmpItemAbbrMatch"},
+    -- CmpItemAbbrMatchFuzzy = {fg = p.n8, style = "bold"},
+    CmpItemKind           = {fg = p.n15},
+    CmpItemMenu           = {link = "CmpItemAbbr"},
+
 }
 
 

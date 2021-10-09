@@ -244,8 +244,8 @@ function M.operator(args) -- {{{
                 -- entering commandline mode. Therefor "gv" is exectued here to retrieve it.
                 -- Somehow the below command sequence cannot produce the effect of retrieving:
                 -- vim.cmd[[:lua vim.cmd([[norm! gv]] .. t"<Esc>"); Print(vim.api.nvim_win_get_cursor(0))]]
-                cmd([[noa norm! gvmz]] .. t"<Esc>")
-                M.cursorPos = api.nvim_buf_get_mark(curBufNr, "z")
+                cmd([[noa norm! gvm`]] .. t"<Esc>")
+                M.cursorPos = api.nvim_buf_get_mark(curBufNr, "`")
             else
                 M.cursorPos = api.nvim_win_get_cursor(0)
                 vim.cmd("noa norm! V" .. vim.v.count1 .. "_" .. t"<Esc>");

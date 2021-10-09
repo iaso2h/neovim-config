@@ -1,7 +1,7 @@
-require('dap.ext.autocompl').attach()
+require("dap.ext.autocompl").attach()
 
-vim.api.nvim_buf_set_keymap(0, "i", [[<C-j>]], [[<C-o>:lua require('dap.repl').on_down()<CR>]], {})
-vim.api.nvim_buf_set_keymap(0, "i", [[<C-k>]], [[<C-o>:lua require('dap.repl').on_up()<CR>]], {})
+vim.api.nvim_buf_set_keymap(0, "i", [[<C-j>]], [[<Down><End>]], {})
+vim.api.nvim_buf_set_keymap(0, "i", [[<C-k>]], [[<Up><End>]],   {})
 vim.api.nvim_buf_set_keymap(0, "i", [[<C-Space>]], [[<C-x><C-o>]], {noremap = true})
 vim.api.nvim_buf_set_keymap(0, "i", [[<C-w>j]], [[<C-[><C-w>j]], {})
 vim.api.nvim_buf_set_keymap(0, "i", [[<C-w>k]], [[<C-[><C-w>k]], {})

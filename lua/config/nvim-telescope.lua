@@ -6,113 +6,115 @@ local actions = require("telescope.actions")
 -- Gloabl customization
 local defaultTheme = {
 -- local defaultTheme = require('telescope.themes').get_ivy{
-        -- TODO:
-        vimgrep_arguments = {
-            'rg',
-            '--color=never',
-            '--no-heading',
-            '--with-filename',
-            '--line-number',
-            '--column',
-            '--smart-case'
+    -- TODO:
+    vimgrep_arguments = {
+        'rg',
+        '--color=never',
+        '--no-heading',
+        '--with-filename',
+        '--line-number',
+        '--column',
+        '--smart-case'
+    },
+    prompt_prefix      = "$ ",
+    selection_caret    = "  ",
+    entry_prefix       = "   ",
+    selection_strategy = "follow",
+
+    sorting_strategy = "ascending",
+    layout_strategy  = "horizontal",
+    layout_config    = {
+        prompt_position = "top",
+        -- -- horizontal = {
+            -- -- mirror = true,
+        -- -- },
+        -- -- vertical = {
+            -- -- mirror = true,
+        -- -- },
+    },
+
+    file_sorter    = require("telescope.sorters").get_fzy_sorter,
+    generic_sorter = require("telescope.sorters").get_fzy_sorter,
+    file_ignore_patterns = {"*.sw?","~$*","*.bak", "*.bk", "*.o","*.so","*.py[co]"},
+
+    winblend = 0,
+    -- border = {},
+    -- borderchars = {"─", "│", "─", "│", "╭", "╮", "╯", "╰"},
+    color_devicons = true,
+
+    use_less = true,
+    path_display = {},
+    set_env = {COLORTERM = "truecolor"},
+
+    -- Developer configurations: Not meant for general override
+    buffer_previewer_maker = require("telescope.previewers").buffer_previewer_maker,
+
+    mappings = {
+        i = {
+            ["<C-u>"]     = false,
+            ["<C-d>"]     = false,
+            ["<C-x>"]     = false,
+
+            ["<C-n>"]     = actions.move_selection_next,
+            ["<C-p>"]     = actions.move_selection_previous,
+            ["<Down>"]    = actions.move_selection_next,
+            ["<Up>"]      = actions.move_selection_previous,
+
+            ["<C-c>"]     = actions.close,
+
+            ["<CR>"]      = actions.select_default + actions.center,
+            ["<C-s>"]     = actions.select_horizontal,
+            ["<C-v>"]     = actions.select_vertical,
+            ["<C-t>"]     = actions.select_tab,
+
+            ["<Tab>"]     = actions.toggle_selection + actions.move_selection_worse,
+            ["<S-Tab>"]   = actions.toggle_selection + actions.move_selection_better,
+            ["<C-q>"]     = actions.send_selected_to_qflist + actions.open_qflist,
+            ["<M-q>"]     = actions.send_selected_to_qflist + actions.open_qflist,
+
+            ["<C-Space>"] = actions.complete_tag,
+            ["<C-j>"]     = actions.cycle_history_next,
+            ["<C-k>"]     = actions.cycle_history_prev,
+
+            ["<A-e>"]     = actions.preview_scrolling_up,
+            ["<A-d>"]     = actions.preview_scrolling_down,
         },
-        prompt_prefix      = "$ ",
-        selection_caret    = "  ",
-        entry_prefix       = "   ",
-        selection_strategy = "follow",
+        n = {
+            ["<C-u>"]   = false,
+            ["<C-d>"]   = false,
+            ["<C-x>"]   = false,
+            ["<C-j>"]   = false,
+            ["<C-k>"]   = false,
+            ["?"]       = false,
 
-        sorting_strategy = "ascending",
-        layout_strategy  = "horizontal",
-        layout_config    = {
-            prompt_position = "top",
-            -- -- horizontal = {
-                -- -- mirror = true,
-            -- -- },
-            -- -- vertical = {
-                -- -- mirror = true,
-            -- -- },
+            ["<esc>"]   = actions.close,
+            ["q"]       = actions.close,
+
+            ["<CR>"]    = actions.select_default + actions.center,
+            ["<C-s>"]   = actions.select_horizontal,
+            ["<C-v>"]   = actions.select_vertical,
+            ["<C-t>"]   = actions.select_tab,
+
+            ["<Tab>"]   = actions.toggle_selection + actions.move_selection_worse,
+            ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
+            ["<C-q>"]   = actions.send_to_qflist + actions.open_qflist,
+            ["<M-q>"]   = actions.send_selected_to_qflist + actions.open_qflist,
+
+            ["j"]       = actions.move_selection_next,
+            ["k"]       = actions.move_selection_previous,
+            ["<Down>"]  = actions.move_selection_next,
+            ["<Up>"]    = actions.move_selection_previous,
+
+            ["<A-e>"]   = actions.preview_scrolling_up,
+            ["<A-d>"]   = actions.preview_scrolling_down,
+
+            ["g"]       = actions.move_to_top,
+            ["z"]       = actions.move_to_middle,
+            ["G"]       = actions.move_to_bottom,
         },
-
-        file_sorter    = require("telescope.sorters").get_fzy_sorter,
-        generic_sorter = require("telescope.sorters").get_fzy_sorter,
-        file_ignore_patterns = {"*.sw?","~$*","*.bak", "*.bk", "*.o","*.so","*.py[co]"},
-
-        winblend = 0,
-        -- border = {},
-        -- borderchars = {"─", "│", "─", "│", "╭", "╮", "╯", "╰"},
-        color_devicons = true,
-
-        use_less = true,
-        path_display = {},
-        set_env = {COLORTERM = "truecolor"},
-
-        -- Developer configurations: Not meant for general override
-        buffer_previewer_maker = require("telescope.previewers").buffer_previewer_maker,
-
-        mappings = {
-            i = {
-                ["<C-u>"]     = false,
-                ["<C-d>"]     = false,
-                ["<C-x>"]     = false,
-
-                ["<C-n>"]     = actions.move_selection_next,
-                ["<C-p>"]     = actions.move_selection_previous,
-                ["<Down>"]    = actions.move_selection_next,
-                ["<Up>"]      = actions.move_selection_previous,
-
-                ["<C-c>"]     = actions.close,
-
-                ["<CR>"]      = actions.select_default + actions.center,
-                ["<C-s>"]     = actions.select_horizontal,
-                ["<C-v>"]     = actions.select_vertical,
-                ["<C-t>"]     = actions.select_tab,
-
-                ["<Tab>"]     = actions.toggle_selection + actions.move_selection_worse,
-                ["<S-Tab>"]   = actions.toggle_selection + actions.move_selection_better,
-                ["<C-q>"]     = actions.send_selected_to_qflist + actions.open_qflist,
-                ["<M-q>"]     = actions.send_selected_to_qflist + actions.open_qflist,
-
-                ["<C-Space>"] = actions.complete_tag,
-                ["<C-j>"]     = actions.cycle_history_next,
-                ["<C-k>"]     = actions.cycle_history_prev,
-
-                ["<A-e>"]     = actions.preview_scrolling_up,
-                ["<A-d>"]     = actions.preview_scrolling_down,
-            },
-            n = {
-                ["<C-u>"]   = false,
-                ["<C-d>"]   = false,
-                ["<C-x>"]   = false,
-                ["<C-j>"]   = false,
-                ["<C-k>"]   = false,
-
-                ["<esc>"]   = actions.close,
-                ["q"]       = actions.close,
-
-                ["<CR>"]    = actions.select_default + actions.center,
-                ["<C-s>"]   = actions.select_horizontal,
-                ["<C-v>"]   = actions.select_vertical,
-                ["<C-t>"]   = actions.select_tab,
-
-                ["<Tab>"]   = actions.toggle_selection + actions.move_selection_worse,
-                ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
-                ["<C-q>"]   = actions.send_to_qflist + actions.open_qflist,
-                ["<M-q>"]   = actions.send_selected_to_qflist + actions.open_qflist,
-
-                ["j"]       = actions.move_selection_next,
-                ["k"]       = actions.move_selection_previous,
-                ["<Down>"]  = actions.move_selection_next,
-                ["<Up>"]    = actions.move_selection_previous,
-
-                ["<A-e>"]   = actions.preview_scrolling_up,
-                ["<A-d>"]   = actions.preview_scrolling_down,
-
-                ["g"]       = actions.move_to_top,
-                ["z"]       = actions.move_to_middle,
-                ["G"]       = actions.move_to_bottom,
-            },
-        }
     }
+}
+
 require('telescope').setup{
     defaults = defaultTheme,
     pickers = {
@@ -133,6 +135,12 @@ require('telescope').load_extension('fzy_native')
 -- Command
 cmd[[
 command! -nargs=0 O lua require('telescope.builtin').oldfiles(require('telescope.themes').get_ivy{})
+]]
+cmd[[
+augroup telescopePreview
+autocmd!
+autocmd User TelescopePreviewerLoaded setlocal number
+augroup END
 ]]
 -- Mappings
 map("n", [[<C-f>l]], [[:lua require('telescope.builtin').builtin()<CR>]], {"silent"})

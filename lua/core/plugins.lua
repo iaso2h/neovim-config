@@ -854,6 +854,7 @@ packer.startup{
     }
     use {
         'abecodes/tabout.nvim',
+        disable = true,
         event    = "InsertEnter",
         requires = "nvim-treesitter",
         config   = function()
@@ -922,7 +923,7 @@ packer.startup{
             vim.cmd [[
             augroup lightBulb
             autocmd!
-            autocmd CursorHold,CursorHoldI * lua require('nvim-lightbulb').update_lightbulb{sign={enabled = false,},virtual_text={enabled=true, text = "💡"}}
+            autocmd CursorHold,CursorHoldI * lua require('nvim-lightbulb').update_lightbulb{sign={enabled=false,},virtual_text={enabled=true, text = "💡"}}
             augroup END
             ]]
             -- require('nvim-lightbulb').update_lightbulb({
@@ -935,6 +936,15 @@ packer.startup{
             -- })
         end
     }
+    use {
+        'weilbith/nvim-code-action-menu',
+        disable = true,
+        cmd     = "CodeActionMenu",
+        keys    = {{"n", "<leader>a"}},
+        config  = function()
+            map("n", [[<leader>a]], [[:<C-u>CodeActionMenu<CR>]], {"silent"})
+        end
+        }
     use {
         'folke/trouble.nvim',
         rquires = "nvim-lspconfig",
@@ -1021,7 +1031,7 @@ packer.startup{
     }
     use {
         'hrsh7th/vim-vsnip',
-        event  = "InsertCharPre",
+        event  = "InsertEnter",
         config = function()
             vim.g.vsnip_snippet_dir   = vim.fn.stdpath("config") .. "/snippets"
             vim.g.vsnip_extra_mapping = false

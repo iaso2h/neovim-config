@@ -10,8 +10,13 @@ if not IsTerm then
     map("", [[<C-=>]], [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Decrease font size")
     map("", [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent"}, "Restore font size")
 end
-map("x", [[&]], [[:lua require("selection").visualSub()<CR>]])
-map("n", [[J]], [[mzJ`z]], {"noremap"})
+-- Quickfix
+map("n", [[<C-q>n]], [[:cnext<CR>zz]],     {"silent"}, "Go to next item in quickFix")
+map("n", [[<C-q>N]], [[:cprevious<CR>zz]], {"silent"}, "Go to previous item in quickFix")
+map("n", [[<C-q>l]], [[:cnfile<CR>]],      {"silent"}, "Go to next file in quickFix")
+map("n", [[<C-q>h]], [[:cpfile<CR>]],      {"silent"}, "Go to previous file in quickFix")
+-- Spell corretion
+map("n", [[\\]], [[z=1<CR><CR>]],  {"silent"}, "Quick spell fix")
 -- Expand region
 map("n", [[<A-a>]], [[:lua require("expandRegion").expandShrink("n", 1)<CR>]],  {"silent"}, "Expand selection")
 map("n", [[<A-s>]], [[<Nop>]])
@@ -145,12 +150,17 @@ map("n", [[<C-g>]],
 -- Tab switcher {{{
 map("n", [[<S-Tab>]], [[:lua require("tabSwitcher").main()<CR>]], {"silent"}, "Change tab size")
 -- }}} Tab switcher
--- Search & Jumping {{{
 -- Delete
--- In case of mistouching
 map("n", [[dj]], [[<Nop>]])
 map("n", [[dk]], [[<Nop>]])
 map("n", [[d<Space>]], [[:<C-u>call setline(".", "")<CR>]],  {"silent"})
+-- Change under cursor
+map("n", [[cn]], [[*``cgn]], {"noremap"}, "Change word under cursor forward")
+map("n", [[cN]], [[*``cgN]], {"noremap"}, "Change word under cursor forward")
+-- Replace under cursor
+map("x", [[&]], [[:lua require("selection").visualSub()<CR>]])
+-- Search & Jumping {{{
+-- In case of mistouching
 -- Inquery word
 map("n", [[<leader>i]], [=[[I]=], "Inquery word under cursor")
 map("x", [[<leader>i]], [[:lua Print("noa g#\\V" .. string.gsub(require("selection").getSelect("string"), "\\", "\\\\") .. "#number")<CR>]], {"silent"})
@@ -169,15 +179,16 @@ map("n", [[#]],  [[g#]], {"noremap"})
 map("n", [[g#]], [[#]],  {"noremap"})
 map("n", [[g*]], [[*]],  {"noremap"})
 -- Add visual mode
-map("x", [[*]], [[mz`z:<C-u>execute "/\\V" . escape(luaeval('require("selection").getSelect("string")'), '\')<CR>]], {"noremap", "silent"})
-map("x", [[#]], [[mz`z:<C-u>execute "?\\V" . escape(luaeval('require("selection").getSelect("string")'), '\')<CR>]], {"noremap", "silent"})
+map("x", [[*]], [[m`:<C-u>execute "/\\V" . escape(luaeval('require("selection").getSelect("string")'), '\')<CR>]], {"noremap", "silent"})
+map("x", [[#]], [[m`:<C-u>execute "?\\V" . escape(luaeval('require("selection").getSelect("string")'), '\')<CR>]], {"noremap", "silent"})
 map("x", [[/]], [[*]])
 map("x", [[?]], [[#]])
 -- Regex very magic
 map("n", [[/]], [[/\v]], {"noremap"}, "Search forward")
 map("n", [[?]], [[?\v]], {"noremap"}, "Search backward")
-map("n", [[n]], [[nzzzv_n]], {"noremap"})
-map("n", [[N]], [[Nzzzv$N]], {"noremap"})
+-- BUG: failed easily when n is search backward
+map("n", [[n]], [[nzzzvhn]], {"noremap"})
+map("n", [[N]], [[NzzzvlN]], {"noremap"})
 -- Disable highlight search & Exit visual mode
 map("n", [[<leader>h]], [[:<C-u>noh<CR>]], {"silent"}, "Disable highlight")
 map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"})
@@ -209,9 +220,9 @@ map("n", [[g"]],      [[:lua require("trailingUtil").trailingChar("\"")<CR>]], {
 map("n", [[g']],      [[:lua require("trailingUtil").trailingChar("'")<CR>]],  {"silent"}, "Trail '")
 map("n", [[g)]],      [[:lua require("trailingUtil").trailingChar(")")<CR>]],  {"silent"}, "Trail )")
 map("n", [[g(]],      [[:lua require("trailingUtil").trailingChar("(")<CR>]],  {"silent"}, "Trail (")
-map("n", [[g<C-CR>]], [[:lua require("trailingUtil").trailingChar("o")<CR>]],  {"silent"}, "Add new line below")
-map("n", [[g<S-CR>]], [[:lua require("trailingUtil").trailingChar("O")<CR>]],  {"silent"}, "Add new line above")
-map("n", [[g<CR>]],   [[:lua require("breakLine").main()<CR>]],                {"silent"}, "Break line at cursor")
+map("n", [[g<C-CR>]], [[:<C-u>call append(line("."),   repeat([""], v:count1))<CR>]], {"silent"}, "Add new line below")
+map("n", [[g<S-CR>]], [[:<C-u>call append(line(".")-1, repeat([""], v:count1))<CR>]], {"silent"}, "Add new line above")
+map("n", [[g<CR>]],   [[:lua require("breakLine").main()<CR>]], {"silent"}, "Break line at cursor")
 -- }}} Trailing character
 -- Messages
 
@@ -282,8 +293,8 @@ map("n", [[zc]], [[:<C-u>call EnhanceFoldHL("", 0, "EnhanceChange")<CR>]],   {"s
 -- api.nvim_echo({{"text", "Normal"}}, true, {})
 map("n", [[g{]],              [[:<C-u>call EnhanceFold(mode(), "{{{")<CR>]],           "Add fold start")
 map("n", [[g}]],              [[:<C-u>call EnhanceFold(mode(), "}}}")<CR>]],           "Add fold end")
-map("x", [[g{]],              [[mz:<C-u>call EnhanceFold(visualmode(), "}}}")<CR>`z]])
-map("x", [[g}]],              [[mz:<C-u>call EnhanceFold(visualmode(), "}}}")<CR>`z]])
+map("x", [[g{]],              [[m`:<C-u>call EnhanceFold(visualmode(), "}}}")<CR>``]])
+map("x", [[g}]],              [[m`:<C-u>call EnhanceFold(visualmode(), "}}}")<CR>``]])
 map("n", [[<leader><Space>]], [[@=(foldlevel('.') ? 'za' : '\<Space>')<CR>]],          {"noremap", "silent"}, "Open fold")
 -- TODO: make <C-Space> snapped to the nearst closed fold even if the cursor
 -- is not on a line with closed fold
@@ -330,6 +341,8 @@ map("n", [[gP]], [[gp]], "Select last put")
 -- Put content from registers 0
 map("n", [[<leader>p]], [["0p]], "Put after from register 0")
 map("n", [[<leader>P]], [["0P]], "Put after from register 0")
+-- Inplace join
+map("n", [[J]], [[m`J``]], {"noremap"})
 -- Inplace yank
 map("", [[<Plug>InplaceYank]],
 [[luaeval("require('operator').expr(require('yankPut').inplaceYank, false, '<Plug>InplaceYank')")]],
@@ -364,8 +377,8 @@ map("x", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode
 -- }}} Mimic the VSCode move/copy line up/down behavior
 -- }}} MS bebhave
 -- Convert \ into /
-map("n", [[g/]], [[mz:s#\\#\/#e<CR>:noh<CR>g`z]],   {"noremap", "silent"}, [[Convert \ to /]])
-map("n", [[g\]], [[mz:s#\/#\\\\#e<CR>:noh<CR>g`z]], {"noremap", "silent"}, [[Convert / to \]])
+map("n", [[g/]], [[m`:s#\\#\/#e<CR>:noh<CR>g``]],   {"noremap", "silent"}, [[Convert \ to /]])
+map("n", [[g\]], [[m`:s#\/#\\\\#e<CR>:noh<CR>g``]], {"noremap", "silent"}, [[Convert / to \]])
 -- Mode: Terminal {{{
 map("t", [[<A-n>]],      [[<C-\><C-n>]])
 map("n", [[<C-`>]],      [[:lua require("terminal").terminalToggle()<CR>]],      {"silent"}, "Terminal toggle")
@@ -399,13 +412,11 @@ map("i", [[<C-k>]],  [[pumvisible() ? "\<C-e>\<Up>" : "\<Up>"]],     {"noremap",
 map("i", [[<C-j>]],  [[pumvisible() ? "\<C-e>\<Down>" : "\<Down>"]], {"noremap", "expr"})
 map("i", [[<C-CR>]], [[pumvisible() ? "\<C-e>\<CR>" : "\<CR>"]],     {"noremap", "expr"})
 map("i", [[<S-CR>]], [[<ESC>O]])
-map("i", [[jj]],     [[<ESC>`^]], {"noremap"})
 map("i", [[<C-d>]],  [[<Del>]])
 map("i", [[<C-.>]],  [[<C-a>]], {"noremap"})
 map("i", [[<C-BS>]], [[<C-w>]], {"noremap"})
 map("i", [[<C-y>]],  [[pumvisible() ? "\<C-e>\<C-y>" : "\<C-y>"]], {"noremap", "expr"})
 map("i", [[<A-y>]],  [[<C-x><C-l>]], {"noremap"})
-map("i", [[<C-i>]],  [[pumvisible() ? "\<C-e>\<C-e>" : "\<C-e>"]], {"noremap", "expr"})
 map("i", [[,]], [[,<C-g>u]], {"noremap"})
 map("i", [[.]], [[.<C-g>u]], {"noremap"})
 map("i", [[!]], [[!<C-g>u]], {"noremap"})

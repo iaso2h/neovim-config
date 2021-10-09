@@ -178,7 +178,7 @@ function M.addJump(action, reservedCount, funArg) -- {{{
         if reservedCount then
             local saveCount = vim.v.count
             if saveCount ~= 0 then
-                cmd [[normal! mz`z]]
+                cmd [[normal! m`]]
                 for _ = 1, saveCount do cmd("normal! " .. action) end
             else
                 cmd("normal! " .. action)
@@ -188,7 +188,7 @@ function M.addJump(action, reservedCount, funArg) -- {{{
         end
     elseif type(action) == "function" then
         if not funArg then return end
-        cmd [[normal! mz`z]]
+        cmd [[normal! m`]]
         action(funArg)
     end
 end -- }}}
@@ -438,13 +438,7 @@ function M.trailingEmptyLine() -- {{{
 end -- }}}
 
 ----
--- Function: TrimSpaces Trim all trailing white spaces in the current
--- buffer or in the given string table
---
--- @param silent: non-zero value will show trimming result when complete
-----
-----
--- Function: M.trimWhiteSpaces :Trim all trailing white spaces in current buffer
+-- Function: M.trimSpaces :Trim all trailing white spaces in current buffer
 --
 -- @param strTbl: Table of source string need to be trimmed. If no table
 --        provided, the whole buffer will be trimmed instead.
@@ -464,12 +458,12 @@ function M.trimSpaces(strTbl, silent, prefix) -- {{{
         local saveView = fn.winsaveview()
         silent = silent or true
         if silent then
-            cmd [[keeppatterns %s#\s\+$##e]]
+            cmd [[noa keeppatterns %s#\s\+$##e]]
         else
-            cmd [[keeppatterns %s#\s\+$##e]]
+            cmd [[noa keeppatterns %s#\s\+$##e]]
             local result = fn.execute [[g#\s\+$#p]]
             local count = #M.matchAll(result, [[\n]])
-            cmd [[keeppatterns %s#\s\+$##e]]
+            cmd [[noa keeppatterns %s#\s\+$##e]]
             api.nvim_echo({{count .. " line[s] trimmed", "Moremsg"}}, false, {})
         end
         fn.winrestview(saveView)

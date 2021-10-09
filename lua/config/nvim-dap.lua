@@ -1,9 +1,9 @@
 local M = {}
 
 M.setup = function()
-    map("n", [[<leader>db]], [[:lua require('dap').toggle_breakpoint()<cr>]], {"silent"})
-    map("n", [[<F5>]],       [[:lua require('dap').continue()<cr>]],          {"silent"})
-    map("n", [[<S-F5>]],     [[:lua require('dap').run_last()<cr>]],          {"silent"})
+    map("n", [[<leader>db]], [[:lua require('dap').toggle_breakpoint()<CR>]], {"silent"})
+    map("n", [[<F5>]],       [[:lua require('dap').continue()<CR>]],          {"silent"})
+    map("n", [[<S-F5>]],     [[:lua require('dap').run_last()<CR>]],          {"silent"})
 end
 
 M.config = function()
@@ -13,36 +13,41 @@ M.config = function()
     local dap = require("dap")
 
     -- General mappings {{{
-    map("n", [[<leader>c]], [[:lua require('dap').run_to_cursor()<cr>]], {"silent"})
-    map("n", [[<leader>s]], [[:lua require('dap').step_into()<cr>]],     {"silent"})
-    map("n", [[<leader>n]], [[:lua require('dap').step_over()<cr>]],     {"silent"})
-    map("n", [[<leader>o]], [[:lua require('dap').step_out()<cr>]],      {"silent"})
+    map("n", [[<leader>c]], [[:lua require('dap').run_to_cursor()<CR>zz]], {"silent"})
+    map("n", [[<leader>s]], [[:lua require('dap').step_into()<CR>zz]],     {"silent"})
+    map("n", [[<leader>n]], [[:lua require('dap').step_over()<CR>zz]],     {"silent"})
+    map("n", [[<leader>o]], [[:lua require('dap').step_out()<CR>zz]],      {"silent"})
 
-    map("n", [[<leader>k]],  [[:lua require('dap').up()<cr>]],    {"silent"})
-    map("n", [[<leader>j]],  [[:lua require('dap').down()<cr>]],  {"silent"})
-    map("n", [[<leader>dg]], [[:lua require('dap').goto_()<cr>]], {"silent"})
+    map("n", [[<leader>k]],  [[:lua require('dap').up()<CR>]],    {"silent"})
+    map("n", [[<leader>j]],  [[:lua require('dap').down()<CR>]],  {"silent"})
+    map("n", [[<leader>dg]], [[:lua require('dap').goto_()<CR>]], {"silent"})
 
-    map("n", [[<leader>dr]], [[:lua require('dap').repl.open()<cr>]], {"silent"})
-    map("n", [[<leader>dB]], [[:lua require('dap').list_breakpoints()cr>]],   {"silent"})
-    -- map("n", [[<leader>B]],  [[:lua require('dap').set_breakpoint(vim.fn.input('Breakpoint Condition: '), nil, nil, true)<cr>]], {"silent"})
-    -- map("n", [[<leader>dl]], [[:lua require('dap').set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<cr>]], {"silent"})
+    map("n", [[<leader>dr]], [[:lua require('dap').repl.toggle()<CR>]],      {"silent"})
+    map("n", [[<leader>dB]], [[:lua require('dap').list_breakpoints()<CR>]], {"silent"})
+    -- map("n", [[<leader>B]],  [[:lua require('dap').set_breakpoint(vim.fn.input('Breakpoint Condition: '), nil, nil, true)<CR>]], {"silent"})
+    -- map("n", [[<leader>dl]], [[:lua require('dap').set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>]], {"silent"})
 
 
     -- TODO:
-    -- map("n", [[<C-w>d]], [[:lua require('dap').toggle({height=15})<cr>]], {"silent"})
-    map("n", [[dK]],     [[:lua require('dap.ui.widgets').hover()<cr>]],  {"silent"})
+    map("n", [[<C-w>d]], [[:lua require("dap.ui.widgets").sidebar(require("dap.ui.widgets").scopes).toggle({height=15})<CR>]], {"silent"})
+    map("n", [[dK]],     [[:lua require("dap.ui.widgets").hover()<CR>]],  {"silent"})
 
-    -- map("n", [[<F12>]], [[:lua require('dap-python').test_method()<cr>]],          {"silent"})
-    -- map("x", [[<F5>]],  [[<esc>:lua require('dap-python').debug_selection()<cr>]], {"silent"})
+    -- map("n", [[<F12>]], [[:lua require('dap-python').test_method()<CR>]],          {"silent"})
+    -- map("x", [[<F5>]],  [[<esc>:lua require('dap-python').debug_selection()<CR>]], {"silent"})
     -- }}} General mappings
 
-    fn.sign_define('DapBreakpoint', {text='●', texthl='Debug', linehl='', numhl='Error'})
-    fn.sign_define('DapStopped',    {text='', texthl='MoreMsg',   linehl='', numhl='WarningMsg'})
-    fn.sign_define('DapLogPoint',   {text='', texthl='MoreMsg',  linehl='', numhl='MoreMsg'})
+    fn.sign_define('DapBreakpoint', {text='●', texthl='DiagnosticError', linehl='', numhl='DiagnosticError'})
+    fn.sign_define('DapStopped',    {text='', texthl='DiagnosticWarn',  linehl='', numhl='DiagnosticWarn'})
+    fn.sign_define('DapLogPoint',   {text='', texthl='MoreMsg',         linehl='', numhl='MoreMsg'})
 
     cmd [[
-    command! -nargs=0 DapBreakpoints :lua require('dap').list_breakpoints()
-    command! -nargs=0 DapSidebar     :lua require('dap').sidebar.toggle()
+    command! -nargs=0 DapBreakpoints lua require('dap').list_breakpoints()
+    command! -nargs=0 DapSidebar     lua require("dap.ui.widgets").sidebar(require("dap.ui.widgets").scopes).toggle({height=15})
+
+    augroup NvimDap
+        autocmd!
+        au FileType dap-repl lua require('dap.ext.autocompl').attach()
+    augroup END
     ]]
 
 
