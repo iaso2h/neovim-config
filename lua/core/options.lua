@@ -23,7 +23,7 @@ o.tabstop     = 4
 o.clipboard = "unnamed,unnamedplus"
 
 o.cmdheight  = 2
-o.shortmess  = "clxTI"
+o.shortmess  = "cxTIF"
 
 o.complete    = ".,w,b,u,t,kspell,i,d,t"
 o.completeopt = "menuone,noselect,noinsert"

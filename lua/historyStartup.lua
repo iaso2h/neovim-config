@@ -45,11 +45,6 @@ M.display = function()
 
     api.nvim_win_set_buf(curWin, M.curBuf)
 
-    -- Always close all the other windows
-    if api.nvim_list_wins() ~= 1 then
-        require("buffer").closeOtherWin()
-    end
-
     api.nvim_buf_set_option(M.curBuf, "modifiable", true)
     api.nvim_buf_set_option(M.curBuf, "bufhidden",  "hide")
     api.nvim_buf_set_option(M.curBuf, "buflisted",  false)

@@ -206,7 +206,7 @@ function M.tblLoaded(termInclude) -- {{{
             vim.split(fn.execute("ls"), '\n', false))
         table.remove(bufTbl, 1)
     else
-        -- BUG: Execute ls! will incur Neovim built-in LSP complain
+        -- NOTE: Execute ls! will incur Neovim built-in LSP complain
         bufTbl = vim.split(fn.execute("ls"), '\n', false)
         table.remove(bufTbl, 1)
     end
@@ -718,11 +718,7 @@ end -- }}}
 
 
 function _G.isFloatWin(winID)
-    if not winID then
-        return api.nvim_win_get_config(0).relative ~= ""
-    else
-        return api.nvim_win_get_config(winID).relative ~= ""
-    end
+    return api.nvim_win_get_config(winID and winID or 0).relative ~= ""
 end
 
 

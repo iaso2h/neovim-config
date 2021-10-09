@@ -90,7 +90,7 @@ return function()
             border = "rounded",
         },
         experimental = {
-            ghost_text = true,
+            ghost_text = false,
             cusom_menu = true,
         },
         mapping = {
@@ -125,18 +125,20 @@ return function()
             ["<C-Space>"] = function(fallback)
                 -- cmp.mapping.complete()
                 if cmp.visible() then
-                    cmp.abort()
+                    require("cmp.utils.autocmd").emit("InsertLeave")
+                    -- vim.api.nvim_feedkeys(t"a", "n", true)
                 else
+                    -- TODO: better trigger mechanics
                     vim.api.nvim_feedkeys(t"<C-n>", "n", true)
                 end
             end,
             -- ["<C-e>"] = cmp.mapping.close(),
-            ["<C-e>"] = function(fallback)
-                if cmp.visible() then
-                    cmp.abort()
-                end
-                vim.api.nvim_feedkeys(t"<End>", "n", true)
-            end,
+            -- ["<C-e>"] = function(fallback)
+                -- if cmp.visible() then
+                    -- cmp.abort()
+                -- end
+                -- vim.api.nvim_feedkeys(t"<End>", "n", true)
+            -- end,
             ["<CR>"]  = cmp.mapping.confirm{
                 select   = true,
                 behavior = cmp.ConfirmBehavior.Replace,

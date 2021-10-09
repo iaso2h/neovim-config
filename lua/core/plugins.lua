@@ -320,7 +320,7 @@ packer.startup{
         keys     = {{"n", "dg"}},
         config   = function()
             require("neogen").setup {
-                enabled = true,
+                enabled = false,
                 languages = {
                     lua = {
                         template = {
@@ -381,7 +381,7 @@ packer.startup{
         'AndrewRadev/switch.vim',
         cmd   = "Switch",
         setup = function()
-            map("n", [[~]], [[<C-u>:Switch<CR>]], {"silent"})
+            map("n", [[gt]], [[<C-u>:Switch<CR>]], {"silent"})
         end
     }
     use {

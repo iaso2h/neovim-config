@@ -43,11 +43,6 @@ M.config = function()
     cmd [[
     command! -nargs=0 DapBreakpoints lua require('dap').list_breakpoints()
     command! -nargs=0 DapSidebar     lua require("dap.ui.widgets").sidebar(require("dap.ui.widgets").scopes).toggle({height=15})
-
-    augroup NvimDap
-        autocmd!
-        au FileType dap-repl lua require('dap.ext.autocompl').attach()
-    augroup END
     ]]
 
 

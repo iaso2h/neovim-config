@@ -11,10 +11,12 @@ if not IsTerm then
     map("", [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent"}, "Restore font size")
 end
 -- Quickfix
-map("n", [[<C-q>n]], [[:cnext<CR>zz]],     {"silent"}, "Go to next item in quickFix")
-map("n", [[<C-q>N]], [[:cprevious<CR>zz]], {"silent"}, "Go to previous item in quickFix")
-map("n", [[<C-q>l]], [[:cnfile<CR>]],      {"silent"}, "Go to next file in quickFix")
-map("n", [[<C-q>h]], [[:cpfile<CR>]],      {"silent"}, "Go to previous file in quickFix")
+map("n", [[<C-q>n]],     [[:cnext<CR>zz]],                                {"silent"}, "Go to next item in quickFix")
+map("n", [[<C-q>N]],     [[:cprevious<CR>zz]],                            {"silent"}, "Go to previous item in quickFix")
+map("n", [[<C-q>l]],     [[:cnfile<CR>]],                                 {"silent"}, "Go to next file in quickFix")
+map("n", [[<C-q>h]],     [[:cpfile<CR>]],                                 {"silent"}, "Go to previous file in quickFix")
+map("n", [[<C-q>q]],     [[:lua require("buffer").quickfixToggle()<CR>]], {"silent"}, "Quickfix toggle")
+map("n", [[<C-q><C-q>]], [[:lua require("buffer").quickfixToggle()<CR>]], {"silent"}, "Quickfix toggle")
 -- Spell corretion
 map("n", [[\\]], [[z=1<CR><CR>]],  {"silent"}, "Quick spell fix")
 -- Expand region
@@ -154,6 +156,7 @@ map("n", [[<S-Tab>]], [[:lua require("tabSwitcher").main()<CR>]], {"silent"}, "C
 map("n", [[dj]], [[<Nop>]])
 map("n", [[dk]], [[<Nop>]])
 map("n", [[d<Space>]], [[:<C-u>call setline(".", "")<CR>]],  {"silent"})
+-- TODO: Modify under cursor
 -- Change under cursor
 map("n", [[cn]], [[*``cgn]], {"noremap"}, "Change word under cursor forward")
 map("n", [[cN]], [[*``cgN]], {"noremap"}, "Change word under cursor forward")
@@ -242,9 +245,8 @@ map("t", [[<A-d>]], [[<C-\><C-n><PageDown>]])
 -- Macro
 map("n", [[<A-q>]], [[q]], {"noremap"}, "Macro")
 -- Register
-map("",  [[<leader>q]],  [[:lua require("register").clear()<CR>]], {"silent"}, "Clear registers")
-map("",  [[<C-q><C-q>]], [[:<C-u>reg<CR>]],                        {"silent"}, "Registers in prompt")
-map("",  [[<C-q>q]],     [[:<C-u>reg<CR>]],                        {"silent"}, "Registers in prompt")
+map("",  [[<leader>']],  [[:lua require("register").clear()<CR>]],                  {"silent"}, "Clear registers")
+map("",  [[g']],         [[:<C-u>reg<CR>]],                                         {"silent"}, "Registers in prompt")
 map("i", [[<C-r><C-r>]], [[<C-\><C-o>:lua require("register").insertPrompt()<CR>]], {"silent"}, "Registers in prompt")
 
 -- Buffer & Window & Tab{{{
@@ -256,17 +258,15 @@ map("n", [[<C-u>]], [[:lua require("buffer").restoreClosedBuf()<CR>]],   {"silen
 -- TODO:
 -- map("",  [[<C-w>s]], [[:lua require("consistantTab").splitCopy("wincmd s")<CR>]], {"silent"})
 -- map("",  [[<C-w>v]], [[:lua require("consistantTab").splitCopy("wincmd v")<CR>]], {"silent"})
-map("n", [[<C-w>V]], [[:lua require("buffer").closeOtherWin();vim.cmd("wincmd v")<CR>]], {"silent"}, "Split only current window vertically")
-map("n", [[<C-w>S]], [[:lua require("buffer").closeOtherWin();vim.cmd("wincmd s")<CR>]], {"silent"}, "Split only current window vertically")
+map("n", [[<C-w>V]], [[:<C-u>wincmd o | wincmd v<CR>]], {"silent"}, "Split only current window vertically")
+map("n", [[<C-w>S]], [[:<C-u>wincmd o | wincmd s<CR>]], {"silent"}, "Split only current window vertically")
 
-map("n", [[<C-w>q]], [[:lua require("buffer").quickfixToggle()<CR>]], {"silent"}, "Quickfix toggle")
 map("n", [[<C-w>t]], [[:<C-u>tabnew<CR>]],                            {"silent"}, "New tab")
 map("",  [[<A-=>]],  [[:<C-u>wincmd +<CR>]],                          {"silent"}, "Increase window size")
 map("i", [[<A-=>]],  [[<C-\><C-O>:wincmd +<CR>]],                     {"silent"})
 map("",  [[<A-->]],  [[:<C-u>wincmd -<CR>]],                          {"silent"}, "Decrease window size")
 map("i", [[<A-->]],  [[<C-\><C-O>:wincmd -<CR>]],                     {"silent"})
 map("i", [[<C-w>=]], [[<C-\><C-O>:wincmd =<CR>]],                     {"silent"})
-map("n", [[<C-w>o]], [[:lua require("buffer").closeOtherWin()<CR>]],  {"silent"})
 
 -- Buffers
 map("",  [[<C-w>O]], [[:lua require("buffer").wipeOtherBuf()<CR>]], {"silent"}, "Wipe other buffer")
