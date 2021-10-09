@@ -1,8 +1,8 @@
 -- File: reloadConfig
 -- Author: iaso2h
 -- Description: reload lua package or vim file at Neovim configuration directory
--- Version: 0.0.16
--- Last Modified: 2021-10-5
+-- Version: 0.0.17
+-- Last Modified: 2021-10-08
 local fn   = vim.fn
 local api  = vim.api
 local cmd  = vim.cmd
@@ -140,8 +140,12 @@ local luaUnload = function(modulePath, ignoreLoaded)
     assert(getmetatable(modulePath) == require("plenary.path"),
         string.format("Expected plenary path object or string, got %s", type(modulePath)))
 
+    local parentStr  = modulePath:parent().filename
     local fileRelStr = path:new(modulePath.filename):make_relative(luaModulePath.filename)
     local fileRel    = string.gsub(fileRelStr, sep, "."):sub(1, -5)
+    -- Get rid of init.lua or <parentDir>.lua whenever possible
+    fileRel = string.gsub(fileRel, ".init.lua$", "")
+    fileRel = string.gsub(fileRel, string.format(".%s.lua$", parentStr), "")
 
     if ignoreLoaded then return fileRel end
 
@@ -177,14 +181,11 @@ M.luaLoadFile = function(luaModule, checkLuaDir) -- {{{
     end
 
     -- Check other lua module at the same directory
+    local parentStr = modulePath:parent().filename
     if checkLuaDir then
-        local parentStr = modulePath:parent().filename
-        local dirRel = string.gsub(path:new(parentStr):make_relative(luaModulePath.filename), sep, ".")
-
         if parentStr ~= luaModulePath.filename and
-        package.loaded[dirRel] and
         not vim.tbl_contains(forceLoadFile, parentStr) then
-            return M.luaLoadDir(modulePath, parentStr)
+            return M.luaLoadDir(modulePath, parentStr, false)
         end
     end
 
@@ -209,19 +210,24 @@ end -- }}}
 
 
 --- Reload lua module that come from a directory
---- @param dirStr string
-M.luaLoadDir = function(modulePath, dirStr) -- {{{
+--- @param modulePath plenary path object
+--- @param dirStr string Diretory string in full path
+--- @param checkLoadedFirst boolean Set this to true to make sure directory
+---        module is loaded before reloading
+M.luaLoadDir = function(modulePath, dirStr, checkLoadedFirst) -- {{{
     assert(type(dirStr) == "string", "Expect string value, got " .. type(dirStr))
 
     local dirRel = string.gsub(path:new(dirStr):make_relative(luaModulePath.filename), sep, ".")
-    -- Check whether a directory module is loaded. If it does, analyze the
-    -- whole directory. If it doesn't, then this module might just happend to
-    -- be located at a ordinary directory for the sake of classification.
-    if package.loaded[dirRel] then
-        -- Unload lua diretory module first
-        package.loaded[dirRel] = nil
-    else
-        return M.luaLoadFile(modulePath, false)
+    if checkLoadedFirst then
+        -- Check whether a directory module is loaded. If it does, analyze the
+        -- whole directory. If it doesn't, then this module might just happend to
+        -- be located at a ordinary directory for the sake of classification.
+        if package.loaded[dirRel] then
+            -- Unload lua diretory module first
+            package.loaded[dirRel] = nil
+        else
+            return M.luaLoadFile(modulePath, false)
+        end
     end
 
     local fileStrs = {}
@@ -279,7 +285,7 @@ end -- }}}
 
 
 ----
--- Function: Reload: Reload lua module path
+-- Function: Reload: Reload lua module path. Called in autocmd
 --
 -- @param module: String value of module path
 ----
@@ -308,11 +314,11 @@ M.reload = function() -- {{{
             for _, dirStr in ipairs(parentDirStrs) do
                 -- Do not load directory of module coming from this
                 -- table. load current directory instead
-                M.luaLoadDir(modulePath, dirStr)
+                M.luaLoadDir(modulePath, dirStr, true)
             end
         else
             -- The lua module is a single file
-            M.luaLoadFile(modulePath, false)
+            M.luaLoadFile(modulePath, true)
         end
         -- }}} Lua
     else

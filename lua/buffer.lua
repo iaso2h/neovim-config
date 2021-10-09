@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: A few of buffer-related utilities
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.18
--- Last Modified: 2021-08-23
+-- Version: 0.0.19
+-- Last Modified: 2021-10-09
 -- BUG: q on startup-log.txt
 -- TODO: check for prompt
 -- TODO: Add situation: one window with buffer, one window with special buffer
@@ -355,7 +355,9 @@ M.closeOtherWin = function()
         end
         require("nvim-tree.view").close()
     end
-    vim.cmd("noa wincmd o")
+    -- Might helps to suppres Vim(only):E445: Other window contains changes
+    -- This might happen when close float windows
+    pcall(vim.cmd, "noa wincmd o")
 end
 
 M.restoreClosedBuf = function()
