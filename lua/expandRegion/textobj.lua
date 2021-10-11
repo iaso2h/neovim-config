@@ -39,6 +39,7 @@ end
 M.getTextObjSelection = function(textObjTbl, curBufNr, tsNode)
     local saveView
     local selectionTbl = {}
+
     for _, textObj in ipairs(textObjTbl) do
         saveView = fn.winsaveview()
         cmd([[noa norm v]] .. textObj .. t"<Esc>")
@@ -53,6 +54,12 @@ M.getTextObjSelection = function(textObjTbl, curBufNr, tsNode)
         else
             selection.content = require("selection").getSelect("string", true)
             selection.length  = #selection.content
+        end
+
+        -- Abort when cursor is start from a whitespace position
+        local whitespace = string.match(selection.content, "%s+")
+        if whitespace and #whitespace == selection.length then
+            return {}
         end
 
         -- Need to correct the i,w and iB text objects due to some malfunctions
@@ -91,12 +98,12 @@ M.getTextObjSelection = function(textObjTbl, curBufNr, tsNode)
             end
         end
 
-
+        -- Resotre view for next iteration and insert the result into selectionTbl
         fn.winrestview(saveView)
         selectionTbl[#selectionTbl+1] = selection
 
-        -- Stop parsing text objects when found a treesitter node has the same
-        -- selection region
+        -- Stop parsing text objects when a treesitter node has the same
+        -- selection region is found
         if tsNode and M.compareWithNode(selection, tsNode) then
             -- Delete the last text object since it has the same region of the
             -- treesitter node. Use treesitter instead. Except for string node,

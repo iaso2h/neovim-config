@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Expand region in visual character mode.
 -- For treesitter support, only tested on python, lua, c files
--- Version: 0.0.16
--- Last Modified: 2021-10-09
+-- Version: 0.0.17
+-- Last Modified: 2021-10-11
 local fn   = vim.fn
 local cmd  = vim.cmd
 local api  = vim.api

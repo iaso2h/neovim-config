@@ -140,10 +140,10 @@ end
 
 --- Generate a region table containing all the treesitter node infos needed to
 --- be selected in visual mode
---- @param startNode treesitter object
---- @param pairNode optional treesitter object
+--- @param startNode  treesitter object
+--- @param pairNode   optional treesitter object
 --- @param parentNode optional treesitter object Parent node of last treesitter candidate
---- @param lastCand optional table Last candidate
+--- @param lastCand   optional table Last candidate
 --- @return table
 M.getNodeCandidate = function(startNode, pairNode, parentNode, lastCand)
     local tsRange
