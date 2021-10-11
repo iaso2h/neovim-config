@@ -181,6 +181,8 @@ packer.startup{
         keys = {
             {"n", "gr"},
             {"n", "grr"},
+            {"n", "grn"},
+            {"n", "grN"},
             {"x", "R"},
         },
         config = function()
@@ -194,7 +196,6 @@ packer.startup{
                 [[:<C-u>let g:ReplaceExpr=getreg("=")<Bar>exec "norm!" . v:count1 . "."<CR>]],
                 {"silent"}
             )
-
             map("n", [[<Plug>ReplaceCurLine]],
                 luaRHS[[
                 :lua require("replace").replaceSave();
@@ -208,7 +209,6 @@ packer.startup{
                 require("replace").operator{"line", "V", "<Plug>ReplaceCurLine", true}<CR>
                 ]],
                 {"noremap", "silent"})
-
             map("x", [[<Plug>ReplaceVisual]],
                 luaRHS[[
                 :lua require("replace").replaceSave();
@@ -244,6 +244,8 @@ packer.startup{
 
             map("n", [[gr]],  [[<Plug>ReplaceOperator]])
             map("n", [[grr]], [[<Plug>ReplaceCurLine]])
+            map("n", [[grn]], [[*``griw]], "Replace word under cursor forward")
+            map("n", [[grN]], [[#``griw]], "Replace word under cursor backward")
             map("x", [[R]],   [[<Plug>ReplaceVisual]])
         end
     }
@@ -336,7 +338,6 @@ packer.startup{
             }
 
             map("n", [[dg]], [[:lua require("neogen").generate()<CR>]], {"silent"})
-            pcall(vim.api.nvim_del_keymap, "dg")
         end,
     }
     use {
@@ -381,7 +382,7 @@ packer.startup{
         'AndrewRadev/switch.vim',
         cmd   = "Switch",
         setup = function()
-            map("n", [[gt]], [[<C-u>:Switch<CR>]], {"silent"})
+            map("n", [[gt]], [[:<C-u>Switch<CR>]], {"silent"})
         end
     }
     use {
@@ -1032,24 +1033,7 @@ packer.startup{
     use {
         'hrsh7th/vim-vsnip',
         event  = "InsertEnter",
-        config = function()
-            vim.g.vsnip_snippet_dir   = vim.fn.stdpath("config") .. "/snippets"
-            vim.g.vsnip_extra_mapping = false
-            vim.g.vsnip_filetypes     = {
-                txt        = {"all"},
-                md         = {"all"},
-                vim        = {"all"},
-                lua        = {"all"},
-                python     = {"all"},
-                c          = {"all"},
-                cpp        = {"all"},
-                javascript = {"all", "typescirpt"},
-                json       = {"all"},
-                html       = {"all"},
-                css        = {"all"},
-                typescript = {"all", "javascript"},
-            }
-        end
+        config = conf "vim-vsnip"
     }
     use {
         'folke/lua-dev.nvim',
@@ -1132,11 +1116,17 @@ packer.startup{
         config = conf("vim-scriptease").config
     }
     use {
-        'gaelph/logsitter.nvim',
+        fn.stdpath("config") .. "/lua/logsitter",
         requires = "nvim-treesitter",
         module   = "logsitter",
-        cmd      = "Logsitter",
-        setup    = [=[map("n", [[<leader>lg]], [[:lua require("logsitter").log(vim.bo.filetype)<CR>]=]
+        config = function()
+            map("n", [[<leader>lg]], [[:lua require("logsitter").log()<CR>]], {"silent"})
+            require("logsitter").setup{
+                logFunc = {
+                    lua = "Print",
+                }
+            }
+        end
     }
     use {
         'mfussenegger/nvim-dap',
@@ -1183,7 +1173,7 @@ packer.startup{
     -- Markdown
     use {
         'iamcco/markdown-preview.nvim',
-        run = [=[vim.fn["mkdp#util#install"]]=],
+        run = [=[vim.fn["mkdp#util#install"] ]=],
         ft  = {'markdown', 'md'}
     }
     use {

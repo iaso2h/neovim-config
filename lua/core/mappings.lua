@@ -11,12 +11,11 @@ if not IsTerm then
     map("", [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent"}, "Restore font size")
 end
 -- Quickfix
-map("n", [[<C-q>n]],     [[:cnext<CR>zz]],                                {"silent"}, "Go to next item in quickFix")
-map("n", [[<C-q>N]],     [[:cprevious<CR>zz]],                            {"silent"}, "Go to previous item in quickFix")
-map("n", [[<C-q>l]],     [[:cnfile<CR>]],                                 {"silent"}, "Go to next file in quickFix")
-map("n", [[<C-q>h]],     [[:cpfile<CR>]],                                 {"silent"}, "Go to previous file in quickFix")
-map("n", [[<C-q>q]],     [[:lua require("buffer").quickfixToggle()<CR>]], {"silent"}, "Quickfix toggle")
-map("n", [[<C-q><C-q>]], [[:lua require("buffer").quickfixToggle()<CR>]], {"silent"}, "Quickfix toggle")
+map("n", [[<C-q>n]],    [[:cnext<CR>zz]],                                {"silent"}, "Go to next item in quickFix")
+map("n", [[<C-q>N]],    [[:cprevious<CR>zz]],                            {"silent"}, "Go to previous item in quickFix")
+map("n", [[<C-q>l]],    [[:cnfile<CR>]],                                 {"silent"}, "Go to next file in quickFix")
+map("n", [[<C-q>h]],    [[:cpfile<CR>]],                                 {"silent"}, "Go to previous file in quickFix")
+map("n", [[<leader>q]], [[:lua require("buffer").quickfixToggle()<CR>]], {"silent"}, "Quickfix toggle")
 -- Spell corretion
 map("n", [[\\]], [[z=1<CR><CR>]],  {"silent"}, "Quick spell fix")
 -- Expand region

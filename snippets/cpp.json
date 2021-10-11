@@ -1,202 +1,225 @@
 {
-    "main": {
-        "prefix": ["main"],
+    "for": {
+        "prefix": "for",
         "body": [
-            "int main()",
-            "{",
-            "\t${0}",
-            "}"
+        "for (${1:size_t} ${2:i} = ${3:0}; $2 < ${4:length}; $2++) {",
+        "\t$0",
+        "}"
         ],
-        "description": "main function"
+        "description": "Code snippet for 'for' loop"
     },
-    "forc": {
-        "prefix": ["forc"],
+    "forr": {
+        "prefix": "forr",
         "body": [
-            "for (${6:auto} ${1:i} = ${2:v.begin()}; `!p import re; snip.rv = re.split(\"[^\\w]\",t[1])[-1]` ${4:!=} ${3:`!p m = re.search(r'^(?:(.*)(\\.|->)begin\\(\\)|((?:std|boost)::)?begin\\((.*)\\))$', t[2]); snip.rv = (((m.group(3) if m.group(3) else \"\") + \"end(\" + m.group(4) + \")\") if m.group(4) else (m.group(1) + m.group(2) + \"end()\")) if m else \"\"`}; ${5:++`!p snip.rv = t[1].split(\" \")[-1]`}) {",
-            "\t${VISUAL}$0",
-            "}"
+        "for (${1:size_t} ${2:i} = ${3:length} - 1; $2 >= ${4:0}; $2--) {",
+        "\t$0",
+        "}"
         ],
-        "description": "general for loop (for)"
+        "description": "Code snippet for reverse 'for' loop"
     },
-    "beginend": {
-        "prefix": ["beginend"],
-        "body": [
-            "${1:v}${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}begin(), $1${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}end()"
-        ],
-        "description": "$1.begin(), $1.end() (beginend)"
+    "do": {
+        "prefix": "do",
+        "body": ["do", "{", "\t$1", "} while($2);"],
+        "description": "Code snippet for do...while loop"
     },
-    "cl": {
-        "prefix": ["cl"],
-        "body": [
-            "class ${1:`!p snip.rv = snip.basename or \"name\"`}",
-            "{",
-            "public:",
-            "\t${1/(\\w+).*/$1/} (${2:arguments});",
-            "\tvirtual ~${1/(\\w+).*/$1/} ();",
-            "",
-            "private:",
-            "\t${0:/* data */}",
-            "};"
-        ],
-        "description": "class .. (class)"
+    "while": {
+        "prefix": "while",
+        "body": ["while ($1)", "{", "\t$2", "}"],
+        "description": ""
     },
-    "ns": {
-        "prefix": ["ns"],
-        "body": [
-            "namespace${1/.+/ /m}${1:`!p snip.rv = snip.basename or \"name\"`}",
-            "{",
-            "\t${VISUAL}$0",
-            "}${1/.+/ \/* /m}$1${1/.+/ *\/ /m}"
-        ],
-        "description": "namespace .. (namespace)"
+    "foreach": {
+        "prefix": "foreach",
+        "body": ["for(${1:auto} ${2:var} : ${3:collection_to_loop})", "{", "\t$0", "}"],
+        "description": "Code snippet for range-based for loop (c++11) statement"
     },
-    "readfile": {
-        "prefix": ["readfile"],
-        "body": [
-            "std::vector<char> v;",
-            "if (FILE *fp = fopen(${1:\"filename\"}, \"r\"))",
-            "{",
-            "\tchar buf[1024];",
-            "\twhile(size_t len = fread(buf, 1, sizeof(buf), fp))",
-            "\t\tv.insert(v.end(), buf, buf + len);",
-            "fclose(fp);",
-            "}"
-        ],
-        "description": "read file (readF)"
+    "if": {
+        "prefix": "if",
+        "body": ["if ($1)", "{", "\t$0", "}"],
+        "description": "Code snippet for if statement"
     },
-    "map": {
-        "prefix": ["map"],
-        "body": [
-            "std::map<${1:key}, ${2:value}> map$0;"
-        ],
-        "description": "std::map (map)"
+    "else": {
+        "prefix": "else",
+        "body": ["else", "{", "\t$0", "}"],
+        "description": "Code snippet for else statement"
     },
-    "vector": {
-        "prefix": ["vector"],
-        "body": [
-            "std::vector<${1:char}> v$0;"
-        ],
-        "description": "std::vector (v)"
+    "else if": {
+        "prefix": "else if",
+        "body": ["else if ($1)", "{", "\t$0", "}"],
+        "description": "Code snippet for else-if statement"
     },
-    "tp": {
-        "prefix": ["tp"],
-        "body": [
-            "template <typename ${1:_InputIter}>"
-        ],
-        "description": "template <typename ..> (template)"
+    "enum": {
+        "prefix": "enum",
+        "body": ["enum ${1:MyEnum} {", "\t$0", "};"],
+        "description": "Code snippet for enum"
     },
-    "cla": {
-        "prefix": ["cla"],
-        "body": [
-            "#ifndef ${2:`!v substitute(vim_snippets#Filename('$1_H','ClassName'),'.*','\\U&\\E','')`}",
-            "#define $2",
-            "",
-            "class ${1:`!v substitute(substitute(vim_snippets#Filename('$1','ClassName'),'^.','\\u&',''), '_\\(\\w\\)', '\\u\\1', 'g')`}",
-            "{",
-            "private:",
-            "\t$3",
-            "",
-            "public:",
-            "\t$1();",
-            "\tvirtual ~$1();",
-            "};",
-            "",
-            "#endif /* $2 */"
-        ],
-        "description": "An entire .h generator"
+    "enum class": {
+        "prefix": "enum class",
+        "body": ["enum class ${1:MyClass} {$0};"],
+        "description": "Code snippet for enum class (c++11)"
     },
-    "fnc": {
-        "prefix": ["fnc"],
+    "class": {
+        "prefix": "class",
         "body": [
-            "/**",
-            "* @brief: ${4:brief}",
-            "*",
-            "* @param: `!p write_docstring_args(t[3],snip)`",
-            "*",
-            "* @return: `!p snip.rv = t[1]`",
-            "*/",
-            "${1:ReturnType} ${2:FunctionName}(${3:param})",
-            "{",
-            "\t${0:FunctionBody}",
-            "}"
+        "class ${1:MyClass}",
+        "{",
+        "public:",
+        "\t$1();",
+        "\t$1($1 &&) = default;",
+        "\t$1(const $1 &) = default;",
+        "\t$1 &operator=($1 &&) = default;",
+        "\t$1 &operator=(const $1 &) = default;",
+        "\t~$1();",
+        "",
+        "private:",
+        "\t$2",
+        "};",
+        "",
+        "$1::$1()",
+        "{",
+        "}",
+        "",
+        "$1::~$1()",
+        "{",
+        "}"
         ],
-        "description": "Basic c++ doxygen function template"
+        "description": "Code snippet for class"
     },
-    "boost_test": {
-        "prefix": ["boost_test"],
+    "classi": {
+        "prefix": "classi",
         "body": [
-            "#define BOOST_TEST_MODULE ${1:TestModuleName}",
-            "#include <boost/test/included/unit_test.hpp>",
-            "",
-            "BOOST_AUTO_TEST_CASE(${2:TestCaseName})",
-            "{",
-            "\t${0:TestDefinition}",
-            "}",
-            ""
+        "class ${1:MyClass}",
+        "{",
+        "public:",
+        "\t$1() = default;",
+        "\t$1($1 &&) = default;",
+        "\t$1(const $1 &) = default;",
+        "\t$1 &operator=($1 &&) = default;",
+        "\t$1 &operator=(const $1 &) = default;",
+        "\t~$1() = default;",
+        "",
+        "private:",
+        "\t$2",
+        "};"
         ],
-        "description": "Boost test module"
+        "description": "Code snippet for class with inline constructor/destructor"
     },
-    "boost_suite": {
-        "prefix": ["boost_suite"],
-        "body": [
-            "#define BOOST_TEST_MODULE ${1:TestModuleName}",
-            "#include <boost/test/included/unit_test.hpp>",
-            "",
-            "BOOST_AUTO_TEST_SUITE(${2:SuiteName})",
-            "",
-            "BOOST_AUTO_TEST_CASE(${3:TestCaseName})",
-            "{",
-            "\t${0:TestDefinition}",
-            "}",
-            "",
-            "BOOST_AUTO_TEST_SUITE_END()",
-            ""
-        ],
-        "description": "Boost test suite module"
+    "interface": {
+        "prefix": "interface",
+        "body": ["__interface I${1:Interface}", "{", "\t$0", "};"],
+        "description": "Code snippet for interface (Visual C++)"
     },
-    "boost_test_fixture": {
-        "prefix": ["boost_test_fixture"],
-        "body": [
-            "#define BOOST_TEST_MODULE ${1:TestModuleName}",
-            "#include <boost/test/included/unit_test.hpp>",
-            "",
-            "struct ${2:FixtureName} {",
-            "\t$2() {}",
-            "\tvirtual ~$2() {}",
-            "\t/* define members here */",
-            "};",
-            "",
-            "BOOST_FIXTURE_TEST_CASE(${3:SuiteName}, $2)",
-            "{",
-            "\t${0:TestDefinition}",
-            "}",
-            ""
-        ],
-        "description": "Boost test module with fixture"
+    "namespace": {
+        "prefix": "namespace",
+        "body": ["namespace ${1:MyNamespace}", "{", "\t$0", "}"]
     },
-    "boost_suite_fixture": {
-        "prefix": ["boost_suite_fixture"],
+    "#ifdef": {
+        "prefix": "#ifdef",
+        "body": ["#ifdef ${1:DEBUG}", "$0", "#endif // ${DEBUG}"],
+        "description": "Code snippet for #ifdef"
+    },
+    "#ifndef": {
+        "prefix": "#ifndef",
+        "body": ["#ifndef ${1:DEBUG}", "$0", "#endif // !$1"],
+        "description": "Code snippet for #ifndef"
+    },
+    "#if": {
+        "prefix": "#if",
+        "body": ["#if ${1:0}", "$0", "#endif // $1"],
+        "description": "Code snippet for #if"
+    },
+    "struct": {
+        "prefix": "struct",
+        "body": ["struct ${1:MyStruct}", "{", "\t$0", "};"],
+        "description": "Code snippet for struct"
+    },
+    "switch": {
+        "prefix": "switch",
+        "body": ["switch (${1:switch_on}) {", "\tdefault:", "\t\t$0", "\t\tbreak;", "}"],
+        "description": "Code snippet for switch statement"
+    },
+    "try": {
+        "prefix": "try",
         "body": [
-            "#define BOOST_TEST_MODULE ${1:TestModuleName}",
-            "#include <boost/test/included/unit_test.hpp>",
-            "",
-            "struct ${2:FixtureName} {",
-            "\t$2() {}",
-            "\tvirtual ~$2() {}",
-            "\t/* define members here */",
-            "};",
-            "",
-            "BOOST_FIXTURE_TEST_SUITE(${3:SuiteName}, $2)",
-            "",
-            "BOOST_AUTO_TEST_CASE(${4:TestCaseName})",
-            "{",
-            "\t${0:TestDefinition}",
-            "}",
-            "",
-            "BOOST_AUTO_TEST_SUITE_END()",
-            ""
+        "try",
+        "{",
+        "\t",
+        "}",
+        "catch (const std::exception&)",
+        "{",
+        "\t$1",
+        "}"
         ],
-        "description": "Boost test suite with fixture"
+        "description": "Code snippet for try catch"
+    },
+    "union": {
+        "prefix": "union",
+        "body": ["union ${1:MyUnion}", "{", "\t$0", "};"],
+        "description": "Code snippet for union"
+    },
+    "cout": {
+        "prefix": "cout",
+        "body": ["std::cout << \"${1:message}\" << std::endl;"],
+        "description": "Code snippet for printing to std::cout, provided the header is set"
+    },
+    "cin": {
+        "prefix": "cin",
+        "body": ["std::cin >> $1;"],
+        "description": "Code snippet for std::cin, provided the header is set"
+    },
+    "printf": {
+        "prefix": "printf",
+        "body": ["printf(\"$1\\n\"$0);"],
+        "description": "Generic printf() snippet"
+    },
+    "sprintf": {
+        "prefix": "sprintf",
+        "body": ["sprintf($1, \"$2\\n\"$0);"],
+        "description": "Generic sprintf() snippet"
+    },
+    "fprintf": {
+        "prefix": "fprintf",
+        "body": ["fprintf(${1:stderr}, \"$2\\n\"$0);"],
+        "description": "Generic fprintf() snippet"
+    },
+    "scanf": {
+        "prefix": "scanf",
+        "body": ["scanf(\"$1\"$0);"],
+        "description": "Generic scanf() snippet"
+    },
+    "sscanf": {
+        "prefix": "sscanf",
+        "body": ["sscanf($1, \"$2\"$0);"],
+        "description": "Generic sscanf() snippet"
+    },
+    "fscanf": {
+        "prefix": "fscanf",
+        "body": ["fscanf($1, \"$2\"$0);"],
+        "description": "Generic fscanf() snippet"
+    },
+    "#inc": {
+        "prefix": "#inc",
+        "body": ["#include \"$0\""],
+        "description": "Code snippet for #include \" \""
+    },
+    "#inc<": {
+        "prefix": "#inc<",
+        "body": ["#include <$0>"],
+        "description": "Code snippet for #include < >"
+    },
+    "#def": {
+        "prefix": "def",
+        "body": ["#define $0"],
+        "description": "Code snippet for #define \" \""
+    },
+    "Main function template": {
+        "prefix": "main",
+        "body": [
+        "int main (int argc, char *argv[])",
+        "{",
+        "\t$1",
+        "\treturn 0;",
+        "}"
+        ],
+        "description": "A standard main function for a C++ program"
     }
 }
-

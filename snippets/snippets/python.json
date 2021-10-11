@@ -85,11 +85,6 @@
         "body": "for ${1:value} in ${2:iterable}:\n\t${3:pass}$0",
         "description" : "Code snippet to create a for loop structure."
     },
-    "forr": {
-        "prefix": "forr",
-        "body": "for ${1:i} in range(${2:step}, ${3:stop}${4:, ${5:step}}):\n\t${6:pass}$0",
-        "description" : "Code snippet to create a for in range loop structure."
-    },
     "while": {
         "prefix": "while",
         "body": "while ${1:condition}:\n\t${2:pass}$0",
