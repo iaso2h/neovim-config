@@ -249,7 +249,20 @@ packer.startup{
             map("x", [[R]],   [[<Plug>ReplaceVisual]])
         end
     }
-
+    use {
+        fn.stdpath("config") .. "/lua/logsitter",
+        requires = "nvim-treesitter",
+        module   = "logsitter",
+        keys     = {"n", "<leader>lg"},
+        config   = function()
+            map("n", [[<leader>lg]], [[:lua require("logsitter").log()<CR>]], {"silent"})
+            require("logsitter").setup{
+                logFunc = {
+                    lua = "Print",
+                }
+            }
+        end
+    }
     use {
         'tommcdo/vim-exchange',
         keys = {
@@ -290,6 +303,9 @@ packer.startup{
                     ignore_groups = {"String"}
                 }
             }
+            map("x", [[A]],  [[<Plug>(EasyAlign)]])
+            map("n", [[ga]], [[<Plug>(EasyAlign)]], "Align operator")
+
             map("x", [[A]],  [[<Plug>(EasyAlign)]])
             map("n", [[ga]], [[<Plug>(EasyAlign)]], "Align operator")
         end
@@ -386,16 +402,42 @@ packer.startup{
         end
     }
     use {
+        'AndrewRadev/linediff.vim',
+        cmd = {"Linediff", "LinediffReset"},
+    }
+    -- TODO: reimplement in lua way and support treesitter
+    use {
+        'AndrewRadev/deleft.vim',
+        disable = true,
+        cmd = {"Linediff", "LinediffReset"},
+    }
+    use {
+        'AndrewRadev/sideways.vim',
+        disable = true,
+        cmd  = {"SidewaysJumpLeft", "SidewaysJumpRight"},
+        keys = {
+            {"n", "gx<"},
+            {"n", "gx>"},
+        },
+        config = function()
+            map("n", [[gx<]], [[:<C-u>SidewaysLeft<CR>]],  {"silent"})
+            map("n", [[gx>]], [[:<C-u>SidewaysRight<CR>]], {"silent"})
+        end
+    }
+    use {
         'windwp/nvim-autopairs',
         require = "nvim-treesitter",
         config  = function()
             require('nvim-autopairs').setup {
                 disable_filetype          = {"TelescopePrompt", "dap-repl"},
+                disable_in_macro          = true,
                 ignored_next_char         = string.gsub([[[%w%%%'%[%"%.] ]],"%s+", ""),
                 enable_moveright          = true,
                 enable_afterquote         = true,   -- add bracket pairs after quote
                 enable_check_bracket_line = false,  -- check bracket in same line
                 check_ts                  = true,
+                map_bs                    = true,
+                map_c_w                   = false,
                 fast_wrap = {
                     map         = '<A-p>',
                     chars       = {'{', '[', '(', '"', "'"},
@@ -1003,6 +1045,11 @@ packer.startup{
         end
     }
     use {
+        'hrsh7th/vim-vsnip',
+        event  = "InsertEnter",
+        config = conf "vim-vsnip"
+    }
+    use {
         'hrsh7th/nvim-cmp',
         module   = "cmp",
         event    = "InsertEnter",
@@ -1010,10 +1057,11 @@ packer.startup{
             "nvim-autopairs",
 
             {"hrsh7th/cmp-nvim-lsp", module = "cmp_nvim_lsp"},
-            {"hrsh7th/cmp-nvim-lua", module = "cmp_nvim_lua", disable = true},
+            {"hrsh7th/cmp-nvim-lua", module = "cmp_nvim_lua",  disable = true},
             {"hrsh7th/cmp-buffer",   module = "cmp_buffer"},
             {"hrsh7th/cmp-path",     module = "cmp_path"},
-            {"hrsh7th/cmp-vsnip"},
+            {"hrsh7th/cmp-vsnip",    module = "cmp_vsnip"},
+            {"lukas-reineke/cmp-under-comparator", module = "cmp-under-comparator",},
             {
                 "tzachar/cmp-tabnine",
                 disable = true,
@@ -1030,11 +1078,10 @@ packer.startup{
         },
         config = conf "nvim-cmp"
     }
-    use {
-        'hrsh7th/vim-vsnip',
-        event  = "InsertEnter",
-        config = conf "vim-vsnip"
-    }
+    -- use {
+        -- "lukas-reineke/cmp-under-comparator",
+        -- module = "cmp-under-comparator",
+    -- }
     use {
         'folke/lua-dev.nvim',
         commit  = "e958850",
@@ -1116,19 +1163,6 @@ packer.startup{
         config = conf("vim-scriptease").config
     }
     use {
-        fn.stdpath("config") .. "/lua/logsitter",
-        requires = "nvim-treesitter",
-        module   = "logsitter",
-        config = function()
-            map("n", [[<leader>lg]], [[:lua require("logsitter").log()<CR>]], {"silent"})
-            require("logsitter").setup{
-                logFunc = {
-                    lua = "Print",
-                }
-            }
-        end
-    }
-    use {
         'mfussenegger/nvim-dap',
         module = "dap",
         setup  = conf "nvim-dap".setup,
@@ -1147,8 +1181,57 @@ packer.startup{
             vim.cmd [[command! -nargs=0 OSVStart lua require("osv").launch()]]
         end
     }
+    use {
+        'michaelb/sniprun',
+        run = 'bash ./install.sh',
+        cmd = {"SnipRun", "SnipReset", "SnipReplMemoryClean", "SnipTerminate", "SnipInfo", "SnipClose"},
+        config = function ()
+            require'sniprun'.setup{
+                selected_interpreters = {},     --# use those instead of the default for the current filetype
+                repl_enable = {},               --# enable REPL-like behavior for the given interpreters
+                repl_disable = {},              --# disable REPL-like behavior for the given interpreters
+
+                interpreter_options = {},       --# intepreter-specific options, consult docs / :SnipInfo <name>
+
+                --# you can combo different display modes as desired
+                display = {
+                    "Classic",                    --# display results in the command-line  area
+                    "VirtualTextOk",              --# display ok results as virtual text (multiline is shortened)
+
+                    -- "VirtualTextErr",          --# display error results as virtual text
+                    -- "TempFloatingWindow",      --# display results in a floating window
+                    -- "LongTempFloatingWindow",  --# same as above, but only long results. To use with VirtualText__
+                    -- "Terminal",                --# display results in a vertical split
+                    -- "NvimNotify",              --# display with the nvim-notify plugin
+                    -- "Api"                      --# return output to a programming interface
+                },
+
+                --# You can use the same keys to customize whether a sniprun producing
+                --# no output should display nothing or '(no output)'
+                show_no_output = {
+                    "Classic",
+                    "TempFloatingWindow",      --# implies LongTempFloatingWindow, which has no effect on its own
+                },
+
+                -- --# customize highlight groups (setting this overrides colorscheme)
+                -- snipruncolors = {
+                    -- SniprunVirtualTextOk  = {bg="#66eeff",fg="#000000"},
+                    -- SniprunFloatingWinOk  = {fg="#66eeff"},
+                    -- SniprunVirtualTextErr = {bg="#881515",fg="#000000"},
+                    -- SniprunFloatingWinErr = {fg="#881515"},
+                -- },
+
+                --# miscellaneous compatibility/adjustement settings
+                inline_messages = 0,             --# inline_message (0/1) is a one-line way to display messages
+                                --# to workaround sniprun not being able to display anything
+
+                borders = 'single'               --# display borders around floating windows
+                                                --# possible values are 'none', 'single', 'double', or 'shadow'
+            }
+        end,
+    }
+
     -- use 'theHamsta/nvim-dap-virtual-text'
-    -- use 'mfussenegger/nvim-dap-python', {'for': 'python'}
     -- use 'puremourning/vimspector'
     -- use 'sakhnik/nvim-gdb', {'do': ':!./install.sh'}
     -- }}} Debug

@@ -14,7 +14,8 @@ local defaultTheme = {
         '--with-filename',
         '--line-number',
         '--column',
-        '--smart-case'
+        '--smart-case',
+        '--follow'
     },
     prompt_prefix      = "$ ",
     selection_caret    = "  ",
@@ -69,8 +70,7 @@ local defaultTheme = {
 
             ["<Tab>"]     = actions.toggle_selection + actions.move_selection_worse,
             ["<S-Tab>"]   = actions.toggle_selection + actions.move_selection_better,
-            ["<C-q>"]     = actions.send_selected_to_qflist + actions.open_qflist,
-            ["<M-q>"]     = actions.send_selected_to_qflist + actions.open_qflist,
+            ["<C-q>"]     = actions.send_to_qflist + actions.open_qflist,
 
             ["<C-Space>"] = actions.complete_tag,
             ["<C-j>"]     = actions.cycle_history_next,
@@ -97,8 +97,7 @@ local defaultTheme = {
 
             ["<Tab>"]   = actions.toggle_selection + actions.move_selection_worse,
             ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
-            ["<C-q>"]   = actions.send_to_qflist + actions.open_qflist,
-            ["<M-q>"]   = actions.send_selected_to_qflist + actions.open_qflist,
+            ["<C-q>"]   = actions.send_selected_to_qflist + actions.open_qflist,
 
             ["j"]       = actions.move_selection_next,
             ["k"]       = actions.move_selection_previous,
@@ -108,9 +107,7 @@ local defaultTheme = {
             ["<A-e>"]   = actions.preview_scrolling_up,
             ["<A-d>"]   = actions.preview_scrolling_down,
 
-            ["g"]       = actions.move_to_top,
             ["z"]       = actions.move_to_middle,
-            ["G"]       = actions.move_to_bottom,
         },
     }
 }
@@ -136,12 +133,12 @@ require('telescope').load_extension('fzy_native')
 cmd[[
 command! -nargs=0 O lua require('telescope.builtin').oldfiles(require('telescope.themes').get_ivy{})
 ]]
-cmd[[
-augroup telescopePreview
-autocmd!
-autocmd User TelescopePreviewerLoaded setlocal number
-augroup END
-]]
+-- cmd[[
+-- augroup telescopePreview
+-- autocmd!
+-- autocmd User TelescopePreviewerLoaded setlocal number
+-- augroup END
+-- ]]
 -- Mappings
 map("n", [[<C-f>l]], [[:lua require('telescope.builtin').builtin()<CR>]], {"silent"})
 
@@ -154,9 +151,8 @@ map("n", [[<C-f>F]], [[:lua require('telescope.builtin').live_grep()<CR>]],     
 map("n", [[<C-f>w]], [[:lua require('telescope.builtin').grep_string({word_match=false)<CR>]], {"silent"})
 map("n", [[<C-f>W]], [[:lua require('telescope.builtin').grep_string({word_match=true)<CR>]],  {"silent"})
 
-map("c", [[<A-C-j>]], [[<Esc>:lua require('telescope.builtin').command_history()<CR>]], {"silent"})
--- BUG: keymapping conflict
-map("c", [[<A-C-k>]], [[<Esc>:lua require('telescope.builtin').command_history()<CR>]], {"silent"})
+map("c", [[<A-C-j>]], [[<C-u>:lua require('telescope.builtin').command_history()<CR>]], {"silent"})
+map("c", [[<A-C-k>]], [[<C-u>:lua require('telescope.builtin').command_history()<CR>]], {"silent"})
 
 map("n", [[<C-h>/]], [[:lua require('telescope.builtin').search_history()<CR>]], {"silent"})
 map("n", [[<C-h>v]], [[:lua require('telescope.builtin').vim_options()<CR>]],    {"silent"})

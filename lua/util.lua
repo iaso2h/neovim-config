@@ -914,8 +914,14 @@ _G.vimRHS = function(str)
 end
 
 
-_G.str_count = function(str, pattern)
-    return select(2, string.gsub(str, pattern, ""))
+_G.stringCount = function(str, pattern)
+    local count = 0
+    local init = 0
+    while true do
+        init = string.find(str, pattern, init + 1)
+        if not init then return count end
+        count = count + 1
+    end
 end
 
 -- dummy

@@ -203,7 +203,7 @@ theme.treesitter = {
     TSConstBuiltin       = {fg    = p.cyan},
     TSConstMacro         = {link  = "TSConstBuiltin"},
     TSConstructor        = {link  = "Structure"},
-    TSError              = {style = "bold,undercurl", sp = p.n11},
+    TSError              = {style = "bold"},
     TSException          = {link  = "Exception"},
     TSField              = {fg    = p.n8},
     TSFloat              = {link  = "Float"},
@@ -450,6 +450,11 @@ theme.plugins = {
     CmpItemKind           = {fg = p.n15},
     CmpItemMenu           = {link = "CmpItemAbbr"},
 
+
+    SniprunVirtualTextOk  = {bg=p.n8, fg=p.w},
+    SniprunFloatingWinOk  = {fg=p.n8},
+    SniprunVirtualTextErr = {bg=p.n11,  fg=p.w},
+    SniprunFloatingWinErr = {fg=p.n11},
 }
 
 

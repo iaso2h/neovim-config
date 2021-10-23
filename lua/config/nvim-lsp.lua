@@ -85,8 +85,8 @@ M.onAttach = function(client, bufNr) -- {{{
     bmap(bufNr, "n", [[<C-f>a]],    [[:lua require('telescope.builtin').lsp_code_actions()<CR>]],          {"silent"})
     bmap(bufNr, "n", [[<C-f>o]],    [[:lua require('telescope.builtin').lsp_document_symbols()<CR>]],      {"silent"})
     bmap(bufNr, "n", [[<C-f>O]],    [[:lua require('telescope.builtin').lsp_workspace_symbols()<CR>]],     {"silent"})
-    -- bmap(bufNr, "n", [[<leader>e]], [[:lua require('telescope.builtin').lsp_document_diagnostics()<CR>]],  {"silent"})
-    -- bmap(bufNr, "n", [[<leader>E]], [[:lua require('telescope.builtin').lsp_workspace_diagnostics()<CR>]], {"silent"})
+    bmap(bufNr, "n", [[<leader>e]], [[:lua require('telescope.builtin').lsp_document_diagnostics()<CR>]],  {"silent"})
+    bmap(bufNr, "n", [[<leader>E]], [[:lua require('telescope.builtin').lsp_workspace_diagnostics()<CR>]], {"silent"})
 
     bmap(bufNr, "n", [=[gD]=],        [[:lua vim.lsp.buf.declaration()<CR>]],     {"silent"})
     bmap(bufNr, "n", [=[gd]=],        [[:lua vim.lsp.buf.definition()<CR>]],      {"silent"})
@@ -100,10 +100,10 @@ M.onAttach = function(client, bufNr) -- {{{
     -- bmap(bufNr, "n", [=[<leader>wr]=], [[:lua vim.lsp.buf.remove_workspace_folder()<CR>]],       {"silent"})
     -- bmap(bufNr, "n", [=[<leader>wl]=], [[:lua Print(vim.lsp.buf.list_workspace_folders())<CR>]], {"silent"})
     -- bmap(bufNr, "n", [=[<leader>e]=], [[:lua vim.diagnostic.setqflist()<CR>]],                     {"silent"})
-    bmap(bufNr, "n", [[[e]],          [[:lua vim.diagnostic.goto_prev({popup_opts = {border = "rounded"}})<CR>]],                     {"silent"})
-    bmap(bufNr, "n", [[]e]],          [[:lua vim.diagnostic.goto_prev({popup_opts = {border = "rounded"}})<CR>]],                     {"silent"})
-    bmap(bufNr, "n", [[[E]],          [[:lua vim.diagnostic.goto_prev({popup_opts = {border = "rounded"}, severity = "Error"})<CR>]], {"silent"})
-    bmap(bufNr, "n", [[]E]],          [[:lua vim.diagnostic.goto_prev({popup_opts = {border = "rounded"}, severity = "Error"})<CR>]], {"silent"})
+    bmap(bufNr, "n", [[[e]],          [[:lua vim.diagnostic.goto_prev{goto_key = {border = "rounded"}}<CR>]],                     {"silent"})
+    bmap(bufNr, "n", [[]e]],          [[:lua vim.diagnostic.goto_prev{goto_key = {border = "rounded"}}<CR>]],                     {"silent"})
+    bmap(bufNr, "n", [[[E]],          [[:lua vim.diagnostic.goto_prev{goto_key = {border = "rounded"}, severity = "Error"}<CR>]], {"silent"})
+    bmap(bufNr, "n", [[]E]],          [[:lua vim.diagnostic.goto_prev{goto_key = {border = "rounded"}, severity = "Error"}<CR>]], {"silent"})
     -- Override existing mapping if lsp support
     if client.resolved_capabilities.document_formatting then
         bmap(bufNr, "n", [=[<A-f>]=], [[:lua vim.lsp.buf.formatting()<CR>]],       {"silent"})

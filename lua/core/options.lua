@@ -5,7 +5,7 @@ local o   = vim.opt
 
 -- let &path.="src/include,/usr/include/AL,"
 if ex("rg") then
-    o.grepprg    = "rg --vimgrep --smart-case"
+    o.grepprg = "rg --vimgrep --smart-case --follow --with-filename --line-number"
     -- o.grepformat = "%f:%l:%c:%m"
 end
 

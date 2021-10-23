@@ -122,7 +122,7 @@ local matchRegType = function(motionType, vimMode, reg, pos) -- {{{
         -- the register contents and set the register type to characterwise yank.
         if motionType == "line" then
             -- TODO: Only support one line reindent, multiline support needed
-            local lineCnt = str_count(reg.content, "\n")
+            local lineCnt = stringCount(reg.content, "\n")
             if lineCnt == 1 then
                 local _, regIndent = string.find(reg.content, "^%s*")
                 local bufferIndent = fn.indent(pos.startPos[1])

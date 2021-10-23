@@ -12,7 +12,6 @@ if not TelescopeOverrideBufMap then
             promptBufNr = tbl[2]
         end
 
-
         vim.api.nvim_buf_set_keymap(promptBufNr, mode, lhs, rhs, opts)
     end
 end

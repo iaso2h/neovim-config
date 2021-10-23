@@ -83,8 +83,8 @@ local luaConfigs = {
     {
         pathPat = e(luaModulePath:joinpath("onenord").filename),
         config  = function(...)
-                cmd [[noa silent colorscheme onenord]]
-                api.nvim_feedkeys(t"<CR>", "nt", false)
+                -- cmd [[noa silent colorscheme onenord]]
+                api.nvim_feedkeys(":colorscheme onenord", "nt", false)
             end
     },
     {

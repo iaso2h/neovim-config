@@ -8,5 +8,6 @@ api.nvim_buf_set_keymap(0, "n", [[%]],     [[:<C-u>Cfilter %<CR>]], {})
 api.nvim_win_set_option(0, "number", true)
 api.nvim_win_set_option(0, "relativenumber", false)
 api.nvim_buf_set_option(0, "buflisted", false)
+cmd [[setlocal winhighlight=Normal:PanelBackground,SignColumn:PanelBackground]]
 cmd [[resize 21]]
 

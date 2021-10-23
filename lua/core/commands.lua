@@ -40,10 +40,10 @@ if not vim.g.vscode then
     }
     cmd [[
     function! EnhanceFoldExpr()
-        let l:line = getline(v:lnum)
-        if match(l:line, g:enhanceFoldStartPat[&filetype]) > -1
+        let line = getline(v:lnum)
+        if match(line, g:enhanceFoldStartPat[&filetype]) > -1
             return "a1"
-        elseif match(l:line, g:enhanceFoldEndPat[&filetype]) > -1
+        elseif match(line, g:enhanceFoldEndPat[&filetype]) > -1
             return "s1"
         else
             return "="
@@ -110,7 +110,7 @@ command! -nargs=+ -complete=command  Redir call luaeval('require("redir").catch(
 command! -nargs=0 -range ExtractSelection lua require("extractSelection").main(vim.fn.visualmode())
 command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | setl norevins
 command! -nargs=0 CD     execute "cd " . expand("%:p:h")
-command! -nargs=0 E      up | let g:refreshBufSavView = winsaveview() | e! | call winrestview(g:refreshBufSavView)
+command! -nargs=0 E      up | mkview | e! | loadview
 command! -nargs=0 O      browse oldfiles
 command! -nargs=0 Dofile lua require("reloadConfig").luaLoadFile()
 
