@@ -54,7 +54,7 @@ end
 
 -- returns the posistion at which the log
 -- should be inserted
-local function get_insertion_position(logger, node, cursorPos)
+local function getInsertPos(logger, node, cursorPos)
     local line, col = unpack(cursorPos)
     local decl, placement = parent_declaration(logger.checks, node)
 
@@ -80,7 +80,7 @@ function M.setup(customOpts)
     if not customOpts then return end
     assert(type(customOpts) == "table", "Expect table")
 
-    vim.tbl_deep_extend("force", opts, customOpts)
+    opts = vim.tbl_deep_extend("force", opts, customOpts)
 
     for _, lang in ipairs{
             'javascriptreact',
@@ -100,34 +100,33 @@ function M.register(logger, for_file_types)
     for _, filetype in ipairs(for_file_types) do loggers[filetype] = logger end
 end
 
-local function get_logger(filetype)
+local function getLogger(filetype)
     return loggers[filetype]
 end
 
 function M.log()
     if not opts.logFunc[vim.bo.filetype] then return vim.notify("Unsuppoted filetype") end
 
-    local logger = get_logger(vim.bo.filetype)
+    local logger = getLogger(vim.bo.filetype)
     if logger == nil then
         return vim.notify("No logger for " .. vim.bo.filetype, vim.log.levels.INFO)
     end
 
-    local winnr     = api.nvim_get_current_win()
-    local node      = tsutils.get_node_at_cursor(winnr)
-    local cursorPos = api.nvim_win_get_cursor(winnr)
+    local winNr     = api.nvim_get_current_win()
+    local node      = tsutils.get_node_at_cursor(winNr)
+    local cursorPos = api.nvim_win_get_cursor(winNr)
 
     if node == nil then return vim.notify("No node found", vim.log.levels.ERROR)end
 
-    local insert_pos = get_insertion_position(logger, node, cursorPos)
+    local insertPos = getInsertPos(logger, node, cursorPos)
 
     local text = utils.node_text(logger.expand(node))
 
-    local output = logger.log(text, opts.logFunc[vim.bo.filetype], cursorPos)
+    local output = logger.log(text, opts.logFunc[vim.bo.filetype], cursorPos, insertPos)
 
-    api.nvim_win_set_cursor(winnr, insert_pos)
-    -- Print(output)
+    api.nvim_win_set_cursor(winNr, insertPos)
     api.nvim_put({output}, "l", true, false)
-    vim.cmd[[norm! ==^]]
+    vim.cmd[[noa norm! ==^]]
 end
 
 M.register(require('logsitter.lang.javascript'),
