@@ -1,9 +1,8 @@
 -- File: historyStartup
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
--- Version: 0.0.5
--- Last Modified: 2021-09-16
--- TODO: mapping
+-- Version: 0.0.6
+-- Last Modified: 2021-11-10
 local api = vim.api
 local fn  = vim.fn
 local cmd = vim.cmd
@@ -15,10 +14,16 @@ local M   = {
 
 local lines = {"< New Buffer >"}
 local curWin
+local oldBuf
 
 
-M.display = function()
-    if fn.argc() > 0 or #vim.v.oldfiles == 1 then
+--- Display history in new buffer
+--- @param force boolean Force to display historyStartup. Set to it to false
+--- when start from autocommand
+M.display = function(force)
+    if (not force and fn.argc() > 0) or
+        #vim.v.oldfiles == 1 then
+
         return
     end
 
@@ -39,7 +44,8 @@ M.display = function()
 
 
     curWin = api.nvim_get_current_win()
-    if api.nvim_buf_is_valid(1) then
+    oldBuf = api.nvim_get_current_buf()
+    if api.nvim_buf_is_valid(1) and api.nvim_buf_get_option(1, "modified") and api.nvim_buf_get_option(1, "filetype") ~= nil then
         M.curBuf = 1
     else
         -- BUG:
@@ -56,14 +62,15 @@ M.display = function()
     api.nvim_buf_set_option(M.curBuf, "modifiable", true)
     api.nvim_buf_set_option(M.curBuf, "bufhidden",  "hide")
     api.nvim_buf_set_option(M.curBuf, "buflisted",  false)
-    api.nvim_buf_set_option(M.curBuf, "modified",   false)
+    api.nvim_buf_set_option(M.curBuf, "modified",   true)
     api.nvim_buf_set_option(M.curBuf, "filetype",   "HistoryStartup")
 
     api.nvim_buf_set_lines(M.curBuf, 0, -1, false, lines)
-
     api.nvim_buf_set_option(M.curBuf, "modifiable", false)
+    api.nvim_buf_set_option(M.curBuf, "modified",   false)
 
-    for _, key in ipairs({"o", "<C-s>", "<C-v>", "<CR>"}) do
+
+    for _, key in ipairs({"o", "<C-s>", "<C-v>", "<CR>", "q"}) do
         api.nvim_buf_set_keymap(
             M.curBuf,
             "n",
@@ -75,20 +82,44 @@ M.display = function()
 
 end
 
+
 M.execMap = function(key)
     local target = lines[api.nvim_win_get_cursor(0)[1]]
+    key = string.lower(key)
 
-    if target == "< New Buffer >" then
-        cmd("enew")
-    elseif key == "o" or string.lower(key) == "<cr>" then
-        cmd("edit " .. target)
-    elseif string.lower(key) == "<c-s>" then
-        api.nvim_win_set_buf(curWin, M.lastBuf)
-        cmd("split " .. target)
-    elseif string.lower(key) == "<c-v>" then
-        api.nvim_win_set_buf(curWin, M.lastBuf)
-        cmd("vsplit " .. target)
+    if key == "q" then
+        local bufNrTbl   = vim.tbl_map(function(buf)
+            return tonumber(string.match(buf, "%d+"))
+            end, require("util").tblLoaded(false))
+        if #bufNrTbl == 0 then
+            cmd("noa q!")
+        else
+            api.nvim_win_set_buf(curWin, oldBuf)
+        end
+
+    elseif key == "o" or key == "<cr>" then
+        if target == "< New Buffer >" then
+            cmd("enew")
+        else
+            cmd("edit " .. target)
+        end
+    elseif key == "<c-s>" then
+        if target == "< New Buffer >" then
+            cmd("noa split")
+            cmd("enew")
+        else
+            api.nvim_win_set_buf(curWin, M.lastBuf)
+            cmd("split " .. target)
+        end
+    elseif key == "<c-v>" then
+        if target == "< New Buffer >" then
+            cmd("vnew")
+        else
+            api.nvim_win_set_buf(curWin, M.lastBuf)
+            cmd("vsplit " .. target)
+        end
     end
+
     M.deleteBuf()
 end
 
