@@ -99,8 +99,9 @@ theme.editor =  {
     TermCursor  = {link = "Normal"},
     -- TermCursorNC
 
-    NonText = {fg = p.n1},
-    Conceal = {fg = p.n1},
+    NonText     = {fg = p.n3},
+    Conceal     = {fg = p.n1},
+    EndOfBuffer = {link = "NonText"},
 
 
     Cursor       = {fg = p.w, style = "reverse"},
@@ -109,12 +110,11 @@ theme.editor =  {
     CursorLine   = {bg = p.n1},
 
 
-    DiffAdd    = {fg = p.n14, bg = p.n1, style = "reverse"},
-    DiffChange = {fg = p.n12, bg = p.n1, style = "reverse"},
-    DiffDelete = {fg = p.n11, bg = p.n1, style = "reverse"},
-    DiffText   = {fg = p.n15, bg = p.n1, style = "reverse"},
+    DiffAdd    = {bg = "#43514b"},
+    DiffChange = {bg = "#3e4d5a"},
+    DiffDelete = {bg = "#4b3d48", fg = p.n3},
+    DiffText   = {bg = "#526c7a", style = "bold"},
 
-    -- Folded       = {fg = p.n8,  bg="#323847", style = "bold"},
     Folded       = {fg = p.n8,  bg = p.n1, style = "bold"},
     FoldColumn   = {fg = p.n3},
     ColorColumn  = {bg = p.n1},
@@ -133,7 +133,6 @@ theme.editor =  {
     MatchWord  = {fg = p.n8, bg = p.n3,  style = "bold"},
 
 
-    EndOfBuffer = {fg = p.n1},
     ErrorMsg    = {fg = p.n4, bg = p.n11},
     WarningMsg  = {fg = p.b,  bg = p.n13},
     ModeMsg     = {fg = p.n4},
@@ -183,7 +182,7 @@ theme.editor =  {
 
     healthError   = {fg = p.n11, bg = p.n1},
     healthSuccess = {fg = p.n14, bg = p.n1},
-    healthWarning = {fg = p.n15, bg = p.n1},
+    healthWarning = {fg = p.n13, bg = p.n1},
 
 
     -- BufferLine
@@ -296,9 +295,9 @@ theme.plugins = {
 
     -- Diff
     diffAdded     = {fg = p.n14},
+    diffChanged   = {fg = p.n13},
     diffRemoved   = {fg = p.n11},
-    diffChanged   = {fg = p.n15},
-    diffOldFile   = {fg = p.n13},
+    diffOldFile   = {fg = p.n15},
     diffNewFile   = {fg = p.n12},
     diffFile      = {fg = p.n7},
     diffLine      = {fg = p.n3},
@@ -331,7 +330,8 @@ theme.plugins = {
     TelescopePreviewBorder  = {fg = p.n10, style = "bold"},
     TelescopeSelectionCaret = {fg = p.n10},
     TelescopeSelection      = {fg = p.w,  bg = p.n8, style = "bold"},
-    TelescopeNormal         = {fg = p.n4, bg = p.n0},
+    -- https://github.com/shaunsingh/nord.nvim/pull/63/files
+    -- TelescopeNormal         = {fg = p.n4, bg = p.n0},
     TelescopeMatching       = {fg = p.n13},
 
     -- NvimTree
@@ -368,7 +368,7 @@ theme.plugins = {
 
     -- LspSaga
     DiagnosticError            = {fg = p.n11},
-    DiagnosticWarning          = {fg = p.n15},
+    DiagnosticWarning          = {fg = p.n13},
     DiagnosticInformation      = {fg = p.n10},
     DiagnosticHint             = {fg = p.n9},
     DiagnosticTruncateLine     = {fg = p.n4},

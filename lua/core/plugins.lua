@@ -44,14 +44,13 @@ packer.startup{
     -- ft = string or list,         -- Specifies filetypes which load this plugin.
     -- keys = string or list,       -- Specifies maps which load this plugin. See "Keybindings".
     -- event = string or list,      -- Specifies autocommand events which load this plugin.
-    -- fn = string or list          -- Specifies functions which load this plugin.
     -- cond = string, function, or list of strings/functions,   -- Specifies a conditional test to load this plugin
+    -- fn = string or list          -- Specifies functions which load this plugin.
     -- module = string or list      -- Specifies Lua module names for require. When requiring a string which starts
                                     -- with one of these module names, the plugin will be loaded.
     -- module_pattern = string/list -- Specifies Lua pattern of Lua module names for require. When
     -- requiring a string which matches one of these patterns, the plugin will be loaded.
     -- }
-    -- BUG: Sometime the appearing sequence of "keys" and "cmd" inside use()
     -- func will take a significant effect on whether a plugin can be lazy
     -- loaded or not
 
@@ -244,8 +243,8 @@ packer.startup{
 
             map("n", [[gr]],  [[<Plug>ReplaceOperator]])
             map("n", [[grr]], [[<Plug>ReplaceCurLine]])
-            map("n", [[grn]], [[*``griw]], "Replace word under cursor forward")
-            map("n", [[grN]], [[#``griw]], "Replace word under cursor backward")
+            map("n", [[grn]], [[*``griw]], {"noremap"}, "Replace word under cursor forward")
+            map("n", [[grN]], [[#``griw]], {"noremap"}, "Replace word under cursor backward")
             map("x", [[R]],   [[<Plug>ReplaceVisual]])
         end
     }
@@ -255,7 +254,7 @@ packer.startup{
         module   = "logsitter",
         keys     = {"n", "<leader>lg"},
         config   = function()
-            map("n", [[<leader>lg]], [[:lua require("logsitter").log()<CR>]], {"silent"})
+            map("n", [[<leader>lg]], [[:lua require("logsitter").log()<CR>]], {"silent"}, "Log under cursor")
             require("logsitter").setup{
                 logFunc = {
                     lua = "Print",
@@ -398,7 +397,7 @@ packer.startup{
         'AndrewRadev/switch.vim',
         cmd   = "Switch",
         setup = function()
-            map("n", [[gt]], [[:<C-u>Switch<CR>]], {"silent"})
+            map("n", [[gt]], [[:<C-u>Switch<CR>]], {"silent"}, "Switch word under cursor")
         end
     }
     use {
@@ -706,8 +705,9 @@ packer.startup{
     }
     use {
     'RRethy/vim-hexokinase',
-        run    = "make hexokinase",
-        setup  = function()
+        event = "BufRead",
+        run   = "make hexokinase",
+        setup = function()
             vim.g.Hexokinase_highlighters = {"backgroundfull"}
             vim.g.Hexokinase_optInPatterns = "full_hex,triple_hex,rgb,rgba,hsl,hsla"
         end
@@ -949,8 +949,8 @@ packer.startup{
             require("config.nvim-lsp").setupServers()
             -- Automatically reload after `:LspInstall <server>` so we don't have to restart neovim
             require("lspinstall").post_install_hook = function ()
-                require("config.nvim-lsp").setupServers()
                 vim.cmd "bufdo e"
+                require("config.nvim-lsp").setupServers()
             end
 
             vim.cmd [[
@@ -1060,7 +1060,7 @@ packer.startup{
             {"hrsh7th/cmp-nvim-lua", module = "cmp_nvim_lua",  disable = true},
             {"hrsh7th/cmp-buffer",   module = "cmp_buffer"},
             {"hrsh7th/cmp-path",     module = "cmp_path"},
-            {"hrsh7th/cmp-vsnip",    module = "cmp_vsnip"},
+            {"hrsh7th/cmp-vsnip",     after = "nvim-cmp",},
             {"lukas-reineke/cmp-under-comparator", module = "cmp-under-comparator",},
             {
                 "tzachar/cmp-tabnine",
@@ -1078,10 +1078,6 @@ packer.startup{
         },
         config = conf "nvim-cmp"
     }
-    -- use {
-        -- "lukas-reineke/cmp-under-comparator",
-        -- module = "cmp-under-comparator",
-    -- }
     use {
         'folke/lua-dev.nvim',
         commit  = "e958850",
@@ -1099,6 +1095,14 @@ packer.startup{
             vim.g.Illuminate_ftblacklist = {"nerdtree", "NvimTree", "qf", "packer"}
             vim.g.Illuminate_delay = 100
         end
+    }
+    use {
+        "ThePrimeagen/refactoring.nvim",
+        disable = true,
+        requires = {
+            "plenary.nvim",
+            "nvim-treesitter"
+        }
     }
     -- }}} Intellisense
     -- Telescope {{{
@@ -1170,7 +1174,30 @@ packer.startup{
     }
     use {
         'rcarriga/nvim-dap-ui',
+        after  = "nvim-dap",
         config = conf "nvim-dap-ui"
+    }
+    use {
+        -- TODO: hlGroup
+        'theHamsta/nvim-dap-virtual-text',
+        after  = "nvim-dap",
+        config = function()
+            require("nvim-dap-virtual-text").setup {
+                enabled = true,                      -- enable this plugin (the default)
+                enabled_commands = true,             -- create commands DapVirtualTextEnable, DapVirtualTextDisable, DapVirtualTextToggle, (DapVirtualTextForceRefresh for refreshing when debug adapter did not notify its termination)
+                highlight_changed_variables = true,  -- highlight changed values with NvimDapVirtualTextChanged, else always NvimDapVirtualText
+                highlight_new_as_changed = false,    -- highlight new variables in the same way as changed variables (if highlight_changed_variables)
+                show_stop_reason = true,             -- show stop reason when stopped for exceptions
+                commented = false,                   -- prefix virtual text with comment string
+
+                -- experimental features:
+                virt_text_pos = 'eol',               -- position of virtual text, see `:h nvim_buf_set_extmark()`
+                all_frames = false,                  -- show virtual text for all stack frames not only current. Only works for debugpy on my machine.
+                virt_lines = false,                  -- show virtual lines instead of virtual text (will flicker!)
+                virt_text_win_col = nil              -- position the virtual text at a fixed window column (starting from the first text column) ,
+                                                     -- e.g. 80 to position at column 80, see `:h nvim_buf_set_extmark()`
+            }
+        end
     }
     use {
         'jbyuki/one-small-step-for-vimkind',
@@ -1231,8 +1258,7 @@ packer.startup{
         end,
     }
 
-    -- use 'theHamsta/nvim-dap-virtual-text'
-    -- use 'puremourning/vimspector'
+
     -- use 'sakhnik/nvim-gdb', {'do': ':!./install.sh'}
     -- }}} Debug
     -- Language support {{{

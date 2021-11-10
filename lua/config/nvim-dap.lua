@@ -23,12 +23,12 @@ M.config = function()
     map("n", [[<leader>dg]], [[:lua require('dap').goto_()<CR>]], {"silent"})
 
     map("n", [[<leader>dr]], [[:lua require('dap').repl.toggle()<CR>]],      {"silent"})
+    -- BUG: function failed
     map("n", [[<leader>dB]], [[:lua require('dap').list_breakpoints()<CR>]], {"silent"})
     -- map("n", [[<leader>B]],  [[:lua require('dap').set_breakpoint(vim.fn.input('Breakpoint Condition: '), nil, nil, true)<CR>]], {"silent"})
     -- map("n", [[<leader>dl]], [[:lua require('dap').set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>]], {"silent"})
 
 
-    -- TODO:
     map("n", [[<C-w>d]], [[:lua require("dap.ui.widgets").sidebar(require("dap.ui.widgets").scopes).toggle({height=15})<CR>]], {"silent"})
     map("n", [[dK]],     [[:lua require("dap.ui.widgets").hover()<CR>]],  {"silent"})
 

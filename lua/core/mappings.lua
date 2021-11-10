@@ -112,7 +112,7 @@ map("n", [[gZ]], [[<Plug>ZealOperatorGlobal]], "Zeal look up...universally")
 map("x", [[Z]],  [[<Plug>ZealVisual]])
 -- }}} Zeal query
 -- HistoryStartup
-map("n", [[<C-s>]], [[:lua require("historyStartup").display()<CR>]], {"silent"}, "Enter HistoryStartup")
+map("n", [[<C-s>]], [[:lua require("historyStartup").display(true)<CR>]], {"silent"}, "Enter HistoryStartup")
 -- Extraction
 map("n", [[<Plug>Extract]],
 luaRHS[[luaeval(
@@ -154,6 +154,8 @@ map("n", [[<S-Tab>]], [[:lua require("tabSwitcher").main()<CR>]], {"silent"}, "C
 -- Delete
 map("n", [[dj]], [[<Nop>]])
 map("n", [[dk]], [[<Nop>]])
+map("n", [[dn]], [[*``dw]], {"noremap"})
+map("n", [[dN]], [[#``dw]], {"noremap"})
 map("n", [[d<Space>]], [[:<C-u>call setline(".", "")<CR>]],  {"silent"})
 -- TODO: Modify under cursor
 -- Change under cursor
@@ -173,14 +175,15 @@ map("n", [[<A-o>]], [[:lua require("historyHop").main("changelist", -1)<CR>]], {
 map("n", [[<A-i>]], [[:lua require("historyHop").main("changelist", 1)<CR>]],  {"silent"}, "Next change")
 map("n", [[<C-o>]], [[<C-o>zz]])
 map("n", [[<C-i>]], [[<C-i>zz]])
+-- Add in jumplist for j/k with count prefix
 map("n", [[j]], [[:lua require("util").addJump("j", true)<CR>]], {"silent"})
 map("n", [[k]], [[:lua require("util").addJump("k", true)<CR>]], {"silent"})
 -- Swap default mapping
-map("n", [[*]],  [[g*]], {"noremap"})
-map("n", [[#]],  [[g#]], {"noremap"})
-map("n", [[g#]], [[#]],  {"noremap"})
-map("n", [[g*]], [[*]],  {"noremap"})
--- Add visual mode
+map("n", [[*]],  [[g*``]], {"noremap"})
+map("n", [[#]],  [[g#``]], {"noremap"})
+map("n", [[g#]], [[#``]],  {"noremap"})
+map("n", [[g*]], [[*``]],  {"noremap"})
+-- Search visual selected
 map("x", [[*]], [[m`:<C-u>execute "/\\V" . escape(luaeval('require("selection").getSelect("string")'), '\')<CR>]], {"noremap", "silent"})
 map("x", [[#]], [[m`:<C-u>execute "?\\V" . escape(luaeval('require("selection").getSelect("string")'), '\')<CR>]], {"noremap", "silent"})
 map("x", [[/]], [[*]])
@@ -282,6 +285,7 @@ map("",  [[zj]], [[<Nop>]])
 map("",  [[zk]], [[<Nop>]])
 map("",  [[[Z]], [[zk]], {"noremap"}, "Previous fold(integral)")
 map("",  [[]Z]], [[zj]], {"noremap"}, "Next fold(integral)")
+map("",  [[[z]], [[:<C-u>call EnhanceFoldJump("previous", 1, 0)<CR>]],       {"silent", "noremap"}, "Previous fold")
 map("",  [[[z]], [[:<C-u>call EnhanceFoldJump("previous", 1, 0)<CR>]],       {"silent", "noremap"}, "Previous fold")
 map("",  [[]z]], [[:<C-u>call EnhanceFoldJump("next",     1, 0)<CR>]],       {"silent", "noremap"}, "Next fold")
 map("n", [[dz]], [[:<C-u>call EnhanceFoldHL("", 800, "EnhanceDelete")<CR>]], {"silent"}, "Delete fold")

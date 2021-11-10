@@ -131,7 +131,7 @@ require('telescope').load_extension('fzy_native')
 
 -- Command
 cmd[[
-command! -nargs=0 O lua require('telescope.builtin').oldfiles(require('telescope.themes').get_ivy{})
+command! -nargs=0 O lua require('telescope.builtin').oldfiles()
 ]]
 -- cmd[[
 -- augroup telescopePreview

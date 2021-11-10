@@ -32,16 +32,21 @@ o.conceallevel  = 0
 o.concealcursor = "nc"
 
 o.cpoptions:append"q;"
-o.cursorline     = true
-o.diffopt        = "context:10000,filler,closeoff,vertical,algorithm:patience"
+o.cursorline  = true
+-- o.colorcolumn = 80
+
+-- o.diffopt        = "context:10000,filler,closeoff,vertical,algorithm:patience"
+o.diffopt    = "context:100,algorithm:histogram,internal,indent-heuristic,filler,closeoff,iwhite,vertical"
 
 o.langmenu      = "en"
 o.fileencodings = "utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1"
 o.modelineexpr  = true
 
-o.fillchars = "fold: ,vert:▏,eob: "
-o.listchars = "tab:>-,precedes:❮,extends:❯,trail:-,nbsp:%,eol:↴"
-o.showbreak = "↳"
+o.fillchars = "fold: ,vert:▏,eob: ,diff:╱"
+o.list      = true
+o.listchars = "tab:>-,precedes:«,extends:»,nbsp:␣"
+-- o.listchars = "tab:>-,precedes:«,extends:»,nbsp:␣,eol:↵,trail:•"
+o.showbreak = "⤷ "
 
 o.foldcolumn = "auto:4"
 o.signcolumn = "auto:4"
