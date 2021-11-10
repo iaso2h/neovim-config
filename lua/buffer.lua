@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: A few of buffer-related utilities
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.20
--- Last Modified: 2021-10-09
+-- Version: 0.0.21
+-- Last Modified: 2021-11-10
 local fn   = vim.fn
 local cmd  = vim.cmd
 local api  = vim.api
@@ -48,13 +48,14 @@ end -- }}}
 --- will be wiped
 --- @param bufNr boolean Buffer number handler
 local function bufWipe(bufNr)
-    -- do return end
-    api.nvim_buf_delete(bufNr and bufNr or 0, {force = true})
+    -- Might help to disable treesitter warning
+    -- Error executing vim.schedule lua callback: /usr/share/nvim/runtime/lua/vim/lsp/util.lua:1486: Invalid buffer id: 63
+    pcall(api.nvim_buf_delete, bufNr and bufNr or 0, {force = true})
 end
 
 
 --- Gather informatioin about buffers and windows for further processing
-local init = function()
+local initBuf = function()
     M.curBufName = api.nvim_buf_get_name(0)
     M.curBufNr   = api.nvim_get_current_buf()
     M.curBufType = vim.o.buftype
@@ -104,13 +105,12 @@ local function bufClose(checkSpecialBuf, checkAllBuf) -- {{{
         else
             if M.curBufType == "nofile" then
                 if M.curBufName == "[Command Line]" then
-                    -- This buffer is displayed when you hit CTRL-F on commandline
+                    -- This buffer shows up When you hit CTRL-F on commandline
                     return api.nvim_win_close(M.curWinID, true)
-                elseif string.match("/home/iaso2h/.config/nvim/[nvim-lua]", [[%[nvim%-lua%]$]]) then
+                elseif string.match(M.curBufName, [[%[nvim%-lua%]$]]) then
                     -- Check for Luapad
                     return api.nvim_buf_delete(M.curBufNr, {force = false, unload = true})
                 else
-                    vim.notify("Close buffer at: " .. M.curBufName)
                     return bufWipe(M.curBufNr)
                 end
             elseif M.curBufType == "prompt" then
@@ -211,7 +211,7 @@ end -- }}}
 -- @return: 0
 ----
 function M.smartClose(type) -- {{{
-    init()
+    initBuf()
 
     if type == "window" then
         if M.curBufType ~= "" then
@@ -226,8 +226,12 @@ function M.smartClose(type) -- {{{
             elseif M.curBufType == "terminal" then
                 api.nvim_win_close(M.curWinID, true)
             else
-                -- other special buffer
-                api.nvim_win_close(M.curWinID, true)
+                -- Other special buffer
+                if #M.winIDTbl > 1 then
+                    api.nvim_win_close(M.curWinID, true)
+                else
+                    bufWipe(M.curBufNr)
+                end
             end
             -- }}} Close window containing special buffer
         else
@@ -288,7 +292,7 @@ end
 function M.wipeOtherBuf() -- {{{
     if vim.o.buftype ~= "" then return end
 
-    init()
+    initBuf()
     -- Check whether call from Nvim Tree
     M.winIDTbl = api.nvim_list_wins()
     if vim.bo.filetype == "NvimTree" then
