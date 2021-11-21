@@ -1,16 +1,13 @@
+-- File: quickFix
+-- Author: iaso2h
+-- Description: Cfilter in lua way
+-- Version: 0.0.3
+-- Last Modified: 2021-11-15
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
 local M   = {}
 
---- Highlight relative row in quickfix with color
---- @param qfChk boolean whether filter out quickfix or not
-M.highlightRelative = function (qfChk)
-    local alterBufNr = fn.bufnr("#")
-    if not api.nvim_buf_is_valid(alterBufNr) then return end
-    local items = qfChk and fn.getqflist() or fn.getloclist(0)
-    --  TODO: implement with api hihghlight
-end
 -- cfilter.lua: Plugin to filter entries from a quickfix/location list
 -- Last Change: Aug 23, 2018
 -- Maintainer: Yegappan Lakshmanan (yegappan AT yahoo DOT com)
@@ -38,6 +35,7 @@ local lastFilterPat = ""
 _G.qFilter = function(qfChk, pat, bang)
     local items = qfChk and fn.getqflist() or fn.getloclist(0)
 
+    -- Parsing the pat
     local firstChar = string.sub(pat, 1, 1)
     local lastChar  = string.sub(pat, -1, -1)
     if firstChar == lastChar and (firstChar == '/' or firstChar == '"' or firstChar == "'") then
@@ -50,13 +48,14 @@ _G.qFilter = function(qfChk, pat, bang)
         pat = pat
     end
 
-    if pat == "%" or "#" then pat = fn.expand("#") end
+    if pat == "%" or pat == "#" then pat = fn.expand("#") end
 
     if pat == '' then return end
 
 
     local cond
     local regex = vim.regex(pat)
+
     if bang == '!' then
         cond = function(i)
             return (not regex:match_str(i.text)) and (not regex:match_str(fn.bufname(i.bufnr)))
@@ -72,6 +71,11 @@ _G.qFilter = function(qfChk, pat, bang)
         fn.setqflist({}, ' ', {items = items})
     else
         fn.setloclist(0, {}, ' ', {items = items})
+    end
+
+    -- Need to refresh the color when todo-comment is installed
+    if package.loaded["todo-comments"] then
+        require("todo-comments.highlight").highlight_win(api.nvim_get_current_win(), true)
     end
 end
 
