@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: A few of buffer-related utilities
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.21
--- Last Modified: 2021-11-10
+-- Version: 0.0.22
+-- Last Modified: 2021-11-18
 local fn   = vim.fn
 local cmd  = vim.cmd
 local api  = vim.api
@@ -43,6 +43,14 @@ local function saveModified(bufNr) -- {{{
     end
 end -- }}}
 
+
+local function historyStartup()
+    if #M.bufNrTbl == 1 then
+        return require("historyStartup").display(true)
+    else
+        return
+    end
+end
 
 --- Force wipe the given buffer, if no bufNr is provided, then current buffer
 --- will be wiped
@@ -145,6 +153,7 @@ local function bufClose(checkSpecialBuf, checkAllBuf) -- {{{
         -- instance
         if not checkAllBuf or #M.winIDTbl == 1 then
             switchAlter(M.curWinID)
+            historyStartup()
             return bufWipe(M.curBufNr)
         end
 
@@ -235,24 +244,23 @@ function M.smartClose(type) -- {{{
             end
             -- }}} Close window containing special buffer
         else
-            -- Close window containing buffer {{{
+        -- Close window containing buffer {{{
             if M.curBufName == "" then
                 -- Scratch files
                 bufClose(false, false)
                 -- Make sure no lingering window
                 if #M.winIDTbl > 1 and api.nvim_win_is_valid(M.curWinID) then
-                    api.nvim_win_close(M.curWinID, true)
+                    return api.nvim_win_close(M.curWinID, true)
                 else
-                    if #M.bufNrTbl == 1 then return cmd [[q!]] end
+                    return
                 end
-                return
             else
                 -- Standard buffer
                 if #M.winIDTbl == 1 then
                     -- 1 Window
                     -- Override the default behavior, treat it like performing
                     -- a buffer delete untill there is no morebuffers loaded
-                    return bufClose(false, false)
+                    bufClose(false, false)
                 else
                     -- 1+ Windows
                     -- In situation like there are multiple buffers loaded
@@ -279,9 +287,9 @@ function M.smartClose(type) -- {{{
         end
         -- }}} Close window containing buffer
     elseif type == "buffer" then
-        bufClose(false, true)
+        return bufClose(false, true)
     end
-end
+end -- }}}
 
 
 ----
