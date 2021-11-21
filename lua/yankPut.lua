@@ -11,8 +11,6 @@ local util     = require("util")
 local operator = require("operator")
 local M = {}
 -- TODO: test cases
--- TODO: merge convertPut into inplacePut
--- TODO: "0cp
 
 
 function M.VSCodeLineMove(vimMode, direction) -- {{{
@@ -203,8 +201,17 @@ function M.inplaceYank(args) -- {{{
 end -- }}}
 
 
-function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
-    if not vim.bo.modifiable then return end
+--- Put text inplace
+--- @param vimMode    string Vim mode. See: `:help mode()`
+--- @param pasteCMD   string Normal mode command to execute. "p" or "P"
+--- @param convertPut boolean Wether to convert "V" type register into "v"
+--- type register or vice versa
+--- @param opts       table
+function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
+    if not vim.bo.modifiable then
+        return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
+    end
+    if fn.foldclosed('.') ~= -1 then return end
 
     opts = opts or {hlGroup="Search", timeout=250}
     local regType   = fn.getregtype()
@@ -212,14 +219,54 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
     local curBufNr  = api.nvim_get_current_buf()
     local curWinID  = api.nvim_get_current_win()
     local cursorPos = api.nvim_win_get_cursor(curWinID)
+    local cursorNS      = api.nvim_create_namespace("inplacePutCursor")
+    local cursorExtmark = api.nvim_buf_set_extmark(curBufNr, cursorNS, cursorPos[1] - 1, cursorPos[2], {})
+    local saveRegContent
 
-    -- Use extmark to track strating cursor position in normal mode
-    local cursorNS
-    local cursorExtmark
-    if vimMode == "n" then
-        cursorNS      = api.nvim_create_namespace("inplacePutCursor")
-        cursorExtmark = api.nvim_buf_set_extmark(curBufNr, cursorNS, cursorPos[1] - 1, cursorPos[2], {})
+    -- Convert register content
+    if convertPut then
+        -- Only support in normal mode
+        if vimMode ~= "n" then return end
+
+        saveRegContent = fn.getreg(vim.v.register, 1)
+        if regType == "v" or regType == "c" then
+            M.lastPutLinewise = true
+
+            local _, regIndent = string.find(saveRegContent, "^%s*")
+            local bufferIndent = fn.indent(cursorPos[1])
+            local reindentCnt = bufferIndent - regIndent
+            local tabCnt      = 0
+
+            -- Convert tab to spaces
+            repeat
+                tabCnt = tabCnt + 1
+                tabCnt = string.find(saveRegContent, "\t", tabCnt)
+            until not tabCnt or tabCnt > regIndent
+            if tabCnt then regIndent = regIndent + tabCnt * api.nvim_buf_get_option(0, "tabstop") end
+
+            -- Reindent the lines if counts do not match up
+            if reindentCnt ~= 0 then
+                local reindents = string.rep(" ", math.abs(reindentCnt))
+
+                if reindentCnt < 0 then
+                    saveRegContent = string.gsub(saveRegContent, "^" .. reindents, "")
+                elseif reindentCnt > 0 then
+                    saveRegContent = reindents .. saveRegContent
+                end
+            end
+
+            fn.setreg(vim.v.register, saveRegContent, "V")
+        elseif regType == "V" or regType == "l" then
+            local filterStr = string.gsub(saveRegContent, "\n%s+", " ")
+            filterStr       = string.gsub(filterStr, "\n", "")
+            filterStr       = string.gsub(filterStr, "^%s+", "")
+            fn.setreg(vim.v.register, filterStr, "v")
+        else
+            -- Blockwise type register content not supported
+            return
+        end
     end
+
 
     if regType == "V" or regType == "l" then
         M.lastPutLinewise = true
@@ -237,7 +284,6 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
             cmd("noautocmd normal! \"" .. vim.v.register .. pasteCMD)
         end
     else
-
         cmd("noautocmd normal! gv\"" .. vim.v.register .. pasteCMD)
     end
 
@@ -262,11 +308,22 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
         M.inplacePutNewContentExtmark = msg
     end
 
-    if regType == "v" then
-        -- Format current line if new paste content consists a single line
-        if vim.o.equalprg == "" then
-            local match = string.match(curLine, '%w')
-            if not match then cmd [[noautocmd normal! ==]] end
+    -- Format new content
+    if convertPut then
+        if regType == "v" then
+            -- Format current line if new paste content consists a single line
+            if vim.o.equalprg == "" then
+                local match = string.match(curLine, '%w')
+                if not match then cmd [[noautocmd normal! ==]] end
+            end
+        end
+    else
+        if regType == "V" or regType == "l" then
+            -- Format current line if new paste content consists a single line
+            if vim.o.equalprg == "" then
+                local match = string.match(curLine, '%w')
+                if not match then cmd [[noautocmd normal! ==]] end
+            end
         end
     end
     -- }}} Format new created content when possible
@@ -276,16 +333,19 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
     api.nvim_buf_clear_namespace(curBufNr, putHLNS, 0, -1)
 
     local newContentResExtmark = api.nvim_buf_get_extmark_by_id(curBufNr,
-                                                    M.inplacePutNewContentNS,
-                                                    M.inplacePutNewContentExtmark,
-                                                    {details = true})
-    local newContentResStart = {newContentResExtmark[1], newContentResExtmark[2]}
-    local newContentResEnd   = {newContentResExtmark[3]["end_row"], newContentResExtmark[3]["end_col"]}
-    local region = vim.region(curBufNr, newContentResStart, newContentResEnd,
-                            regType, vim.o.selection == "inclusive" and true or false)
+                                            M.inplacePutNewContentNS,
+                                            M.inplacePutNewContentExtmark,
+                                            {details = true})
+    local newContentResStart = {newContentResExtmark[1],
+                                newContentResExtmark[2]}
+    local newContentResEnd   = {newContentResExtmark[3]["end_row"],
+                                newContentResExtmark[3]["end_col"]}
+    local region = vim.region(curBufNr, newContentResStart,
+                            newContentResEnd, regType,
+                            vim.o.selection == "inclusive" and true or false)
     for lineNr, cols in pairs(region) do
-        api.nvim_buf_add_highlight(curBufNr, putHLNS, opts["hlGroup"], lineNr, cols[1],
-                                cols[2])
+        api.nvim_buf_add_highlight(curBufNr, putHLNS, opts["hlGroup"],
+                                    lineNr, cols[1], cols[2])
     end
 
     vim.defer_fn(function()
@@ -304,126 +364,6 @@ function M.inplacePut(vimMode, pasteCMD, opts) -- {{{
     else
         api.nvim_win_set_cursor(curWinID, cursorPos)
     end
-end --  }}}
-
-
-function M.convertPut(pasteCMD, opts) --  {{{
-    if not vim.bo.modifiable then return end
-    if fn.foldclosed('.') ~= -1 then return end
-
-    opts = opts or {hlGroup="Search", timeout=250}
-    local curBufNr       = api.nvim_get_current_buf()
-    local curWinID       = api.nvim_get_current_win()
-    local cursorPos      = api.nvim_win_get_cursor(curWinID)
-    local regType        = fn.getregtype()
-    local saveRegContent = fn.getreg(vim.v.register, 1)
-    local curLine        = api.nvim_get_current_line()
-    local cursorNS       = api.nvim_create_namespace("inplacePutCursor")
-    local cursorExtmark  = api.nvim_buf_set_extmark(curBufNr, cursorNS, cursorPos[1] - 1, cursorPos[2], {})
-
-    -- TODO: when convert a V-regtype register int characterwise mode. Always
-    -- check new content whether is comment or not. And preserve a additional
-    -- spece for comment
-
-    -- Convert register content
-    if regType == "v" or regType == "c" then
-        M.lastPutLinewise = true
-
-        local _, regIndent = string.find(saveRegContent, "^%s*")
-        local bufferIndent = fn.indent(cursorPos[1])
-        local reindentCnt = bufferIndent - regIndent
-        local tabCnt      = 0
-
-        -- Convert tab to spaces
-        repeat
-            tabCnt = tabCnt + 1
-            tabCnt = string.find(saveRegContent, "\t", tabCnt)
-        until not tabCnt or tabCnt > regIndent
-        if tabCnt then regIndent = regIndent + tabCnt * api.nvim_buf_get_option(0, "tabstop") end
-
-        -- Reindent the lines if counts do not match up
-        if reindentCnt ~= 0 then
-            local reindents = string.rep(" ", math.abs(reindentCnt))
-
-            if reindentCnt < 0 then
-                saveRegContent = string.gsub(saveRegContent, "^" .. reindents, "")
-            elseif reindentCnt > 0 then
-                saveRegContent = reindents .. saveRegContent
-            end
-        else
-        end
-
-        fn.setreg(vim.v.register, saveRegContent, "V")
-
-    elseif regType == "V" or regType == "l" then
-        M.lastPutLinewise = false
-        local filterStr = string.gsub(saveRegContent, "\n%s+", " ")
-        filterStr       = string.gsub(filterStr, "\n", "")
-        filterStr       = string.gsub(filterStr, "^%s+", "")
-        fn.setreg(vim.v.register, filterStr, "v")
-    else
-        return
-    end
-
-    -- Execute EX command
-    if vim.v.count ~= 0 then
-        for _=0, vim.v.count do
-            cmd("noautocmd normal! \"" .. vim.v.register .. pasteCMD)
-        end
-    else
-        cmd("noautocmd normal! \"" .. vim.v.register .. pasteCMD)
-    end
-
-    -- Position of new created content
-    local posStart = api.nvim_buf_get_mark(curBufNr, "[")
-    local posEnd   = api.nvim_buf_get_mark(curBufNr, "]")
-    -- Change to 0-based for extmark creation
-    posStart = {posStart[1] - 1, posStart[2]}
-    posEnd   = {posEnd[1] - 1, posEnd[2]}
-
-    -- Format new created content when possible {{{
-    -- Create extmark to track position of new content
-    M.inplacePutNewContentNS      = api.nvim_create_namespace("inplacePutNewContent")
-    M.inplacePutNewContentExtmark = api.nvim_buf_set_extmark(curBufNr, M.inplacePutNewContentNS,
-                posStart[1], posStart[2], {end_line = posEnd[1], end_col = posEnd[2]})
-
-    if regType == "V" or regType == "l" then
-        -- Format current line if new paste content consists a single line
-        local match = string.match(curLine, '%w')
-        if not match then cmd [[noautocmd normal! ==]] end
-    end
-    -- }}} Format new created content when possible
-
-    -- Create highlight {{{
-    local putHLNS = api.nvim_create_namespace('inplacePutHL')
-    api.nvim_buf_clear_namespace(curBufNr, putHLNS, 0, -1)
-
-    local newContentResExtmark = api.nvim_buf_get_extmark_by_id(curBufNr,
-                                            M.inplacePutNewContentNS,
-                                            M.inplacePutNewContentExtmark,
-                                            {details = true})
-    local newContentResStart = {newContentResExtmark[1], newContentResExtmark[2]}
-    local newContentResEnd   = {newContentResExtmark[3]["end_row"], newContentResExtmark[3]["end_col"]}
-    local region = vim.region(curBufNr, newContentResStart, newContentResEnd,
-                            regType, vim.o.selection == "inclusive" and true or false)
-    for lineNr, cols in pairs(region) do
-        api.nvim_buf_add_highlight(curBufNr, putHLNS, opts["hlGroup"], lineNr, cols[1], cols[2])
-    end
-
-    vim.defer_fn(function()
-        if api.nvim_buf_is_valid(curBufNr) then
-            pcall(api.nvim_buf_clear_namespace, curBufNr, putHLNS, 0, -1)
-        end
-    end, opts["timeout"])
-    -- }}} Create highlight
-
-    -- Restore cursor position
-    local cursorResExtmark = api.nvim_buf_get_extmark_by_id(curBufNr, cursorNS, cursorExtmark, {})
-    api.nvim_win_set_cursor(curWinID, {cursorResExtmark[1] + 1, cursorResExtmark[2]})
-    api.nvim_buf_clear_namespace(curBufNr, cursorNS, 0, -1)
-
-    -- Restore register content
-    fn.setreg(vim.v.register, saveRegContent, regType)
 end --  }}}
 
 

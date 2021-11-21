@@ -346,11 +346,6 @@ map("n", [[gy]], [[:lua require("yankPut").lastYankPut("yank")<CR>]], {"silent"}
 map("n", [[gY]], [[gy]], "Select last yank")
 map("n", [[gp]], [[:lua require("yankPut").lastYankPut("put")<CR>]],  {"silent"}, "Select last put")
 map("n", [[gP]], [[gp]], "Select last put")
--- Put content from registers 0
-map("n", [[<leader>p]],  [["0p]],  "Put after from register 0")
-map("n", [[<leader>P]],  [["0P]],  "Put after from register 0")
-map("n", [[<leader>cp]], [["0cp]], "Convert put after from register 0")
-map("n", [[<leader>cP]], [["0cP]], "Convert put after from register 0")
 -- Inplace join
 map("n", [[J]], [[m`J``]], {"noremap"})
 -- Inplace yank
@@ -360,14 +355,18 @@ map("", [[<Plug>InplaceYank]],
 map("", [[y]], [[<Plug>InplaceYank]], "Yank operator")
 map("", [[Y]], [[yy]], "Yank line")
 -- Inplace put
-map("n", [[p]], [[:lua require("yankPut").inplacePut("n", "p")<CR>]], {"silent"}, "Put after")
-map("x", [[p]], [[:lua require("yankPut").inplacePut("v", "p")<CR>]], {"silent"})
-map("n", [[P]], [[:lua require("yankPut").inplacePut("n", "P")<CR>]], {"silent"}, "Put before")
-map("x", [[P]], [[:lua require("yankPut").inplacePut("v", "P")<CR>]], {"silent"})
--- Inplace replace
--- Convert paste
-map("n", [[cP]], [[:lua require("yankPut").convertPut("P")<CR>]], {"silent"}, "Convert put")
-map("n", [[cp]], [[:lua require("yankPut").convertPut("p")<CR>]], {"silent"}, "Convert put")
+map("n", [[p]], [[:lua require("yankPut").inplacePut("n", "p", false)<CR>]], {"silent"}, "Put after")
+map("x", [[p]], [[:lua require("yankPut").inplacePut("v", "p", false)<CR>]], {"silent"})
+map("n", [[P]], [[:lua require("yankPut").inplacePut("n", "P", false)<CR>]], {"silent"}, "Put before")
+map("x", [[P]], [[:lua require("yankPut").inplacePut("v", "P", false)<CR>]], {"silent"})
+-- Convert put
+map("n", [[cp]], [[:lua require("yankPut").inplacePut("n", "p", true)<CR>]], {"silent"}, "Convert put after")
+map("n", [[cP]], [[:lua require("yankPut").inplacePut("n", "P", true)<CR>]], {"silent"}, "Convert put before")
+-- Put from registers 0
+map("n", [[<leader>p]],  [["0p]],  "Put after from register 0")
+map("n", [[<leader>P]],  [["0P]],  "Put after from register 0")
+map("n", [[<leader>cp]], [["0cp]], "Convert put after from register 0")
+map("n", [[<leader>cP]], [["0cP]], "Convert put after from register 0")
 -- Mimic the VSCode move/copy line up/down behavior {{{
 -- Move line
 map("i", [[<A-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineMove("n", "down")<CR>]], {"silent"})
