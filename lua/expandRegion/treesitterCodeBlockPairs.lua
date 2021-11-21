@@ -68,6 +68,11 @@ return {
         pairs      = {nil},
         skips      = {nil}
     },
+    ts_table = {
+        childStart = 0,
+        pairs      = {nil},
+        skips      = {nil}
+    },
     ts_parenthesized_expression = {
         childStart = 0,
         pairs      = {nil},
