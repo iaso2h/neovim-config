@@ -491,9 +491,9 @@ function M.saveReg() -- {{{
     local plus        = fn.getreg('+', 1)
     local plusType    = fn.getregtype('+')
     M.restoreReg = function()
-        fn.setreg('"', unnamed, unnamedType)
         fn.setreg('*', star,    starType)
         fn.setreg('+', plus,    plusType)
+        fn.setreg('"', unnamed, unnamedType)
         vim.defer_fn(function() M.restoreReg = nil end, 1000)
     end
 end -- }}}

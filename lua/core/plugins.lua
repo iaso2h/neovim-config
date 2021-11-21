@@ -334,7 +334,7 @@ packer.startup{
     use {
         'danymat/neogen',
         requires = {"nvim-treesitter", "nvim-cmp"},
-        keys     = {{"n", "dg"}},
+        keys     = {{"n", "g<Space>d"}},
         config   = function()
             require("neogen").setup {
                 enabled = false,
@@ -352,7 +352,7 @@ packer.startup{
                 }
             }
 
-            map("n", [[dg]], [[:lua require("neogen").generate()<CR>]], {"silent"})
+            map("n", [[g<Space>d]], [[:lua require("neogen").generate()<CR>]], {"silent"})
         end,
     }
     use {
@@ -542,6 +542,7 @@ packer.startup{
         config  = function()
             require("indent_blankline").setup{
                 char             = "▏",
+                context_char     = "▏",
                 buftype_exclude  = {"terminal"},
                 filetype_exclude = {"help", "startify", "NvimTree", "Trouble", "packer"},
                 bufname_exclude  = {"*.md"},
@@ -723,6 +724,10 @@ packer.startup{
         keys     = {{"n", "<C-w>e"}},
         requires = "nvim-web-devicons",
         config   = conf "nvim-tree"
+    }
+    use {
+        'MunifTanjim/nui.nvim',
+        disable = true
     }
     -- }}} UI
     -- Treesitter {{{
@@ -1097,12 +1102,27 @@ packer.startup{
         end
     }
     use {
-        "ThePrimeagen/refactoring.nvim",
+        'ThePrimeagen/refactoring.nvim',
         disable = true,
         requires = {
             "plenary.nvim",
             "nvim-treesitter"
-        }
+        },
+        config = function()
+            local refactor = require("refactoring")
+            refactor.setup{}
+
+            -- -- telescope refactoring helper
+            -- local function refactor(prompt_bufnr)
+                -- local content = require("telescope.actions.state").get_selected_entry(
+                    -- prompt_bufnr
+                -- )
+                -- require("telescope.actions").close(prompt_bufnr)
+                -- require("refactoring").refactor(content.value)
+            -- end
+            map("x", [[<leader>re]], [[:lua require("refactoring").refactor("Extract Function")<CR>]],         {"silent"})
+            map("x", [[<leader>rf]], [[:lua require("refactoring").refactor("Extract Function To File")<CR>]], {"silent"})
+        end
     }
     -- }}} Intellisense
     -- Telescope {{{
@@ -1123,7 +1143,6 @@ packer.startup{
             {"n", [[<C-f>o]]},  {"n", [[<C-f>O]]},    {"n", [[<C-f>gc]]}, {"n", [[<C-f>gC]]},
             {"n", [[<C-f>gs]]}, {"n", [[<leader>b]]},
 
-            {"n", [[gd]]},        {"n", [[gD]]},     {"n", [[gR]]},     {"n", [[gi]]},
             {"n", [[<C-f>a]]},    {"n", [[<C-f>o]]}, {"n", [[<C-f>O]]}, {"n", [[<leader>e]]},
             {"n", [[<leader>E]]},
         },
@@ -1333,6 +1352,10 @@ packer.startup{
         'RishabhRD/nvim-cheat.sh',
         cmd      = {"Cheat", "CheatList", "CheatListWithoutComments", "CheatWithoutComments"},
         requries = "popfix"
+    }
+    use {
+        "AndrewRadev/exercism.vim",
+        cmd = "Exercism"
     }
     use {
         'dahu/VimRegexTutor',

@@ -4,8 +4,6 @@ M.VM_Start = function()
     map("i", [[<C-BS>]],    [[<C-\><C-o>db]])
     map("n", [[S]],         [[ys]])
     map("n", [[<leader>h]], [[<esc>]])
-    map("n", [[<C-n>]],     [[,<C-n>]])
-    map("n", [[<C-p>]],     [[,<C-p>]])
 end
 
 M.VM_Exit = function()

@@ -100,10 +100,10 @@ M.onAttach = function(client, bufNr) -- {{{
     -- bmap(bufNr, "n", [=[<leader>wr]=], [[:lua vim.lsp.buf.remove_workspace_folder()<CR>]],       {"silent"})
     -- bmap(bufNr, "n", [=[<leader>wl]=], [[:lua Print(vim.lsp.buf.list_workspace_folders())<CR>]], {"silent"})
     -- bmap(bufNr, "n", [=[<leader>e]=], [[:lua vim.diagnostic.setqflist()<CR>]],                     {"silent"})
-    bmap(bufNr, "n", [[[e]],          [[:lua vim.diagnostic.goto_prev{goto_key = {border = "rounded"}}<CR>]],                     {"silent"})
-    bmap(bufNr, "n", [[]e]],          [[:lua vim.diagnostic.goto_prev{goto_key = {border = "rounded"}}<CR>]],                     {"silent"})
-    bmap(bufNr, "n", [[[E]],          [[:lua vim.diagnostic.goto_prev{goto_key = {border = "rounded"}, severity = "Error"}<CR>]], {"silent"})
-    bmap(bufNr, "n", [[]E]],          [[:lua vim.diagnostic.goto_prev{goto_key = {border = "rounded"}, severity = "Error"}<CR>]], {"silent"})
+    bmap(bufNr, "n", [[[e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"})
+    bmap(bufNr, "n", [[]e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"})
+    bmap(bufNr, "n", [[[E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"})
+    bmap(bufNr, "n", [[]E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"})
     -- Override existing mapping if lsp support
     if client.resolved_capabilities.document_formatting then
         bmap(bufNr, "n", [=[<A-f>]=], [[:lua vim.lsp.buf.formatting()<CR>]],       {"silent"})

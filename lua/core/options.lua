@@ -26,7 +26,7 @@ o.cmdheight  = 2
 o.shortmess  = "cxTIF"
 
 o.complete    = ".,w,b,u,t,kspell,i,d,t"
-o.completeopt = "menuone,noselect,noinsert"
+o.completeopt = "menuone,noselect,menu"
 
 o.conceallevel  = 0
 o.concealcursor = "nc"
@@ -44,7 +44,7 @@ o.modelineexpr  = true
 
 o.fillchars = "fold: ,vert:▏,eob: ,diff:╱"
 o.list      = true
-o.listchars = "tab:>-,precedes:«,extends:»,nbsp:␣"
+o.listchars = "tab:>_,precedes:«,extends:»,nbsp:␣"
 -- o.listchars = "tab:>-,precedes:«,extends:»,nbsp:␣,eol:↵,trail:•"
 o.showbreak = "⤷ "
 

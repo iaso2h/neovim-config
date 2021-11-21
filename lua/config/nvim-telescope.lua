@@ -164,7 +164,7 @@ map("n", [[<C-h>k]], [[:lua require('telescope.builtin').keymaps()<CR>]],       
 map("n", [[<C-h>c]], [[:lua require('telescope.builtin').commands()<CR>]],       {"silent"})
 map("n", [[<C-h>h]], [[:lua require('telescope.builtin').help_tags()<CR>]],      {"silent"})
 map("n", [[<C-h>H]], [[:lua require('telescope.builtin').man_pages()<CR>]],      {"silent"})
-map("n", [[<C-h>l]], [[:lua require('telescope.builtin').realoader()<CR>]],      {"silent"})
+map("n", [[<C-h>l]], [[:lua require('telescope.builtin').reloader()<CR>]],       {"silent"})
 
 map("n", [[<C-f>o]], [[:lua require('telescope.builtin').current_buffer_tags()<CR>]], {"silent"})
 map("n", [[<C-f>O]], [[:lua require('telescope.builtin').tags()<CR>]],                {"silent"})

@@ -10,6 +10,12 @@ if not IsTerm then
     map("", [[<C-=>]], [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Decrease font size")
     map("", [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent"}, "Restore font size")
 end
+-- Diffmode
+map("n", [[[d]], [[[c]], {"noremap", "silent"}, "Go to the previous start of a change")
+map("n", [[]d]], [[]c]], {"noremap", "silent"}, "Go to the next start of a change")
+-- Colorcolumn
+map("n", [[]c]], [[:noa windo set cc=80<CR>]], {"silent"}, "Turn on colorcolumn")
+map("n", [[[c]], [[:noa windo set cc&<CR>]],   {"silent"}, "Turn off colorcolumn")
 -- Quickfix
 map("n", [[<C-q>n]],    [[:cnext<CR>zz]],                                {"silent"}, "Go to next item in quickFix")
 map("n", [[<C-q>N]],    [[:cprevious<CR>zz]],                            {"silent"}, "Go to previous item in quickFix")
@@ -268,7 +274,6 @@ map("",  [[<A-=>]],  [[:<C-u>wincmd +<CR>]],                          {"silent"}
 map("i", [[<A-=>]],  [[<C-\><C-O>:wincmd +<CR>]],                     {"silent"})
 map("",  [[<A-->]],  [[:<C-u>wincmd -<CR>]],                          {"silent"}, "Decrease window size")
 map("i", [[<A-->]],  [[<C-\><C-O>:wincmd -<CR>]],                     {"silent"})
-map("i", [[<C-w>=]], [[<C-\><C-O>:wincmd =<CR>]],                     {"silent"})
 
 -- Buffers
 map("",  [[<C-w>O]], [[:lua require("buffer").wipeOtherBuf()<CR>]], {"silent"}, "Wipe other buffer")

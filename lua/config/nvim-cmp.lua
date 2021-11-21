@@ -145,12 +145,12 @@ return function()
                 end
             end,
             -- ["<C-e>"] = cmp.mapping.close(),
-            -- ["<C-e>"] = function(fallback)
-                -- if cmp.visible() then
-                    -- cmp.abort()
-                -- end
-                -- vim.api.nvim_feedkeys(t"<End>", "n", true)
-            -- end,
+            ["<C-e>"] = function(fallback)
+                if cmp.visible() then
+                    cmp.abort()
+                end
+                vim.api.nvim_feedkeys(t"<End>", "n", true)
+            end,
             ["<CR>"]  = cmp.mapping.confirm{
                 select   = true,
                 behavior = cmp.ConfirmBehavior.Replace,
@@ -162,8 +162,7 @@ return function()
 
     -- If you want insert `(` after select function or method item
     local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-    local cmp = require("cmp")
-    cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done({  map_char = { tex = "" } }))
+    cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done({map_char = {tex = "" }}))
 
 
     -- add a lisp filetype (wrap my-function), FYI: Hardcoded = { "clojure", "clojurescript", "fennel", "janet" }
