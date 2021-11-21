@@ -32,15 +32,16 @@ M.insertPrompt = function()
     cmd [[noa echohl None]]
 
     -- local regContent = reg == "=" and fn.getreg(reg, 1) or fn.getreg(reg, 0)
-    local regType = fn.getregtype(reg)
-    local regContent
+    local regType    = fn.getregtype(reg)
+    local regContent = fn.getreg(reg, 0)
+
     if regType == "" then
         return
-    elseif regType == "line" then
-        regContent = vim.split(fn.get(reg, 0), [[\n]], false)
-        api.nvim_put(regContent, "c", true, false)
+    elseif regType == "V" or regType == "line" then
+        regContent = string.gsub(regContent, "\n", "")
+        api.nvim_put({regContent}, "c", true, false)
     else
-        api.nvim_put({fn.getreg(reg, 0)}, "c", true, false)
+        api.nvim_put({regContent}, "c", true, false)
     end
 end
 
