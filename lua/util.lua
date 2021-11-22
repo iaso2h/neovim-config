@@ -484,16 +484,34 @@ end -- }}}
 -- independantly, restoreReg can be accessed after saveReg is called
 ----
 function M.saveReg() -- {{{
-    local unnamed     = fn.getreg('"', 1)
-    local unnamedType = fn.getregtype('"')
-    local star        = fn.getreg('*', 1)
-    local starType    = fn.getregtype('*')
-    local plus        = fn.getreg('+', 1)
-    local plusType    = fn.getregtype('+')
+    local unnamedContent = fn.getreg('"', 1)
+    local unnamedType    = fn.getregtype('"')
+    local starContent    = fn.getreg('*', 1)
+    local starType       = fn.getregtype('*')
+    local plusContent    = fn.getreg('+', 1)
+    local plusType       = fn.getregtype('+')
+    local nonDefaultName = vim.v.register
+    local nonDefaultContent
+    local nonDefaultType
+    if not vim.tbl_contains({'"', "*", "+"}, nonDefaultName) then
+        nonDefaultContent = fn.getreg(nonDefaultName, 1)
+        nonDefaultType    = fn.getregtype(nonDefaultName)
+    end
     M.restoreReg = function()
-        fn.setreg('*', star,    starType)
-        fn.setreg('+', plus,    plusType)
-        fn.setreg('"', unnamed, unnamedType)
+        if nonDefaultContent and nonDefaultContent ~= "" then
+            fn.setreg(nonDefaultName, nonDefaultContent, nonDefaultType)
+        end
+
+        if starContent ~= "" then
+            fn.setreg('*', starContent,    starType)
+        end
+        if plusContent ~= "" then
+            fn.setreg('+', plusContent,    plusType)
+        end
+        if unnamedContent ~= "" then
+            fn.setreg('"', unnamedContent, unnamedType)
+        end
+
         vim.defer_fn(function() M.restoreReg = nil end, 1000)
     end
 end -- }}}

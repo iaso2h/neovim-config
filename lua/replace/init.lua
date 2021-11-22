@@ -1,19 +1,20 @@
 -- File: init
 -- Author: iaso2h
 -- Description: Heavily inspired Ingo Karkat's work. Replace text with register
--- Version: 0.1.0
+-- Version: 0.1.1
 -- Last Modified: 2021-11-19
 local fn   = vim.fn
 local cmd  = vim.cmd
 local api  = vim.api
 local util = require("util")
-local restoreOption
 local M    = {
-    regType         = nil,
-    cursorPos       = nil,
-    count           = nil,
-    devMode         = false,
-    motionDirection = nil
+    regName              = nil,
+    cursorPos            = nil,
+    count                = nil,
+    devMode              = false,
+    motionDirection      = nil,
+    restoreNondefaultReg = nil,
+    restoreOption        = nil
 }
 
 
@@ -36,8 +37,8 @@ end
 ---  it's cleared during the file modification
 M.replaceSave = function()
     util.saveReg()
-    M.regType   = vim.v.register
-    M.count     = vim.v.count1
+    M.regName = vim.v.register
+    M.count   = vim.v.count1
 end
 
 
@@ -63,10 +64,12 @@ local saveOption = function() -- {{{
     end
 
     if saveClipboard or saveSelection then
-        restoreOption = function()
+        M.restoreOption = function()
             if saveSelection then vim.opt.selection = saveSelection end
             if saveClipboard then vim.opt.clipboard = saveClipboard end
         end
+    else
+        M.restoreOption = nil
     end
 end -- }}}
 
@@ -392,19 +395,19 @@ function M.operator(args) -- {{{
     -- }}} Saving
 
     -- Gather register info
-    if M.regType == "=" then
+    if M.regName == "=" then
         -- To get the expression result into the buffer, we use the unnamed
         -- register; this will be restored, anyway.
         fn.setreg('"', vim.g.ReplaceExpr)
         reg = {
             name    = '"',
-            type    = fn.getregtype(M.regType),
+            type    = fn.getregtype(M.regName),
             content = vim.g.ReplaceExpr
         }
     else
         reg = {
-            name    = M.regType,
-            type    = fn.getregtype(M.regType),
+            name    = M.regName,
+            type    = fn.getregtype(M.regName),
             content = fn.getreg(vim.v.register, 1)
         }
     end
@@ -439,13 +442,13 @@ function M.operator(args) -- {{{
     end, opts["timeout"])
     -- }}} Create highlight
     -- Restoration {{{
+
+    -- Register
     util.restoreReg()
-    fn.setreg(reg.name, reg.content, reg.type)
+    -- Options
+    if vim.is_callable(M.restoreOption) then M.restoreOption() end
 
-    -- Options restoration
-    if vim.is_callable(restoreOption) then restoreOption(); restoreOption = nil end
-
-    -- Cursor restoration
+    -- Cursor
     if vimMode == "n" then
         if not M.cursorPos then
             -- TODO: Dot repeat not supported
@@ -527,7 +530,7 @@ function M.operator(args) -- {{{
             -- VisualLine
             fn["repeat#set"](t(plugMap))
         end
-    elseif M.regType == "=" then
+    elseif M.regName == "=" then
         fn["repeat#set"](t"<Plug>ReplaceExpr")
     end
     -- Visual repeating
@@ -537,6 +540,8 @@ function M.operator(args) -- {{{
 end -- }}}
 
 
+--- Expression callback for replace operator
+--- @return string "g@"
 function M.expr() -- {{{
     -- TODO: Detect virutal edit
     if not warnRead() then return "" end
@@ -552,7 +557,7 @@ function M.expr() -- {{{
     -- Evaluate the expression register outside of a function. Because
     -- unscoped variables do not refer to the global scope. Therefore,
     -- evaluation happened earlier in the mappings.
-    return M.regType == "=" and [[:let g:ReplaceExpr = getreg("=")<CR>g@]] or "g@"
+    return M.regName == "=" and [[:let g:ReplaceExpr = getreg("=")<CR>g@]] or "g@"
 end -- }}}
 
 
