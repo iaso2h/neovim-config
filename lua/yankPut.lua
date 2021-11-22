@@ -1,8 +1,8 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.5
--- Last Modified: 2021-11-20
+-- Version: 0.1.6
+-- Last Modified: 2021-11-21
 
 local fn       = vim.fn
 local cmd      = vim.cmd
@@ -145,13 +145,13 @@ function M.inplaceYank(args) -- {{{
     end
 
     if motionType == "char" then
-        cmd [[noautocmd normal! g`[vg`]y]]
+        cmd(string.format([[noautocmd normal! g`[vg`]"%sy]], vim.v.register))
         M.lastYankLinewise = false
     elseif motionType == "line" then
-        cmd [[noautocmd normal! g`[Vg`]y]]
+        cmd(string.format([[noautocmd normal! g`[Vg`]"%sy]], vim.v.register))
         M.lastYankLinewise = true
     else
-        cmd [[noautocmd normal! gvy]]
+        cmd(string.format([[noautocmd normal! gv"%sy]], vim.v.register))
         M.lastYankLinewise = false
     end
 
@@ -228,6 +228,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
         -- Only support in normal mode
         if vimMode ~= "n" then return end
 
+        util.saveReg()
         saveRegContent = fn.getreg(vim.v.register, 1)
         if regType == "v" or regType == "c" then
             M.lastPutLinewise = true
@@ -363,6 +364,10 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
         api.nvim_buf_clear_namespace(curBufNr, cursorNS, 0, -1)
     else
         api.nvim_win_set_cursor(curWinID, cursorPos)
+    end
+    -- Restore register
+    if convertPut then
+        util.restoreReg()
     end
 end --  }}}
 
