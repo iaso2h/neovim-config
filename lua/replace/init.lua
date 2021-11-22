@@ -211,11 +211,15 @@ local matchRegType = function(motionType, vimMode, reg, regionMotion, motionDire
             end
 
             fn.setreg(reg.name, string.sub(reg.content, 1, -2), "V")
-        else
+        elseif motionType == "char" then
             fn.setreg(reg.name, vim.trim(reg.content), "v")
+        else
+            -- TODO: blockwise parsing?
         end
 
         return true
+    else
+        -- TODO:?
     end
 
     return false
@@ -302,9 +306,6 @@ function M.operator(args) -- {{{
     local reg
     local motionDirection
 
-    local cursorNS
-    local cursorExtmark
-
     -- Saving {{{
     if vimMode == "n" then
         -- For Replace operator inclusively
@@ -318,31 +319,7 @@ function M.operator(args) -- {{{
         -- be ignore when using dot repeat
         M.replaceSave()
 
-        if motionType == "char" then
-            -- Hard to determine then motion direction if it's charwise
-            motionDirection   = nil
-            M.motionDirection = nil
-
-            if M.cursorPos then
-            -- In charwise mode, the motion direction need to be checked
-            -- Save cursor position
-                -- Record curosr position
-                -- if not util.withinRegion(M.cursorPos, regionMotion.startPos, regionMotion.endPos) then
-                if require("util").compareDist(M.cursorPos, regionMotion.endPos) > 0 then
-                    -- When motion like h, b are used across multi-line, it's hard
-                    -- to track down the offset of cursor, so the extmark feature
-                    -- is come in handy to pull this off
-                    cursorNS      = api.nvim_create_namespace("replaceCursor")
-                    cursorExtmark = api.nvim_buf_set_extmark(curBufNr, cursorNS, M.cursorPos[1] - 1, M.cursorPos[2], {})
-                else
-                    -- Motion like l, w, ge. Because cursorPos in whithin then
-                    -- region defined by regionMotion and buffer text within will
-                    -- be modified, chances that extmark will failed in the end.
-                end
-            else
-                -- Dot repeat
-            end
-        elseif motionType == "line" then
+        if motionType == "line" then
             if M.cursorPos then
                 if M.cursorPos[1] == regionMotion.endPos[1] then
                     -- Motion direction detection for k
@@ -362,7 +339,7 @@ function M.operator(args) -- {{{
                 motionDirection = M.motionDirection
             end
         else
-            -- TODO: block motion parsing?
+            -- TODO: charwise and blockwise motion parsing?
             M.motionDirection = nil
         end
     else
@@ -453,54 +430,27 @@ function M.operator(args) -- {{{
         if not M.cursorPos then
             -- TODO: Dot repeat not supported
         else
-            if motionType == "char" then -- {{{
+            if require("util").compareDist(M.cursorPos, regionReplace.endPos) <= 0 then
+                -- Avoid curosr out of scope
+                local cursorLine = api.nvim_buf_get_lines(curBufNr,
+                    M.cursorPos[1] - 1, M.cursorPos[1], false)[1]
+                cursorLine = #cursorLine == 0 and 1 or cursorLine
 
-                if not cursorNS then -- {{{
-                    if require("util").compareDist(M.cursorPos, regionReplace.endPos) <= 0 then
-                        -- Avoid curosr out of scope
-                        local cursorLine = api.nvim_buf_get_lines(curBufNr,
-                            M.cursorPos[1] - 1, M.cursorPos[1], false)[1]
-                        cursorLine = #cursorLine == 0 and 1 or cursorLine
-
-                        if #cursorLine - 1 > M.cursorPos[2] then
-                            api.nvim_win_set_cursor(0, M.cursorPos)
-                        else
-                            api.nvim_win_set_cursor(0, {M.cursorPos[1], #cursorLine - 1})
-                        end
-                    else
-                        api.nvim_win_set_cursor(0, regionReplace.startPos)
-                    end
+                if #cursorLine - 1 > M.cursorPos[2] then
+                    api.nvim_win_set_cursor(0, M.cursorPos)
                 else
-                    -- Motion like h, b
-                    local cursorPos = api.nvim_buf_get_extmark_by_id(curBufNr,
-                        cursorNS, cursorExtmark, {})
-                    api.nvim_win_set_cursor(0, {cursorPos[1] + 1, cursorPos[2]})
-                end -- }}}
-            elseif motionType == "line" then
-                -- if not util.withinRegion(M.cursorPos, regionReplace.startPos, regionReplace.endPos) then -- {{{
-                if require("util").compareDist(M.cursorPos, regionReplace.endPos) <= 0 then
-                    -- If the starting cursor postion is not within the
-                    -- replaced region, then locate the cursor to the line as
-                    -- near as possible
-                    -- if require("util").posDist(M.cursorPos, regionReplace.startPos) <=
-                        -- require("util").posDist(M.cursorPos, regionReplace.endPos) then
-                        local repStartLine = api.nvim_buf_get_lines(curBufNr,
-                            regionReplace.startPos[1] - 1, regionReplace.startPos[1], false)[1]
-                        repStartLine = #repStartLine == 0 and 1 or repStartLine
-
-                        if M.cursorPos[2] <= #repStartLine - 1 then
-                            api.nvim_win_set_cursor(0, {regionReplace.startPos[1], M.cursorPos[2]})
-                        else
-                            api.nvim_win_set_cursor(0, regionReplace.startPos)
-                        end
-                else
+                    api.nvim_win_set_cursor(0, {M.cursorPos[1], #cursorLine - 1})
+                end
+            else
+                if motionType == "char" then -- {{{
+                    api.nvim_win_set_cursor(0, regionReplace.startPos)
+                elseif motionType == "line" then
                     -- Cursor should be able to locate itself at the no-blank
                     -- beginning of the replacement
-                end -- }}}
-            else
-                -- TODO: blockwise parse
-            end -- }}}
-
+                else
+                    -- TODO: blockwise parse
+                end
+            end
 
             -- Always clear M.cursorPos after restoration
             if not M.devMode then
