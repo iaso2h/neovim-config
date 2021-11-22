@@ -145,25 +145,14 @@ local matchRegType = function(motionType, vimMode, reg, regionMotion, motionDire
                 end
 
                 fn.setreg(reg.name, table.concat(linesConcn, "\n"), "b")
-                return true
             end
         elseif reg.type == "V" and linesCnt > 1 then
             -- If the register contains multiple lines, paste as blockwise. then
             fn.setreg(reg.name, "", "b")
-            return true
         else
             -- No need to changed register when the register type is already blockwise
-            return false
         end
-    elseif vimMode == "V" and reg.type == "v" then
-        -- Prepend indents to the char type register to match the same indent
-        -- of the first visual selected line
-        local indent = fn.indent(regionMotion.startPos[1])
-        -- BUG: validate the spaces in register beforehand
-        if indent ~= 0 then
-            fn.setreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
-        end
-    elseif vimMode == "n" and motionType == "line" then
+    elseif vimMode == "n" then
         -- TODO: might be able to merge with when vimMode == "V"
         if reg.type == "v" then
             local reindentCnt = reindent(reg, regionMotion, motionDirection)
@@ -175,54 +164,57 @@ local matchRegType = function(motionType, vimMode, reg, regionMotion, motionDire
                     reg.content = reindents .. reg.content
                 end
             end
-        else
-            -- TODO:
-        end
+        elseif reg.type == "V" then
+            -- Our custom operator is characterwise, even in the
+            -- ReplaceWithRegisterLine variant, in order to be able to replace less
+            -- than entire lines (i.e. characterwise yanks).
+            -- So there"s a mismatch when the replacement text is a linewise yank,
+            -- and the replacement would put an additional newline to the end.
+            -- To fix that, we temporarily remove the trailing newline character from
+            -- the register contents and set the register type to characterwise yank.
+            if motionType == "line" then
+                local reindentCnt = reindent(reg, regionMotion, motionDirection)
+                local lineCnt     = stringCount(reg.content, "\n")
 
-        fn.setreg(reg.name, reg.content, "v")
-
-        return true
-    elseif reg.type == "V" and string.match(reg.content, "\n$") then
-        -- Our custom operator is characterwise, even in the
-        -- ReplaceWithRegisterLine variant, in order to be able to replace less
-        -- than entire lines (i.e. characterwise yanks).
-        -- So there"s a mismatch when the replacement text is a linewise yank,
-        -- and the replacement would put an additional newline to the end.
-        -- To fix that, we temporarily remove the trailing newline character from
-        -- the register contents and set the register type to characterwise yank.
-        if motionType == "line" then
-            local reindentCnt = reindent(reg, regionMotion, motionDirection)
-            local lineCnt     = stringCount(reg.content, "\n")
-
-            -- Reindent the lines if counts do not match up
-            if reindentCnt and reindentCnt ~= 0 then
-                local reindents = string.rep(" ", math.abs(reindentCnt))
-                if reindentCnt < 0 then
-                    reg.content = string.gsub(reg.content, "^" .. reindents, "")
-                    if lineCnt ~= 1 then
-                        reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
-                    end
-                elseif reindentCnt > 0 then
-                    reg.content = reindents .. reg.content
-                    if lineCnt ~= 1 then
-                        reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
+                -- Reindent the lines if counts do not match up
+                if reindentCnt and reindentCnt ~= 0 then
+                    local reindents = string.rep(" ", math.abs(reindentCnt))
+                    if reindentCnt < 0 then
+                        reg.content = string.gsub(reg.content, "^" .. reindents, "")
+                        if lineCnt ~= 1 then
+                            reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
+                        end
+                    elseif reindentCnt > 0 then
+                        reg.content = reindents .. reg.content
+                        if lineCnt ~= 1 then
+                            reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
+                        end
                     end
                 end
+
+                fn.setreg(reg.name, string.sub(reg.content, 1, -2), "V")
+            elseif motionType == "char" then
+                fn.setreg(reg.name, vim.trim(reg.content), "v")
             end
 
-            fn.setreg(reg.name, string.sub(reg.content, 1, -2), "V")
-        elseif motionType == "char" then
-            fn.setreg(reg.name, vim.trim(reg.content), "v")
         else
             -- TODO: blockwise parsing?
         end
 
-        return true
+        fn.setreg(reg.name, reg.content, "v")
+
+    elseif vimMode == "V" and reg.type == "v" then
+        -- Prepend indents to the char type register to match the same indent
+        -- of the first visual selected line
+        local indent = fn.indent(regionMotion.startPos[1])
+        -- BUG: validate the spaces in register beforehand
+        if indent ~= 0 then
+            fn.setreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
+        end
     else
-        -- TODO:?
+        -- TODO: more vimMode and tests
     end
 
-    return false
 end -- }}}
 
 
@@ -391,12 +383,17 @@ function M.operator(args) -- {{{
 
 
     -- Match the motionType type with register type
-    local ok, regChanged = pcall(matchRegType, motionType, vimMode, reg, regionMotion, motionDirection)
-    if not ok then vim.notify(regChanged, vim.log.levels.ERROR) end
+    local ok, msg = pcall(matchRegType, motionType, vimMode, reg, regionMotion, motionDirection)
+    if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 
     -- Replace with new content
-    local ok, regionReplace = pcall(replace, motionType, vimMode, reg, regionMotion, curBufNr)
-    if not ok then vim.notify(regionReplace, vim.log.levels.ERROR) end
+    local regionReplace
+    ok, msg = pcall(replace, motionType, vimMode, reg, regionMotion, curBufNr)
+    if not ok then
+        vim.notify(msg, vim.log.levels.ERROR)
+    else
+        regionReplace = msg
+    end
 
     -- Create highlight {{{
     local repHLNS = api.nvim_create_namespace("inplaceReplaceHL")
