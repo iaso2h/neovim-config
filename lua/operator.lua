@@ -2,23 +2,26 @@ local cmd = vim.cmd
 local api = vim.api
 local M   = {}
 
-cmd [[
-function! LuaExprCallback(...)
-    let l:args = deepcopy(a:000)
-    call add(l:args, mode())
-    return v:lua.Opfunc(l:args)
-endfunction
-]]
+if not LuaExprCallbackSetup then
+    cmd [[
+    function! LuaExprCallback(...)
+        let l:args = deepcopy(a:000)
+        call add(l:args, mode())
+        return v:lua.Opfunc(l:args)
+    endfunction
+    ]]
+    LuaExprCallbackSetup = true
+end
 
 function _G.saveCursorPos()
     M.cursorPos = api.nvim_win_get_cursor(0)
 end
 --- Expression function that evaluated to return str for mapping
 --- @param func            function
---- @param checkModifiable boolean. Set this to true if the operator will
+--- @param checkModifiable boolean Set this to true if the operator will
 ---                        modify the buffer
---- @param plugMap         string. eg: <Plug>myplug
---- @return return "g@" if successful
+--- @param plugMap         string eg: <Plug>myplug
+--- @return return         string "g@" if successful
 function M.expr(func, checkModifiable, plugMap)
     if checkModifiable then
         if not vim.o.modifiable or vim.o.readonly then
