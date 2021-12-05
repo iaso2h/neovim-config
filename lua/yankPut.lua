@@ -1,8 +1,9 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.6
--- Last Modified: 2021-11-21
+-- Version: 0.1.8
+-- Last Modified: 2021-11-23
+-- BUG: paste V-type(containing lines with indent) register into blank line
 
 local fn       = vim.fn
 local cmd      = vim.cmd
@@ -14,25 +15,27 @@ local M = {}
 
 
 function M.VSCodeLineMove(vimMode, direction) -- {{{
-    if not vim.bo.modifiable then return end
+    if not vim.bo.modifiable then
+        return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
+    end
     if fn.foldclosed('.') ~= -1 then return end
 
-    local curWinID = api.nvim_get_current_win()
-    local cursorPos = api.nvim_win_get_cursor(curWinID)
-    local curIndent = fn.indent(cursorPos[1])
+    -- local curWinID = api.nvim_get_current_win()
+    -- local cursorPos = api.nvim_win_get_cursor(curWinID)
+    -- local curIndent = fn.indent(cursorPos[1])
     if vimMode == "n" then
         if direction == "down" then
-            local nextIndent = fn.indent(cursorPos[1] + 1)
+            -- local nextIndent = fn.indent(cursorPos[1] + 1)
             pcall(cmd, [[m .+1]])
-            if not (nextIndent == curIndent or nextIndent == 0) then
-                if vim.o.equalprg == "" then cmd [[noautocmd normal! ==]] end
-            end
+            -- if not (nextIndent == curIndent or nextIndent == 0) then
+                -- if vim.o.equalprg == "" then cmd [[noautocmd normal! ==]] end
+            -- end
         elseif direction == "up" then
-            local previousIndent = fn.indent(cursorPos[1] - 1)
+            -- local previousIndent = fn.indent(cursorPos[1] - 1)
             pcall(cmd, [[m .-2]])
-            if not (previousIndent == curIndent or previousIndent == 0) then
-                if vim.o.equalprg == "" then cmd [[noautocmd normal! ==]] end
-            end
+            -- if not (previousIndent == curIndent or previousIndent == 0) then
+                -- if vim.o.equalprg == "" then cmd [[noautocmd normal! ==]] end
+            -- end
         end
     elseif vimMode == "v" then
         if direction == "down" then
@@ -40,6 +43,7 @@ function M.VSCodeLineMove(vimMode, direction) -- {{{
         elseif direction == "up" then
             pcall(cmd, [['<,'>m '<-2]])
         end
+
         cmd [[noautocmd normal! gv]]
     end
 end -- }}}
@@ -47,8 +51,14 @@ end -- }}}
 
 -- VSCode yank line {{{
 function M.VSCodeLineYank(vimMode, direction)
-    if not vim.bo.modifiable then return end
+    if not vim.bo.modifiable then
+        return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
+    end
     -- if fn.foldclosed('.') ~= -1 then return end
+    local saveClipboard = api.nvim_get_option("clipboard")
+    -- Set clipboard to "" temporarily to avoid xclip warning
+    vim.opt.clipboard = ""
+
 
     util.saveReg()
 
@@ -105,6 +115,7 @@ function M.VSCodeLineYank(vimMode, direction)
     -- }}} Duplication
 
     util.restoreReg()
+    vim.opt.clipboard = saveClipboard
 end
 -- }}} VSCode yank line
 
@@ -127,6 +138,7 @@ function M.inplaceYank(args) -- {{{
     local curBufNr = api.nvim_get_current_buf()
     local posStart = api.nvim_buf_get_mark(0, "[")
     local posEnd   = api.nvim_buf_get_mark(0, "]")
+    local regName  = vim.v.register == "+" and "" or '"' .. vim.v.register
 
     -- Change position info to (0,0) index based
     if motionType == "line" then
@@ -145,13 +157,13 @@ function M.inplaceYank(args) -- {{{
     end
 
     if motionType == "char" then
-        cmd(string.format([[noautocmd normal! g`[vg`]"%sy]], vim.v.register))
+        cmd(string.format([[noautocmd normal! g`[vg`]%sy]], regName))
         M.lastYankLinewise = false
     elseif motionType == "line" then
-        cmd(string.format([[noautocmd normal! g`[Vg`]"%sy]], vim.v.register))
+        cmd(string.format([[noautocmd normal! g`[Vg`]%sy]], regName))
         M.lastYankLinewise = true
     else
-        cmd(string.format([[noautocmd normal! gv"%sy]], vim.v.register))
+        cmd(string.format([[noautocmd normal! gv%sy]], regName))
         M.lastYankLinewise = false
     end
 
@@ -298,7 +310,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     -- Format new created content when possible {{{
     -- Create extmark to track position of new content
     local saveNS = M.inplacePutNewContentNS
-    M.inplacePutNewContentNS      = api.nvim_create_namespace("inplacePutNewContent")
+    M.inplacePutNewContentNS = api.nvim_create_namespace("inplacePutNewContent")
     -- BUG: can be out of scope
     local ok, msg = pcall(api.nvim_buf_set_extmark, curBufNr, M.inplacePutNewContentNS,
                     posStart[1], posStart[2], {end_line = posEnd[1], end_col = posEnd[2]})
