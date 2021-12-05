@@ -7,7 +7,6 @@ M.setup = function()
 end
 
 M.config = function()
-
     local cmd = vim.cmd
     local fn  = vim.fn
     local dap = require("dap")
@@ -46,7 +45,6 @@ M.config = function()
     ]]
 
 
-
     dap.configurations.lua = {
         {
             type = "nlua",
@@ -73,7 +71,6 @@ M.config = function()
         -- callback{type = 'server', host = config.host, port = config.port}
         callback{type = 'server', host = "127.0.0.1", port = config.port, }
     end
-
 end
 
 return M

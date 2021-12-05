@@ -93,7 +93,7 @@ theme.syntax = {
 -- Editor highlight {{{
 theme.editor =  {
     -- normal text and background color
-    Normal      = {fg = p.n4,  bg = p.n0},
+    Normal      = {fg = p.n4, bg = p.n0},
     -- vim.api.nvim_open_win
     NormalFloat = {fg = p.n10, bg = p.n0, style = "bold"},
     TermCursor  = {link = "Normal"},
@@ -282,18 +282,18 @@ theme.lsp = {
     LspReferenceRead  = {bg = p.n3},
     LspReferenceWrite = {bg = p.n3},
 
-    FloatBorder = {link = "NormalFloat"}
+    FloatBorder = {fg = p.n10, bg = p.n0, style = "bold"},
 }
 
 
 theme.plugins = {
 
-    -- LspTrouble
+    -- https://github.com/folke/trouble.nvim
     LspTroubleText   = {fg = p.n4},
     LspTroubleCount  = {fg = p.n9, bg = p.n10},
     LspTroubleNormal = {fg = p.n4, bg = p.sidebar},
 
-    -- Diff
+    -- https://github.com/sindrets/diffview.nvim
     diffAdded     = {fg = p.n14},
     diffChanged   = {fg = p.n13},
     diffRemoved   = {fg = p.n11},
@@ -312,7 +312,7 @@ theme.plugins = {
     -- NeogitDiffDeleteHighlight  = {fg = p.n11, style="reverse"},
     -- NeogitDiffAddHighlight     = {fg = p.n14, style="reverse"},
 
-    -- GitSigns
+    -- https://github.com/lewis6991/gitsigns.nvim
     GitSignsAdd      = {fg = p.n14}, -- diff mode: Added line |diff.txt|
     GitSignsAddNr    = {fg = p.n14}, -- diff mode: Added line |diff.txt|
     GitSignsAddLn    = {fg = p.n14}, -- diff mode: Added line |diff.txt|
@@ -323,7 +323,7 @@ theme.plugins = {
     GitSignsDeleteNr = {fg = p.n11}, -- diff mode: Deleted line |diff.txt|
     GitSignsDeleteLn = {fg = p.n11}, -- diff mode: Deleted line |diff.txt|
 
-    -- Telescope
+    -- https://github.com/nvim-telescope/telescope.nvim
     TelescopePromptBorder   = {fg = p.n8, style = "bold"},
     TelescopePromptPrefix   = {fg = p.n14},
     TelescopeResultsBorder  = {fg = p.n8, style = "bold"},
@@ -331,10 +331,14 @@ theme.plugins = {
     TelescopeSelectionCaret = {fg = p.n10},
     TelescopeSelection      = {fg = p.w,  bg = p.n8, style = "bold"},
     -- https://github.com/shaunsingh/nord.nvim/pull/63/files
-    -- TelescopeNormal         = {fg = p.n4, bg = p.n0},
+    -- TelescopeNormal        = {fg = p.n4, bg = p.n0},
+    -- TelescopeResultsNormal = {fg = p.n4, bg = p.n0},
+    -- TelescopePromptNormal  = {fg = p.n4, bg = p.n0},
+    -- TelescopePreviewNormal = {fg = p.n4, bg = p.n0},
     TelescopeMatching       = {fg = p.n13},
+    TelescopePromptCounter  = {link = "TelescopeMatching"},
 
-    -- NvimTree
+    -- https://github.com/kyazdani42/nvim-tree.lua
     NvimTreeNormal           = {fg    = p.n4, bg = p.sidebar},
     NvimTreeFolderName       = {fg    = p.n4},
     NvimTreeFolderIcon       = {link  = "NvimTreeFolderName"},
@@ -358,7 +362,7 @@ theme.plugins = {
     LspDiagnosticsInformation = {link = "DiagnosticInfo"},
     LspDiagnosticsHint        = {link = "DiagnosticHint"},
 
-    -- WhichKey
+    -- https://github.com/folke/which-key.nvim
     -- WhichKey =          {fg = p.n4 , style = "bold"},
     -- WhichKeyGroup =     {fg = p.n4},
     -- WhichKeyDesc =      {fg = p.n7, style = "italic"},
@@ -366,82 +370,40 @@ theme.plugins = {
     -- WhichKeyFloating =  {bg = p.float},
     -- WhichKeyFloat =     {bg = p.float},
 
-    -- LspSaga
-    DiagnosticError            = {fg = p.n11},
-    DiagnosticWarning          = {fg = p.n13},
-    DiagnosticInformation      = {fg = p.n10},
-    DiagnosticHint             = {fg = p.n9},
-    DiagnosticTruncateLine     = {fg = p.n4},
-    LspFloatWinNormal          = {bg = p.n2},
-    LspFloatWinBorder          = {fg = p.n9},
-    LspSagaBorderTitle         = {fg = p.n8},
-    LspSagaHoverBorder         = {fg = p.n10},
-    LspSagaRenameBorder        = {fg = p.n10},
-    LspSagaDefPreviewBorder    = {fg = p.n14},
-    LspSagaCodeActionBorder    = {fg = p.n7},
-    LspSagaFinderSelection     = {fg = p.n14},
-    LspSagaCodeActionTitle     = {fg = p.n10},
-    LspSagaCodeActionContent   = {fg = p.n9},
-    LspSagaSignatureHelpBorder = {fg = p.n13},
-    ReferencesCount            = {fg = p.n9},
-    DefinitionCount            = {fg = p.n9},
-    DefinitionIcon             = {fg = p.n7},
-    ReferencesIcon             = {fg = p.n7},
-    TargetWord                 = {fg = p.n8},
-
-    -- Indent Blankline
+    -- https://github.com/lukas-reineke/indent-blankline.nvim
     IndentBlanklineChar        = {link = "SignColumn"},
     IndentBlanklineContextChar = {fg = p.n8},
 
-    -- Illuminate
+    -- https://github.com/RRethy/vim-illuminate
     illuminatedWord    = {link = "LspReferenceText"},
     illuminatedCurWord = {bg = p.n3},
 
-    -- nvim-dap
+    -- https://github.com/mfussenegger/nvim-dap
     DapBreakpoint = {fg = p.n14},
     DapStopped    = {fg = p.n15},
 
-    -- Hop
+    -- https://github.com/phaazon/hop.nvim
     HopNextKey   = {link = "IncSearch"},
     HopNextKey1  = {link = "Search"},
     HopNextKey2  = {link = "Search"},
     HopUnmatched = {fg   = p.n3},
 
-    -- machakann/vim-sandwich
+    -- https://github.com/machakann/vim-sandwich
     OperatorSandwichAdd    = {link = "Search"},
     OperatorSandwichAddrcc = {link = "Search"},
     OperatorSandwichBuns   = {link = "Search"},
     OperatorSandwichChange = {link = "Search"},
     OperatorSandwichDelete = {link = "IncSearch"},
 
-    -- Fern
-    -- FernBranchText = {fg = p.n3b},
-
     -- HistoryStartup
     HistoryStartupCreate   = {fg = p.n10, style = "bold"},
     HistoryStartupFileRoot = {fg = p.n8,  style = "italic"},
 
-    -- lightspeed
-    -- LightspeedLabel                  = {fg = p.n8,         style = "bold"},
-    -- LightspeedLabelOverlapped        = {fg = p.n8,         style = "bold,underline"},
-    -- LightspeedLabelDistant           = {fg = p.n15,        style = "bold"},
-    -- LightspeedLabelDistantOverlapped = {fg = p.n15,        style = "bold,underline"},
-    -- LightspeedShortcut               = {fg = p.n10,        style = "bold"},
-    -- LightspeedShortcutOverlapped     = {fg = p.n10,        style = "bold,underline"},
-    -- LightspeedMaskedChar             = {fg = p.n4,         bg = p.n2,       style = "bold"},
-    -- LightspeedGreyWash               = {fg = p.n3b},
-    -- LightspeedUnlabeledMatch         = {fg = p.n4,         bg = p.n1},
-    -- LightspeedOneCharMatch           = {fg = p.n8,         style = "bold,   reverse"},
-    -- LightspeedUniqueChar             = {style = "bold,     underline"},
-    -- LightspeedPendingOpArea          = {style = "strikethrough"},
-    -- LightspeedPendingChangeOpArea    = {style = "strikethrough"},
-    -- LightspeedCursor                 = {fg = nord.nord7, style = "underline,reverse"},
-
-    -- nvim-lightbulb
+    -- https://github.com/kosayoda/nvim-lightbulb
     LightBulbVirtualText = {link = "NormalFloat"},
     LightBulbFloatWin    = {link = "NormalFloat"},
 
-    -- nvim-cmp
+    -- https://github.com/hrsh7th/nvim-cmp
     CmpItemAbbr           = {fg = p.n4},
     -- CmpItemAbbrDeprecated = {fg = p.n3b, style = "italic"},
     CmpItemAbbrMatch      = {fg = p.n13, style = "bold"},
@@ -450,13 +412,18 @@ theme.plugins = {
     CmpItemKind           = {fg = p.n15},
     CmpItemMenu           = {link = "CmpItemAbbr"},
 
-
+    -- https://github.com/michaelb/sniprun
     SniprunVirtualTextOk  = {bg=p.n8, fg=p.w},
     SniprunFloatingWinOk  = {fg=p.n8},
     SniprunVirtualTextErr = {bg=p.n11,  fg=p.w},
     SniprunFloatingWinErr = {fg=p.n11},
-}
 
+    -- https://github.com/mg979/vim-visual-multi
+    VMExtend = {link = "Visual"},
+    VMCursor = {fg = p.w, bg = p.n8, style = "bold"},
+    VMInsert = {fg = p.w, bg = p.n14},
+    VMMono   = {fg = p.w, bg = p.n11},
+}
 
 theme.loadTerminal = function()
     vim.g.terminal_color_0  = p.n1

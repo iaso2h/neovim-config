@@ -123,6 +123,8 @@ command! -nargs=0 TrailingEmptyLineToggle lua  if type(TrailEmptyLineChk) == "ni
 
 command! -nargs=+ -bang Cfilter call v:lua.qFilter(v:true,  <q-args>, <q-bang>)
 command! -nargs=+ -bang Lfilter call v:lua.qFilter(v:false, <q-args>, <q-bang>)
+
+command! -nargs=0 -range Reverse lua require("selection").mirror()
 ]]
 if jit.os == "Windows" then
     cmd [[command! -nargs=0 PS     terminal powershell]]

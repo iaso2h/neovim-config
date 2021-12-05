@@ -57,7 +57,7 @@ require("todo-comments").setup{
 
 vim.cmd [[command! -nargs=0 TodoTelescope Telescope todo-comments todo theme=ivy]]
 map("n", [[<C-f>t]], [[:<C-u>TodoTelescope<CR>]], {"silent"})
-map("n", [[<C-q>t]], [[:<C-u>TodoQuickFix<CR>]],  {"silent"})
+map("n", [[<C-q>t]], [[:lua QuickfixSwitchBufNr=vim.api.nvim_get_current_buf();vim.cmd"TodoQuickFix"<CR>]],  {"silent"})
 
 end
 

@@ -17,8 +17,10 @@ map("n", [[]d]], [[]c]], {"noremap", "silent"}, "Go to the next start of a chang
 map("n", [[]c]], [[:noa windo set cc=80<CR>]], {"silent"}, "Turn on colorcolumn")
 map("n", [[[c]], [[:noa windo set cc&<CR>]],   {"silent"}, "Turn off colorcolumn")
 -- Quickfix
-map("n", [[<C-q>n]],    [[:cnext<CR>zz]],                                {"silent"}, "Go to next item in quickFix")
-map("n", [[<C-q>N]],    [[:cprevious<CR>zz]],                            {"silent"}, "Go to previous item in quickFix")
+map("n", [[<C-q>g]],    [[:cfirst<CR>zzzv]],                               {"silent"}, "Go to first item in quickFix")
+map("n", [[<C-q>G]],    [[:clast<CR>zzzv]],                                {"silent"}, "Go to last item in quickFix")
+map("n", [[<C-q>n]],    [[:cnext<CR>zzzv]],                                {"silent"}, "Go to next item in quickFix")
+map("n", [[<C-q>N]],    [[:cprevious<CR>zzzv]],                            {"silent"}, "Go to previous item in quickFix")
 map("n", [[<C-q>l]],    [[:cnfile<CR>]],                                 {"silent"}, "Go to next file in quickFix")
 map("n", [[<C-q>h]],    [[:cpfile<CR>]],                                 {"silent"}, "Go to previous file in quickFix")
 map("n", [[<leader>q]], [[:lua require("buffer").quickfixToggle()<CR>]], {"silent"}, "Quickfix toggle")
@@ -36,14 +38,7 @@ map("x", [[gM]], luaRHS[[:lua vim.cmd(
     )
 )<CR>]],
 {"silent"})
-map("n", [[<Plug>InterestingWordOperator]],
-luaRHS[[luaeval("
-    require('operator').expr(
-        require('interestingWord').operator,
-        false,
-        '<Plug>InterestingWordOperator')
-    ")
-]], {"expr", "silent"})
+map("x", [[<C-s>]], [[:lua require("selection").visualSub()<CR>]])
 -- Interesting word {{{
 map("n", [[<Plug>InterestingWordOperator]],
 luaRHS[[luaeval("
@@ -53,29 +48,28 @@ luaRHS[[luaeval("
         '<Plug>InterestingWordOperator')
     ")
 ]], {"expr", "silent"})
-map("x", [[<C-s>]], [[:lua require("selection").visualSub()<CR>]])
 map("x", [[<Plug>InterestingWordVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisual", vim.v.register);
 
     local vMotion = require("operator").vMotion(true);
-    table.insert(vMotion, "<Plug>InterestingWordVisual")
+    table.insert(vMotion, "<Plug>InterestingWordVisual");
     require("interestingWord").operator(vMotion)<CR>]],
 {"silent"})
 map("n", [[<Plug>InterestingWordVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisual", vim.v.register);
-    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
+    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0));
 
     local vMotion = require("operator").vMotion(true);
-    table.insert(vMotion, "<Plug>InterestingWordVisual")
+    table.insert(vMotion, "<Plug>InterestingWordVisual");
     require("interestingWord").operator(vMotion)<CR>]],
 {"silent"})
 map("n", [[gw]],        [[<Plug>InterestingWordOperator]], "Highlight interesting word...")
 map("x", [[gw]],        [[<Plug>InterestingWordVisual]],   "Highlight selected as interesting word")
-map("n", [[gww]],       [[:lua require("interestingWord").reapplyColor()<CR>]], "Recolor last interesting word...")
-map("n", [[<leader>w]], [[:lua require("interestingWord").clearColor()<CR>]],   "Clear interesting word...")
-map("n", [[<leader>W]], [[:lua require("interestingWord").restoreColor()<CR>]], "Restore interesting word...")
+map("n", [[gww]],       [[:lua require("interestingWord").reapplyColor()<CR>]], {"silent"}, "Recolor last interesting word...")
+map("n", [[<leader>w]], [[:lua require("interestingWord").clearColor()<CR>]],   {"silent"}, "Clear interesting word...")
+map("n", [[<leader>W]], [[:lua require("interestingWord").restoreColor()<CR>]], {"silent"}, "Restore interesting word...")
 -- }}} Interesting word
 -- Zeal query {{{
 map("n", [[<Plug>ZealOperator]],
@@ -101,16 +95,16 @@ luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>ZealVisual", vim.v.register);
 
     local vMotion = require("operator").vMotion(true);
-    table.insert(vMotion, "<Plug>ZealVisual")
+    table.insert(vMotion, "<Plug>ZealVisual");
     require("zeal").zeal(vMotion)<CR>]],
 {"silent"}, "Zeal look up selected")
 map("n", [[<Plug>ZealVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>ZealVisual", vim.v.register);
-    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
+    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0));
 
     local vMotion = require("operator").vMotion(true);
-    table.insert(vMotion, "<Plug>ZealVisual")
+    table.insert(vMotion, "<Plug>ZealVisual");
     require("zeal").zeal(vMotion)<CR>]],
 {"silent"}, "Zeal look up selected")
 map("n", [[gz]], [[<Plug>ZealOperator]],       "Zeal look up...")
@@ -134,16 +128,16 @@ luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>ExtractVisual", vim.v.register);
 
     local vMotion = require("operator").vMotion(true);
-    table.insert(vMotion, "<Plug>ExtractVisual")
+    table.insert(vMotion, "<Plug>ExtractVisual");
     require("extraction").operator(vMotion)<CR>]],
 {"silent"}, "Extract selected")
 map("n", [[<Plug>ExtractVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>ExtractVisual", vim.v.register);
-    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
+    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0));
 
     local vMotion = require("operator").vMotion(true);
-    table.insert(vMotion, "<Plug>ExtractVisual")
+    table.insert(vMotion, "<Plug>ExtractVisual");
     require("extraction").operator(vMotion)<CR>]],
 {"silent"}, "Extract selected")
 map("n", [[gc]], [[<Plug>Extract]])
@@ -163,7 +157,6 @@ map("n", [[dk]], [[<Nop>]])
 map("n", [[dn]], [[*``dw]], {"noremap"})
 map("n", [[dN]], [[#``dw]], {"noremap"})
 map("n", [[d<Space>]], [[:<C-u>call setline(".", "")<CR>]],  {"silent"})
--- TODO: Modify under cursor
 -- Change under cursor
 map("n", [[cn]], [[*``cgn]], {"noremap"}, "Change word under cursor forward")
 map("n", [[cN]], [[*``cgN]], {"noremap"}, "Change word under cursor forward")
@@ -197,7 +190,7 @@ map("x", [[?]], [[#]])
 -- Regex very magic
 map("n", [[/]], [[/\v]], {"noremap"}, "Search forward")
 map("n", [[?]], [[?\v]], {"noremap"}, "Search backward")
--- BUG: failed easily when n is search backward
+-- BUG: failed easily when n is search backward. Possibly fix by utilizing setcharsearch()?
 map("n", [[n]], [[nzzzvhn]], {"noremap"})
 map("n", [[N]], [[NzzzvlN]], {"noremap"})
 -- Disable highlight search & Exit visual mode

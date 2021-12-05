@@ -3,7 +3,6 @@ local cmd = vim.cmd
 local api = vim.api
 local M   = {}
 
--- TODO: add comment support
 M.main = function ()
     local line      = api.nvim_get_current_line()
     local cursorPos = api.nvim_win_get_cursor(0)

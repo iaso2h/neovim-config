@@ -41,19 +41,19 @@ function M.main()
         -- Last edit pos is set and is < no of lines in buffer
         if winend == buffend then
             -- Last line in buffer is also last line visible
-            cmd 'noa normal! g`"'
+            cmd 'normal! g`"'
         elseif buffend - lastpos > ((winend - winstart) / 2) - 1 then
             -- Center cursor on screen if not at bottom
-            cmd 'noa normal! g`"zz'
+            cmd 'normal! g`"zz'
         else
             -- Otherwise, show as much context as we can
-            cmd "noa normal! \\G'\"\\<c-e>"
+            cmd "normal! \\G'\"\\<c-e>"
         end
     end
 
     if fn.foldclosed('.') ~= -1 then
         -- Cursor was inside a fold; open it
-        cmd 'noa normal! zA'
+        cmd 'normal! zzzv'
     end
 end
 

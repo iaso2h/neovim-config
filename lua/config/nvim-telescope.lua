@@ -61,6 +61,10 @@ local defaultTheme = {
             ["<Down>"]    = actions.move_selection_next,
             ["<Up>"]      = actions.move_selection_previous,
 
+            -- https://github.com/nvim-telescope/telescope.nvim/pull/1305
+            -- ["<C-u>"] = actions.toggle_preview,
+            -- ["<C-d>"] = actions.toggle_results_and_prompt,
+
             ["<C-c>"]     = actions.close,
 
             ["<CR>"]      = actions.select_default + actions.center,

@@ -3,6 +3,7 @@ local cmd = vim.cmd
 local fn  = vim.fn
 local M   = {}
 
+
 function M.oppoSelection() -- {{{
     local curPos         = api.nvim_win_get_cursor(0)
     local startSelectPos = api.nvim_buf_get_mark(0, "<")
@@ -28,13 +29,20 @@ function M.oppoSelection() -- {{{
     end
 end -- }}}
 
+
 M.visualSub = function()
     local str = string.gsub(M.getSelect("string"), [[\]], [[\\]])
     api.nvim_feedkeys(string.format([[:s#\V%s]], str), "nt", false)
 end
 
 
--- TODO: grep refactoring
+M.mirror = function()
+    cmd("norm! gvd")
+    local keyStr = "i" .. string.reverse(fn.getreg("-", 1)) .. t"<ESC>"
+    api.nvim_feedkeys(keyStr, "tn", true)
+end
+
+
 -- HACK: different behaviors between vim.getpos() and nvim_buf_get_mark() when selection is empty
 M.getSelect = function(returnType, returnNormal) -- {{{
     -- Not support blockwise visual mode

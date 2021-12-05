@@ -1,7 +1,7 @@
 -- File: quickFix
 -- Author: iaso2h
 -- Description: Cfilter in lua way
--- Version: 0.0.3
+-- Version: 0.0.4
 -- Last Modified: 2021-11-15
 local fn  = vim.fn
 local cmd = vim.cmd
@@ -48,7 +48,14 @@ _G.qFilter = function(qfChk, pat, bang)
         pat = pat
     end
 
-    if pat == "%" or pat == "#" then pat = fn.expand("#") end
+    if pat == "%" or pat == "#" then
+        if QuickfixSwitchBufNr then
+            pat = fn.bufname(QuickfixSwitchBufNr)
+            QuickfixSwitchBufNr = nil
+        else
+            pat = fn.expand("#")
+        end
+    end
 
     if pat == '' then return end
 
@@ -67,6 +74,18 @@ _G.qFilter = function(qfChk, pat, bang)
     end
 
     items = vim.tbl_filter(cond, items)
+    -- Check whether item list is emptry and prompt for continuation
+    if not next(items) then
+        cmd "noa echohl MoreMsg"
+        local answer = fn.confirm("No satisified items, proceed?  ",
+            ">>> &Yes\n&No\n&Cancel", 3, "Question")
+        cmd "noa echohl None"
+
+        if answer ~= 1 then
+            return
+        end
+    end
+
     if qfChk then
         fn.setqflist({}, ' ', {items = items})
     else

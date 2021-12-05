@@ -145,8 +145,6 @@ packer.startup{
         },
         config = function()
             require('hop').setup{
-                keys             = 'ghfjdkstyrueiwovbcnxalqozm',
-                perm_method      = require'hop.perm'.TermSeqBias,
                 case_insensitive = false
             }
             map("", [[<leader>f]], [[<cmd>lua require("hop").hint_char1()<CR>]], {"silent"}, "Hop char")
@@ -337,7 +335,8 @@ packer.startup{
         keys     = {{"n", "g<Space>d"}},
         config   = function()
             require("neogen").setup {
-                enabled = false,
+                enabled             = false,
+                input_after_comment = true,
                 languages = {
                     lua = {
                         template = {
@@ -947,21 +946,9 @@ packer.startup{
         config = conf("nvim-lsp").config
     }
     use {
-        'kabouzeid/nvim-lspinstall',
-        module  = "lspinstall",
+        'williamboman/nvim-lsp-installer',
+        module  = "nvim-lsp-installer",
         rquires = "nvim-lspconfig",
-        config  = function()
-            require("config.nvim-lsp").setupServers()
-            -- Automatically reload after `:LspInstall <server>` so we don't have to restart neovim
-            require("lspinstall").post_install_hook = function ()
-                vim.cmd "bufdo e"
-                require("config.nvim-lsp").setupServers()
-            end
-
-            vim.cmd [[
-            command! -nargs=0 LspInstalled lua Print(require("lspinstall").installed_servers())
-            ]]
-        end
     }
     use {
         'kosayoda/nvim-lightbulb',
@@ -1065,7 +1052,7 @@ packer.startup{
             {"hrsh7th/cmp-nvim-lua", module = "cmp_nvim_lua",  disable = true},
             {"hrsh7th/cmp-buffer",   module = "cmp_buffer"},
             {"hrsh7th/cmp-path",     module = "cmp_path"},
-            {"hrsh7th/cmp-vsnip",     after = "nvim-cmp",},
+            {"hrsh7th/cmp-vsnip",    after = "nvim-cmp",},
             {"lukas-reineke/cmp-under-comparator", module = "cmp-under-comparator",},
             {
                 "tzachar/cmp-tabnine",

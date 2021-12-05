@@ -18,16 +18,16 @@ require('gitsigns').setup{
         ['n ]h'] = {expr = true, "&diff ? ']h' : '<cmd>lua require\"gitsigns.actions\".next_hunk()<CR>'"},
         ['n [h'] = {expr = true, "&diff ? '[h' : '<cmd>lua require\"gitsigns.actions\".prev_hunk()<CR>'"},
 
-        ['n <C-h>s'] = '<cmd>lua require"gitsigns".stage_hunk()<CR>',
-        ['v <C-h>s'] = '<cmd>lua require"gitsigns".stage_hunk({vim.fn.line("."), vim.fn.line("v")})<CR>',
-        ['n <C-h>u'] = '<cmd>lua require"gitsigns".undo_stage_hunk()<CR>',
-        ['n <C-h>r'] = '<cmd>lua require"gitsigns".reset_hunk()<CR>',
-        ['v <C-h>r'] = '<cmd>lua require"gitsigns".reset_hunk({vim.fn.line("."), vim.fn.line("v")})<CR>',
-        ['n <C-h>R'] = '<cmd>lua require"gitsigns".reset_buffer()<CR>',
-        ['n <C-h>p'] = '<cmd>lua require"gitsigns".preview_hunk()<CR>',
-        ['n <C-h>b'] = '<cmd>lua require"gitsigns".blame_line(true)<CR>',
-        ['n <C-h>S'] = '<cmd>lua require"gitsigns".stage_buffer()<CR>',
-        ['n <C-h>U'] = '<cmd>lua require"gitsigns".reset_buffer_index()<CR>',
+        ['n <C-h>s'] = '<cmd>Gitsigns stage_hunk<CR>',
+        ['v <C-h>s'] = ':Gitsigns stage_hunk<CR>',
+        ['n <C-h>S'] = '<cmd>Gitsigns stage_buffer<CR>',
+        ['n <C-h>u'] = '<cmd>Gitsigns undo_stage_hunk<CR>',
+        ['n <C-h>U'] = '<cmd>Gitsigns reset_buffer_index<CR>',
+        ['n <C-h>r'] = '<cmd>Gitsigns reset_hunk<CR>',
+        ['v <C-h>r'] = ':Gitsigns reset_hunk<CR>',
+        ['n <C-h>R'] = '<cmd>Gitsigns reset_buffer<CR>',
+        ['n <C-h>p'] = '<cmd>Gitsigns preview_hunk<CR>',
+        ['n <C-h>b'] = '<cmd>lua require"gitsigns".blame_line{full=true}<CR>',
 
         -- Text objects
         ['o ih'] = ':<C-u>lua require"gitsigns.actions".select_hunk()<CR>',
@@ -53,7 +53,7 @@ require('gitsigns').setup{
     max_file_length  = 40000,
     preview_config   = {
         -- Options passed to nvim_open_win
-        border   = 'none',
+        border   = 'rounded',
         style    = 'minimal',
         relative = 'cursor',
         row      = 0,

@@ -34,8 +34,6 @@ M.setup = function() -- {{{
     vim.g.VM_insert_special_keys            = {'c-v', 'c-e', 'c-a'}
     -- Settings
 
-    -- vim.g.VM_theme = 'nord'
-    -- TODO: Highlight
     vim.g.VM_Mono_hl   = "VMMono"
     vim.g.VM_Extend_hl = "VMExtend"
     vim.g.VM_Cursor_hl = "VMCursor"

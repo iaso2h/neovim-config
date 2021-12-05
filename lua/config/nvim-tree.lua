@@ -165,6 +165,4 @@ map("n", [[<C-w>e]], [[:lua require("nvim-tree").toggle()<CR>]], {"silent"})
 -- map("n", [[<leader>r]], [[:NvimTreeRefresh<CR>]], {"noremap"})
 -- map("n", [[<leader>n]], [[:NvimTreeFindFile<CR>]], {"noremap"})
 
--- BUG: Seem to not working
--- require("nvim-tree").find_file(false)
 end

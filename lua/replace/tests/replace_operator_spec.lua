@@ -1762,6 +1762,39 @@ api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
+            it("replace with \"i[\" motion, linewise", function() -- {{{
+                local input = [[
+    elseif vimMode == "n" then
+                foobar
+        if reg.type == "v" then
+                ^
+            if motionType == "line" then
+                local regContentNew = reindent(reg.content, regionMotion, motionDirection, vimMode)
+            ]]
+                local expected = [[
+        if reg.type == "v" then
+        if motionType == "line" then
+
+        if reg.type == "v" then
+            if motionType == "line" then
+            ]]
+                local expected = [[
+    if reg.type == "v" then
+        if motionType == "line" then
+            ]]
+                local expectedDot = [[
+api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols[2])
+            ]]
+                setUpMapping()
+                setUpBuffer(input, "lua")
+                -- replace
+                vim.fn.setreg("a", '    elseif vimMode == "n" then\n        if reg.type == "v" then\n', "V")
+                runCommandAndAssert([["agri[]], expected)
+                -- replace, via dot
+                -- vim.fn.setreg("a", "'foo'", "V")
+                -- runCommandAndAssert([[.]], expectedDot)
+            end) -- }}}
+
             it("replace with \"i\"\" motion, test1", function() -- {{{
             -- BUG: seems to have issue with feedkeys
                 local input = [[

@@ -93,7 +93,7 @@ o.winheight        = 3
 o.winhighlight     = "NormalNC:WinNormalNC"
 o.splitbelow       = true
 o.splitright       = true
-o.switchbuf        = "split"
+-- o.switchbuf        = "split"
 
 -- GUI
 -- cmd [[colorscheme onedarknord]]
