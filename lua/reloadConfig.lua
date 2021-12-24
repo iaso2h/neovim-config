@@ -23,7 +23,11 @@ local sep           = jit.os == "Windows" and "\\" or "/"
 --- @param str string
 --- @return string
 local e = function(str)
-    return string.gsub(str, [[\]], [[\\]])
+    if jit.os == "Windows" then
+        return str
+    else
+        return string.gsub(str, [[\]], [[\\]])
+    end
 end
 
 
@@ -163,7 +167,13 @@ end
 --- @param checkLuaDir boolean Default is true. Set this to true to check whether the other lua
 ---        module in the same directory
 M.luaLoadFile = function(luaModule, checkLuaDir) -- {{{
-    luaModule = luaModule or fn.expand("%:p")
+    if not luaModule then
+        local fullPathStr = fn.expand("%:p")
+        if jit.os == "Windows" and string.sub(fullPathStr, 1, 1):match("[a-z]") then
+            luaModule = string.sub(fullPathStr, 1, 1):upper() .. string.sub(fullPathStr, 2, -1)
+        end
+    end
+
     assert(getmetatable(luaModule) == require("plenary.path") or
         type(luaModule) == "string",
         string.format("Expected plenary path object or string, got %s", type(luaModule)))
@@ -174,8 +184,9 @@ M.luaLoadFile = function(luaModule, checkLuaDir) -- {{{
     if type(luaModule) == "string" then
         modulePath = path:new(luaModule)
         assert(modulePath:is_file(), "Invalid string of file path")
-        assert(string.match(modulePath.filename, e(luaModulePath.filename))
-            and vim.endswith(modulePath.filename, ".lua"), "Unsuppoted file path")
+
+        assert(string.match(modulePath.filename, e(luaModulePath.filename)) and
+            vim.endswith(modulePath.filename, ".lua"), "Unsuppoted file path")
     else
         modulePath = luaModule
     end
@@ -290,7 +301,11 @@ end -- }}}
 -- @param module: String value of module path
 ----
 M.reload = function() -- {{{
-    local modulePath  = path:new(fn.expand("%:p"))
+    local fullPathStr = fn.expand("%:p")
+    if jit.os == "Windows" and string.sub(fullPathStr, 1, 1):match("[a-z]") then
+        fullPathStr = string.sub(fullPathStr, 1, 1):upper() .. string.sub(fullPathStr, 2, -1)
+    end
+    local modulePath  = path:new(fullPathStr)
 
     -- Config path only
     if not string.match(modulePath.filename, e(configPath.filename)) then return end
