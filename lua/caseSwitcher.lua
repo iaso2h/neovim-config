@@ -1,44 +1,50 @@
 -- File: caseSwitcher
 -- Author: iaso2h
 -- Description: prerequisite zatchheems/vim-camelsnek
--- Version: 0.0.1
--- Last Modified: 2021/03/13
-local vim = vim
-local fn  = vim.fn
+-- Version: 0.0.2
+-- Last Modified: 2021-12-24
 local cmd = vim.cmd
 local api = vim.api
 local M   = {}
--- BUG:
 
 M.timer = {}
+M.CMDList = {}
 M.defaultCMDList = {"Camel", "Snake", "Pascal", "Snakecaps"}
 
 function M.cycleCase() -- {{{
+    local timeout = 1000
     local cursorPos = api.nvim_win_get_cursor(0)
     -- When timer fire, the timer list will be empty, and the default cmdlist ->
     -- will be used
-    if not M.CMDList or not next(M.timer) then
+    if not next(M.CMDList) or not next(M.timer) then
         M.CMDList = vim.deepcopy(M.defaultCMDList)
     end
-    local firstCMD = table.remove(M.CMDList, 1)
-    -- BUG:
-    cmd("noa silent " .. firstCMD)
-    api.nvim_echo({{string.format("\nSwitch to %s", firstCMD), "MoreMsg"}}, false, {})
 
+    -- Always re-append then vimCMD after pop it up
+    local vimCMD = table.remove(M.CMDList, 1)
+    table.insert(M.CMDList, vimCMD)
+
+    -- Execute the vim command to switch case
+    cmd("noa silent " .. vimCMD)
+    api.nvim_echo({{string.format("\nSwitch to %s", vimCMD), "MoreMsg"}}, false, {})
+
+    -- Restore cursor position
     api.nvim_win_set_cursor(0, cursorPos)
-    -- When the first CMD is cmd, it will reappend to the list
-    table.insert(M.CMDList, firstCMD)
-    -- Stop previous timer, make sure only the latest timer can run
-    if #M.timer > 1 then
+
+    -- Stop all existing timers in advance if the func M.cycleCase is call
+    -- agian within the timeout
+    if #M.timer ~= 0 then
         for index, timer in ipairs(M.timer) do
-            if index ~= 1 then
-                timer:stop()
+            if getmetatable(timer).timer_stop then
+                timer:timer_stop()
                 table.remove(M.timer, index)
             end
         end
     end
-    -- Set new timer
-    table.insert(M.timer, vim.defer_fn(function () table.remove(M.timer, 1) end, 1000))
+
+    -- Set new timer and insert the timer object before the first element of
+    -- M.timer
+    table.insert(M.timer, 1, vim.defer_fn(function () table.remove(M.timer) end, timeout))
 end -- }}}
 
 function M.cycleDefaultCMDList() -- {{{
