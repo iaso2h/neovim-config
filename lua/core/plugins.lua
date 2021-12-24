@@ -59,10 +59,7 @@ packer.startup{
     -- Vim enhancement {{{
     use 'nathom/filetype.nvim'
     use 'inkarkat/vim-visualrepeat'
-    use {
-        'iaso2h/vim-repeat',
-        lock = true
-    }
+    use 'tpope/vim-repeat'
     use {
         'tpope/vim-eunuch',
         cmd = {"Delete", "Unlink", "Remove", "Move", "Rename", "Chmod", "Mkdir", "Cfind", "Lfind", "Clocate", "Llocate", "SudoEdit", "SudoWrite", "Wall", "W"}

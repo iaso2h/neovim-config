@@ -170,9 +170,11 @@ M.config = function()
     -- https://github.com/sumneko/lua-language-server
     -- For linux: https://github.com/sumneko/lua-language-server/wiki/Build-and-Run-(Standalone)
     -- Settings: https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md#sumneko_lua
-    local sumnekoRootPath = fn.glob("~/.config/nvim/lsp/lua-language-server")
     local binaryExt       = {macOS = "", Linux = "", Windows = ".exe"}
-    local sumnekoBinary   = fn.glob(sumnekoRootPath .. "/bin/" .. jit.os .. "/lua-language-server") .. binaryExt[jit.os]
+    local sep             = jit.os == "Windows" and "\\" or "/"
+    local dataPath        = fn.stdpath("data")
+    local sumnekoRootPath = string.format("%s%slsp_servers%ssumneko_lua%sextension%sserver%sbin", dataPath, sep, sep, sep, sep, sep)
+    local sumnekoBinary   = sumnekoRootPath .. sep .. "lua-language-server" .. binaryExt["Windows"]
     local runtimePath     = vim.split(package.path, ";")
     table.insert(runtimePath, "lua/?.lua")
     table.insert(runtimePath, "lua/?/init.lua")
