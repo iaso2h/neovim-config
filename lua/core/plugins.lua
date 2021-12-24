@@ -435,6 +435,7 @@ packer.startup{
                 enable_check_bracket_line = false,  -- check bracket in same line
                 check_ts                  = true,
                 map_bs                    = true,
+                map_c_h                   = false,
                 map_c_w                   = false,
                 fast_wrap = {
                     map         = '<A-p>',

@@ -1,7 +1,7 @@
 -- File: cursorRecall
 -- Author: iaso2h
 -- Description: Derived from and simplified:
-    -- https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
+-- https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
 -- Version: 0.0.2
 -- Last Modified: 2021-09-25
 
@@ -29,10 +29,11 @@ function M.main()
     end
 
     -- Do nothing if file does not exist on disk
-    if fn.empty(fn.glob("@%")) == 0 then
+    if not vim.loop.fs_stat(fn.expand("%:p")) then
         return
     end
-    local lastpos  = fn.line("'\"")
+
+    local lastpos  = fn.line('`"')
     local buffend  = fn.line('$')
     local winend   = fn.line('w$')
     local winstart = fn.line('w0')
@@ -47,7 +48,7 @@ function M.main()
             cmd 'normal! g`"zz'
         else
             -- Otherwise, show as much context as we can
-            cmd "normal! \\G'\"\\<c-e>"
+            cmd('normal! G`"' .. t'<c-e>')
         end
     end
 
