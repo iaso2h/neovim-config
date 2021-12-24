@@ -1,6 +1,6 @@
 -- Configuration are based on Neovim 0.5.1(with this patch:
 -- https://github.com/neovim/neovim/issues/14090#issuecomment-921312955) or
--- Neovim 0.6.0 Nightly
+-- Neovim 0.7.0 Nightly
 require("impatient").enable_profile()
 -- Build-in plugin {{{
 -- Disable
