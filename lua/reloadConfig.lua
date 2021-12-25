@@ -1,8 +1,8 @@
 -- File: reloadConfig
 -- Author: iaso2h
 -- Description: reload lua package or vim file at Neovim configuration directory
--- Version: 0.0.17
--- Last Modified: 2021-10-08
+-- Version: 0.0.18
+-- Last Modified: 2021-12-25
 local fn   = vim.fn
 local api  = vim.api
 local cmd  = vim.cmd
@@ -19,17 +19,6 @@ local configPath    = path:new(fn.stdpath("config"))
 local luaModulePath = configPath:joinpath("lua")
 local sep           = jit.os == "Windows" and "\\" or "/"
 
---- Escape \ in path string
---- @param str string
---- @return string
-local e = function(str)
-    if jit.os == "Windows" then
-        return str
-    else
-        return string.gsub(str, [[\]], [[\\]])
-    end
-end
-
 
 local packerCompileQuery = function(...)
     local answer = fn.confirm("Update packages?", "&Sync\ncom&Pile\n&No", 3)
@@ -44,7 +33,7 @@ end
 
 local luaSetups = {
     {
-        pathPat = e(luaModulePath:joinpath("core", "mappings.lua").filename),
+        pathPat = luaModulePath:joinpath("core", "mappings.lua").filename,
         config  = function(...)
                 _G.CoreMappingsLast = vim.deepcopy(CoreMappings)
                 CoreMappings = {}
@@ -57,7 +46,7 @@ local luaSetups = {
 local luaConfigs = {
     {
         -- Call the config func from "<NvimConfig>/lua/config/" if it's callable
-        pathPat = e(luaModulePath:joinpath("config").filename),
+        pathPat = luaModulePath:joinpath("config").filename,
         config  = function(modulePath, callback)
             local ok, msg
             if type(callback) == "function" then
@@ -81,18 +70,18 @@ local luaConfigs = {
     },
     {
         -- Ask whether to compile lua packages for "<NvimConfig> /lua/core/plugins.lua"
-        pathPat = e(luaModulePath:joinpath("core", "plugins.lua").filename),
+        pathPat = luaModulePath:joinpath("core", "plugins.lua").filename,
         config  = packerCompileQuery
     },
     {
-        pathPat = e(luaModulePath:joinpath("onenord").filename),
+        pathPat = luaModulePath:joinpath("onenord").filename,
         config  = function(...)
                 -- cmd [[noa silent colorscheme onenord]]
                 api.nvim_feedkeys(":colorscheme onenord", "nt", false)
             end
     },
     {
-        pathPat = e(luaModulePath:joinpath("core", "mappings.lua").filename),
+        pathPat = luaModulePath:joinpath("core", "mappings.lua").filename,
         config  = function(...)
                 CoreMappigsStart = false
                 local ok, msg
@@ -168,10 +157,7 @@ end
 ---        module in the same directory
 M.luaLoadFile = function(luaModule, checkLuaDir) -- {{{
     if not luaModule then
-        local fullPathStr = fn.expand("%:p")
-        if jit.os == "Windows" and string.sub(fullPathStr, 1, 1):match("[a-z]") then
-            luaModule = string.sub(fullPathStr, 1, 1):upper() .. string.sub(fullPathStr, 2, -1)
-        end
+        luaModule = fn.expand("%:p")
     end
 
     assert(getmetatable(luaModule) == require("plenary.path") or
@@ -185,8 +171,20 @@ M.luaLoadFile = function(luaModule, checkLuaDir) -- {{{
         modulePath = path:new(luaModule)
         assert(modulePath:is_file(), "Invalid string of file path")
 
-        assert(string.match(modulePath.filename, e(luaModulePath.filename)) and
-            vim.endswith(modulePath.filename, ".lua"), "Unsuppoted file path")
+        if jit.os ~= "Windows" then
+            assert(string.match(modulePath.filename, luaModulePath.filename) and
+                vim.endswith(modulePath.filename, ".lua"), "Unsuppoted file path")
+        else
+            -- Deal with the lowercase Drive character comparision in Windows
+            assert(
+                string.match(
+                    string.sub(modulePath.filename, 2, -1),
+                    string.sub(luaModulePath.filename, 2, -1)
+                ) and
+                string.sub(modulePath.filename, 1, 1):lower() ==
+                string.sub(luaModulePath.filename, 1, 1):lower() and
+                vim.endswith(modulePath.filename, ".lua"), "Unsuppoted file path")
+        end
     else
         modulePath = luaModule
     end
@@ -302,18 +300,19 @@ end -- }}}
 ----
 M.reload = function() -- {{{
     local fullPathStr = fn.expand("%:p")
+    -- Uppercase the first character in Windows
     if jit.os == "Windows" and string.sub(fullPathStr, 1, 1):match("[a-z]") then
         fullPathStr = string.sub(fullPathStr, 1, 1):upper() .. string.sub(fullPathStr, 2, -1)
     end
     local modulePath  = path:new(fullPathStr)
 
     -- Config path only
-    if not string.match(modulePath.filename, e(configPath.filename)) then return end
+    if not string.match(modulePath.filename, configPath.filename) then return end
 
     if vim.bo.filetype == "lua" then
         -- Lua {{{
         -- Only load lua module at: ~/.config/nvim/lua
-        if not string.match(modulePath.filename, e(luaModulePath.filename)) then return end
+        if not string.match(modulePath.filename, luaModulePath.filename) then return end
 
         local parentDirStr = modulePath:parent().filename
         if parentDirStr ~= luaModulePath.filename and
@@ -340,11 +339,11 @@ M.reload = function() -- {{{
         -- Vim {{{
         -- Module path is always full path in VimL
         if modulePath.filename == configPath:joinpath("init.vim").filename or
-            string.match(modulePath.filename, e(configPath:joinpath("plugins").filename)) then
+            string.match(modulePath.filename, configPath:joinpath("plugins").filename) then
 
             cmd("noa source " .. modulePath)
             vim.notify(string.format("Reload: %s", modulePath), vim.log.levels.INFO)
-        elseif string.match(modulePath.filename, e(configPath:joinpath("colors").filename)) then
+        elseif string.match(modulePath.filename, configPath:joinpath("colors").filename) then
             local colorDirPath = configPath:joinpath("colors")
             local colorRel     = string.sub(
                 path:new(modulePath.filename):make_relative(colorDirPath.filename),
