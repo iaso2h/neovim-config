@@ -20,7 +20,7 @@ o.shiftwidth  = 4
 o.softtabstop = 4
 o.tabstop     = 4
 
-o.clipboard = "unnamed,unnamedplus"
+o.clipboard = "unnamed"
 
 o.cmdheight  = 2
 o.shortmess  = "cxTIF"
