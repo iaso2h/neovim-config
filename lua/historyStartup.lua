@@ -28,8 +28,15 @@ M.display = function(force)
     end
 
     for _, file in pairs(vim.v.oldfiles) do
-        if vim.loop.fs_stat(file) then
-            table.insert(lines, file)
+        if jit.os ~= "Windows" then
+            if vim.loop.fs_stat(file) then
+                table.insert(lines, file)
+            end
+        else
+            file = string.sub(file, 1, 1):upper() .. string.sub(file, 2, -1)
+            if not vim.tbl_contains(lines, file) and vim.loop.fs_stat(file) then
+                table.insert(lines, file)
+            end
         end
     end
 
