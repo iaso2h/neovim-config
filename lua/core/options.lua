@@ -20,7 +20,11 @@ o.shiftwidth  = 4
 o.softtabstop = 4
 o.tabstop     = 4
 
-o.clipboard = "unnamed"
+if jit.os == "Windows" then
+    o.clipboard = "unnamed"
+else
+    o.clipboard = "unnamed,unnamedplus"
+end
 
 o.cmdheight  = 2
 o.shortmess  = "cxTIF"

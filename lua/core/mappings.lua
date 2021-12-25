@@ -129,7 +129,7 @@ luaRHS[[:lua
 
     local vMotion = require("operator").vMotion(true);
     table.insert(vMotion, "<Plug>ExtractVisual");
-    require("extraction").operator(VMotion)<CR>]],
+    require("extraction").operator(vMotion)<CR>]],
 {"silent"}, "Extract selected")
 map("n", [[<Plug>ExtractVisual]],
 luaRHS[[:lua

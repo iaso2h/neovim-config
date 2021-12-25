@@ -14,7 +14,12 @@ api.nvim_buf_set_option(0, "buflisted", false)
 cmd [[setlocal winhighlight=Normal:PanelBackground,SignColumn:PanelBackground]]
 cmd [[resize 21]]
 if QuickfixSwitchWinID then
-    vim.api.nvim_set_current_win(QuickfixSwitchWinID)
-    QuickfixSwitchWinID = nil
+    local winnr = vim.fn.bufwinnr("#")
+    vim.defer_fn(function()
+        if winnr ~= -1 then
+            cmd(winnr .. "wincmd w")
+        end
+    end, 0)
+    QuickfixSwitchWinID = false
 end
 

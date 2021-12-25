@@ -56,9 +56,9 @@ end
 --- will be wiped
 --- @param bufNr boolean Buffer number handler
 local function bufWipe(bufNr)
-    -- Might help to disable treesitter warning
-    -- Error executing vim.schedule lua callback: /usr/share/nvim/runtime/lua/vim/lsp/util.lua:1486: Invalid buffer id: 63
-    pcall(api.nvim_buf_delete, bufNr and bufNr or 0, {force = true})
+    bufNr = bufNr or 0
+    cmd("bdelete! " .. bufNr)
+    -- pcall(api.nvim_buf_delete, bufNr and bufNr or 0, {force = true})
 end
 
 
@@ -380,6 +380,7 @@ function M.quickfixToggle() -- {{{
     local winInfo = fn.getwininfo()
     for _, tbl in ipairs(winInfo) do
         if tbl["quickfix"] == 1 then
+            QuickfixSwitchBufNr = api.nvim_get_current_buf()
             return api.nvim_set_current_win(tbl["winid"])
         end
     end

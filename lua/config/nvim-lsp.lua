@@ -1,7 +1,7 @@
 local M   = {servers = {}}
 
 
-M.formatCode = function(vimMode)
+M.formatCode = function(vimMode) -- {{{
     local fn  = vim.fn
     local cmd = vim.cmd
     if not vim.bo.modified then return end
@@ -31,14 +31,15 @@ M.formatCode = function(vimMode)
         cmd [[normal! gv=]]
         fn.winrestview(saveView)
     end
-end
+end -- }}}
 
 
 ----
 -- Function: M.config: Find and setup configuration for each LSP, including keymaps
 ----
-M.config = function()
+M.config = function() -- {{{
     local lspConfig = require("lspconfig")
+    local path = require("plenary.path")
     local lsp = vim.lsp
     local fn  = vim.fn
     local cmd = vim.cmd
@@ -49,6 +50,7 @@ M.config = function()
     -- @param client: language-server client
     -- @param bufNr: buffer number
     ----
+
     local onAttach = function(client, bufNr) -- {{{
         require("illuminate").on_attach(client)
 
@@ -71,10 +73,10 @@ M.config = function()
         bmap(bufNr, "n", [=[gi]=],        [[:lua vim.lsp.buf.implementation()<CR>]],  {"silent"})
         bmap(bufNr, "n", [=[gR]=], luaRHS[[:lua
     do
-        QuickfixSwitchWinID = vim.api.nvim_get_current_win();
-        vim.lsp.buf.references{includeDeclaration = false};
+        QuickfixSwitchWin = true;
+        vim.lsp.buf.references{includeDeclaration = false}
     end<CR>
--- ]], {"silent"})
+]], {"silent"})
         bmap(bufNr, "n", [[K]],           [[:lua vim.lsp.buf.hover()<CR>]],           {"silent"})
         bmap(bufNr, "n", [[<C-p>]],       [[:lua vim.lsp.buf.signature_help()<CR>]],  {"silent"})
         bmap(bufNr, "n", [[<leader>r]],   [[:lua vim.lsp.buf.rename()<CR>]],          {"silent"})
@@ -94,60 +96,16 @@ M.config = function()
         end
     end -- }}}
 
-
-    local setupServers = function() -- {{{
-        -- local M                     = require("config.nvim-lsp")
-        local lsp_installer_servers = require("nvim-lsp-installer.servers")
-        local snippetCapabilities   = vim.lsp.protocol.make_client_capabilities()
-        snippetCapabilities.textDocument.completion.completionItem.snippetSupport = true
-
-        local basicConfig = {
-            -- enable snippet support
-            capabilities = require("cmp_nvim_lsp").update_capabilities(snippetCapabilities),
-            -- map buffer local keybindings when the language server attaches
-            on_attach    = onAttach
-        }
-
-        for _, server in pairs(vim.tbl_keys(M.servers)) do
-            local server_available, requested_server = lsp_installer_servers.get_server(server)
-            if server_available then
-                requested_server:on_ready(function ()
-                    local config = {}
-                    if server == "lua" then
-                        config = require("lua-dev").setup{
-                            -- lspconfig = M.servers[server]
-                        }
-                        config = vim.tbl_deep_extend("force", basicConfig, config)
-                    else
-                        config = vim.tbl_deep_extend("force", basicConfig, M.servers[server])
-                    end
-                    requested_server:setup(config)
-                end)
-                if not requested_server:is_installed() then
-                    -- Queue the server to be installed
-                    requested_server:install()
-                end
-            end
-        end
-
-    end -- }}}
-
-
-    -- LSP override config {{{
+    -- LSP config override {{{
     -- Setup() function: https://github.com/neovim/nvim-lspconfig#setup-function
     -- Individual configuration: https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md
-    local checkExt = function(serverExec)
-        return jit.os == "Windows" and serverExec .. ".cmd" or serverExec
-    end
-
     -- Python {{{
     -- https://github.com/microsoft/pyright
-    -- npm install -g pyright
     -- https://github.com/microsoft/pyright/blob/master/docs/configuration.md
     -- https://github.com/microsoft/pyright/blob/96871bec5a427048fead499ab151be87b7baf023/packages/vscode-pyright/package.json
 
     M.servers.pyright = {
-        cmd       = {checkExt("pyright-langserver"), "--stdio" },
+        -- cmd       = {checkExt("pyright-langserver"), "--stdio" },
         settings  = {
             python = {
                 pythonPath = "python",
@@ -168,19 +126,13 @@ M.config = function()
     -- }}} Python
     -- Lua {{{
     -- https://github.com/sumneko/lua-language-server
-    -- For linux: https://github.com/sumneko/lua-language-server/wiki/Build-and-Run-(Standalone)
     -- Settings: https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md#sumneko_lua
-    local binaryExt       = {macOS = "", Linux = "", Windows = ".exe"}
-    local sep             = jit.os == "Windows" and "\\" or "/"
-    local dataPath        = fn.stdpath("data")
-    local sumnekoRootPath = string.format("%s%slsp_servers%ssumneko_lua%sextension%sserver%sbin", dataPath, sep, sep, sep, sep, sep)
-    local sumnekoBinary   = sumnekoRootPath .. sep .. "lua-language-server" .. binaryExt["Windows"]
     local runtimePath     = vim.split(package.path, ";")
     table.insert(runtimePath, "lua/?.lua")
     table.insert(runtimePath, "lua/?/init.lua")
 
     M.servers.sumneko_lua = {
-        cmd = {sumnekoBinary, "-E", sumnekoRootPath .. "/main.lua"};
+        -- cmd = {sumnekoBinary, "-E", sumnekoRootPath .. "/main.lua"};
         settings = {
             Lua = {
                 runtime = {
@@ -214,7 +166,6 @@ M.config = function()
         'help'
     }
     M.servers.vimls = {
-        cmd = {checkExt("vim-language-server"), "--stdio"},
         init_options = {
             isNeovim    = true,
             runtimepath = "",
@@ -243,27 +194,23 @@ M.config = function()
             "--suggest-missing-includes",
             "--fallback-style=google"
         }
-        if jit.os == "Windows" then
-            if ex("clangd") then
-                table.insert(cmdStr, 1, "clangd")
-                return cmdStr
-            else
-                return ""
-            end
-        elseif jit.os == "Linux" then
-            if ex("clangd-11") then -- The current clangd version. 2021-08-23
-                table.insert(cmdStr, 1, "clangd-11")
-                return cmdStr
-            else
-                local clangdVersion = string.match(fn.system[[apt list --installed | grep -Eo "clangd-.."]], "clangd%-%d%d") -- Query installed clangd on Ubuntu
-                if not nil then return "" end
-                table.insert(cmdStr, 1, clangdVersion)
-                return cmdStr
-            end
+
+        local binaryExt       = {macOS = "", Linux = "", Windows = ".exe"}
+        local sep             = jit.os == "Windows" and "\\" or "/"
+        local dataPath   = path:new(fn.stdpath("data"))
+        local clangdGenericPath = dataPath:joinpath("lsp_servers/clangd")
+        local clangdPathStr     = fn.glob(clangdGenericPath.filename .. sep .. "clangd_*")
+        if clangdPathStr == "" then
+            return {}
         else
-            return ""
+            local clangdBinPath = path:new(clangdPathStr):joinpath("bin", "clangd")
+            local clangdBinStr  = clangdBinPath.filename .. binaryExt[jit.os]
+            table.insert(cmdStr, 1, clangdBinStr)
+            return cmdStr
         end
+
     end -- }}}
+
     local clangdCMD = findClangd()
     if clangdCMD ~= "" then
         M.servers.clangd = {
@@ -286,25 +233,20 @@ M.config = function()
     end
     -- }}} Clangd
     M.servers.jsonls = {
-    cmd = {checkExt("vscode-json-language-server"), "--stdio"},
     }
     M.servers.html = {
-    cmd = {checkExt("vscode-html-language-server"), "--stdio"},
     }
     M.servers.tsserver = {
-    cmd = {checkExt("typescript-language-server"), "--stdio"},
     }
     M.servers.yamlls = {
-    cmd = {checkExt("yaml-language-server"), "--stdio"},
     }
     M.servers.cssls = {
-    cmd = {checkExt("vscode-css-language-server"), "--stdio"},
     }
     M.servers.bashls = {
-    cmd = {checkExt("bash-language-server"), "start"}
     }
-    -- }}} LSP override config
+    -- }}} LSP config override
 
+    -- vim.lsp and vim.diagnostic setups {{{
     vim.diagnostic.config {
         underline        = true,
         virtual_text     = true,
@@ -321,6 +263,7 @@ M.config = function()
     ]]
     lsp.handlers["textDocument/hover"]         = lsp.with(lsp.handlers.hover,          {border = "rounded"})
     lsp.handlers["textDocument/signatureHelp"] = lsp.with(lsp.handlers.signature_help, {border = "rounded"})
+    -- }}} vim.lsp and vim.diagnostic setups
 
     -- Format mapping {{{
     cmd [[command! -nargs=0 Format lua require("config.nvim-lsp").formatCode("n")]]
@@ -328,9 +271,42 @@ M.config = function()
     map("x", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("v")<CR>]], {"silent"})
     -- }}} Format mapping
 
-    setupServers()
+    -- Setup servers {{{
+    local lsp_installer_servers = require("nvim-lsp-installer.servers")
+    local snippetCapabilities   = vim.lsp.protocol.make_client_capabilities()
+    snippetCapabilities.textDocument.completion.completionItem.snippetSupport = true
 
-end
+    local basicConfig = {
+        -- enable snippet support
+        capabilities = require("cmp_nvim_lsp").update_capabilities(snippetCapabilities),
+        -- map buffer local keybindings when the language server attaches
+        on_attach    = onAttach
+    }
+
+    for _, server in pairs(vim.tbl_keys(M.servers)) do
+        local server_available, requested_server = lsp_installer_servers.get_server(server)
+        if server_available then
+            requested_server:on_ready(function ()
+                local config = {}
+                if server == "lua" then
+                    config = require("lua-dev").setup{
+                        -- lspconfig = M.servers[server]
+                    }
+                    config = vim.tbl_deep_extend("force", basicConfig, config)
+                else
+                    config = vim.tbl_deep_extend("force", basicConfig, M.servers[server])
+                end
+                requested_server:setup(config)
+            end)
+            if not requested_server:is_installed() then
+                -- Queue the server to be installed
+                requested_server:install()
+            end
+        end
+    end
+    -- }}} Setup servers
+
+end -- }}}
 
 
 return M
