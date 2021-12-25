@@ -56,6 +56,8 @@ packer.startup{
 
     use 'wbthomason/packer.nvim'
 
+    -- use_rocks 'icecream'
+
     -- Vim enhancement {{{
     use 'nathom/filetype.nvim'
     use 'inkarkat/vim-visualrepeat'
@@ -79,16 +81,17 @@ packer.startup{
     }
     use {
         'zatchheems/vim-camelsnek',
-        cmd  = {"Camel", "Snake", "Pascal", "Snakecaps"},
         keys = {
             {"x", [[<A-c>]]},
             {"n", [[<A-c>]]},
             {"n", [[<A-S-c>]]},
         },
-        config = function()
+        setup = function()
             vim.g.camelsnek_alternative_camel_commands = 1
             vim.g.camelsnek_no_fun_allowed             = 1
-            vim.g.camelsnek_iskeyword_overre           = 0
+            vim.g.camelsnek_iskeyword_override         = 0
+        end,
+        config = function()
             map("x", [[<A-c>]],   [[:call CaseSwitcher()<CR>]],                               {"silent"})
             map("n", [[<A-c>]],   [[:lua require("caseSwitcher").cycleCase()<CR>]],           {"silent"}, "Cycle cases")
             map("n", [[<A-S-c>]], [[:lua require("caseSwitcher").cycleDefaultCMDList()<CR>]], {"silent"}, "Cycle cases reset")
@@ -165,9 +168,7 @@ packer.startup{
     use {
         'inkarkat/vim-ReplaceWithRegister',
         disable = true,
-        config  = function()
-                map("x", "R", "gr")
-            end
+        config  = 'map("x", "R", "gr")'
     }
     use {
         fn.stdpath("config") .. "/lua/replace",
@@ -392,9 +393,7 @@ packer.startup{
     use {
         'AndrewRadev/switch.vim',
         cmd   = "Switch",
-        setup = function()
-            map("n", [[gt]], [[:<C-u>Switch<CR>]], {"silent"}, "Switch word under cursor")
-        end
+        setup = 'map("n", [[gt]], [[:<C-u>Switch<CR>]], {"silent"}, "Switch word under cursor")'
     }
     use {
         'AndrewRadev/linediff.vim',
@@ -801,7 +800,7 @@ packer.startup{
     use {
         'romgrk/nvim-treesitter-context',
         requires = "nvim-treesitter",
-        event   = {"CursorHold", "CursorHoldI"},
+        event    = {"CursorHold", "CursorHoldI"},
         config   = function()
             require("treesitter-context").setup{
                 enable   = true,  -- Enable this plugin (Can be enabled/disabled later via commands)
@@ -974,9 +973,7 @@ packer.startup{
         disable = true,
         cmd     = "CodeActionMenu",
         keys    = {{"n", "<leader>a"}},
-        config  = function()
-            map("n", [[<leader>a]], [[:<C-u>CodeActionMenu<CR>]], {"silent"})
-        end
+        config  = 'map("n", [[<leader>a]], [[:<C-u>CodeActionMenu<CR>]], {"silent"})'
         }
     use {
         'folke/trouble.nvim',
@@ -1358,6 +1355,9 @@ packer.startup{
             open_fn       = function()
                 return require("packer.util").float{border = "single"}
             end
+        },
+        luarocks = {
+            python_cmd = 'python' -- Set the python command to use for running hererocks
         }
     }
 }
