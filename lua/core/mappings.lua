@@ -168,7 +168,7 @@ map("x", [[&]], [[:lua require("selection").visualSub()<CR>]])
 map("n", [[<leader>i]], [=[[I]=], "Inquery word under cursor")
 map("x", [[<leader>i]], [[:lua Print("noa g#\\V" .. string.gsub(require("selection").getSelect("string"), "\\", "\\\\") .. "#number")<CR>]], {"silent"})
 -- Fast mark & resotre
-map("n", [[M]], [[`m]], "Restore mark M")
+map("n", [[M]], [[`mzzzv]], "Restore mark M")
 -- Changelist jumping
 map("n", [[<A-o>]], [[:lua require("historyHop").main("changelist", -1)<CR>]], {"silent"}, "Previous change")
 map("n", [[<A-i>]], [[:lua require("historyHop").main("changelist", 1)<CR>]],  {"silent"}, "Next change")

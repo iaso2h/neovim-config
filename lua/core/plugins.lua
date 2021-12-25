@@ -154,7 +154,7 @@ packer.startup{
     use {
         fn.stdpath("config") .. "/lua/compileRun",
         cmd  = {"Run", "Compile"},
-        keys = {"F9", "S-F9"},
+        keys = {"F9", "<S-F9>"},
         config = function()
             vim.cmd [[
             command! -nargs=0 Compile lua require("compileRun").compileCode()
@@ -1310,8 +1310,14 @@ packer.startup{
     }
     use {
         'rhysd/conflict-marker.vim',
-        disable = true,
-        keys    = "}x, ]x, cb, co, cn, cb",
+        disable = ex("lazygit"),
+        setup = [[vim.g.conflict_marker_enable_mappings = 0; vim.g.conflict_marker_enable_highlight = 1]],
+        config = function ()
+            map("x", "]x", [[<Plug>(conflict-marker-next-hunk)]])
+            map("x", "[x", [[<Plug>(conflict-marker-prev-hunk)]])
+        end
+        -- disable = true,
+        -- keys    = "}x, ]x, ct, co, cn, cb",
     }
     use {
         'sindrets/diffview.nvim',
