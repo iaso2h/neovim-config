@@ -291,7 +291,6 @@ map("n", [[zd]], [[:<C-u>call EnhanceFoldHL("", 800, "EnhanceDelete")<CR>]], {"s
 map("n", [[cz]], [[:<C-u>call EnhanceFoldHL("", 0, "EnhanceChange")<CR>]],   {"silent"}, "Change fold")
 map("n", [[zc]], [[:<C-u>call EnhanceFoldHL("", 0, "EnhanceChange")<CR>]],   {"silent"}, "Change fold")
 -- TODO: Check whether target line is a comment or not
--- api.nvim_echo({{"text", "Normal"}}, true, {})
 map("n", [[g{]],              [[:<C-u>call EnhanceFold(mode(), "{{{")<CR>]],           "Add fold start")
 map("n", [[g}]],              [[:<C-u>call EnhanceFold(mode(), "}}}")<CR>]],           "Add fold end")
 map("x", [[g{]],              [[m`:<C-u>call EnhanceFold(visualmode(), "}}}")<CR>``]])

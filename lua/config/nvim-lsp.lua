@@ -105,7 +105,6 @@ M.config = function() -- {{{
     -- https://github.com/microsoft/pyright/blob/96871bec5a427048fead499ab151be87b7baf023/packages/vscode-pyright/package.json
 
     M.servers.pyright = {
-        -- cmd       = {checkExt("pyright-langserver"), "--stdio" },
         settings  = {
             python = {
                 pythonPath = "python",
@@ -132,7 +131,6 @@ M.config = function() -- {{{
     table.insert(runtimePath, "lua/?/init.lua")
 
     M.servers.sumneko_lua = {
-        -- cmd = {sumnekoBinary, "-E", sumnekoRootPath .. "/main.lua"};
         settings = {
             Lua = {
                 runtime = {
@@ -150,7 +148,6 @@ M.config = function() -- {{{
                 },
 
                 workspace = {
-                    -- NOTE: in favor of https://github.com/folke/lua-dev.nvim
                     maxPreload      = 10000,
                     preloadFileSize = 10000,
                     ignoreDir       = {".vscode", ".git"}
@@ -232,18 +229,12 @@ M.config = function() -- {{{
         }
     end
     -- }}} Clangd
-    M.servers.jsonls = {
-    }
-    M.servers.html = {
-    }
-    M.servers.tsserver = {
-    }
-    M.servers.yamlls = {
-    }
-    M.servers.cssls = {
-    }
-    M.servers.bashls = {
-    }
+    M.servers.jsonls = nil
+    M.servers.html = nil
+    M.servers.tsserver = nil
+    M.servers.yamlls = nil
+    M.servers.cssls = nil
+    M.servers.bashls = nil
     -- }}} LSP config override
 
     -- vim.lsp and vim.diagnostic setups {{{
