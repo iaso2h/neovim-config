@@ -1,24 +1,34 @@
 -- File: caseSwitcher
 -- Author: iaso2h
 -- Description: prerequisite zatchheems/vim-camelsnek
--- Version: 0.0.2
--- Last Modified: 2021-12-24
+-- Version: 0.0.3
+-- Last Modified: 2022-01-13
 local cmd = vim.cmd
 local api = vim.api
 local M   = {}
 
-M.timer = {}
+M.timer = nil
 M.CMDList = {}
 M.defaultCMDList = {"Camel", "Snake", "Pascal", "Snakecaps"}
+M.lastSwitchPos = {}
+M.lastSwitchBufNr = nil
+M.timeout = 1000
 
 function M.cycleCase() -- {{{
-    local timeout = 1000
-    local cursorPos = api.nvim_win_get_cursor(0)
-    -- When timer fire, the timer list will be empty, and the default cmdlist ->
-    -- will be used
-    if not next(M.CMDList) or not next(M.timer) then
+    local curPos   = api.nvim_win_get_cursor(0)
+    local curBufNr = api.nvim_get_current_buf()
+
+    -- When function is first time called or cursor have been moved from last
+    -- switch position, the value of M.CMDList reset to default
+    if curBufNr ~= M.lastSwitchBufNr or
+        curPos[1] ~= M.lastSwitchPos[1] or
+        curPos[2] ~= M.lastSwitchPos[2] then
         M.CMDList = vim.deepcopy(M.defaultCMDList)
     end
+
+    -- Stop the previous defered function if this func is quick enough to be
+    -- called again
+    if M.timer then M.timer:stop() end
 
     -- Always re-append then vimCMD after pop it up
     local vimCMD = table.remove(M.CMDList, 1)
@@ -28,24 +38,25 @@ function M.cycleCase() -- {{{
     cmd("noa silent " .. vimCMD)
     api.nvim_echo({{string.format("\nSwitch to %s", vimCMD), "MoreMsg"}}, false, {})
 
-    -- Restore cursor position
-    api.nvim_win_set_cursor(0, cursorPos)
 
-    -- Stop all existing timers in advance if the func M.cycleCase is call
-    -- agian within the timeout
-    if #M.timer ~= 0 then
-        for index, timer in ipairs(M.timer) do
-            if getmetatable(timer).timer_stop then
-                timer:timer_stop()
-                table.remove(M.timer, index)
-            end
-        end
-    end
+    -- Store the cursor position. When this function is called again, the
+    -- value of M.lastSwitchBufNr and M.lastSwitchPos will be checked whether
+    -- the cursor move or not after last case switch.
+    -- If the cursor have been moved, then the value of M.CMDList will be copied
+    -- from M.defaultCMDList
+    M.lastSwitchPos = api.nvim_buf_get_mark(0, "[")
+    M.lastSwitchBufNr = api.nvim_get_current_buf()
 
-    -- Set new timer and insert the timer object before the first element of
-    -- M.timer
-    table.insert(M.timer, 1, vim.defer_fn(function () table.remove(M.timer) end, timeout))
+    -- Always set cursor position to the first character of the text changed area
+    api.nvim_win_set_cursor(0, M.lastSwitchPos)
+
+    -- Set the defered func.
+    M.timer = vim.defer_fn(function ()
+        M.CMDList = vim.deepcopy(M.defaultCMDList)
+        M.timer = nil
+    end, M.timeout)
 end -- }}}
+
 
 function M.cycleDefaultCMDList() -- {{{
     table.insert(M.defaultCMDList, table.remove(M.defaultCMDList, 1))
