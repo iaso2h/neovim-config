@@ -1,8 +1,8 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.8
--- Last Modified: 2021-11-23
+-- Version: 0.1.10
+-- Last Modified: 2022-01-13
 -- BUG: paste V-type(containing lines with indent) register into blank line
 
 local fn       = vim.fn
@@ -10,7 +10,18 @@ local cmd      = vim.cmd
 local api      = vim.api
 local util     = require("util")
 local operator = require("operator")
-local M = {}
+local M = {
+    lineMove = {
+        lastMovePos = {
+            bufNr = nil,
+            lineNr = nil
+        },
+        timer    = nil,
+        timeout  = 500,
+        gitsignsOn     = package.loaded["gitsigns"] ~= nil,
+        gitsignsLineHl = package.loaded["gitsigns"] ~= nil,
+    }
+}
 -- TODO: test cases
 
 
@@ -20,32 +31,60 @@ function M.VSCodeLineMove(vimMode, direction) -- {{{
     end
     if fn.foldclosed('.') ~= -1 then return end
 
-    -- local curWinID = api.nvim_get_current_win()
-    -- local cursorPos = api.nvim_win_get_cursor(curWinID)
-    -- local curIndent = fn.indent(cursorPos[1])
+    -- Stop previous timer if this func is quick enough to be called again
+    -- before the defered function is called and stop it
+    if M.lineMove.timer then
+        M.lineMove.timer:stop()
+    end
+
+    -- Disable Gitsign.nvim plugin to prevent frequently shrinking or
+    -- expanding in sign column
+    if M.lineMove.gitsignsOn and M.lineMove.gitsignsLineHl then
+        cmd [[noautocmd Gitsigns toggle_signs]]
+        M.lineMove.gitsignsLineHl = false
+    end
+
     if vimMode == "n" then
         if direction == "down" then
-            -- local nextIndent = fn.indent(cursorPos[1] + 1)
-            pcall(cmd, [[m .+1]])
-            -- if not (nextIndent == curIndent or nextIndent == 0) then
-                -- if vim.o.equalprg == "" then cmd [[noautocmd normal! ==]] end
-            -- end
+            pcall(cmd, [[noautocmd m .+1]])
         elseif direction == "up" then
-            -- local previousIndent = fn.indent(cursorPos[1] - 1)
-            pcall(cmd, [[m .-2]])
-            -- if not (previousIndent == curIndent or previousIndent == 0) then
-                -- if vim.o.equalprg == "" then cmd [[noautocmd normal! ==]] end
-            -- end
+            pcall(cmd, [[noautocmd m .-2]])
         end
     elseif vimMode == "v" then
         if direction == "down" then
-            pcall(cmd, [['<,'>m '>+1]])
+            pcall(cmd, [[noautocmd '<,'>m '>+1]])
         elseif direction == "up" then
-            pcall(cmd, [['<,'>m '<-2]])
+            pcall(cmd, [[noautocmd '<,'>m '<-2]])
         end
 
         cmd [[noautocmd normal! gv]]
     end
+
+    -- Get line info
+    if vimMode == "n" then
+        M.lineMove.lastMovePos.lineNr = {fn.getpos("'[")[2], fn.getpos("']")[2]}
+    else
+        M.lineMove.lastMovePos.lineNr = {fn.getpos("'<")[2], fn.getpos("'>")[2]}
+    end
+    M.lineMove.lastMovePos.bufNr  = api.nvim_get_current_buf()
+
+    -- Set defered func. If the cursor is still at the same buffer and
+    -- whithin the same line range, then perform a format action
+    M.lineMove.timer = vim.defer_fn(function()
+        local curBufNr = api.nvim_get_current_buf()
+        local curlineNr = fn.getpos(".")[2]
+        if curBufNr == M.lineMove.lastMovePos.bufNr and
+            curlineNr <= M.lineMove.lastMovePos.lineNr[2] and
+            curlineNr >= M.lineMove.lastMovePos.lineNr[1] and
+            vim.o.equalprg == "" then
+
+            cmd [[noautocmd normal! ==]]
+        end
+        cmd [[noautocmd Gitsigns toggle_signs]]
+        M.lineMove.gitsignsLineHl = true
+        M.lineMove.timer = nil
+    end, M.lineMove.timeout)
+
 end -- }}}
 
 
