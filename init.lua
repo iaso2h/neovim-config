@@ -2,6 +2,10 @@
 -- https://github.com/neovim/neovim/issues/14090#issuecomment-921312955) or
 -- Neovim 0.7.0 Nightly
 require("impatient").enable_profile()
+
+-- Global lua var
+_G.IsTerm = os.getenv("TERM") ~= ""
+
 -- Build-in plugin {{{
 -- Disable
 vim.g.loaded_2html_plugin      = 1
@@ -25,6 +29,7 @@ vim.g.loaded_vimballPlugin     = 1
 vim.g.loaded_zip               = 1
 vim.g.loaded_zipPlugin         = 1
 vim.g.did_load_filetypes       = 1
+vim.g.do_filetype_lua          = 1
 -- Toggle embed syntax
 vim.g.vimsyn_embed = 'lPr'
 -- c.vim
@@ -39,9 +44,8 @@ vim.g.doxygen_enhanced_color = 1
 -- msql.vim
 vim.g.msql_sql_query = 1
 -- }}} Build-in plugin
-local ok, msg = pcall(require, "util"); if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 
+local ok, msg = pcall(require, "util"); if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 require "core"
 require "quickFix"
 
-_G.IsTerm = os.getenv("TERM") or false

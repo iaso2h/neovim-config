@@ -59,7 +59,10 @@ packer.startup{
     -- use_rocks 'icecream'
 
     -- Vim enhancement {{{
-    use 'nathom/filetype.nvim'
+    use {
+        'nathom/filetype.nvim',
+        disable = false
+        }
     use 'inkarkat/vim-visualrepeat'
     use 'tpope/vim-repeat'
     use {
