@@ -169,7 +169,7 @@ map("n", [[cN]], [[*``cgN]], {"noremap"}, "Change word under cursor, then highli
 map("n", [[<leader>i]], [=[[I]=], "Inquery word under cursor")
 map("x", [[<leader>i]], [[:lua Print("noa g#\\V" .. string.gsub(require("selection").getSelect("string"), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquery selected words")
 -- Fast mark & resotre
-map("n", [[M]], [[`m]], "Restore mark M")
+map("n", [[M]], [[`mzzzv]], "Restore mark M")
 -- Changelist jumping
 map("n", [[<A-o>]], [[:lua require("historyHop").main("changelist", -1)<CR>]], {"silent"}, "Previous change")
 map("n", [[<A-i>]], [[:lua require("historyHop").main("changelist", 1)<CR>]],  {"silent"}, "Next change")
@@ -346,7 +346,7 @@ map("n", [[J]], [[m`J``]], {"noremap"})
 map({"n", "x", "o"}, [[<Plug>InplaceYank]],
 [[luaeval("require('operator').expr(require('yankPut').inplaceYank, false, '<Plug>InplaceYank')")]],
 {"expr", "silent"}, "Yank operator")
-map({"n", "x"}, [[y]], [[<Plug>InplaceYank]], "Yank operator")
+map({"n", "x", "o"}, [[y]], [[<Plug>InplaceYank]], "Yank operator")
 map({"n", "x"}, [[Y]], [[yy]], "Yank line")
 -- Inplace put
 map("n", [[p]], [[:lua require("yankPut").inplacePut("n", "p", false)<CR>]], {"silent"}, "Put after")
