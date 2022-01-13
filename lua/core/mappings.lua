@@ -292,17 +292,10 @@ map("n", [[zd]], [[<CMD>call EnhanceFoldHL("", 800, "EnhanceDelete")<CR>]], {"si
 map("n", [[cz]], [[<CMD>call EnhanceFoldHL("", 0, "EnhanceChange")<CR>]],   {"silent"}, "Change fold")
 map("n", [[zc]], [[<CMD>call EnhanceFoldHL("", 0, "EnhanceChange")<CR>]],   {"silent"}, "Change fold")
 -- TODO: Check whether target line is a comment or not
--- api.nvim_echo({{"text", "Normal"}}, true, {})
 map("n", [[g{]], [[<CMD>call EnhanceFold(mode(), "{{{")<CR>]],           "Add fold start")
 map("n", [[g}]], [[<CMD>call EnhanceFold(mode(), "}}}")<CR>]],           "Add fold end")
 map("x", [[g{]], [[m`<CMD>call EnhanceFold(visualmode(), "}}}")<CR>``]], "Add fold for selected")
 map("x", [[g}]], [[m`<CMD>call EnhanceFold(visualmode(), "}}}")<CR>``]], "Add fold for selected")
-||||||| beab17d
--- api.nvim_echo({{"text", "Normal"}}, true, {})
-map("n", [[g{]],              [[:<C-u>call EnhanceFold(mode(), "{{{")<CR>]],           "Add fold start")
-map("n", [[g}]],              [[:<C-u>call EnhanceFold(mode(), "}}}")<CR>]],           "Add fold end")
-map("x", [[g{]],              [[m`:<C-u>call EnhanceFold(visualmode(), "}}}")<CR>``]])
-map("x", [[g}]],              [[m`:<C-u>call EnhanceFold(visualmode(), "}}}")<CR>``]])
 map("n", [[<leader><Space>]], [[@=(foldlevel('.') ? 'za' : '\<Space>')<CR>]],          {"noremap", "silent"}, "Open fold")
 -- TODO: make <C-Space> snapped to the nearst closed fold even if the cursor
 -- is not on a line with closed fold
@@ -442,6 +435,8 @@ map("!", [[<C-w>]], [[<C-Right>]], "Move cursor to one word forward")
 map("c", [[<C-j>]],   [[<Down>]], "Move cursor down")
 map("c", [[<C-k>]],   [[<Up>]], "Move cursor up")
 map("c", [[<C-BS>]],  [[<C-\>e(RemoveLastPathComponent())<CR>]], "Delete word before")
+map("c", [[<A-l>]], [[<C-d>]], {"noremap"}, "List more commands")
+map("c", [[<A-e>]], [[<C-\>e]], "Evaluate in Vimscript")
 -- }}} Mode: Commandline & Insert
 
 return M
