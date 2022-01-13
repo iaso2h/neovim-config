@@ -178,7 +178,12 @@ function M.inplaceYank(args) -- {{{
     end
 
     -- Restor cursor position
-    api.nvim_win_set_cursor(curWinID, operator.cursorPos)
+    if operator.cursorPos then
+        api.nvim_win_set_cursor(curWinID, operator.cursorPos)
+        -- Always clear M.cursorPos after restoration to avoid restoring
+        -- cursor in after repeat command is performed
+        operator.cursorPos = nil
+    end
 
     vim.defer_fn(function()
         -- In case of buffer being deleted
@@ -311,7 +316,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     -- Create extmark to track position of new content
     local saveNS = M.inplacePutNewContentNS
     M.inplacePutNewContentNS = api.nvim_create_namespace("inplacePutNewContent")
-    -- BUG: can be out of scope
+    -- HACK: can be out of scope
     local ok, msg = pcall(api.nvim_buf_set_extmark, curBufNr, M.inplacePutNewContentNS,
                     posStart[1], posStart[2], {end_line = posEnd[1], end_col = posEnd[2]})
     if not ok then
