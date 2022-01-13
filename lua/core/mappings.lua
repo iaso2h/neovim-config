@@ -132,7 +132,7 @@ luaRHS[[:lua
 
     local vMotion = require("operator").vMotion(true);
     table.insert(vMotion, "<Plug>ExtractVisual");
-    require("extraction").operator(vMotion)<CR>]],
+    require("extraction").operator(VMotion)<CR>]],
 {"silent"}, "Extract selected")
 map("n", [[<Plug>ExtractVisual]],
 luaRHS[[:lua
@@ -297,6 +297,12 @@ map("n", [[g{]], [[<CMD>call EnhanceFold(mode(), "{{{")<CR>]],           "Add fo
 map("n", [[g}]], [[<CMD>call EnhanceFold(mode(), "}}}")<CR>]],           "Add fold end")
 map("x", [[g{]], [[m`<CMD>call EnhanceFold(visualmode(), "}}}")<CR>``]], "Add fold for selected")
 map("x", [[g}]], [[m`<CMD>call EnhanceFold(visualmode(), "}}}")<CR>``]], "Add fold for selected")
+||||||| beab17d
+-- api.nvim_echo({{"text", "Normal"}}, true, {})
+map("n", [[g{]],              [[:<C-u>call EnhanceFold(mode(), "{{{")<CR>]],           "Add fold start")
+map("n", [[g}]],              [[:<C-u>call EnhanceFold(mode(), "}}}")<CR>]],           "Add fold end")
+map("x", [[g{]],              [[m`:<C-u>call EnhanceFold(visualmode(), "}}}")<CR>``]])
+map("x", [[g}]],              [[m`:<C-u>call EnhanceFold(visualmode(), "}}}")<CR>``]])
 map("n", [[<leader><Space>]], [[@=(foldlevel('.') ? 'za' : '\<Space>')<CR>]],          {"noremap", "silent"}, "Open fold")
 -- TODO: make <C-Space> snapped to the nearst closed fold even if the cursor
 -- is not on a line with closed fold
