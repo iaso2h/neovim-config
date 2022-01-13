@@ -19,14 +19,14 @@ M.config = function()
     }
 
     map("n", [[gs]], [[<Plug>(operator-sandwich-add)]], "Add surround")
-    map("x", [[S]], [[<Plug>(operator-sandwich-add)]])
+    map("x", [[S]], [[<Plug>(operator-sandwich-add)]], "Add surround for selected")
     map("n", [[ds]], [[<Plug>(operator-sandwich-delete)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)]], "Delete surround")
     map("n", [[cs]], [[<Plug>(operator-sandwich-replace)<Plug>(operator-sandwich-release-count)<Plug>(textobj-sandwich-query-a)]], "Change surround")
 
-    map("x", [[iq]], [[<Plug>(textobj-sandwich-literal-query-i)]])
-    map("x", [[aq]], [[<Plug>(textobj-sandwich-literal-query-a)]])
-    map("o", [[iq]], [[<Plug>(textobj-sandwich-literal-query-i)]])
-    map("o", [[aq]], [[<Plug>(textobj-sandwich-literal-query-a)]])
+    map("x", [[iq]], [[<Plug>(textobj-sandwich-literal-query-i)]], "Surround query iq text object")
+    map("x", [[aq]], [[<Plug>(textobj-sandwich-literal-query-a)]], "Surround query aq text object")
+    map("o", [[iq]], [[<Plug>(textobj-sandwich-literal-query-i)]], "Surround query iq text object")
+    map("o", [[aq]], [[<Plug>(textobj-sandwich-literal-query-a)]], "Surround query aq text object")
 
     fn["operator#sandwich#set"]('add',     'all', 'hi_duration', 1000)
     fn["operator#sandwich#set"]('replace', 'all', 'hi_duration', 1000)

@@ -92,9 +92,9 @@ packer.startup{
             vim.g.camelsnek_iskeyword_override         = 0
         end,
         config = function()
-            map("x", [[<A-c>]],   [[:call CaseSwitcher()<CR>]],                               {"silent"})
-            map("n", [[<A-c>]],   [[:lua require("caseSwitcher").cycleCase()<CR>]],           {"silent"}, "Cycle cases")
-            map("n", [[<A-S-c>]], [[:lua require("caseSwitcher").cycleDefaultCMDList()<CR>]], {"silent"}, "Cycle cases reset")
+            map("x", [[<A-c>]],   [[:call CaseSwitcher()<CR>]],    {"silent"}, "Change case for selected")
+            map("n", [[<A-c>]],   require("caseSwitcher").cycleCase,           "Cycle cases")
+            map("n", [[<A-S-c>]], require("caseSwitcher").cycleDefaultCMDList, "Cycle cases reset")
         end,
     }
     use {
@@ -114,25 +114,22 @@ packer.startup{
             vim.g.matchup_matchparen_nomode     = "i"
             vim.g.matchup_delim_start_plaintext = 0
             vim.g.matchup_delim_noskips         = 2
+            vim.g.matchup_surround_enabled      = 0
             -- Text obeject
-            map("x", [[am]],      [[<Plug>(matchup-a%)]])
-            map("x", [[im]],      [[<Plug>(matchup-i%)]])
-            map("o", [[am]],      [[<Plug>(matchup-a%)]])
-            map("o", [[im]],      [[<Plug>(matchup-i%)]])
+            map("x", [[am]],      [[<Plug>(matchup-a%)]], "Matchup a% text object")
+            map("x", [[im]],      [[<Plug>(matchup-i%)]], "Matchup i% text object")
+            map("o", [[am]],      [[<Plug>(matchup-a%)]], "Matchup a% text object")
+            map("o", [[im]],      [[<Plug>(matchup-i%)]], "Matchup i% text object")
             -- Inclusive
-            map("",  [[<C-m>]],   [[<Plug>(matchup-%)]], "Matchup forward inclusive")
-            map("",  [[<C-S-m>]], [[<Plug>(matchup-g%)]], "Matchup backward inclusive")
+            map({"n", "x", "o"},  [[<C-m>]],   [[<Plug>(matchup-%)]], "Matchup forward inclusive")
+            map({"n", "x", "o"},  [[<C-S-m>]], [[<Plug>(matchup-g%)]], "Matchup backward inclusive")
             -- Exclusive
             map("n", [[<A-m>]],   [[<Plug>(matchup-]%)]], "Matchup forward exclusive")
-            map("x", [[<A-m>]],   [[<Plug>(matchup-]%)]])
+            map("x", [[<A-m>]],   [[<Plug>(matchup-]%)]], "Matchup forward exclusive")
             map("n", [[<A-S-m>]], [[<Plug>(matchup-[%)]], "Matchup backward exclusive")
-            map("x", [[<A-S-m>]], [[<Plug>(matchup-[%)]])
+            map("x", [[<A-S-m>]], [[<Plug>(matchup-[%)]], "Matchup backward exclusive")
             -- Highlight
             map("n", [[<leader>m]], [[<Plug>(matchup-hi-surround)]], "Highlight Matchup")
-            -- Change/Delete surrounds
-            vim.g.matchup_surround_enabled = 1
-            map("n", [[dsm]], [[<Plug>(matchup-ds%)]])
-            map('n', [[csm]], [[<Plug>(matchup-cs%)]])
         end,
     }
     use {
@@ -147,8 +144,8 @@ packer.startup{
             require('hop').setup{
                 case_insensitive = false
             }
-            map("", [[<leader>f]], [[<cmd>lua require("hop").hint_char1()<CR>]], {"silent"}, "Hop char")
-            map("", [[<leader>F]], [[<cmd>lua require("hop").hint_lines()<CR>]], {"silent"}, "Hop line")
+            map({"n", "x"}, [[<leader>f]], require("hop").hint_char1, "Hop char")
+            map({"n", "x"}, [[<leader>F]], require("hop").hint_lines, "Hop line")
         end
         }
     use {
@@ -168,7 +165,7 @@ packer.startup{
     use {
         'inkarkat/vim-ReplaceWithRegister',
         disable = true,
-        config  = 'map("x", "R", "gr")'
+        config  = 'map("x", "R", "gr", "Replace operator)'
     }
     use {
         fn.stdpath("config") .. "/lua/replace",
@@ -183,13 +180,13 @@ packer.startup{
         config = function()
             map("n", [[<Plug>ReplaceOperator]],
                 luaRHS[[luaeval("require('replace').expr()")]],
-                {"silent", "expr"}
+                {"silent", "expr"}, "Replace operator"
             )
 
             -- TODO: Test needed
             map("n", [[<Plug>ReplaceExpr]],
                 [[:<C-u>let g:ReplaceExpr=getreg("=")<Bar>exec "norm!" . v:count1 . "."<CR>]],
-                {"silent"}
+                {"silent"}, "Replace expression"
             )
             map("n", [[<Plug>ReplaceCurLine]],
                 luaRHS[[
@@ -203,7 +200,7 @@ packer.startup{
 
                 require("replace").operator{"line", "V", "<Plug>ReplaceCurLine", true}<CR>
                 ]],
-                {"noremap", "silent"})
+                {"noremap", "silent"}, "Replace current line")
             map("x", [[<Plug>ReplaceVisual]],
                 luaRHS[[
                 :lua require("replace").replaceSave();
@@ -218,7 +215,7 @@ packer.startup{
                 table.insert(vMotion, "<Plug>ReplaceVisual");
                 require("replace").operator(vMotion)<CR>
                 ]],
-                {"noremap", "silent"})
+                {"noremap", "silent"}, "Replace selected")
             map("n", [[<Plug>ReplaceVisual]],
                 luaRHS[[
                 :lua require("replace").replaceSave();
@@ -235,22 +232,22 @@ packer.startup{
                 table.insert(vMotion, "<Plug>ReplaceVisual");
                 require("replace").operator(vMotion)<CR>
                 ]],
-                {"noremap", "silent"})
+                {"noremap", "silent"}, "Visual-repeat for replaced selected")
 
-            map("n", [[gr]],  [[<Plug>ReplaceOperator]])
-            map("n", [[grr]], [[<Plug>ReplaceCurLine]])
-            map("n", [[grn]], [[*``griw]], {"noremap"}, "Replace word under cursor forward")
-            map("n", [[grN]], [[#``griw]], {"noremap"}, "Replace word under cursor backward")
-            map("x", [[R]],   [[<Plug>ReplaceVisual]])
+            map("n", [[gr]],  [[<Plug>ReplaceOperator]], "Replace operator")
+            map("n", [[grr]], [[<Plug>ReplaceCurLine]], "Replace current line")
+            map("n", [[grn]], [[*``griw]], {"noremap"}, "Replace word under cursor, then highlight forward")
+            map("n", [[grN]], [[#``griw]], {"noremap"}, "Replace word under cursor, then highlight backward")
+            map("x", [[R]],   [[<Plug>ReplaceVisual]], "Replace selected")
         end
     }
     use {
         fn.stdpath("config") .. "/lua/logsitter",
         requires = "nvim-treesitter",
         module   = "logsitter",
-        keys     = {"n", "<leader>lg"},
+        keys     = {{"n", "<leader>lg"}},
         config   = function()
-            map("n", [[<leader>lg]], [[:lua require("logsitter").log()<CR>]], {"silent"}, "Log under cursor")
+            map("n", [[<leader>lg]], require("logsitter").log, "Log under cursor")
             require("logsitter").setup{
                 logFunc = {
                     lua = "Print",
@@ -266,7 +263,7 @@ packer.startup{
         },
         config = function()
             map("n", [[gx]],  [[<Plug>(Exchange)]], "Exchange operator")
-            map("x", [[X]],   [[<Plug>(Exchange)]])
+            map("x", [[X]],   [[<Plug>(Exchange)]], "Exchange selected")
             map("n", [[gxc]], [[<Plug>(ExchangeClear)]], "Exchange highlight clear")
             map("n", [[gxx]], [[<Plug>(ExchangeLine)]], "Exchange current line")
         end,
@@ -298,10 +295,7 @@ packer.startup{
                     ignore_groups = {"String"}
                 }
             }
-            map("x", [[A]],  [[<Plug>(EasyAlign)]])
-            map("n", [[ga]], [[<Plug>(EasyAlign)]], "Align operator")
-
-            map("x", [[A]],  [[<Plug>(EasyAlign)]])
+            map("x", [[A]],  [[<Plug>(EasyAlign)]], "Align selected")
             map("n", [[ga]], [[<Plug>(EasyAlign)]], "Align operator")
         end
     }
@@ -319,12 +313,12 @@ packer.startup{
             {"x", [[<leader>g<C-x>]]},
         },
         config = function()
-            map("n", [[<leader><C-a>]],  [[<Plug>(dial-increment)]], "Dial up")
-            map("n", [[<leader><C-x>]],  [[<Plug>(dial-decrement)]], "Dial down")
-            map("x", [[<leader><C-a>]],  [[<Plug>(dial-increment)]])
-            map("x", [[<leader><C-x>]],  [[<Plug>(dial-decrement)]])
-            map("x", [[<leader>g<C-a>]], [[<Plug>(dial-increment-additional)]])
-            map("x", [[<leader>g<C-x>]], [[<Plug>(dial-decrement-additional)]])
+            map("n", [[<leader><C-a>]],  [[<Plug>(dial-increment)]],            "Dial up")
+            map("n", [[<leader><C-x>]],  [[<Plug>(dial-decrement)]],            "Dial down")
+            map("x", [[<leader><C-a>]],  [[<Plug>(dial-increment)]],            "Dial up for selected")
+            map("x", [[<leader><C-x>]],  [[<Plug>(dial-decrement)]],            "Dial down for selected")
+            map("x", [[<leader>g<C-a>]], [[<Plug>(dial-increment-additional)]], "Dial up additional for selected")
+            map("x", [[<leader>g<C-x>]], [[<Plug>(dial-decrement-additional)]], "Dial down additional for selected")
         end
     }
     use {
@@ -345,11 +339,51 @@ packer.startup{
                         template = {
                             annotation_convention = "google_docstrings"
                         }
-                    }
+                    },
+                    php = {
+                        template = {
+                            annotation_convention = "phpdoc"
+                        }
+                    },
+                    rust = {
+                        template = {
+                            annotation_convention = "rustdoc"
+                        }
+                    },
+                    c = {
+                        template = {
+                            annotation_convention = "doxygen"
+                        }
+                    },
+                    cpp = {
+                        template = {
+                            annotation_convention = "doxygen"
+                        }
+                    },
+                    csharp = {
+                        template = {
+                            annotation_convention = "xmldoc"
+                        }
+                    },
+                    java = {
+                        template = {
+                            annotation_convention = "javadoc"
+                        }
+                    },
+                    javascript = {
+                        template = {
+                            annotation_convention = "jsdoc"
+                        }
+                    },
+                    typescript = {
+                        template = {
+                            annotation_convention = "jsdoc"
+                        }
+                    },
                 }
             }
 
-            map("n", [[g<Space>d]], [[:lua require("neogen").generate()<CR>]], {"silent"})
+            map("n", [[g<Space>d]], require("neogen").generate, "Comment function description")
         end,
     }
     use {
@@ -361,13 +395,19 @@ packer.startup{
         config = function()
             vim.g.splitjoin_align = 1
             vim.g.splitjoin_curly_brace_padding = 0
-            map("n", [["gS"]], [[:<C-u>SplitjoinSplit<CR>]], {"silent"}, "Smart split")
-            map("n", [["gJ"]], [[:<C-u>SplitjoinJoin<CR>]],  {"silent"}, "Smart join")
+            map("n", [["gS"]], [[<CMD>SplitjoinSplit<CR>]], {"silent"}, "Smart split")
+            map("n", [["gJ"]], [[<CMD>SplitjoinJoin<CR>]],  {"silent"}, "Smart join")
         end
     }
     use {
         'mg979/vim-visual-multi',
-        keys   = {",j", ",k", ",m", ",a", ",d"},
+        keys = {
+                {"n", ",j"},
+                {"n", ",k"},
+                {"n", ",m"},
+                {"n", ",a"},
+                {"n", ",d"}
+            },
         setup  = conf("vim-visual-multi").setup,
         config = conf("vim-visual-multi").config
     }
@@ -393,7 +433,7 @@ packer.startup{
     use {
         'AndrewRadev/switch.vim',
         cmd   = "Switch",
-        setup = 'map("n", [[gt]], [[:<C-u>Switch<CR>]], {"silent"}, "Switch word under cursor")'
+        setup = 'map("n", [[gt]], [[<CMD>Switch<CR>]], {"silent"}, "Switch word under cursor")'
     }
     use {
         'AndrewRadev/linediff.vim',
@@ -408,15 +448,15 @@ packer.startup{
     use {
         'AndrewRadev/sideways.vim',
         disable = true,
-        cmd  = {"SidewaysJumpLeft", "SidewaysJumpRight"},
-        keys = {
-            {"n", "gx<"},
-            {"n", "gx>"},
-        },
-        config = function()
-            map("n", [[gx<]], [[:<C-u>SidewaysLeft<CR>]],  {"silent"})
-            map("n", [[gx>]], [[:<C-u>SidewaysRight<CR>]], {"silent"})
-        end
+        -- cmd  = {"SidewaysJumpLeft", "SidewaysJumpRight"},
+        -- keys = {
+            -- {"n", "gx<"},
+            -- {"n", "gx>"},
+        -- },
+        -- config = function()
+            -- map("n", [[gx<]], [[<CMD>SidewaysLeft<CR>]],  {"silent"})
+            -- map("n", [[gx>]], [[<CMD>SidewaysRight<CR>]], {"silent"})
+        -- end
     }
     use {
         'windwp/nvim-autopairs',
@@ -562,8 +602,8 @@ packer.startup{
         },
         cmd    = "MaximizerToggle",
         config = function()
-            map("",  [[<C-w>m]], [[:MaximizerToggle<CR>]],      {"silent"}, "Maximize window")
-            map("t", [[<C-w>m]], [[<A-n>:MaximizerToggle<CR>]], {"silent"})
+            map({"n", "x"},  [[<C-w>m]], [[<CMD>MaximizerToggle<CR>]],  {"silent"}, "Maximize window")
+            map("t",         [[<C-w>m]], [[<A-n>:MaximizerToggle<CR>]], {"silent"}, "Maximize window")
         end
     }
     use {
@@ -574,7 +614,7 @@ packer.startup{
             vim.g.mundo_help               = 1
             vim.g.mundo_tree_statusline    = 'Mundo'
             vim.g.mundo_preview_statusline = 'Mundo Preview'
-            map("n", [[<C-W>u]], [[:<C-u>MundoToggle<CR>]], {"silent"}, "Open Mundo")
+            map("n", [[<C-W>u]], [[<CMD>MundoToggle<CR>]], {"silent"}, "Open Mundo")
         end
     }
     -- }}} Vim enhancement
@@ -760,9 +800,9 @@ packer.startup{
                 },
             }
 
-            map("n", [[<A-S-a>]], [[gnn]])
-            map("x", [[<A-S-a>]], [[grc]])
-            map("",  [[<A-S-s>]], [[grm]])
+            map("n",        [[<A-S-a>]], [[gnn]], "Expand selection")
+            map("x",        [[<A-S-a>]], [[grc]], "Expand selection")
+            map({"n", "x"}, [[<A-S-s>]], [[grm]], "Shirnk selection")
         end
     }
     use {
@@ -794,7 +834,7 @@ packer.startup{
                 }
             }
 
-            map("n", [[gH]], [[:<C-u>TSHighlightCapturesUnderCursor<CR>]], {"silent"})
+            map("n", [[gH]], [[<CMD>TSHighlightCapturesUnderCursor<CR>]], {"silent"}, "Show Tree sitter highlight group")
         end
     }
     use {
@@ -969,13 +1009,6 @@ packer.startup{
         end
     }
     use {
-        'weilbith/nvim-code-action-menu',
-        disable = true,
-        cmd     = "CodeActionMenu",
-        keys    = {{"n", "<leader>a"}},
-        config  = 'map("n", [[<leader>a]], [[:<C-u>CodeActionMenu<CR>]], {"silent"})'
-        }
-    use {
         'folke/trouble.nvim',
         rquires = "nvim-lspconfig",
         -- TODO: shortcuts
@@ -1102,8 +1135,10 @@ packer.startup{
                 -- require("telescope.actions").close(prompt_bufnr)
                 -- require("refactoring").refactor(content.value)
             -- end
-            map("x", [[<leader>re]], [[:lua require("refactoring").refactor("Extract Function")<CR>]],         {"silent"})
-            map("x", [[<leader>rf]], [[:lua require("refactoring").refactor("Extract Function To File")<CR>]], {"silent"})
+            map("x", [[<leader>re]], [[:lua require("refactoring").refactor("Extract Function")<CR>]],         {"silent"}, "Extract function")
+            map("x", [[<leader>rf]], [[:lua require("refactoring").refactor("Extract Function To File")<CR>]], {"silent"}, "Extract function to file")
+            map("v", [[<Leader>rv]], [[:lua require('refactoring').refactor('Extract Variable')<CR>]], {"silent"}, "extract varibale")
+            map("v", [[<Leader>ri]], [[:lua require('refactoring').refactor('Inline Variable')<CR>]], {"silent"}, "extract inline varibale")
         end
     }
     -- }}} Intellisense
@@ -1258,8 +1293,6 @@ packer.startup{
             }
         end,
     }
-
-
     -- use 'sakhnik/nvim-gdb', {'do': ':!./install.sh'}
     -- }}} Debug
     -- Language support {{{
@@ -1349,6 +1382,7 @@ packer.startup{
     }
     -- }}} Knowlege
     end,
+
     config = {
         display = {
             prompt_border = 'rounded',

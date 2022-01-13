@@ -1,14 +1,16 @@
 local cmd  = vim.cmd
 local M    = {}
 
+-- NOTE: Mapping is always recursive unless noremap is specified
+
 -- First thing first
 vim.g.mapleader = " "
 
 -- Change font size (GUI client only)
 if not IsTerm then
-    map("", [[<C-->]], [[:lua GuiFontSize = GuiFontSize - 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Increase font size")
-    map("", [[<C-=>]], [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Decrease font size")
-    map("", [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent"}, "Restore font size")
+    map({"n", "x"}, [[<C-->]], [[:lua GuiFontSize = GuiFontSize - 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Increase GUI client font size")
+    map({"n", "x"}, [[<C-=>]], [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Decrease GUI client font size")
+    map({"n", "x"}, [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent"}, "Restore GUI client font size")
 end
 -- Diffmode
 map("n", [[[d]], [[[c]], {"noremap", "silent"}, "Go to the previous start of a change")
@@ -17,28 +19,27 @@ map("n", [[]d]], [[]c]], {"noremap", "silent"}, "Go to the next start of a chang
 map("n", [[]c]], [[:noa windo set cc=80<CR>]], {"silent"}, "Turn on colorcolumn")
 map("n", [[[c]], [[:noa windo set cc&<CR>]],   {"silent"}, "Turn off colorcolumn")
 -- Quickfix
-map("n", [[<C-q>g]],    [[:cfirst<CR>zzzv]],                               {"silent"}, "Go to first item in quickFix")
-map("n", [[<C-q>G]],    [[:clast<CR>zzzv]],                                {"silent"}, "Go to last item in quickFix")
-map("n", [[<C-q>n]],    [[:cnext<CR>zzzv]],                                {"silent"}, "Go to next item in quickFix")
-map("n", [[<C-q>N]],    [[:cprevious<CR>zzzv]],                            {"silent"}, "Go to previous item in quickFix")
-map("n", [[<C-q>l]],    [[:cnfile<CR>]],                                 {"silent"}, "Go to next file in quickFix")
-map("n", [[<C-q>h]],    [[:cpfile<CR>]],                                 {"silent"}, "Go to previous file in quickFix")
-map("n", [[<leader>q]], [[:lua require("buffer").quickfixToggle()<CR>]], {"silent"}, "Quickfix toggle")
+map("n", [[<C-q>g]],    [[:cfirst<CR>zzzv]],    {"silent"}, "Go to first item in quickFix")
+map("n", [[<C-q>G]],    [[:clast<CR>zzzv]],     {"silent"}, "Go to last item in quickFix")
+map("n", [[<C-q>n]],    [[:cnext<CR>zzzv]],     {"silent"}, "Go to next item in quickFix")
+map("n", [[<C-q>N]],    [[:cprevious<CR>zzzv]], {"silent"}, "Go to previous item in quickFix")
+map("n", [[<C-q>l]],    [[:cnfile<CR>]],        {"silent"}, "Go to next file in quickFix")
+map("n", [[<C-q>h]],    [[:cpfile<CR>]],        {"silent"}, "Go to previous file in quickFix")
+map("n", [[<leader>q]], require("buffer").quickfixToggle, "Quickfix toggle")
 -- Spell corretion
-map("n", [[\\]], [[z=1<CR><CR>]],  {"silent"}, "Quick spell fix")
+map("n", [[\\]], [[z=1<CR><CR>]], {"silent"}, "Quick spell fix")
 -- Expand region
 map("n", [[<A-a>]], [[:lua require("expandRegion").expandShrink("n", 1)<CR>]],  {"silent"}, "Expand selection")
 map("n", [[<A-s>]], [[<Nop>]])
-map("x", [[<A-a>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), 1)<CR>]],  {"silent"})
-map("x", [[<A-s>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), -1)<CR>]], {"silent"})
+map("x", [[<A-a>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), 1)<CR>]],  {"silent"}, "Expand selection")
+map("x", [[<A-s>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), -1)<CR>]], {"silent"}, "Shrink selection")
 -- Run selected
 map("x", [[gM]], luaRHS[[:lua vim.cmd(
     string.format("lua %s",
         luaRHS(require("selection").getSelect("string"))
     )
 )<CR>]],
-{"silent"})
-map("x", [[<C-s>]], [[:lua require("selection").visualSub()<CR>]])
+{"silent"}, "Run selected line in lua")
 -- Interesting word {{{
 map("n", [[<Plug>InterestingWordOperator]],
 luaRHS[[luaeval("
@@ -47,7 +48,7 @@ luaRHS[[luaeval("
         false,
         '<Plug>InterestingWordOperator')
     ")
-]], {"expr", "silent"})
+]], {"expr", "silent"}, "Interesting word operator")
 map("x", [[<Plug>InterestingWordVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisual", vim.v.register);
@@ -55,7 +56,7 @@ luaRHS[[:lua
     local vMotion = require("operator").vMotion(true);
     table.insert(vMotion, "<Plug>InterestingWordVisual");
     require("interestingWord").operator(vMotion)<CR>]],
-{"silent"})
+{"silent"}, "Mark selected as interesting words")
 map("n", [[<Plug>InterestingWordVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisual", vim.v.register);
@@ -64,12 +65,12 @@ luaRHS[[:lua
     local vMotion = require("operator").vMotion(true);
     table.insert(vMotion, "<Plug>InterestingWordVisual");
     require("interestingWord").operator(vMotion)<CR>]],
-{"silent"})
+{"silent"}, "Visual-repeat for interesting words")
 map("n", [[gw]],        [[<Plug>InterestingWordOperator]], "Highlight interesting word...")
-map("x", [[gw]],        [[<Plug>InterestingWordVisual]],   "Highlight selected as interesting word")
-map("n", [[gww]],       [[:lua require("interestingWord").reapplyColor()<CR>]], {"silent"}, "Recolor last interesting word...")
-map("n", [[<leader>w]], [[:lua require("interestingWord").clearColor()<CR>]],   {"silent"}, "Clear interesting word...")
-map("n", [[<leader>W]], [[:lua require("interestingWord").restoreColor()<CR>]], {"silent"}, "Restore interesting word...")
+map("x", [[gw]],        [[<Plug>InterestingWordVisual]],   "Highlight selected as interesting words")
+map("n", [[gww]],       require("interestingWord").reapplyColor, "Recolor last interesting word")
+map("n", [[<leader>w]], require("interestingWord").clearColor,   "Clear interesting word")
+map("n", [[<leader>W]], require("interestingWord").restoreColor, "Restore interesting word")
 -- }}} Interesting word
 -- Zeal query {{{
 map("n", [[<Plug>ZealOperator]],
@@ -80,7 +81,7 @@ luaRHS[[luaeval(
         '<Plug>ZealOperator')
     ")
 ]],
-{"silent", "expr"}, "Zeal look up...")
+{"silent", "expr"}, "Zeal look up operator")
 map("n", [[<Plug>ZealOperatorGlobal]],
 luaRHS[[luaeval(
     "require('operator').expr{
@@ -89,7 +90,7 @@ luaRHS[[luaeval(
         '<Plug>ZealOperatorGlobal'}
     ")
 ]],
-{"silent", "expr"}, "Zeal look up... universally")
+{"silent", "expr"}, "Zeal look up universally operator")
 map("x", [[<Plug>ZealVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>ZealVisual", vim.v.register);
@@ -109,8 +110,10 @@ luaRHS[[:lua
 {"silent"}, "Zeal look up selected")
 map("n", [[gz]], [[<Plug>ZealOperator]],       "Zeal look up...")
 map("n", [[gZ]], [[<Plug>ZealOperatorGlobal]], "Zeal look up...universally")
-map("x", [[Z]],  [[<Plug>ZealVisual]])
+map("x", [[Z]],  [[<Plug>ZealVisual]], "Zeal look up selected")
 -- }}} Zeal query
+-- Substitue selected
+map("x", [[<C-s>]], require("selection").visualSub, "Substitue selected in command line")
 -- HistoryStartup
 map("n", [[<C-s>]], [[:lua require("historyStartup").display(true)<CR>]], {"silent"}, "Enter HistoryStartup")
 -- Extraction
@@ -122,7 +125,7 @@ luaRHS[[luaeval(
         '<Plug>Extract')
     ")
 ]],
-{"silent", "expr"}, "Extract...")
+{"silent", "expr"}, "Extract operator")
 map("x", [[<Plug>ExtractVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>ExtractVisual", vim.v.register);
@@ -140,40 +143,38 @@ luaRHS[[:lua
     table.insert(vMotion, "<Plug>ExtractVisual");
     require("extraction").operator(vMotion)<CR>]],
 {"silent"}, "Extract selected")
-map("n", [[gc]], [[<Plug>Extract]])
+map("n", [[gc]], [[<Plug>Extract]], "Extract operator")
 -- TODO: implement with visualreapet?
--- map("x", [[<Plug>fallbackC]], [[:<C-u>norm! gvC<CR>]])
-map("x", [[C]],  [[visualmode() == "^V" ? "" : "\<Plug>ExtractVisual"]], {"expr"})
+-- map("x", [[<Plug>fallbackC]], [[<CMD>norm! gvC<CR>]])
+map("x", [[C]],  [[visualmode() == "^V" ? "" : "\<Plug>ExtractVisual"]], {"expr"}, "Extract selected")
 -- Print file info
 map("n", [[<C-g>]],
 [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<CR>]],
 {"silent"}, "Display file info")
 -- Tab switcher {{{
-map("n", [[<S-Tab>]], [[:lua require("tabSwitcher").main()<CR>]], {"silent"}, "Change tab size")
+map("n", [[<S-Tab>]], require("tabSwitcher").main, "Change tab size")
 -- }}} Tab switcher
 -- Delete
 map("n", [[dj]], [[<Nop>]])
 map("n", [[dk]], [[<Nop>]])
-map("n", [[dn]], [[*``dw]], {"noremap"})
-map("n", [[dN]], [[#``dw]], {"noremap"})
-map("n", [[d<Space>]], [[:<C-u>call setline(".", "")<CR>]],  {"silent"})
+map("n", [[dn]], [[*``dw]], {"noremap"}, "Delete word under curosr, then highlight it forward")
+map("n", [[dN]], [[#``dw]], {"noremap"}, "Delete word under curosr, then highlight it backward")
+map("n", [[d<Space>]], [[<CMD>call setline(".", "")<CR>]],  {"silent"}, "Empty current line,")
 -- Change under cursor
-map("n", [[cn]], [[*``cgn]], {"noremap"}, "Change word under cursor forward")
-map("n", [[cN]], [[*``cgN]], {"noremap"}, "Change word under cursor forward")
--- Replace under cursor
-map("x", [[&]], [[:lua require("selection").visualSub()<CR>]])
+map("n", [[cn]], [[*``cgn]], {"noremap"}, "Change word under cursor, then highlight it forward")
+map("n", [[cN]], [[*``cgN]], {"noremap"}, "Change word under cursor, then highlight it backward")
 -- Search & Jumping {{{
 -- In case of mistouching
 -- Inquery word
 map("n", [[<leader>i]], [=[[I]=], "Inquery word under cursor")
-map("x", [[<leader>i]], [[:lua Print("noa g#\\V" .. string.gsub(require("selection").getSelect("string"), "\\", "\\\\") .. "#number")<CR>]], {"silent"})
+map("x", [[<leader>i]], [[:lua Print("noa g#\\V" .. string.gsub(require("selection").getSelect("string"), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquery selected words")
 -- Fast mark & resotre
 map("n", [[M]], [[`m]], "Restore mark M")
 -- Changelist jumping
 map("n", [[<A-o>]], [[:lua require("historyHop").main("changelist", -1)<CR>]], {"silent"}, "Previous change")
 map("n", [[<A-i>]], [[:lua require("historyHop").main("changelist", 1)<CR>]],  {"silent"}, "Next change")
-map("n", [[<C-o>]], [[<C-o>zz]])
-map("n", [[<C-i>]], [[<C-i>zz]])
+map("n", [[<C-o>]], [[<C-o>zzzv]])
+map("n", [[<C-i>]], [[<C-i>zzzv]])
 -- Add in jumplist for j/k with count prefix
 map("n", [[j]], [[:lua require("util").addJump("j", true)<CR>]], {"silent"})
 map("n", [[k]], [[:lua require("util").addJump("k", true)<CR>]], {"silent"})
@@ -183,8 +184,8 @@ map("n", [[#]],  [[g#``]], {"noremap"})
 map("n", [[g#]], [[#``]],  {"noremap"})
 map("n", [[g*]], [[*``]],  {"noremap"})
 -- Search visual selected
-map("x", [[*]], [[m`:<C-u>execute "/\\V" . escape(luaeval('require("selection").getSelect("string")'), '\')<CR>]], {"noremap", "silent"})
-map("x", [[#]], [[m`:<C-u>execute "?\\V" . escape(luaeval('require("selection").getSelect("string")'), '\')<CR>]], {"noremap", "silent"})
+map("x", [[*]], [[m`<CMD>execute "/\\V" . escape(luaeval('require("selection").getSelect("string")'), '\')<CR>]], {"noremap", "silent"})
+map("x", [[#]], [[m`<CMD>execute "?\\V" . escape(luaeval('require("selection").getSelect("string")'), '\')<CR>]], {"noremap", "silent"})
 map("x", [[/]], [[*]])
 map("x", [[?]], [[#]])
 -- Regex very magic
@@ -194,27 +195,27 @@ map("n", [[?]], [[?\v]], {"noremap"}, "Search backward")
 map("n", [[n]], [[nzzzvhn]], {"noremap"})
 map("n", [[N]], [[NzzzvlN]], {"noremap"})
 -- Disable highlight search & Exit visual mode
-map("n", [[<leader>h]], [[:<C-u>noh<CR>]], {"silent"}, "Disable highlight")
-map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"})
+map("n", [[<leader>h]], [[<CMD>noh<CR>]], {"silent"}, "Clear highlight")
+map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"}, "Disable highlight")
 -- Visual selection
-map("n", [[go]],    [[:lua require("selection").oppoSelection()<CR>]], {"silent"}, "Go to opposite of selection")
-map("n", [[<A-v>]], [[<C-q>]],                                         {"noremap"}, "Visual Block Mode")
+map("n", [[go]],    require("selection").oppoSelection, "Go to opposite of the selection")
+map("n", [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
 -- }}} Search & Jumping
 -- Scratch file
-map("n", [[<C-n>]], [[:<C-u>new<CR>]], {"silent"}, "New buffer")
+map("n", [[<C-n>]], [[<CMD>new<CR>]], {"silent"}, "New buffer")
 -- Open/Search in browser
-map("n", [[gl]], [[:lua require("openLink").main()<CR>]], {"silent"}, "Open link")
-map("x", [[gl]], [[:lua require("openLink").main(require("selection").getSelect("string"))<CR>]], {"silent"})
+map("n", [[gl]], require("openLink").main, "Open link")
+map("x", [[gl]], [[:lua require("openLink").main(require("selection").getSelect("string"))<CR>]], {"silent"}, "Open selected as link")
 -- Interrupt
-map("n", [[<C-A-c>]], [[:<C-u>call interrupt()<CR>]], {"noremap", "silent"}, "Interrupt")
+map("n", [[<C-A-c>]], [[<CMD>call interrupt()<CR>]], {"noremap", "silent"}, "Interrupt")
 -- Paragraph & Block navigation
--- map("", [[{]], [[:lua require("inclusiveParagraph").main("up")<CR>]],   {"noremap", "silent"})
--- map("", [[}]], [[:lua require("inclusiveParagraph").main("down")<CR>]], {"noremap", "silent"})
+-- map({"n", "x", "o"}, [[{]], [[:lua require("inclusiveParagraph").main("up")<CR>]],   {"noremap", "silent"})
+-- map({"n", "x", "o"}, [[}]], [[:lua require("inclusiveParagraph").main("down")<CR>]], {"noremap", "silent"})
 -- Line end/start
-map("", [[H]], [[^]], "Start of line(non-blank)")
-map("", [[L]], [[$]], "End of line")
+map({"n", "x", "o"}, [[H]], [[^]], "Start of line(non-blank)")
+map({"n", "x", "o"}, [[L]], [[$]], "End of line")
 -- Non-blank last character
-map("", [[g$]], [[g_]], {"noremap"}, "End of line(non-blank)")
+map({"n", "x", "o"}, [[g$]], [[g_]], {"noremap"}, "End of line(non-blank)")
 -- Trailing character {{{
 map("n", [[g.]],      [[:lua require("trailingUtil").trailingChar(".")<CR>]],  {"silent"}, "Trail .")
 map("n", [[g,]],      [[:lua require("trailingUtil").trailingChar(",")<CR>]],  {"silent"}, "Trail ,")
@@ -224,84 +225,84 @@ map("n", [[g"]],      [[:lua require("trailingUtil").trailingChar("\"")<CR>]], {
 map("n", [[g']],      [[:lua require("trailingUtil").trailingChar("'")<CR>]],  {"silent"}, "Trail '")
 map("n", [[g)]],      [[:lua require("trailingUtil").trailingChar(")")<CR>]],  {"silent"}, "Trail )")
 map("n", [[g(]],      [[:lua require("trailingUtil").trailingChar("(")<CR>]],  {"silent"}, "Trail (")
-map("n", [[g<C-CR>]], [[:<C-u>call append(line("."),   repeat([""], v:count1))<CR>]], {"silent"}, "Add new line below")
-map("n", [[g<S-CR>]], [[:<C-u>call append(line(".")-1, repeat([""], v:count1))<CR>]], {"silent"}, "Add new line above")
-map("n", [[g<CR>]],   [[:lua require("breakLine").main()<CR>]], {"silent"}, "Break line at cursor")
+map("n", [[g<C-CR>]], [[:call append(line("."),   repeat([""], v:count1))<CR>]], {"silent"}, "Add new line below")
+map("n", [[g<S-CR>]], [[:call append(line(".")-1, repeat([""], v:count1))<CR>]], {"silent"}, "Add new line above")
+map("n", [[g<CR>]],   require("breakLine").main, "Break line at cursor")
 -- }}} Trailing character
 -- Messages
 
-map("n", [[<leader>,]], [[:<C-u>execute 'messages clear<Bar>echohl Moremsg<Bar>echo "Message clear"<Bar>echohl None'<CR>]])
-map("n", [[<leader>.]], [[:<C-u>execute 'messages clear<Bar>echohl Moremsg<Bar>echo "Message clear"<Bar>echohl None'<CR>]], "Clear messages")
+map("n", [[<leader>,]], [[<CMD>execute 'messages clear<Bar>echohl Moremsg<Bar>echo "Message clear"<Bar>echohl None'<CR>]], "Clear messages")
+map("n", [[<leader>.]], [[<CMD>execute 'messages clear<Bar>echohl Moremsg<Bar>echo "Message clear"<Bar>echohl None'<CR>]], "Clear messages")
 -- Pageup/Pagedown
-map("",  [[<C-e>]], [[<C-y>]], {"noremap"})
-map("",  [[<C-d>]], [[<C-e>]], {"noremap"})
+map({"n", "x"},  [[<C-e>]], [[<C-y>]], {"noremap"})
+map({"n", "x"},  [[<C-d>]], [[<C-e>]], {"noremap"})
 map("t", [[<C-e>]], [[<C-\><C-n><C-y>]])
 map("t", [[<C-d>]], [[<C-\><C-n><C-d>]])
 
-map("",  [[<A-e>]], [[<PageUp>]],   "PageUp")
-map("",  [[<A-d>]], [[<PageDown>]], "PageDown")
+map({"n", "x"},  [[<A-e>]], [[<PageUp>]])
+map({"n", "x"},  [[<A-d>]], [[<PageDown>]])
 map("t", [[<A-e>]], [[<C-\><C-n><PageUp>]])
 map("t", [[<A-d>]], [[<C-\><C-n><PageDown>]])
 
 -- Macro
 map("n", [[<A-q>]], [[q]], {"noremap"}, "Macro")
 -- Register
-map("",  [[<leader>']],  [[:lua require("register").clear()<CR>]],                  {"silent"}, "Clear registers")
-map("",  [[g']],         [[:<C-u>reg<CR>]],                                         {"silent"}, "Registers in prompt")
+map({"n", "x"}, [[<leader>']], require("register").clear, "Clear registers")
+map({"n", "x"}, [[g']],        [[<CMD>reg<CR>]],          {"silent"}, "Registers in prompt")
 map("i", [[<C-r><C-r>]], [[<C-\><C-o>:lua require("register").insertPrompt()<CR>]], {"silent"}, "Registers in prompt")
 
 -- Buffer & Window & Tab{{{
 -- Smart quit
 map("n", [[q]],     [[:lua require("buffer").smartClose("window")<CR>]], {"silent"}, "Close window")
 map("n", [[Q]],     [[:lua require("buffer").smartClose("buffer")<CR>]], {"silent"}, "Close buffer")
-map("n", [[<C-u>]], [[:lua require("buffer").restoreClosedBuf()<CR>]],   {"silent"}, "Restore last closed buffer")
+map("n", [[<C-u>]], require("buffer").restoreClosedBuf, "Restore last closed buffer")
 -- Window
 -- TODO:
--- map("",  [[<C-w>s]], [[:lua require("consistantTab").splitCopy("wincmd s")<CR>]], {"silent"})
--- map("",  [[<C-w>v]], [[:lua require("consistantTab").splitCopy("wincmd v")<CR>]], {"silent"})
-map("n", [[<C-w>V]], [[:<C-u>wincmd o | wincmd v<CR>]], {"silent"}, "Split only current window vertically")
-map("n", [[<C-w>S]], [[:<C-u>wincmd o | wincmd s<CR>]], {"silent"}, "Split only current window vertically")
+-- map("n", [[<C-w>s]], [[:lua require("consistantTab").splitCopy("wincmd s")<CR>]], {"silent"})
+-- map("n", [[<C-w>v]], [[:lua require("consistantTab").splitCopy("wincmd v")<CR>]], {"silent"})
+map("n", [[<C-w>V]], [[<CMD>wincmd o | wincmd v<CR>]], {"silent"}, "Split only current window vertically")
+map("n", [[<C-w>S]], [[<CMD>wincmd o | wincmd s<CR>]], {"silent"}, "Split only current window vertically")
 
-map("n", [[<C-w>t]], [[:<C-u>tabnew<CR>]],                            {"silent"}, "New tab")
-map("",  [[<A-=>]],  [[:<C-u>wincmd +<CR>]],                          {"silent"}, "Increase window size")
-map("i", [[<A-=>]],  [[<C-\><C-O>:wincmd +<CR>]],                     {"silent"})
-map("",  [[<A-->]],  [[:<C-u>wincmd -<CR>]],                          {"silent"}, "Decrease window size")
-map("i", [[<A-->]],  [[<C-\><C-O>:wincmd -<CR>]],                     {"silent"})
+map("n",        [[<C-w>t]], [[<CMD>tabnew<CR>]],         {"silent"}, "New tab")
+map({"n", "x"}, [[<A-=>]],  [[<CMD>wincmd +<CR>]],       {"silent"}, "Increase window size")
+map("i",        [[<A-=>]],  [[<C-\><C-O>:wincmd +<CR>]], {"silent"}, "Increase window size")
+map({"n", "x"}, [[<A-->]],  [[<CMD>wincmd -<CR>]],       {"silent"}, "Decrease window size")
+map("i",        [[<A-->]],  [[<C-\><C-O>:wincmd -<CR>]], {"silent"}, "Decrease window size")
 
 -- Buffers
-map("",  [[<C-w>O]], [[:lua require("buffer").wipeOtherBuf()<CR>]], {"silent"}, "Wipe other buffer")
-map("n", [[<A-h>]],  [[:<C-u>bp<CR>]],                              {"silent"}, "Previous buffer")
-map("n", [[<A-l>]],  [[:<C-u>bn<CR>]],                              {"silent"}, "next buffer")
+map("n", [[<C-w>O]], require("buffer").wipeOtherBuf, "Wipe other buffer")
+map("n", [[<A-h>]],  [[<CMD>bp<CR>]], {"silent"},    "Previous buffer")
+map("n", [[<A-l>]],  [[<CMD>bn<CR>]], {"silent"},    "Next buffer")
 -- Tab
-map("", [[<A-C-h>]],    [[:<C-u>tabp<CR>]],    {"silent"}, "Previous tab")
-map("", [[<A-C-l>]],    [[:<C-u>tabn<CR>]],    {"silent"}, "Next tab")
-map("", [[<C-W><C-o>]], [[:<C-u>tabonly<CR>]], {"silent"}, "Tab only")
+map({"n", "x"}, [[<A-C-h>]],    [[<CMD>tabp<CR>]],    {"silent"}, "Previous tab")
+map({"n", "x"}, [[<A-C-l>]],    [[<CMD>tabn<CR>]],    {"silent"}, "Next tab")
+map({"n", "x"}, [[<C-W><C-o>]], [[<CMD>tabonly<CR>]], {"silent"}, "Tab only")
 -- }}} Buffer & Window & Tab
 -- Folding {{{
-map("",  [[<leader>z]], [[:<C-u>call EnhanceFoldHL("No fold marker found", 500, "")<CR>]], {"silent"})
-map("",  [[zj]], [[<Nop>]])
-map("",  [[zk]], [[<Nop>]])
-map("",  [[[Z]], [[zk]], {"noremap"}, "Previous fold(integral)")
-map("",  [[]Z]], [[zj]], {"noremap"}, "Next fold(integral)")
-map("",  [[[z]], [[:<C-u>call EnhanceFoldJump("previous", 1, 0)<CR>]],       {"silent", "noremap"}, "Previous fold")
-map("",  [[[z]], [[:<C-u>call EnhanceFoldJump("previous", 1, 0)<CR>]],       {"silent", "noremap"}, "Previous fold")
-map("",  [[]z]], [[:<C-u>call EnhanceFoldJump("next",     1, 0)<CR>]],       {"silent", "noremap"}, "Next fold")
-map("n", [[dz]], [[:<C-u>call EnhanceFoldHL("", 800, "EnhanceDelete")<CR>]], {"silent"}, "Delete fold")
-map("n", [[zd]], [[:<C-u>call EnhanceFoldHL("", 800, "EnhanceDelete")<CR>]], {"silent"}, "Delete fold")
-map("n", [[cz]], [[:<C-u>call EnhanceFoldHL("", 0, "EnhanceChange")<CR>]],   {"silent"}, "Change fold")
-map("n", [[zc]], [[:<C-u>call EnhanceFoldHL("", 0, "EnhanceChange")<CR>]],   {"silent"}, "Change fold")
+map({"n", "x", "o"},  [[<leader>z]], [[<CMD>call EnhanceFoldHL("No fold marker found", 500, "")<CR>]], {"silent"})
+map({"n", "x", "o"},  [[zj]], [[<Nop>]])
+map({"n", "x", "o"},  [[zk]], [[<Nop>]])
+map({"n", "x", "o"},  [[[Z]], [[zk]], {"noremap"}, "Previous fold(integral)")
+map({"n", "x", "o"},  [[]Z]], [[zj]], {"noremap"}, "Next fold(integral)")
+map({"n", "x", "o"},  [[[z]], [[<CMD>call EnhanceFoldJump("previous", 1, 0)<CR>]], {"silent", "noremap"}, "Previous fold")
+map({"n", "x", "o"},  [[[z]], [[<CMD>call EnhanceFoldJump("previous", 1, 0)<CR>]], {"silent", "noremap"}, "Previous fold")
+map({"n", "x", "o"},  [[]z]], [[<CMD>call EnhanceFoldJump("next",     1, 0)<CR>]], {"silent", "noremap"}, "Next fold")
+map("n", [[dz]], [[<CMD>call EnhanceFoldHL("", 800, "EnhanceDelete")<CR>]], {"silent"}, "Delete fold")
+map("n", [[zd]], [[<CMD>call EnhanceFoldHL("", 800, "EnhanceDelete")<CR>]], {"silent"}, "Delete fold")
+map("n", [[cz]], [[<CMD>call EnhanceFoldHL("", 0, "EnhanceChange")<CR>]],   {"silent"}, "Change fold")
+map("n", [[zc]], [[<CMD>call EnhanceFoldHL("", 0, "EnhanceChange")<CR>]],   {"silent"}, "Change fold")
 -- TODO: Check whether target line is a comment or not
 -- api.nvim_echo({{"text", "Normal"}}, true, {})
-map("n", [[g{]],              [[:<C-u>call EnhanceFold(mode(), "{{{")<CR>]],           "Add fold start")
-map("n", [[g}]],              [[:<C-u>call EnhanceFold(mode(), "}}}")<CR>]],           "Add fold end")
-map("x", [[g{]],              [[m`:<C-u>call EnhanceFold(visualmode(), "}}}")<CR>``]])
-map("x", [[g}]],              [[m`:<C-u>call EnhanceFold(visualmode(), "}}}")<CR>``]])
+map("n", [[g{]], [[<CMD>call EnhanceFold(mode(), "{{{")<CR>]],           "Add fold start")
+map("n", [[g}]], [[<CMD>call EnhanceFold(mode(), "}}}")<CR>]],           "Add fold end")
+map("x", [[g{]], [[m`<CMD>call EnhanceFold(visualmode(), "}}}")<CR>``]], "Add fold for selected")
+map("x", [[g}]], [[m`<CMD>call EnhanceFold(visualmode(), "}}}")<CR>``]], "Add fold for selected")
 map("n", [[<leader><Space>]], [[@=(foldlevel('.') ? 'za' : '\<Space>')<CR>]],          {"noremap", "silent"}, "Open fold")
 -- TODO: make <C-Space> snapped to the nearst closed fold even if the cursor
 -- is not on a line with closed fold
 map("n", [[<C-Space>]],       [[@=(foldlevel('.') ? 'zA' : '\<Space>')<CR>]],          {"noremap", "silent"}, "Open fold recursively")
 for i=0, 9 do
-    map("",
+    map({"n", "x"},
         string.format("z%d", i),
         string.format([[:set foldlevel=%d<Bar>echohl Moremsg<Bar>echo 'Foldlevel set to: %d'<Bar>echohl None<CR>]], i, i),
         string.format("Set fold level to %d", i)
@@ -311,29 +312,29 @@ end
 -- MS behavior {{{
 -- <C-z/v/s> {{{
 map("n", [[<C-z>]], [[u]], "Undo")
-map("x", [[<C-z>]], [[<esc>u]])
-map("i", [[<C-z>]], [[<C-\><C-o>u]])
+map("x", [[<C-z>]], [[<esc>u]], "Undo")
+map("i", [[<C-z>]], [[<C-\><C-o>u]], "Undo")
 
-map("n", [[<C-c>]], [[Y]], "Undo")
-map("x", [[<C-c>]], [[y]])
--- map("i", [[<C-c>]], [[<C-\><C-o>Y]])
+map("n", [[<C-c>]], [[Y]], "Yank")
+map("x", [[<C-c>]], [[y]], "Yank")
+-- map("i", [[<C-c>]], [[<C-\><C-o>Y]], "Yank")
 
-map("n", [[<C-v>]], [[p]], {"noremap"}, "Undo")
-map("x", [[<C-v>]], [[<esc>i<C-v><esc>]])
-map("i", [[<C-v>]], [[<C-r>*]])
+map("n", [[<C-v>]], [[p]], {"noremap"}, "Put")
+map("x", [[<C-v>]], [[<esc>i<C-v><esc>]], "Put")
+map("i", [[<C-v>]], [[<C-r>*]], "Put")
 
--- map("n", [[<C-s>]], [[:<C-u>w<CR>]])
--- map("x", [[<C-s>]], [[:<C-u>w<CR>]])
-map("i", [[<C-s>]], [[<C-\><C-o>:w<CR>]])
+-- map("n", [[<C-s>]], [[<CMD>w<CR>]], "Write")
+-- map("x", [[<C-s>]], [[<CMD>w<CR>]], "Write")
+map("i", [[<C-s>]], [[<C-\><C-o>:w<CR>]], "Write")
 -- }}} <C-z/x/v/s>
 -- Save as..
 cmd [[command! -nargs=0 Saveas echohl Moremsg | echo "CWD: ".getcwd() | execute input("", "saveas ") | echohl None<CR> | e!]]
-map("n", [[<C-S-s>]], [[:<C-u>Saveas<CR>]],      {"silent"}, "Save as...")
-map("i", [[<C-S-s>]], [[<C-\><C-o>:Saveas<CR>]], {"silent"})
+map("n", [[<C-S-s>]], [[<CMD>Saveas<CR>]],       {"silent"}, "Save as")
+map("i", [[<C-S-s>]], [[<C-\><C-o>:Saveas<CR>]], {"silent"}, "Save as")
 -- Delete
-map("n", [[<C-S-d>]], [[:<C-u>d<CR>]],      {"silent"}, "Detele line")
-map("x", [[<C-S-d>]], [[:d<CR>]],           {"silent"})
-map("i", [[<C-S-d>]], [[<C-\><C-o>:d<CR>]], {"silent"})
+map("n", [[<C-S-d>]], [[<CMD>d<CR>]],       {"silent"}, "Detele line")
+map("x", [[<C-S-d>]], [[:d<CR>]],           {"silent"}, "Detele line")
+map("i", [[<C-S-d>]], [[<C-\><C-o>:d<CR>]], {"silent"}, "Detele line")
 -- Highlight New Paste Content
 map("n", [[gy]], [[:lua require("yankPut").lastYankPut("yank")<CR>]], {"silent"}, "Select last yank")
 map("n", [[gY]], [[gy]], "Select last yank")
@@ -342,16 +343,16 @@ map("n", [[gP]], [[gp]], "Select last put")
 -- Inplace join
 map("n", [[J]], [[m`J``]], {"noremap"})
 -- Inplace yank
-map("", [[<Plug>InplaceYank]],
+map({"n", "x", "o"}, [[<Plug>InplaceYank]],
 [[luaeval("require('operator').expr(require('yankPut').inplaceYank, false, '<Plug>InplaceYank')")]],
 {"expr", "silent"}, "Yank operator")
-map("", [[y]], [[<Plug>InplaceYank]], "Yank operator")
-map("", [[Y]], [[yy]], "Yank line")
+map({"n", "x"}, [[y]], [[<Plug>InplaceYank]], "Yank operator")
+map({"n", "x"}, [[Y]], [[yy]], "Yank line")
 -- Inplace put
 map("n", [[p]], [[:lua require("yankPut").inplacePut("n", "p", false)<CR>]], {"silent"}, "Put after")
-map("x", [[p]], [[:lua require("yankPut").inplacePut("v", "p", false)<CR>]], {"silent"})
+map("x", [[p]], [[:lua require("yankPut").inplacePut("v", "p", false)<CR>]], {"silent"}, "Put after")
 map("n", [[P]], [[:lua require("yankPut").inplacePut("n", "P", false)<CR>]], {"silent"}, "Put before")
-map("x", [[P]], [[:lua require("yankPut").inplacePut("v", "P", false)<CR>]], {"silent"})
+map("x", [[P]], [[:lua require("yankPut").inplacePut("v", "P", false)<CR>]], {"silent"}, "Put before")
 -- Convert put
 map("n", [[cp]], [[:lua require("yankPut").inplacePut("n", "p", true)<CR>]], {"silent"}, "Convert put after")
 map("n", [[cP]], [[:lua require("yankPut").inplacePut("n", "P", true)<CR>]], {"silent"}, "Convert put before")
@@ -362,19 +363,19 @@ map("n", [[<leader>cp]], [["0cp]], "Convert put after from register 0")
 map("n", [[<leader>cP]], [["0cP]], "Convert put after from register 0")
 -- Mimic the VSCode move/copy line up/down behavior {{{
 -- Move line
-map("i", [[<A-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineMove("n", "down")<CR>]], {"silent"})
-map("i", [[<A-k>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineMove("n", "up")<CR>]],   {"silent"})
+map("i", [[<A-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineMove("n", "down")<CR>]], {"silent"}, "Move line down")
+map("i", [[<A-k>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineMove("n", "up")<CR>]],   {"silent"}, "Move line up")
 map("n", [[<A-j>]], [[:lua require("yankPut").VSCodeLineMove("n", "down")<CR>]], {"silent"}, "Move line down")
 map("n", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("n", "up")<CR>]],   {"silent"}, "Move line up")
-map("x", [[<A-j>]], [[:lua require("yankPut").VSCodeLineMove("v", "down")<CR>]], {"silent"})
-map("x", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("v", "up")<CR>]],   {"silent"})
+map("x", [[<A-j>]], [[:lua require("yankPut").VSCodeLineMove("v", "down")<CR>]], {"silent"}, "Move line down")
+map("x", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("v", "up")<CR>]],   {"silent"}, "Move line up")
 -- Copy line
 map("n", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank("n", "down")<CR>]],                 {"silent"}, "Copy line down")
 map("n", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank("n", "up")<CR>]],                   {"silent"}, "Copy line up")
-map("i", [[<A-S-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "down")<CR>]],       {"silent"})
-map("i", [[<A-S-k>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "up")<CR>]],         {"silent"})
-map("x", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "down")<CR>]], {"silent"})
-map("x", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "up")<CR>]],   {"silent"})
+map("i", [[<A-S-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "down")<CR>]],       {"silent"}, "Copy line down")
+map("i", [[<A-S-k>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "up")<CR>]],         {"silent"}, "Copy line up")
+map("x", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "down")<CR>]], {"silent"}, "Copy line down")
+map("x", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "up")<CR>]],   {"silent"}, "Copy line up")
 
 -- }}} Mimic the VSCode move/copy line up/down behavior
 -- }}} MS bebhave
@@ -382,66 +383,59 @@ map("x", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode
 map("n", [[g/]], [[m`:s#\\#\/#e<CR>:noh<CR>g``]],   {"noremap", "silent"}, [[Convert \ to /]])
 map("n", [[g\]], [[m`:s#\/#\\\\#e<CR>:noh<CR>g``]], {"noremap", "silent"}, [[Convert / to \]])
 -- Mode: Terminal {{{
-map("t", [[<A-n>]],      [[<C-\><C-n>]])
-map("n", [[<C-`>]],      [[:lua require("terminal").terminalToggle()<CR>]],      {"silent"}, "Terminal toggle")
-map("n", [[<leader>t]],  [[:lua require("terminal").terminalToggle()<CR>]],      {"silent"}, "Terminal toggle")
-map("t", [[<C-`>]],      [[<A-n>:lua require("terminal").terminalToggle()<CR>]], {"silent"})
-map("t", [[<A-h>]],      [[<A-n><A-h>]])
-map("t", [[<A-l>]],      [[<A-n><A-l>]])
-map("t", [[<A-S-h>]],    [[<A-n><A-S-h>]])
-map("t", [[<A-S-l>]],    [[<A-n><A-S-l>]])
-map("t", [[<C-BS>]],     [[<C-w>]],                                 {"noremap"})
-map("t", [[<C-r>]],      [['\<A-n>"' . nr2char(getchar()) . 'pi']], {"expr"})
-map("t", [[<C-w>k]],     [[<A-n><C-w>k]])
-map("t", [[<C-w>j]],     [[<A-n><C-w>j]])
-map("t", [[<C-w>h]],     [[<A-n><C-w>h]])
-map("t", [[<C-w>l]],     [[<A-n><C-w>l]])
-map("t", [[<C-w>w]],     [[<A-n><C-w>w]])
-map("t", [[<C-w><C-w>]], [[<A-n><C-w><C-w>]])
-map("t", [[<C-w>=]],     [[<A-n><C-w>=:startinsert<CR>]], {"silent"})
-map("t", [[<C-w>o]],     [[<A-n><C-w>o:startinsert<CR>]], {"silent"})
-map("t", [[<C-w>W]],     [[<A-n><C-w>W:startinsert<CR>]], {"silent"})
-map("t", [[<C-w>H]],     [[<A-n><C-w>H:startinsert<CR>]], {"silent"})
-map("t", [[<C-w>L]],     [[<A-n><C-w>L:startinsert<CR>]], {"silent"})
-map("t", [[<C-w>J]],     [[<A-n><C-w>J:startinsert<CR>]], {"silent"})
-map("t", [[<C-w>K]],     [[<A-n><C-w>K:startinsert<CR>]], {"silent"})
+map("t", [[<A-n>]],      [[<C-\><C-n>]], "Enter Normal mode")
+map("n", [[<C-`>]],      require("terminal").terminalToggle, "Terminal toggle")
+map("n", [[<leader>t]],  require("terminal").terminalToggle, "Terminal toggle")
+map("t", [[<C-`>]],      [[<A-n>:lua require("terminal").terminalToggle()<CR>]], {"silent"}, "Toggle Terminal")
+map("t", [[<A-h>]],      [[<A-n><A-h>]], "Previous buffer")
+map("t", [[<A-l>]],      [[<A-n><A-l>]], "Next buffer")
+map("t", [[<A-C-h>]],    [[<A-n><A-C-h>]], "Previous tab")
+map("t", [[<A-C-l>]],    [[<A-n><A-C-l>]], "Next tab")
+map("t", [[<C-BS>]],     [[<C-w>]], {"noremap"}, "Delete word before")
+map("t", [[<C-r>]],      [['\<A-n>"' . nr2char(getchar()) . 'pi']], {"expr"}, "Insert from register")
+map("t", [[<C-w>k]],     [[<A-n><C-w>k]], "Window above")
+map("t", [[<C-w>j]],     [[<A-n><C-w>j]], "Window below")
+map("t", [[<C-w>h]],     [[<A-n><C-w>h]], "Window left")
+map("t", [[<C-w>l]],     [[<A-n><C-w>l]], "Window right")
+map("t", [[<C-w>w]],     [[<A-n><C-w>w]], "Next window")
+map("t", [[<C-w>W]],     [[<A-n><C-w>W:startinsert<CR>]], {"silent"}, "Previous window")
+map("t", [[<C-w><C-w>]], [[<A-n><C-w><C-w>]], "Next window")
+map("t", [[<C-w>=]],     [[<A-n><C-w>=:startinsert<CR>]], {"silent"}, "Make all window equal")
+map("t", [[<C-w>o]],     [[<A-n><C-w>o:startinsert<CR>]], {"silent"}, "Close other windows")
+map("t", [[<C-w>H]],     [[<A-n><C-w>H:startinsert<CR>]], {"silent"}, "Move the current window to the far left")
+map("t", [[<C-w>L]],     [[<A-n><C-w>L:startinsert<CR>]], {"silent"}, "Move the current window to the far right")
+map("t", [[<C-w>J]],     [[<A-n><C-w>J:startinsert<CR>]], {"silent"}, "Move the current window to the bottommost left")
+map("t", [[<C-w>K]],     [[<A-n><C-w>K:startinsert<CR>]], {"silent"}, "Move the current window to the topmost left")
 -- TODO: Split terminal in new instance
 -- }}} Mode: Terminal
 -- Mode: Commandline & Insert {{{
-map("i", [[<A-[>]],  [[<C-d>]], {"noremap"})
-map("i", [[<A-]>]],  [[<C-t>]], {"noremap"})
-map("i", [[<C-k>]],  [[pumvisible() ? "\<C-e>\<Up>" : "\<Up>"]],     {"noremap", "expr"})
-map("i", [[<C-j>]],  [[pumvisible() ? "\<C-e>\<Down>" : "\<Down>"]], {"noremap", "expr"})
-map("i", [[<C-CR>]], [[pumvisible() ? "\<C-e>\<CR>" : "\<CR>"]],     {"noremap", "expr"})
-map("i", [[<S-CR>]], [[<ESC>O]])
-map("i", [[<C-d>]],  [[<Del>]])
-map("i", [[<C-.>]],  [[<C-a>]], {"noremap"})
-map("i", [[<C-BS>]], [[<C-w>]], {"noremap"})
-map("i", [[<C-y>]],  [[pumvisible() ? "\<C-e>\<C-y>" : "\<C-y>"]], {"noremap", "expr"})
-map("i", [[<A-y>]],  [[<C-x><C-l>]], {"noremap"})
+map("i", [[<S-Tab>]], [[<C-d>]], {"noremap"}, "Delete indent")
+map("i", [[<A-[>]],   [[<C-d>]], {"noremap"}, "Delete indent")
+map("i", [[<A-]>]],   [[<C-t>]], {"noremap"}, "Add indent")
+map("i", [[<C-k>]],  [[pumvisible() ? "\<C-e>\<Up>" : "\<Up>"]],     {"noremap", "expr"}, "Move cursor up")
+map("i", [[<C-j>]],  [[pumvisible() ? "\<C-e>\<Down>" : "\<Down>"]], {"noremap", "expr"}, "Move cursor down")
+map("i", [[<C-CR>]], [[pumvisible() ? "\<C-e>\<CR>" : "\<CR>"]],     {"noremap", "expr"}, "Add new line below")
+map("i", [[<S-CR>]], [[<ESC>O]], "Add new line above")
+map("i", [[<C-.>]],  [[<C-a>]], "Insert previous insert character")
+map("i", [[<C-BS>]], [[<C-w>]], {"noremap"}, "Delete word before")
+map("i", [[<C-y>]],  [[pumvisible() ? "\<C-e>\<C-y>" : "\<C-y>"]], {"noremap", "expr"}, "Insert character from above")
+map("i", [[<A-y>]],  [[<C-x><C-l>]], {"noremap"}, "Insert from sentence")
 map("i", [[,]], [[,<C-g>u]], {"noremap"})
 map("i", [[.]], [[.<C-g>u]], {"noremap"})
 map("i", [[!]], [[!<C-g>u]], {"noremap"})
 map("i", [[*]], [[*<C-g>u]], {"noremap"})
--- Outdent
-map("i", [[<S-Tab>]], [[<C-d>]], {"noremap"})
 -- Navigation {{{
-map("!", [[<C-a>]], [[<Home>]])
-map("!", [[<C-e>]], [[<End>]])
-map("!", [[<C-h>]], [[<Left>]])
-map("!", [[<C-l>]], [[<Right>]])
-map("!", [[<C-b>]], [[<C-Left>]])
-map("!", [[<C-w>]], [[<C-Right>]])
-map("!", [[<C-h>]], [[<Left>]])
-map("!", [[<C-u>]], [[<C-u>]], {"noremap"})
+map("!", [[<C-a>]], [[<Home>]], "Move cursor to the start")
+map("!", [[<C-e>]], [[<End>]], "Move cursor to the end")
+map("!", [[<C-h>]], [[<Left>]], "Move cursor to one character left")
+map("!", [[<C-l>]], [[<Right>]], "Move cursor to one character right")
+map("!", [[<C-b>]], [[<C-Left>]], "Move cursor to one word backward")
+map("!", [[<C-d>]],  [[<Del>]], "Delete character to the right")
+map("!", [[<C-w>]], [[<C-Right>]], "Move cursor to one word forward")
 -- }}} Navigation
-map("c", [[<C-j>]],   [[<Down>]])
-map("c", [[<C-k>]],   [[<Up>]])
-map("c", [[<C-BS>]],  [[<C-\>e(RemoveLastPathComponent())<CR>]])
-map("c", [[<C-S-l>]], [[<C-d>]], {"noremap"})
-map("c", [[<C-d>]],   [[<Del>]])
-map("c", [[<C-S-e>]], [[<C-\>e]])
-map("c", [[<C-v>]],   [[<C-R>*]])
+map("c", [[<C-j>]],   [[<Down>]], "Move cursor down")
+map("c", [[<C-k>]],   [[<Up>]], "Move cursor up")
+map("c", [[<C-BS>]],  [[<C-\>e(RemoveLastPathComponent())<CR>]], "Delete word before")
 -- }}} Mode: Commandline & Insert
 
 return M

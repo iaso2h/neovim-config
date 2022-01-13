@@ -2,12 +2,13 @@
 return function()
 require("todo-comments").setup{
     signs = true, -- show icons in the signs column
+    sign_priority = 8, -- sign priority
     -- keywords recognized as todo comments
     keywords = {
         FIX   = {
             icon  = " ", -- icon used for the sign, and in search results
             color = "error", -- can be a hex color, or a named color (see below)
-            alt   = { "FIXME", "BUG", "FIXIT", "FIX", "ISSUE" }, -- a set of other keywords that all map to this FIX keywords
+            alt   = {"FIXME", "BUG", "FIXIT", "FIX", "ISSUE"}, -- a set of other keywords that all map to this FIX keywords
             -- signs = false, -- configure signs for some keywords individually
         },
         TODO = { icon = " ", color = "warning" },
@@ -56,8 +57,8 @@ require("todo-comments").setup{
 }
 
 vim.cmd [[command! -nargs=0 TodoTelescope Telescope todo-comments todo theme=ivy]]
-map("n", [[<C-f>t]], [[:<C-u>TodoTelescope<CR>]], {"silent"})
-map("n", [[<C-q>t]], [[:lua QuickfixSwitchBufNr=vim.api.nvim_get_current_buf();vim.cmd"TodoQuickFix"<CR>]],  {"silent"})
+map("n", [[<C-f>t]], [[<CMD>TodoTelescope<CR>]], {"silent"}, "Telescope todo")
+map("n", [[<C-q>t]], [[:lua QuickfixSwitchBufNr=vim.api.nvim_get_current_buf();vim.cmd"TodoQuickFix"<CR>]],  {"silent"}, "Toggle todo in quickfix")
 
 end
 

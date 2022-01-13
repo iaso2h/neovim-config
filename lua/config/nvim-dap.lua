@@ -1,9 +1,11 @@
 local M = {}
 
 M.setup = function()
-    map("n", [[<leader>db]], [[:lua require('dap').toggle_breakpoint()<CR>]], {"silent"})
-    map("n", [[<F5>]],       [[:lua require('dap').continue()<CR>]],          {"silent"})
-    map("n", [[<S-F5>]],     [[:lua require('dap').run_last()<CR>]],          {"silent"})
+    map("n", [[<leader>db]], require('dap').toggle_breakpoint, "Dap toggle breakpoint")
+    map("n", [[<leader>dcb]],  [[:lua require('dap').set_breakpoint(vim.fn.input('Breakpoint Condition: '), nil, nil, true)<CR>]], {"silent"}, "Dap set conditional break point")
+    map("n", [[<leader>dl]], [[:lua require('dap').set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>]], {"silent"}, "Dap set log point")
+    map("n", [[<F5>]],       require('dap').continue, "Dap continue")
+    map("n", [[<S-F5>]],     require('dap').run_last, "Dap run last")
 end
 
 M.config = function()
@@ -12,24 +14,21 @@ M.config = function()
     local dap = require("dap")
 
     -- General mappings {{{
-    map("n", [[<leader>c]], [[:lua require('dap').run_to_cursor()<CR>zz]], {"silent"})
-    map("n", [[<leader>s]], [[:lua require('dap').step_into()<CR>zz]],     {"silent"})
-    map("n", [[<leader>n]], [[:lua require('dap').step_over()<CR>zz]],     {"silent"})
-    map("n", [[<leader>o]], [[:lua require('dap').step_out()<CR>zz]],      {"silent"})
+    map("n", [[<leader>c]], require('dap').run_to_cursor, "Dap run_to_cursor")
+    map("n", [[<leader>s]], require('dap').step_into, "Dap run_to_cursor")
+    map("n", [[<leader>n]], require('dap').step_over, "Dap run_to_cursor")
+    map("n", [[<leader>o]], require('dap').step_out, "Dap run_to_cursor")
 
-    map("n", [[<leader>k]],  [[:lua require('dap').up()<CR>]],    {"silent"})
-    map("n", [[<leader>j]],  [[:lua require('dap').down()<CR>]],  {"silent"})
-    map("n", [[<leader>dg]], [[:lua require('dap').goto_()<CR>]], {"silent"})
+    map("n", [[<leader>k]],  require('dap').up, "Dap run_to_cursor")
+    map("n", [[<leader>j]],  require('dap').down, "Dap run_to_cursor")
+    map("n", [[<leader>dg]], require('dap').goto_, "Dap run_to_cursor")
 
-    map("n", [[<leader>dr]], [[:lua require('dap').repl.toggle()<CR>]],      {"silent"})
+    map("n", [[<leader>dr]], require('dap').repl.toggle, "Dap run_to_cursor")
     -- BUG: function failed
-    map("n", [[<leader>dB]], [[:lua require('dap').list_breakpoints()<CR>]], {"silent"})
-    -- map("n", [[<leader>B]],  [[:lua require('dap').set_breakpoint(vim.fn.input('Breakpoint Condition: '), nil, nil, true)<CR>]], {"silent"})
-    -- map("n", [[<leader>dl]], [[:lua require('dap').set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>]], {"silent"})
+    map("n", [[<leader>ld]], require('dap').list_breakpoints, "Dap run_to_cursor")
 
-
-    map("n", [[<C-w>d]], [[:lua require("dap.ui.widgets").sidebar(require("dap.ui.widgets").scopes).toggle({height=15})<CR>]], {"silent"})
-    map("n", [[dK]],     [[:lua require("dap.ui.widgets").hover()<CR>]],  {"silent"})
+    map("n", [[<C-w>d]], [[:lua require("dap.ui.widgets").sidebar(require("dap.ui.widgets").scopes).toggle({height=15})<CR>]], {"silent"}, "Dap toggle sidebar")
+    map("n", [[dK]],     [[:lua require("dap.ui.widgets").hover()<CR>]],  {"silent"}, "Dap hover")
 
     -- map("n", [[<F12>]], [[:lua require('dap-python').test_method()<CR>]],          {"silent"})
     -- map("x", [[<F5>]],  [[<esc>:lua require('dap-python').debug_selection()<CR>]], {"silent"})

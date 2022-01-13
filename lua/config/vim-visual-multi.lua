@@ -1,14 +1,12 @@
 local M   = {}
 
 M.VM_Start = function()
-    map("i", [[<C-BS>]],    [[<C-\><C-o>db]])
-    map("n", [[S]],         [[ys]])
-    map("n", [[<leader>h]], [[<esc>]])
+    map("i", [[<C-BS>]],    [[<C-\><C-o>db]], "Delete word before")
+    map("n", [[<leader>h]], [[<esc>]], "Exit vim-visual-multi mode")
 end
 
 M.VM_Exit = function()
-    map("n", [[<leader>h]], [[:noh<cr>]], {"silent"})
-    map("n", [[<C-p>]],     [[<C-p>]],    {"noremap"})
+    map("n", [[<leader>h]], [[<CMD>noh<cr>]], {"silent"}, "Clear highlight")
 end
 
 M.config = function()

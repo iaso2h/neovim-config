@@ -18,8 +18,8 @@ local defaultTheme = {
         '--follow'
     },
     prompt_prefix      = "$ ",
-    selection_caret    = "  ",
-    entry_prefix       = "   ",
+    selection_caret    = "  ",
+    entry_prefix       = "  ",
     selection_strategy = "follow",
 
     sorting_strategy = "ascending",
@@ -55,6 +55,7 @@ local defaultTheme = {
             ["<C-u>"]     = false,
             ["<C-d>"]     = false,
             ["<C-x>"]     = false,
+            ["<C-w>"]     = false,
 
             ["<C-n>"]     = actions.move_selection_next,
             ["<C-p>"]     = actions.move_selection_previous,
@@ -144,40 +145,44 @@ command! -nargs=0 O lua require('telescope.builtin').oldfiles()
 -- augroup END
 -- ]]
 -- Mappings
-map("n", [[<C-f>l]], [[:lua require('telescope.builtin').builtin()<CR>]], {"silent"})
+map("n", [[<C-f>l]], require('telescope.builtin').builtin, "Telescope builtin")
 
-map("n", [[<C-f>E]], [[:lua require('telescope.builtin').find_files({no_ignore=true})<CR>]],  {"silent"})
-map("n", [[<C-f>e]], [[:lua require('telescope.builtin').find_files({no_ignore=false})<CR>]], {"silent"})
+map("n", [[<C-f>E]], [[:lua require('telescope.builtin').find_files({no_ignore=true})<CR>]],
+        {"silent"}, "Telescope find files(ignore git file)")
+map("n", [[<C-f>e]], [[:lua require('telescope.builtin').find_files({no_ignore=false})<CR>]],
+        {"silent"}, "Telescope find all files")
 
-map("n", [[<C-f>f]], [[:lua require('telescope.builtin').current_buffer_fuzzy_find()<CR>]], {"silent"})
-map("n", [[<C-f>F]], [[:lua require('telescope.builtin').live_grep()<CR>]],                 {"silent"})
+map("n", [[<C-f>f]], require('telescope.builtin').current_buffer_fuzzy_find, "Telescope current buffer fuzzy find")
+map("n", [[<C-f>F]], require('telescope.builtin').live_grep,                 "Telescope live grep")
 
-map("n", [[<C-f>w]], [[:lua require('telescope.builtin').grep_string({word_match=false)<CR>]], {"silent"})
-map("n", [[<C-f>W]], [[:lua require('telescope.builtin').grep_string({word_match=true)<CR>]],  {"silent"})
+map("n", [[<C-f>w]], [[:lua require('telescope.builtin').grep_string({word_match=false)<CR>]],
+        {"silent"}, "Telescope grep word")
+map("n", [[<C-f>W]], [[:lua require('telescope.builtin').grep_string({word_match=true)<CR>]],
+        {"silent"}, "Telescope grep exact word")
 
-map("c", [[<A-C-j>]], [[<C-u>:lua require('telescope.builtin').command_history()<CR>]], {"silent"})
-map("c", [[<A-C-k>]], [[<C-u>:lua require('telescope.builtin').command_history()<CR>]], {"silent"})
+map("c", [[<A-C-j>]], require('telescope.builtin').command_history, "Telescope command history")
+map("c", [[<A-C-k>]], require('telescope.builtin').command_history, "Telescope command history")
 
-map("n", [[<C-h>/]], [[:lua require('telescope.builtin').search_history()<CR>]], {"silent"})
-map("n", [[<C-h>v]], [[:lua require('telescope.builtin').vim_options()<CR>]],    {"silent"})
-map("n", [[<C-h>o]], [[:lua require('telescope.builtin').jumplist()<CR>]],       {"silent"})
-map("n", [[<C-h>i]], [[:lua require('telescope.builtin').jumplist()<CR>]],       {"silent"})
-map("n", [[<C-h>q]], [[:lua require('telescope.builtin').registers()<CR>]],      {"silent"})
-map("n", [[<C-h>m]], [[:lua require('telescope.builtin').marks()<CR>]],          {"silent"})
-map("n", [[<C-h>k]], [[:lua require('telescope.builtin').keymaps()<CR>]],        {"silent"})
-map("n", [[<C-h>c]], [[:lua require('telescope.builtin').commands()<CR>]],       {"silent"})
-map("n", [[<C-h>h]], [[:lua require('telescope.builtin').help_tags()<CR>]],      {"silent"})
-map("n", [[<C-h>H]], [[:lua require('telescope.builtin').man_pages()<CR>]],      {"silent"})
-map("n", [[<C-h>l]], [[:lua require('telescope.builtin').reloader()<CR>]],       {"silent"})
+map("n", [[<C-h>/]], require('telescope.builtin').search_history, "Telescope search history")
+map("n", [[<C-h>v]], require('telescope.builtin').vim_options,    "Telescope vim options")
+map("n", [[<C-h>o]], require('telescope.builtin').jumplist,       "Telescope jumplist")
+map("n", [[<C-h>i]], require('telescope.builtin').jumplist,       "Telescope jumplist")
+map("n", [[<C-h>']], require('telescope.builtin').registers,      "Telescope registers")
+map("n", [[<C-h>m]], require('telescope.builtin').marks,          "Telescope marks")
+map("n", [[<C-h>k]], require('telescope.builtin').keymaps,        "Telescope keymaps")
+map("n", [[<C-h>c]], require('telescope.builtin').commands,       "Telescope commands")
+map("n", [[<C-h>h]], require('telescope.builtin').help_tags,      "Telescope help tags")
+map("n", [[<C-h>H]], require('telescope.builtin').man_pages,      "Telescope man_pages")
+map("n", [[<C-h>l]], require('telescope.builtin').reloader,       "Telescope reloader")
 
-map("n", [[<C-f>o]], [[:lua require('telescope.builtin').current_buffer_tags()<CR>]], {"silent"})
-map("n", [[<C-f>O]], [[:lua require('telescope.builtin').tags()<CR>]],                {"silent"})
+map("n", [[<C-f>o]], require('telescope.builtin').current_buffer_tags, "Telescope current buffer tags")
+map("n", [[<C-f>O]], require('telescope.builtin').tags,                "Telescope tags")
 
-map("n", [[<C-f>gc]], [[:lua require('telescope.builtin').git_bcommits()<CR>]], {"silent"})
-map("n", [[<C-f>gC]], [[:lua require('telescope.builtin').git_commits()<CR>]],  {"silent"})
-map("n", [[<C-f>gs]], [[:lua require('telescope.builtin').git_status()<CR>]],   {"silent"})
+map("n", [[<C-f>gc]], require('telescope.builtin').git_bcommits, "Telescope git bcommits")
+map("n", [[<C-f>gC]], require('telescope.builtin').git_commits,  "Telescope git commits")
+map("n", [[<C-f>gs]], require('telescope.builtin').git_status,   "Telescope git status")
 
-map("n", [[<leader>b]], [[:lua require('telescope.builtin').buffers()<CR>]], {"silent"})
+map("n", [[<leader>b]], require('telescope.builtin').buffers, "Telescope buffers")
 
 end
 

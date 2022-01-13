@@ -24,40 +24,37 @@ M.config = function() -- {{{
     vim.g.NERDAltDelims_conf       = 0
 
 
-    map("n", [[g<space>o]], [[:lua require("config.vim-nerdcommenter").commentJump("o")<CR>]], {"silent"})
-    map("n", [[g<space>O]], [[:lua require("config.vim-nerdcommenter").commentJump("O")<CR>]], {"silent"})
+    map("n", [[g<space>o]], [[:lua require("config.vim-nerdcommenter").commentJump("o")<CR>]], {"silent"}, "Add comment below")
+    map("n", [[g<space>O]], [[:lua require("config.vim-nerdcommenter").commentJump("O")<CR>]], {"silent"}, "Add comment above")
 
-    vmap("n", [[g<space><space>]], [[<c-u>:call VSCodeCall("editor.action.commentLine")<CR>]])
-    vmap("x", [[g<space><space>]], [[:call VSCodeCall("editor.action.commentLine")<CR>]])
+    map("n", [[g<space><space>]], [[<plug>NERDCommenterToggle]], "Toggle comment for current line")
+    map("x", [[g<space><space>]], [[<plug>NERDCommenterToggle]], "Toggle comment for the selected")
+    map("n", [[g<space>n]], [[<plug>NERDCommenterNested]], "Toggle nested comment for current line")
+    map("x", [[g<space>n]], [[<plug>NERDCommenterNested]], "Toggle nested comment for the selected")
 
-    map("n", [[g<space><space>]], [[<plug>NERDCommenterToggle]], {"novscode"})
-    map("x", [[g<space><space>]], [[<plug>NERDCommenterToggle]], {"novscode"})
-    map("n", [[g<space>n]], [[<plug>NERDCommenterNested]], {"novscode"})
-    map("x", [[g<space>n]], [[<plug>NERDCommenterNested]], {"novscode"})
+    map("n", [[g<space>i]], [[<plug>NERDCommenterInvert]], "Toggle comment invert for current line")
+    map("x", [[g<space>i]], [[<plug>NERDCommenterInvert]], "Toggle comment invert for the selected")
 
-    map("n", [[g<space>i]], [[<plug>NERDCommenterInvert]], {"novscode"})
-    map("x", [[g<space>i]], [[<plug>NERDCommenterInvert]], {"novscode"})
+    map("n", [[g<space>s]], [[<plug>NERDCommenterSexy]], "Toggle comment sexy for current line")
+    map("x", [[g<space>s]], [[<plug>NERDCommenterSexy]], "Toggle comment sexy for the selected")
 
-    map("n", [[g<space>s]], [[<plug>NERDCommenterSexy]], {"novscode"})
-    map("x", [[g<space>s]], [[<plug>NERDCommenterSexy]], {"novscode"})
+    map("n", [[g<space>y]], [[<plug>NERDCommenterYank]], "Yank, then toggle comment for current line")
+    map("x", [[g<space>y]], [[<plug>NERDCommenterYank]], "Yank, then toggle comment for the selected")
 
-    map("n", [[g<space>y]], [[<plug>NERDCommenterYank]], {"novscode"})
-    map("x", [[g<space>y]], [[<plug>NERDCommenterYank]], {"novscode"})
+    map("n", [[g<space>$]], [[<plug>NERDCommenterToEOL]], "Comment to the end of the line")
+    map("n", [[g<space>A]], [[<plug>NERDCommenterAppend]], "Append comment after current line")
+    map("n", [[g<space>I]], [[<plug>NERDCommenterInsert]], "Insert comment before current line")
 
-    map("n", [[g<space>$]], [[<plug>NERDCommenterToEOL]], {"novscode"})
-    map("n", [[g<space>A]], [[<plug>NERDCommenterAppend]], {"novscode"})
-    map("n", [[g<space>I]], [[<plug>NERDCommenterInsert]], {"novscode"})
+    map("x", [[<A-/>]], [[<plug>NERDCommenterAltDelims]], "Change comment style for the selected")
+    map("n", [[<A-/>]], [[<plug>NERDCommenterAltDelims]], "Change comment style of the current line")
 
-    map("x", [[<A-/>]], [[<plug>NERDCommenterAltDelims]], {"novscode"})
-    map("n", [[<A-/>]], [[<plug>NERDCommenterAltDelims]], {"novscode"})
+    map("n", [[g<space>n]], [[<plug>NERDCommenterAlignLeft]], "Toggle comment and align to the left in current line")
+    map("x", [[g<space>n]], [[<plug>NERDCommenterAlignLeft]], "Toggle comment and align to the left for the selected")
+    map("n", [[g<space>b]], [[<plug>NERDCommenterAlignBoth]], "Toggle comment and align to the both sides in current line")
+    map("x", [[g<space>b]], [[<plug>NERDCommenterAlignBoth]], "Toggle comment and align to the both sides for the selected")
 
-    map("n", [[g<space>n]], [[<plug>NERDCommenterAlignLeft]], {"novscode"})
-    map("x", [[g<space>n]], [[<plug>NERDCommenterAlignLeft]], {"novscode"})
-    map("n", [[g<space>b]], [[<plug>NERDCommenterAlignBoth]], {"novscode"})
-    map("x", [[g<space>b]], [[<plug>NERDCommenterAlignBoth]], {"novscode"})
-
-    map("n", [[g<space>u]], [[<plug>NERDCommenterUncomment]], {"novscode"})
-    map("x", [[g<space>u]], [[<plug>NERDCommenterUncomment]], {"novscode"})
+    map("n", [[g<space>u]], [[<plug>NERDCommenterUncomment]], "Uncomment current line")
+    map("x", [[g<space>u]], [[<plug>NERDCommenterUncomment]], "Uncomment selected")
 
     vim.g.NERDSpaceDelims              = 1
     vim.g.NERDRemoveExtraSpaces        = 1
