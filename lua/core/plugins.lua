@@ -812,9 +812,7 @@ packer.startup{
         'nvim-treesitter/playground',
         requires = "nvim-treesitter",
         cmd      = "TSPlaygroundToggle",
-        keys     = {
-                {"n", "gH"}
-            },
+        keys     = {{"n", "gH"}},
         config   = function()
             require "nvim-treesitter.configs".setup {
                 playground = {
@@ -1121,7 +1119,6 @@ packer.startup{
     }
     use {
         'ThePrimeagen/refactoring.nvim',
-        disable = true,
         requires = {
             "plenary.nvim",
             "nvim-treesitter"
@@ -1200,9 +1197,7 @@ packer.startup{
             "PP", "Runtime", "Disarm", "Scriptnames", "Messages",
             "Verbose", "Time", "Breakadd", "Vopen", "Vedit", "Vsplit"
         },
-        keys   = {
-            {"n", "g>"}
-        },
+        keys   = {{"n", "g>"}},
         config = conf("vim-scriptease").config
     }
     use {
