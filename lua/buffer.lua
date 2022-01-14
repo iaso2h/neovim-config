@@ -356,7 +356,7 @@ function M.wipeOtherBuf() -- {{{
 
     -- Wipe buffers
     for _, bufNr in ipairs(M.bufNrTbl) do
-        if api.nvim_buf_is_valid(M.bufNrTbl) then
+        if api.nvim_buf_is_valid(bufNr) then
             api.nvim_buf_delete(bufNr, {force = true})
         end
     end
