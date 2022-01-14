@@ -39,11 +39,12 @@ end -- }}}
 ----
 M.config = function() -- {{{
     local lspConfig = require("lspconfig")
-    local path = require("plenary.path")
-    local lsp = vim.lsp
-    local fn  = vim.fn
-    local cmd = vim.cmd
-    local M   = require("config.nvim-lsp")
+    local path      = require("plenary.path")
+    local lsp       = vim.lsp
+    local fn        = vim.fn
+    local cmd       = vim.cmd
+    local lspUtil   = require("lspconfig.util")
+    local M         = require("config.nvim-lsp")
     ----
     -- Function: onAttach :Mappings or commands need to be loaded when specific LSP is attach
     --
@@ -61,12 +62,13 @@ M.config = function() -- {{{
         -- bmap(bufNr, "n", [[gD]], require('telescope.builtin').lsp_type_definitions, "Telescope LSP definition")
         -- bmap(bufNr, "n", [[gR]], require('telescope.builtin').lsp_references, "Telescope LSP references")
         -- bmap(bufNr, "n", [[gi]], require('telescope.builtin').lsp_implementations, "Telescope LSP implementation)
-        bmap(bufNr, "n", [[<C-f>a]],    require('telescope.builtin').lsp_code_actions,          "Telescope LSP code action")
-        bmap(bufNr, "n", [[<C-f>o]],    require('telescope.builtin').lsp_document_symbols,      "Telescope LSP document symbols")
-        bmap(bufNr, "n", [[<C-f>O]],    require('telescope.builtin').lsp_workspace_symbols,     "Telescope LSP workspace symbols")
-        bmap(bufNr, "n", [[<leader>e]], require('telescope.builtin').lsp_document_diagnostics,  "Telescope LSP document diagnostics")
-        bmap(bufNr, "n", [[<leader>E]], require('telescope.builtin').lsp_workspace_diagnostics, "Telescope LSP workspace diagnostics")
-
+        bmap(bufNr, "n", [[<C-f>a]],    require('telescope.builtin').lsp_code_actions,      "Telescope LSP code action")
+        bmap(bufNr, "n", [[<C-f>o]],    require('telescope.builtin').lsp_document_symbols,  "Telescope LSP document symbols")
+        bmap(bufNr, "n", [[<C-f>O]],    require('telescope.builtin').lsp_workspace_symbols, "Telescope LSP workspace symbols")
+        bmap(bufNr, "n", [[<leader>e]], [[:lua require('telescope.builtin').diagnostics{bufnr=0}<CR>]],
+            {"silent"}, "Telescope LSP document diagnostics")
+        bmap(bufNr, "n", [[<leader>E]], [[:lua require('telescope.builtin').diagnostics{bufnr=nil}<CR>]],
+            {"silent"}, "Telescope LSP workspace diagnostics")
         bmap(bufNr, "n", [=[gD]=],        vim.lsp.buf.declaration,     "LSP documentation")
         bmap(bufNr, "n", [=[gd]=],        vim.lsp.buf.definition,      "LSP definition")
         bmap(bufNr, "n", [=[<leader>D]=], vim.lsp.buf.type_definition, "LSP type definition")
@@ -77,8 +79,8 @@ M.config = function() -- {{{
         vim.lsp.buf.references{includeDeclaration = false}
     end<CR>
 ]], "LSP references")
-        bmap(bufNr, "n", [[K]],         vim.lsp.buf.hover,          "LSP hover")
-        bmap(bufNr, "n", [[<C-p>]],     vim.lsp.buf.signature_help, "LSP signature help")
+        bmap(bufNr, "n", [[K]],          vim.lsp.buf.hover,          "LSP hover")
+        bmap(bufNr, "n", [[<C-p>]],      vim.lsp.buf.signature_help, "LSP signature help")
         bmap(bufNr, "n", [[<leader>rn]], vim.lsp.buf.rename,         "LSP rename")
         -- bmap(bufNr, "n", [=[<leader>wa]=], vim.lsp.buf.add_workspace_folder, "LSP add workspace folder")
         -- bmap(bufNr, "n", [=[<leader>wr]=], vim.lsp.buf.remove_workspace_folder, "LSP remove workspace folder")
@@ -103,17 +105,29 @@ M.config = function() -- {{{
     -- https://github.com/microsoft/pyright
     -- https://github.com/microsoft/pyright/blob/master/docs/configuration.md
     -- https://github.com/microsoft/pyright/blob/96871bec5a427048fead499ab151be87b7baf023/packages/vscode-pyright/package.json
+    local pyRootFiles = {
+        'pyproject.toml',
+        'setup.py',
+        'main.py',
+        'setup.cfg',
+        'requirements.txt',
+        'Pipfile',
+        'pyrightconfig.json',
+        }
 
     M.servers.pyright = {
         settings  = {
+            root_dir = lspUtil.root_pattern(unpack(pyRootFiles)),
             python = {
                 pythonPath = "python",
                 venvPath = "",
                 analysis = {
-                    diagnosticMode = "openFileOnly",
-                    extraPaths = "",
+                    autoSearchPaths = true,
+                    diagnosticMode = "workspace",
+                    -- diagnosticMode = "openFileOnly",
+                    -- extraPaths = "",
                     typeCheckingMode = "basic",
-                    useLibraryCodeForTypes = false,
+                    useLibraryCodeForTypes = true,
                 }
             },
             pyright = {
@@ -126,31 +140,31 @@ M.config = function() -- {{{
     -- Lua {{{
     -- https://github.com/sumneko/lua-language-server
     -- Settings: https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md#sumneko_lua
-    local runtimePath     = vim.split(package.path, ";")
-    table.insert(runtimePath, "lua/?.lua")
-    table.insert(runtimePath, "lua/?/init.lua")
 
     M.servers.sumneko_lua = {
         settings = {
             Lua = {
                 runtime = {
-                -- For neovim
-                version = 'LuaJIT',
-                -- Setup your lua path
-                path = runtimePath
+                    -- For neovim
+                    version = 'LuaJIT',
+                },
+                hint = {
+                    enable = true
                 },
                 completion = {
                     callSnippet    = "Replace",
-                    keywordSnippet = "Replace"
+                    keywordSnippet = "Replace",
+                    displayContext = 1,
                 },
                 diagnostics = {
                     globals = {'vim'},
                 },
 
                 workspace = {
-                    maxPreload      = 10000,
-                    preloadFileSize = 10000,
-                    ignoreDir       = {".vscode", ".git"}
+                    maxPreload      = 2000,
+                    preloadFileSize = 1000,
+                    ignoreDir       = {".vscode", ".git"},
+                    useGitIgnore    = true
                 },
             },
         }
@@ -229,12 +243,15 @@ M.config = function() -- {{{
         }
     end
     -- }}} Clangd
-    M.servers.jsonls = nil
-    M.servers.html = nil
-    M.servers.tsserver = nil
-    M.servers.yamlls = nil
-    M.servers.cssls = nil
-    M.servers.bashls = nil
+    M.servers.jsonls      = {}
+    M.servers.html        = {}
+    M.servers.tsserver    = {}
+    M.servers.yamlls      = {}
+    M.servers.tailwindcss = {}
+    M.servers.cssls       = {}
+    M.servers.bashls      = {}
+    M.servers.grammarly   = {}
+    M.servers.remark_ls   = {}
     -- }}} LSP config override
 
     -- vim.lsp and vim.diagnostic setups {{{
@@ -274,14 +291,15 @@ M.config = function() -- {{{
         on_attach    = onAttach
     }
 
+
     for _, server in pairs(vim.tbl_keys(M.servers)) do
         local server_available, requested_server = lsp_installer_servers.get_server(server)
         if server_available then
             requested_server:on_ready(function ()
                 local config = {}
-                if server == "lua" then
+                if server == "sumneko_lua" then
                     config = require("lua-dev").setup{
-                        -- lspconfig = M.servers[server]
+                        lspconfig = M.servers[server]
                     }
                     config = vim.tbl_deep_extend("force", basicConfig, config)
                 else
