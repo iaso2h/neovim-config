@@ -21,7 +21,7 @@ o.softtabstop = 4
 o.tabstop     = 4
 
 if jit.os == "Windows" then
-    o.clipboard = "unnamed"
+    -- o.clipboard = "unnamed"
 else
     o.clipboard = "unnamed,unnamedplus"
 end

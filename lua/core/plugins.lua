@@ -1101,7 +1101,6 @@ packer.startup{
     }
     use {
         'folke/lua-dev.nvim',
-        commit  = "e958850",
         module  = "lua-dev",
         rquires = {
             "nvim-lspconfig",
@@ -1314,11 +1313,8 @@ packer.startup{
     -- Markdown
     use {
         'iamcco/markdown-preview.nvim',
-        run = [=[vim.fn["mkdp#util#install"] ]=],
-        ft  = {'markdown', 'md'}
-    }
-    use {
-        'plasticboy/vim-markdown',
+        run    = 'vim.fn["mkdp#util#install"]()',
+        -- cmd    = {"MarkdownPreview", "MarkdownPreviewStop"},
         ft     = {'markdown', 'md'},
         config = conf "vim-markdown"
     }
