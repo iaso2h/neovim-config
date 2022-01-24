@@ -125,7 +125,9 @@ return function()
                 end
             end, {"i", "s"}),
             ["<S-Tab>"] = cmp.mapping(function(fallback)
-                if vim.fn["vsnip#jumpable"](-1) == 1 then
+                if package.loaded["neogen"] and require("neogen").jumpable() then
+                    vim.api.nvim_feedkeys(t[[<cmd>lua require("neogen").jump_prev()<CR>]], "", true)
+                elseif vim.fn["vsnip#jumpable"](-1) == 1 then
                     vim.api.nvim_feedkeys(t"<Plug>(vsnip-jump-prev)", "", true)
                 -- elseif cmp.visible() then
                 -- else

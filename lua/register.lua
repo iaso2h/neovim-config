@@ -6,6 +6,7 @@ local M = {
          all = [=[[-a-zA-Z0-9":.%#=*+~/]]=]
 }
 
+--- Clear register
 M.clear = function() -- {{{
     local regexWritable = vim.regex(M.writable)
     local char
@@ -19,6 +20,7 @@ M.clear = function() -- {{{
 end -- }}}
 
 
+--- Prompt for inserting register
 M.insertPrompt = function() -- {{{
     -- TODO: Custom register completion prompt
     local regexAll = vim.regex(M.all)
@@ -46,19 +48,24 @@ M.insertPrompt = function() -- {{{
 end -- }}}
 
 
-M.reindent = function(indentCntTarget, srcContent) -- {{{
-    if indentCntTarget == 0 then return srcContent end
+--- Reindent the register content
+--- @param indentOffset integer Can be negative integer. How many indents
+--- the source register content going to be prefixed or trimed
+--- @param srcContent string The content return by vim.fn.getreg()
+--- @return string Reindented register content
+M.reindent = function(indentOffset, srcContent) -- {{{
+    if indentOffset == 0 then return srcContent end
 
     local targetContent
     local srcLineCnt   = stringCount(srcContent, "\n")
-    local indentCntAbs = string.rep(" ", math.abs(indentCntTarget))
+    local indentCntAbs = string.rep(" ", math.abs(indentOffset))
 
-    if indentCntTarget < 0 then
+    if indentOffset < 0 then
         targetContent = string.gsub(srcContent, "^" .. indentCntAbs, "")
         if srcLineCnt > 1 then
             targetContent = string.gsub(targetContent, "\n" .. indentCntAbs, "\n")
         end
-    elseif indentCntTarget > 0 then
+    elseif indentOffset > 0 then
         targetContent = indentCntAbs .. srcContent
         if srcLineCnt > 1 then
             targetContent = string.gsub(targetContent, "\n", "\n" .. indentCntAbs)
@@ -66,9 +73,9 @@ M.reindent = function(indentCntTarget, srcContent) -- {{{
             -- Minus the extra spaces in the end of regConetent, like: ".....\n    "
             if endLnStart then
                 if endLnEnd ~= endLnStart then
-                    targetContent = string.sub(targetContent, 1, #targetContent - indentCntTarget * 2 - 1)
+                    targetContent = string.sub(targetContent, 1, #targetContent - indentOffset * 2 - 1)
                 else
-                    targetContent = string.sub(targetContent, 1, #targetContent - indentCntTarget - 1)
+                    targetContent = string.sub(targetContent, 1, #targetContent - indentOffset - 1)
                 end
             end
         end
@@ -78,6 +85,11 @@ M.reindent = function(indentCntTarget, srcContent) -- {{{
 end -- }}}
 
 
+--- Get the correct indent count of a register content by its leading space
+--- number. It also converts leading tabs into corresponding spaces and takes
+--- that into account
+--- @param regContent string Value return by vim.fn.getreg()
+--- @return integer Value of the corresponding leading spaces of a register
 M.getIndent = function(regContent) -- {{{
     local _, regIndent = string.find(regContent, "^%s*")
     local _, prefixLineBreak = string.find(regContent, "^\n*")

@@ -113,7 +113,7 @@ map("n", [[gZ]], [[<Plug>ZealOperatorGlobal]], "Zeal look up...universally")
 map("x", [[Z]],  [[<Plug>ZealVisual]], "Zeal look up selected")
 -- }}} Zeal query
 -- Substitue selected
-map("x", [[<C-s>]], require("selection").visualSub, "Substitue selected in command line")
+map("x", [[<C-s>]], [[:lua require("selection").visualSub()<CR>]],        {"silent"}, "Substitue selected in command line")
 -- HistoryStartup
 map("n", [[<C-s>]], [[:lua require("historyStartup").display(true)<CR>]], {"silent"}, "Enter HistoryStartup")
 -- Extraction
