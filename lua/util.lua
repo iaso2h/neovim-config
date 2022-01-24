@@ -193,26 +193,6 @@ function M.addJump(action, reservedCount, funArg) -- {{{
     end
 end -- }}}
 
-----
--- Function: M.tblLoaded return all loaded buffer listed in the :ls command in a table
---
--- @param termInclude: boolean value to determine whether contains terminal or not
--- @return: table
-----
-function M.tblLoaded(termInclude) -- {{{
-    local bufTbl
-    if not termInclude then
-        bufTbl = vim.tbl_filter(function(buf) return string.match(buf, "term://") == nil end,
-            vim.split(fn.execute("ls"), '\n', false))
-        table.remove(bufTbl, 1)
-    else
-        -- NOTE: Execute ls! will incur Neovim built-in LSP complain
-        bufTbl = vim.split(fn.execute("ls"), '\n', false)
-        table.remove(bufTbl, 1)
-    end
-    return bufTbl
-end -- }}}
-
 
 ----
 -- Function: _G.map wrap around the nvim_set_keymap, and accept the fouth argument as table
