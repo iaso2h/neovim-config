@@ -6,6 +6,7 @@ local M = {
          all = [=[[-a-zA-Z0-9":.%#=*+~/]]=]
 }
 
+--- Clear register
 M.clear = function() -- {{{
     local regexWritable = vim.regex(M.writable)
     local char
@@ -19,6 +20,7 @@ M.clear = function() -- {{{
 end -- }}}
 
 
+--- Prompt for inserting register
 M.insertPrompt = function() -- {{{
     -- TODO: Custom register completion prompt
     local regexAll = vim.regex(M.all)
@@ -46,6 +48,11 @@ M.insertPrompt = function() -- {{{
 end -- }}}
 
 
+--- Reindent the register content
+--- @param indentCntTarget integer Can be negative integer. How many indents
+--- the source register content going to be prefixed or trimed
+--- @param srcContent string The content return by vim.fn.getreg()
+--- @return string Reindented register content
 M.reindent = function(indentCntTarget, srcContent) -- {{{
     if indentCntTarget == 0 then return srcContent end
 
@@ -78,6 +85,11 @@ M.reindent = function(indentCntTarget, srcContent) -- {{{
 end -- }}}
 
 
+--- Get the correct indent count of a register content by its leading space
+--- number. It also converts leading tabs into corresponding spaces and takes
+--- that into account
+--- @param regContent string Value return by vim.fn.getreg()
+--- @return integer Value of the corresponding leading spaces of a register
 M.getIndent = function(regContent) -- {{{
     local _, regIndent = string.find(regContent, "^%s*")
     local _, prefixLineBreak = string.find(regContent, "^\n*")
