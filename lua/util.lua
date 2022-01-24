@@ -995,6 +995,64 @@ _G.stringCount = function(str, pattern)
     end
 end
 
+
+--- Create highlights for region in a buffer. The region is defined by two
+--- tables containg position info represent the start and the end
+--- respectively. The region can be multi-lines across in a buffer
+--- @param bufNr integer Buffer number/handler
+--- @param posStart table (1, 0)-indexed values from vim.api.nvim_buf_get_mark()
+--- @param posEnd table (1, 0)-indexed values from vim.api.nvim_buf_get_mark()
+--- @param presNS integer ID of the preserved namespace, in which the
+--- preserved extmark will be stored
+--- @param regType string Register type from vim.fn.getregtype()
+--- @param hlGroup string Highlight group name
+--- @param hlTimeout integer Determine how long the highlight will be clear
+--- after being created
+--- @return integer/boolean Return integer when successful, which is the ID of the preserved namespace of the content defined by. Return false when failed
+--- posStart and posEnd
+M.nvimBufAddHl = function(bufNr, posStart, posEnd, presNS, regType, hlGroup, hlTimeout)
+    local presExtmark
+
+    -- Change to 0-based for extmark creation
+    posStart = {posStart[1] - 1, posStart[2]}
+    posEnd = {posEnd[1] - 1, posEnd[2]}
+
+    -- Create extmark to track the position of new content
+    local ok, msg = pcall(api.nvim_buf_set_extmark, bufNr, presNS,
+        posStart[1], posStart[2], {end_line = posEnd[1], end_col = posEnd[2]})
+    -- End function calling if exmark is out of scope
+    if not ok then
+        vim.notify(msg, vim.log.levels.WARN)
+        return false
+    else
+        presExtmark = msg
+    end
+
+    -- Creates a new namespace or gets an existing one.
+    local hlNS = api.nvim_create_namespace('myHighlight')
+    -- Always clear all namespaced obejcts
+    api.nvim_buf_clear_namespace(bufNr, hlNS, 0, -1)
+
+    -- Add highlight
+    local region = vim.region(bufNr, posStart, posEnd, regType,
+                    vim.o.selection == "inclusive" and true or false)
+    for lineNr, cols in pairs(region) do
+        api.nvim_buf_add_highlight(bufNr, hlNS, hlGroup,
+                                    lineNr, cols[1], cols[2])
+    end
+
+    -- Clear highlight after certain timeout
+    vim.defer_fn(function()
+        -- In case of buffer being deleted
+        if api.nvim_buf_is_valid(bufNr) then
+            pcall(api.nvim_buf_clear_namespace, bufNr, hlNS, 0, -1)
+        end
+    end, hlTimeout)
+
+    return presExtmark
+end
+
+
 -- dummy
 _G.whichKeyDoc = function(docs)
     return
