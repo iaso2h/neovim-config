@@ -105,7 +105,7 @@ end
 
 -- Commands {{{
 cmd [[
-command! -nargs=+ -complete=command  Echo PPmsg strftime('%c') . ": " . <args>
+command! -nargs=+ -complete=command  Echo PP strftime('%c') . ": " . <args>
 command! -nargs=+ -complete=command  Redir call luaeval('require("redir").catch(_A)', <q-args>)
 command! -nargs=0 -range ExtractSelection lua require("extractSelection").main(vim.fn.visualmode())
 command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | setl norevins

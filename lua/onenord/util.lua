@@ -13,7 +13,7 @@ util.hi = function (group, color)
         local bg    = color.bg    and "guibg=" .. color.bg    or "guibg=NONE"
         local sp    = color.sp    and "guisp=" .. color.sp    or ""
 
-        local hl = "highlight " .. group .. " " .. style .. " " .. fg .. " " .. bg .. " " .. sp
+        local hl = string.format("highlight %s %s %s %s %s", group, style, fg, bg, sp)
 
         ok, msg = pcall(cmd, hl)
     end

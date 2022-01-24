@@ -21,7 +21,7 @@ end
 --- @param checkModifiable boolean Set this to true if the operator will
 ---                        modify the buffer
 --- @param plugMap         string eg: <Plug>myplug
---- @return return         string "g@" if successful
+--- @return string "g@" if successful
 function M.expr(func, checkModifiable, plugMap)
     if checkModifiable then
         if not vim.o.modifiable or vim.o.readonly then

@@ -530,11 +530,13 @@ function M.trimSpaces(strTbl, silent, prefix) -- {{{
     end
 end -- }}}
 
+
 ----
 -- Function: M.saveReg will save the star registers, plus and unnamed registers
 -- independantly, restoreReg can be accessed after saveReg is called
 ----
 function M.saveReg() -- {{{
+    vim.notify("Soon will be deprecated", vim.log.levels.WARN)
     local unnamedContent = fn.getreg('"', 1)
     local unnamedType    = fn.getregtype('"')
     local starContent    = fn.getreg('*', 1)

@@ -324,13 +324,14 @@ packer.startup{
             map("x", [[<leader>g<C-x>]], [[<Plug>(dial-decrement-additional)]], "Dial down additional for selected")
         end
     }
+    -- BUG:
     use {
         'danymat/neogen',
         requires = {"nvim-treesitter", "nvim-cmp"},
         keys     = {{"n", "g<Space>d"}},
         config   = function()
             require("neogen").setup {
-                enabled             = false,
+                enabled             = true,
                 input_after_comment = true,
                 languages = {
                     lua = {
@@ -1106,6 +1107,16 @@ packer.startup{
             "nvim-lspconfig",
             "nvim-cmp"
         },
+    }
+    use {
+        'ray-x/lsp_signature.nvim',
+        config = function()
+            require("lsp_signature").setup{
+                hint_enable    = false,
+                always_trigger = true,
+                doc_lines      = 12
+            }
+        end
     }
     use {
         'RRethy/vim-illuminate',

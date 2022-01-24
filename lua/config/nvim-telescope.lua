@@ -160,8 +160,8 @@ map("n", [[<C-f>w]], [[:lua require('telescope.builtin').grep_string({word_match
 map("n", [[<C-f>W]], [[:lua require('telescope.builtin').grep_string({word_match=true)<CR>]],
         {"silent"}, "Telescope grep exact word")
 
-map("c", [[<A-C-j>]], require('telescope.builtin').command_history, "Telescope command history")
-map("c", [[<A-C-k>]], require('telescope.builtin').command_history, "Telescope command history")
+map("c", [[<A-C-j>]], [[<C-u>lua require('telescope.builtin').command_history()<CR>]], {"silent"}, "Telescope command history")
+map("c", [[<A-C-k>]], [[<A-C-j]], {"silent"}, "Telescope command history")
 
 map("n", [[<C-h>/]], require('telescope.builtin').search_history, "Telescope search history")
 map("n", [[<C-h>v]], require('telescope.builtin').vim_options,    "Telescope vim options")

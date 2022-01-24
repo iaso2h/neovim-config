@@ -412,6 +412,9 @@ theme.plugins = {
     CmpItemKind           = {fg = p.n15},
     CmpItemMenu           = {link = "CmpItemAbbr"},
 
+    -- https://github.com/ray-x/lsp_signature.nvim
+    LspSignatureActiveParameter = {link = "CmpItemAbbrMatch"},
+
     -- https://github.com/michaelb/sniprun
     SniprunVirtualTextOk  = {bg=p.n8, fg=p.w},
     SniprunFloatingWinOk  = {fg=p.n8},
