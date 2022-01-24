@@ -1,15 +1,15 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.10
--- Last Modified: 2022-01-13
--- BUG: paste V-type(containing lines with indent) register into blank line
+-- Version: 0.1.12
+-- Last Modified: 2022-01-24
 
 local fn       = vim.fn
 local cmd      = vim.cmd
 local api      = vim.api
 local util     = require("util")
 local operator = require("operator")
+local register = require("register")
 local M = {
     lineMove = {
         lastMovePos = {
@@ -20,7 +20,9 @@ local M = {
         timeout  = 500,
         gitsignsOn     = package.loaded["gitsigns"] ~= nil,
         gitsignsLineHl = package.loaded["gitsigns"] ~= nil,
-    }
+    },
+    hlInterval = 250,
+    hlGroup    = "Search"
 }
 -- TODO: test cases
 
@@ -99,10 +101,10 @@ function M.VSCodeLineYank(vimMode, direction)
     vim.opt.clipboard = ""
 
 
-    util.saveReg()
+    register.saveReg()
 
     -- Duplication {{{
-    if string.lower(vimMode) == "v" then
+    if vimMode ~= "n" then
         cmd [[noautocmd normal! gv]]
         -- Visual mode {{{
         local cursor      = api.nvim_win_get_cursor(0)
@@ -138,7 +140,7 @@ function M.VSCodeLineYank(vimMode, direction)
             })
         end
         -- }}} Visual mode
-    elseif vimMode == "n" then
+    else
         -- Normal mode {{{
         local cursor = api.nvim_win_get_cursor(0)
         cmd [[noautocmd yank]]
@@ -153,7 +155,7 @@ function M.VSCodeLineYank(vimMode, direction)
     end
     -- }}} Duplication
 
-    util.restoreReg()
+    register.restoreReg()
     vim.opt.clipboard = saveClipboard
 end
 -- }}} VSCode yank line
@@ -169,7 +171,7 @@ end
 function M.inplaceYank(args) -- {{{
     -- TODO add opts
     -- opts = opts or {hlGroup="Search", timeout=500}
-    local opts = {hlGroup="Search", timeout=250}
+    local opts = {hlGroup=M.hlGroup, timeout=M.hlInterval}
     local motionType = args[1]
     local vimMode    = args[2]
     local plugMap    = operator.plugMap
@@ -257,6 +259,23 @@ function M.inplaceYank(args) -- {{{
 end -- }}}
 
 
+-- TODO: doc
+local function inplacePutExCmd(pasteCMD, vimMode)
+        -- Execute traditional EX command
+    if vimMode == "n" then
+        if vim.v.count ~= 0 then
+            for _=0, vim.v.count do
+                cmd("noautocmd normal! \"" .. vim.v.register .. pasteCMD)
+            end
+        else
+            cmd("noautocmd normal! \"" .. vim.v.register .. pasteCMD)
+        end
+    else
+        cmd("noautocmd normal! gv\"" .. vim.v.register .. pasteCMD)
+    end
+end
+
+
 --- Put text inplace
 --- @param vimMode    string Vim mode. See: `:help mode()`
 --- @param pasteCMD   string Normal mode command to execute. "p" or "P"
@@ -269,81 +288,88 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     end
     if fn.foldclosed('.') ~= -1 then return end
 
-    opts = opts or {hlGroup="Search", timeout=250}
-    local regType   = fn.getregtype()
-    local curLine   = api.nvim_get_current_line()
-    local curBufNr  = api.nvim_get_current_buf()
-    local curWinID  = api.nvim_get_current_win()
-    local cursorPos = api.nvim_win_get_cursor(curWinID)
-    local cursorNS      = api.nvim_create_namespace("inplacePutCursor")
-    local cursorExtmark = api.nvim_buf_set_extmark(curBufNr, cursorNS, cursorPos[1] - 1, cursorPos[2], {})
-    local saveRegContent
+    -- Highlight Configuration
+    opts = opts or {hlGroup=M.hlGroup, timeout=M.hlInterval}
 
-    -- Convert register content
-    if convertPut then
-        -- Only support in normal mode
-        if vimMode ~= "n" then return end
-
-        util.saveReg()
-        saveRegContent = fn.getreg(vim.v.register, 1)
-        if regType == "v" or regType == "c" then
-            M.lastPutLinewise = true
-
-            local _, regIndent = string.find(saveRegContent, "^%s*")
-            local bufferIndent = fn.indent(cursorPos[1])
-            local reindentCnt = bufferIndent - regIndent
-            local tabCnt      = 0
-
-            -- Convert tab to spaces
-            repeat
-                tabCnt = tabCnt + 1
-                tabCnt = string.find(saveRegContent, "\t", tabCnt)
-            until not tabCnt or tabCnt > regIndent
-            if tabCnt then regIndent = regIndent + tabCnt * api.nvim_buf_get_option(0, "tabstop") end
-
-            -- Reindent the lines if counts do not match up
-            if reindentCnt ~= 0 then
-                local reindents = string.rep(" ", math.abs(reindentCnt))
-
-                if reindentCnt < 0 then
-                    saveRegContent = string.gsub(saveRegContent, "^" .. reindents, "")
-                elseif reindentCnt > 0 then
-                    saveRegContent = reindents .. saveRegContent
-                end
-            end
-
-            fn.setreg(vim.v.register, saveRegContent, "V")
-        elseif regType == "V" or regType == "l" then
-            local filterStr = string.gsub(saveRegContent, "\n%s+", " ")
-            filterStr       = string.gsub(filterStr, "\n", "")
-            filterStr       = string.gsub(filterStr, "^%s+", "")
-            fn.setreg(vim.v.register, filterStr, "v")
-        else
-            -- Blockwise type register content not supported
+    local regTypeSave   = fn.getregtype()
+    -- "Block-wise type register"
+    if regTypeSave == "\0221" then
+        if convertPut then
             return
+        else
+            return inplacePutExCmd(pasteCMD, vimMode)
         end
     end
 
+    -- Initiation
+    local regContentSave = fn.getreg(vim.v.register, 1)
+    local regContentNew
 
-    if regType == "V" or regType == "l" then
+    local curBufNr      = api.nvim_get_current_buf()
+    local curWinID      = api.nvim_get_current_win()
+    local cursorPos     = api.nvim_win_get_cursor(curWinID)
+    local cursorNS      = api.nvim_create_namespace("inplacePutCursor")
+    local cursorExtmark = api.nvim_buf_set_extmark(curBufNr, cursorNS, cursorPos[1] - 1, cursorPos[2], {})
+
+
+    -- Format the register content {{{
+    if convertPut then
+        -- Convert "v" type register into "V" type register and vice versa
+
+        -- Only support in normal mode
+        if vimMode ~= "n" then return end
+
+        register.saveReg()
+        if regTypeSave == "v" or regTypeSave == "c" then
+            M.lastPutLinewise = true
+
+            local bufferIndent = fn.indent(cursorPos[1])
+            -- Get reindent count
+            local reindent  = bufferIndent - register.getIndent(regContentSave)
+
+            -- Reindent the lines if counts do not match up
+            if reindent ~= 0 then
+                regContentNew = register.reindent(reindent, regContentSave)
+            else
+                regContentNew = regContentSave
+            end
+
+        elseif regTypeSave == "V" or regTypeSave == "l" then
+            regContentNew = string.gsub(regContentSave, "\n%s+", " ")
+            regContentNew = string.gsub(regContentNew, "\n", "")
+            regContentNew = string.gsub(regContentNew, "^%s+", "")
+        end
+
+        fn.setreg(vim.v.register, regContentNew, "V")
+    else
+        -- Reindent the multiple line register before putting it into the editing buffer
+        if regTypeSave == "V" or regTypeSave == "l" then
+            local bufferIndent = fn.indent(cursorPos[1])
+            -- Get reindent count
+            local reindent  = bufferIndent - register.getIndent(regContentSave)
+
+            if reindent ~= 0 then
+                regContentNew = register.reindent(reindent, regContentSave)
+            else
+                regContentNew = regContentSave
+            end
+
+            fn.setreg(vim.v.register, regContentNew, regTypeSave)
+        end
+    end
+    -- }}} Format the register content
+
+    -- Record the register type for the lastYankPut()
+    if regTypeSave == "V" or regTypeSave == "l" then
         M.lastPutLinewise = true
     else
         M.lastPutLinewise = false
     end
 
-    -- Execute EX command
-    if vimMode == "n" then
-        if vim.v.count ~= 0 then
-            for _=0, vim.v.count do
-                cmd("noautocmd normal! \"" .. vim.v.register .. pasteCMD)
-            end
-        else
-            cmd("noautocmd normal! \"" .. vim.v.register .. pasteCMD)
-        end
-    else
-        cmd("noautocmd normal! gv\"" .. vim.v.register .. pasteCMD)
-    end
+    inplacePutExCmd(pasteCMD, vimMode)
 
+
+    -- Highlight new content {{{
     -- Position of new created content
     local posStart = api.nvim_buf_get_mark(curBufNr, "[")
     local posEnd = api.nvim_buf_get_mark(curBufNr, "]")
@@ -351,7 +377,6 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     posStart = {posStart[1] - 1, posStart[2]}
     posEnd = {posEnd[1] - 1, posEnd[2]}
 
-    -- Format new created content when possible {{{
     -- Create extmark to track position of new content
     local saveNS = M.inplacePutNewContentNS
     M.inplacePutNewContentNS = api.nvim_create_namespace("inplacePutNewContent")
@@ -364,26 +389,21 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     else
         M.inplacePutNewContentExtmark = msg
     end
+    -- }}} Highlight new content
 
-    -- Format new content
+    -- Use equalprg for the new single-line content {{{
     if convertPut then
-        if regType == "v" then
-            -- Format current line if new paste content consists a single line
-            if vim.o.equalprg == "" then
-                local match = string.match(curLine, '%w')
-                if not match then cmd [[noautocmd normal! ==]] end
-            end
+        if regTypeSave == "v" and vim.o.equalprg == "" then
+            local match = string.match(api.nvim_get_current_line(), '^%w')
+            if not match then cmd [[noautocmd normal! ==]] end
         end
     else
-        if regType == "V" or regType == "l" then
-            -- Format current line if new paste content consists a single line
-            if vim.o.equalprg == "" then
-                local match = string.match(curLine, '%w')
-                if not match then cmd [[noautocmd normal! ==]] end
-            end
+        if (regTypeSave == "V" or regTypeSave == "l") and vim.o.equalprg == "" then
+            local match = string.match(api.nvim_get_current_line(), '^%w')
+            if not match then cmd [[noautocmd normal! ==]] end
         end
     end
-    -- }}} Format new created content when possible
+    -- }}} Use equalprg for the new single-line content
 
     -- Create highlight {{{
     local putHLNS = api.nvim_create_namespace('inplacePutHL')
@@ -398,7 +418,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     local newContentResEnd   = {newContentResExtmark[3]["end_row"],
                                 newContentResExtmark[3]["end_col"]}
     local region = vim.region(curBufNr, newContentResStart,
-                            newContentResEnd, regType,
+                            newContentResEnd, regTypeSave,
                             vim.o.selection == "inclusive" and true or false)
     for lineNr, cols in pairs(region) do
         api.nvim_buf_add_highlight(curBufNr, putHLNS, opts["hlGroup"],
@@ -423,7 +443,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     end
     -- Restore register
     if convertPut then
-        util.restoreReg()
+        register.restoreReg()
     end
 end --  }}}
 

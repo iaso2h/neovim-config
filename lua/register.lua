@@ -6,7 +6,7 @@ local M = {
          all = [=[[-a-zA-Z0-9":.%#=*+~/]]=]
 }
 
-M.clear = function()
+M.clear = function() -- {{{
     local regexWritable = vim.regex(M.writable)
     local char
     for i=34, 122 do
@@ -16,10 +16,10 @@ M.clear = function()
         end
     end
     vim.api.nvim_echo({{"Register cleared", "MoreMsg"}}, true, {})
-end
+end -- }}}
 
 
-M.insertPrompt = function()
+M.insertPrompt = function() -- {{{
     -- TODO: Custom register completion prompt
     local regexAll = vim.regex(M.all)
     local reg
@@ -43,7 +43,99 @@ M.insertPrompt = function()
     else
         api.nvim_put({regContent}, "c", true, false)
     end
-end
+end -- }}}
+
+
+M.reindent = function(indentCntTarget, srcContent) -- {{{
+    if indentCntTarget == 0 then return srcContent end
+
+    local targetContent
+    local srcLineCnt   = stringCount(srcContent, "\n")
+    local indentCntAbs = string.rep(" ", math.abs(indentCntTarget))
+
+    if indentCntTarget < 0 then
+        targetContent = string.gsub(srcContent, "^" .. indentCntAbs, "")
+        if srcLineCnt > 1 then
+            targetContent = string.gsub(targetContent, "\n" .. indentCntAbs, "\n")
+        end
+    elseif indentCntTarget > 0 then
+        targetContent = indentCntAbs .. srcContent
+        if srcLineCnt > 1 then
+            targetContent = string.gsub(targetContent, "\n", "\n" .. indentCntAbs)
+            local endLnStart, endLnEnd = string.find(srcContent, "\n%s*$")
+            -- Minus the extra spaces in the end of regConetent, like: ".....\n    "
+            if endLnStart then
+                if endLnEnd ~= endLnStart then
+                    targetContent = string.sub(targetContent, 1, #targetContent - indentCntTarget * 2 - 1)
+                else
+                    targetContent = string.sub(targetContent, 1, #targetContent - indentCntTarget - 1)
+                end
+            end
+        end
+    end
+
+    return targetContent
+end -- }}}
+
+
+M.getIndent = function(regContent) -- {{{
+    local _, regIndent = string.find(regContent, "^%s*")
+    local _, prefixLineBreak = string.find(regContent, "^\n*")
+
+    -- Minus the leading line breaks
+    if prefixLineBreak then regIndent = regIndent - prefixLineBreak end
+
+    -- Convert tab to spaces, then update reindent count
+    local tabIdx = 0
+    local tabCnt = 0
+    repeat
+        tabIdx = tabIdx + 1
+        tabIdx = string.find(regContent, "\t", tabIdx)
+        if tabIdx then tabCnt = tabCnt + 1 end
+    until not tabIdx or tabIdx > regIndent
+
+    if tabIdx then regIndent = regIndent + tabCnt * api.nvim_buf_get_option(0, "tabstop") end
+
+    return regIndent
+end -- }}}
+
+
+----
+-- Function: M.saveReg will save the star registers, plus and unnamed registers
+-- independantly, restoreReg can be accessed after saveReg is called
+----
+M.saveReg = function() -- {{{
+    local unnamedContent = fn.getreg('"', 1)
+    local unnamedType    = fn.getregtype('"')
+    local starContent    = fn.getreg('*', 1)
+    local starType       = fn.getregtype('*')
+    local plusContent    = fn.getreg('+', 1)
+    local plusType       = fn.getregtype('+')
+    local nonDefaultName = vim.v.register
+    local nonDefaultContent
+    local nonDefaultType
+    if not vim.tbl_contains({'"', "*", "+"}, nonDefaultName) then
+        nonDefaultContent = fn.getreg(nonDefaultName, 1)
+        nonDefaultType    = fn.getregtype(nonDefaultName)
+    end
+    M.restoreReg = function()
+        if nonDefaultContent and nonDefaultContent ~= "" then
+            fn.setreg(nonDefaultName, nonDefaultContent, nonDefaultType)
+        end
+
+        if starContent ~= "" then
+            fn.setreg('*', starContent,    starType)
+        end
+        if plusContent ~= "" then
+            fn.setreg('+', plusContent,    plusType)
+        end
+        if unnamedContent ~= "" then
+            fn.setreg('"', unnamedContent, unnamedType)
+        end
+
+        vim.defer_fn(function() M.restoreReg = nil end, 1000)
+    end
+end -- }}}
 
 return M
 
