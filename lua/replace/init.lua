@@ -1,13 +1,15 @@
--- File: init
+-- File: replace
 -- Author: iaso2h
 -- Description: Heavily inspired Ingo Karkat's work. Replace text with register
 -- Version: 0.1.3
 -- Last Modified: 2021-12-04
 -- TODO: tests for softtab convert
-local fn   = vim.fn
-local cmd  = vim.cmd
-local api  = vim.api
-local util = require("util")
+local fn       = vim.fn
+local cmd      = vim.cmd
+local api      = vim.api
+local util     = require("util")
+local register = require("register")
+require("operator")
 local M    = {
     regName              = nil,
     cursorPos            = nil, -- (1, 0) indexed
@@ -37,7 +39,7 @@ end
 ---  This function is used for preserving the vim.v.register value in case that
 ---  it's cleared during the file modification
 M.replaceSave = function()
-    util.saveReg()
+    register.saveReg()
     M.regName = vim.v.register
     M.count   = vim.v.count1
 end
@@ -90,7 +92,6 @@ local reindent = function(regContent, regionMotion, motionDirection, vimMode)
     -- The value of bufferIndent is the first line where motion starts or
     -- visual selection starts
     local bufferIndent
-    Print(motionDirection)
     if vimMode == "V" then
         -- In visual linewise mode, set the indentation value of starting
         -- position of region motion to bufferIndent
@@ -108,53 +109,12 @@ local reindent = function(regContent, regionMotion, motionDirection, vimMode)
         end
     end
 
-    local reindentCnt
-    local lineCnt = stringCount(regContent, "\n")
-    local regContentNew
-    local _, regIndent       = string.find(regContent, "^%s*")
-    local _, prefixLineBreak = string.find(regContent, "^\n*")
-    -- Minus the leading line breaks
-    if prefixLineBreak then regIndent = regIndent - prefixLineBreak end
-
-    -- Convert tab to spaces, then update reindent count
-    local tabIdx = 0
-    local tabCnt = 0
-    repeat
-        tabIdx = tabIdx + 1
-        tabIdx = string.find(regContent, "\t", tabIdx)
-        if tabIdx then tabCnt = tabCnt + 1 end
-    until not tabIdx or tabIdx > regIndent
-
-    if tabIdx then regIndent = regIndent + tabCnt * api.nvim_buf_get_option(0, "tabstop") end
-
     -- Get reindent count
-    reindentCnt = bufferIndent - regIndent
+    local reindent = bufferIndent - register.getIndent(regContent)
 
     -- Reindent the lines if counts do not match up
-    if reindentCnt ~= 0 then
-        local reindents = string.rep(" ", math.abs(reindentCnt))
-        if reindentCnt < 0 then
-            regContentNew = string.gsub(regContent, "^" .. reindents, "")
-            if lineCnt > 1 then
-                regContentNew = string.gsub(regContentNew, "\n" .. reindents, "\n")
-            end
-        elseif reindentCnt > 0 then
-            regContentNew = reindents .. regContent
-            if lineCnt > 1 then
-                regContentNew = string.gsub(regContentNew, "\n", "\n" .. reindents)
-                local endLnStart, endLnEnd = string.find(regContent, "\n%s*$")
-                -- Minus the extra spaces in the end of regConetent, like: ".....\n    "
-                if endLnStart then
-                    if endLnEnd ~= endLnStart then
-                        regContentNew = string.sub(regContentNew, 1, #regContentNew - reindentCnt * 2 - 1)
-                    else
-                        regContentNew = string.sub(regContentNew, 1, #regContentNew - reindentCnt - 1)
-                    end
-                end
-            end
-        end
-
-        return regContentNew
+    if reindent ~= 0 then
+        return register.reindent(reindent, regContent)
     else
         return false
     end
@@ -477,7 +437,7 @@ function M.operator(args) -- {{{
     -- Restoration {{{
 
     -- Register
-    util.restoreReg()
+    register.restoreReg()
     -- Options
     if vim.is_callable(M.restoreOption) then M.restoreOption() end
 
@@ -486,7 +446,7 @@ function M.operator(args) -- {{{
         if not M.cursorPos then
             -- TODO: Supported in repeat mode?
         else
-            if require("util").compareDist(M.cursorPos, regionReplace.endPos) <= 0 then
+            if util.compareDist(M.cursorPos, regionReplace.endPos) <= 0 then
                 -- Avoid curosr out of scope
                 local cursorLine = api.nvim_buf_get_lines(curBufNr,
                     M.cursorPos[1] - 1, M.cursorPos[1], false)[1]
@@ -537,7 +497,7 @@ function M.operator(args) -- {{{
         end
 
     elseif vimMode == "V" then
-        if require("util").compareDist(M.cursorPos, regionReplace.endPos) <= 0 then
+        if util.compareDist(M.cursorPos, regionReplace.endPos) <= 0 then
             -- Avoid curosr out of scope
             local cursorLine = api.nvim_buf_get_lines(curBufNr,
                 M.cursorPos[1] - 1, M.cursorPos[1], false)[1]
@@ -593,17 +553,6 @@ function M.expr() -- {{{
 
     Opfunc = M.operator
     vim.o.opfunc = "LuaExprCallback"
-
-    if not LuaExprCallbackSetup then
-        cmd [[
-        function! LuaExprCallback(...)
-            let l:args = deepcopy(a:000)
-            call add(l:args, mode())
-            return v:lua.Opfunc(l:args)
-        endfunction
-        ]]
-        LuaExprCallbackSetup = true
-    end
 
     -- Preserving cursor position as its position will changed once the
     -- vim.o.opfunc() being called
