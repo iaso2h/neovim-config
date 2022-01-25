@@ -193,26 +193,6 @@ function M.addJump(action, reservedCount, funArg) -- {{{
     end
 end -- }}}
 
-----
--- Function: M.tblLoaded return all loaded buffer listed in the :ls command in a table
---
--- @param termInclude: boolean value to determine whether contains terminal or not
--- @return: table
-----
-function M.tblLoaded(termInclude) -- {{{
-    local bufTbl
-    if not termInclude then
-        bufTbl = vim.tbl_filter(function(buf) return string.match(buf, "term://") == nil end,
-            vim.split(fn.execute("ls"), '\n', false))
-        table.remove(bufTbl, 1)
-    else
-        -- NOTE: Execute ls! will incur Neovim built-in LSP complain
-        bufTbl = vim.split(fn.execute("ls"), '\n', false)
-        table.remove(bufTbl, 1)
-    end
-    return bufTbl
-end -- }}}
-
 
 ----
 -- Function: _G.map wrap around the nvim_set_keymap, and accept the fouth argument as table
@@ -686,108 +666,6 @@ function M.splitExist()
 end
 
 
-local function newWin(func, funcArgList, bufListed, scratchBuf, layoutStyle, height2width, width2height)
-    local newBufNr = api.nvim_create_buf(bufListed, scratchBuf)
-    if layoutStyle == "col" then
-        cmd [[wincmd v]]
-        api.nvim_win_set_buf(0, newBufNr)
-        cmd("vertical resize " .. (api.nvim_win_get_width(0) - math.floor(api.nvim_win_get_height(0) * 0.618 * height2width)))
-    else
-        cmd [[wincmd s]]
-        api.nvim_win_set_buf(0, newBufNr)
-        cmd("resize " .. (api.nvim_win_get_height(0) - math.floor(api.nvim_win_get_width(0) * 0.618 * width2height)))
-    end
-    if func then
-        if next(funcArgList) then
-            func(newBufNr, funcArgList)
-        else
-            func(newBufNr)
-        end
-    end
-end
-
-----
--- Function: M.newSplit :Create a new split window based on the window layout
---
--- @param func:        function object to be executed after new window is
--- create. This function must accept the buffer number of the new buffer as the first argument
--- @param funcArgList: function argument table, can be empty
--- @param bufnamePat:  Shift focus to window if any window contains the buffer that match the given pattern, can be an empty string
--- @param bufListed:   Determine whether the new create buffer listed when calling api.nvim_create_buf(), expected boolean
--- @param scratchBuf:  Create a "throwaway" scratch-buffer when calling api.nvim_create_buf(), expected boolean
--- @return: 0
-----
-function M.newSplit(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
-    local winIDTbl            = api.nvim_list_wins()
-    local winIDNonRelativeTbl = vim.tbl_filter(function(winID) return vim.api.nvim_win_get_config(winID).relative == "" end, winIDTbl)
-    local nonSplitFileTypeTbl = {"coc-explorer", "qf", "NvimTree"}
-
-    local curWinID  = api.nvim_get_current_win()
-    local winInfo   = fn.getwininfo()
-    local winLayout = fn.winlayout()
-    -- -- UbuntuMono
-    -- local width2height   = 0.1978
-    -- local height2width   = 5.0566
-    -- Delugia
-    local width2height   = 0.4798
-    local height2width   = 2.5523
-
-    local ui             = api.nvim_list_uis()[1]
-    local screenWidth    = ui.width
-    local screenHeight   = ui.height
-
-    -- Store windows ID for position restoration
-    M.newSplitLastBufNr = curWinID
-
-    -- If bufnamePat is provided and vim find the buffer that match the
-    -- pattern, Shift focus to that buffer in current window instead
-    if bufnamePat ~= "" then -- {{{
-        local matchResult
-        for _, tbl in ipairs(winInfo) do
-            matchResult = string.match(api.nvim_buf_get_name(api.nvim_win_get_buf(tbl["winid"])), bufnamePat)
-            if matchResult then
-                cmd(string.format("%dwincmd w", tbl["winnr"]))
-                return
-            end
-        end
-    end -- }}}
-
-    if #winIDNonRelativeTbl == 1 then
-        if screenWidth <= screenHeight * height2width then
-            return newWin(func, funcArgList, bufListed, scratchBuf, "row", height2width, width2height)
-        else
-            return newWin(func, funcArgList, bufListed, scratchBuf, "col", height2width - 1., width2height)
-        end
-    else -- {{{
-
-        local newSplitChk = false
-
-        -- Do not split on special window
-        if vim.tbl_contains(nonSplitFileTypeTbl, vim.bo.filetype) then
-            winLayout[1] = winLayout[1] == "row" and "col" or "row"
-            cmd "noautocmd wincmd W"
-        end
-
-        repeat
-            cmd "noautocmd wincmd W"
-            if not vim.tbl_contains(nonSplitFileTypeTbl, vim.bo.filetype) and
-                vim.tbl_contains(winIDNonRelativeTbl, api.nvim_get_current_win()) then
-
-                newWin(func, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
-                newSplitChk = true
-            end
-        until api.nvim_get_current_win() ~= curWinID
-
-        -- In case of new win never had been created
-        if not newSplitChk then
-            cmd "noautocmd wincmd W"
-            cmd "noautocmd wincmd W"
-            return newWin(func, funcArgList, bufListed, scratchBuf, winLayout[1], height2width, width2height)
-        end
-    end -- }}}
-end -- }}}
-
-
 function _G.isFloatWin(winID)
     return api.nvim_win_get_config(winID and winID or 0).relative ~= ""
 end
@@ -994,6 +872,64 @@ _G.stringCount = function(str, pattern)
         count = count + 1
     end
 end
+
+
+--- Create highlights for region in a buffer. The region is defined by two
+--- tables containg position info represent the start and the end
+--- respectively. The region can be multi-lines across in a buffer
+--- @param bufNr integer Buffer number/handler
+--- @param posStart table (1, 0)-indexed values from vim.api.nvim_buf_get_mark()
+--- @param posEnd table (1, 0)-indexed values from vim.api.nvim_buf_get_mark()
+--- @param presNS integer ID of the preserved namespace, in which the
+--- preserved extmark will be stored
+--- @param regType string Register type from vim.fn.getregtype()
+--- @param hlGroup string Highlight group name
+--- @param hlTimeout integer Determine how long the highlight will be clear
+--- after being created
+--- @return integer/boolean Return integer when successful, which is the ID of the preserved namespace of the content defined by. Return false when failed
+--- posStart and posEnd
+M.nvimBufAddHl = function(bufNr, posStart, posEnd, presNS, regType, hlGroup, hlTimeout)
+    local presExtmark
+
+    -- Change to 0-based for extmark creation
+    posStart = {posStart[1] - 1, posStart[2]}
+    posEnd = {posEnd[1] - 1, posEnd[2]}
+
+    -- Create extmark to track the position of new content
+    local ok, msg = pcall(api.nvim_buf_set_extmark, bufNr, presNS,
+        posStart[1], posStart[2], {end_line = posEnd[1], end_col = posEnd[2]})
+    -- End function calling if exmark is out of scope
+    if not ok then
+        vim.notify(msg, vim.log.levels.WARN)
+        return false
+    else
+        presExtmark = msg
+    end
+
+    -- Creates a new namespace or gets an existing one.
+    local hlNS = api.nvim_create_namespace('myHighlight')
+    -- Always clear all namespaced obejcts
+    api.nvim_buf_clear_namespace(bufNr, hlNS, 0, -1)
+
+    -- Add highlight
+    local region = vim.region(bufNr, posStart, posEnd, regType,
+                    vim.o.selection == "inclusive" and true or false)
+    for lineNr, cols in pairs(region) do
+        api.nvim_buf_add_highlight(bufNr, hlNS, hlGroup,
+                                    lineNr, cols[1], cols[2])
+    end
+
+    -- Clear highlight after certain timeout
+    vim.defer_fn(function()
+        -- In case of buffer being deleted
+        if api.nvim_buf_is_valid(bufNr) then
+            pcall(api.nvim_buf_clear_namespace, bufNr, hlNS, 0, -1)
+        end
+    end, hlTimeout)
+
+    return presExtmark
+end
+
 
 -- dummy
 _G.whichKeyDoc = function(docs)

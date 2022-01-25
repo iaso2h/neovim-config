@@ -25,7 +25,7 @@ map("n", [[<C-q>n]],    [[:cnext<CR>zzzv]],     {"silent"}, "Go to next item in 
 map("n", [[<C-q>N]],    [[:cprevious<CR>zzzv]], {"silent"}, "Go to previous item in quickFix")
 map("n", [[<C-q>l]],    [[:cnfile<CR>]],        {"silent"}, "Go to next file in quickFix")
 map("n", [[<C-q>h]],    [[:cpfile<CR>]],        {"silent"}, "Go to previous file in quickFix")
-map("n", [[<leader>q]], require("buffer").quickfixToggle, "Quickfix toggle")
+map("n", [[<leader>q]], require("buf").quickfixToggle, "Quickfix toggle")
 -- Spell corretion
 map("n", [[\\]], [[z=1<CR><CR>]], {"silent"}, "Quick spell fix")
 -- Expand region
@@ -113,7 +113,7 @@ map("n", [[gZ]], [[<Plug>ZealOperatorGlobal]], "Zeal look up...universally")
 map("x", [[Z]],  [[<Plug>ZealVisual]], "Zeal look up selected")
 -- }}} Zeal query
 -- Substitue selected
-map("x", [[<C-s>]], require("selection").visualSub, "Substitue selected in command line")
+map("x", [[<C-s>]], [[:lua require("selection").visualSub()<CR>]],        {"silent"}, "Substitue selected in command line")
 -- HistoryStartup
 map("n", [[<C-s>]], [[:lua require("historyStartup").display(true)<CR>]], {"silent"}, "Enter HistoryStartup")
 -- Extraction
@@ -253,9 +253,9 @@ map("i", [[<C-r><C-r>]], [[<C-\><C-o>:lua require("register").insertPrompt()<CR>
 
 -- Buffer & Window & Tab{{{
 -- Smart quit
-map("n", [[q]],     [[:lua require("buffer").smartClose("window")<CR>]], {"silent"}, "Close window")
-map("n", [[Q]],     [[:lua require("buffer").smartClose("buffer")<CR>]], {"silent"}, "Close buffer")
-map("n", [[<C-u>]], require("buffer").restoreClosedBuf, "Restore last closed buffer")
+map("n", [[q]],     [[:lua require("buf").close("window")<CR>]],    {"silent"}, "Close window")
+map("n", [[Q]],     [[:lua require("buf").close("buffer")<CR>]],    {"silent"}, "Close buffer")
+map("n", [[<C-u>]], require("buf").restoreClosedBuf, "Restore last closed buffer")
 -- Window
 -- TODO:
 -- map("n", [[<C-w>s]], [[:lua require("consistantTab").splitCopy("wincmd s")<CR>]], {"silent"})
@@ -270,7 +270,7 @@ map({"n", "x"}, [[<A-->]],  [[<CMD>wincmd -<CR>]],       {"silent"}, "Decrease w
 map("i",        [[<A-->]],  [[<C-\><C-O>:wincmd -<CR>]], {"silent"}, "Decrease window size")
 
 -- Buffers
-map("n", [[<C-w>O]], require("buffer").wipeOtherBuf, "Wipe other buffer")
+map("n", [[<C-w>O]], require("buf").closeOther, "Wipe other buffer")
 map("n", [[<A-h>]],  [[<CMD>bp<CR>]], {"silent"},    "Previous buffer")
 map("n", [[<A-l>]],  [[<CMD>bn<CR>]], {"silent"},    "Next buffer")
 -- Tab

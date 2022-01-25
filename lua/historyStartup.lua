@@ -55,7 +55,7 @@ M.display = function(force)
     if api.nvim_buf_is_valid(1) and api.nvim_buf_get_option(1, "modified") and api.nvim_buf_get_option(1, "filetype") ~= nil then
         M.curBuf = 1
     else
-        -- BUG:
+        -- HACK:
         -- M.curBuf = api.nvim_create_buf(true, true)
 
         -- if M.curBuf == 0 then
@@ -95,9 +95,9 @@ M.execMap = function(key)
     key = string.lower(key)
 
     if key == "q" then
-        local bufNrTbl   = vim.tbl_map(function(buf)
+        local bufNrTbl = vim.tbl_map(function(buf)
             return tonumber(string.match(buf, "%d+"))
-            end, require("util").tblLoaded(false))
+            end, require("buf.util").bufLoadedTbl(false))
         if #bufNrTbl == 0 then
             cmd("noa q!")
         else

@@ -1145,8 +1145,8 @@ packer.startup{
                 -- require("telescope.actions").close(prompt_bufnr)
                 -- require("refactoring").refactor(content.value)
             -- end
-            map("x", [[<leader>re]], [[:lua require("refactoring").refactor("Extract Function")<CR>]],         {"silent"}, "Extract function")
-            map("x", [[<leader>rf]], [[:lua require("refactoring").refactor("Extract Function To File")<CR>]], {"silent"}, "Extract function to file")
+            map("x", [[<leader>rf]], [[:lua require("refactoring").refactor("Extract Function")<CR>]],         {"silent"}, "Extract function")
+            map("x", [[<leader>rF]], [[:lua require("refactoring").refactor("Extract Function To File")<CR>]], {"silent"}, "Extract function to file")
             map("v", [[<Leader>rv]], [[:lua require('refactoring').refactor('Extract Variable')<CR>]], {"silent"}, "extract varibale")
             map("v", [[<Leader>ri]], [[:lua require('refactoring').refactor('Inline Variable')<CR>]], {"silent"}, "extract inline varibale")
         end

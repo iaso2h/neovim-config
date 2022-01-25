@@ -240,18 +240,17 @@ local matchRegType = function(motionType, vimMode, reg, regionMotion, motionDire
 end -- }}}
 
 
-----
--- Replace text by manipulating visual selection and put
---
--- @param motionType: String. Motion type by which how the operator perform.
--- Can be "line", "char" or "block"
--- @param vimMode: String. Vim mode. See: `:help mode()`
--- @param reg: Table. Contain name, type, content of v:register
--- Can be "line", "char" or "block"
--- @param regionMotion: Table. Contain start and end position of operator movement. {1, 0} indexed
--- @param curBufNr: Ineger. Buffer handler(number)
-----
-local replace = function(motionType, vimMode, reg, regionMotion, curBufNr) -- {{{
+--- Replace text by manipulating visual selection and put
+--- @param motionType string Motion type by which how the operator
+--- perform. Can be "line", "char" or "block"
+--- @param vimMode string Vim mode. See: `:help mode()`
+--- @param reg table Contain name, type, content of v:register Can be "line",
+--- "char" or "block"
+--- @param regionMotion table Contain start and end position of operator movement. {1, 0} indexed
+--- @param curBufNr integer Buffer handler(number)
+--- @param opts table Options about highlighting
+--- @return table {repStart = {}, repEnd = {}}
+local replace = function(motionType, vimMode, reg, regionMotion, curBufNr, opts) -- {{{
     -- With a put in visual mode, the previously selected text is put in the
     -- unnamed register, so we need to save and restore that.
     local regCMD = reg.name == [["]] and "" or [["]] .. reg.name
@@ -277,12 +276,13 @@ local replace = function(motionType, vimMode, reg, regionMotion, curBufNr) -- {{
     local repStart = api.nvim_buf_get_mark(0, "[")
     local repEnd   = api.nvim_buf_get_mark(0, "]")
 
-    -- Inplace-replaced new can be retieved from 'gp' mapping, same as the inplace-put
-    require("yankPut").inplacePutNewContentNS      = api.nvim_create_namespace("inplacePutNewContent")
-    require("yankPut").inplacePutNewContentExtmark = api.nvim_buf_set_extmark(curBufNr,
-        require("yankPut").inplacePutNewContentNS,
-        repStart[1] - 1, repStart[2],
-        {end_line = repEnd[1] - 1, end_col = repEnd[2]})
+    -- Create highlight {{{
+    -- Creates a new namespace or gets an existing one.
+    require("yankPut").inplacePutNewContentNS = api.nvim_create_namespace("inplacePutNewContent")
+    local newContentExmark = util.nvimBufAddHl(curBufNr, repStart, repEnd,
+            require("yankPut").inplacePutNewContentNS, reg.type, opts.hlGroup, opts.timeout)
+    if newContentExmark then require("yankPut").inplacePutNewContentExtmark = newContentExmark end
+    -- }}} Create highlight
 
     -- Report change in Neovim statusbar
     local srcLinesCnt = regionMotion.endPos[1] - regionMotion.startPos[1] + 1
@@ -407,35 +407,14 @@ function M.operator(args) -- {{{
 
     -- Replace with new content
     local regionReplace
-    ok, msg = pcall(replace, motionType, vimMode, reg, regionMotion, curBufNr)
+    ok, msg = pcall(replace, motionType, vimMode, reg, regionMotion, curBufNr, opts)
     if not ok then
         vim.notify(msg, vim.log.levels.ERROR)
     else
         regionReplace = msg
     end
 
-    -- Create highlight {{{
-    local repHLNS = api.nvim_create_namespace("inplaceReplaceHL")
-    api.nvim_buf_clear_namespace(curBufNr, repHLNS, 0, -1)
-
-    local region = vim.region(curBufNr,
-        {regionReplace.startPos[1] - 1, regionReplace.startPos[2]},
-        {regionReplace.endPos[1] - 1,   regionReplace.endPos[2]},
-        reg.type, true)
-
-    for lineNr, cols in pairs(region) do
-        api.nvim_buf_add_highlight(curBufNr, repHLNS, opts["hlGroup"], lineNr, cols[1], cols[2])
-    end
-
-    vim.defer_fn(function()
-        -- In case of buffer being deleted
-        if api.nvim_buf_is_valid(curBufNr) then
-            pcall(api.nvim_buf_clear_namespace, curBufNr, repHLNS, 0, -1)
-        end
-    end, opts["timeout"])
-    -- }}} Create highlight
     -- Restoration {{{
-
     -- Register
     register.restoreReg()
     -- Options

@@ -49,7 +49,7 @@ vim.g.nvim_tree_icons = {
         staged    = "",
         unmerged  = "",
         renamed   = "",
-        untracked = " ",
+        untracked = "",
         deleted   = "",
         ignored   = "◌"
     },
@@ -138,7 +138,7 @@ require("nvim-tree").setup {
                 {key = "I",                            cb = cb("toggle_ignored")},
                 {key = "H",                            cb = cb("toggle_dotfiles")},
                 {key = "R",                            cb = cb("refresh")},
-                {key = "n",                            cb = cb("create")},
+                {key = "<C-n>",                        cb = cb("create")},
                 {key = "df",                           cb = cb("remove")},
                 {key = "r",                            cb = cb("full_rename")},
                 {key = "gr",                           cb = cb("rename")},

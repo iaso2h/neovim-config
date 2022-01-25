@@ -1,6 +1,11 @@
--- Configuration are based on Neovim 0.5.1(with this patch:
--- https://github.com/neovim/neovim/issues/14090#issuecomment-921312955) or
--- Neovim 0.7.0 Nightly
+if vim.fn.has("nvim-0.6.1") ~= 1 then
+    vim.notify(" ", vim.log.levels.WARN)
+    vim.notify(" ", vim.log.levels.WARN)
+    vim.notify("Neovim with 0.6.1 or higher build version required", vim.log.levels.WARN)
+    vim.notify(" ", vim.log.levels.WARN)
+    vim.notify(" ", vim.log.levels.WARN)
+    return
+end
 require("impatient").enable_profile()
 
 -- Global lua var

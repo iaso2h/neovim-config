@@ -5,16 +5,12 @@ local M   = {}
 
 -- File: terminalToggle.vim
 -- Author: iaso2h
--- Description: Toggle terminal like VS Code
+-- Description: Toggle terminal like VS Code does
 -- Last Modified: 2021-05-03
 -- Version: 0.0.4
 
-----
--- Function: TerminalToggle Toggle terminal on split windows, support Winodows
--- and linux only
--- Return: 0
-----
-
+--- Toggle terminal on split windows, support Winodows
+--- and linux only
 function M.terminalToggle() -- {{{
     local winTbl            = api.nvim_list_wins()
     local winNonRelativeTbl = vim.tbl_filter(function(winID) return vim.api.nvim_win_get_config(winID).relative == "" end, winTbl)
@@ -22,7 +18,7 @@ function M.terminalToggle() -- {{{
     local winInfo           = fn.getwininfo()
 
     if vim.bo.buftype ~= "terminal" then
-        require("util").newSplit(require("terminal").openTerminal, {}, "^term.*", false, true)
+        require("buf").newSplit(require("terminal").openTerminal, {}, "^term.*", false, true)
     else
         if winCount == 1 then
             cmd [[bp]]
@@ -32,7 +28,7 @@ function M.terminalToggle() -- {{{
         else
             cmd [[q]]
             -- Switch back last window if exists
-            if not require("util").newSplitLastBufNr then
+            if not require("buf.var").newSplitLastBufNr then
                 for _, tbl in winInfo do
                     if api.nvim_win_get_buf(tbl["winid"]) == vim.g.smartSplitLastBufNr then
                         cmd(string.format("%dwincmd w", tbl["winnr"]))
@@ -44,20 +40,20 @@ function M.terminalToggle() -- {{{
 end -- }}}
 
 
-----
--- Function: openTerminal Run terminal in a smart way
--- Return: if no terminal found, run a new instance. If one or multiple terminal is
--- found, the smallest buffer number, which is determined by bufnr(), will be
--- invoke
-----
+--- Run terminal in a smart way
+--- @param newBufNr integer Buffer number/handler
 function M.openTerminal(newBufNr) -- {{{
+    -- if no terminal found, run a new instance. If one or multiple terminal is
+    -- found, the smallest buffer number, which is determined by bufnr(), will be
+    -- invoke
     local termBufOutput = vim.api.nvim_exec("ls! R", true)
     if termBufOutput ~= "" then  -- Buffer instance exist
         local termBufInfo = vim.split(termBufOutput, "\n", true)[1]
         cmd("noa b " .. string.match(termBufInfo, "%d+"))
         cmd "startinsert"
+
         -- Clear the scratch buffer
-        cmd("bwipe! " .. newBufNr)
+        cmd("noa bwipe! " .. newBufNr)
     else                         -- Create new buffer instance
         if jit.os == "Windows" then
             cmd "terminal powershell"
