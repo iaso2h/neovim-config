@@ -5,4 +5,6 @@ return {
     winID    = nil,
     winIDtbl = nil,
     bufNrTbl = nil,
+
+    newSplitLastBufNr = nil
 }

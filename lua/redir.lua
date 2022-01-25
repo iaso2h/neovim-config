@@ -13,7 +13,7 @@ local M   = {}
 ----
 function M.catch(CMD)
     local output = api.nvim_exec(string.format([[%s]], CMD), true)
-    require("util").newSplit(M.dump, {output}, "", false, true)
+    require("buf").newSplit(M.dump, {output}, "", false, true)
 end
 
 function M.dump(newBufNr, funcArgTbl)

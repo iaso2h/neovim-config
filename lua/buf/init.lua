@@ -45,5 +45,10 @@ M.quickfixToggle = function () -- {{{
     cmd "copen"
 end -- }}}
 
+
+M.newSplit = function (func, funcArgList, bufnamePat, bufListed, scratchBuf)
+    require("buf.action.newSplit").init(func, funcArgList, bufnamePat, bufListed, scratchBuf)
+end
+
 return M
 
