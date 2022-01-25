@@ -45,7 +45,7 @@ end -- }}}
 --- @param bufNr boolean Buffer number handler
 M.bufWipe = function(bufNr)
     bufNr = bufNr or 0
-    cmd("bdelete! " .. bufNr)
+    pcall(cmd, "bdelete! " .. bufNr)
     -- pcall(api.nvim_buf_delete, bufNr and bufNr or 0, {force = true})
 end
 

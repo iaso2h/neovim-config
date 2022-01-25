@@ -6,5 +6,6 @@ return {
     winIDtbl = nil,
     bufNrTbl = nil,
 
-    newSplitLastBufNr = nil
+    newSplitLastBufNr = nil,
+    lastClosedFilePath = nil
 }

@@ -255,9 +255,7 @@ map("i", [[<C-r><C-r>]], [[<C-\><C-o>:lua require("register").insertPrompt()<CR>
 -- Smart quit
 map("n", [[q]],     [[:lua require("buf").close("window")<CR>]],    {"silent"}, "Close window")
 map("n", [[Q]],     [[:lua require("buf").close("buffer")<CR>]],    {"silent"}, "Close buffer")
-map("n", [[<C-u>]], [[:lua require("buf").restoreClosedBuf()<CR>]], {"silent"}, "Restore last closed buffer")
--- BUG:
--- map("n", [[<C-u>]], require("buf").restoreClosedBuf, "Restore last closed buffer")
+map("n", [[<C-u>]], require("buf").restoreClosedBuf, "Restore last closed buffer")
 -- Window
 -- TODO:
 -- map("n", [[<C-w>s]], [[:lua require("consistantTab").splitCopy("wincmd s")<CR>]], {"silent"})

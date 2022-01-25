@@ -2,12 +2,13 @@
 -- Author: iaso2h
 -- Description: A few of buffer-related utilities
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.24
+-- Version: 0.0.25
 -- Last Modified: 2022-01-25
-local fn    = vim.fn
-local cmd   = vim.cmd
-local api   = vim.api
-local M    = {}
+local fn  = vim.fn
+local cmd = vim.cmd
+local api = vim.api
+local var = require("buf.var")
+local M   = {}
 
 
 M.close = function(type)
@@ -21,8 +22,9 @@ end
 
 
 M.restoreClosedBuf = function()
-    if M.lastClosedFilePath then
-        cmd(string.format("e %s", M.lastClosedFilePath))
+    Print(var.lastClosedFilePath)
+    if var.lastClosedFilePath then
+        cmd(string.format("e %s", var.lastClosedFilePath))
     end
 end
 

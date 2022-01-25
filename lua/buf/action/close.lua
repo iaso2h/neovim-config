@@ -61,7 +61,7 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
 
     if checkSpecBuf or util.isSpecBuf() then
         -- Closing Special buffer
-        M.lastClosedFilePath = nil
+        var.lastClosedFilePath = nil
 
         -- if util.winCnt() ~= 1 then
             -- -- Just close the window. Won't do any damage
@@ -108,12 +108,12 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         -- }}} Scratch files
 
         -- Standard buffer -- {{{
+        -- Store closed file path
+        var.lastClosedFilePath = fn.expand("%:p")
+
         -- Always prompt for unsaved change, so that buffer is ready to be
         -- deleted safely. Abort the processing when false is evaluated
         if not saveModified(var.bufNr) then return false end
-
-        -- Store closed file path
-        M.lastClosedFilePath = fn.expand("%:p")
 
         -- Whether to check other windows that might have the same buffer instance
         if not checkAllBuf or util.winCnt() == 1 then
