@@ -278,6 +278,55 @@ flatten = function(tbl)
     end
 end
 
+
+--- Check whether lua modules under the same lua directory have been opened
+--- and modified in other Neovim buffer. If any, prompt the user to save the
+--- changes before reloading them all.
+--- @param fileStrs object Plenary path object
+local luaChkLoadedOpenAndMod = function (fileStrs)
+    local bufNrTbl = vim.tbl_map(function(buf)
+        return tonumber(string.match(buf, "%d+"))
+        end, require("buf.util").bufLoadedTbl(false))
+
+    if #bufNrTbl <= 1 then return end
+
+    local bufNrOpenTbl = {}
+    local bufNrCur = api.nvim_get_current_buf()
+    for _, s in ipairs(fileStrs) do
+        for _, n in ipairs(bufNrTbl) do
+            -- TODO: test in Windows needed
+            local bufName = api.nvim_buf_get_name(n)
+            if n ~= bufNrCur and string.match(bufName, s) and
+                    not tbl_idx(bufNrOpenTbl, n) and
+                    api.nvim_buf_get_option(n, "modified") then
+                bufNrOpenTbl[#bufNrOpenTbl+1] = n
+            end
+        end
+    end
+
+    if #bufNrOpenTbl == 0 then return end
+
+    for _, n in ipairs(bufNrOpenTbl) do
+        vim.notify(api.nvim_buf_get_name(n), vim.log.levels.INFO)
+    end
+    local filePlural = #bufNrOpenTbl > 1 and "s" or ""
+    cmd "noa echohl MoreMsg"
+    local answer = fn.confirm(
+        string.format("Save the modification%s for file%s under the same lua directory?",
+            filePlural, filePlural),
+        ">>> &Yes\n&No", 1, "Question")
+    cmd "noa echohl None"
+    if answer == 1 then
+        for _, n in ipairs(bufNrOpenTbl) do
+            cmd(string.format("%sbufdo noa update", n))
+        end
+        -- Since "<range>bufdo" will set the current buf in curent window to
+        -- the buffer specified by the <range> prefix, an additional action
+        -- needed to take to bring back the origin buffer
+        api.nvim_win_set_buf(0, bufNrCur)
+    end
+end
+
 --- Get the relative lua module path that can be passed directly in func require()
 --- @param srcPath object Plenary path object
 --- @return string Relative lua module path
@@ -437,6 +486,7 @@ M.luaLoadDir = function(srcPath, dirStr, checkLoadedFirst) -- {{{
         return dirPath:parent().filename .. sep .. string.gsub(i, "%.", sep)
     end, luaRelStrs)
 
+    luaChkLoadedOpenAndMod(fileStrs)
 
     -- Unloading
     -- TODO: doc the importance of the unloading sequence
