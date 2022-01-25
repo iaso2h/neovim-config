@@ -11,17 +11,27 @@ local loop = vim.loop
 local flattenTbl = {}
 local M    = {}
 
-local configPath                = path:new(fn.stdpath("config"))
+local configPath = path:new(fn.stdpath("config"))
 -- Force files that match those patterns to be treated as individual lua file
 -- module even if they are coming from a the lua directory module
 local configPathForceFileLoadTbl    = {configPath:joinpath("lua", "core"), configPath:joinpath("lua", "config")}
 local configPathForceFileLoadStrTbl = vim.tbl_map(function (i)
     return i.filename end, configPathForceFileLoadTbl)
+
 local configPathForceDirLoadTbl    = {configPath:joinpath("lua", "onenord")}
 local configPathForceDirLoadStrTbl = vim.tbl_map(function (i)
     return i.filename end, configPathForceDirLoadTbl)
 local luaModulePath       = configPath:joinpath("lua")
 local sep                 = jit.os == "Windows" and "\\" or "/"
+
+
+local function upperCaseWindowsDrive(fullPathStr)
+    if not string.sub(fullPathStr, 1, 1):match("[a-z]") then
+        return fullPathStr
+    end
+
+    return string.sub(fullPathStr, 1, 1):upper() .. string.sub(fullPathStr, 2, -1)
+end
 
 
 local packerCompileQuery = function(...)
@@ -303,8 +313,10 @@ local luaChkLoadedOpenAndMod = function (fileStrs)
     local bufNrCur = api.nvim_get_current_buf()
     for _, s in ipairs(fileStrs) do
         for _, n in ipairs(bufNrTbl) do
-            -- TODO: test in Windows needed
             local bufName = api.nvim_buf_get_name(n)
+            if jit.os == "Windows" then
+                bufName = upperCaseWindowsDrive(bufName)
+            end
             if n ~= bufNrCur and string.match(bufName, s) and
                     not tbl_idx(bufNrOpenTbl, n) and
                     api.nvim_buf_get_option(n, "modified") then
@@ -382,6 +394,9 @@ end
 M.luaLoadFile = function(luaModule, checkLuaDir) -- {{{
     if not luaModule then
         luaModule = fn.expand("%:p")
+        if jit.os == "Windows" then
+            luaModule = upperCaseWindowsDrive(luaModule)
+        end
     end
 
     assert(getmetatable(luaModule) == require("plenary.path") or
@@ -498,7 +513,9 @@ M.luaLoadDir = function(srcPath, dirStr, checkLoadedFirst) -- {{{
     luaChkLoadedOpenAndMod(fileStrs)
 
     -- Unloading
-    -- TODO: doc the importance of the unloading sequence
+    -- luaSubfiles() makes sure that relative dir file path always listed
+    -- before relative file path, so lua dir module will be always unloaded
+    -- and reloaded one step ahead
     for _, s in ipairs(luaRelStrs) do
         package.loaded[s] = nil
     end
@@ -541,8 +558,8 @@ end -- }}}
 M.reload = function() -- {{{
     local srcFullPathStr = fn.expand("%:p")
     -- Uppercase the first character in Windows
-    if jit.os == "Windows" and string.sub(srcFullPathStr, 1, 1):match("[a-z]") then
-        srcFullPathStr = string.sub(srcFullPathStr, 1, 1):upper() .. string.sub(srcFullPathStr, 2, -1)
+    if jit.os == "Windows" then
+        srcFullPathStr = upperCaseWindowsDrive(srcFullPathStr)
     end
     local srcPath = path:new(srcFullPathStr)
 
