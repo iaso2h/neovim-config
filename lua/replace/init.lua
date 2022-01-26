@@ -525,17 +525,22 @@ end -- }}}
 
 
 --- Expression callback for replace operator
+--- @param restoreCursorChk boolean Whether to restore the cursor if possible
 --- @return string "g@"
-function M.expr() -- {{{
+function M.expr(restoreCursorChk) -- {{{
     -- TODO: Detect virutal edit
     if not warnRead() then return "" end
 
     Opfunc = M.operator
     vim.o.opfunc = "LuaExprCallback"
 
-    -- Preserving cursor position as its position will changed once the
-    -- vim.o.opfunc() being called
-    M.cursorPos = api.nvim_win_get_cursor(0)
+    if restoreCursorChk then
+        -- Preserving cursor position as its position will changed once the
+        -- vim.o.opfunc() being called
+        M.cursorPos = api.nvim_win_get_cursor(0)
+    else
+        M.cursorPos = nil
+    end
 
     -- Evaluate the expression register outside of a function. Because
     -- unscoped variables do not refer to the global scope. Therefore,

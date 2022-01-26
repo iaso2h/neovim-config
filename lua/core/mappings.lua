@@ -154,15 +154,95 @@ map("n", [[<C-g>]],
 -- Tab switcher {{{
 map("n", [[<S-Tab>]], require("tabSwitcher").main, "Change tab size")
 -- }}} Tab switcher
+-- Delete & Change & Replace {{{
 -- Delete
 map("n", [[dj]], [[<Nop>]])
 map("n", [[dk]], [[<Nop>]])
-map("n", [[dn]], [[*``dw]], {"noremap"}, "Delete word under curosr, then highlight it forward")
-map("n", [[dN]], [[#``dw]], {"noremap"}, "Delete word under curosr, then highlight it backward")
+map("n", [[<Plug>DeleteUnderForward]],
+    [[:lua require("changeUnder").init("diw", 1, "<Plug>DeleteUnderForward")<CR>]],
+    {"silent"}, "Delete the whold word under curosr, then highlight it forward")
+map("n", [[<Plug>DeleteUnderBackward]],
+    [[:lua require("changeUnder").init("diw", 0, "<Plug>DeleteUnderBackward")<CR>]],
+    {"silent"}, "Delete the whold word under curosr, then highlight it backward")
+map("n", [[dn]], [[<Plug>DeleteUnderForward]], "Delete the whold word under curosr, then highlight it forward")
+map("n", [[dN]], [[<Plug>DeleteUnderBackward]], "Delete the whold word under curosr, then highlight it backward")
 map("n", [[d<Space>]], [[<CMD>call setline(".", "")<CR>]],  {"silent"}, "Empty current line,")
 -- Change under cursor
-map("n", [[cn]], [[*``cgn]], {"noremap"}, "Change word under cursor, then highlight it forward")
-map("n", [[cN]], [[*``cgN]], {"noremap"}, "Change word under cursor, then highlight it backward")
+map("n", [[cn]], [[v:hlsearch? "cgn" : "g*``cgn"]], {"noremap", "expr"}, "Change whole word under cursor, then highlight it forward")
+map("n", [[cN]], [[v:hlsearch? "cgN" : "g#``cgN"]], {"noremap", "expr"}, "Change whole word under cursor, then highlight it backward")
+-- Replace
+map("n", [[<Plug>ReplaceOperatorRestoreCursor]],
+    luaRHS[[luaeval("require('replace').expr(true)")]],
+    {"silent", "expr"}, "Replace operator and restore the cursor position"
+)
+map("n", [[<Plug>ReplaceOperator]],
+    luaRHS[[luaeval("require('replace').expr(false)")]],
+    {"silent", "expr"}, "Replace operator"
+)
+map("n", [[<Plug>ReplaceExpr]],
+    [[:<C-u>let g:ReplaceExpr=getreg("=")<Bar>exec "norm!" . v:count1 . "."<CR>]],
+    {"silent"}, "Replace expression"
+)
+map("n", [[<Plug>ReplaceCurLine]],
+    luaRHS[[
+    :lua require("replace").replaceSave();
+
+    vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register);
+
+    if require("replace").regType == "=" then
+        vim.g.ReplaceExpr = vim.fn.getreg("=")
+    end;
+
+    require("replace").operator{"line", "V", "<Plug>ReplaceCurLine", true}<CR>
+    ]],
+    {"noremap", "silent"}, "Replace current line")
+map("x", [[<Plug>ReplaceVisual]],
+    luaRHS[[
+    :lua require("replace").replaceSave();
+
+    vim.fn["repeat#setreg"](t"<Plug>ReplaceVisual", vim.v.register);
+
+    if require("replace").regType == "=" then
+        vim.g.ReplaceExpr = vim.fn.getreg("=")
+    end;
+
+    local vMotion = require("operator").vMotion(false);
+    table.insert(vMotion, "<Plug>ReplaceVisual");
+    require("replace").operator(vMotion)<CR>
+    ]],
+    {"noremap", "silent"}, "Replace selected")
+map("n", [[<Plug>ReplaceVisual]],
+    luaRHS[[
+    :lua require("replace").replaceSave();
+
+    vim.fn["repeat#setreg"](t"<Plug>ReplaceVisual", vim.v.register);
+
+    if require("replace").regType == "=" then
+        vim.g.ReplaceExpr = vim.fn.getreg("=")
+    end;
+
+    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0));
+
+    local vMotion = require("operator").vMotion(false);
+    table.insert(vMotion, "<Plug>ReplaceVisual");
+    require("replace").operator(vMotion)<CR>
+    ]],
+    {"noremap", "silent"}, "Visual-repeat for replaced selected")
+
+map("n", [[gr]],  [[<Plug>ReplaceOperatorRestoreCursor]], "Replace operator and restore the cursor position")
+map("n", [[gru]], [[<Plug>ReplaceOperator]],              "Replace operator")
+map("n", [[grr]], [[<Plug>ReplaceCurLine]],               "Replace current line")
+map("x", [[R]],   [[<Plug>ReplaceVisual]],                "Replace selected")
+
+map("n", [[<Plug>ReplaceUnderForward]],
+    [[:lua require("changeUnder").init("gruiw", 1, "<Plug>ReplaceUnderForward")<CR>]],
+    {"silent"}, "Replace the whold word under curosr, then highlight it forward")
+map("n", [[<Plug>ReplaceUnderBackward]],
+    [[:lua require("changeUnder").init("gruiw", 0, "<Plug>ReplaceUnderBackward")<CR>]],
+    {"silent"}, "Replace the whold word under curosr, then highlight it backward")
+map("n", [[grn]], [[<Plug>ReplaceUnderForward]], "Replace the whold word under curosr, then highlight it forward")
+map("n", [[grN]], [[<Plug>ReplaceUnderBackward]], "Replace the whold word under curosr, then highlight it backward")
+-- }}} Delete & Change & Replace
 -- Search & Jumping {{{
 -- In case of mistouching
 -- Inquery word
