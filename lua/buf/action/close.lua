@@ -101,7 +101,7 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
             if util.bufCnt() ~= 1 then
                 util.bufWipe(var.bufNr)
             else
-                cmd("q")
+                cmd("q!")
             end
             return true
         end
