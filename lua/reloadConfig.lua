@@ -360,8 +360,8 @@ local getLuaRelStr = function(srcPath)
     local luaRelStr = string.gsub(fileRelStr, sep, "."):sub(1, -5)
 
     -- Get rid of init.lua and <parentDir>.lua whenever possible
-    luaRelStr = string.gsub(luaRelStr, ".init.lua$", "")
-    luaRelStr = string.gsub(luaRelStr, string.format(".%s.lua$", parentStr), "")
+    luaRelStr = string.gsub(luaRelStr, ".init$", "")
+    luaRelStr = string.gsub(luaRelStr, string.format(".%s$", parentStr), "")
 
     return luaRelStr
 end
@@ -507,7 +507,13 @@ M.luaLoadDir = function(srcPath, dirStr, checkLoadedFirst) -- {{{
     -- Check if any type of module has been loaded. Even if no lua files nested
     -- inside a directory, the first element of the table return by the
     -- luaSubfiles will always be the dirRelStr
-    if #fileRelStrs == 1 then return end
+    if #fileRelStrs == 1 then
+        if package.loaded[fileRelStrs[1]] then
+            return M.luaLoadFile(srcPath, false)
+        else
+            return
+        end
+    end
 
     local luaRelStrs = fileRel2luaRel(fileRelStrs)
 
@@ -611,9 +617,6 @@ M.reload = function() -- {{{
                 srcParentDirStrs[i] = nil
             end
 
-            -- for _, dirStr in ipairs(srcParentDirStrs) do
-                -- M.luaLoadDir(srcPath, dirStr, true)
-            -- end
             M.luaLoadDir(srcPath, srcParentDirStrs[#srcParentDirStrs], true)
         else
             -- The lua module is a single file
