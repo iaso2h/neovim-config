@@ -27,7 +27,7 @@ else
 end
 
 o.cmdheight  = 2
-o.shortmess  = "cxTIF"
+o.shortmess  = "cxTIFSs"
 
 o.complete    = ".,w,b,u,t,kspell,i,d,t"
 o.completeopt = "menuone,noselect,menu"
