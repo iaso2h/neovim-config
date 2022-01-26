@@ -1,8 +1,8 @@
 -- File: reloadConfig
 -- Author: iaso2h
 -- Description: reload lua package or vim file at Neovim configuration directory
--- Version: 0.0.19
--- Last Modified: 2022-01-25
+-- Version: 0.0.20
+-- Last Modified: 2022-01-26
 local fn   = vim.fn
 local api  = vim.api
 local cmd  = vim.cmd
@@ -452,13 +452,25 @@ M.luaLoadFile = function(luaModule, checkLuaDir) -- {{{
     end
 
     -- Capture callback from module loading
-    local callback = require(luaRelStr)
-    vim.notify(
-        string.format("Reload lua package[%s] at: %s", luaRelStr, srcPath.filename),
-        vim.log.levels.INFO)
+    local ok, callback = pcall(require, luaRelStr)
+    if not ok then
+        vim.notify(
+            string.format("Error detected while reloading lua package[%s] at: %s", luaRelStr, srcPath.filename),
+            vim.log.levels.ERROR)
+        vim.notify(" ", vim.log.levels.INFO)
+        vim.notify(callback, vim.log.levels.ERROR)
+        vim.notify(" ", vim.log.levels.INFO)
+        vim.notify(
+            string.format("Lua package[%s] has been unloaded", luaRelStr),
+            vim.log.levels.INFO)
+    else
+        vim.notify(
+            string.format("Reload lua package[%s] at: %s", luaRelStr, srcPath.filename),
+            vim.log.levels.INFO)
 
-    -- Load configuration AFTER reloading for specific module match the given path
-    luaLoadHook(luaConfigs, srcPath, callback)
+        -- Load configuration AFTER reloading for specific module match the given path
+        luaLoadHook(luaConfigs, srcPath, callback)
+    end
 
 end -- }}}
 
@@ -525,21 +537,39 @@ M.luaLoadDir = function(srcPath, dirStr, checkLoadedFirst) -- {{{
         -- Prevent some lua modules get imported automatically due to the
         -- import from the last lua module
         if not package.loaded[luaRelStr] then
-            require(luaRelStr)
-
             local fileStr = fileStrs[idx]
+            local fileChk
             if path:new(fileStr):is_dir() then
-                vim.notify(string.format("Reload lua package[%s] at: %s",
-                    luaRelStr, dirStr),
-                    vim.log.levels.INFO)
+                fileChk = false
             else
+                fileChk = true
                 fileStr = fileStr .. ".lua"
-                vim.notify(
-                    string.format("Reload lua package[%s]: %s", luaRelStr, fileStr),
-                    vim.log.levels.INFO)
-
             end
 
+            local ok, msg = require(luaRelStr)
+            if not ok then
+                vim.notify(
+                    string.format("Error detected while reloading lua package[%s] at: %s", luaRelStr, fileStr),
+                    vim.log.levels.ERROR)
+                vim.notify(" ", vim.log.levels.INFO)
+                vim.notify(msg, vim.log.levels.ERROR)
+                vim.notify(" ", vim.log.levels.INFO)
+                for i = idx, #luaRelStrs, 1 do
+                    vim.notify(
+                        string.format("Lua package[%s] has been unloaded", luaRelStrs[i]),
+                        vim.log.levels.INFO)
+                end
+            else
+                if not fileChk then
+                    vim.notify(string.format("Reload lua package[%s] at: %s",
+                        luaRelStr, dirStr),
+                        vim.log.levels.INFO)
+                else
+                    vim.notify(
+                        string.format("Reload lua package[%s]: %s", luaRelStr, fileStr),
+                        vim.log.levels.INFO)
+                end
+            end
         end
 
         -- Load the hook func at the last element

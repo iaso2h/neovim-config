@@ -265,6 +265,7 @@ function _G.map(mode, lhs, rhs, optsTbl, doc) -- {{{
             vim.notify(
                 string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhs),
                 vim.log.levels.ERROR)
+            vim.notify(" ", vim.log.levels.INFO)
             return vim.notify(msg, vim.log.levels.ERROR)
         end
     end
@@ -355,6 +356,7 @@ function _G.bmap(bufNr, mode, lhs, rhs, optsTbl, doc) -- {{{
             vim.notify(
                 string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhs),
                 vim.log.levels.ERROR)
+            vim.notify(" ", vim.log.levels.INFO)
             return vim.notify(msg, vim.log.levels.ERROR)
         end
     end
