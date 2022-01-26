@@ -20,12 +20,6 @@ end
 
 
 
--- if not ok then vim.notify(msg, vim.log.levels.ERROR) end
--- if vim.startswith(msg, "E5108") then
-    -- return
--- else
-    -- success(ok, err)
--- end
 M.cycleSearch = function(exCMD)
     local ok, msg = pcall(cmd, "noa norm! " .. exCMD)
     if not ok then

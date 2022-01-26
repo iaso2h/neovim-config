@@ -193,6 +193,8 @@ map("n", [[<Plug>ReplaceCurLine]],
         vim.g.ReplaceExpr = vim.fn.getreg("=")
     end;
 
+    vim.cmd("norm! V" .. vim.v.count1 .. "_" .. t"<lt>Esc>");
+
     require("replace").operator{"line", "V", "<Plug>ReplaceCurLine", true}<CR>
     ]],
     {"noremap", "silent"}, "Replace current line")
