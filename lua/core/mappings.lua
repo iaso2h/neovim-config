@@ -180,7 +180,7 @@ map("n", [[<Plug>ReplaceOperator]],
     {"silent", "expr"}, "Replace operator"
 )
 map("n", [[<Plug>ReplaceExpr]],
-    [[:<C-u>let g:ReplaceExpr=getreg("=")<Bar>exec "norm!" . v:count1 . "."<CR>]],
+    [[<CMD>let g:ReplaceExpr=getreg("=")<Bar>exec "norm!" . v:count1 . "."<CR>]],
     {"silent"}, "Replace expression"
 )
 map("n", [[<Plug>ReplaceCurLine]],
@@ -192,8 +192,6 @@ map("n", [[<Plug>ReplaceCurLine]],
     if require("replace").regType == "=" then
         vim.g.ReplaceExpr = vim.fn.getreg("=")
     end;
-
-    vim.cmd("norm! V" .. vim.v.count1 .. "_" .. t"<lt>Esc>");
 
     require("replace").operator{"line", "V", "<Plug>ReplaceCurLine", true}<CR>
     ]],

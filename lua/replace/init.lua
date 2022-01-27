@@ -1,8 +1,8 @@
 -- File: replace
 -- Author: iaso2h
 -- Description: Heavily inspired Ingo Karkat's work. Replace text with register
--- Version: 0.1.3
--- Last Modified: 2021-12-04
+-- Version: 0.1.4
+-- Last Modified: 2022-01-27
 -- TODO: tests for softtab convert
 local fn       = vim.fn
 local cmd      = vim.cmd
@@ -253,7 +253,7 @@ end -- }}}
 local replace = function(motionType, vimMode, reg, regionMotion, curBufNr, opts) -- {{{
     -- With a put in visual mode, the previously selected text is put in the
     -- unnamed register, so we need to save and restore that.
-    local regCMD = reg.name == [["]] and "" or [["]] .. reg.name
+    local regCMD = reg.name == [["]] and "" or ([["]] .. reg.name)
 
     if vimMode ~= "n" then
         cmd(string.format("noa norm! gv%sp", regCMD))
@@ -308,6 +308,7 @@ end -- }}}
 function M.operator(args) -- {{{
     if not warnRead() then return end
 
+    -- NOTE: see ":help g@" for details about motionType
     local motionType = args[1]
     local vimMode    = args[2]
     local plugMap    = args[3]
@@ -319,14 +320,15 @@ function M.operator(args) -- {{{
     local motionDirection
 
     -- Saving {{{
+    -- In addition to the M.replaceSave(), some generic savings are implemented here
     if vimMode == "n" then
-        -- For Replace operator inclusively
+        -- For Replace operator exclusively
 
         regionMotion = {
             startPos = api.nvim_buf_get_mark(curBufNr, "["),
             endPos   = api.nvim_buf_get_mark(curBufNr, "]")
         }
-        -- This is for M.expr() only. Other type of replace will do the saving
+        -- This is for M.expr() only. Other Replace mapping will do the saving
         -- part before calling operator(). Saving register in the expr() will
         -- be ignore when using dot repeat
         M.replaceSave()
@@ -354,17 +356,23 @@ function M.operator(args) -- {{{
             -- TODO: charwise and blockwise motion parsing?
             M.motionDirection = nil
         end
-    else
-        -- For all replace modes other than replace operator
 
-        regionMotion = {
-            startPos = api.nvim_buf_get_mark(curBufNr, "<"),
-            endPos   = api.nvim_buf_get_mark(curBufNr, ">")
-        }
-        -- Save cusor position
+    else
+        -- For all replace modes other than the replace operator
+
+        -- The value of vim.v.count1 will be changed whenever the
+        -- vim.cmd("norm! <normal command>") is executed, so the preservation
+        -- of register and count have to be done in advanced. Due to the
+        -- mapping of replacing current line is parsed in "V" vim mode, and
+        -- the preservation of register in other visual vim mode is
+        -- implemented in the key mapping stage Save cusor position, therefore
+        -- the replaceSave() is called in the key mapping stage to achieve
+        -- a consistent mapping layout
         if vimMode == "V" and #args == 4 then
+            -- For mapping of replacing current line
             M.cursorPos = api.nvim_win_get_cursor(0)
-            vim.cmd("noa norm! V" .. vim.v.count1 .. "_" .. t"<Esc>");
+            -- Override the position of mark "<" and ">"
+            vim.cmd("noa norm! V" .. M.count .. "_" .. t"<Esc>");
         else
             -- Because in visual mode, the cursor will place at the first
             -- column once entering commandline mode. Therefor cursor is
@@ -377,6 +385,11 @@ function M.operator(args) -- {{{
             cmd([[noa norm! gvm`]] .. t"<Esc>")
             M.cursorPos = api.nvim_buf_get_mark(curBufNr, "`")
         end
+
+        regionMotion = {
+            startPos = api.nvim_buf_get_mark(curBufNr, "<"),
+            endPos   = api.nvim_buf_get_mark(curBufNr, ">")
+        }
     end
 
     -- Save vim options
@@ -505,6 +518,10 @@ function M.operator(args) -- {{{
     -- }}} Restoration
 
     -- Mapping repeating {{{
+    if vimMode ~= "n" then
+        vim.fn["repeat#setreg"](t(plugMap), M.regName);
+    end
+
     if #args > 2 then
         if #args == 4 then
             -- ReplaceCurLine
@@ -520,7 +537,7 @@ function M.operator(args) -- {{{
     -- Visual repeating
     fn["visualrepeat#set"](t"<Plug>ReplaceVisual")
 
-    -- }}} visualrepeat visualrepeat1
+    -- }}} Mapping repeating
 end -- }}}
 
 
