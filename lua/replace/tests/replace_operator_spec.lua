@@ -1,19 +1,19 @@
 local api = vim.api
-local describe = describe
-local it = it
-
 
 local function setUpMapping() -- {{{
     require("util")
 
-    map("n", [[<Plug>ReplaceOperator]],
-        luaRHS[[luaeval("require('replace').expr()")]],
-        {"silent", "expr"}
+    map("n", [[<Plug>ReplaceOperatorRestoreCursor]],
+        luaRHS[[luaeval("require('replace').expr(true)")]],
+        {"silent", "expr"}, "Replace operator and restore the cursor position"
     )
-
+    map("n", [[<Plug>ReplaceOperator]],
+        luaRHS[[luaeval("require('replace').expr(false)")]],
+        {"silent", "expr"}, "Replace operator"
+    )
     map("n", [[<Plug>ReplaceExpr]],
-        [[:<C-u>let g:ReplaceExpr=getreg("=")<Bar>exec "norm!" . v:count1 . "."<CR>]],
-        {"silent"}
+        [[<CMD>let g:ReplaceExpr=getreg("=")<Bar>exec "norm!" . v:count1 . "."<CR>]],
+        {"silent"}, "Replace expression"
     )
     map("n", [[<Plug>ReplaceCurLine]],
         luaRHS[[
@@ -27,7 +27,7 @@ local function setUpMapping() -- {{{
 
         require("replace").operator{"line", "V", "<Plug>ReplaceCurLine", true}<CR>
         ]],
-        {"noremap", "silent"})
+        {"noremap", "silent"}, "Replace current line")
     map("x", [[<Plug>ReplaceVisual]],
         luaRHS[[
         :lua require("replace").replaceSave();
@@ -42,7 +42,7 @@ local function setUpMapping() -- {{{
         table.insert(vMotion, "<Plug>ReplaceVisual");
         require("replace").operator(vMotion)<CR>
         ]],
-        {"noremap", "silent"})
+        {"noremap", "silent"}, "Replace selected")
     map("n", [[<Plug>ReplaceVisual]],
         luaRHS[[
         :lua require("replace").replaceSave();
@@ -59,13 +59,21 @@ local function setUpMapping() -- {{{
         table.insert(vMotion, "<Plug>ReplaceVisual");
         require("replace").operator(vMotion)<CR>
         ]],
-        {"noremap", "silent"})
+        {"noremap", "silent"}, "Visual-repeat for replaced selected")
 
-    map("n", [[gr]],  [[<Plug>ReplaceOperator]])
-    map("n", [[grr]], [[<Plug>ReplaceCurLine]])
-    map("n", [[grn]], [[*``griw]], {"noremap"}, "Replace word under cursor forward")
-    map("n", [[grN]], [[#``griw]], {"noremap"}, "Replace word under cursor backward")
-    map("x", [[R]],   [[<Plug>ReplaceVisual]])
+    map("n", [[gr]],  [[<Plug>ReplaceOperatorRestoreCursor]], "Replace operator and restore the cursor position")
+    map("n", [[gru]], [[<Plug>ReplaceOperator]],              "Replace operator")
+    map("n", [[grr]], [[<Plug>ReplaceCurLine]],               "Replace current line")
+    map("x", [[R]],   [[<Plug>ReplaceVisual]],                "Replace selected")
+
+    map("n", [[<Plug>ReplaceUnderForward]],
+        [[:lua require("changeUnder").init("gruiw", 1, "<Plug>ReplaceUnderForward")<CR>]],
+        {"silent"}, "Replace the whold word under curosr, then highlight it forward")
+    map("n", [[<Plug>ReplaceUnderBackward]],
+        [[:lua require("changeUnder").init("gruiw", 0, "<Plug>ReplaceUnderBackward")<CR>]],
+        {"silent"}, "Replace the whold word under curosr, then highlight it backward")
+    map("n", [[grn]], [[<Plug>ReplaceUnderForward]], "Replace the whold word under curosr, then highlight it forward")
+    map("n", [[grN]], [[<Plug>ReplaceUnderBackward]], "Replace the whold word under curosr, then highlight it backward")
 end -- }}}
 
 

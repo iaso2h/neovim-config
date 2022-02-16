@@ -180,7 +180,7 @@ map("n", [[<Plug>ReplaceOperator]],
     {"silent", "expr"}, "Replace operator"
 )
 map("n", [[<Plug>ReplaceExpr]],
-    [[:<C-u>let g:ReplaceExpr=getreg("=")<Bar>exec "norm!" . v:count1 . "."<CR>]],
+    [[<CMD>let g:ReplaceExpr=getreg("=")<Bar>exec "norm!" . v:count1 . "."<CR>]],
     {"silent"}, "Replace expression"
 )
 map("n", [[<Plug>ReplaceCurLine]],

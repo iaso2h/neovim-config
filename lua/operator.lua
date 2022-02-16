@@ -43,6 +43,7 @@ end
 --- @param saveCursorChk boolean Whether to save cursor position or not
 --- @return table with two str represent motion type and vim visual mode
 function M.vMotion(saveCursorChk)
+    -- NOTE: see ":help g@" for details about motionType
     local visualMode = vim.fn.visualmode()
     local motionType
     if visualMode == "v" then

@@ -1,6 +1,4 @@
 -- TODO: restore cursor for dot repeat
-local describe = describe
-local it = it
 
 local function setUpMapping() -- {{{
     require("util")

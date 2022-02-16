@@ -1,8 +1,8 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.13
--- Last Modified: 2022-01-24
+-- Version: 0.1.15
+-- Last Modified: 2022-01-27
 
 local fn       = vim.fn
 local cmd      = vim.cmd
@@ -311,7 +311,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
             regContentNew = string.gsub(regContentNew, "^%s+", "")
         end
 
-        fn.setreg(vim.v.register, regContentNew, "V")
+        fn.setreg(vim.v.register, regContentNew, regTypeNew)
     else
         regTypeNew = regTypeSave
 
