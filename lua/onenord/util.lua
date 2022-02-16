@@ -1,10 +1,9 @@
-local cmd   = vim.cmd
-local util  = {}
-local theme = require('onenord.theme')
+local cmd = vim.cmd
+local M   = {}
 local ok, msg
 
 -- Go trough the table and highlight the group with the color values
-util.hi = function (group, color)
+M.hi = function (group, color)
     if color.link then
         ok, msg = pcall(cmd, string.format([[highlight! link %s %s]], group, color.link))
     else
@@ -25,7 +24,7 @@ util.hi = function (group, color)
 end
 
 -- Only define onenord if it's the active colorscheme
--- function util.onColorScheme()
+-- function M.onColorScheme()
     -- if vim.g.colors_name ~= "onenord" then
         -- cmd [[autocmd! onenord]]
         -- cmd [[augroup! onenord]]
@@ -33,7 +32,7 @@ end
 -- end
 
 -- Change the background for the terminal, packer and qf windows
--- util.contrast = function ()
+-- M.contrast = function ()
     -- cmd [[
     -- augroup onenord
     -- autocmd!
@@ -45,37 +44,4 @@ end
     -- ]]
 -- end
 
--- Load the theme
-function util.load()
-    -- Set the theme environment
-    cmd("hi clear")
-    if vim.fn.exists("syntax_on") then cmd("syntax reset") end
-    vim.g.colors_name   = "onenord"
-
-    for group, colors in pairs(theme.editor) do
-        util.hi(group, colors)
-    end
-    for group, colors in pairs(theme.syntax) do
-        util.hi(group, colors)
-    end
-    for group, colors in pairs(theme.treesitter) do
-        util.hi(group, colors)
-    end
-
-    -- TODO: check fn.has("termguicolors")
-    -- theme.loadTerminal()
-
-    for group, colors in pairs(theme.lsp) do
-        util.hi(group, colors)
-    end
-    for group, colors in pairs(theme.plugins) do
-        util.hi(group, colors)
-    end
-
-    -- if contrast is enabled, apply it to sidebars and floating windows
-    -- if vim.g.onenord_contrast == true then
-        -- util.contrast()
-    -- end
-end
-
-return util
+return M
