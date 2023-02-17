@@ -194,91 +194,115 @@ function M.addJump(action, reservedCount, funArg) -- {{{
 end -- }}}
 
 
-----
--- Function: _G.map wrap around the nvim_set_keymap, and accept the fouth argument as table
---
--- @param mode:    Same as vim.api.nvim_set_keymap()
--- @param lhs:     Same as vim.api.nvim_set_keymap()
--- @param rhs:     Same as vim.api.nvim_set_keymap()
--- @param optsTbl: Table value contain string elements that will be pass into_
--- the fourth argument of nvim_set_keymap as the key name of value pairs, and
--- the value is true
--- @param doc:     String. Key documentation
---
-----
-function _G.map(mode, lhs, rhs, optsTbl, doc) -- {{{
-    -- Behavior difference between vim.keymap.set() and api.nvim_set_keymap()
-    -- https://github.com/neovim/neovim/commit/6d41f65aa45f10a93ad476db01413abaac21f27d
-    -- New api.nvim_set_keymap(): https://github.com/neovim/neovim/commit/b411f436d3e2e8a902dbf879d00fc5ed0fc436d3
-
-    optsTbl = optsTbl or {}
+--- Convert arguments to match up the specified ones in vim.api.nvim_set_keymap()
+---@param mode table Same as vim.api.nvim_set_keymap()
+---@param lhs string Same as vim.api.nvim_set_keymap()
+---@param rhs string Same as vim.api.nvim_set_keymap()
+---@param opts string|table Table value contain `h:map-arguments` strings
+-- that will be convert into table then passed into vim.api.nvim_set_keymap
+---@param doc string key mapping description
+---@return table, table, string
+local argConvert = function(mode, lhs, rhs, opts, doc)
+    opts = opts or {}
     doc = doc or ""
 
-    -- Parameter "mode" can be either table value or string value
+    -- Parameter "mode" can be either table value or string value, but parse
+    -- it as table anyway
     mode = type(mode) == "string" and {mode} or mode
 
-    -- Parameter "optsTbl" can be string value, which will be parsed as doc/description
-    if type(optsTbl) == "string" then
-        doc = optsTbl
+    -- Do not use "v" to map select mode inexplicitly
+    for _, modeStr in ipairs(mode) do
+        if modeStr == "v" then
+            vim.notify(
+                string.format([=[Please use "x" to map [[%s]] for [[%s]] instead]=], lhs, rhs),
+                vim.log.levels.WARN)
+            vim.notify(debug.traceback(), lhs, rhs, vim.log.levels.WARN)
+            table[modeStr] = nil
+            table.insert(mode, "x")
+        end
+    end
+
+    local optsTbl
+    -- Parameter "opts" can be string value, which will be parsed as doc/description
+    if type(opts) == "string" then
+        doc = opts
         optsTbl = {}
+    else
+        optsTbl = opts
     end
 
     -- Change string items in optsTbl into key-value pair table
     local optsKeyValTbl = {}
     if next(optsTbl) then
         for _, val in ipairs(optsTbl) do
+            -- Handle RHS function
+            if type(rhs) == "function" then
+                optsKeyValTbl.callback = rhs
+                rhs = ""
+            -- Add description
+            elseif doc and doc ~= "" then
+                optsKeyValTbl.desc = doc
+                -- Disable whichkey temporarily
+                -- Register key documentation
+                -- if doc then
+                    -- if not WhichKeyDocRegistered then
+                        -- M.whichKeyDocs[lhs] = doc
+                    -- else
+                        -- require("which-key").register{lhs = doc}
+                    -- end
+                -- end
+            end
             optsKeyValTbl[val] = true
         end
     end
 
-    -- Handel RHS
-    if type(rhs) == "function" then
-        optsKeyValTbl.callback = rhs
-        rhs = ""
+
+    return mode, optsKeyValTbl, rhs
+end
+
+
+--- Handy mapping func that wrap around the vim.api.nvim_set_keymap()
+---@param mode table Same as vim.api.nvim_set_keymap()
+---@param lhs string Same as vim.api.nvim_set_keymap()
+---@param rhs string Same as vim.api.nvim_set_keymap()
+---@param opts string|table Table value contain `h:map-arguments` strings
+-- that will be convert into table then passed into vim.api.nvim_set_keymap
+---@param ... string optional key mapping description
+function _G.map(mode, lhs, rhs, opts, ...) -- {{{
+    -- Behavior difference between vim.keymap.set() and api.nvim_set_keymap()
+    -- https://github.com/neovim/neovim/commit/6d41f65aa45f10a93ad476db01413abaac21f27d
+    -- New api.nvim_set_keymap(): https://github.com/neovim/neovim/commit/b411f436d3e2e8a902dbf879d00fc5ed0fc436d3
+    local optsKeyValTbl
+    local modeTbl
+    local doc
+    local arg = {...}
+
+    if next(arg) and type(arg[1]) == "string" then
+        doc = arg[1]
     end
 
-    -- Add description
-    if doc ~= "" then optsKeyValTbl.desc = doc end
+    modeTbl, optsKeyValTbl, rhs = argConvert(mode, lhs, rhs, opts, doc)
 
-    -- Disable whichkey temporarily
-    -- Register key documentation
-    -- if doc then
-        -- if not WhichKeyDocRegistered then
-            -- M.whichKeyDocs[lhs] = doc
-        -- else
-            -- require("which-key").register{lhs = doc}
-        -- end
-    -- end
-
-    -- Do not use "v" to map select mode inplicit
-    if mode == "v" then
-        vim.notify(
-            string.format([=[Please use "x" to map [[%s]] for [[%s]] instead]=], lhs, rhs),
-            vim.log.levels.WARN)
-        mode = "x"
-    end
-
-
-    for _, m in ipairs(mode) do
+    for _, m in ipairs(modeTbl) do
         local ok, msg = pcall(api.nvim_set_keymap, m, lhs, rhs, optsKeyValTbl)
         if not ok then
             vim.notify(
                 string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhs),
                 vim.log.levels.ERROR)
-            vim.notify(" ", vim.log.levels.INFO)
-            return vim.notify(msg, vim.log.levels.ERROR)
+            vim.notify(msg, vim.log.levels.ERROR)
+            return vim.notify(" ", vim.log.levels.INFO)
         end
     end
 
     -- Always disable Select mode mapping for key mapping like: R,C,A,S,X
     -- when lhs is "". See: ":help map-table"
-    if string.match(lhs, "[A-Z]") and mode == "" then
+    if string.match(lhs, "[A-Z]") and modeTbl == "" then
         return api.nvim_del_keymap("s", lhs)
     end
 
     if CoreMappigsStart then
-        if mode[1] == "" then mode[1] = "all" end
-        for _, m in ipairs(mode) do
+        if modeTbl[1] == "" then modeTbl[1] = "all" end
+        for _, m in ipairs(modeTbl) do
             -- Initiation
             _G.CoreMappings = _G.CoreMappings or {}
             CoreMappings[m] = CoreMappings[m] or {}
@@ -289,81 +313,33 @@ function _G.map(mode, lhs, rhs, optsTbl, doc) -- {{{
 end -- }}}
 
 
-----
--- Function: _G.bmap wrap around the nvim_set_keymap, and accept the fouth argument as table
---
--- @param bufNr:   Same as vim.api.nvim_buf_set_keymap()
--- @param mode:    Same as vim.api.nvim_buf_set_keymap()
--- @param lhs:     Same as vim.api.nvim_buf_set_keymap()
--- @param rhs:     Same as vim.api.nvim_buf_set_keymap()
--- @param optsTbl: Table value contain string elements that will be pass into_
--- the fourth argument of nvim_set_keymap as the key name of value pairs, and
--- the value is true
--- @param doc:     String. Key documentation
-----
+--- Handy mapping func that wrap around the vim.api.nvim_set_keymap()
+---@param mode table Same as vim.api.nvim_buf_et_keymap()
+---@param lhs string Same as vim.api.nvim_buf_et_keymap()
+---@param rhs string Same as vim.api.nvim_buf_et_keymap()
+---@param optsTbl string/table Table value contain `h:map-arguments` strings
+-- that will be convert into table then passed into vim.api.nvim_set_keymap
+---@param doc string key mapping description
 function _G.bmap(bufNr, mode, lhs, rhs, optsTbl, doc) -- {{{
-    optsTbl = optsTbl or {}
-    doc = doc or ""
+    assert(type(bufNr) == "number", "#1 argument is not a valid number")
+    local optsKeyValTbl
+    local modeTbl
+    modeTbl, optsKeyValTbl, rhs = argConvert(mode, lhs, rhs, optsTbl, doc)
 
-    -- Parameter "mode" can be either table value or string value
-    mode = type(mode) == "string" and {mode} or mode
-
-    -- Parameter "optsTbl" can be string value, which will be parsed as doc/description
-    if type(optsTbl) == "string" then
-        doc = optsTbl
-        optsTbl = {}
-    end
-
-
-    -- Register key documentation
-    if doc then
-        if not WhichKeyDocRegistered then
-            M.whichKeyDocs[lhs] = doc
-        else
-            require("which-key").register{lhs = doc}
-        end
-    end
-
-    -- Change string items in optsTbl into key-value pair table
-    local optsKeyValTbl = {}
-    if next(optsTbl) then
-        for _, val in ipairs(optsTbl) do
-            optsKeyValTbl[val] = true
-        end
-    end
-
-    -- Handel RHS
-    if type(rhs) == "function" then
-        optsKeyValTbl.callback = rhs
-        rhs = ""
-    end
-
-
-    -- Add description
-    if doc ~= "" then optsKeyValTbl.desc = doc end
-
-    if mode == "v" then
-        vim.notify(
-            string.format([=[Please use "x" to map [[%s]] for [[%s]] instead]=], lhs, rhs),
-            vim.log.levels.WARN)
-        mode = "x"
-    end
-
-
-    for _, m in ipairs(mode) do
+    for _, m in ipairs(modeTbl) do
         local ok, msg = pcall(api.nvim_buf_set_keymap, bufNr, m, lhs, rhs, optsKeyValTbl)
         if not ok then
             vim.notify(
                 string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhs),
                 vim.log.levels.ERROR)
-            vim.notify(" ", vim.log.levels.INFO)
-            return vim.notify(msg, vim.log.levels.ERROR)
+            vim.notify(msg, vim.log.levels.ERROR)
+            return vim.notify(" ", vim.log.levels.INFO)
         end
     end
 
-    -- Always disable Select mode mapping for key mapping like: R,C,A,S,X
+    -- Always disable Select modemapping for key mapping like: R,C,A,S,X
     -- when lhs is "". See: ":help map-table"
-    if string.match(lhs, "[A-Z]") and mode == "" then
+    if string.match(lhs, "[A-Z]") and modeTbl == "" then
         return api.nvim_buf_del_keymap(bufNr, "s", lhs)
     end
 end -- }}}
