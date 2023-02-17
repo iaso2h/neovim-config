@@ -1,12 +1,18 @@
-if vim.fn.has("nvim-0.6.1") ~= 1 then
+if vim.fn.has("nvim-0.8.3") ~= 1 then
     vim.notify(" ", vim.log.levels.WARN)
     vim.notify(" ", vim.log.levels.WARN)
-    vim.notify("Neovim with 0.6.1 or higher build version required", vim.log.levels.WARN)
+    vim.notify("Neovim with 0.8.3 or higher build version required", vim.log.levels.WARN)
     vim.notify(" ", vim.log.levels.WARN)
     vim.notify(" ", vim.log.levels.WARN)
     return
 end
-require("impatient").enable_profile()
+
+-- TODO: Interupt when Go and C compiler isn't installed
+
+-- local impatient, msg = pcall(require, "impatient")
+-- if impatient then
+    -- require("impatient").enable_profile()
+-- end
 
 -- Global lua var
 _G.IsTerm = os.getenv("TERM") ~= ""
@@ -33,8 +39,6 @@ vim.g.loaded_vimball           = 1
 vim.g.loaded_vimballPlugin     = 1
 vim.g.loaded_zip               = 1
 vim.g.loaded_zipPlugin         = 1
-vim.g.did_load_filetypes       = 1
-vim.g.do_filetype_lua          = 1
 -- Toggle embed syntax
 vim.g.vimsyn_embed = 'lPr'
 -- c.vim
