@@ -95,7 +95,8 @@ theme.editor =  {
     -- normal text and background color
     Normal      = {fg = p.n4, bg = p.n0},
     -- vim.api.nvim_open_win
-    NormalFloat = {fg = p.n10, bg = p.n0, style = "bold"},
+    -- NormalFloat = {fg = p.n10, bg = p.n0, style = "bold"},
+    NormalFloat = {bg = p.n0},
     TermCursor  = {link = "Normal"},
     -- TermCursorNC
 
@@ -127,6 +128,7 @@ theme.editor =  {
 
     IncSearch = {fg = p.w, bg = "#ED427C", style = "bold"},
     Search    = {fg = p.w, bg = p.n8,      style = "bold"},
+    CurSearch = {link = "IncSearch"},
 
 
     MatchParen = {fg = p.n8, bg = p.n3b, style = "bold"},
@@ -140,8 +142,11 @@ theme.editor =  {
     Question    = {fg = p.n8, style = "italic"},
 
 
-    Pmenu      = {fg = p.n4, bg = p.n2},
-    PmenuSel   = {fg = p.w,  bg = p.n8, style = "bold"},
+    -- 2023-2-16
+    -- Pmenu      = {fg = p.n4, bg = p.n2},
+    -- PmenuSel   = {fg = p.w,  bg = p.n8, style = "bold"},
+    Pmenu      = {fg = p.n4, bg = p.n1},
+    PmenuSel   = {fg = p.w,  bg = p.n3, style = "bold"},
     PmenuSbar  = {fg = p.n4, bg = p.n3},
     PmenuThumb = {fg = p.n4, bg = p.n10},
     WildMenu   = {link = "PmenuSel"},
@@ -183,11 +188,6 @@ theme.editor =  {
     healthError   = {fg = p.n11, bg = p.n1},
     healthSuccess = {fg = p.n14, bg = p.n1},
     healthWarning = {fg = p.n13, bg = p.n1},
-
-
-    -- BufferLine
-    BufferLineIndicatorSelected = {fg = p.n0},
-    BufferLineFill              = {bg = p.n0},
 }
 -- }}} Editor highlight
 
@@ -375,8 +375,9 @@ theme.plugins = {
     IndentBlanklineContextChar = {fg = p.n8},
 
     -- https://github.com/RRethy/vim-illuminate
-    illuminatedWord    = {link = "LspReferenceText"},
-    illuminatedCurWord = {bg = p.n3},
+    illuminatedWordText  = {link = "LspReferenceText"},
+    IlluminatedWordRead  = {link = "LspReferenceText"},
+    IlluminatedWordWrite = {link = "LspReferenceText"},
 
     -- https://github.com/mfussenegger/nvim-dap
     DapBreakpoint = {fg = p.n14},
