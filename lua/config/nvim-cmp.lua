@@ -1,109 +1,124 @@
 -- TODO: tabnine priority
 return function()
     local completionItemKind = {
-        -- Sarasa Mono Nerd
-        -- Text          = "",
-        -- Function      = "",
-        -- Method        = "",
-        -- Constructor   = "",
-        -- Field         = "",
-        -- Variable      = "",
-        -- Class         = "",
+        -- -- UbuntuMono
+        -- Text          = "",
+        -- Method        = "",
+        -- Function      = "",
+        -- Constructor   = "",
+        -- Field         = "ﰠ",
+        -- Variable      = "",
+        -- Class         = "ﴯ",
         -- Interface     = "",
         -- Module        = "",
-        -- Property      = "",
-        -- Unit          = "",
+        -- Property      = "ﰠ",
+        -- Unit          = "塞",
         -- Value         = "",
         -- Enum          = "",
         -- Keyword       = "",
         -- Snippet       = "",
-        -- Color         = "",
-        -- File          = "",
+        -- Color         = "",
+        -- File          = "",
         -- Reference     = "",
         -- Folder        = "",
         -- EnumMember    = "",
-        -- Constant      = "",
+        -- Constant      = "",
         -- Struct        = "",
         -- Event         = "",
-        -- Operator      = "⨋",
+        -- Operator      = "",
         -- TypeParameter = "",
-
-        -- UbuntuMono
-        Text          = "",
-        Method        = "",
-        Function      = "",
-        Constructor   = "",
-        Field         = "ﰠ",
-        Variable      = "",
-        Class         = "ﴯ",
-        Interface     = "",
-        Module        = "",
-        Property      = "ﰠ",
-        Unit          = "塞",
-        Value         = "",
-        Enum          = "",
-        Keyword       = "",
-        Snippet       = "",
-        Color         = "",
-        File          = "",
-        Reference     = "",
-        Folder        = "",
-        EnumMember    = "",
-        Constant      = "",
-        Struct        = "",
-        Event         = "",
-        Operator      = "",
-        TypeParameter = ""
+        Text = "",
+        Method = "",
+        Function = "",
+        Constructor = "",
+        Field = "",
+        Variable = "",
+        Class = "ﴯ",
+        Interface = "",
+        Module = "",
+        Property = "ﰠ",
+        Unit = "",
+        Value = "",
+        Enum = "",
+        Keyword = "",
+        Snippet = "",
+        Color = "",
+        File = "",
+        Reference = "",
+        Folder = "",
+        EnumMember = "",
+        Constant = "",
+        Struct = "",
+        Event = "",
+        Operator = "",
+        TypeParameter = ""
+        -- VS Code
+        -- Text = '  ',
+        -- Method = '  ',
+        -- Function = '  ',
+        -- Constructor = '  ',
+        -- Field = '  ',
+        -- Variable = '  ',
+        -- Class = '  ',
+        -- Interface = '  ',
+        -- Module = '  ',
+        -- Property = '  ',
+        -- Unit = '  ',
+        -- Value = '  ',
+        -- Enum = '  ',
+        -- Keyword = '  ',
+        -- Snippet = '  ',
+        -- Color = '  ',
+        -- File = '  ',
+        -- Reference = '  ',
+        -- Folder = '  ',
+        -- EnumMember = '  ',
+        -- Constant = '  ',
+        -- Struct = '  ',
+        -- Event = '  ',
+        -- Operator = '  ',
+        -- TypeParameter = '  ',
 }
 
-    local cmp = require("cmp")
+    local cmp     = require("cmp")
+    local luasnip = require("luasnip")
+
     cmp.setup{
-        sources = {
-            {name = "nvim_lsp"},
-            {name = "nvim_lua"},
-            {name = "buffer"},
-            {name = "path"},
-            {name = "vsnip"},
-            {name = "cmp_tabnine"},
-        },
-        formatting = {
-            format = function(entry, vimItem)
-                vimItem.kind = completionItemKind[vimItem.kind] .. " " .. vimItem.kind
-                vimItem.menu = ({
-                    nvim_lsp    = "[LSP]",
-                    nvim_lua    = "[Lua]",
-                    buffer      = "[Buffer]",
-                    path        = "[Path]",
-                    vsnip       = "[VSnip]",
-                    cmp_tabnine = "[Tabnine]",
-                })[entry.source.name]
-                return vimItem
+
+        enabled = function()
+            -- Disable for (telescope)prompt
+            if vim.bo.buftype == "prompt" then
+                return false
             end
+            -- Disable completion in comments
+            local context = require("cmp.config.context")
+            -- keep command mode completion enabled when cursor is in a comment
+            if vim.api.nvim_get_mode().mode == 'c' then
+                return true
+            else
+                return not context.in_treesitter_capture("comment")
+                and not context.in_syntax_group("Comment")
+            end
+        end,
+        completion = {
+            completeopt = "menu,menuone,noinsert",
         },
         snippet = {
             expand = function(args)
-                vim.fn["vsnip#anonymous"](args.body)
+                require('luasnip').lsp_expand(args.body)
             end,
         },
-        sorting = {
-            comparators = {
-                cmp.config.compare.offset,
-                cmp.config.compare.exact,
-                cmp.config.compare.score,
-                require "cmp-under-comparator".under,
-                cmp.config.compare.kind,
-                cmp.config.compare.sort_text,
-                cmp.config.compare.length,
-                cmp.config.compare.order,
+        window = {
+            completion = cmp.config.window.bordered{
+                winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:PmenuSel',
+                scrollbar = {
+                    thumb_char = "│",
+                    position = "edge",
+                },
             },
-        },
-        preselect = cmp.PreselectMode.Item,
-        documentation = {
-            border = "rounded",
-        },
-        experimental = {
-            ghost_text = false,
-            cusom_menu = true,
+            documentation = cmp.config.window.bordered{
+                winhighlight = 'Normal:Normal,FloatBorder:FloatBorder',
+            }
         },
         mapping = {
             ["<A-e>"] = cmp.mapping.scroll_docs(-4),
@@ -113,13 +128,8 @@ return function()
             ["<Tab>"] = cmp.mapping(function(fallback)
                 if package.loaded["neogen"] and require("neogen").jumpable() then
                     vim.api.nvim_feedkeys(t[[<cmd>lua require("neogen").jump_next()<CR>]], "", true)
-                elseif vim.fn["vsnip#jumpable"](1) == 1 then
-                    -- NOTE: maybe use "<Plug>(vsnip-jump-or-expand)" instead when cmp support <tab>
-                    -- key to expand snippet provided by LSP?
-                    vim.api.nvim_feedkeys(t"<Plug>(vsnip-jump-next)", "", true)
-                -- elseif cmp.visible() then
-                -- else
-                    -- vim.api.nvim_feedkeys(t"<Plug>(Tabout)", "", true)
+                elseif luasnip.expand_or_jumpable() then
+                    luasnip.expand_or_jump()
                 else
                     fallback()
                 end
@@ -127,11 +137,8 @@ return function()
             ["<S-Tab>"] = cmp.mapping(function(fallback)
                 if package.loaded["neogen"] and require("neogen").jumpable() then
                     vim.api.nvim_feedkeys(t[[<cmd>lua require("neogen").jump_prev()<CR>]], "", true)
-                elseif vim.fn["vsnip#jumpable"](-1) == 1 then
-                    vim.api.nvim_feedkeys(t"<Plug>(vsnip-jump-prev)", "", true)
-                -- elseif cmp.visible() then
-                -- else
-                    -- vim.api.nvim_feedkeys(t"<Plug>(TaboutBack)", "", true)
+                elseif luasnip.jumpable(-1) then
+                    luasnip.jump(-1)
                 else
                     fallback()
                 end
@@ -142,11 +149,12 @@ return function()
                     require("cmp.utils.autocmd").emit("InsertLeave")
                     -- vim.api.nvim_feedkeys(t"a", "n", true)
                 else
-                    -- TODO: better trigger mechanics
-                    vim.api.nvim_feedkeys(t"<C-n>", "n", true)
+                    require("cmp.utils.autocmd").emit("InsertStart")
+                    -- -- TODO: better trigger mechanics
+                    -- vim.api.nvim_feedkeys(t"<C-n>", "n", true)
+
                 end
             end,
-            -- ["<C-e>"] = cmp.mapping.close(),
             ["<C-e>"] = function(fallback)
                 if cmp.visible() then
                     cmp.abort()
@@ -157,17 +165,41 @@ return function()
                 select   = true,
                 behavior = cmp.ConfirmBehavior.Replace,
             },
+            ["<C-CR>"] = function()
+                if cmp.visible() then
+                    cmp.abort()
+                    vim.api.nvim_feedkeys("o", "n", true)
+                else
+                    vim.api.nvim_feedkeys("<CR>", "n", true)
+                end
+            end
+        },
+
+        sources = {
+            {name = "nvim_lsp"},
+            {name = "buffer"},
+            {name = "path"},
+            {name = "cmdline"},
+            {name = "luasnip"},
+            {name = "cmp_tabnine"},
+        },
+
+        formatting = {
+            format = function(entry, vimItem)
+                vimItem.kind = completionItemKind[vimItem.kind] .. " " .. vimItem.kind
+                vimItem.menu = ({
+                    nvim_lsp    = "[LSP]",
+                    buffer      = "[Buffer]",
+                    path        = "[Path]",
+                    cmdline     = "[CMDLine]",
+                    luasnip     = "[LuaSnip]",
+                    cmp_tabnine = "[Tabnine]",
+                })[entry.source.name]
+                return vimItem
+            end
         },
         keyword_length   = 2,
         default_behavior = cmp.ConfirmBehavior.Replace,
     }
-
-    -- If you want insert `(` after select function or method item
-    local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-    cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done({map_char = {tex = "" }}))
-
-
-    -- add a lisp filetype (wrap my-function), FYI: Hardcoded = { "clojure", "clojurescript", "fennel", "janet" }
-    cmp_autopairs.lisp[#cmp_autopairs.lisp+1] = "racket"
 end
 

@@ -1,167 +1,290 @@
--- TODO: add filesize
--- TODO: Update in shortcut sheet
 return function()
 
--- Basic settings {{{
-vim.g.nvim_tree_gitignore = 0
-vim.g.nvim_tree_show_icons = {
-    git           = 1,
-    folders       = 1,
-    files         = 1,
-    folder_arrows = 1,
-    }
-vim.g.nvim_tree_highlight_opened_files = 2
-vim.g.nvim_tree_git_hl                 = 1
-vim.g.nvim_tree_quit_on_open           = 0
-vim.g.nvim_tree_indent_markers         = 0
-vim.g.nvim_tree_hide_dotfiles          = 0
-vim.g.nvim_tree_root_folder_modifier   = ':~' -- see :help filename-modifiers
-vim.g.nvim_tree_add_trailing           = 1
-vim.g.nvim_tree_group_empty            = 1
--- vim.g.nvim_tree_special_files = {["README.md"] = 1, Makefile = 1, MAKEFILE = 1 } -- List of filenames that gets highlighted with NvimTreeSpecialFile
-vim.g.nvim_tree_special_files = {} -- List of filenames that gets highlighted with NvimTreeSpecialFile
+require("nvim-tree").setup { -- BEGIN_DEFAULT_OPTS
+    auto_reload_on_write = true,
+    disable_netrw = true,
+    hijack_netrw = true,
+    hijack_cursor = false,
+    hijack_unnamed_buffer_when_opening = false,
+    sort_by = "name", -- name, case_sensitive, modification_time, extension or a
+    root_dirs = {}, -- Only relevant when update_focused_file.update_root is true
+    prefer_startup_root = false, -- Only relevant when update_focused_file.update_root is true
+    sync_root_with_cwd = false,
+    reload_on_bufenter = false,
+    respect_buf_cwd = true,
+    on_attach = "disable", -- Function ran when creating the nvim-tree buffer.
+    remove_keymaps = false, -- Remove the default mappings in the tree.
+    select_prompts = false,
+    view = {
+        centralize_selection = true,
+        cursorline = true,
+        debounce_delay = 15,
+        width = 40,
+        hide_root_folder = false,
+        side = "left",
+        preserve_window_proportions = false,
+        number = false,
+        relativenumber = false,
+        signcolumn = "no",
+        mappings = {
+            custom_only = true,
+            list = {
+                {key = {"<CR>", "o", "<2-LeftMouse>"}, action = "edit"},
+                {key = "O",                            action = "edit_in_place" },
+                {key = "go",                           action = "system_open"},
+                {key = "p",                            action = "preview"},
+                {key = "<C-v>",                        action = "vsplit"},
+                {key = "<C-s>",                        action = "split"},
+                {key = "<C-t>",                        action = "tabnew"},
 
-vim.g.nvim_tree_disable_window_picker  = 0
-vim.g.nvim_tree_window_picker_exclude = {
-    filetype = {
-        'packer',
-        'qf',
-        'help'
+                {key = {"<2-RightMouse>", "."}, action = "cd"},
+                {key = "u",                     action = "parent_node"},
+                {key = "U",                     action = "dir_up"},
+
+                {key = "gc", action = "toggle_git_clean"},
+                {key = "gi", action = "toggle_git_ignored"},
+
+                {key = "I", action = "toggle_ignored"},
+                {key = "H", action = "toggle_dotfiles"},
+                {key = "B", action = "toggle_no_buffer"},
+                {key = "U", action = "toggle_custom"},
+
+                {key = "f", action = "live_filter"},
+                {key = "F", action = "clear_live_filter"},
+
+                {key = "K", action = "first_sibling"},
+                {key = "J", action = "last_sibling"},
+                {key = "<", action = "prev_sibling"},
+                {key = ">", action = "next_sibling"},
+                {key = "E", action = "expand_all"},
+
+                {key = "R",     action = "refresh"},
+                {key = "<C-n>", action = "create"},
+                {key = "df",    action = "remove"},
+                {key = "r",     action = "full_rename"},
+                {key = "gr",    action = "rename"},
+                {key = "dd",    action = "cut"},
+                {key = "yy",    action = "copy"},
+                {key = "Y",     action = "copy"},
+                {key = "p",     action = "paste"},
+                {key = "yn",    action = "copy_name"},
+                {key = "yp",    action = "copy_path"},
+                {key = "yP",    action = "copy_absolute_path"},
+
+                {key = "[g", action = "prev_git_item"},
+                {key = "]g", action = "next_git_item"},
+
+                {key = "m", action = "toggle_mark"},
+                {key = "q", action = "close"},
+                {key = "?", action = "toggle_help"}
+
+            },
         },
-    buftype = {
-        'terminal'
-        }
-    }
-
-vim.g.nvim_tree_respect_buf_cwd = 0
-vim.g.nvim_tree_create_in_closed_folder = 1
--- }}} Basic settings
-
--- Icon {{{
-vim.g.nvim_tree_icon_padding  = ' '     -- one space by default, used for rendering the space between the icon and the filename. Use with caution, it could break rendering if you set an empty string depending on your font.
-vim.g.nvim_tree_symlink_arrow = ' >> '  -- defaults to ' ➛ '. used as a separator between symlinks' source and target.
--- vim.o.guifont = "更纱黑体 Mono SC Nerd:h13"
-vim.g.nvim_tree_icons = {
-    default = '',
-    symlink = '',
-    git = {
-        unstaged  = "",
-        staged    = "",
-        unmerged  = "",
-        renamed   = "",
-        untracked = "",
-        deleted   = "",
-        ignored   = "◌"
+        float = {
+            enable = false,
+            quit_on_focus_loss = true,
+            open_win_config = {
+                relative = "editor",
+                border = "rounded",
+                width = 30,
+                height = 30,
+                row = 1,
+                col = 1,
+            },
+        },
     },
-    folder = {
-        arrow_open   = "",
-        arrow_closed = "",
-        default      = "",
-        open         = "",
-        empty        = "",
-        empty_open   = "",
-        symlink      = "",
-        symlink_open = "",
+    renderer = {
+        add_trailing = true,
+        group_empty = true,
+        highlight_git = true,
+        full_name = false,
+        highlight_opened_files = "name",
+        highlight_modified = "none",
+        root_folder_label = ":~:s?$?/..?",
+        indent_width = 2,
+        indent_markers = {
+            enable = true,
+            inline_arrows = true,
+            icons = {
+                corner = "└",
+                edge = "│",
+                item = "│",
+                bottom = "─",
+                none = " ",
+            },
         },
-        lsp = {
+        icons = {
+            webdev_colors = true,
+            git_placement = "before",
+            modified_placement = "after",
+            padding = " ",
+            symlink_arrow = " ➛ ",
+            show = {
+                file = true,
+                folder = true,
+                folder_arrow = true,
+                git = true,
+                modified = true,
+            },
+            glyphs = {
+                    default  = "",
+                    symlink  = "",
+                    bookmark = "",
+                    modified = "*",
+                    folder = {
+                        arrow_closed = "",
+                        arrow_open   = "",
+                        default      = "",
+                        open         = "",
+                        empty        = "",
+                        empty_open   = "",
+                        symlink      = "",
+                        symlink_open = "",
+                },
+                git = {
+                    unstaged  = "",
+                    staged    = "",
+                    unmerged  = "",
+                    renamed   = "",
+                    untracked = "",
+                    deleted   = "",
+                    ignored   = "◌",
+                },
+            },
+        },
+        special_files = { "Cargo.toml", "Makefile", "README.md", "readme.md" },
+        symlink_destination = true,
+    },
+    hijack_directories = {
+        enable = true,
+        auto_open = true,
+    },
+    update_focused_file = {
+        enable = true,
+        update_root = false,
+        ignore_list = {},
+    },
+    system_open = {
+        cmd = "",
+        args = {},
+    },
+    diagnostics = {
+        enable = false,
+        show_on_dirs = false,
+        show_on_open_dirs = true,
+        debounce_delay = 50,
+        severity = {
+            min = vim.diagnostic.severity.HINT,
+            max = vim.diagnostic.severity.ERROR,
+        },
+        icons = {
             hint    = "",
             info    = "",
             warning = "",
             error   = "",
-    }
-}
--- }}} Icon
-
-local cb = require('nvim-tree.config').nvim_tree_callback
-
-require("nvim-tree").setup {
-    -- disables netrw completely
-    disable_netrw       = true,
-    -- hijack netrw window on startup
-    hijack_netrw        = true,
-    -- open the tree when running this setup function
-    open_on_setup       = false,
-    -- will not open on setup if the filetype is in this list
-    ignore_ft_on_setup  = {'.git', 'node_modules', '.cache'},
-    -- closes neovim automatically when the tree is the last **WINDOW** in the view
-    auto_close          = false,
-    -- opens the tree when changing/opening a new tab if the tree wasn't previously opened
-    open_on_tab         = false,
-    -- hijack the cursor in the tree to put it at the start of the filename
-    hijack_cursor       = false,
-    -- updates the root directory of the tree on `DirChanged` (when your run `:cd` usually)
-    update_cwd          = true,
-    -- update the focused file on `BufEnter`, un-collapses the folders recursively until it finds the file
-    update_focused_file = {
-        -- enables the feature
-        enable      = true,
-        -- update the root directory of the tree to the one of the folder containing the file if the file is not under the current root directory
-        -- only relevant when `update_focused_file.enable` is true
-        update_cwd  = true,
-        -- list of buffer names / filetypes that will not update the cwd if the file isn't found under the current root directory
-        -- only relevant when `update_focused_file.update_cwd` is true and `update_focused_file.enable` is true
-        ignore_list = {}
+        },
     },
-    -- configuration options for the system open command (`s` in the tree by default)
-    system_open = {
-        -- the command to run this, leaving nil should work in most cases
-        cmd  = nil,
-        -- the command arguments as a list
-        args = {}
+    filters = {
+        dotfiles = false,
+        git_clean = false,
+        no_buffer = false,
+        custom = {},
+        exclude = {},
     },
+    filesystem_watchers = {
+        enable = true,
+        debounce_delay = 50,
+        ignore_dirs = {},
+    },
+    git = {
+        enable = true,
+        ignore = false,
+        show_on_dirs = true,
+        show_on_open_dirs = true,
+        timeout = 400,
+    },
+    modified = {
+        enable = false,
+        show_on_dirs = true,
+        show_on_open_dirs = true,
+    },
+    actions = {
+        use_system_clipboard = true,
+        change_dir = {
+            enable = true,
+            global = false,
+            restrict_above_cwd = false,
+        },
+        expand_all = {
+            max_folder_discovery = 300,
+            exclude = {},
+        },
+        file_popup = {
+            open_win_config = {
+                col = 1,
+                row = 1,
+                relative = "cursor",
+                border = "shadow",
+                style = "minimal",
+            },
+        },
+        open_file = {
+            quit_on_open = false,
+            resize_window = true,
+            window_picker = {
+                enable = true,
+                picker = "default",
+                chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+                exclude = {
+                    filetype = { "notify", "packer", "qf", "diff", "fugitive", "fugitiveblame", "dap-repl", "help", "packer"},
+                    buftype = { "nofile", "terminal", "help" },
+                },
+            },
+        },
+        remove_file = {
+            close_window = true,
+        },
+    },
+    trash = {
+        cmd = "gio trash",
+    },
+    live_filter = {
+        always_show_folders = true,
+        prefix = "[FILTER]: ",
+    },
+    tab = {
+        sync = {
+            open = false,
+            close = false,
+            ignore = {},
+        },
+    },
+    notify = {
+        threshold = vim.log.levels.INFO,
+    },
+    ui = {
+        confirm = {
+            remove = true,
+            trash = true,
+        },
+    },
+    log = {
+        enable = false,
+        truncate = false,
+        types = {
+            all = false,
+            config = false,
+            copy_paste = false,
+            dev = false,
+            diagnostics = false,
+            git = false,
+            profile = false,
+            watcher = false,
+        },
+    },
+} -- END_DEFAULT_OPTS
 
-    view = {
-        -- width of the window, can be either a number (columns) or a string in `%`
-        width = 40,
-        -- side of the tree, can be one of 'left' | 'right' | 'top' | 'bottom'
-        side = 'left',
-        -- if true the tree will resize itself after opening a file
-        auto_resize = false,
-        mappings = {
-            -- custom only false will merge the list with the default mappings
-            -- if true, it will only use your list to set the mappings
-            custom_only = true,
-            -- list of mappings to set on the tree manually
-            list = {
-                {key = {"<CR>", "o", "<2-LeftMouse>"}, cb = cb("edit")},
-                {key = "go",                           cb = cb("system_open")},
-                {key = {"<2-RightMouse>", "."},        cb = cb("cd")},
-                {key = "<C-v>",                        cb = cb("vsplit")},
-                {key = "<C-s>",                        cb = cb("split")},
-                {key = "<C-t>",                        cb = cb("tabnew")},
-                {key = "<",                            cb = cb("prev_sibling")},
-                {key = ">",                            cb = cb("next_sibling")},
-                {key = "<BS>",                         cb = cb("close_node")},
-                {key = "<Tab>",                        cb = cb("preview")},
-                {key = "K",                            cb = cb("first_sibling")},
-                {key = "J",                            cb = cb("last_sibling")},
-                {key = "I",                            cb = cb("toggle_ignored")},
-                {key = "H",                            cb = cb("toggle_dotfiles")},
-                {key = "R",                            cb = cb("refresh")},
-                {key = "<C-n>",                        cb = cb("create")},
-                {key = "df",                           cb = cb("remove")},
-                {key = "r",                            cb = cb("full_rename")},
-                {key = "gr",                           cb = cb("rename")},
-                {key = "dd",                           cb = cb("cut")},
-                {key = "yy",                           cb = cb("copy")},
-                {key = "Y",                            cb = cb("copy")},
-                {key = "p",                            cb = cb("paste")},
-                {key = "yn",                           cb = cb("copy_name")},
-                {key = "yp",                           cb = cb("copy_path")},
-                {key = "yP",                           cb = cb("copy_absolute_path")},
-                {key = "[g",                           cb = cb("prev_git_item")},
-                {key = "]g",                           cb = cb("next_git_item")},
-                {key = "u",                            cb = cb("parent_node")},
-                {key = "U",                            cb = cb("dir_up")},
-                {key = "q",                            cb = cb("close")},
-                {key = "?",                            cb = cb("toggle_help")}
-            }
-        }
-    }
-}
-
-
-map("n", [[<C-w>e]], require("nvim-tree").toggle, "Toggle Nvim tree")
+map("n", [[<C-w>e]], [[:lua require("nvim-tree").toggle()<CR>]], {"silent"}, "Toggle Nvim tree")
 -- map("n", [[<leader>r]], [[:NvimTreeRefresh<CR>]], {"noremap"})
 -- map("n", [[<leader>n]], [[:NvimTreeFindFile<CR>]], {"noremap"})
 

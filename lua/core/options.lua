@@ -30,7 +30,7 @@ o.cmdheight  = 2
 o.shortmess  = "cxTIFSs"
 
 o.complete    = ".,w,b,u,t,kspell,i,d,t"
-o.completeopt = "menuone,noselect,menu"
+o.completeopt = "menuone,noinsert,noselect"
 
 o.conceallevel  = 0
 o.concealcursor = "nc"

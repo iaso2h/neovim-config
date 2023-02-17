@@ -1,68 +1,150 @@
 local fn   = vim.fn
-local cmd  = vim.cmd
 local M    = {}
-local conf       = function(moduleString) return require(string.format("config.%s", moduleString)) end
-local packerPath = fn.stdpath("data") .. "site/pack/packer/start/packer.nvim"
-local packer     = require("packer")
-
+local packerPath = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
 if fn.empty(fn.glob(packerPath)) > 0 then
+    vim.notify("Fetching packer.nvim from github.com", vim.log.levels.WARN)
     fn.system{"git", "clone", "https://github.com/wbthomason/packer.nvim", packerPath}
+    return vim.notify("Please restart neovim", vim.log.levels.WARN)
 end
 
-cmd "packadd packer.nvim"
+local packer = require("packer")
+local conf   = function(moduleString) return require(string.format("config.%s", moduleString)) end
+
 
 packer.init{
     package_root = vim.fn.stdpath("config") .. "/pack",
     compile_path = vim.fn.stdpath("config") .. "/lua/packer_compiled.lua"
 }
 
-packer.startup{
-    function(use, use_rocks)
-    -- NOTE: https://github.com/wbthomason/packer.nvim#specifying-plugins
-    -- use {
-    -- 'myusername/example',                                   -- The plugin location string
-    --                                                         -- The following keys are all optional
-    -- disable = boolean,                                      -- Mark a plugin as inactive
-    -- as = string,                                            -- Specifies an alias under which to install the plugin
-    -- installer = function,                                   -- Specifies custom installer. See "custom installers" below.
-    -- updater = function,                                     -- Specifies custom updater. See "custom installers" below.
-    -- after = string or list,                                 -- Specifies plugins to load before this plugin. See "sequencing" below
-    -- rtp = string,                                           -- Specifies a subdirectory of the plugin to add to runtimepath.
-    -- opt = boolean,                                          -- Manually marks a plugin as optional.
-
-    -- branch = string,                                        -- Specifies a git branch to use
-    -- tag = string,                                           -- Specifies a git tag to use
-    -- commit = string,                                        -- Specifies a git commit to use
-    -- lock = boolean,                                         -- Skip this plugin in updates/syncs
-
-    -- run = string, function, or table,                       -- Post-update/install hook. See "update/install hooks".
-
-    -- requires = string or list,                              -- Specifies plugin dependencies. See "dependencies".
-    -- rocks = string or list,                                 -- Specifies Luarocks dependencies for the plugin
-    -- config = string or function,                            -- Specifies code to run after this plugin is loaded.
-    --                                                         -- The setup key implies opt = true
-    -- setup = string or function,                             -- Specifies code to run before this plugin is loaded.
-    --                                                         -- The following keys all imply lazy-loading and imply opt = true
-    -- cmd = string or list,                                   -- Specifies commands which load this plugin. Can be an autocmd pattern.
-    -- ft = string or list,                                    -- Specifies filetypes which load this plugin.
-    -- keys = string or list,                                  -- Specifies maps which load this plugin. See "Keybindings".
-    -- event = string or list,                                 -- Specifies autocommand events which load this plugin.
-    -- cond = string, function, or list of strings/functions,  -- Specifies a conditional test to load this plugin
-    -- fn = string or list                                     -- Specifies functions which load this plugin.
-    -- module = string or list                                 -- Specifies Lua module names for require. When requiring a string which starts
-                                    -- with one of these module names, the plugin will be loaded.
-    -- module_pattern = string/list                            -- Specifies Lua pattern of Lua module names for require. When
-    -- requiring a string which matches one of these patterns, the plugin will be loaded.
-    -- }
+packer.startup{function(use, use_rocks)
     use 'wbthomason/packer.nvim'
-
     -- use_rocks 'icecream'
 
-    -- Vim enhancement {{{
+    -- disable = boolean,           -- Mark a plugin as inactive
+    -- as = string,                 -- Specifies an alias under which to install the plugin
+    -- installer = function,        -- Specifies custom installer. See |packer-custom-installers|
+    -- updater = function,          -- Specifies custom updater. See |packer-custom-installers|
+    -- after = string or list,      -- Specifies plugins to load before this plugin.
+    -- rtp = string,                -- Specifies a subdirectory of the plugin to add to runtimepath.
+    -- opt = boolean,               -- Manually marks a plugin as optional.
+    -- bufread = boolean,           -- Manually specifying if a plugin needs BufRead after being loaded
+    -- branch = string,             -- Specifies a git branch to use
+    -- tag = string,                -- Specifies a git tag to use. Supports '*' for "latest tag"
+    -- commit = string,             -- Specifies a git commit to use
+    -- lock = boolean,              -- Skip updating this plugin in updates/syncs. Still cleans.
+    -- run = string, function, or table  -- Post-update/install hook. See |packer-plugin-hooks|
+    -- requires = string or list    -- Specifies plugin dependencies. See |packer-plugin-dependencies|
+    -- config = string or function, -- Specifies code to run after this plugin is loaded.
+    -- rocks = string or list,      -- Specifies Luarocks dependencies for the plugin
+    -- -- The following keys all imply lazy-loading
+    -- cmd = string or list,        -- Specifies commands which load this plugin.  Can be an autocmd pattern.
+    -- ft = string or list,         -- Specifies filetypes which load this plugin.
+    -- keys = string or list,       -- Specifies maps which load this plugin. See |packer-plugin-keybindings|
+    -- event = string or list,      -- Specifies autocommand events which load this plugin.
+    -- fn = string or list          -- Specifies functions which load this plugin.
+    -- cond = string, function, or list of strings/functions,   -- Specifies a conditional test to load this plugin
+    -- setup = string or function,  -- Specifies code to run before this plugin is loaded. The code is ran even if
+                                -- -- the plugin is waiting for other conditions (ft, cond...) to be met.
+    -- module = string or list      -- Specifies Lua module names for require. When requiring a string which starts
+                                -- -- with one of these module names, the plugin will be loaded.
+    -- module_pattern = string/list -- Specifies Lua pattern of Lua module names for require. When requiring a string
+                                -- -- which matches one of these patterns, the plugin will be loaded.
+
+
+
+    -- Dependencies {{{
     use {
-        'nathom/filetype.nvim',
-        disable = false
+        'nvim-lua/plenary.nvim',
+        module_pattern = "plenary.*"
+    }
+    -- }}} Dependencies
+-- Treesitter {{{
+use {
+    'nvim-treesitter/nvim-treesitter',
+    run = function()
+        require('nvim-treesitter.install').update({with_sync = true})
+        ts_update()
+    end,
+    config = conf "nvim-treesitter"
+}
+use {
+    'nvim-treesitter/playground',
+    requires = "nvim-treesitter",
+    cmd      = "TSPlaygroundToggle",
+    keys     = {{"n", "gH"}},
+    config   = function()
+        require "nvim-treesitter.configs".setup {
+            playground = {
+                enable          = true,
+                disable         = {},
+                updatetime      = 25,    -- Debounced time for highlighting nodes in the playground from source code
+                persist_queries = false, -- Whether the query persists across vim sessions
+                keybindings     = {
+                    toggle_query_editor       = 'o',
+                    toggle_hl_groups          = 'i',
+                    toggle_injected_languages = 't',
+                    toggle_anonymous_nodes    = 'a',
+                    toggle_language_display   = 'I',
+                    focus_language            = 'f',
+                    unfocus_language          = 'F',
+                    update                    = 'R',
+                    goto_node                 = '<CR>',
+                    show_help                 = '?',
+                },
+            }
         }
+
+        map("n", [[gH]], [[<CMD>TSHighlightCapturesUnderCursor<CR>]], {"silent"}, "Show Tree sitter highlight group")
+    end
+}
+use {
+    'romgrk/nvim-treesitter-context',
+    requires = "nvim-treesitter",
+    event    = {"CursorHold", "CursorHoldI"},
+    config   = [[require("treesitter-context").setup()]]
+}
+use {
+    'p00f/nvim-ts-rainbow',
+    -- TODO:
+    -- 'HiPhish/nvim-ts-rainbow2',
+    requires = "nvim-treesitter",
+    after    = "nvim-treesitter",
+    config   = function()
+        require("nvim-treesitter.configs").setup{
+            rainbow = {
+                enable         = true,
+                extended_mode  = true,
+                max_file_lines = 3000,
+                colors         = {
+                    "#cc7000",
+                    "#7a28a3",
+                    "#3a5eca",
+                    }
+            },
+        }
+    end
+}
+use {
+    'lewis6991/gitsigns.nvim',
+    config = conf "nvim-gitsigns"
+}
+use {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    requires = {
+        "nvim-treesitter",
+        "gitsigns.nvim"
+    },
+    config = conf "nvim-treesitter-textobjects"
+}
+use {
+    'windwp/nvim-ts-autotag',
+    requires = "nvim-treesitter",
+    ft       = {"html", "javascript", "javascriptreact", "typescriptreact", "svelte", "vue"},
+    config   = [[require("nvim-treesitter.configs").setup {autotag = {enable = true}}]]
+}
+
+-- }}} Treesitter
+    -- Vim enhancement {{{
     use 'inkarkat/vim-visualrepeat'
     use 'tpope/vim-repeat'
     use {
@@ -79,10 +161,6 @@ packer.startup{
         setup = [[vim.g.camelcasemotion_key = ',']],
     }
     use {
-        'antoinemadec/FixCursorHold.nvim',
-        setup = [[vim.g.cursorhold_updatetime = 100]]
-    }
-    use {
         'zatchheems/vim-camelsnek',
         keys = {
             {"x", [[<A-c>]]},
@@ -95,7 +173,8 @@ packer.startup{
             vim.g.camelsnek_iskeyword_override         = 0
         end,
         config = function()
-            map("x", [[<A-c>]],   [[:call CaseSwitcher()<CR>]],    {"silent"}, "Change case for selected")
+            -- TODO: support in visual mode
+            -- map("x", [[<A-c>]],   [[:call CaseSwitcher()<CR>]],    {"silent"}, "Change case for selected")
             map("n", [[<A-c>]],   require("caseSwitcher").cycleCase,           "Cycle cases")
             map("n", [[<A-S-c>]], require("caseSwitcher").cycleDefaultCMDList, "Cycle cases reset")
         end,
@@ -103,37 +182,8 @@ packer.startup{
     use {
         'andymass/vim-matchup',
         require = "nvim-treesitter",
-        event   = {"CursorHold", "CursorHoldI"},
-        config  = function()
-            vim.g.matchup_mappings_enabled      = 0
-            vim.g.matchup_matchparen_deferred   = 1
-            vim.g.matchup_matchparen_pumvisible = 0
-            vim.g.matchup_motion_cursor_end     = 0
-            -- vim.g.matchup_matchparen_hi_surround_always = 1
-            -- vim.g.matchup_matchparen_hi_background = 1
-            -- vim.g.matchup_matchparen_offscreen = {method = 'popup', highlight = 'OffscreenPopup'}
-            -- In favor of Neovim Treesitter context display
-            vim.g.matchup_matchparen_offscreen  = {}
-            vim.g.matchup_matchparen_nomode     = "i"
-            vim.g.matchup_delim_start_plaintext = 0
-            vim.g.matchup_delim_noskips         = 2
-            vim.g.matchup_surround_enabled      = 0
-            -- Text obeject
-            map("x", [[am]],      [[<Plug>(matchup-a%)]], "Matchup a% text object")
-            map("x", [[im]],      [[<Plug>(matchup-i%)]], "Matchup i% text object")
-            map("o", [[am]],      [[<Plug>(matchup-a%)]], "Matchup a% text object")
-            map("o", [[im]],      [[<Plug>(matchup-i%)]], "Matchup i% text object")
-            -- Inclusive
-            map({"n", "x", "o"},  [[<C-m>]],   [[<Plug>(matchup-%)]], "Matchup forward inclusive")
-            map({"n", "x", "o"},  [[<C-S-m>]], [[<Plug>(matchup-g%)]], "Matchup backward inclusive")
-            -- Exclusive
-            map("n", [[<A-m>]],   [[<Plug>(matchup-]%)]], "Matchup forward exclusive")
-            map("x", [[<A-m>]],   [[<Plug>(matchup-]%)]], "Matchup forward exclusive")
-            map("n", [[<A-S-m>]], [[<Plug>(matchup-[%)]], "Matchup backward exclusive")
-            map("x", [[<A-S-m>]], [[<Plug>(matchup-[%)]], "Matchup backward exclusive")
-            -- Highlight
-            map("n", [[<leader>m]], [[<Plug>(matchup-hi-surround)]], "Highlight Matchup")
-        end,
+        setup   = conf "vim-matchup".setup,
+        config  = conf "vim-matchup".config
     }
     use {
         'phaazon/hop.nvim',
@@ -207,10 +257,11 @@ packer.startup{
         'junegunn/vim-easy-align',
         keys = {
             {"x", "A"},
-            {"n", "ga"},
+            -- {"n", "ga"},
         },
         config = function()
             vim.g.easy_align_delimiters = {
+                -- Align to lua comment
                 ["l"] = {
                     pattern       = "--",
                     left_margin   = 2,
@@ -220,7 +271,7 @@ packer.startup{
                 }
             }
             map("x", [[A]],  [[<Plug>(EasyAlign)]], "Align selected")
-            map("n", [[ga]], [[<Plug>(EasyAlign)]], "Align operator")
+            -- map("n", [[ga]], [[<Plug>(EasyAlign)]], "Align operator")
         end
     }
     use {
@@ -245,10 +296,9 @@ packer.startup{
             map("x", [[<leader>g<C-x>]], [[<Plug>(dial-decrement-additional)]], "Dial down additional for selected")
         end
     }
-    -- BUG:
     use {
         'danymat/neogen',
-        requires = {"nvim-treesitter", "nvim-cmp"},
+        requires = "nvim-treesitter",
         keys     = {{"n", "g<Space>d"}},
         config   = function()
             require("neogen").setup {
@@ -265,22 +315,7 @@ packer.startup{
                             annotation_convention = "google_docstrings"
                         }
                     },
-                    php = {
-                        template = {
-                            annotation_convention = "phpdoc"
-                        }
-                    },
-                    rust = {
-                        template = {
-                            annotation_convention = "rustdoc"
-                        }
-                    },
                     c = {
-                        template = {
-                            annotation_convention = "doxygen"
-                        }
-                    },
-                    cpp = {
                         template = {
                             annotation_convention = "doxygen"
                         }
@@ -290,14 +325,9 @@ packer.startup{
                             annotation_convention = "xmldoc"
                         }
                     },
-                    java = {
+                    rust = {
                         template = {
-                            annotation_convention = "javadoc"
-                        }
-                    },
-                    javascript = {
-                        template = {
-                            annotation_convention = "jsdoc"
+                            annotation_convention = "rustdoc"
                         }
                     },
                     typescript = {
@@ -305,10 +335,15 @@ packer.startup{
                             annotation_convention = "jsdoc"
                         }
                     },
+                    typescriptreact = {
+                        template = {
+                            annotation_convention = "jsdoc"
+                        }
+                    },
                 }
             }
 
-            map("n", [[g<Space>d]], require("neogen").generate, "Comment function description")
+            map("n", [[g<Space>d]], [[:lua require("neogen").generate()<CR>]], {"silent"}, "Document generation")
         end,
     }
     use {
@@ -317,9 +352,11 @@ packer.startup{
             {"n", "gS"},
             {"n", "gJ"}
         },
-        config = function()
+        setup = function()
             vim.g.splitjoin_align = 1
             vim.g.splitjoin_curly_brace_padding = 0
+        end,
+        config = function()
             map("n", [["gS"]], [[<CMD>SplitjoinSplit<CR>]], {"silent"}, "Smart split")
             map("n", [["gJ"]], [[<CMD>SplitjoinJoin<CR>]],  {"silent"}, "Smart join")
         end
@@ -383,29 +420,38 @@ packer.startup{
             -- map("n", [[gx>]], [[<CMD>SidewaysRight<CR>]], {"silent"})
         -- end
     }
+    -- BUG:
     use {
         'windwp/nvim-autopairs',
+        disable = true,
         require = "nvim-treesitter",
         config  = function()
             require('nvim-autopairs').setup {
-                disable_filetype          = {"TelescopePrompt", "dap-repl"},
-                disable_in_macro          = true,
-                ignored_next_char         = string.gsub([[[%w%%%'%[%"%.] ]],"%s+", ""),
-                enable_moveright          = true,
+                disable_filetype        = {"TelescopePrompt", "dap-repl"},
+                disable_in_macro        = true,
+                disable_in_visualblock  = false,
+                disable_in_replace_mode = true,
+                ignored_next_char         = [=[[%w%%%'%[%"%.%`%$]]=],
+                enable_moverighR          = true,
                 enable_afterquote         = true,   -- add bracket pairs after quote
-                enable_check_bracket_line = false,  -- check bracket in same line
-                check_ts                  = true,
-                map_bs                    = true,
-                map_c_h                   = false,
-                map_c_w                   = false,
+                enable_check_bracket_line = true,  -- check bracket in same line
+                enable_bracket_in_quote   = true,
+                enable_abbr               = true, -- trigger abbreviation
+                break_undo = true, -- switch for basic rule break undo sequence
+                check_ts   = false,
+                map_cr  = true,
+                map_bs  = true,
+                map_c_h = false,
+                map_c_w = false,
                 fast_wrap = {
-                    map         = '<A-p>',
-                    chars       = {'{', '[', '(', '"', "'"},
-                    pattern     = string.gsub([[ [%'%"%)%>%]%)%}%,] ]], '%s+', ''),
-                    end_key     = 'p',
-                    keys        = 'qwertyuiopzxcvbnmasdfghjkl',
-                    check_comma = true,
-                    hightlight  = 'Search'
+                    map            = '<M-e>',
+                    chars          = {'{', '[', '(', '"', "'"},
+                    pattern        = [=[[%'%"%>%]%)%}%,]]=],
+                    end_key        = '$',
+                    keys           = 'qwertyuiopzxcvbnmasdfghjkl',
+                    check_comma    = true,
+                    highlight      = 'Search',
+                    highlight_grey = 'Comment'
                 },
             }
         end
@@ -454,67 +500,23 @@ packer.startup{
         config = conf("vim-nerdcommenter").config,
     }
     use {
-        'winston0410/range-highlight.nvim',
-        disable  = true,
-        requires = "winston0410/cmd-parser.nvim",
-        config   = function()
-            require("range-highlight").setup {
-                highlight = "Visual",
-                highlight_with_out_range = {
-                    d          = true,
-                    delete     = true,
-                    m          = true,
-                    move       = true,
-                    y          = true,
-                    yank       = true,
-                    c          = true,
-                    change     = true,
-                    j          = true,
-                    join       = true,
-                    ["<"]      = true,
-                    [">"]      = true,
-                    s          = true,
-                    subsititue = true,
-                    sno        = true,
-                    snomagic   = true,
-                    sm         = true,
-                    smagic     = true,
-                    ret        = true,
-                    retab      = true,
-                    t          = true,
-                    co         = true,
-                    copy       = true,
-                    ce         = true,
-                    center     = true,
-                    ri         = true,
-                    right      = true,
-                    le         = true,
-                    left       = true,
-                    sor        = true,
-                    sort       = true
-                }
-            }
-        end
-    }
-    use {
         'lukas-reineke/indent-blankline.nvim',
         require = "nvim-treesitter",
         event   = "BufRead",
         config  = function()
             require("indent_blankline").setup{
+                use_treesitter = true,
                 char             = "▏",
+                char_blankline   = "▏",
                 context_char     = "▏",
                 buftype_exclude  = {"terminal"},
                 filetype_exclude = {"help", "startify", "NvimTree", "Trouble", "packer"},
                 bufname_exclude  = {"*.md"},
-                char_highlight   = "SignColumn",
-                use_treesitter                 = true,
+                char_highlight_list = {"SignColumn"},
                 show_current_context           = true,
-                show_first_indent_level        = true,
-                show_trailing_blankline_indent = true,
-                show_end_of_line               = true,
-                show_foldtext                  = true,
-                strict_tabs                    = true
+                show_trailing_blankline_indent = false,
+                -- TODO:
+                -- show_foldtext                  = true,
             }
         end
     }
@@ -543,122 +545,59 @@ packer.startup{
         end
     }
     -- }}} Vim enhancement
+    -- Telescope {{{
+    use {
+        'nvim-telescope/telescope.nvim',
+        module_pattern = "telescope.*",
+        cmd      = "Telescope",
+        keys     = {
+            {"n", [[<C-f>l]]},  {"n", [[<C-f>E]]},    {"n", [[<C-f>e]]},  {"n", [[<C-f>f]]},
+            {"n", [[<C-f>F]]},  {"n", [[<C-f>w]]},    {"n", [[<C-f>W]]},  {"n", [[<A-C-j>]]},
+            {"n", [[<A-C-k>]]}, {"n", [[<C-h>/]]},    {"n", [[<C-h>v]]},  {"n", [[<C-h>o]]},
+            {"n", [[<C-h>i]]},  {"n", [[<C-h>q]]},    {"n", [[<C-h>m]]},  {"n", [[<C-h>k]]},
+            {"n", [[<C-h>c]]},  {"n", [[<C-h>h]]},    {"n", [[<C-h>H]]},  {"n", [[<C-h>l]]},
+            {"n", [[<C-f>o]]},  {"n", [[<C-f>O]]},    {"n", [[<C-f>gc]]}, {"n", [[<C-f>gC]]},
+            {"n", [[<C-f>gs]]}, {"n", [[<leader>b]]},
+
+            {"n", [[<C-f>o]]}, {"n", [[<C-f>O]]}, {"n", [[<leader>e]]}, {"n", [[<leader>E]]},
+        },
+        requires = {
+            "plenary.nvim",
+            { "nvim-telescope/telescope-fzy-native.nvim",
+                run = "make -C deps/fzy-lua-native",
+            },
+        },
+        config = conf "nvim-telescope"
+    }
+    use {
+        'nvim-telescope/telescope-symbols.nvim',
+        module   = "telescope",
+        requires = "telescope.nvim"
+    }
+    -- }}} Telescope
     -- UI {{{
     use {
         'kyazdani42/nvim-web-devicons',
-        config = function()
-            require'nvim-web-devicons'.setup { -- {{{
-                override = {
-                    html = {
-                        icon = "",
-                        color = "#DE8C92",
-                        name = "html"
-                    },
-                    css = {
-                        icon = "",
-                        color = "#61afef",
-                        name = "css"
-                    },
-                    js = {
-                        icon = "",
-                        color = "#EBCB8B",
-                        name = "js"
-                    },
-                    png = {
-                        icon = " ",
-                        color = "#BD77DC",
-                        name = "png"
-                    },
-                    jpg = {
-                        icon = " ",
-                        color = "#BD77DC",
-                        name = "jpg"
-                    },
-                    jpeg = {
-                        icon = " ",
-                        color = "#BD77DC",
-                        name = "jpeg"
-                    },
-                    mp3 = {
-                        icon = "",
-                        color = "#C8CCD4",
-                        name = "mp3"
-                    },
-                    mp4 = {
-                        icon = "",
-                        color = "#C8CCD4",
-                        name = "mp4"
-                    },
-                    out = {
-                        icon = "",
-                        color = "#C8CCD4",
-                        name = "out"
-                    },
-                    toml = {
-                        icon = "",
-                        color = "#61afef",
-                        name = "toml"
-                    },
-                    lock = {
-                        icon = "",
-                        color = "#DE6B74",
-                        name = "lock"
-                    },
-                    webpack = {
-                        icon = "",
-                        color = "#519aba",
-                        name = "Webpack",
-                    },
-                    svg = {
-                        icon = "",
-                        color = "#FFB13B",
-                        name = "Svg",
-                    },
-                    [".babelrc"] = {
-                        icon = "",
-                        color = "#cbcb41",
-                        name = "Babelrc"
-                    },
-                    ["_vimrc"] = {
-                        icon = "",
-                        color = "#019833",
-                        name = "Vimrc",
-                    },
-                    [".vimrc"] = {
-                        icon = "",
-                        color = "#019833",
-                        name = "Vimrc"
-                    },
-                    ["_gvimrc"] = {
-                        icon = "",
-                        color = "#019833",
-                        name = "Vimrc"
-                    },
-                    ["vim"] = {
-                        icon = "",
-                        color = "#019833",
-                        name = "Vim"
-                    },
-                    [".exe"] = {
-                        icon = "",
-                        color = "#6d8086",
-                        name = "Executable"
-                    },
-                },
-                default = true
-            } -- }}}
-        end
+        config = conf "nvim-web-devicons"
+    }
+    use {
+        disable = true,
+        'yamatsum/nvim-nonicons',
+        requires = "nvim-web-devicons",
+        config = [[require("nvim-nonicons").setup()]]
     }
     use {
         'joshdick/onedark.vim',
         disable = true
     }
     use {
+        -- TODO: use the main brach
         'NTBBloodbath/galaxyline.nvim',
         event    = "BufRead",
         requires = "nvim-web-devicons",
         config   = conf "nvim-galaxyline"
     }
+
     use {
         'akinsho/bufferline.nvim',
         event    = "BufRead",
@@ -666,13 +605,34 @@ packer.startup{
         config   = conf "nvim-bufferline".config
     }
     use {
-    'RRethy/vim-hexokinase',
+        'NvChad/nvim-colorizer.lua',
         event = "BufRead",
-        run   = "make hexokinase",
-        setup = function()
-            vim.g.Hexokinase_highlighters = {"backgroundfull"}
-            vim.g.Hexokinase_optInPatterns = "full_hex,triple_hex,rgb,rgba,hsl,hsla"
-        end
+        config = function() -- {{{
+            require("colorizer").setup {
+                filetypes = { "*" },
+                user_default_options = {
+                    RGB      = true,  -- #RGB hex codes
+                    RRGGBB   = true,  -- #RRGGBB hex codes
+                    names    = true,  -- "Name" codes like Blue or blue
+                    RRGGBBAA = true,  -- #RRGGBBAA hex codes
+                    AARRGGBB = true,  -- 0xAARRGGBB hex codes
+                    rgb_fn   = true,  -- CSS rgb() and rgba() functions
+                    hsl_fn   = true,  -- CSS hsl() and hsla() functions
+                    css      = true,  -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
+                    css_fn   = true,  -- Enable all CSS *functions*: rgb_fn, hsl_fn
+                    -- Available modes for `mode`: foreground, background,  virtualtext
+                    mode = "background", -- Set the display mode.
+                    -- Available methods are false / true / "normal" / "lsp" / "both"
+                    -- True is same as normal
+                    tailwind = false, -- Enable tailwind colors
+                    -- parsers can contain values used in |user_default_options|
+                    sass = {enable = true, parsers = {"css"},}, -- Enable sass colors
+                    virtualtext = "■",
+                },
+                -- all the sub-options of filetypes apply to buftypes
+                buftypes = {},
+            }
+        end -- }}}
     }
     use {
         'folke/todo-comments.nvim',
@@ -687,290 +647,131 @@ packer.startup{
         config   = conf "nvim-tree"
     }
     use {
-        'MunifTanjim/nui.nvim',
-        disable = true
+        'stevearc/dressing.nvim',
+        config = conf "nvim-dressing"
     }
     -- }}} UI
-    -- Treesitter {{{
-    use {
-        'nvim-treesitter/nvim-treesitter',
-        run    = ":TSUpdate",
-        config = function()
-            require("nvim-treesitter.configs").setup{
-                -- ensure_installed = "maintained",
-                ensure_installed = {
-                    "c", "cpp", "cmake", "lua", "json", "toml",
-                    "python", "bash", "fish", "ruby", "regex", "css", "html",
-                    "go", "javascript", "rust", "vue", "c_sharp", "typescript",
-                    "comment", "query", "yaml"
-                },
-                highlight        = {
-                    enable = true,
-                    custom_captures = {
-                    },
-                    additional_vim_regex_highlighting = false
-                },
-                indent           = {enable = true},
-                incremental_selection = {
-                    enable  = true,
-                    keymaps = {
-                        init_selection    = "gnn",
-                        node_incremental  = "grn",
-                        node_decremental  = "grm",
-                        scope_incremental = "grc",
-                    },
-                },
-                matchup = {
-                    enable = true,
-                },
-            }
-
-            map("n",        [[<A-S-a>]], [[gnn]], "Expand selection")
-            map("x",        [[<A-S-a>]], [[grc]], "Expand selection")
-            map({"n", "x"}, [[<A-S-s>]], [[grm]], "Shirnk selection")
-        end
-    }
-    use {
-        'nvim-treesitter/playground',
-        requires = "nvim-treesitter",
-        cmd      = "TSPlaygroundToggle",
-        keys     = {{"n", "gH"}},
-        config   = function()
-            require "nvim-treesitter.configs".setup {
-                playground = {
-                    enable          = true,
-                    disable         = {},
-                    updatetime      = 25,    -- Debounced time for highlighting nodes in the playground from source code
-                    persist_queries = false, -- Whether the query persists across vim sessions
-                    keybindings     = {
-                        toggle_query_editor       = 'o',
-                        toggle_hl_groups          = 'i',
-                        toggle_injected_languages = 't',
-                        toggle_anonymous_nodes    = 'a',
-                        toggle_language_display   = 'I',
-                        focus_language            = 'f',
-                        unfocus_language          = 'F',
-                        update                    = 'R',
-                        goto_node                 = '<CR>',
-                        show_help                 = '?',
-                    },
-                }
-            }
-
-            map("n", [[gH]], [[<CMD>TSHighlightCapturesUnderCursor<CR>]], {"silent"}, "Show Tree sitter highlight group")
-        end
-    }
-    use {
-        'romgrk/nvim-treesitter-context',
-        requires = "nvim-treesitter",
-        event    = {"CursorHold", "CursorHoldI"},
-        config   = function()
-            require("treesitter-context").setup{
-                enable   = true,  -- Enable this plugin (Can be enabled/disabled later via commands)
-                throttle = true,  -- Throttles plugin updates (may improve performance)
-                patterns = {      -- Match patterns for TS nodes. These get wrapped to match at word boundaries.
-                    -- For all filetypes
-                    -- Note that setting an entry here replaces all other patterns for this entry.
-                    -- By setting the 'default' entry below, you can control which nodes you want to
-                    -- appear in the context window.
-                    default = {
-                        'class',
-                        'function',
-                        'method',
-                        'for',
-                        'while',
-                        'if',
-                        'switch',
-                        'case',
-                    },
-                }
-            }
-        end
-    }
-    use {
-        'p00f/nvim-ts-rainbow',
-        requires = "nvim-treesitter",
-        after    = "nvim-treesitter",
-        config   = function()
-            require("nvim-treesitter.configs").setup{
-                rainbow = {
-                    enable         = true,
-                    extended_mode  = true,
-                    max_file_lines = nil,
-                    colors         = {
-                        "#cc7000",
-                        "#7a28a3",
-                        "#3a5eca",
-                        }
-                },
-            }
-        end
-    }
-    use {
-        'nvim-treesitter/nvim-treesitter-textobjects',
-        requires = "nvim-treesitter",
-        config   = function()
-            require("nvim-treesitter.configs").setup{
-                textobjects = {
-                    select = {
-                        enable = true,
-                        keymaps = {
-                            -- ["nf"] = "@function.outer",
-                            ["if"] = "@function.inner",
-                            ["ac"] = "@class.outer",
-                            ["ic"] = "@class.inner",
-                        },
-                    },
-                    swap = {
-                        enable = true,
-                        swap_next = {
-                            ["<A-.>"] = "@parameter.inner",
-                        },
-                        swap_previous = {
-                            ["<A-,>"] = "@parameter.inner",
-                        },
-                    },
-                    move = {
-                        enable = true,
-                        goto_next_start = {
-                            ["]m"] = "@function.outer",
-                            ["]]"] = "@function.outer",
-                        },
-                        goto_next_end = {
-                            ["]M"] = "@function.outer",
-                            ["]["] = "@function.outer",
-                        },
-                        goto_previous_start = {
-                            ["[m"] = "@function.outer",
-                            ["[["] = "@function.outer",
-                        },
-                        goto_previous_end = {
-                            ["[M"] = "@function.outer",
-                            ["[]"] = "@function.outer",
-                        },
-                    },
-                },
-            }
-        end
-    }
-    use {
-        'windwp/nvim-ts-autotag',
-        requires = "nvim-treesitter",
-        ft       = {"html", "javascript", "javascriptreact", "typescriptreact", "svelte", "vue"},
-        config   = [[require("nvim-treesitter.configs").setup {autotag = {enable = true}}]]
-    }
-    use {
-        'abecodes/tabout.nvim',
-        disable = true,
-        event    = "InsertEnter",
-        requires = "nvim-treesitter",
-        config   = function()
-            require('tabout').setup {
-                -- key to trigger tabout, set to an empty string to disable
-                tabkey           = '',
-                -- key to trigger backwards tabout, set to an empty string to disable
-                backwards_tabkey = '',
-                -- shift content if tab out is not possible
-                act_as_tab       = true,
-                -- reverse shift content if tab out is not possible (if your keyboard/terminal supports <S-Tab>)
-                act_as_shift_tab = true,
-                -- well ...
-                enable_backwards = true,
-                -- if the tabkey is used in a completion pum
-                completion       = true,
-                tabouts          = {
-                    {open = "'",  close = "'"},
-                    {open = '"',  close = '"'},
-                    {open = '`',  close = '`'},
-                    {open = '(',  close = ')'},
-                    {open = '[',  close = ']'},
-                    {open = '{',  close = '}'},
-                    {open = '<',  close = '>'},
-                    {open = '《', close = '》'},
-                    {open = '「', close = '」'},
-                    {open = '【', close = '】'},
-                    {open = '“',  close = '”'},
-                },
-                --[[ if the cursor is at the beginning of a filled element it will rather tab out than shift the content ]]
-                ignore_beginning = true,
-                -- tabout will ignore these filetypes
-                exclude = {}
-            }
-        end
-    }
-    -- }}} Treesitter
     -- Intellisense {{{
     use {
-        'neovim/nvim-lspconfig',
-        event  = "BufRead",
-        config = conf("nvim-lsp").config
-    }
-    use {
-        'williamboman/nvim-lsp-installer',
-        module  = "nvim-lsp-installer",
-        rquires = "nvim-lspconfig",
-    }
-    use {
-        'kosayoda/nvim-lightbulb',
-        require = "nvim-lspconfig",
-        event   = {"CursorHold", "CursorHoldI"},
-        config  = function()
-            vim.cmd [[
-            augroup lightBulb
-            autocmd!
-            autocmd CursorHold,CursorHoldI * lua require('nvim-lightbulb').update_lightbulb{sign={enabled=false,},virtual_text={enabled=true, text = "💡"}}
-            augroup END
+        'williamboman/mason.nvim',
+        config = function()
+            require("mason").setup {
+                ui = {
+                    border = "rounded",
+                    keymaps = {
+                        toggle_package_expand   = "<CR>",
+                        install_package         = "i",
+                        update_package          = "u",
+                        update_all_packages     = "U",
+                        check_package_version   = "c",
+                        check_outdated_packages = "C",
+                        uninstall_package       = "d",
+                        cancel_installation     = "<C-c>",
+                        apply_language_filter   = "f",
+                    }
+                }
+            }
+            vim.cmd[[
+            command! -nargs=0 MasonInstalled lua Print(require("mason-registry").get_installed_package_names())
+            command! -nargs=0 MasonAvailable lua Print(require("mason-registry").get_all_package_names())
             ]]
-            -- require('nvim-lightbulb').update_lightbulb({
-                -- sign = {
-                    -- enabled = true,
-                    -- },
-                -- virtual_text = {
-                    -- enabled = true, text = "💡"
-                -- }
-            -- })
         end
+    }
+    use {
+        'williamboman/mason-lspconfig.nvim',
+        requires = {
+            "mason.nvim",
+        },
+        config = conf("nvim-mason-lspconfig").config
+    }
+    use {
+        'neovim/nvim-lspconfig',
+        requires = {
+            "plenary.nvim",
+            "hrsh7th/cmp-nvim-lsp"
+        },
+        event  = "BufRead",
+    }
+    use {
+        'folke/neodev.nvim',
+        after = "nvim-lspconfig",
+        config = [[ require("neodev").setup(); require("config.nvim-lspconfig")() ]]
+    }
+    use {
+        'hrsh7th/nvim-cmp',
+        requires = {
+            {"hrsh7th/cmp-nvim-lsp", module = "cmp_nvim_lsp"},
+            {"hrsh7th/cmp-buffer",   module = "cmp_buffer"},
+            {"hrsh7th/cmp-path",     module = "cmp_path"},
+            {"hrsh7th/cmp-cmdline",  module = "cmp_cmdline"},
+            {"L3MON4D3/LuaSnip",
+                run = "make install_jsregexp"
+                -- config = conf "nvim-luasnip"
+            -- TODO: VSNIP Legacy
+                -- event  = "InsertEnter",
+                -- config = conf "vim-vsnip"
+            },
+            {
+                "tzachar/cmp-tabnine",
+                run = function()
+                    if jit.os == "Windows" then
+                        vim.cmd "!powershell ./install.ps1'"
+                    elseif jit.os == "linux" then
+                        vim.cmd "!./install.sh"
+                    end
+                end,
+                -- config = function()
+                    -- require('cmp_tabnine.config'):setup{
+                        -- max_num_results = 20,
+                        -- max_lines       = 1000,
+                        -- sort            = true
+                    -- }
+                -- end
+            },
+        },
+        config = conf "nvim-cmp"
     }
     use {
         'folke/trouble.nvim',
         rquires = "nvim-lspconfig",
-        -- TODO: shortcuts
-        cmd     = "LspTrouble",
+        cmd     = "Trouble",
         config  = function()
             require("trouble").setup {
                 position    = "bottom",  -- position of the list can be: bottom, top, left, right
                 height      = 15,        -- height of the trouble list when position is top or bottom
                 width       = 50,        -- width of the list when position is left or right
                 icons       = true,      -- use devicons for filenames
-                mode        = "lsp_workspace_diagnostics", -- "lsp_workspace_diagnostics", "lsp_document_diagnostics", "quickfix", "lsp_references", "loclist"
+                mode        = "workspace_diagnostics", -- "lsp_workspace_diagnostics", "lsp_document_diagnostics", "quickfix", "lsp_references", "loclist"
                 fold_open   = "",  -- icon used for open folds
                 fold_closed = "",  -- icon used for closed folds
+                group = true,       -- group results by file
+                padding = false,    -- add an extra new line on top of the list
                 action_keys = {
                     -- key mappings for actions in the trouble list
                     -- map to {} to remove a mapping, for example:
                     -- close = {},
-                    close          = "q",            -- close the list
-                    cancel         = "<C-o>",        -- cancel the preview and get back to your last window / buffer / cursor
-                    refresh        = "r",            -- manually refresh
-                    jump           = {"<CR>", "o"},  -- jump to the diagnostic or open / close folds
-                    open_split     = "<C-s>",        -- open buffer in new split
-                    open_vsplit    = "<C-v>",        -- open buffer in new vsplit
-                    open_tab       = "<C-t>",        -- open buffer in new tab
-                    jump_close     = "<S-CR>",       -- jump to the diagnostic and close the list
-                    toggle_mode    = "<Tab>",        -- toggle between "workspace" and "document" diagnostics mode
-                    toggle_preview = "P",            -- toggle auto_preview
-                    hover          = "K",            -- opens a small popup with the full multiline message
-                    preview        = "p",            -- preview the diagnostic location
+                    close          = "q",                 -- close the list
+                    cancel         = {"<esc>", "<C-o>"},  -- cancel the preview and get back to your last window / buffer / cursor
+                    refresh        = "r",                 -- manually refresh
+                    jump           = {"<CR>", "o"},       -- jump to the diagnostic or open / close folds
+                    open_split     = "<C-s>",             -- open buffer in new split
+                    open_vsplit    = "<C-v>",             -- open buffer in new vsplit
+                    open_tab       = "<C-t>",             -- open buffer in new tab
+                    jump_close     = "O",                 -- jump to the diagnostic and close the list
+                    toggle_mode    = "<Tab>",             -- toggle between "workspace" and "document" diagnostics mode
+                    toggle_preview = "P",                 -- toggle auto_preview
+                    hover          = "K",                 -- opens a small popup with the full multiline message
+                    preview        = "p",                 -- preview the diagnostic location
 
-                    close_folds    = {"zM", "zm"},   -- close all folds
-                    open_folds     = {"zR", "zr"},   -- open all folds
-                    toggle_fold    = "<Leader><Space>", -- toggle fold of current file
+                    close_folds    = {"zM", "zm"},        -- close all folds
+                    open_folds     = {"zR", "zr"},        -- open all folds
+                    toggle_fold    = "<Leader><Space>",   -- toggle fold of current file
 
-                    previous       = "k",            -- preview item
-                    next           = ""             -- next item
+                    previous       = "k",                 -- preview item
+                    next           = "j"                  -- next item
                 },
 
-                indent_lines = false, -- add an indent guide below the fold icons
+                indent_lines = true, -- add an indent guide below the fold icons
                 auto_open    = false, -- automatically open the list when you have diagnostics
                 auto_close   = false, -- automatically close the list when you have no diagnostics
                 auto_preview = false, -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
@@ -983,51 +784,9 @@ packer.startup{
                     information = "",
                     other       = "﫠"
                 },
-                use_lsp_diagnostic_signs = false -- enabling this will use the signs defined in your lsp client
+                use_lsp_diagnostic_signs = true -- enabling this will use the signs defined in your lsp client
             }
         end
-    }
-    use {
-        'hrsh7th/vim-vsnip',
-        event  = "InsertEnter",
-        config = conf "vim-vsnip"
-    }
-    use {
-        'hrsh7th/nvim-cmp',
-        module   = "cmp",
-        event    = "InsertEnter",
-        requires = {
-            "nvim-autopairs",
-
-            {"hrsh7th/cmp-nvim-lsp", module = "cmp_nvim_lsp"},
-            {"hrsh7th/cmp-nvim-lua", module = "cmp_nvim_lua",  disable = true},
-            {"hrsh7th/cmp-buffer",   module = "cmp_buffer"},
-            {"hrsh7th/cmp-path",     module = "cmp_path"},
-            {"hrsh7th/cmp-vsnip",    after = "nvim-cmp",},
-            {"lukas-reineke/cmp-under-comparator", module = "cmp-under-comparator",},
-            {
-                "tzachar/cmp-tabnine",
-                disable = true,
-                run    = "./install.sh",
-                after  = "nvim-cmp",
-                config = function()
-                    require('cmp_tabnine.config'):setup{
-                        max_num_results = 20;
-                        max_lines       = 1000;
-                        sort            = true;
-                    }
-                end
-            },
-        },
-        config = conf "nvim-cmp"
-    }
-    use {
-        'folke/lua-dev.nvim',
-        module  = "lua-dev",
-        rquires = {
-            "nvim-lspconfig",
-            "nvim-cmp"
-        },
     }
     use {
         'ray-x/lsp_signature.nvim',
@@ -1041,15 +800,23 @@ packer.startup{
     }
     use {
         'RRethy/vim-illuminate',
-        module  = "illuminate",
-        rquires = "nvim-lspconfig",
-        setup   = function()
-            vim.g.Illuminate_ftblacklist = {"nerdtree", "NvimTree", "qf", "packer"}
-            vim.g.Illuminate_delay = 100
+        config = function()
+            require("illuminate").configure{
+                providers = {
+                    "lsp",
+                    "treesitter",
+                },
+                filetypes_denylist = {
+                    "fugitive",
+                    "dap"
+                },
+                min_count_to_highlight = 2
+            }
         end
     }
     use {
         'ThePrimeagen/refactoring.nvim',
+        disable = true,
         requires = {
             "plenary.nvim",
             "nvim-treesitter"
@@ -1073,42 +840,6 @@ packer.startup{
         end
     }
     -- }}} Intellisense
-    -- Telescope {{{
-    use {
-        'nvim-lua/plenary.nvim',
-        module_pattern = "plenary.*"
-    }
-    use {
-        'nvim-telescope/telescope.nvim',
-        module_pattern = "telescope.*",
-        cmd      = "Telescope",
-        keys     = {
-            {"n", [[<C-f>l]]},  {"n", [[<C-f>E]]},    {"n", [[<C-f>e]]},  {"n", [[<C-f>f]]},
-            {"n", [[<C-f>F]]},  {"n", [[<C-f>w]]},    {"n", [[<C-f>W]]},  {"n", [[<A-C-j>]]},
-            {"n", [[<A-C-k>]]}, {"n", [[<C-h>/]]},    {"n", [[<C-h>v]]},  {"n", [[<C-h>o]]},
-            {"n", [[<C-h>i]]},  {"n", [[<C-h>q]]},    {"n", [[<C-h>m]]},  {"n", [[<C-h>k]]},
-            {"n", [[<C-h>c]]},  {"n", [[<C-h>h]]},    {"n", [[<C-h>H]]},  {"n", [[<C-h>l]]},
-            {"n", [[<C-f>o]]},  {"n", [[<C-f>O]]},    {"n", [[<C-f>gc]]}, {"n", [[<C-f>gC]]},
-            {"n", [[<C-f>gs]]}, {"n", [[<leader>b]]},
-
-            {"n", [[<C-f>a]]},    {"n", [[<C-f>o]]}, {"n", [[<C-f>O]]}, {"n", [[<leader>e]]},
-            {"n", [[<leader>E]]},
-        },
-        requires = {
-            "plenary.nvim",
-            { "nvim-telescope/telescope-fzy-native.nvim",
-                run = "make -C deps/fzy-lua-native",
-                -- opt = true,
-            },
-        },
-        config = conf "nvim-telescope"
-    }
-    use {
-        'nvim-telescope/telescope-symbols.nvim',
-        module   = "telescope",
-        requires = "telescope.nvim"
-    }
-    -- }}} Telescope
     -- Debug {{{
     use {
         'bfredl/nvim-luadev',
@@ -1119,7 +850,7 @@ packer.startup{
         cmd    = "StartupTime",
         config = [[vim.g.startuptime_tries = 50]]
     }
-    use 'lewis6991/impatient.nvim'
+    -- use 'lewis6991/impatient.nvim'
     use {
         'iaso2h/vim-scriptease',
         branch = 'ftplugin',
@@ -1131,20 +862,23 @@ packer.startup{
         keys   = {{"n", "g>"}},
         config = conf("vim-scriptease").config
     }
-    use {
-        'mfussenegger/nvim-dap',
-        module = "dap",
-        setup  = conf "nvim-dap".setup,
-        config = conf "nvim-dap".config
-    }
+    -- use {
+        -- 'mfussenegger/nvim-dap',
+            -- disable = true,
+        -- module = "dap",
+        -- setup  = conf("nvim-dap").setup,
+        -- config = conf("nvim-dap").config
+    -- }
     use {
         'rcarriga/nvim-dap-ui',
+            disable = true,
         after  = "nvim-dap",
         config = conf "nvim-dap-ui"
     }
     use {
         -- TODO: hlGroup
         'theHamsta/nvim-dap-virtual-text',
+        disable = true,
         after  = "nvim-dap",
         config = function()
             require("nvim-dap-virtual-text").setup {
@@ -1263,11 +997,6 @@ packer.startup{
     -- }}} Language support
     -- Source control {{{
     use {
-        'lewis6991/gitsigns.nvim',
-        event  = "BufRead",
-        config = conf "nvim-gitsigns"
-    }
-    use {
         'rhysd/conflict-marker.vim',
         disable = ex("lazygit"),
         setup = [[vim.g.conflict_marker_enable_mappings = 0; vim.g.conflict_marker_enable_highlight = 1]],
@@ -1314,7 +1043,6 @@ packer.startup{
     }
     -- }}} Knowlege
     end,
-
     config = {
         display = {
             prompt_border = 'rounded',

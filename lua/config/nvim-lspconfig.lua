@@ -1,50 +1,10 @@
-local M   = {servers = {}}
-
-
-M.formatCode = function(vimMode) -- {{{
-    local fn  = vim.fn
-    local cmd = vim.cmd
-    if not vim.bo.modified then return end
-
-    local fileType = vim.bo.filetype
-
-    cmd "up"
-
-    if vimMode == "n" then
-        if fileType == "lua" then
-            if not ex("lua-format") then return end
-            local saveView = fn.winsaveview()
-            local flags
-            flags = vim.b.luaFormatflags or [[--indent-width=4 --tab-width=4 --continuation-indent-width=4]]
-            cmd([[silent %!lua-format % ]] .. flags)
-            fn.winrestview(saveView)
-        elseif fileType == "json" then
-            if not ex("js-beautify") then return end
-            cmd [[silent %!js-beautify %]]
-        else
-            local saveView = fn.winsaveview()
-            cmd [[normal vae=]]
-            fn.winrestview(saveView)
-        end
-    else
-        local saveView = fn.winsaveview()
-        cmd [[normal! gv=]]
-        fn.winrestview(saveView)
-    end
-end -- }}}
-
-
-----
--- Function: M.config: Find and setup configuration for each LSP, including keymaps
-----
-M.config = function() -- {{{
-    local lspConfig = require("lspconfig")
-    local path      = require("plenary.path")
+return function()
     local lsp       = vim.lsp
     local fn        = vim.fn
-    local cmd       = vim.cmd
+    local lspConfig = require("lspconfig")
     local lspUtil   = require("lspconfig.util")
-    local M         = require("config.nvim-lsp")
+    local path      = require("plenary.path")
+    local servers   = require("config.nvim-mason-lspconfig").servers
     ----
     -- Function: onAttach :Mappings or commands need to be loaded when specific LSP is attach
     --
@@ -53,49 +13,35 @@ M.config = function() -- {{{
     ----
 
     local onAttach = function(client, bufNr) -- {{{
-        require("illuminate").on_attach(client)
+        -- TODO:
+        -- bmap(bufNr, "n", [[<A-n>]],   [[:lua require("util").addJump(require("illuminate").next_reference, false, {wrap = true})<CR>]],                 {"silent"})
+        -- bmap(bufNr, "n", [[<A-S-n>]], [[:lua require("util").addJump(require("illuminate").next_reference, false, {reverse = true, wrap = true})<CR>]], {"silent"})
 
-        bmap(bufNr, "n", [[<A-n>]],   [[:lua require("util").addJump(require("illuminate").next_reference, false, {wrap = true})<CR>]],                 {"silent"})
-        bmap(bufNr, "n", [[<A-S-n>]], [[:lua require("util").addJump(require("illuminate").next_reference, false, {reverse = true, wrap = true})<CR>]], {"silent"})
         -- Mappings
         -- bmap(bufNr, "n", [[gd]], require('telescope.builtin').lsp_definitions, "Telescope LSP definition")
         -- bmap(bufNr, "n", [[gD]], require('telescope.builtin').lsp_type_definitions, "Telescope LSP definition")
         -- bmap(bufNr, "n", [[gR]], require('telescope.builtin').lsp_references, "Telescope LSP references")
         -- bmap(bufNr, "n", [[gi]], require('telescope.builtin').lsp_implementations, "Telescope LSP implementation)
-        bmap(bufNr, "n", [[<C-f>a]],    require('telescope.builtin').lsp_code_actions,      "Telescope LSP code action")
-        bmap(bufNr, "n", [[<C-f>o]],    require('telescope.builtin').lsp_document_symbols,  "Telescope LSP document symbols")
-        bmap(bufNr, "n", [[<C-f>O]],    require('telescope.builtin').lsp_workspace_symbols, "Telescope LSP workspace symbols")
-        bmap(bufNr, "n", [[<leader>e]], [[:lua require('telescope.builtin').diagnostics{bufnr=0}<CR>]],
-            {"silent"}, "Telescope LSP document diagnostics")
-        bmap(bufNr, "n", [[<leader>E]], [[:lua require('telescope.builtin').diagnostics{bufnr=nil}<CR>]],
-            {"silent"}, "Telescope LSP workspace diagnostics")
-        bmap(bufNr, "n", [=[gD]=],        vim.lsp.buf.declaration,     "LSP documentation")
-        bmap(bufNr, "n", [=[gd]=],        vim.lsp.buf.definition,      "LSP definition")
-        bmap(bufNr, "n", [=[<leader>D]=], vim.lsp.buf.type_definition, "LSP type definition")
-        bmap(bufNr, "n", [=[gi]=],        vim.lsp.buf.implementation,  "LSP implementation")
-        bmap(bufNr, "n", [=[gR]=], luaRHS[[:lua
-    do
-        QuickfixSwitchWin = true;
-        vim.lsp.buf.references{includeDeclaration = false}
-    end<CR>
-]], "LSP references")
-        bmap(bufNr, "n", [[K]],          vim.lsp.buf.hover,          "LSP hover")
-        bmap(bufNr, "n", [[<C-p>]],      vim.lsp.buf.signature_help, "LSP signature help")
-        bmap(bufNr, "n", [[<leader>rn]], vim.lsp.buf.rename,         "LSP rename")
+        -- BUG:
+        -- bmap(bufNr, "n", [[<C-f>a]],    require('telescope.builtin').lsp_code_actions,      "Telescope LSP code action")
+        bmap(bufNr, "n", [[<C-f>o]], [[:lua require('telescope.builtin').lsp_document_symbols]],  {"silent"}, "Telescope LSP document symbols")
+        bmap(bufNr, "n", [[<C-f>O]], [[:lua require('telescope.builtin').lsp_workspace_symbols]], {"silent"}, "Telescope LSP workspace symbols")
+        bmap(bufNr, "n", [=[ga]=],        [[:lua vim.lsp.buf.code_action()<CR>]],     {"silent"}, "LSP code action")
+        bmap(bufNr, "n", [=[gd]=],        [[:lua vim.lsp.buf.definition()<CR>]],      {"silent"}, "LSP definition")
+        bmap(bufNr, "n", [=[gD]=],        [[:lua vim.lsp.buf.type_definition()<CR>]], {"silent"}, "LSP type definition")
+        bmap(bufNr, "n", [=[gi]=],        [[:lua vim.lsp.buf.implementation()<CR>]],  {"silent"}, "LSP implementation")
+        bmap(bufNr, "n", [=[<leader>D]=], [[:lua vim.lsp.buf.declaration()<CR>]],     {"silent"}, "LSP documentation")
+        bmap(bufNr, "n", [=[<leader>R]=], function()
+            QuickfixSwitchWin = true
+            vim.lsp.buf.references{includeDeclaration = false}
+        end, "LSP references")
+        bmap(bufNr, "n", "<leader>rn", [[:lua vim.lsp.buf.rename()<CR>]],           {"silent"}, "LSP rename")
+        bmap(bufNr, "n", [[K]],        [[:lua vim.lsp.buf.hover()<CR>]],            {"silent"}, "LSP hover")
+        bmap(bufNr, "n", [[<C-p>]],    [[:lua vim.lsp.buf.signature_help()<CR>]],   {"silent"}, "LSP signature help")
+        bmap(bufNr, "n", [[<A-f>]],    [[:lua vim.lsp.buf.format{async=true}<CR>]], {"silent"}, "LSP format")
         -- bmap(bufNr, "n", [=[<leader>wa]=], vim.lsp.buf.add_workspace_folder, "LSP add workspace folder")
         -- bmap(bufNr, "n", [=[<leader>wr]=], vim.lsp.buf.remove_workspace_folder, "LSP remove workspace folder")
         -- bmap(bufNr, "n", [=[<leader>wl]=], Print(vim.lsp.buf.list_workspace_folders, "LSP list workspace folder")
-        bmap(bufNr, "n", [[<C-q>e]], vim.diagnostic.setqflist, "LSP add workspace folder")
-        bmap(bufNr, "n", [[[e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"})
-        bmap(bufNr, "n", [[]e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"})
-        bmap(bufNr, "n", [[[E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"})
-        bmap(bufNr, "n", [[]E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"})
-        -- Override existing mapping if lsp support
-        if client.resolved_capabilities.document_formatting then
-            bmap(bufNr, "n", [=[<A-f>]=], [[:lua vim.lsp.buf.formatting()<CR>]],       {"silent"})
-        elseif client.resolved_capabilities.document_range_formatting then
-            bmap(bufNr, "n", [=[<A-f]=],  [[:lua vim.lsp.buf.range_formatting()<CR>]], {"silent"})
-        end
     end -- }}}
 
     -- LSP config override {{{
@@ -115,7 +61,7 @@ M.config = function() -- {{{
         'pyrightconfig.json',
         }
 
-    M.servers.pyright = {
+    servers.pyright = {
         settings  = {
             root_dir = lspUtil.root_pattern(unpack(pyRootFiles)),
             python = {
@@ -138,14 +84,13 @@ M.config = function() -- {{{
     }
     -- }}} Python
     -- Lua {{{
-    -- https://github.com/sumneko/lua-language-server
-    -- Settings: https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md#sumneko_lua
+    -- https://github.com/LuaLS/lua-language-server
+    -- Settings: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#lua_ls
 
-    M.servers.sumneko_lua = {
+    servers.lua_ls = {
         settings = {
             Lua = {
                 runtime = {
-                    -- For neovim
                     version = 'LuaJIT',
                 },
                 hint = {
@@ -159,8 +104,9 @@ M.config = function() -- {{{
                 diagnostics = {
                     globals = {'vim'},
                 },
-
                 workspace = {
+                    -- Make the server aware of Neovim runtime files
+                    library = vim.api.nvim_get_runtime_file("", true),
                     maxPreload      = 2000,
                     preloadFileSize = 1000,
                     ignoreDir       = {".vscode", ".git"},
@@ -176,7 +122,7 @@ M.config = function() -- {{{
         'vim',
         'help'
     }
-    M.servers.vimls = {
+    servers.vimls = {
         init_options = {
             isNeovim    = true,
             runtimepath = "",
@@ -205,7 +151,7 @@ M.config = function() -- {{{
             "--suggest-missing-includes",
             "--fallback-style=google"
         }
-
+        -- TODO: breaking change in clangd path
         local binaryExt       = {macOS = "", Linux = "", Windows = ".exe"}
         local sep             = jit.os == "Windows" and "\\" or "/"
         local dataPath   = path:new(fn.stdpath("data"))
@@ -224,7 +170,7 @@ M.config = function() -- {{{
 
     local clangdCMD = findClangd()
     if clangdCMD ~= "" then
-        M.servers.clangd = {
+        servers.clangd = {
             cmd = clangdCMD,
             init_options = {
                 -- capabilities         = {},
@@ -243,15 +189,6 @@ M.config = function() -- {{{
         }
     end
     -- }}} Clangd
-    M.servers.jsonls      = {}
-    M.servers.html        = {}
-    M.servers.tsserver    = {}
-    M.servers.yamlls      = {}
-    M.servers.tailwindcss = {}
-    M.servers.cssls       = {}
-    M.servers.bashls      = {}
-    M.servers.grammarly   = {}
-    M.servers.remark_ls   = {}
     -- }}} LSP config override
 
     -- vim.lsp and vim.diagnostic setups {{{
@@ -263,7 +200,7 @@ M.config = function() -- {{{
         severity_sort    = true,
     }
 
-    cmd [[
+    vim.cmd [[
     sign define DiagnosticSignError text= texthl=DiagnosticError linehl= numhl=DiagnosticError
     sign define DiagnosticSignWarn  text= texthl=DiagnosticWarn  linehl= numhl=DiagnosticWarn
     sign define DiagnosticSignInfo  text= texthl=DiagnosticInfo  linehl= numhl=DiagnosticInfo
@@ -273,50 +210,37 @@ M.config = function() -- {{{
     lsp.handlers["textDocument/signatureHelp"] = lsp.with(lsp.handlers.signature_help, {border = "rounded"})
     -- }}} vim.lsp and vim.diagnostic setups
 
-    -- Format mapping {{{
-    cmd [[command! -nargs=0 Format lua require("config.nvim-lsp").formatCode("n")]]
-    map("n", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("n")<CR>]], {"silent"})
-    map("x", [[<A-f>]], [[:lua require("config.nvim-lsp").formatCode("v")<CR>]], {"silent"})
-    -- }}} Format mapping
+    -- TODO:
+    -- Move to core/mapping.lua
+    -- Diagnostic mapping
+    map("n", [[<C-q>e]], [[:lua vim.diagnostic.setqflist()<CR>]], {"silent"}, "LSP add workspace folder")
+    map("n", [[[e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"})
+    map("n", [[]e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"})
+    map("n", [[[E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"})
+    map("n", [[]E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"})
+    if TelescopeGlobalState then
+        map("n", [[<leader>e]], [[:lua require('telescope.builtin').diagnostics{bufnr=0}<CR>]],
+            {"silent"}, "Telescope LSP document diagnostics")
+        map("n", [[<leader>E]], [[:lua require('telescope.builtin').diagnostics{bufnr=nil}<CR>]],
+        {"silent"}, "Telescope LSP workspace diagnostics")
+    else
+        map("n", [[<leader>e]], [[:lua vim.diagnostic.open_float()<CR>]], {"silent"}, "LSP diagnostics")
+    end
 
     -- Setup servers {{{
-    local lsp_installer_servers = require("nvim-lsp-installer.servers")
-    local snippetCapabilities   = vim.lsp.protocol.make_client_capabilities()
-    snippetCapabilities.textDocument.completion.completionItem.snippetSupport = true
-
     local basicConfig = {
         -- enable snippet support
-        capabilities = require("cmp_nvim_lsp").update_capabilities(snippetCapabilities),
+        capabilities = require("cmp_nvim_lsp").default_capabilities(),
         -- map buffer local keybindings when the language server attaches
         on_attach    = onAttach
     }
 
-
-    for _, server in pairs(vim.tbl_keys(M.servers)) do
-        local server_available, requested_server = lsp_installer_servers.get_server(server)
-        if server_available then
-            requested_server:on_ready(function ()
-                local config = {}
-                if server == "sumneko_lua" then
-                    config = require("lua-dev").setup{
-                        lspconfig = M.servers[server]
-                    }
-                    config = vim.tbl_deep_extend("force", basicConfig, config)
-                else
-                    config = vim.tbl_deep_extend("force", basicConfig, M.servers[server])
-                end
-                requested_server:setup(config)
-            end)
-            if not requested_server:is_installed() then
-                -- Queue the server to be installed
-                requested_server:install()
-            end
-        end
+    local config
+    for _, server in pairs(vim.tbl_keys(servers)) do
+        config = vim.tbl_deep_extend("force", basicConfig, servers[server])
+        lspConfig[server].setup(config)
     end
     -- }}} Setup servers
 
-end -- }}}
-
-
-return M
+end
 

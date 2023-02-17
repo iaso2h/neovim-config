@@ -13,13 +13,12 @@ local gls       = gl.section
 local condition = require("galaxyline.condition")
 -- local extension = require("galaxyline.provider_extensions")
 
+-- Filetype
 gl.short_line_list = {
     "LuaTree", "vista", "dbui", "startify", "term", "fugitive", "fugitiveblame",
     "plug", "coc-explorer", "Mundo", "MundoDiff", "vim-plug", "qf", "NvimTree",
     "dap-repl", "HistoryStartup", ""
 }
-
--- TODO support qf and statify
 
 local colors = {
     bright_bg1 = '#4C566A',
