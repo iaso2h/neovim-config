@@ -195,34 +195,45 @@ end -- }}}
 
 
 --- Convert arguments to match up the specified ones in vim.api.nvim_set_keymap()
----@param mode table Same as vim.api.nvim_set_keymap()
+---@param mode string|table Same as vim.api.nvim_set_keymap()
 ---@param lhs string Same as vim.api.nvim_set_keymap()
----@param rhs string Same as vim.api.nvim_set_keymap()
+---@param rhs string|function Same as vim.api.nvim_set_keymap()
 ---@param opts string|table Table value contain `h:map-arguments` strings
 -- that will be convert into table then passed into vim.api.nvim_set_keymap
 ---@param doc string key mapping description
 ---@return table, table, string
 local argConvert = function(mode, lhs, rhs, opts, doc)
+    local optsTbl
+    local modeTbl
     opts = opts or {}
     doc = doc or ""
 
-    -- Parameter "mode" can be either table value or string value, but parse
+    -- Parameter "mode" can be either table value or string value, but convert
     -- it as table anyway
-    mode = type(mode) == "string" and {mode} or mode
+    if type(mode) == "string" then
+        -- Convert "" into {"n", "x", "o"}. Do not use "" to map visual mode
+        -- inexplicitly, and possibly apply mapping to select mode as well
+        if mode == "" then
+            modeTbl = {"n", "x", "o"}
+        else
+            modeTbl = {mode}
+        end
+    else
+        modeTbl = mode
+    end
 
     -- Do not use "v" to map select mode inexplicitly
-    for _, modeStr in ipairs(mode) do
+    for _, modeStr in ipairs(modeTbl) do
         if modeStr == "v" then
             vim.notify(
                 string.format([=[Please use "x" to map [[%s]] for [[%s]] instead]=], lhs, rhs),
                 vim.log.levels.WARN)
             vim.notify(debug.traceback(), lhs, rhs, vim.log.levels.WARN)
             table[modeStr] = nil
-            table.insert(mode, "x")
+            table.insert(modeTbl, "x")
         end
     end
 
-    local optsTbl
     -- Parameter "opts" can be string value, which will be parsed as doc/description
     if type(opts) == "string" then
         doc = opts
@@ -231,66 +242,76 @@ local argConvert = function(mode, lhs, rhs, opts, doc)
         optsTbl = opts
     end
 
+
     -- Change string items in optsTbl into key-value pair table
     local optsKeyValTbl = {}
+    local rhsStr
+    -- Add description
+    if doc and doc ~= "" then
+        optsKeyValTbl.desc = doc
+        -- Disable whichkey temporarily
+        -- Register key documentation
+        -- if doc then
+            -- if not WhichKeyDocRegistered then
+                -- M.whichKeyDocs[lhs] = doc
+            -- else
+                -- require("which-key").register{lhs = doc}
+            -- end
+        -- end
+    end
+    -- Handle RHS function
+    if type(rhs) == "function" then
+        optsKeyValTbl.callback = rhs
+        rhsStr = ""
+    else
+        rhsStr = rhs
+    end
+    -- Cycle through optsTbl
     if next(optsTbl) then
         for _, val in ipairs(optsTbl) do
-            -- Handle RHS function
-            if type(rhs) == "function" then
-                optsKeyValTbl.callback = rhs
-                rhs = ""
-            -- Add description
-            elseif doc and doc ~= "" then
-                optsKeyValTbl.desc = doc
-                -- Disable whichkey temporarily
-                -- Register key documentation
-                -- if doc then
-                    -- if not WhichKeyDocRegistered then
-                        -- M.whichKeyDocs[lhs] = doc
-                    -- else
-                        -- require("which-key").register{lhs = doc}
-                    -- end
-                -- end
-            end
             optsKeyValTbl[val] = true
+
         end
     end
 
-
-    return mode, optsKeyValTbl, rhs
+    return modeTbl, optsKeyValTbl, rhsStr
 end
 
 
 --- Handy mapping func that wrap around the vim.api.nvim_set_keymap()
----@param mode table Same as vim.api.nvim_set_keymap()
+---@param mode string|table Same as vim.api.nvim_set_keymap()
 ---@param lhs string Same as vim.api.nvim_set_keymap()
----@param rhs string Same as vim.api.nvim_set_keymap()
----@param opts string|table Table value contain `h:map-arguments` strings
--- that will be convert into table then passed into vim.api.nvim_set_keymap
----@param ... string optional key mapping description
-function _G.map(mode, lhs, rhs, opts, ...) -- {{{
+---@param rhs string|function Same as vim.api.nvim_set_keymap()
+---@vararg ... table|string Optional table value contain `h:map-arguments` strings
+--- that will be convert into table then passed into vim.api.nvim_set_keymap.
+--- Optional key mapping description
+function _G.map(mode, lhs, rhs, ...) -- {{{
     -- Behavior difference between vim.keymap.set() and api.nvim_set_keymap()
     -- https://github.com/neovim/neovim/commit/6d41f65aa45f10a93ad476db01413abaac21f27d
     -- New api.nvim_set_keymap(): https://github.com/neovim/neovim/commit/b411f436d3e2e8a902dbf879d00fc5ed0fc436d3
-    local optsKeyValTbl
-    local modeTbl
     local doc
+    local opts
     local arg = {...}
-
-    if next(arg) and type(arg[1]) == "string" then
-        doc = arg[1]
+    if next(arg) then
+        if type(arg[1]) == "string" then
+            doc = arg[1]
+        elseif type(arg[1]) == "table" then
+            opts = arg[1]
+        elseif type(arg[2]) == "string" then
+            doc = arg[2]
+        end
     end
 
-    modeTbl, optsKeyValTbl, rhs = argConvert(mode, lhs, rhs, opts, doc)
+    local modeTbl, optsKeyValTbl, rhsStr = argConvert(mode, lhs, rhs, opts, doc)
 
     for _, m in ipairs(modeTbl) do
-        local ok, msg = pcall(api.nvim_set_keymap, m, lhs, rhs, optsKeyValTbl)
+        local ok, msg = pcall(api.nvim_set_keymap, m, lhs, rhsStr, optsKeyValTbl)
         if not ok then
             vim.notify(
-                string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhs),
+                string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhsStr),
                 vim.log.levels.ERROR)
             vim.notify(msg, vim.log.levels.ERROR)
-            return vim.notify(" ", vim.log.levels.INFO)
+            return vim.notify(debug.traceback(), vim.log.levels.ERROR)
         end
     end
 
@@ -314,26 +335,40 @@ end -- }}}
 
 
 --- Handy mapping func that wrap around the vim.api.nvim_set_keymap()
----@param mode table Same as vim.api.nvim_buf_et_keymap()
----@param lhs string Same as vim.api.nvim_buf_et_keymap()
----@param rhs string Same as vim.api.nvim_buf_et_keymap()
----@param optsTbl string/table Table value contain `h:map-arguments` strings
--- that will be convert into table then passed into vim.api.nvim_set_keymap
----@param doc string key mapping description
-function _G.bmap(bufNr, mode, lhs, rhs, optsTbl, doc) -- {{{
+---@param bufNr number Same as vim.api.nvim_set_keymap()
+---@param mode string|table Same as vim.api.nvim_set_keymap()
+---@param lhs string Same as vim.api.nvim_set_keymap()
+---@param rhs string|function Same as vim.api.nvim_set_keymap()
+---@vararg ... table|string
+--- Optional table value contain `h:map-arguments` strings
+--- that will be convert into table then passed into vim.api.nvim_set_keymap.
+--- Optional key mapping description
+function _G.bmap(bufNr, mode, lhs, rhs, ...) -- {{{
     assert(type(bufNr) == "number", "#1 argument is not a valid number")
-    local optsKeyValTbl
-    local modeTbl
-    modeTbl, optsKeyValTbl, rhs = argConvert(mode, lhs, rhs, optsTbl, doc)
+    local doc
+    local opts
+    local arg = {...}
+    if next(arg) then
+        if type(arg[1]) == "string" then
+            doc = arg[1]
+        elseif type(arg[1]) == "table" then
+            opts = arg[1]
+        elseif type(arg[2]) == "string" then
+            doc = arg[2]
+        end
+    end
+
+    local modeTbl, optsKeyValTbl, rhsStr = argConvert(mode, lhs, rhs, opts, doc)
 
     for _, m in ipairs(modeTbl) do
-        local ok, msg = pcall(api.nvim_buf_set_keymap, bufNr, m, lhs, rhs, optsKeyValTbl)
+        local ok, msg = pcall(api.nvim_buf_set_keymap, bufNr, m, lhs, rhsStr, optsKeyValTbl)
         if not ok then
             vim.notify(
-                string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhs),
+                string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhsStr),
                 vim.log.levels.ERROR)
+                Print(rhsStr)
             vim.notify(msg, vim.log.levels.ERROR)
-            return vim.notify(" ", vim.log.levels.INFO)
+            return vim.notify(debug.traceback(), vim.log.levels.ERROR)
         end
     end
 
@@ -557,27 +592,23 @@ function M.visualSelection(returnType, returnNormal) -- {{{
 end -- }}}
 
 
-----
--- Function: M.posDist Caculate the distance from pos1 to pos2
---
--- @param pos1:    {line, col} like table value contain {1, 0} based number.
---                 Can be retrieved by calling vim.api.nvim_buf_get_mark()
--- @param pos2:    Same as pos1
--- @param bias:    Bias number. Default value: 1
--- @param baisIdx: Bias index, possible value: 1 or 2. Default value: 1
--- @return: integer value of distance from pos1 to pos2
-----
-function M.posDist(pos1, pos2, bias, baisIdx)
-    bias    = bias or 1
-    baisIdx = baisIdx or 1
+--- Caculate the distance from pos1 to pos2
+---@param pos1 table {1, 0} based number. Can be retrieved by calling vim.api.nvim_buf_get_mark()
+---@param pos2 table Same as pos1
+---@param biasFactor number
+---@param biasIdx number To which value the factor is going to apply
+---@return number value of distance from pos1 to pos2
+function M.posDist(pos1, pos2, biasFactor, biasIdx)
+    biasFactor    = biasFactor or 1
+    biasIdx = biasIdx or 1
     local lineDist
     local colDist
-    if baisIdx == 1 then
-        lineDist = (pos1[1] - pos2[1])^2 * bias
+    if biasIdx == 1 then
+        lineDist = (pos1[1] - pos2[1])^2 * biasFactor
         colDist  = (pos1[2] - pos2[2])^2
     else
         lineDist = (pos1[1] - pos2[1])^2
-        colDist  = (pos1[2] - pos2[2])^2 * bias
+        colDist  = (pos1[2] - pos2[2])^2 * biasFactor
     end
     return lineDist + colDist
 end
