@@ -1,31 +1,63 @@
+-- File: selection
+-- Author: iaso2h
+-- Description: Selection Utilities
+-- Version: 0.0.9
+-- Last Modified: 2023-2-18
 local api = vim.api
 local cmd = vim.cmd
 local fn  = vim.fn
 local M   = {}
 
 
-function M.oppoSelection() -- {{{
+local jumpToEnd = function(selectEndPos)
+    local endLineLen = #api.nvim_buf_get_lines(0, selectEndPos[1] - 1, selectEndPos[1], false)[1]
+    -- In line-wise selection mode, the cursor is freely move horizontally
+    -- in the last while maintain the selection unchanged. In this case,
+    -- the cursor need to jump to where it located in the last line while
+    -- line-wise selection is active.
+    if selectEndPos[2] < endLineLen then
+        -- Length of line have to minus 1 to convert to (1,0) based
+        api.nvim_win_set_cursor(0, {selectEndPos[1], endLineLen - 1})
+    else
+        api.nvim_win_set_cursor(0, selectEndPos)
+    end
+
+end
+
+local jumpToStart = function(selectStartPos)
+    api.nvim_win_set_cursor(0, selectStartPos)
+end
+
+
+--- Jump to the corner position of the last previous selection area
+---@param bias number 1 or -1. Set to 1 will make cursor jump to the closest
+--- corner. Set to -1 to make cursor jump to furthest corner
+function M.cornerSelection(bias) -- {{{
     local curPos         = api.nvim_win_get_cursor(0)
-    local startSelectPos = api.nvim_buf_get_mark(0, "<")
-    if startSelectPos[1] == 0 then return end  -- Sanity check
-    local endSelectPos   = api.nvim_buf_get_mark(0, ">")
-    if curPos[1] == startSelectPos[1] then
-        api.nvim_win_set_cursor(0, endSelectPos)
+    local selectStartPos = api.nvim_buf_get_mark(0, "<")
+    if selectStartPos[1] == 0 then return end  -- Sanity check
+    local selectEndPos   = api.nvim_buf_get_mark(0, ">")
+    if curPos[1] == selectStartPos[1] then
+        api.nvim_win_set_cursor(0, selectEndPos)
         return
-    elseif curPos[1] == endSelectPos[1] then
-        api.nvim_win_set_cursor(0, startSelectPos)
+    elseif curPos[1] == selectEndPos[1] then
+        api.nvim_win_set_cursor(0, selectStartPos)
         return
     end
-    local closerToEnd = require("util").posDist(startSelectPos, curPos) > require("util").posDist(endSelectPos, curPos)
-    if closerToEnd then
-        local endSelectLen = #api.nvim_buf_get_lines(0, endSelectPos[1] - 1, endSelectPos[1], false)[1]
-        if endSelectLen < endSelectPos[2] then
-            api.nvim_win_set_cursor(0, {endSelectPos[1], endSelectLen - 1})
+
+    local closerToEnd = require("util").posDist(selectStartPos, curPos) < require("util").posDist(selectEndPos, curPos)
+    if bias == 1 then
+        if closerToEnd then
+            jumpToStart(selectStartPos)
         else
-            api.nvim_win_set_cursor(0, endSelectPos)
+            jumpToEnd(selectEndPos)
         end
-    else
-        api.nvim_win_set_cursor(0, startSelectPos)
+    elseif bias == -1 then
+        if closerToEnd then
+            jumpToStart(selectStartPos)
+        else
+            jumpToEnd(selectEndPos)
+        end
     end
 end -- }}}
 
