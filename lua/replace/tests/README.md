@@ -6,6 +6,5 @@
 * [plenary.nvim](https://github.com/nvim-lua/plenary.nvim)(optional) to run tests
 
 # How to run test
-* Make sure have [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) installed and is included in neovim runtime path
-* Run `nvim --headless -c "PlenaryBustedDirectory <path_to_the_tests_dir/path_to_the_spec_file>` in command line.
-* Run Neovim instance, and then run `:PlenaryBustedDirectory <path_to_the_tests_dir>` in command mode.
+* Naviagte to the tests folder in terminal
+* Run `nvim --clean --headless -u .\minimal_init.lua -c "PlenaryBustedFile ./replace_operator_spec.lua"`

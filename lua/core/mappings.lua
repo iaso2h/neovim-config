@@ -34,21 +34,21 @@ map("n", [[<A-s>]], [[<Nop>]])
 map("x", [[<A-a>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), 1)<CR>]],  {"silent"}, "Expand selection")
 map("x", [[<A-s>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), -1)<CR>]], {"silent"}, "Shrink selection")
 -- Run selected
-map("x", [[gM]], luaRHS[[:lua vim.cmd(
+-- TODO: Make it only run in lua filetype
+map("x", [[gM]], function()
+    vim.cmd(
     string.format("lua %s",
-        luaRHS(require("selection").getSelect("string"))
-    )
-)<CR>]],
-{"silent"}, "Run selected line in lua")
+    require("selection").getSelect("string")))
+end, {"silent"}, "Run selected line in lua")
 -- Interesting word {{{
-map("n", [[<Plug>InterestingWordOperator]],
-luaRHS[[luaeval("
-    require('operator').expr(
-        require('interestingWord').operator,
+map("n", [[<Plug>InterestingWordOperator]], function ()
+        return vim.fn.luaeval[[
+        require("operator").expr(require("interestingWord").operator,
         false,
-        '<Plug>InterestingWordOperator')
-    ")
-]], {"expr", "silent"}, "Interesting word operator")
+        "<Plug>InterestingWordOperator")
+        ]]
+end, {"expr", "silent"}, "Interesting word operator")
+
 map("x", [[<Plug>InterestingWordVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisual", vim.v.register);
@@ -57,15 +57,16 @@ luaRHS[[:lua
     table.insert(vMotion, "<Plug>InterestingWordVisual");
     require("interestingWord").operator(vMotion)<CR>]],
 {"silent"}, "Mark selected as interesting words")
-map("n", [[<Plug>InterestingWordVisual]],
-luaRHS[[:lua
-    vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisual", vim.v.register);
-    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0));
 
-    local vMotion = require("operator").vMotion(true);
-    table.insert(vMotion, "<Plug>InterestingWordVisual");
-    require("interestingWord").operator(vMotion)<CR>]],
-{"silent"}, "Visual-repeat for interesting words")
+map("n", [[<Plug>InterestingWordVisual]], function ()
+    vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisual", vim.v.register)
+    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
+
+    local vMotion = require("operator").vMotion(true)
+    table.insert(vMotion, "<Plug>InterestingWordVisual")
+    require("interestingWord").operator(vMotion)
+end, {"silent"}, "Visual-repeat for interesting words")
+
 map("n", [[gw]],        [[<Plug>InterestingWordOperator]], "Highlight interesting word...")
 map("x", [[gw]],        [[<Plug>InterestingWordVisual]],   "Highlight selected as interesting words")
 map("n", [[gww]],       [[:lua require("interestingWord").reapplyColor()<CR>]], {"silent"}, "Recolor last interesting word")
@@ -73,24 +74,24 @@ map("n", [[<leader>w]], [[:lua require("interestingWord").clearColor()<CR>]],   
 map("n", [[<leader>W]], [[:lua require("interestingWord").restoreColor()<CR>]], {"silent"}, "Restore interesting word")
 -- }}} Interesting word
 -- Zeal query {{{
-map("n", [[<Plug>ZealOperator]],
-luaRHS[[luaeval(
-    "require('operator').expr(
-        require('zeal').zeal,
+map("n", [[<Plug>ZealOperator]], function ()
+    return vim.fn.luaeval[[
+    require("operator").expr(
+        require("zeal").zeal,
         false,
-        '<Plug>ZealOperator')
-    ")
-]],
-{"silent", "expr"}, "Zeal look up operator")
-map("n", [[<Plug>ZealOperatorGlobal]],
-luaRHS[[luaeval(
-    "require('operator').expr{
-        require('zeal').zealGlobal,
+        "<Plug>ZealOperator")
+    ]]
+end, {"silent", "expr"}, "Zeal look up operator")
+
+map("n", [[<Plug>ZealOperatorGlobal]], function ()
+    return vim.fn.luaeval[[
+    require("operator").expr{
+        require("zeal").zealGlobal,
         false,
-        '<Plug>ZealOperatorGlobal'}
-    ")
-]],
-{"silent", "expr"}, "Zeal look up universally operator")
+        "<Plug>ZealOperatorGlobal"}
+    ]]
+end, {"silent", "expr"}, "Zeal look up universally operator")
+
 map("x", [[<Plug>ZealVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>ZealVisual", vim.v.register);
@@ -99,15 +100,16 @@ luaRHS[[:lua
     table.insert(vMotion, "<Plug>ZealVisual");
     require("zeal").zeal(vMotion)<CR>]],
 {"silent"}, "Zeal look up selected")
-map("n", [[<Plug>ZealVisual]],
-luaRHS[[:lua
-    vim.fn["repeat#setreg"](t"<Plug>ZealVisual", vim.v.register);
-    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0));
 
-    local vMotion = require("operator").vMotion(true);
-    table.insert(vMotion, "<Plug>ZealVisual");
-    require("zeal").zeal(vMotion)<CR>]],
-{"silent"}, "Zeal look up selected")
+map("n", [[<Plug>ZealVisual]], function ()
+    vim.fn["repeat#setreg"](t"<Plug>ZealVisual", vim.v.register)
+    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
+
+    local vMotion = require("operator").vMotion(true)
+    table.insert(vMotion, "<Plug>ZealVisual")
+    require("zeal").zeal(vMotion)
+end, {"silent"}, "Zeal look up selected")
+
 map("n", [[gz]], [[<Plug>ZealOperator]],       "Zeal look up...")
 map("n", [[gZ]], [[<Plug>ZealOperatorGlobal]], "Zeal look up...universally")
 map("x", [[Z]],  [[<Plug>ZealVisual]], "Zeal look up selected")
@@ -117,15 +119,15 @@ map("x", [[<C-s>]], [[:lua require("selection").visualSub()<CR>]],        {"sile
 -- HistoryStartup
 map("n", [[<C-s>]], [[:lua require("historyStartup").display(true)<CR>]], {"silent"}, "Enter HistoryStartup")
 -- Extraction
-map("n", [[<Plug>Extract]],
-luaRHS[[luaeval(
-    "require('operator').expr(
-        require('extraction').operator,
+map("n", [[<Plug>Extract]], function ()
+    return vim.fn.luaeval[[
+    require("operator").expr(
+        require("extraction").operator,
         false,
-        '<Plug>Extract')
-    ")
-]],
-{"silent", "expr"}, "Extract operator")
+        "<Plug>Extract")
+    ]]
+end, {"silent", "expr"}, "Extract operator")
+
 map("x", [[<Plug>ExtractVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>ExtractVisual", vim.v.register);
@@ -134,15 +136,16 @@ luaRHS[[:lua
     table.insert(vMotion, "<Plug>ExtractVisual");
     require("extraction").operator(vMotion)<CR>]],
 {"silent"}, "Extract selected")
-map("n", [[<Plug>ExtractVisual]],
-luaRHS[[:lua
-    vim.fn["repeat#setreg"](t"<Plug>ExtractVisual", vim.v.register);
-    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0));
 
-    local vMotion = require("operator").vMotion(true);
-    table.insert(vMotion, "<Plug>ExtractVisual");
-    require("extraction").operator(vMotion)<CR>]],
-{"silent"}, "Extract selected")
+map("n", [[<Plug>ExtractVisual]], function ()
+    vim.fn["repeat#setreg"](t"<Plug>ExtractVisual", vim.v.register)
+    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
+
+    local vMotion = require("operator").vMotion(true)
+    table.insert(vMotion, "<Plug>ExtractVisual")
+    require("extraction").operator(vMotion)
+end, {"silent"}, "Extract selected")
+
 map("n", [[gc]], [[<Plug>Extract]], "Extract operator")
 -- TODO: implement with visualreapet?
 -- map("x", [[<Plug>fallbackC]], [[<CMD>norm! gvC<CR>]])
@@ -175,31 +178,47 @@ map("n", [[d<Space>]], [[<CMD>call setline(".", "")<CR>]],  {"silent"}, "Empty c
 map("n", [[cn]], [[v:hlsearch? "cgn" : "g*``cgn"]], {"noremap", "expr"}, "Change whole word under cursor, then highlight it forward")
 map("n", [[cN]], [[v:hlsearch? "cgN" : "g#``cgN"]], {"noremap", "expr"}, "Change whole word under cursor, then highlight it backward")
 -- Replace
-map("n", [[<Plug>ReplaceOperatorRestoreCursor]],
-    luaRHS[[luaeval("require('replace').expr(true)")]],
-    {"silent", "expr"}, "Replace operator and restore the cursor position"
-)
-map("n", [[<Plug>ReplaceOperator]],
-    luaRHS[[luaeval("require('replace').expr(false)")]],
-    {"silent", "expr"}, "Replace operator"
-)
+map("n", [[<Plug>ReplaceOperatorInplace]], function ()
+    return vim.fn.luaeval [[require("replace").expr(true)]]
+end, {"silent", "expr"}, "Replace operator and restore the cursor position")
+
+map("n", [[<Plug>ReplaceOperator]], function ()
+    return vim.fn.luaeval [[require("replace").expr(false)]]
+end, {"silent", "expr"}, "Replace operator")
+
 map("n", [[<Plug>ReplaceExpr]],
     [[<CMD>let g:ReplaceExpr=getreg("=")<Bar>exec "norm!" . v:count1 . "."<CR>]],
     {"silent"}, "Replace expression"
 )
-map("n", [[<Plug>ReplaceCurLine]],
-    luaRHS[[
-    :lua require("replace").replaceSave();
 
-    vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register);
+map("n", [[<Plug>ReplaceCurLine]], function ()
+    require("replace").replaceSave()
+
+    vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register)
 
     if require("replace").regType == "=" then
         vim.g.ReplaceExpr = vim.fn.getreg("=")
-    end;
+    end
 
-    require("replace").operator{"line", "V", "<Plug>ReplaceCurLine", true}<CR>
-    ]],
-    {"noremap", "silent"}, "Replace current line")
+    require("replace").operator{"line", "V", "<Plug>ReplaceCurLine", true}
+end, {"noremap", "silent"}, "Replace current line")
+
+-- HACK: function passed in to arg will ignore current selected region
+
+-- map("x", [[<Plug>ReplaceVisual]], function ()
+    -- require("replace").replaceSave()
+
+    -- vim.fn["repeat#setreg"](t"<Plug>ReplaceVisual", vim.v.register)
+
+    -- if require("replace").regType == "=" then
+        -- vim.g.ReplaceExpr = vim.fn.getreg("=")
+    -- end
+
+    -- local vMotion = require("operator").vMotion(false)
+    -- table.insert(vMotion, "<Plug>ReplaceVisual")
+    -- require("replace").operator(vMotion)
+-- end, {"noremap", "silent"}, "Replace selected")
+
 map("x", [[<Plug>ReplaceVisual]],
     luaRHS[[
     :lua require("replace").replaceSave();
@@ -215,28 +234,27 @@ map("x", [[<Plug>ReplaceVisual]],
     require("replace").operator(vMotion)<CR>
     ]],
     {"noremap", "silent"}, "Replace selected")
-map("n", [[<Plug>ReplaceVisual]],
-    luaRHS[[
-    :lua require("replace").replaceSave();
 
-    vim.fn["repeat#setreg"](t"<Plug>ReplaceVisual", vim.v.register);
+map("n", [[<Plug>ReplaceVisual]], function ()
+    require("replace").replaceSave()
+
+    vim.fn["repeat#setreg"](t"<Plug>ReplaceVisual", vim.v.register)
 
     if require("replace").regType == "=" then
         vim.g.ReplaceExpr = vim.fn.getreg("=")
-    end;
+    end
 
-    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0));
+    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
 
-    local vMotion = require("operator").vMotion(false);
-    table.insert(vMotion, "<Plug>ReplaceVisual");
-    require("replace").operator(vMotion)<CR>
-    ]],
-    {"noremap", "silent"}, "Visual-repeat for replaced selected")
+    local vMotion = require("operator").vMotion(false)
+    table.insert(vMotion, "<Plug>ReplaceVisual")
+    require("replace").operator(vMotion)
+end, {"noremap", "silent"}, "Visual-repeat for replaced selected")
 
-map("n", [[gr]],  [[<Plug>ReplaceOperatorRestoreCursor]], "Replace operator and restore the cursor position")
-map("n", [[gru]], [[<Plug>ReplaceOperator]],              "Replace operator")
-map("n", [[grr]], [[<Plug>ReplaceCurLine]],               "Replace current line")
-map("x", [[R]],   [[<Plug>ReplaceVisual]],                "Replace selected")
+map("n", [[gr]],  [[<Plug>ReplaceOperatorInplace]], "Replace operator and restore the cursor position")
+map("n", [[gru]], [[<Plug>ReplaceOperator]],        "Replace operator")
+map("n", [[grr]], [[<Plug>ReplaceCurLine]],         "Replace current line")
+map("x", [[R]],   [[<Plug>ReplaceVisual]],          "Replace selected")
 -- TODO: replaceWordUnderCarret
 
 map("n", [[<Plug>ReplaceUnderForward]],
@@ -440,9 +458,10 @@ map("n", [[gP]], [[gp]], "Select last put")
 -- Inplace join
 map("n", [[J]], [[m`J``]], {"noremap"})
 -- Inplace yank
-map("", [[<Plug>InplaceYank]],
-[[luaeval("require('operator').expr(require('yankPut').inplaceYank, false, '<Plug>InplaceYank')")]],
-{"expr", "silent"}, "Yank operator")
+map("", [[<Plug>InplaceYank]], function ()
+   return vim.fn.luaeval[[require("operator").expr(require("yankPut").inplaceYank, false, "<Plug>InplaceYank")]]
+end, {"expr", "silent"}, "Yank operator")
+
 map("", [[y]], [[<Plug>InplaceYank]], "Yank operator")
 map({"n", "x"}, [[Y]], [[yy]], "Yank line")
 -- Inplace put

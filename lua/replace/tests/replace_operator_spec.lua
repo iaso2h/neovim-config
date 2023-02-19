@@ -1,80 +1,5 @@
 local api = vim.api
-
-local function setUpMapping() -- {{{
-    require("util")
-
-    map("n", [[<Plug>ReplaceOperatorRestoreCursor]],
-        luaRHS[[luaeval("require('replace').expr(true)")]],
-        {"silent", "expr"}, "Replace operator and restore the cursor position"
-    )
-    map("n", [[<Plug>ReplaceOperator]],
-        luaRHS[[luaeval("require('replace').expr(false)")]],
-        {"silent", "expr"}, "Replace operator"
-    )
-    map("n", [[<Plug>ReplaceExpr]],
-        [[<CMD>let g:ReplaceExpr=getreg("=")<Bar>exec "norm!" . v:count1 . "."<CR>]],
-        {"silent"}, "Replace expression"
-    )
-    map("n", [[<Plug>ReplaceCurLine]],
-        luaRHS[[
-        :lua require("replace").replaceSave();
-
-        vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register);
-
-        if require("replace").regType == "=" then
-            vim.g.ReplaceExpr = vim.fn.getreg("=")
-        end;
-
-        require("replace").operator{"line", "V", "<Plug>ReplaceCurLine", true}<CR>
-        ]],
-        {"noremap", "silent"}, "Replace current line")
-    map("x", [[<Plug>ReplaceVisual]],
-        luaRHS[[
-        :lua require("replace").replaceSave();
-
-        vim.fn["repeat#setreg"](t"<Plug>ReplaceVisual", vim.v.register);
-
-        if require("replace").regType == "=" then
-            vim.g.ReplaceExpr = vim.fn.getreg("=")
-        end;
-
-        local vMotion = require("operator").vMotion(false);
-        table.insert(vMotion, "<Plug>ReplaceVisual");
-        require("replace").operator(vMotion)<CR>
-        ]],
-        {"noremap", "silent"}, "Replace selected")
-    map("n", [[<Plug>ReplaceVisual]],
-        luaRHS[[
-        :lua require("replace").replaceSave();
-
-        vim.fn["repeat#setreg"](t"<Plug>ReplaceVisual", vim.v.register);
-
-        if require("replace").regType == "=" then
-            vim.g.ReplaceExpr = vim.fn.getreg("=")
-        end;
-
-        vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0));
-
-        local vMotion = require("operator").vMotion(false);
-        table.insert(vMotion, "<Plug>ReplaceVisual");
-        require("replace").operator(vMotion)<CR>
-        ]],
-        {"noremap", "silent"}, "Visual-repeat for replaced selected")
-
-    map("n", [[gr]],  [[<Plug>ReplaceOperatorRestoreCursor]], "Replace operator and restore the cursor position")
-    map("n", [[gru]], [[<Plug>ReplaceOperator]],              "Replace operator")
-    map("n", [[grr]], [[<Plug>ReplaceCurLine]],               "Replace current line")
-    map("x", [[R]],   [[<Plug>ReplaceVisual]],                "Replace selected")
-
-    map("n", [[<Plug>ReplaceUnderForward]],
-        [[:lua require("changeUnder").init("gruiw", 1, "<Plug>ReplaceUnderForward")<CR>]],
-        {"silent"}, "Replace the whold word under curosr, then highlight it forward")
-    map("n", [[<Plug>ReplaceUnderBackward]],
-        [[:lua require("changeUnder").init("gruiw", 0, "<Plug>ReplaceUnderBackward")<CR>]],
-        {"silent"}, "Replace the whold word under curosr, then highlight it backward")
-    map("n", [[grn]], [[<Plug>ReplaceUnderForward]], "Replace the whold word under curosr, then highlight it forward")
-    map("n", [[grN]], [[<Plug>ReplaceUnderBackward]], "Replace the whold word under curosr, then highlight it backward")
-end -- }}}
+local fn  = vim.fn
 
 
 local function findCursorIndicator(cursorChar, inputTbl)
@@ -114,16 +39,19 @@ local function setUpBuffer(input, filetype) -- {{{
 end -- }}}
 
 
-local function runCommandAndAssert(feedkeys, expected) -- {{{
-    api.nvim_feedkeys(api.nvim_replace_termcodes(feedkeys, true, true, true),
+--- Run command and then assert the output with expected
+--- @param feedkeys string Commands to execute in Neovim
+--- @param expected string Multi-lines content of the output
+local runCommandAndAssert = function(feedkeys, expected) -- {{{
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(feedkeys, true, true, true),
                         "x", false)
-    local resultLines = api.nvim_buf_get_lines(0, 0, api.nvim_buf_line_count(0), false)
-    local cursorPos, expectedLines = findCursorIndicator("^", vim.split(expected, "\n"))
+    local resultLines = vim.api.nvim_buf_get_lines(0, 0, vim.api.nvim_buf_line_count(0), false)
+    local expectCursorPos, expectedLines = findCursorIndicator("^", vim.split(expected, "\n"), false)
 
     assert.are.same(expectedLines, resultLines)
-    if cursorPos then
-        local newPos = api.nvim_win_get_cursor(0)
-        assert.are.same(cursorPos, newPos)
+    if expectCursorPos and next(expectCursorPos) then
+        local resultCursorPos = vim.api.nvim_win_get_cursor(0)
+        assert.are.same(expectCursorPos, resultCursorPos)
     end
 end -- }}}
 
@@ -159,13 +87,12 @@ describe('Replace operator', function() -- {{{
     if reg.type == "v" or (rushing and robbing.type == "V" and linesCnt == 1) then
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "obbin", "c")
+                fn.setreg("a", "obbin", "c")
                 runCommandAndAssert([["agrl]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "ushing and ro", "c")
+                fn.setreg("a", "ushing and ro", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -182,13 +109,12 @@ describe('Replace operator', function() -- {{{
     if reg.type == "v" or (frandrogleg.type == "V" and linesCnt == 1) then
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "dogl", "c")
+                fn.setreg("a", "dogl", "c")
                 runCommandAndAssert([["agrh]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "frandr", "c")
+                fn.setreg("a", "frandr", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -205,13 +131,12 @@ describe('Replace operator', function() -- {{{
     if reg.type == "v" or (room
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "uthless", "c")
+                fn.setreg("a", "uthless", "c")
                 runCommandAndAssert([["agr$]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "oom", "c")
+                fn.setreg("a", "oom", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -228,13 +153,12 @@ describe('Replace operator', function() -- {{{
     if reg.typer's script peg.type == "V" and linesCnt == 1) then
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "script p", "c")
+                fn.setreg("a", "script p", "c")
                 runCommandAndAssert([["agrTe]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "r's ", "c")
+                fn.setreg("a", "r's ", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
         end) -- }}}
@@ -271,13 +195,12 @@ describe('Replace operator', function() -- {{{
             end
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "c")
+                fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "c")
                 runCommandAndAssert([["agr3j]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "Lorem ipsum dolor sit amet.", "c")
+                fn.setreg("a", "Lorem ipsum dolor sit amet.", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -312,13 +235,12 @@ if reindentCnt < 0 then
                                         end
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "c")
+                fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "c")
                 runCommandAndAssert([["agr3k]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "Lorem ipsum dolor sit amet.", "c")
+                fn.setreg("a", "Lorem ipsum dolor sit amet.", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -350,13 +272,12 @@ if reindentCnt < 0 then
                                         fidne
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "endif", "c")
+                fn.setreg("a", "endif", "c")
                 runCommandAndAssert([["agr4k]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "fidne", "c")
+                fn.setreg("a", "fidne", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -388,13 +309,12 @@ if reindentCnt < 0 then
             end
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "foo", "c")
+                fn.setreg("a", "foo", "c")
                 runCommandAndAssert([["agr3_]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "bar", "c")
+                fn.setreg("a", "bar", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
         end) -- }}}
@@ -413,13 +333,12 @@ if reindentCnt < 0 then
             reg.content = string.global_sub(arg1, 55 .. reindents, "")
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "find(val1, 2 ", "c")
+                fn.setreg("a", "find(val1, 2 ", "c")
                 runCommandAndAssert([["agr2W]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "global_sub(arg1, 55 ", "c")
+                fn.setreg("a", "global_sub(arg1, 55 ", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -439,13 +358,12 @@ local reindentCnt = reindent(reg, regionMotion, motionDirection)
 local reindentCnt = reindent(reg, regionMotion, motionDirection + getreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", " ge", "c")
+                fn.setreg("a", " ge", "c")
                 runCommandAndAssert([["agr4ge]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", " + ", "c")
+                fn.setreg("a", " + ", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -466,13 +384,12 @@ if M then
 It said: call_me
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "call_", "c")
+                fn.setreg("a", "call_", "c")
                 runCommandAndAssert([["agr5b]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "It said: ", "c")
+                fn.setreg("a", "It said: ", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -497,13 +414,12 @@ It said: call_me
         if not factor + number ~= 1 then
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "number ~", "c")
+                fn.setreg("a", "number ~", "c")
                 runCommandAndAssert([["agr6b]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "factor + ", "c")
+                fn.setreg("a", "factor + ", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
         end) -- }}}
@@ -576,13 +492,12 @@ foobar
 while true
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "while", "c")
+                fn.setreg("a", "while", "c")
                 runCommandAndAssert([["agr3{]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "foobar", "c")
+                fn.setreg("a", "foobar", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -650,13 +565,12 @@ while true
         return true
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "foo", "c")
+                fn.setreg("a", "foo", "c")
                 runCommandAndAssert([["agr4}]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "bar", "c")
+                fn.setreg("a", "bar", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
         end) -- }}}
@@ -675,13 +589,12 @@ while true
         api.nvim_win_set_cursor(0, {M.cursorPos[1], #bar})
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "foo", "c")
+                fn.setreg("a", "foo", "c")
                 runCommandAndAssert([["agriw]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "bar", "c")
+                fn.setreg("a", "bar", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -698,13 +611,12 @@ while true
             api.nvim_win_set_cursor[index]
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "(2 * (index - 1))", "c")
+                fn.setreg("a", "(2 * (index - 1))", "c")
                 runCommandAndAssert([["agra)]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "[index]", "c")
+                fn.setreg("a", "[index]", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -722,13 +634,12 @@ while true
             local repEndLine = api.nvim_buf_get_lines_tbl[1]
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "(bufNr, start, end, true)", "c")
+                fn.setreg("a", "(bufNr, start, end, true)", "c")
                 runCommandAndAssert([["agra)]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "_tbl", "c")
+                fn.setreg("a", "_tbl", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -752,13 +663,12 @@ while true
 </ul>
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", '<List name="foo">', "c")
+                fn.setreg("a", '<List name="foo">', "c")
                 runCommandAndAssert([["agra<]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "</li>", "c")
+                fn.setreg("a", "</li>", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -799,13 +709,12 @@ while true
   <div>
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "meta none", "c")
+                fn.setreg("a", "meta none", "c")
                 runCommandAndAssert([["agri<]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "foobar", "c")
+                fn.setreg("a", "foobar", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -826,13 +735,12 @@ while true
 </ul>
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "URL", "c")
+                fn.setreg("a", "URL", "c")
                 runCommandAndAssert([["agri<]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "/ul", "c")
+                fn.setreg("a", "/ul", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -849,13 +757,12 @@ while true
     local opts = {vimMode = 'n'}
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "timeout = 150", "c")
+                fn.setreg("a", "timeout = 150", "c")
                 runCommandAndAssert([["agri{]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "vimMode = 'n'", "c")
+                fn.setreg("a", "vimMode = 'n'", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -879,13 +786,12 @@ while true
         }
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "foo", "c")
+                fn.setreg("a", "foo", "c")
                 runCommandAndAssert([["agri{]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "bar", "c")
+                fn.setreg("a", "bar", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -902,13 +808,12 @@ api.nvim_buf_add_highlight(curBufNr, repHLNS, opts[myHighlightGroup], lineNr, co
 api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols[2])
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "myHighlightGroup", "c")
+                fn.setreg("a", "myHighlightGroup", "c")
                 runCommandAndAssert([["agri[]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "'foo'", "c")
+                fn.setreg("a", "'foo'", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -925,14 +830,13 @@ api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols
             it("foobar", function()
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 assert.are.same(api.nvim_win_get_cursor(0), {1, 21})
                 -- replace
-                vim.fn.setreg("a", "bar", "c")
+                fn.setreg("a", "bar", "c")
                 runCommandAndAssert([["agri"]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "foobar", "c")
+                fn.setreg("a", "foobar", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -949,13 +853,12 @@ api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols
         fn["foobar"](t"<Plug>ReplaceExpr")
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "addSortedDataToTable", "c")
+                fn.setreg("a", "addSortedDataToTable", "c")
                 runCommandAndAssert([["agri"]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "foobar", "c")
+                fn.setreg("a", "foobar", "c")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
         end) -- }}}
@@ -978,15 +881,14 @@ find
         local api  = vim.api
                 ]]
 
-                    setUpMapping()
                     setUpBuffer(input, "lua")
                     -- replace
                     vim.cmd("norm! mm")
-                    vim.fn.setreg("a", "lsp.", "c")
+                    fn.setreg("a", "lsp.", "c")
                     runCommandAndAssert([[gg"agr`m]], expected)
                     -- replace, via dot
                     vim.cmd("norm! 0")
-                    vim.fn.setreg("a", "fin", "c")
+                    fn.setreg("a", "fin", "c")
                     runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
         end) -- }}}
@@ -1013,15 +915,14 @@ find
     if reg.type == "v" or (rashingbbing.type == "V" and linesCnt == 1) then
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
                 -- NOTE: same results
-                -- vim.fn.setreg("a", "o\nbbin\n", "V")
-                vim.fn.setreg("a", "ubbin", "V")
+                -- fn.setreg("a", "o\nbbin\n", "V")
+                fn.setreg("a", "ubbin", "V")
                 runCommandAndAssert([["agrl]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "ashing", "V")
+                fn.setreg("a", "ashing", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1037,13 +938,12 @@ find
                 local expectedDot = [[
     if reg.type == "v" or (test_Foobareg.type == "V" and linesCnt == 1) then
             ]]
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "foobar", "v")
+                fn.setreg("a", "foobar", "v")
                 runCommandAndAssert([["agrh]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "test_F", "V")
+                fn.setreg("a", "test_F", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1060,13 +960,12 @@ find
     if reg.type == "v" or (room
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "uthless", "V")
+                fn.setreg("a", "uthless", "V")
                 runCommandAndAssert([["agr$]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "oom", "V")
+                fn.setreg("a", "oom", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1083,13 +982,12 @@ find
     if reg.typer's luascript peg.type == "V" and linesCnt == 1) then
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "script p", "V")
+                fn.setreg("a", "script p", "V")
                 runCommandAndAssert([["agrTe]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "                                  r's lua      \n\t         ", "V")
+                fn.setreg("a", "                                  r's lua      \n\t         ", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
         end) -- }}}
@@ -1126,13 +1024,12 @@ find
             end
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "V")
+                fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "V")
                 runCommandAndAssert([["agr3j]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "Lorem ipsum dolor sit amet.", "V")
+                fn.setreg("a", "Lorem ipsum dolor sit amet.", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1167,13 +1064,12 @@ if reindentCnt < 0 then
                                         end
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "V")
+                fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "V")
                 runCommandAndAssert([["agr3k]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "Lorem ipsum dolor sit amet.", "V")
+                fn.setreg("a", "Lorem ipsum dolor sit amet.", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1205,13 +1101,12 @@ if reindentCnt < 0 then
                                         fidne
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "endif", "V")
+                fn.setreg("a", "endif", "V")
                 runCommandAndAssert([["agr4k]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "fidne", "V")
+                fn.setreg("a", "fidne", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1243,13 +1138,12 @@ if reindentCnt < 0 then
             end
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "foo", "V")
+                fn.setreg("a", "foo", "V")
                 runCommandAndAssert([["agr3_]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "bar", "V")
+                fn.setreg("a", "bar", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
         end) -- }}}
@@ -1268,13 +1162,12 @@ if reindentCnt < 0 then
             reg.content = string.global_sub(arg1, arg2,val3.. reindents, "")
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "find(val1, val2, val3\t", "V")
+                fn.setreg("a", "find(val1, val2, val3\t", "V")
                 runCommandAndAssert([["agr2W]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "global_sub(arg1, arg2,\n", "V")
+                fn.setreg("a", "global_sub(arg1, arg2,\n", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1294,13 +1187,12 @@ local reindentCnt = reindent(reg, regionMotion, motionDirection)
 local reindentCnt = reindent(reg, regionMotion, motionDirection+ getreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "ge", "V")
+                fn.setreg("a", "ge", "V")
                 runCommandAndAssert([["agr4ge]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", " + g               \t             ", "V")
+                fn.setreg("a", " + g               \t             ", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1321,13 +1213,12 @@ if M then
 foobar_help_me
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "help_", "V")
+                fn.setreg("a", "help_", "V")
                 runCommandAndAssert([["agr5b]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "\tfoobar_\t", "V")
+                fn.setreg("a", "\tfoobar_\t", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1352,13 +1243,12 @@ foobar_help_me
         if not M.factor +number ~= 1 then
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "number ~", "V")
+                fn.setreg("a", "number ~", "V")
                 runCommandAndAssert([["agr6b]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "M.factor +\t", "V")
+                fn.setreg("a", "M.factor +\t", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
         end) -- }}}
@@ -1431,13 +1321,12 @@ foobar2021
 while true
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "while", "V")
+                fn.setreg("a", "while", "V")
                 runCommandAndAssert([["agr3{]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "foobar2021", "V")
+                fn.setreg("a", "foobar2021", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1505,13 +1394,12 @@ while true
         return true
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "foo", "V")
+                fn.setreg("a", "foo", "V")
                 runCommandAndAssert([["agr4}]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "bar", "V")
+                fn.setreg("a", "bar", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
         end) -- }}}
@@ -1530,13 +1418,12 @@ while true
         api.nvim_win_set_cursor(0, {M.cursorPos[1], #bar})
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "foo", "V")
+                fn.setreg("a", "foo", "V")
                 runCommandAndAssert([["agriw]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "bar", "V")
+                fn.setreg("a", "bar", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1553,13 +1440,12 @@ while true
             api.nvim_win_set_cursor[index]
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "(2 * (index - 1))", "V")
+                fn.setreg("a", "(2 * (index - 1))", "V")
                 runCommandAndAssert([["agra)]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "[index]", "V")
+                fn.setreg("a", "[index]", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1577,13 +1463,12 @@ while true
             local repEndLine = api.nvim_buf_get_lines_tbl[1]
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "(bufNr, start, end, true)", "V")
+                fn.setreg("a", "(bufNr, start, end, true)", "V")
                 runCommandAndAssert([["agra)]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "_tbl", "V")
+                fn.setreg("a", "_tbl", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1607,13 +1492,12 @@ while true
 </ul>
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", '<List name="foo">', "V")
+                fn.setreg("a", '<List name="foo">', "V")
                 runCommandAndAssert([["agra<]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "</li>", "V")
+                fn.setreg("a", "</li>", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1654,13 +1538,12 @@ while true
   <div>
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "meta none", "V")
+                fn.setreg("a", "meta none", "V")
                 runCommandAndAssert([["agri<]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "foobar", "V")
+                fn.setreg("a", "foobar", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1681,13 +1564,12 @@ while true
 </ul>
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "URL", "V")
+                fn.setreg("a", "URL", "V")
                 runCommandAndAssert([["agri<]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "/ul", "V")
+                fn.setreg("a", "/ul", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1704,13 +1586,12 @@ while true
     local opts = {vimMode = 'n'}
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "timeout = 150", "V")
+                fn.setreg("a", "timeout = 150", "V")
                 runCommandAndAssert([["agri{]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "vimMode = 'n'", "V")
+                fn.setreg("a", "vimMode = 'n'", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1734,13 +1615,12 @@ while true
         }
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "foo", "V")
+                fn.setreg("a", "foo", "V")
                 runCommandAndAssert([["agri{]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "bar", "V")
+                fn.setreg("a", "bar", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1757,13 +1637,12 @@ api.nvim_buf_add_highlight(curBufNr, repHLNS, opts[myHighlightGroup], lineNr, co
 api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols[2])
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "myHighlightGroup", "V")
+                fn.setreg("a", "myHighlightGroup", "V")
                 runCommandAndAssert([["agri[]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "'foo'", "V")
+                fn.setreg("a", "'foo'", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1783,15 +1662,14 @@ api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols
                 local expectedDot = [==[[[
     M.replaceSave = function()
         end
-   
+
             ]]]==]
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", '        if reg.type == "v" then\n            if motionType == "line" then\n', "V")
+                fn.setreg("a", '        if reg.type == "v" then\n            if motionType == "line" then\n', "V")
                 runCommandAndAssert([["agri[]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "M.replaceSave = function()\n    end\n   ", "V")
+                fn.setreg("a", "M.replaceSave = function()\n    end\n   ", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1808,14 +1686,13 @@ api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols
             it("foobar", function()
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 assert.are.same(api.nvim_win_get_cursor(0), {1, 21})
                 -- replace
-                vim.fn.setreg("a", "bar", "V")
+                fn.setreg("a", "bar", "V")
                 runCommandAndAssert([["agri"]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "foobar", "V")
+                fn.setreg("a", "foobar", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
 
@@ -1832,13 +1709,12 @@ api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols
         fn["foobar"](t"<Plug>ReplaceExpr")
             ]]
 
-                setUpMapping()
                 setUpBuffer(input, "lua")
                 -- replace
-                vim.fn.setreg("a", "addSortedDataToTable", "V")
+                fn.setreg("a", "addSortedDataToTable", "V")
                 runCommandAndAssert([["agri"]], expected)
                 -- replace, via dot
-                vim.fn.setreg("a", "foobar", "V")
+                fn.setreg("a", "foobar", "V")
                 runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
         end) -- }}}
@@ -1861,15 +1737,14 @@ find
         local api  = vim.api
                 ]]
 
-                    setUpMapping()
                     setUpBuffer(input, "lua")
                     -- replace
                     vim.cmd("norm! mm")
-                    vim.fn.setreg("a", "lsp.", "V")
+                    fn.setreg("a", "lsp.", "V")
                     runCommandAndAssert([[gg"agr`m]], expected)
                     -- replace, via dot
                     vim.cmd("norm! 0")
-                    vim.fn.setreg("a", "fin", "V")
+                    fn.setreg("a", "fin", "V")
                     runCommandAndAssert([[.]], expectedDot)
             end) -- }}}
         end) -- }}}
@@ -1877,4 +1752,5 @@ find
     end)
 
 end) -- }}}
+
 

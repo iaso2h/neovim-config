@@ -1,7 +1,7 @@
 -- File: replace
 -- Author: iaso2h
 -- Description: Heavily inspired Ingo Karkat's work. Replace text with register
--- Version: 0.1.4
+-- Version: 0.1.5
 -- Last Modified: 2022-01-27
 -- TODO: tests for softtab convert
 local fn       = vim.fn
@@ -14,10 +14,10 @@ local M    = {
     regName              = nil,
     cursorPos            = nil, -- (1, 0) indexed
     count                = nil,
-    devMode              = false,
     motionDirection      = nil,
     restoreNondefaultReg = nil,
-    restoreOption        = nil
+    restoreOption        = nil,
+    suppressMessage      = nil
 }
 
 
@@ -285,14 +285,17 @@ local replace = function(motionType, vimMode, reg, regionMotion, curBufNr, opts)
     -- }}} Create highlight
 
     -- Report change in Neovim statusbar
-    local srcLinesCnt = regionMotion.endPos[1] - regionMotion.startPos[1] + 1
-    local repLineCnt  = repEnd[1] - repStart[1] + 1
-    if srcLinesCnt >= vim.o.report or repLineCnt >= vim.o.report then
-        local srcReport = string.format("Replaced %d line%s", srcLinesCnt, srcLinesCnt == 1 and "" or "s")
-        local repReport = srcLinesCnt == repLineCnt and '' or
-            string.format(" with %d line%s", repLineCnt, repLineCnt == 1 and "" or "s")
+    if not M.suppressMessage then
+        local srcLinesCnt = regionMotion.endPos[1] - regionMotion.startPos[1] + 1
+        local repLineCnt  = repEnd[1] - repStart[1] + 1
+        if srcLinesCnt >= vim.o.report or repLineCnt >= vim.o.report then
+            local srcReport = string.format("Replaced %d line%s", srcLinesCnt, srcLinesCnt == 1 and "" or "s")
+            local repReport = srcLinesCnt == repLineCnt and '' or
+                string.format(" with %d line%s", repLineCnt, repLineCnt == 1 and "" or "s")
 
-        api.nvim_echo({{srcReport .. repReport, "Normal"}}, false, {})
+            api.nvim_echo({{srcReport .. repReport, "Normal"}}, false, {})
+            -- TODO: Make new message start at another new line
+        end
     end
 
     return {startPos = repStart, endPos = repEnd}
@@ -461,9 +464,7 @@ function M.operator(args) -- {{{
             end
 
             -- Always clear M.cursorPos after restoration
-            if not M.devMode then
-                M.cursorPos = nil
-            end
+            M.cursorPos = nil
         end
     elseif vimMode == "v" then
         if reg.type == "V" or reg.type == "l" then

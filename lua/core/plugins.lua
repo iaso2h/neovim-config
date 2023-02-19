@@ -1,5 +1,4 @@
 local fn   = vim.fn
-local M    = {}
 local packerPath = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
 if fn.empty(fn.glob(packerPath)) > 0 then
     vim.notify("Fetching packer.nvim from github.com", vim.log.levels.WARN)
@@ -1042,7 +1041,7 @@ use {
         disable = true
     }
     -- }}} Knowlege
-    end,
+end,
     config = {
         display = {
             prompt_border = 'rounded',
@@ -1055,6 +1054,3 @@ use {
         }
     }
 }
-
-return M
-
