@@ -281,8 +281,8 @@ map("n", [[<A-i>]], [[:lua require("historyHop").main("changelist", 1)<CR>]],  {
 map("n", [[<C-o>]], [[<C-o>zzzv]])
 map("n", [[<C-i>]], [[<C-i>zzzv]])
 -- Add in jumplist for j/k movement with numerical prefix
-map("n", [[j]], [[:lua require("util").addJump("j", true)<CR>]], {"silent"})
-map("n", [[k]], [[:lua require("util").addJump("k", true)<CR>]], {"silent"})
+map("n", [[j]], [[:lua require("util").addJump("j", true)<CR>]], {"silent"}, "Down")
+map("n", [[k]], [[:lua require("util").addJump("k", true)<CR>]], {"silent"}, "Up")
 -- Swap default mapping
 map("n", [[*]],  [[g*``:lua require("searchHop").info(true)<CR>]], {"noremap", "silent"})
 map("n", [[#]],  [[g#``:lua require("searchHop").info(true)<CR>]], {"noremap", "silent"})
@@ -305,6 +305,7 @@ map("n", [[N]], [[:lua require("searchHop").cycleSearch("N")<CR>]], {"silent"}, 
 map("n", [[<leader>h]], [[<CMD>noh<CR>]], {"silent"}, "Clear highlight")
 map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"}, "Disable highlight")
 -- Visual selection
+-- TODO: add visual mapping
 map("n", [[go]],    [[:lua require("selection").cornerSelection(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
 map("n", [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
 -- }}} Search & Jumping
@@ -338,15 +339,15 @@ map("n", [[g<CR>]],   [[:lua require("breakLine").main()<CR>]], {"silent"}, "Bre
 -- }}} Trailing character
 
 -- Pageup/Pagedown
-map({"n", "x"},  [[<C-e>]], [[<C-y>]], {"noremap"})
-map({"n", "x"},  [[<C-d>]], [[<C-e>]], {"noremap"})
-map("t", [[<C-e>]], [[<C-\><C-n><C-y>]])
-map("t", [[<C-d>]], [[<C-\><C-n><C-d>]])
+map({"n", "x"},  [[<C-e>]], [[<C-y>]], {"noremap"}, "Scroll up")
+map({"n", "x"},  [[<C-d>]], [[<C-e>]], {"noremap"}, "Scroll down")
+map("t", [[<C-e>]], [[<C-\><C-n><C-y>]], "Scroll up")
+map("t", [[<C-d>]], [[<C-\><C-n><C-d>]], "Scroll down")
 
-map({"n", "x"},  [[<A-e>]], [[<PageUp>]])
-map({"n", "x"},  [[<A-d>]], [[<PageDown>]])
-map("t", [[<A-e>]], [[<C-\><C-n><PageUp>]])
-map("t", [[<A-d>]], [[<C-\><C-n><PageDown>]])
+map({"n", "x"}, [[<A-e>]], [[<PageUp>]],   "Scroll one window up")
+map({"n", "x"}, [[<A-d>]], [[<PageDown>]], "Scroll one window down")
+map("t", [[<A-e>]], [[<C-\><C-n><PageUp>]], "Scroll one window up")
+map("t", [[<A-d>]], [[<C-\><C-n><PageDown>]], "Scroll one window down")
 
 -- Macro
 map("n", [[<A-q>]], [[q]], {"noremap"}, "Macro")
@@ -389,12 +390,13 @@ map({"n", "x"}, [[<A-C-l>]],    [[<CMD>tabn<CR>]],    {"silent"}, "Next tab")
 map({"n", "x"}, [[<C-W><C-o>]], [[<CMD>tabonly<CR>]], {"silent"}, "Tab only")
 -- }}} Buffer & Window & Tab
 -- Folding {{{
-map("",  [[zm]], [[zMzz]], {"noremap"})
-map("",  [[zr]], [[zRzz]], {"noremap"})
-map("",  [[zM]], [[zmzz]], {"noremap"})
-map("",  [[zR]], [[zrzz]], {"noremap"})
-map("",  [[zA]], [[zAzz]], {"noremap"})
-map("",  [[<leader>z]], [[<CMD>call EnhanceFoldHL("No fold marker found", 500, "")<CR>]], {"silent"})
+map("",  [[zm]], [[zMzz]], {"noremap"}, "Close all folds recursively")
+map("",  [[zr]], [[zRzz]], {"noremap"}, "Open all folds recursively")
+map("",  [[zM]], [[zmzz]], {"noremap"}, "Close current fold recursively")
+map("",  [[zR]], [[zrzz]], {"noremap"}, "Open current fold recursively")
+map("",  [[zA]], [[zAzz]], {"noremap"}, "Toggle current fold recursively")
+-- BUG:
+map("",  [[<leader>z]], [[<CMD>call EnhanceFoldHL("No fold marker found", 500, "")<CR>]], {"silent"}, "Highlight current fold marker")
 map("",  [[zj]], [[<Nop>]])
 map("",  [[zk]], [[<Nop>]])
 map("",  [[[Z]], [[zk]], {"noremap"}, "Previous fold(integral)")
@@ -456,7 +458,9 @@ map("n", [[gY]], [[gy]], "Select last yank")
 map("n", [[gp]], [[:lua require("yankPut").lastYankPut("put")<CR>]],  {"silent"}, "Select last put")
 map("n", [[gP]], [[gp]], "Select last put")
 -- Inplace join
-map("n", [[J]], [[m`J``]], {"noremap"})
+map("n", [[J]], function ()
+    vim.cmd("norm! m`" .. vim.v.count1 .. "J``")
+end, {"noremap"}, "Join line")
 -- Inplace yank
 map("", [[<Plug>InplaceYank]], function ()
    return vim.fn.luaeval[[require("operator").expr(require("yankPut").inplaceYank, false, "<Plug>InplaceYank")]]
@@ -537,24 +541,24 @@ map("i", [[<C-.>]],  [[<C-a>]], "Insert previous insert character")
 map("i", [[<C-BS>]], [[<C-w>]], {"noremap"}, "Delete word before")
 map("i", [[<C-y>]],  [[pumvisible() ? "\<C-e>\<C-y>" : "\<C-y>"]], {"noremap", "expr"}, "Insert character from above")
 map("i", [[<A-y>]],  [[<C-x><C-l>]], {"noremap"}, "Insert from sentence")
-map("i", [[,]], [[,<C-g>u]], {"noremap"})
-map("i", [[.]], [[.<C-g>u]], {"noremap"})
-map("i", [[!]], [[!<C-g>u]], {"noremap"})
-map("i", [[*]], [[*<C-g>u]], {"noremap"})
+map("i", [[,]], [[,<C-g>u]], {"noremap"}, "Undo break ,")
+map("i", [[.]], [[.<C-g>u]], {"noremap"}, "Undo break .")
+map("i", [[!]], [[!<C-g>u]], {"noremap"}, "Undo break !")
+map("i", [[*]], [[*<C-g>u]], {"noremap"}, "Undo break *")
 -- Navigation {{{
-map("!", [[<C-a>]], [[<Home>]], "Move cursor to the start")
-map("!", [[<C-e>]], [[<End>]], "Move cursor to the end")
-map("!", [[<C-h>]], [[<Left>]], "Move cursor to one character left")
-map("!", [[<C-l>]], [[<Right>]], "Move cursor to one character right")
-map("!", [[<C-b>]], [[<C-Left>]], "Move cursor to one word backward")
-map("!", [[<C-d>]],  [[<Del>]], "Delete character to the right")
+map("!", [[<C-a>]], [[<Home>]],    "Move cursor to the start")
+map("!", [[<C-e>]], [[<End>]],     "Move cursor to the end")
+map("!", [[<C-h>]], [[<Left>]],    "Move cursor to one character left")
+map("!", [[<C-l>]], [[<Right>]],   "Move cursor to one character right")
+map("!", [[<C-b>]], [[<C-Left>]],  "Move cursor to one word backward")
+map("!", [[<C-d>]], [[<Del>]],     "Delete character to the right")
 map("!", [[<C-w>]], [[<C-Right>]], "Move cursor to one word forward")
 -- }}} Navigation
-map("c", [[<C-j>]],   [[<Down>]], "Move cursor down")
-map("c", [[<C-k>]],   [[<Up>]], "Move cursor up")
 map("c", [[<C-BS>]],  [[<C-\>e(RemoveLastPathComponent())<CR>]], "Delete word before")
-map("c", [[<A-l>]], [[<C-d>]], {"noremap"}, "List more commands")
-map("c", [[<A-e>]], [[<C-\>e]], "Evaluate in Vimscript")
+map("c", [[<C-j>]], [[<Down>]], "Move cursor down")
+map("c", [[<C-k>]], [[<Up>]], "Move cursor up")
+map("c", [[<A-l>]], [[<C-d>]],  {"noremap"}, "List more commands")
+map("c", [[<A-e>]], [[<C-\>e]], {"noremap"}, "Evaluate in Vimscript")
 -- }}} Mode: Commandline & Insert
 
 return M

@@ -55,6 +55,8 @@ vim.g.msql_sql_query = 1
 -- }}} Build-in plugin
 
 local ok, msg = pcall(require, "util"); if not ok then vim.notify(msg, vim.log.levels.ERROR) end
+ok, msg = pcall(require, "keymapUtil"); if not ok then vim.notify(msg, vim.log.levels.ERROR) end
+
 require "core"
 require "quickFix"
 
