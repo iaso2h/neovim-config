@@ -1,8 +1,8 @@
 -- File: historyStartup
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
--- Version: 0.0.6
--- Last Modified: 2021-11-10
+-- Version: 0.0.7
+-- Last Modified: 2023-2-20
 local api = vim.api
 local fn  = vim.fn
 local cmd = vim.cmd
@@ -27,15 +27,19 @@ M.display = function(force)
         return
     end
 
-    for _, file in pairs(vim.v.oldfiles) do
+    for _, fileStr in pairs(vim.v.oldfiles) do
         if jit.os ~= "Windows" then
-            if vim.loop.fs_stat(file) then
-                table.insert(lines, file)
+            if vim.loop.fs_stat(fileStr) then
+                table.insert(lines, fileStr)
             end
         else
-            file = string.sub(file, 1, 1):upper() .. string.sub(file, 2, -1)
-            if not vim.tbl_contains(lines, file) and vim.loop.fs_stat(file) then
-                table.insert(lines, file)
+            -- Upper case the first dirver character in Windows
+            fileStr = string.sub(fileStr, 1, 1):upper() .. string.sub(fileStr, 2, -1)
+            -- Filter out duplicates and check validity
+            if not vim.tbl_contains(lines, fileStr) and vim.loop.fs_stat(fileStr) then
+                -- Substitue the / character with the \ one
+                fileStr = string.gsub(fileStr, "/", "\\")
+                table.insert(lines, fileStr)
             end
         end
     end
@@ -77,7 +81,7 @@ M.display = function(force)
     api.nvim_buf_set_option(M.curBuf, "modified",   false)
 
 
-    for _, key in ipairs({"o", "<C-s>", "<C-v>", "<CR>", "q"}) do
+    for _, key in ipairs {"o", "<C-s>", "<C-v>", "<CR>", "q"} do
         api.nvim_buf_set_keymap(
             M.curBuf,
             "n",
