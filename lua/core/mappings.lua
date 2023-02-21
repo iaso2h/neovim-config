@@ -146,10 +146,10 @@ map("n", [[<Plug>ExtractVisual]], function ()
     require("extraction").operator(vMotion)
 end, {"silent"}, "Extract selected")
 
-map("n", [[gc]], [[<Plug>Extract]], "Extract operator")
+-- map("n", [[gc]], [[<Plug>Extract]], "Extract operator")
 -- TODO: implement with visualreapet?
 -- map("x", [[<Plug>fallbackC]], [[<CMD>norm! gvC<CR>]])
-map("x", [[C]],  [[visualmode() == "^V" ? "" : "\<Plug>ExtractVisual"]], {"expr"}, "Extract selected")
+-- map("x", [[C]],  [[visualmode() == "^V" ? "" : "\<Plug>ExtractVisual"]], {"expr"}, "Extract selected")
 -- Print file info
 map("n", [[<C-g>]],
 [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<CR>]],
