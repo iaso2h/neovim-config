@@ -5,6 +5,7 @@
 .netrwhist
 dein/
 pack/
+packer.nvim/
 lsp/
 
 packer_compiled.lua
