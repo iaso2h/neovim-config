@@ -1,28 +1,30 @@
 local fn  = vim.fn
-local cmd = vim.cmd
 local api = vim.api
 local M   = {}
 
 --- Echo search pattern and result index at the commandline
-M.info = function()
+M.echoSearch = function()
     local searchDict = fn.searchcount()
     local result = string.format("[%s/%s]", searchDict.current, searchDict.total)
     local searchPat = fn.histget("search")
-    local str = string.format('%s %s', searchPat, result)
+    local echoStr = string.format('%s %s', searchPat, result)
 
     if searchDict.current == 1 or
             math.abs(searchDict.current - searchDict.total) == 0 then
-        api.nvim_echo({{str, "CmpItemAbbrMatch"}}, false, {})
+        -- When search reaches the end
+        api.nvim_echo({{echoStr, "CmpItemAbbrMatch"}}, false, {})
     else
-        api.nvim_echo({{str}}, false, {})
+        api.nvim_echo({{echoStr}}, false, {})
     end
 end
 
 
-
+--- Search func wraps around the native n/N exCMD
+---@param exCMD string "n" or "N"
 M.cycleSearch = function(exCMD)
-    local ok, msg = pcall(cmd, "noa norm! " .. exCMD)
+    local ok, msg = pcall(vim.cmd, "noa norm! " .. exCMD)
     if not ok then
+        ---@diagnostic disable-next-line: param-type-mismatch
         if string.match(msg, "E486") then
             api.nvim_echo({{"Pattern not found: " .. fn.histget("search")}}, false, {})
             return
@@ -31,13 +33,15 @@ M.cycleSearch = function(exCMD)
         end
     end
 
-    cmd("norm! " .. "zv")
+    vim.cmd("norm! " .. "zv")
     -- cmd("norm! " .. "zzzv")
-    M.info()
+    M.echoSearch()
 end
 
 
-M.start = function(exCMD)
+--- Search func wraps around the native //? exCMD
+---@param exCMD string "/" or "?"
+M.input = function(exCMD)
     local placeholder
     if exCMD == "/" then
         placeholder = "/\\v"
@@ -56,7 +60,7 @@ M.start = function(exCMD)
         end
     end
 
-    ok, msg = pcall(cmd, input)
+    ok, msg = pcall(vim.cmd, input)
     if not ok then
         if vim.startswith(msg, "Vim:E486") then
             api.nvim_echo({{"Pattern not found: " .. input}}, false, {})
@@ -66,11 +70,27 @@ M.start = function(exCMD)
     else
         local searchDict = fn.searchcount()
         if searchDict.total ~= 0 and searchDict.current == 0 then
-            cmd("norm! n")
+           vim.cmd "norm! n"
         end
-        cmd("norm! zv:" .. t[[<C-\>e<Esc>]])
-        M.info()
+        vim.cmd("norm! zv:" .. t[[<C-\>e<Esc>]])
+        M.echoSearch()
     end
 end
 
+
+--- Search func wraps around the native //? exCMD in Visual mode
+---@param exCMD string "/" or "?"
+M.searchSelected = function(exCMD)
+    local cursorPos = api.nvim_win_get_cursor(0)
+    local selectedStr = fn.escape(
+        require("selection").getSelect("string", true),
+        [[\]]
+    )
+    selectedStr = exCMD .. [[\V]] .. selectedStr
+    vim.cmd(selectedStr)
+    api.nvim_echo({{selectedStr}}, false, {})
+    api.nvim_win_set_cursor(0, cursorPos)
+end
+
 return M
+

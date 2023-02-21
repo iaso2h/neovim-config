@@ -1,5 +1,3 @@
-local cmd = vim.cmd
-
 -- Function {{{
 vim.g.FiletypeCommentDelimiter = {
     vim    = "\"",
@@ -38,7 +36,7 @@ if not vim.g.vscode then
         zsh    = '\\s\\{-}\\"[^#"]\\{-}}}}[^#]*$',
         fish   = '\\s\\{-}\\"[^#"]\\{-}}}}[^#]*$',
     }
-    cmd [[
+    vim.cmd [[
     function! EnhanceFoldExpr()
         let line = getline(v:lnum)
         if match(line, g:enhanceFoldStartPat[&filetype]) > -1
@@ -52,7 +50,7 @@ if not vim.g.vscode then
     ]]
 end
 
-cmd [[
+vim.cmd [[
 function! RemoveLastPathComponent()
     let l:cmdlineBeforeCursor = strpart(getcmdline(), 0, getcmdpos() - 1)
     let l:cmdlineAfterCursor  = strpart(getcmdline(), getcmdpos() - 1)
@@ -69,7 +67,7 @@ endfunction
 -- Auto commands {{{
 if not vim.g.vscode then
     -- TODO: Monitor file changed and prevent fold close
-    cmd[[
+    vim.cmd[[
     augroup fileType
     autocmd!
     autocmd VimEnter             * nested lua require("historyStartup").display()
@@ -84,7 +82,7 @@ if not vim.g.vscode then
     autocmd TermOpen             *        startinsert
     autocmd TermOpen             *        setlocal nobuflisted | setlocal nonumber
 
-    autocmd BufEnter             *.txt,COMMIT_EDITMSG,index lua require("util").splitExist()
+  " autocmd BufEnter             *.txt,COMMIT_EDITMSG,index lua require("util").splitExist()
 
   " autocmd CursorHold            *.c,*.h,*.cpp,*.cc,*.vim :call HLCIOFunc()
     autocmd FileType              java setlocal includeexpr=substitute(v:fname,'\\.','/','g')
@@ -104,7 +102,7 @@ end
 -- }}} Auto commands
 
 -- Commands {{{
-cmd [[
+vim.cmd [[
 command! -nargs=+ -complete=command  Echo PP strftime('%c') . ": " . <args>
 command! -nargs=+ -complete=command  Redir call luaeval('require("redir").catch(_A)', <q-args>)
 command! -nargs=0 -range ExtractSelection lua require("extractSelection").main(vim.fn.visualmode())
@@ -124,10 +122,11 @@ command! -nargs=0 TrailingEmptyLineToggle lua  if type(TrailEmptyLineChk) == "ni
 command! -nargs=+ -bang Cfilter call v:lua.qFilter(v:true,  <q-args>, <q-bang>)
 command! -nargs=+ -bang Lfilter call v:lua.qFilter(v:false, <q-args>, <q-bang>)
 
-command! -nargs=0 -range Reverse lua require("selection").mirror()
+command! -nargs=0 -range Reverse     lua require("selection").mirror()
+command! -nargs=0 -range Runselected lua require("selection").runSelected()
 ]]
 if jit.os == "Windows" then
-    cmd [[command! -nargs=0 PS     terminal powershell]]
+    vim.cmd [[command! -nargs=0 PS terminal powershell]]
 end
 -- }}} Commands
 

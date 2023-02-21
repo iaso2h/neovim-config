@@ -33,14 +33,6 @@ map("n", [[<A-a>]], [[:lua require("expandRegion").expandShrink("n", 1)<CR>]],  
 map("n", [[<A-s>]], [[<Nop>]])
 map("x", [[<A-a>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), 1)<CR>]],  {"silent"}, "Expand selection")
 map("x", [[<A-s>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), -1)<CR>]], {"silent"}, "Shrink selection")
--- Run selected
--- TODO: Make it only run in lua filetype
-map("x", [[gM]], function()
-    vim.cmd(
-    string.format("lua %s",
-    require("selection").getSelect("string")))
-end, {"silent"}, "Run selected line in lua")
--- Interesting word {{{
 map("n", [[<Plug>InterestingWordOperator]], function ()
         return vim.fn.luaeval[[
         require("operator").expr(require("interestingWord").operator,
@@ -270,7 +262,7 @@ map("n", [[grN]], [[<Plug>ReplaceUnderBackward]], "Replace the whold word under 
 -- In case of mistouching
 -- Inquery word
 map("n", [[<leader>i]], [=[[I]=], "Inquery word under cursor")
-map("x", [[<leader>i]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selection").getSelect("string"), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquery selected words")
+map("x", [[<leader>i]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selection").getSelect("string", false), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquery selected words")
 -- Fast mark & resotre
 -- TODO: zz seems unneccessary when mark position in still in range of editor window
 map("n", [[M]], [[`mzzzv]], "Restore mark M")
@@ -278,25 +270,24 @@ map("n", [[M]], [[`mzzzv]], "Restore mark M")
 map("n", [[<A-o>]], [[:lua require("historyHop").main("changelist", -1)<CR>]], {"silent"}, "Previous change")
 map("n", [[<A-i>]], [[:lua require("historyHop").main("changelist", 1)<CR>]],  {"silent"}, "Next change")
 -- History jumping
-map("n", [[<C-o>]], [[<C-o>zzzv]])
-map("n", [[<C-i>]], [[<C-i>zzzv]])
+map("n", [[<C-o>]], [[<C-o>zzzv]], "Jump forward in jumplist")
+map("n", [[<C-i>]], [[<C-i>zzzv]], "Jump backward in jumplist")
 -- Add in jumplist for j/k movement with numerical prefix
 map("n", [[j]], [[:lua require("util").addJump("j", true)<CR>]], {"silent"}, "Down")
 map("n", [[k]], [[:lua require("util").addJump("k", true)<CR>]], {"silent"}, "Up")
 -- Swap default mapping
-map("n", [[*]],  [[g*``:lua require("searchHop").info(true)<CR>]], {"noremap", "silent"})
-map("n", [[#]],  [[g#``:lua require("searchHop").info(true)<CR>]], {"noremap", "silent"})
-map("n", [[g#]], [[#``:lua require("searchHop").info(true)<CR>]],  {"noremap", "silent"})
-map("n", [[g*]], [[*``:lua require("searchHop").info(true)<CR>]],  {"noremap", "silent"})
+map("n", [[*]],  [[g*:lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> forward")
+map("n", [[#]],  [[g#:lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> back")
+map("n", [[g#]], [[#:lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
+map("n", [[g*]], [[*:lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
 -- Search visual selected
--- BUG:
-map("x", [[*]], [[m`<CMD>execute "/\\V" . escape(luaeval('require("selection").getSelect("string")'), '\')<CR>]], {"noremap", "silent"})
-map("x", [[#]], [[m`<CMD>execute "?\\V" . escape(luaeval('require("selection").getSelect("string")'), '\')<CR>]], {"noremap", "silent"})
-map("x", [[/]], [[*]])
-map("x", [[?]], [[#]])
+map("x", [[/]], [[:lua require("searchHop").searchSelected("/")<CR>]], {"silent"}, "Search selected forward")
+map("x", [[?]], [[:lua require("searchHop").searchSelected("?")<CR>]], {"silent"}, "Search selected backward")
+map("x", [[*]], [[/]], "Search selected forward")
+map("x", [[#]], [[?]], "Search selected backward")
 -- Regex very magic
--- map("n", [[/]], [[:lua require("searchHop").start("/")<CR>]], {"silent"}, "Search forward")
--- map("n", [[?]], [[:lua require("searchHop").start("?")<CR>]], {"silent"}, "Search backward")
+-- map("n", [[/]], [[:lua require("searchHop").input("/")<CR>]], {"silent"}, "Search forward")
+-- map("n", [[?]], [[:lua require("searchHop").input("?")<CR>]], {"silent"}, "Search backward")
 map("n", [[/]], [[/\v]], {"noremap"}, "Search forward")
 map("n", [[?]], [[?\v]], {"noremap"}, "Search backward")
 map("n", [[n]], [[:lua require("searchHop").cycleSearch("n")<CR>]], {"silent"}, "Cycle through search result forward")
@@ -313,7 +304,7 @@ map("n", [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
 map("n", [[<C-n>]], [[<CMD>new<CR>]], {"silent"}, "New buffer")
 -- Open/Search in browser
 map("n", [[gl]], [[:lua require("openLink").main()<CR>]], {"silent"}, "Open link")
-map("x", [[gl]], [[:lua require("openLink").main(require("selection").getSelect("string"))<CR>]], {"silent"}, "Open selected as link")
+map("x", [[gl]], [[:lua require("openLink").main(require("selection").getSelect("string", false))<CR>]], {"silent"}, "Open selected as link")
 -- Interrupt
 map("n", [[<C-A-c>]], [[<CMD>call interrupt()<CR>]], {"noremap", "silent"}, "Interrupt")
 -- Paragraph & Block navigation

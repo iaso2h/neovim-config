@@ -1,8 +1,8 @@
 -- File: selection
 -- Author: iaso2h
 -- Description: Selection Utilities
--- Version: 0.0.9
--- Last Modified: 2023-2-18
+-- Version: 0.0.10
+-- Last Modified: 2023-2-23
 local api = vim.api
 local cmd = vim.cmd
 local fn  = vim.fn
@@ -62,8 +62,10 @@ function M.cornerSelection(bias) -- {{{
 end -- }}}
 
 
+--- Substitute selected area
 M.visualSub = function()
-    local str = string.gsub(M.getSelect("string"), [[\]], [[\\]])
+    ---@diagnostic disable-next-line: param-type-mismatch
+    local str = string.gsub(M.getSelect("string", false), [[\]], [[\\]])
     api.nvim_feedkeys(string.format([[:s#\V%s]], str), "nt", false)
 end
 
@@ -75,20 +77,34 @@ M.mirror = function()
 end
 
 
--- HACK: different behaviors between vim.getpos() and nvim_buf_get_mark() when selection is empty
-M.getSelect = function(returnType, returnNormal) -- {{{
+--- Get the text of selected area
+---@param returnType string Set to decide to return "string" or "list"
+---@param exitToNormal boolean Set to decide to return in Normal mode in Neovim
+---@return string|table Decided by returnType
+M.getSelect = function(returnType, exitToNormal) -- {{{
+    if returnType ~= "list" and returnType ~= "string" then
+        return vim.notify("Not a supported string value", vim.log.levels.ERROR)
+    end
     -- Not support blockwise visual mode
     local mode = fn.visualmode()
-    if mode == "\22" then return end
+    if mode == "\22" then
+        return vim.notify("Blockwise visual mode is not supported", vim.log.levels.WARN)
+    end
+
     -- Return (1,0)-indexed line,col info
     local selectStart = api.nvim_buf_get_mark(0, "<")
     local selectEnd = api.nvim_buf_get_mark(0, ">")
-    local lines = api.nvim_buf_get_lines(0, selectStart[1] - 1, selectEnd[1],
-                                         false)
+    local lines = api.nvim_buf_get_lines(0, selectStart[1] - 1, selectEnd[1], false)
 
     if #lines == 0 then
-        return {""}
+        if returnType == "list" then
+            return lines
+        elseif returnType == "string" then
+            return table.concat(lines, "\n")
+        ---@diagnostic disable-next-line: missing-return
+        end
     end
+
     -- Needed to remove the last character to make it match the visual selction
     if vim.o.selection == "exclusive" then selectEnd[2] = selectEnd[2] - 1 end
     if mode == "v" then
@@ -96,14 +112,34 @@ M.getSelect = function(returnType, returnNormal) -- {{{
         lines[1]      = lines[1]:sub(selectStart[2] + 1)
     end
 
-    if returnNormal then cmd("norm! " .. t"<Esc>") end
+    if exitToNormal then cmd("norm! " .. t"<Esc>") end
 
     if returnType == "list" then
         return lines
     elseif returnType == "string" then
         return table.concat(lines, "\n")
+    ---@diagnostic disable-next-line: missing-return
     end
 end -- }}}
+
+
+--- Run selected code
+M.runSelected = function()
+    if not vim.bo.filetype == "lua" then
+       return vim.notify("Only support in Lua file", vim.log.levels.WARN)
+    end
+
+    local lineStr = require("selection").getSelect("string", false)
+    local vimMode = fn.visualmode()
+
+    if vimMode == "\22" then
+        return vim.notify("Blockwise visual mode is not supported", vim.log.levels.WARN)
+    elseif vimMode == "V" then
+        lineStr = string.gsub(lineStr, "\n", "")
+    end
+
+    vim.cmd("lua " .. lineStr)
+end
 
 
 return M
