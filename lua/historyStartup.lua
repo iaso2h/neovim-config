@@ -35,10 +35,10 @@ M.display = function(force)
         else
             -- Upper case the first dirver character in Windows
             fileStr = string.sub(fileStr, 1, 1):upper() .. string.sub(fileStr, 2, -1)
+            -- Substitue the / character with the \ one
+            fileStr = string.gsub(fileStr, "/", "\\")
             -- Filter out duplicates and check validity
             if not vim.tbl_contains(lines, fileStr) and vim.loop.fs_stat(fileStr) then
-                -- Substitue the / character with the \ one
-                fileStr = string.gsub(fileStr, "/", "\\")
                 table.insert(lines, fileStr)
             end
         end

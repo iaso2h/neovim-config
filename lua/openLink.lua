@@ -1,8 +1,8 @@
 -- File: openBrowser
 -- Author: iaso2h
 -- Description: Open url link in browser
--- Version: 0.0.5
--- Last Modified: 2021-09-17
+-- Version: 0.0.6
+-- Last Modified: 2023-2-13
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
@@ -15,8 +15,9 @@ function M.main(selectText)
         local urlStart
         local urlEnd
         local curLine
+        local sep = jit.os == "Windows" and "\\" or "/"
 
-        if fn.expand("%:p") == fn.stdpath("config") .. "/lua/core/plugins.lua" then
+        if fn.expand("%:p") == fn.stdpath("config") .. string.format("%slua%score%splugins.lua", sep, sep, sep) then
             -- Support for jumping to neovim plugin in github.com
             local curPos  = api.nvim_win_get_cursor(0)
             local lines   = api.nvim_buf_get_lines(0, curPos[1] - 2, curPos[1], false)
@@ -86,6 +87,7 @@ function M.main(selectText)
                 fn.system("xdg-open '" .. url .. "'")
             end
         end, opts["timeout"])
+
     -- Visual mode with selected text provided
     else
         if jit.os == "Windows" then
