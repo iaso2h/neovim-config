@@ -174,8 +174,8 @@ use {
         config = function()
             -- TODO: support in visual mode
             -- map("x", [[<A-c>]],   [[:call CaseSwitcher()<CR>]],    {"silent"}, "Change case for selected")
-            map("n", [[<A-c>]],   require("caseSwitcher").cycleCase,           "Cycle cases")
-            map("n", [[<A-S-c>]], require("caseSwitcher").cycleDefaultCMDList, "Cycle cases reset")
+            map("n", [[<A-c>]],   [[<CMD>lua require("caseSwitcher").cycleCase()<CR>]],           "Cycle cases")
+            map("n", [[<A-S-c>]], [[<CMD>lua require("caseSwitcher").cycleDefaultCMDList()<CR>]], "Cycle cases reset")
         end,
     }
     use {
@@ -210,22 +210,8 @@ use {
             command! -nargs=0 Run     lua require("compileRun").runCode()
             ]]
 
-            map("n", [[<F9>]],   [[:lua require("compileRun").compileCode(true)<CR>]], {"noremap", "silent"}, "Compile code")
-            map("n", [[<S-F9>]], [[:lua require("compileRun").runCode(true)<CR>]],     {"noremap", "silent"}, "Run code")
-        end
-    }
-    use {
-        fn.stdpath("config") .. "/lua/logsitter",
-        requires = "nvim-treesitter",
-        module   = "logsitter",
-        keys     = {{"n", "<leader>lg"}},
-        config   = function()
-            map("n", [[<leader>lg]], require("logsitter").log, "Log under cursor")
-            require("logsitter").setup{
-                logFunc = {
-                    lua = "Print",
-                }
-            }
+            map("n", [[<F9>]],   [[<CMD>lua require("compileRun").compileCode(true)<CR>]], {"noremap", "silent"}, "Compile code")
+            map("n", [[<S-F9>]], [[<CMD>lua require("compileRun").runCode(true)<CR>]],     {"noremap", "silent"}, "Run code")
         end
     }
     use {
@@ -235,10 +221,10 @@ use {
             {"x", [[X]]},
         },
         config = function()
-            map("n", [[gx]],  [[<Plug>(Exchange)]], "Exchange operator")
-            map("x", [[X]],   [[<Plug>(Exchange)]], "Exchange selected")
+            map("n", [[gx]],  [[<Plug>(Exchange)]],      "Exchange operator")
+            map("x", [[X]],   [[<Plug>(Exchange)]],      "Exchange selected")
             map("n", [[gxc]], [[<Plug>(ExchangeClear)]], "Exchange highlight clear")
-            map("n", [[gxx]], [[<Plug>(ExchangeLine)]], "Exchange current line")
+            map("n", [[gxx]], [[<Plug>(ExchangeLine)]],  "Exchange current line")
         end,
     }
     use {
@@ -298,7 +284,7 @@ use {
     use {
         'danymat/neogen',
         requires = "nvim-treesitter",
-        keys     = {{"n", "g<Space>d"}},
+        keys     = {{"n", "gcd"}},
         config   = function()
             require("neogen").setup {
                 enabled             = true,
@@ -342,7 +328,7 @@ use {
                 }
             }
 
-            map("n", [[g<Space>d]], [[:lua require("neogen").generate()<CR>]], {"silent"}, "Document generation")
+            map("n", [[gcd]], [[<CMD>lua require("neogen").generate()<CR>]], {"silent"}, "Document generation")
         end,
     }
     use {
@@ -460,40 +446,40 @@ use {
         keys = {
             {"x", [[<A-/>]]},
             {"n", [[<A-/>]]},
-            {"n", [[g<space>o]]},
-            {"n", [[g<space>O]]},
+            {"n", [[gco]]},
+            {"n", [[gcO]]},
 
-            {"n", [[g<space><space>]]},
-            {"x", [[g<space><space>]]},
+            {"n", [[gcc]]},
+            {"x", [[C]]},
 
-            {"n", [[g<space><space>]]},
-            {"x", [[g<space><space>]]},
-            {"n", [[g<space>n]]},
-            {"x", [[g<space>n]]},
+            {"n", [[gcc]]},
+            {"x", [[gcc]]},
+            {"n", [[gcn]]},
+            {"x", [[gcn]]},
 
-            {"n", [[g<space>i]]},
-            {"x", [[g<space>i]]},
+            {"n", [[gci]]},
+            {"x", [[gci]]},
 
-            {"n", [[g<space>s]]},
-            {"x", [[g<space>s]]},
+            {"n", [[gcs]]},
+            {"x", [[gcs]]},
 
-            {"n", [[g<space>y]]},
-            {"x", [[g<space>y]]},
+            {"n", [[gcy]]},
+            {"x", [[gcy]]},
 
-            {"n", [[g<space>$]]},
-            {"n", [[g<space>A]]},
-            {"n", [[g<space>I]]},
+            {"n", [[gc$]]},
+            {"n", [[gcA]]},
+            {"n", [[gcI]]},
 
             {"x", [[<A-/>]]},
             {"n", [[<A-/>]]},
 
-            {"n", [[g<space>n]]},
-            {"x", [[g<space>n]]},
-            {"n", [[g<space>b]]},
-            {"x", [[g<space>b]]},
+            {"n", [[gcn]]},
+            {"x", [[gcn]]},
+            {"n", [[gcb]]},
+            {"x", [[gcb]]},
 
-            {"n", [[g<space>u]]},
-            {"x", [[g<space>u]]},
+            {"n", [[gcu]]},
+            {"x", [[gcu]]},
         },
         setup  = [[vim.api.nvim_set_var("NERDCreateDefaultMappings", 0)]],
         config = conf("vim-nerdcommenter").config,
@@ -543,6 +529,10 @@ use {
             map("n", [[<C-W>u]], [[<CMD>MundoToggle<CR>]], {"silent"}, "Open Mundo")
         end
     }
+    use {
+        'folke/which-key.nvim',
+        config = conf "nvim-which-key"
+    }
     -- }}} Vim enhancement
     -- Telescope {{{
     use {
@@ -550,21 +540,17 @@ use {
         module_pattern = "telescope.*",
         cmd      = "Telescope",
         keys     = {
-            {"n", [[<C-f>l]]},  {"n", [[<C-f>E]]},    {"n", [[<C-f>e]]},  {"n", [[<C-f>f]]},
-            {"n", [[<C-f>F]]},  {"n", [[<C-f>w]]},    {"n", [[<C-f>W]]},  {"n", [[<A-C-j>]]},
-            {"n", [[<A-C-k>]]}, {"n", [[<C-h>/]]},    {"n", [[<C-h>v]]},  {"n", [[<C-h>o]]},
-            {"n", [[<C-h>i]]},  {"n", [[<C-h>q]]},    {"n", [[<C-h>m]]},  {"n", [[<C-h>k]]},
-            {"n", [[<C-h>c]]},  {"n", [[<C-h>h]]},    {"n", [[<C-h>H]]},  {"n", [[<C-h>l]]},
-            {"n", [[<C-f>o]]},  {"n", [[<C-f>O]]},    {"n", [[<C-f>gc]]}, {"n", [[<C-f>gC]]},
-            {"n", [[<C-f>gs]]}, {"n", [[<leader>b]]},
+            {"n", [[<C-f>l]]},  {"n", [[<C-f>E]]},  {"n", [[<C-f>e]]},    {"n", [[<C-f>f]]},
+            {"n", [[<C-f>F]]},  {"n", [[<C-f>w]]},  {"n", [[<C-f>W]]},    {"n", [[<A-C-j>]]},
+            {"n", [[<A-C-k>]]}, {"n", [[<C-h>/]]},  {"n", [[<C-h>v]]},    {"n", [[<C-h>o]]},
+            {"n", [[<C-h>i]]},  {"n", [[<C-h>q]]},  {"n", [[<C-h>m]]},    {"n", [[<C-h>k]]},
+            {"n", [[<C-h>c]]},  {"n", [[<C-h>h]]},  {"n", [[<C-h>H]]},    {"n", [[<C-h>l]]},
+            {"n", [[<C-f>gc]]}, {"n", [[<C-f>gC]]}, {"n", [[<C-f>gs]]},   {"n", [[<leader>b]]},
 
-            {"n", [[<C-f>o]]}, {"n", [[<C-f>O]]}, {"n", [[<leader>e]]}, {"n", [[<leader>E]]},
+            {"n", [[<C-f>o]]},  {"n", [[<C-f>O]]},  {"n", [[<leader>e]]}, {"n", [[<leader>E]]},
         },
         requires = {
             "plenary.nvim",
-            { "nvim-telescope/telescope-fzy-native.nvim",
-                run = "make -C deps/fzy-lua-native",
-            },
         },
         config = conf "nvim-telescope"
     }
@@ -826,9 +812,9 @@ use {
             {"n", "<Leader>rc"}
         },
         config = function()
-            local refactor = require("refactoring")
-            refactor.setup{}
-            map("n", [[<Leader>rf]], [[<CMD>lua require("refactoring").select_refactor()<CR>]],              {"silent"}, "Extract selected")
+            require("refactoring").setup{}
+
+            map("x", [[<Leader>rf]], [[<CMD>lua require("refactoring").select_refactor()<CR>]],              {"silent"}, "Extract selected")
             map("n", [[<Leader>rv]], [[<CMD>lua require("refactoring").debug.print_var{normal = true}<CR>]], {"silent"}, "Debug print vairiable under cursor")
             map("n", [[<Leader>rp]], [[<CMD>lua require("refactoring").debug.printf{below = false}<CR>]],    {"silent"}, "Debug printf")
             map("n", [[<Leader>rc]], [[<CMD>lua require("refactoring").debug.cleanup()<CR>]],                {"silent"}, "Debug clean up")
@@ -843,7 +829,7 @@ use {
     use {
         'dstein64/vim-startuptime',
         cmd    = "StartupTime",
-        config = [[vim.g.startuptime_tries = 50]]
+        config = [[vim.g.startuptime_tries = 20]]
     }
     -- use 'lewis6991/impatient.nvim'
     use {
@@ -854,7 +840,7 @@ use {
             "PP", "Runtime", "Disarm", "Scriptnames", "Messages",
             "Verbose", "Time", "Breakadd", "Vopen", "Vedit", "Vsplit"
         },
-        keys   = {{"n", "g>"}},
+        keys   = {{"n", "<C-q>,"}, {"n", "<C-q>."}},
         config = conf("vim-scriptease").config
     }
     -- use {
@@ -1009,12 +995,6 @@ use {
     }
     -- }}} Source control
     -- Knowlege {{{
-    use {
-        'folke/which-key.nvim',
-        disable = true,
-        event   = "VimEnter",
-        config  = conf "nvim-which-key"
-    }
     use {
         'RishabhRD/popfix',
         module_pattern = "popfix.*",

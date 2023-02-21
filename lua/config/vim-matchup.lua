@@ -17,15 +17,16 @@ M.setup = function ()
 end
 
 
-M.configure = function ()
+M.config = function ()
     -- Text obeject
     map("x", [[am]],      [[<Plug>(matchup-a%)]], "Matchup a% text object")
     map("x", [[im]],      [[<Plug>(matchup-i%)]], "Matchup i% text object")
     map("o", [[am]],      [[<Plug>(matchup-a%)]], "Matchup a% text object")
     map("o", [[im]],      [[<Plug>(matchup-i%)]], "Matchup i% text object")
     -- Inclusive
-    map({"n", "x", "o"},  [[<C-m>]],   [[<Plug>(matchup-%)]], "Matchup forward inclusive")
-    map({"n", "x", "o"},  [[<C-S-m>]], [[<Plug>(matchup-g%)]], "Matchup backward inclusive")
+    -- TODO: optimize with treesitter
+    map("",  [[<C-m>]],   [[<Plug>(matchup-%)]], "Matchup forward inclusive")
+    map("",  [[<C-S-m>]], [[<Plug>(matchup-g%)]], "Matchup backward inclusive")
     -- Exclusive
     map("n", [[<A-m>]],   [[<Plug>(matchup-]%)]], "Matchup forward exclusive")
     map("x", [[<A-m>]],   [[<Plug>(matchup-]%)]], "Matchup forward exclusive")

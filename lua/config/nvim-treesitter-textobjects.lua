@@ -5,7 +5,6 @@ return function()
                 enable    = true,
                 lookahead = false,
                 keymaps = {
-                    -- BUG: not working
                     ["af"] = {query = "@function.outer", desc = "Select outer part of a function region"},
                     ["if"] = {query = "@function.inner", desc = "Select inner part of a function region"},
                     ["ac"] = {query = "@class.outer", desc = "Select outer part of a class region"},

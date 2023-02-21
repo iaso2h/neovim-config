@@ -14,31 +14,30 @@ return function()
 
     local onAttach = function(client, bufNr) -- {{{
         -- TODO:
-        -- bmap(bufNr, "n", [[<A-n>]],   [[:lua require("util").addJump(require("illuminate").next_reference, false, {wrap = true})<CR>]],                 {"silent"})
-        -- bmap(bufNr, "n", [[<A-S-n>]], [[:lua require("util").addJump(require("illuminate").next_reference, false, {reverse = true, wrap = true})<CR>]], {"silent"})
+        -- bmap(bufNr, "n", [[<A-n>]],   [[<CMD>lua require("util").addJump(require("illuminate").next_reference, false, {wrap = true})<CR>]],                 {"silent"})
+        -- bmap(bufNr, "n", [[<A-S-n>]], [[<CMD>lua require("util").addJump(require("illuminate").next_reference, false, {reverse = true, wrap = true})<CR>]], {"silent"})
 
         -- Mappings
         -- bmap(bufNr, "n", [[gd]], require('telescope.builtin').lsp_definitions, "Telescope LSP definition")
         -- bmap(bufNr, "n", [[gD]], require('telescope.builtin').lsp_type_definitions, "Telescope LSP definition")
         -- bmap(bufNr, "n", [[gR]], require('telescope.builtin').lsp_references, "Telescope LSP references")
         -- bmap(bufNr, "n", [[gi]], require('telescope.builtin').lsp_implementations, "Telescope LSP implementation)
-        -- BUG:
-        -- bmap(bufNr, "n", [[<C-f>a]],    require('telescope.builtin').lsp_code_actions,      "Telescope LSP code action")
-        bmap(bufNr, "n", [[<C-f>o]], [[:lua require('telescope.builtin').lsp_document_symbols]],  {"silent"}, "Telescope LSP document symbols")
-        bmap(bufNr, "n", [[<C-f>O]], [[:lua require('telescope.builtin').lsp_workspace_symbols]], {"silent"}, "Telescope LSP workspace symbols")
-        bmap(bufNr, "n", [=[ga]=],        [[:lua vim.lsp.buf.code_action()<CR>]],     {"silent"}, "LSP code action")
-        bmap(bufNr, "n", [=[gd]=],        [[:lua vim.lsp.buf.definition()<CR>]],      {"silent"}, "LSP definition")
-        bmap(bufNr, "n", [=[gD]=],        [[:lua vim.lsp.buf.type_definition()<CR>]], {"silent"}, "LSP type definition")
-        bmap(bufNr, "n", [=[gi]=],        [[:lua vim.lsp.buf.implementation()<CR>]],  {"silent"}, "LSP implementation")
-        bmap(bufNr, "n", [=[<leader>D]=], [[:lua vim.lsp.buf.declaration()<CR>]],     {"silent"}, "LSP documentation")
+        bmap(bufNr, "n", [[<C-f>o]], [[<CMD>lua require('telescope.builtin').lsp_document_symbols()<CR>]],  {"silent"}, "Telescope LSP document symbols")
+        bmap(bufNr, "n", [[<C-f>O]], [[<CMD>lua require('telescope.builtin').lsp_workspace_symbols()<CR>]], {"silent"}, "Telescope LSP workspace symbols")
+
+        bmap(bufNr, "n", [=[ga]=],        [[<CMD>lua vim.lsp.buf.code_action()<CR>]],     {"silent"}, "LSP code action")
+        bmap(bufNr, "n", [=[gd]=],        [[<CMD>lua vim.lsp.buf.definition()<CR>]],      {"silent"}, "LSP definition")
+        bmap(bufNr, "n", [=[gD]=],        [[<CMD>lua vim.lsp.buf.type_definition()<CR>]], {"silent"}, "LSP type definition")
+        bmap(bufNr, "n", [=[gi]=],        [[<CMD>lua vim.lsp.buf.implementation()<CR>]],  {"silent"}, "LSP implementation")
+        bmap(bufNr, "n", [=[<leader>D]=], [[<CMD>lua vim.lsp.buf.declaration()<CR>]],     {"silent"}, "LSP documentation")
         bmap(bufNr, "n", [=[<leader>R]=], function()
             QuickfixSwitchWin = true
             vim.lsp.buf.references{includeDeclaration = false}
         end, "LSP references")
-        bmap(bufNr, "n", "<leader>rn", [[:lua vim.lsp.buf.rename()<CR>]],           {"silent"}, "LSP rename")
-        bmap(bufNr, "n", [[K]],        [[:lua vim.lsp.buf.hover()<CR>]],            {"silent"}, "LSP hover")
-        bmap(bufNr, "n", [[<C-p>]],    [[:lua vim.lsp.buf.signature_help()<CR>]],   {"silent"}, "LSP signature help")
-        bmap(bufNr, "n", [[<A-f>]],    [[:lua vim.lsp.buf.format{async=true}<CR>]], {"silent"}, "LSP format")
+        bmap(bufNr, "n", "<leader>rn", [[<CMD>lua vim.lsp.buf.rename()<CR>]],           {"silent"}, "LSP rename")
+        bmap(bufNr, "n", [[K]],        [[<CMD>lua vim.lsp.buf.hover()<CR>]],            {"silent"}, "LSP hover")
+        bmap(bufNr, "n", [[<C-p>]],    [[<CMD>lua vim.lsp.buf.signature_help()<CR>]],   {"silent"}, "LSP signature help")
+        bmap(bufNr, "n", [[<A-f>]],    [[<CMD>lua vim.lsp.buf.format{async=true}<CR>]], {"silent"}, "LSP format")
         -- bmap(bufNr, "n", [=[<leader>wa]=], vim.lsp.buf.add_workspace_folder, "LSP add workspace folder")
         -- bmap(bufNr, "n", [=[<leader>wr]=], vim.lsp.buf.remove_workspace_folder, "LSP remove workspace folder")
         -- bmap(bufNr, "n", [=[<leader>wl]=], Print(vim.lsp.buf.list_workspace_folders, "LSP list workspace folder")
@@ -86,7 +85,6 @@ return function()
     -- Lua {{{
     -- https://github.com/LuaLS/lua-language-server
     -- Settings: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#lua_ls
-
     servers.lua_ls = {
         settings = {
             Lua = {
@@ -213,18 +211,18 @@ return function()
     -- TODO:
     -- Move to core/mapping.lua
     -- Diagnostic mapping
-    map("n", [[<C-q>e]], [[:lua vim.diagnostic.setqflist()<CR>]], {"silent"}, "LSP add workspace folder")
+    map("n", [[<C-q>e]], [[<CMD>lua vim.diagnostic.setqflist()<CR>]], {"silent"}, "LSP add workspace folder")
     map("n", [[[e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"})
     map("n", [[]e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"})
     map("n", [[[E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"})
     map("n", [[]E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"})
     if TelescopeGlobalState then
-        map("n", [[<leader>e]], [[:lua require('telescope.builtin').diagnostics{bufnr=0}<CR>]],
+        map("n", [[<leader>e]], [[<CMD>lua require('telescope.builtin').diagnostics{bufnr=0}<CR>]],
             {"silent"}, "Telescope LSP document diagnostics")
-        map("n", [[<leader>E]], [[:lua require('telescope.builtin').diagnostics{bufnr=nil}<CR>]],
+        map("n", [[<leader>E]], [[<CMD>lua require('telescope.builtin').diagnostics{bufnr=nil}<CR>]],
         {"silent"}, "Telescope LSP workspace diagnostics")
     else
-        map("n", [[<leader>e]], [[:lua vim.diagnostic.open_float()<CR>]], {"silent"}, "LSP diagnostics")
+        map("n", [[<leader>e]], [[<CMD>lua vim.diagnostic.open_float()<CR>]], {"silent"}, "LSP diagnostics")
     end
 
     -- Setup servers {{{
