@@ -70,7 +70,6 @@ local function lookUp(args)
     else
         return
     end
-    -- }}} Create highlight
 
     -- Restore cursor position
     if vimMode == "n" and not require("util").withinRegion(operator.cursorPos, posStart, posEnd) then

@@ -1,4 +1,3 @@
-local cmd  = vim.cmd
 local M    = {}
 
 -- NOTE: Mapping is always recursive unless noremap is specified
@@ -317,17 +316,17 @@ map("", [[L]], [[$]], "End of line")
 -- Non-blank last character
 map("", [[g$]], [[g_]], {"noremap"}, "End of line(non-blank)")
 -- Trailing character {{{
-map("n", [[g.]],      [[:lua require("trailingUtil").trailingChar(".")<CR>]],  {"silent"}, "Trail .")
-map("n", [[g,]],      [[:lua require("trailingUtil").trailingChar(",")<CR>]],  {"silent"}, "Trail ,")
-map("n", [[g;]],      [[:lua require("trailingUtil").trailingChar(";")<CR>]],  {"silent"}, "Trail ;")
-map("n", [[g:]],      [[:lua require("trailingUtil").trailingChar(":")<CR>]],  {"silent"}, "Trail :")
-map("n", [[g"]],      [[:lua require("trailingUtil").trailingChar("\"")<CR>]], {"silent"}, 'Trail "')
-map("n", [[g']],      [[:lua require("trailingUtil").trailingChar("'")<CR>]],  {"silent"}, "Trail '")
-map("n", [[g)]],      [[:lua require("trailingUtil").trailingChar(")")<CR>]],  {"silent"}, "Trail )")
-map("n", [[g(]],      [[:lua require("trailingUtil").trailingChar("(")<CR>]],  {"silent"}, "Trail (")
-map("n", [[g<C-CR>]], [[:call append(line("."),   repeat([""], v:count1))<CR>]], {"silent"}, "Add new line below")
-map("n", [[g<S-CR>]], [[:call append(line(".")-1, repeat([""], v:count1))<CR>]], {"silent"}, "Add new line above")
-map("n", [[g<CR>]],   [[:lua require("breakLine").main()<CR>]], {"silent"}, "Break line at cursor")
+map("n", [[g.]],      [[<CMD>lua require("trailingChar").main(".")<CR>]],  {"silent"}, "Trail .")
+map("n", [[g,]],      [[<CMD>lua require("trailingChar").main(",")<CR>]],  {"silent"}, "Trail ,")
+map("n", [[g;]],      [[<CMD>lua require("trailingChar").main(";")<CR>]],  {"silent"}, "Trail ;")
+map("n", [[g:]],      [[<CMD>lua require("trailingChar").main(":")<CR>]],  {"silent"}, "Trail :")
+map("n", [[g"]],      [[<CMD>lua require("trailingChar").main("\"")<CR>]], {"silent"}, 'Trail "')
+map("n", [[g']],      [[<CMD>lua require("trailingChar").main("'")<CR>]],  {"silent"}, "Trail '")
+map("n", [[g)]],      [[<CMD>lua require("trailingChar").main(")")<CR>]],  {"silent"}, "Trail )")
+map("n", [[g(]],      [[<CMD>lua require("trailingChar").main("(")<CR>]],  {"silent"}, "Trail (")
+map("n", [[g<C-CR>]], [[<CMD>call append(line("."),   repeat([""], v:count1))<CR>]], {"silent"}, "Add new line below")
+map("n", [[g<S-CR>]], [[<CMD>call append(line(".")-1, repeat([""], v:count1))<CR>]], {"silent"}, "Add new line above")
+map("n", [[g<CR>]],   [[<CMD>lua require("breakLine").main()<CR>]], {"silent"}, "Break line at cursor")
 -- }}} Trailing character
 
 -- Pageup/Pagedown
@@ -382,13 +381,6 @@ map({"n", "x"}, [[<A-C-l>]],    [[<CMD>tabn<CR>]],    {"silent"}, "Next tab")
 map({"n", "x"}, [[<C-W><C-o>]], [[<CMD>tabonly<CR>]], {"silent"}, "Tab only")
 -- }}} Buffer & Window & Tab
 -- Folding {{{
-map("",  [[zm]], [[zMzz]], {"noremap"}, "Close all folds recursively")
-map("",  [[zr]], [[zRzz]], {"noremap"}, "Open all folds recursively")
-map("",  [[zM]], [[zmzz]], {"noremap"}, "Close current fold recursively")
-map("",  [[zR]], [[zrzz]], {"noremap"}, "Open current fold recursively")
-map("",  [[zA]], [[zAzz]], {"noremap"}, "Toggle current fold recursively")
--- BUG:
-map("",  [[<leader>z]], [[<CMD>call EnhanceFoldHL("No fold marker found", 500, "")<CR>]], {"silent"}, "Highlight current fold marker")
 map("",  [[zj]], [[<Nop>]])
 map("",  [[zk]], [[<Nop>]])
 map("",  [[[Z]], [[zk]], {"noremap"}, "Previous fold(integral)")
@@ -400,12 +392,12 @@ map("n", [[dz]], [[<CMD>call EnhanceFoldHL("", 800, "EnhanceDelete")<CR>]], {"si
 map("n", [[zd]], [[<CMD>call EnhanceFoldHL("", 800, "EnhanceDelete")<CR>]], {"silent"}, "Delete fold")
 map("n", [[cz]], [[<CMD>call EnhanceFoldHL("", 0, "EnhanceChange")<CR>]],   {"silent"}, "Change fold")
 map("n", [[zc]], [[<CMD>call EnhanceFoldHL("", 0, "EnhanceChange")<CR>]],   {"silent"}, "Change fold")
--- TODO: Check whether target line is a comment or not
-map("n", [[g{]], [[<CMD>call EnhanceFold(mode(), "{{{")<CR>]],           "Add fold start")
-map("n", [[g}]], [[<CMD>call EnhanceFold(mode(), "}}}")<CR>]],           "Add fold end")
+map("n", [[g{]], [[<CMD>lua require("trailingChar").main("{")<CR>]], {"silent"}, "Add fold marker start")
+map("n", [[g}]], [[<CMD>lua require("trailingChar").main("}")<CR>]], {"silent"}, "Add fold marker end")
 -- BUG:
 map("x", [[g{]], [[m`<CMD>call EnhanceFold(visualmode(), "}}}")<CR>``]], "Add fold for selected")
 map("x", [[g}]], [[m`<CMD>call EnhanceFold(visualmode(), "}}}")<CR>``]], "Add fold for selected")
+
 map("",  [[<leader>z]], [[<CMD>call EnhanceFoldHL("No fold marker found", 500, "")<CR>]], {"silent"}, "Highlight current fold marker")
 map("", [[zm]], [[zMzz]], {"noremap"}, "Close all folds recursively")
 map("", [[zr]], [[zRzz]], {"noremap"}, "Open all folds recursively")
@@ -428,7 +420,7 @@ end
 -- }}} Folding
 -- MS behavior {{{
 -- <C-z/v/s> {{{
-map("n", [[<C-z>]], [[u]], "Undo")
+map("n", [[<C-z>]], [[u]], "Undo") -- test
 map("x", [[<C-z>]], [[<esc>u]], "Undo")
 map("i", [[<C-z>]], [[<C-\><C-o>u]], "Undo")
 
@@ -445,7 +437,7 @@ map("i", [[<C-v>]], [[<C-r>*]], "Put")
 map("i", [[<C-s>]], [[<C-\><C-o>:w<CR>]], "Write")
 -- }}} <C-z/x/v/s>
 -- Save as..
-cmd [[command! -nargs=0 Saveas echohl Moremsg | echo "CWD: ".getcwd() | execute input("", "saveas ") | echohl None<CR> | e!]]
+vim.cmd [[command! -nargs=0 Saveas echohl Moremsg | echo "CWD: ".getcwd() | execute input("", "saveas ") | echohl None<CR> | e!]]
 map("n", [[<C-S-s>]], [[<CMD>Saveas<CR>]],       {"silent"}, "Save as")
 map("i", [[<C-S-s>]], [[<C-\><C-o>:Saveas<CR>]], {"silent"}, "Save as")
 -- Delete
