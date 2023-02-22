@@ -11,10 +11,8 @@ M.updateDebug = function()
 end
 
 M.config = function()
-    map("n", [[g>]], [[<CMD>Messages<CR>]], {"silent"}, "Messages in quickfix")
-    whichKeyDoc({"gS", "Show syntax highlighting groups"})
-    whichKeyDoc({"g=", "Eval operator"})
-    whichKeyDoc({"g==", "Eval current line"})
+    map("n", [[<C-q>.]], [[<CMD>Messages<CR>]], {"silent"}, "Messages in quickfix")
+    map("n", [[<C-q>,]], [[<CMD>Messages<CR>]], {"silent"}, "Messages in quickfix")
 end
 
 return M
