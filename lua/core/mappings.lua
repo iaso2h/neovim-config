@@ -33,6 +33,7 @@ map("n", [[<A-a>]], [[:lua require("expandRegion").expandShrink("n", 1)<CR>]],  
 map("n", [[<A-s>]], [[<Nop>]])
 map("x", [[<A-a>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), 1)<CR>]],  {"silent"}, "Expand selection")
 map("x", [[<A-s>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), -1)<CR>]], {"silent"}, "Shrink selection")
+-- Interesting word {{{
 map("n", [[<Plug>InterestingWordOperator]], function ()
         return vim.fn.luaeval[[
         require("operator").expr(require("interestingWord").operator,
@@ -405,10 +406,18 @@ map("n", [[g}]], [[<CMD>call EnhanceFold(mode(), "}}}")<CR>]],           "Add fo
 -- BUG:
 map("x", [[g{]], [[m`<CMD>call EnhanceFold(visualmode(), "}}}")<CR>``]], "Add fold for selected")
 map("x", [[g}]], [[m`<CMD>call EnhanceFold(visualmode(), "}}}")<CR>``]], "Add fold for selected")
-map("n", [[<leader><Space>]], [[@=(foldlevel('.') ? 'za' : '\<Space>')<CR>]],          {"noremap", "silent"}, "Open fold")
--- TODO: make <C-Space> snapped to the nearst closed fold even if the cursor
--- is not on a line with closed fold
-map("n", [[<C-Space>]],       [[@=(foldlevel('.') ? 'zA' : '\<Space>')<CR>]],          {"noremap", "silent"}, "Open fold recursively")
+map("",  [[<leader>z]], [[<CMD>call EnhanceFoldHL("No fold marker found", 500, "")<CR>]], {"silent"}, "Highlight current fold marker")
+map("", [[zm]], [[zMzz]], {"noremap"}, "Close all folds recursively")
+map("", [[zr]], [[zRzz]], {"noremap"}, "Open all folds recursively")
+map("", [[zM]], [[zmzz]], {"noremap"}, "Close folds recursively")
+map("", [[zR]], [[zrzz]], {"noremap"}, "Open folds recursively")
+map("", [[zA]], [[za]],   {"noremap"}, "Toggle current fold")
+map("", [[za]],
+    [[:lua require("snapToFold").main("norm! zA", true, 0.5)<CR>]],
+    {"silent"}, "Snap to closest fold then toggle it recursively")
+map("",  [[<leader><Space>]],
+    [[:lua require("snapToFold").main("norm! za", true, 0.5)<CR>]],
+    {"silent"}, "Snap to closest fold then toggle it")
 for i=0, 9 do
     map({"n", "x"},
         string.format("z%d", i),

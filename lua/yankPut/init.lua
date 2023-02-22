@@ -207,8 +207,8 @@ function M.inplaceYank(args) -- {{{
     -- Create highlight {{{
     -- Creates a new namespace or gets an existing one.
     M.lastYankNS = api.nvim_create_namespace("inplacePutNewContent")
-    local newContentExmark = util.nvimBufAddHl(curBufNr, posStart, posEnd, M.lastYankNS,
-                    fn.getregtype(), opts.hlGroup, opts.timeout)
+    local newContentExmark = util.nvimBufAddHl(curBufNr, posStart, posEnd,
+        fn.getregtype(), opts.hlGroup, opts.timeout)
     if newContentExmark then M.lastYankExtmark = newContentExmark end
     -- }}} Create highlight
 
@@ -339,7 +339,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     local posEnd = api.nvim_buf_get_mark(curBufNr, "]")
     -- Creates a new namespace or gets an existing one.
     M.inplacePutNewContentNS = api.nvim_create_namespace("inplacePutNewContent")
-    local newContentExmark = util.nvimBufAddHl(curBufNr, posStart, posEnd, M.inplacePutNewContentNS, regTypeNew, opts.hlGroup, opts.timeout)
+    local newContentExmark = util.nvimBufAddHl(curBufNr, posStart, posEnd, regTypeNew, opts.hlGroup, opts.timeout, M.inplacePutNewContentNS)
     if newContentExmark then M.inplacePutNewContentExtmark = newContentExmark end
     -- }}} Create highlight
 

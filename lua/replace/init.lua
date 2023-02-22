@@ -280,7 +280,7 @@ local replace = function(motionType, vimMode, reg, regionMotion, curBufNr, opts)
     -- Creates a new namespace or gets an existing one.
     require("yankPut").inplacePutNewContentNS = api.nvim_create_namespace("inplacePutNewContent")
     local newContentExmark = util.nvimBufAddHl(curBufNr, repStart, repEnd,
-            require("yankPut").inplacePutNewContentNS, reg.type, opts.hlGroup, opts.timeout)
+            reg.type, opts.hlGroup, opts.timeout, require("yankPut").inplacePutNewContentNS)
     if newContentExmark then require("yankPut").inplacePutNewContentExtmark = newContentExmark end
     -- }}} Create highlight
 

@@ -410,14 +410,14 @@ end -- }}}
 
 
 --- Caculate the distance from pos1 to pos2
----@param pos1 table {1, 0} based number. Can be retrieved by calling vim.api.nvim_buf_get_mark()
----@param pos2 table Same as pos1
----@param biasFactor number
----@param biasIdx number To which value the factor is going to apply
+---@param pos1       table      {1, 0} based number. Can be retrieved by calling vim.api.nvim_buf_get_mark()
+---@param pos2       table      Same as pos1
+---@param biasFactor number|nil
+---@param biasIdx    number|nil To which value the factor is going to apply
 ---@return number value of distance from pos1 to pos2
 function M.posDist(pos1, pos2, biasFactor, biasIdx)
-    biasFactor    = biasFactor or 1
-    biasIdx = biasIdx or 1
+    biasFactor = biasFactor or 1
+    biasIdx    = biasIdx or 1
     local lineDist
     local colDist
     if biasIdx == 1 then
@@ -703,33 +703,37 @@ end
 --- Create highlights for region in a buffer. The region is defined by two
 --- tables containg position info represent the start and the end
 --- respectively. The region can be multi-lines across in a buffer
---- @param bufNr integer Buffer number/handler
---- @param posStart table (1, 0)-indexed values from vim.api.nvim_buf_get_mark()
---- @param posEnd table (1, 0)-indexed values from vim.api.nvim_buf_get_mark()
---- @param presNS integer ID of the preserved namespace, in which the
---- preserved extmark will be stored
---- @param regType string Register type from vim.fn.getregtype()
---- @param hlGroup string Highlight group name
---- @param hlTimeout integer Determine how long the highlight will be clear
+--- @param bufNr      number     Buffer number/handler
+--- @param posStart   table      (1, 0)-indexed values from vim.api.nvim_buf_get_mark()
+--- @param posEnd     table      (1, 0)-indexed values from vim.api.nvim_buf_get_mark()
+--- @param regType    string     Register type from vim.fn.getregtype()
+--- @param hlGroup    string     Highlight group name
+--- @param hlTimeout  number     Determine how long the highlight will be clear
 --- after being created
---- @return integer/boolean Return integer when successful, which is the ID of the preserved namespace of the content defined by. Return false when failed
---- posStart and posEnd
-M.nvimBufAddHl = function(bufNr, posStart, posEnd, presNS, regType, hlGroup, hlTimeout)
+--- @param presNS     number|nil Otional ID of the preserved namespace, in which the
+--- preserved extmark will be stored to keep track of highlight content
+--- @return number|boolean Return integer or true when successful, which is the
+--- ID of the preserved namespace of the content defined by. Return false when
+--- failed posStart and posEnd
+M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, presNS)
     local presExtmark
 
     -- Change to 0-based for extmark creation
     posStart = {posStart[1] - 1, posStart[2]}
     posEnd = {posEnd[1] - 1, posEnd[2]}
 
-    -- Create extmark to track the position of new content
-    local ok, msg = pcall(api.nvim_buf_set_extmark, bufNr, presNS,
-        posStart[1], posStart[2], {end_line = posEnd[1], end_col = posEnd[2]})
-    -- End function calling if exmark is out of scope
-    if not ok then
-        vim.notify(msg, vim.log.levels.WARN)
-        return false
-    else
-        presExtmark = msg
+    -- Create extmark to track the position of the highlight content if preserved
+    -- namespace is provided
+    if presNS then
+        local ok, msg = pcall(api.nvim_buf_set_extmark, bufNr, presNS,
+            posStart[1], posStart[2], {end_line = posEnd[1], end_col = posEnd[2]})
+        -- End function calling if exmark is out of scope
+        if not ok then
+            vim.notify(msg, vim.log.levels.WARN)
+            return false
+        else
+            presExtmark = msg
+        end
     end
 
     -- Creates a new namespace or gets an existing one.
@@ -753,13 +757,11 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, presNS, regType, hlGroup, hlT
         end
     end, hlTimeout)
 
-    return presExtmark
-end
-
-
--- dummy
-_G.whichKeyDoc = function(docs)
-    return
+    if presNS then
+        return presExtmark
+    else
+        return true
+    end
 end
 
 
