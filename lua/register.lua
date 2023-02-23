@@ -1,5 +1,9 @@
+-- File: trailingChar
+-- Author: iaso2h
+-- Description: Add character at the end of line
+-- Version: 0.0.4
+-- Last Modified: 2023-2-23
 local fn  = vim.fn
-local cmd = vim.cmd
 local api = vim.api
 local M = {
     writable = [=[[-a-zA-Z0-9"*+_/]]=],
@@ -25,13 +29,23 @@ M.insertPrompt = function() -- {{{
     -- TODO: Custom register completion prompt
     local regexAll = vim.regex(M.all)
     local reg
-    cmd [[noa reg]]
+    vim.cmd [[noa reg]]
 
-    cmd [[noa echohl Moremsg]]
+    vim.cmd [[noa echohl Moremsg]]
     repeat
-        reg = fn.input("Register: ")
+        local ok, msg = pcall(fn.input, "Register: ")
+        if not ok then
+            if string.find(msg, "Keyboard interrupt") then
+                return
+            else
+                return vim.notify(msg, vim.log.levels.ERROR)
+            end
+        else
+            reg = msg
+        end
+
     until (#reg == 1 and regexAll:match_str(reg)) or vim.notify("    Invalid register name", vim.log.levels.ERROR)
-    cmd [[noa echohl None]]
+    vim.cmd [[noa echohl None]]
 
     -- local regContent = reg == "=" and fn.getreg(reg, 1) or fn.getreg(reg, 0)
     local regType    = fn.getregtype(reg)
