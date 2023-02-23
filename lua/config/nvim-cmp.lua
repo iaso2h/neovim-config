@@ -143,19 +143,23 @@ return function()
                     fallback()
                 end
             end, {"i", "s"}),
-            ["<C-Space>"] = function(fallback)
-                -- cmp.mapping.complete()
+            ["<C-Space>"] = function(_)
                 if cmp.visible() then
                     require("cmp.utils.autocmd").emit("InsertLeave")
-                    -- vim.api.nvim_feedkeys(t"a", "n", true)
                 else
-                    require("cmp.utils.autocmd").emit("InsertStart")
-                    -- -- TODO: better trigger mechanics
-                    -- vim.api.nvim_feedkeys(t"<C-n>", "n", true)
+                    -- TODO: better trigger mechanics
+                    vim.api.nvim_feedkeys(t"<C-n>", "n", true)
 
                 end
             end,
-            ["<C-e>"] = function(fallback)
+            ["<C-i>"] = function(fallback)
+                if cmp.visible() then
+                    require("cmp.utils.autocmd").emit("InsertLeave")
+                else
+                    fallback()
+                end
+            end,
+            ["<C-e>"] = function(_)
                 if cmp.visible() then
                     cmp.abort()
                 end

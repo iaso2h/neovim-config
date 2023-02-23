@@ -62,6 +62,7 @@ use {
     'nvim-treesitter/nvim-treesitter',
     run = function()
         require('nvim-treesitter.install').update({with_sync = true})
+        ---@diagnostic disable-next-line: undefined-global
         ts_update()
     end,
     config = conf "nvim-treesitter"
@@ -106,6 +107,7 @@ use {
     'p00f/nvim-ts-rainbow',
     -- TODO:
     -- 'HiPhish/nvim-ts-rainbow2',
+    event    = "BufAdd",
     requires = "nvim-treesitter",
     after    = "nvim-treesitter",
     config   = function()
@@ -129,6 +131,7 @@ use {
 }
 use {
     "nvim-treesitter/nvim-treesitter-textobjects",
+    event    = "BufAdd",
     requires = {
         "nvim-treesitter",
         "gitsigns.nvim"
@@ -137,6 +140,7 @@ use {
 }
 use {
     'windwp/nvim-ts-autotag',
+    event    = "InsertEnter",
     requires = "nvim-treesitter",
     ft       = {"html", "javascript", "javascriptreact", "typescriptreact", "svelte", "vue"},
     config   = [[require("nvim-treesitter.configs").setup {autotag = {enable = true}}]]
@@ -144,8 +148,14 @@ use {
 
 -- }}} Treesitter
     -- Vim enhancement {{{
-    use 'inkarkat/vim-visualrepeat'
-    use 'tpope/vim-repeat'
+    use {
+        'inkarkat/vim-visualrepeat',
+        event = "BufModifiedSet"
+    }
+    use {
+        'tpope/vim-repeat',
+        event = "BufModifiedSet"
+    }
     use {
         'tpope/vim-eunuch',
         cmd = {"Delete", "Unlink", "Remove", "Move", "Rename", "Chmod", "Mkdir", "Cfind", "Lfind", "Clocate", "Llocate", "SudoEdit", "SudoWrite", "Wall", "W"}
@@ -157,6 +167,7 @@ use {
     }
     use {
         'bkad/camelcasemotion',
+        event = "BufAdd",
         setup = [[vim.g.camelcasemotion_key = ',']],
     }
     use {
@@ -180,6 +191,7 @@ use {
     }
     use {
         'andymass/vim-matchup',
+        event   = "BufAdd",
         require = "nvim-treesitter",
         setup   = conf "vim-matchup".setup,
         config  = conf "vim-matchup".config
@@ -261,6 +273,7 @@ use {
     }
     use {
         'michaeljsmith/vim-indent-object',
+        event = "BufAdd"
     }
     use {
         'monaqa/dial.nvim',
@@ -360,7 +373,7 @@ use {
     }
     use {
         'airblade/vim-rooter',
-        event  = "BufRead",
+        event  = "BufAdd",
         config = function()
             vim.g.rooter_change_directory_for_non_project_files = "current"
             vim.g.rooter_patterns = {
@@ -381,29 +394,6 @@ use {
         'AndrewRadev/switch.vim',
         cmd   = "Switch",
         setup = 'map("n", [[gt]], [[<CMD>Switch<CR>]], {"silent"}, "Switch word under cursor")'
-    }
-    use {
-        'AndrewRadev/linediff.vim',
-        cmd = {"Linediff", "LinediffReset"},
-    }
-    -- TODO: reimplement in lua way and support treesitter
-    use {
-        'AndrewRadev/deleft.vim',
-        disable = true,
-        cmd = {"Linediff", "LinediffReset"},
-    }
-    use {
-        'AndrewRadev/sideways.vim',
-        disable = true,
-        -- cmd  = {"SidewaysJumpLeft", "SidewaysJumpRight"},
-        -- keys = {
-            -- {"n", "gx<"},
-            -- {"n", "gx>"},
-        -- },
-        -- config = function()
-            -- map("n", [[gx<]], [[<CMD>SidewaysLeft<CR>]],  {"silent"})
-            -- map("n", [[gx>]], [[<CMD>SidewaysRight<CR>]], {"silent"})
-        -- end
     }
     -- BUG:
     use {
@@ -443,7 +433,8 @@ use {
     }
     use {
         'preservim/nerdcommenter',
-        keys = {
+        event = "BufAdd",
+        keys  = {
             {"x", [[<A-/>]]},
             {"n", [[<A-/>]]},
             {"n", [[gco]]},
@@ -487,7 +478,7 @@ use {
     use {
         'lukas-reineke/indent-blankline.nvim',
         require = "nvim-treesitter",
-        event   = "BufRead",
+        event   = "BufAdd",
         config  = function()
             require("indent_blankline").setup{
                 use_treesitter = true,
@@ -531,6 +522,7 @@ use {
     }
     use {
         'folke/which-key.nvim',
+        cmd    = "WhichKey",
         config = conf "nvim-which-key"
     }
     -- }}} Vim enhancement
@@ -578,20 +570,20 @@ use {
     use {
         -- TODO: use the main brach
         'NTBBloodbath/galaxyline.nvim',
-        event    = "BufRead",
+        event    = "BufAdd",
         requires = "nvim-web-devicons",
         config   = conf "nvim-galaxyline"
     }
 
     use {
         'akinsho/bufferline.nvim',
-        event    = "BufRead",
+        event    = "BufAdd",
         requires = "nvim-web-devicons",
         config   = conf "nvim-bufferline".config
     }
     use {
         'NvChad/nvim-colorizer.lua',
-        event = "BufRead",
+        event = "BufAdd",
         config = function() -- {{{
             require("colorizer").setup {
                 filetypes = { "*" },
@@ -621,7 +613,7 @@ use {
     }
     use {
         'folke/todo-comments.nvim',
-        event    = "BufRead",
+        event    = "BufAdd",
         requires = "nvim-web-devicons",
         config   = conf "nvim-todo-comments"
     }
@@ -633,6 +625,7 @@ use {
     }
     use {
         'stevearc/dressing.nvim',
+        event = "BufAdd",
         config = conf "nvim-dressing"
     }
     -- }}} UI
@@ -671,50 +664,67 @@ use {
     }
     use {
         'neovim/nvim-lspconfig',
+        event  = "BufAdd",
         requires = {
             "plenary.nvim",
-            "hrsh7th/cmp-nvim-lsp"
+            {
+                "hrsh7th/cmp-nvim-lsp",
+                event  = "BufAdd",
+            }
         },
-        event  = "BufRead",
     }
     use {
         'folke/neodev.nvim',
-        after = "nvim-lspconfig",
+        ft     = "lua",
         config = [[ require("neodev").setup(); require("config.nvim-lspconfig")() ]]
     }
     use {
         'hrsh7th/nvim-cmp',
-        requires = {
-            {"hrsh7th/cmp-nvim-lsp", module = "cmp_nvim_lsp"},
-            {"hrsh7th/cmp-buffer",   module = "cmp_buffer"},
-            {"hrsh7th/cmp-path",     module = "cmp_path"},
-            {"hrsh7th/cmp-cmdline",  module = "cmp_cmdline"},
-            {"L3MON4D3/LuaSnip",
-                run = "make install_jsregexp"
-                -- config = conf "nvim-luasnip"
-            -- TODO: VSNIP Legacy
-                -- event  = "InsertEnter",
-                -- config = conf "vim-vsnip"
-            },
-            {
-                "tzachar/cmp-tabnine",
-                run = function()
-                    if jit.os == "Windows" then
-                        vim.cmd "!powershell ./install.ps1'"
-                    elseif jit.os == "linux" then
-                        vim.cmd "!./install.sh"
-                    end
-                end,
-                -- config = function()
-                    -- require('cmp_tabnine.config'):setup{
-                        -- max_num_results = 20,
-                        -- max_lines       = 1000,
-                        -- sort            = true
-                    -- }
-                -- end
-            },
-        },
+        requires = "LuaSnip",
         config = conf "nvim-cmp"
+    }
+    use {
+        'hrsh7th/cmp-nvim-lsp',
+        requires = "nvim-cmp"
+    }
+    use {
+        "tzachar/cmp-tabnine",
+        event = "InsertEnter",
+        requires = "nvim-cmp",
+        run = function()
+            if jit.os == "Windows" then
+                vim.cmd "!powershell ./install.ps1'"
+            elseif jit.os == "linux" then
+                vim.cmd "!./install.sh"
+            end
+        end,
+    }
+    use {
+        "saadparwaiz1/cmp_luasnip",
+        event = "InsertEnter",
+        requires = "nvim-cmp",
+        run = function()
+            if jit.os == "Windows" then
+                vim.cmd "!powershell ./install.ps1'"
+            elseif jit.os == "linux" then
+                vim.cmd "!./install.sh"
+            end
+        end,
+    }
+    use {
+        "hrsh7th/cmp-buffer",
+        event = "InsertEnter",
+        requires = "nvim-cmp",
+    }
+    use {
+        "hrsh7th/cmp-path",
+        event = "InsertEnter",
+        requires = "nvim-cmp",
+    }
+    use {
+        "hrsh7th/cmp-cmdline",
+        event = "InsertEnter",
+        requires = "nvim-cmp",
     }
     use {
         'folke/trouble.nvim',
@@ -775,6 +785,7 @@ use {
     }
     use {
         'ray-x/lsp_signature.nvim',
+        event  = "InsertEnter",
         config = function()
             require("lsp_signature").setup{
                 hint_enable    = false,
@@ -785,6 +796,7 @@ use {
     }
     use {
         'RRethy/vim-illuminate',
+        event = "BufAdd",
         config = function()
             require("illuminate").configure{
                 providers = {
@@ -801,6 +813,7 @@ use {
     }
     use {
         'ThePrimeagen/refactoring.nvim',
+        event    = "BufAdd",
         requires = {
             "plenary.nvim",
             "nvim-treesitter"
