@@ -1,20 +1,19 @@
 local M = {}
 
 M.servers = {
-    bashls,
-    clangd,
-    cmake,
-    cssls,
-    grammarly,
-    html,
-    jsonls,
-    lua_ls,
-    pyright,
-    remark_ls,
-    cssls,
-    tsserver,
-    vimls,
-    yamlls,
+    bashls = {},
+    clangd = {},
+    cmake = {},
+    cssls = {},
+    grammarly = {},
+    html = {},
+    jsonls = {},
+    lua_ls = {},
+    pyright = {},
+    remark_ls = {},
+    tsserver = {},
+    vimls = {},
+    yamlls = {},
 }
 
 M.config = function()

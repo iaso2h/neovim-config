@@ -95,11 +95,15 @@ return function()
                     enable = true
                 },
                 completion = {
-                    callSnippet    = "Replace",
-                    keywordSnippet = "Replace",
+                    callSnippet    = "Both",
+                    keywordSnippet = "Both",
                     displayContext = 1,
                 },
                 diagnostics = {
+                    disable = {
+                        "trailing-space",
+                        "empty-block"
+                    },
                     globals = {'vim'},
                 },
                 workspace = {
