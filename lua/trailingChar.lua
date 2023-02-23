@@ -1,9 +1,10 @@
 -- File: trailingChar
 -- Author: iaso2h
 -- Description: Add character at the end of line
--- Version: 0.0.4
--- Last Modified: 2023-2-22
+-- Version: 0.0.5
+-- Last Modified: 2023-2-23
 local api = vim.api
+local fn  = vim.fn
 local ts  = vim.treesitter
 local M   = {}
 
@@ -53,6 +54,7 @@ local function findCommentNode(cursorPos, lastNode, lineLen)
 
         cnt = cnt + 1
         if cnt > 50 then
+            vim.notify("Reoccured too many times", vim.log.levels.WARN)
             break
         end
     until i > lineLen
@@ -124,19 +126,104 @@ local trailingMarker = function (cursorPos, line, char)
 end
 
 
+local function findEmptyLine(line)
+    return string.find(line, "^$")
+end
+
+
+local function indentCopy(lineNr)
+    return string.rep(" ", fn.indent(lineNr))
+end
+
+
 --- Add trailing character
 ---@param char string
-function M.main(char) -- {{{
+function M.main(vimMode, char) -- {{{
     local cursorPos = api.nvim_win_get_cursor(0)
-    local line = api.nvim_buf_get_lines(0, cursorPos[1] - 1,cursorPos[1], false)[1]
-    if char == "{" or char == "}" then
-        trailingMarker(cursorPos, line, char)
+    local lines
+    if vimMode == "n" then
+        lines = api.nvim_buf_get_lines(0, cursorPos[1] - 1,cursorPos[1], false)[1]
+
+        if char == "{" or char == "}" then
+            trailingMarker(cursorPos, lines, char)
+        else
+            api.nvim_set_current_line(lines .. char)
+        end
     else
-        -- local curLine = api.nvim_get_current_line()
-        -- if string.sub(curLine, #curLine) ~= trailingChar then
-            vim.cmd("noa normal! A" .. char)
-            api.nvim_win_set_cursor(0, cursorPos)
-        -- end
+        local startPos = api.nvim_buf_get_mark(0, "<")
+        local endPos   = api.nvim_buf_get_mark(0, ">")
+        lines = api.nvim_buf_get_lines(0, startPos[1] - 1, endPos[1], false)
+
+        if char == "{" or char == "}" then
+            local commentStr
+            local ok, msg = pcall(string.gsub, vim.bo.commentstring, "%s+%%s$", "")
+            if not ok then
+                vim.notify("Failed at retrieving comment string", vim.log.levels.ERROR)
+                return vim.notify(msg, vim.log.levels.ERROR)
+            else
+                commentStr = msg
+            end
+
+            -- Get user note
+            local note
+            vim.cmd [[noa echohl Moremsg]]
+            ok, msg = pcall(fn.input, "Input note: ")
+            vim.cmd [[noa echohl None]]
+            if not ok then
+                if string.find(msg, "Keyboard interrupt") then
+                    note = ""
+                else
+                    return vim.notify(msg, vim.log.levels.ERROR)
+                end
+            else
+                note = msg
+            end
+
+            -- Decide fold marker type
+            local topEmpty = findEmptyLine(lines[1])
+            local botEmpty = findEmptyLine(lines[#lines])
+            local newLine
+            -- Whole line fold marker
+            if topEmpty or botEmpty then
+                -- Always put empty line at the very end of visual seletion
+                if topEmpty then
+                    newLine = indentCopy(startPos[1] + 1) .. commentStr .. " " .. note .. " {{{"
+                    table.insert(lines, 2, newLine)
+                else
+                    newLine = indentCopy(startPos[1]) .. commentStr .. " " .. note .. " {{{"
+                    table.insert(lines, 1, newLine)
+                end
+
+                if botEmpty then
+                    newLine = indentCopy(endPos[1] - 1) .. commentStr .. " }}}" .. note
+                    table.insert(lines, #lines, newLine)
+                else
+                    newLine = indentCopy(endPos[1]) .. commentStr .. " }}}" .. note
+                    lines[#lines+1] = newLine
+                end
+            -- Inline fold marker
+            else
+                if note == "" then
+                    newLine = " " .. commentStr .. note .. " {{{"
+                else
+                    newLine = " " .. commentStr .. " " .. note .. " {{{"
+                end
+                lines[1] = lines[1] .. newLine
+
+                newLine = " " .. commentStr .. " }}} " .. note
+                lines[#lines] = lines[#lines] .. newLine
+            end
+        else
+            for i, line in ipairs(lines) do
+                -- Skip blank line
+                if not findEmptyLine(line) then
+                    lines[i] = line .. char
+                end
+            end
+        end
+
+        -- Replace lines
+        api.nvim_buf_set_lines(0, startPos[1] - 1, endPos[1], false, lines)
     end
 end -- }}}
 
