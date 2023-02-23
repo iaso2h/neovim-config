@@ -678,6 +678,17 @@ use {
         ft     = "lua",
         config = [[ require("neodev").setup(); require("config.nvim-lspconfig")() ]]
     }
+    use 'rafamadriz/friendly-snippets'
+    use {
+        "L3MON4D3/LuaSnip",
+        run      = "make install_jsregexp",
+        config = function ()
+            local sep = jit.os == "Windows" and "\\" or "/"
+            local mySnippets = vim.fn.stdpath("config") .. sep .. "snippets"
+            require("luasnip.loaders.from_vscode").lazy_load()
+            require("luasnip.loaders.from_vscode").lazy_load{paths = {mySnippets}}
+        end
+    }
     use {
         'hrsh7th/nvim-cmp',
         requires = "LuaSnip",

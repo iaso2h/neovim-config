@@ -25,65 +25,8 @@
         "body": ["return $0"],
         "description": "return value"
     },
-    "assigment": {
-        "prefix": "as",
-        "body": ["local ${1:varName} = ${0:value}"],
-        "description": "create a variable"
-    },
-    "require": {
-        "prefix": "req",
-        "body": ["require(\"${1:module}\")"],
-        "description": "Require module"
-    },
-    "new function": {
-        "prefix": "fun",
-        "body": [
-            "function ${1:new_function}(${2:args})",
-            "\t$0,",
-            "end"
-        ],
-        "description": "new function"
-    },
-    "for pairs loop": {
-        "prefix": [
-            "forp"
-        ],
-        "body": [
-            "for ${1:key}, ${2:val} in pairs(${3:table_name}) do",
-            "\t$0",
-            "end"
-        ],
-        "description": "pair for loop"
-    },
-    "for ipairs loop": {
-        "prefix": "fori",
-        "body": [
-            "for ${1:idx}, ${2:val} in ipairs(${3:table_name}) do",
-            "\t$0",
-            "end"
-        ],
-        "description": "ipair for foop"
-    },
-    "for loop": {
-        "prefix": "for",
-        "body": [
-            "for ${1:i}=${2:first}, ${3:last}${4:, ${step}} do",
-            "\t$0",
-            "end"
-        ],
-        "description": "numeric for loop"
-    },
-    "do code block": {
-        "prefix": "do",
-        "body": [
-            "do",
-            "\t$0",
-            "end"
-        ],
-        "description": "insert do code block"
-    },
-    "nvim echo": {
-        "prefix": "necho",
+    "vimecho": {
+        "prefix": "vimecho",
         "body": [
             "api.nvim_echo({{\"${1:text}\", \"${2:Normal}\"}}, ${3:true}, {})"
         ],
@@ -108,84 +51,13 @@
         ],
         "description": "do return end"
     },
-    "repeat loop": {
-        "prefix": "repeat",
-        "body": [
-            "repeat",
-            "\t$1",
-            "until $0"
-        ],
-        "description": "repeat loop"
-    },
-    "while loop": {
-        "prefix": "while",
-        "body": [
-            "while $1 do",
-            "\t$0",
-            "end"
-        ],
-        "description": "while loop"
-    },
-    "if statement": {
-        "prefix": "if",
-        "body": [
-            "if $1 then",
-            "\t$0",
-            "end"
-        ],
-        "description": "if statement"
-    },
-    "if/else statemtn": {
-        "prefix": "ife",
-        "body": [
-            "if $1 then",
-            "\t$2",
-            "else",
-            "\t$0",
-            "end"
-        ],
-        "description": "if/else statement"
-    },
-    "if/elseif statement": {
-        "prefix": "eif",
-        "body": [
-            "if $1 then",
-            "\t$2,",
-            "elseif $3 then",
-            "\t$0",
-            "end"
-        ],
-        "description": "if/elseif statement"
-    },
-    "if/elseif/else statement": {
-        "prefix": "eife",
-        "body": [
-            "if $1 then",
-            "\t$2,",
-            "elseif $3 then",
-            "\t$4",
-            "else",
-            "\t$0",
-            "end"
-        ],
-        "description": "if/elseif/else statement"
-    },
-    "pcall statement": {
-        "prefix": "pcall",
+    "vimpcall": {
+        "prefix": "pcallv",
         "body": [
             "local ok, msg = pcall(${1:func}, ${2:args})",
             "${3:if not ok then vim.notify(msg, vim.log.levels.ERROR)} end",
             "${4:\thandler(ok, err)\nelse\n\tsuccess(ok, err)\nend}"
         ],
         "description": "pcall statement"
-    },
-
-    "local": {
-        "prefix": "local",
-        "body": [
-            "local ${1:x} = ${0:1}"
-        ],
-        "description": "initialize new local variable"
     }
 }
-
