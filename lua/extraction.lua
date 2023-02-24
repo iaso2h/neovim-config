@@ -1,33 +1,40 @@
 -- File: extraction
 -- Author: iaso2h
 -- Description: Extract selected content into new variable or new file
--- Version: 0.0.5
--- Last Modified: 2021-04-05
--- TODO: change the other var in the same scope
--- BUG: Visual character mode will remove one extra space
-local vim = vim
-local fn  = vim.fn
-local cmd = vim.cmd
-local api = vim.api
-local M   = {}
+-- Version: 0.0.7
+-- Last Modified: 2023-2-24
+-- NOTE: Deprecated: Please use refactor.nvim instead for visual line mode
+require("operator")
+local fn   = vim.fn
+local api  = vim.api
 local util = require("util")
-local langAmid = {
+local M = {}
+local reset = function ()
+    M.data = {
+        cwd        = nil,
+        vimMode    = nil,
+        motionMode = nil
+    }
+end
+
+reset()
+
+
+local langAssignOper = {
     go = " := "
 }
 local langSuffix = {
-    c          = {";", "\\"},
-    cpp        = {";", "\\"},
-    java       = {";"},
-    javascript = {";"},
+    c          = ";",
+    cpp        = ";",
+    java       = ";",
+    javascript = ";",
 }
 
-----
--- Function: getPrefix : return different prefix of variable assignment based on language type
---
--- @param lang string value of code language
--- @param lhs  string value of LHS
--- @return string value of prefix
-----
+
+--- Return different prefix of variable assignment based on language type
+--- @param lang string Value of code language
+--- @param lhs  string Value of LHS
+--- @return string value of prefix
 local getPrefix = function(lang, lhs)
     if lang == "vim" then
         return "let "
@@ -44,10 +51,9 @@ end
 
 
 --- Join string table based on language
---- @param lang string Coding language
 --- @param rhs string RHS of language expression
 --- @return string
-local joinRHS = function(lang, rhs)
+local joinRHS = function(rhs)
     local lines = vim.split(rhs, "\n", true)
     lines = util.trimSpaces(lines, false, true)
     -- TODO remove line suffix like ";" in c, cpp language when concatenate the line
@@ -55,144 +61,128 @@ local joinRHS = function(lang, rhs)
 end
 
 
-----
--- Function: getSrcContent :Get the source content from visual selection
---
--- @param lang     string value of coding language.
--- @param vimMode  string value of Vim mode.
--- @param curBufNr number of current buffer.
--- @param curBufNr number of window ID.
--- @return: For "v" mode, return string value of source content value, and the
--- namespace together with the extmark to track the position information; For
--- "V" mode return string value of source content value for "V" mode only.
-----
-local getSrcContent = function(lang, vimMode, curBufNr, curWinID) -- {{{
-    local pos1
-    local pos2
-    local srcContent
-    local linebreakSelectCheck = false
+--- Get the source content from visual selection
+--- @return table For "v" mode, return string value of source content value, and the
+--- namespace together with the extmark to track the position information; For
+--- "V" mode return string value of source content value for "V" mode only.
+local getSrcContent = function() -- {{{
+    local startPos
+    local endPos
 
-    if vimMode == "n" then
-        pos1 = api.nvim_buf_get_mark(curBufNr, "[")
-        pos2 = api.nvim_buf_get_mark(curBufNr, "]")
-        api.nvim_win_set_cursor(curWinID, pos1)
-        cmd("noa normal! v")
-        api.nvim_win_set_cursor(curWinID, pos2)
-        cmd("noa normal! v")
-    elseif vimMode:lower() == "v" then
-        pos1 = api.nvim_buf_get_mark(curBufNr, "<")
-        pos2 = api.nvim_buf_get_mark(curBufNr, ">")
+    if M.vimMode == "n" then
+        startPos = api.nvim_buf_get_mark(0, "[")
+        endPos   = api.nvim_buf_get_mark(0, "]")
+
+    elseif M.vimMode:lower() == "v" then
+        startPos = api.nvim_buf_get_mark(0, "<")
+        endPos   = api.nvim_buf_get_mark(0, ">")
+
         -- Abort when selection is invalid
-        if pos1[1] == pos2[1] and pos1[2] == pos2[2] then return false end
+        if startPos[1] == endPos[1] and startPos[2] == endPos[2] then
+            vim.notify("Too small selection", vim.log.levels.ERROR)
+            return {}
+        end
     end
 
-    -- Cut content into register and retrieve it as RHS content
+    -- Save register
     util.saveReg()
-    if vimMode == "v" or vimMode == "n" then
+
+    -- Cut content into register and retrieve it as RHS content
+    local linebreakChk = false
+    local srcContent
+    if M.vimMode == "v" or M.vimMode == "n" then
         -- Avoid delete "\n" line break character in the end of line
-        local pos2LineLen = #api.nvim_buf_get_lines(curBufNr, pos2[1] - 1, pos2[1], false)[1]
-        if vimMode == "v" then
-            if pos2[2] == pos2LineLen then
-                linebreakSelectCheck = true
-                pos2 = {pos2[1], pos2[2] - 1}
+        local endLineLen = #api.nvim_buf_get_lines(0, endPos[1] - 1, endPos[1], false)[1]
+        if M.vimMode == "v" then
+            if endPos[2] == endLineLen then
+                linebreakChk = true
+                endPos = {endPos[1], endPos[2] - 1}
             end
         else
-            if pos2[2] == pos2LineLen - 1 then
-                linebreakSelectCheck = true
+            if endPos[2] == endLineLen - 1 then
+                linebreakChk = true
             end
         end
 
         -- Create extmark to track position of new content
-        local extra2VarNS      = api.nvim_create_namespace("extra2Var")
-        local extra2VarExtmark = api.nvim_buf_set_extmark(curBufNr, extra2VarNS,
-                                    pos1[1] - 1, pos1[2],
-                                    {end_line = pos2[1] - 1, end_col = pos2[2]})
+        local namespace = api.nvim_create_namespace("extractToVar")
+        -- (0, 0) indexed
+        local extmark   = api.nvim_buf_set_extmark(0, namespace,
+                                    startPos[1] - 1,           startPos[2],
+                                    {end_line = endPos[1] - 1, end_col = endPos[2]})
 
         -- Cut source content into register
-        api.nvim_win_set_cursor(curWinID, pos1)
-        cmd "noa normal! v"
-        api.nvim_win_set_cursor(curWinID, pos2)
-        cmd "noa normal! d"
+        api.nvim_win_set_cursor(0, startPos)
+        vim.cmd "noa normal! v"
+        api.nvim_win_set_cursor(0, endPos)
+        vim.cmd "noa normal! d"
         srcContent = fn.getreg("\"", 1)
 
         -- Join source content for multiple line visual characterwise selection
-        srcContent = joinRHS(lang, srcContent)
+        srcContent = joinRHS(srcContent)
 
         -- util.restoreReg()
-        return srcContent, extra2VarNS, extra2VarExtmark, linebreakSelectCheck
-    elseif vimMode == "V" then
-        cmd [[noa normal! gvd]]
+        return {srcContent, namespace, extmark, linebreakChk}
+    -- Visual line mode
+    else
+        vim.cmd [[noa normal! gvd]]
         srcContent = fn.getreg("\"", 1)
 
         util.restoreReg()
-        return srcContent
+        return {srcContent}
     end
 end -- }}}
 
 
-----
--- Function: newVar :Create new variable
---
--- @param lang                 string value of coding language
--- @param curWinID             number value of current window ID
--- @param curBufNr             number value of current buffer number
--- @param lhs                  string value of the LHS
--- @param rhs                  string value of the RHS
--- @param extra2VarNS          number value of the namespace handler
--- @param extra2VarExtmark     number value of the extmark ID
--- @param linebreakSelectCheck boolean
-----
-local newVar = function(lang, curWinID, curBufNr, lhs, rhs, extra2VarNS, extra2VarExtmark, linebreakSelectCheck) -- {{{
-    local prefix
+--- Create new variable
+--- @param lhs          string Value of the LHS
+--- @param rhs          string Value of the RHS
+--- @param namespace    number Value of the namespace handler
+--- @param extmark      number Value of the extmark ID
+--- @param linebreakChk boolean
+local newVar = function(lhs, rhs, namespace, extmark, linebreakChk) -- {{{
+    local lang = vim.bo.filetype
+    local prefix = getPrefix(lang, lhs)
     local suffix = langSuffix[lang] or ""
-    suffix = suffix ~= "" and langSuffix[1] or ""
-    local amid   = langAmid[lang]   or " = "
+    suffix = suffix and suffix or ""
+    local assignOper = langAssignOper[lang]
+    assignOper = assignOper and assignOper or " = "
     -- Retrieve RHS source location
-    local rhsSrcResExtmark = api.nvim_buf_get_extmark_by_id(curBufNr,
-                                                            extra2VarNS,
-                                                            extra2VarExtmark,
-                                                            {details = true})
-    local rhsSrcResStart = {rhsSrcResExtmark[1], rhsSrcResExtmark[2]}
-    local rhsSrcResEnd   = {rhsSrcResExtmark[3]["end_row"], rhsSrcResExtmark[3]["end_col"]}
+    -- (0, 0) indexed
+    local rhsExtmark = api.nvim_buf_get_extmark_by_id(0, namespace, extmark, {details = true})
+    local rhsStart = {rhsExtmark[1], rhsExtmark[2]}
+    local rhsEnd   = {rhsExtmark[3]["end_row"], rhsExtmark[3]["end_col"]}
 
     -- Put new content {{{
-    local indentWidth = fn.indent(rhsSrcResStart[1] + 1)
-    prefix = getPrefix(lang, lhs)
-    local newLine = string.format("%s%s%s%s%s%s", string.rep(" ", indentWidth),
-        prefix, lhs, amid, rhs, suffix)
-    api.nvim_put({newLine}, "l", false, false)
-    api.nvim_win_set_cursor(curWinID, {rhsSrcResEnd[1] + 2, rhsSrcResEnd[2]})
-    -- Create record in jumplist
-    cmd [[noa normal! m`]]
 
-    -- Put lhs value after when linebreak character is selected
-    if not linebreakSelectCheck then
+    local indentWidth = fn.indent(rhsStart[1] + 1)
+    local newLine = string.format("%s%s%s%s%s%s",
+        string.rep(" ", indentWidth),
+        prefix, lhs, assignOper, rhs, suffix)
+    api.nvim_put({newLine}, "l", false, false)
+
+    -- Set location in jump list
+    vim.cmd [[noa norm! m`]]
+
+    -- Put lhs value
+    api.nvim_win_set_cursor(0, {rhsEnd[1] + 2, rhsEnd[2]})
+    if not linebreakChk then
         api.nvim_put({lhs}, "c", false, false)
     else
         api.nvim_put({lhs}, "c", true, false)
     end
-    local lhsNewStart = {rhsSrcResStart[1] + 1, indentWidth + #prefix}
-    api.nvim_win_set_cursor(curWinID, lhsNewStart)
-    -- }}} Put new content
 
-    -- Create highlight {{{
-    -- api.nvim_buf_clear_namespace(curBufNr, extra2VarNS, 0, -1)
-    -- api.nvim_buf_add_highlight(curBufNr, extra2VarNS, opts["hlGroup"], lhsNewStart[1] - 1, lhsNewStart[2], lhsNewStart[2] + #lhs)
-    -- vim.defer_fn(function()
-    -- api.nvim_buf_clear_namespace(curBufNr, extra2VarNS, 0, -1)
-    -- end, opts["timeout"])
-    -- }}} Create highlight
+    -- Place cursor at the declaration of new var
+    local newLineStart = {rhsStart[1] + 1, indentWidth + #prefix}
+    api.nvim_win_set_cursor(0, newLineStart)
+    -- }}} Put new content
 end -- }}}
 
 
-----
--- Function: newFile :Create new file at given path
---
--- @param newFilePath string value contain new file path
--- @param srcContent  string value of source content of the new file
--- @param CWD         string value of current working directory
-----
-local newFile = function(newFilePath, srcContent, CWD) -- {{{
+--- Create new file at given path
+--- @param newFilePath string value contain new file path
+--- @param srcContent  string value of source content of the new file
+local newFile = function(newFilePath, srcContent) -- {{{
     -- Find slash
     local byteSlashIndex = util.matchAll(newFilePath, "/")
     local filePath
@@ -206,14 +196,14 @@ local newFile = function(newFilePath, srcContent, CWD) -- {{{
         end
         -- Refine file path
         if newFilePath[1] == "/" or newFilePath[1] == '\\' then
-            filePath = CWD .. newFilePath
+            filePath = M.cwd .. newFilePath
         elseif string.sub(newFilePath, 1, 2) == './' then
-            filePath = CWD .. string.sub(newFilePath, 2)
+            filePath = M.cwd .. string.sub(newFilePath, 2)
         else
-            filePath = CWD .. "/" .. newFilePath
+            filePath = M.cwd .. "/" .. newFilePath
         end
         -- Make sure folder created before file creation
-        local absFolder = string.sub(filePath, 1, byteSlashIndex[#byteSlashIndex] + #CWD + 1)
+        local absFolder = string.sub(filePath, 1, byteSlashIndex[#byteSlashIndex] + #M.cwd + 1)
         fn.mkdir(absFolder, "p")
     else -- Slash does not exist
         filePath = newFilePath
@@ -229,86 +219,71 @@ local newFile = function(newFilePath, srcContent, CWD) -- {{{
     api.nvim_echo({{"File created: " .. filePath, "false"}}, true, {})
     -- Delete selection code
     util.saveReg()
-    cmd [[noa normal! gvd]]
+    vim.cmd [[noa normal! gvd]]
     util.restoreReg()
     local openFileAnswer = fn.confirm("Open and edit new file?", "&Yes\n&No", 1)
-    if openFileAnswer == 1 then cmd("e " .. filePath) end
+    if openFileAnswer == 1 then vim.cmd("e " .. filePath) end
 end -- }}}
 
 
-----
--- Function: M.operator :Main function to start the extraction for creating either
--- new variable or new file
---
--- @param args table {motionType, vimMode, plugMap}
---        motionType string Motion type by which how the operator perform.
---                    Can be "line", "char" or "block"
---        vimMode    string Vim mode. See `help mode()`
---        plugMap    string eg <Plug>myplug
---        vimMode     string Vim mode. See `help mode()`
--- @return: nil
-----
+M.newIdentifier = function(newID)
+    ---@diagnostic disable-next-line: deprecated
+    local unpack = unpack and unpack or table.unpack
+    -- Get source content
+    local src, namespace, extmark, linebreakChk = unpack(getSrcContent())
+    if not src then return end -- Sanity check
+
+    -- Create new variable or new file
+    if M.vimMode == "v" or M.vimMode == "n" then
+        return newVar(newID, src, namespace, extmark, linebreakChk)
+    elseif M.vimMode == "V" then
+        return newFile(newID, src)
+    end
+end
+
+
+--- Main function to start the extraction for creating either
+--- new variable or new file
+--- @param args table {motionType, vimMode, plugMap}
+---        motionType string Motion type by which how the operator perform.
+---                    Can be "line", "char" or "block"
+---        vimMode    string Vim mode. See `help mode()`
+---        plugMap    string eg <Plug>myplug
+---        vimMode     string Vim mode. See `help mode()`
 function M.operator(args) -- {{{
-    local motionType = args[1]
+    M.vimMode    = args[2]
+    M.motionType = args[1]
     if not vim.o.modifiable or vim.o.readonly then
+        reset()
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
+    end
+    if M.vimMode == "\22" then
+        reset()
+        return vim.notify("Visual block mode is not supported", vim.log.levels.WARN)
     end
 
     -- opts = opts or {hlGroup="Search", timeout=500}
-    local vimMode  = args[2]
-    local operator = require("operator")
-    local plugMap  = vimMode == "n" and operator.plugMap or args[3]
-    local lang     = vim.bo.filetype
-    local CWD      = fn.getcwd()
-    local curWinID = api.nvim_get_current_win()
-    local curBufNr = api.nvim_get_current_buf()
-    local newID
-    local srcContent
-    local extra2VarNS
-    local extra2VarExtmark
-    local linebreakSelectCheck
+    M.cwd  = fn.getcwd()
 
     -- Get new identifier for new LHS or new file {{{
-    if vimMode == "v" or vimMode == "n" then
-        cmd [[noa echohl Moremsg]]
-        newID = fn.input("Variable Name: ")
-        cmd [[noa echohl None]]
-        if newID == "" then return end -- User abort
-    elseif vimMode == "V" then
-        -- Check CWD {{{
-        if jit.os == "Windows" then
-            -- Check file cwd
-            local newCWD = fn.expand("%:p:h")
-            if CWD ~= newCWD then
-                local answerCD = fn.confirm("Change CWD to \"" .. newCWD .. "\"?", "&Yes\n&No")
-                if answerCD == 1 then
-                    cmd("noa cd " .. newCWD)
-                    CWD = newCWD
-                elseif answerCD == 0 then
-                    return
-                end
+    if M.vimMode == "v" or M.vimMode == "n" then
+        vim.ui.input({prompt = "Variable name: "}, function(input)
+            if input and input ~= "" then
+                require("extraction").newIdentifier(input)
             end
-        end
-        api.nvim_echo({{"CWD: " .. CWD, "Moremsg"}}, false, {})
-        -- }}} Check CWD
-        newID = fn.input("Enter new file path: ")
-        -- Check valid input
-        if newID == "" then return end
+        end)
+    elseif M.vimMode == "V" then
+        vim.ui.input({prompt = "Enter new file path: "}, function(input)
+            if input and input ~= "" then
+                require("extraction").newIdentifier(input)
+            end
+        end)
+    else
+        return vim.notify("Not support in current mode", vim.log.levels.WARN)
     end
+
+    reset()
     -- }}} Get new identifier for new LHS or new file
-
-    -- Get source content {{{
-    srcContent, extra2VarNS, extra2VarExtmark, linebreakSelectCheck = getSrcContent(lang, vimMode, curBufNr, curWinID)
-    if not srcContent then return end -- Sanity check
-    -- }}} Get source content
-
-    -- Create new variable or new file {{{
-    if vimMode == "v" or vimMode == "n" then
-        return newVar(lang, curWinID, curBufNr, newID, srcContent, extra2VarNS, extra2VarExtmark, linebreakSelectCheck)
-    elseif vimMode == "V" then
-        return newFile(newID, srcContent, CWD)
-    end
-    -- }}} Create new variable or new file
 end -- }}}
 
 return M

@@ -183,8 +183,6 @@ use {
             vim.g.camelsnek_iskeyword_override         = 0
         end,
         config = function()
-            -- TODO: support in visual mode
-            -- map("x", [[<A-c>]],   [[:call CaseSwitcher()<CR>]],    {"silent"}, "Change case for selected")
             map("n", [[<A-c>]],   [[<CMD>lua require("caseSwitcher").cycleCase()<CR>]],           "Cycle cases")
             map("n", [[<A-S-c>]], [[<CMD>lua require("caseSwitcher").cycleDefaultCMDList()<CR>]], "Cycle cases reset")
         end,
@@ -491,8 +489,6 @@ use {
                 char_highlight_list = {"SignColumn"},
                 show_current_context           = true,
                 show_trailing_blankline_indent = false,
-                -- TODO:
-                -- show_foldtext                  = true,
             }
         end
     }
@@ -682,7 +678,7 @@ use {
             local sep = jit.os == "Windows" and "\\" or "/"
             local mySnippets = vim.fn.stdpath("config") .. sep .. "snippets"
             require("luasnip.loaders.from_vscode").lazy_load()
-            require("luasnip.loaders.from_vscode").lazy_load{paths = {mySnippets}}
+            require("luasnip.loaders.from_vscode").lazy_load { paths = { mySnippets } }
         end
     }
     use {
@@ -826,18 +822,17 @@ use {
             "nvim-treesitter"
         },
         keys = {
-            {"x", "<Leader>rf"},
-            {"n", "<Leader>rp"},
-            {"n", "<Leader>rv"},
-            {"n", "<Leader>rc"}
+            {"x", "gf"},
+            {"n", "gfp"},
+            {"n", "gfv"},
+            {"n", "gfc"}
         },
         config = function()
             require("refactoring").setup{}
-
-            map("x", [[<Leader>rf]], [[<CMD>lua require("refactoring").select_refactor()<CR>]],              {"silent"}, "Extract selected")
-            map("n", [[<Leader>rv]], [[<CMD>lua require("refactoring").debug.print_var{normal = true}<CR>]], {"silent"}, "Debug print vairiable under cursor")
-            map("n", [[<Leader>rp]], [[<CMD>lua require("refactoring").debug.printf{below = false}<CR>]],    {"silent"}, "Debug printf")
-            map("n", [[<Leader>rc]], [[<CMD>lua require("refactoring").debug.cleanup()<CR>]],                {"silent"}, "Debug clean up")
+            map("x", [[gf]],  [[<CMD>lua require("refactoring").select_refactor()<CR>]],              {"silent"}, "Extract selected")
+            map("n", [[gfp]], [[<CMD>lua require("refactoring").debug.print_var{normal = true}<CR>]], {"silent"}, "Debug print vairiable under cursor")
+            map("n", [[gfv]], [[<CMD>lua require("refactoring").debug.printf{below = false}<CR>]],    {"silent"}, "Debug printf")
+            map("n", [[gfc]], [[<CMD>lua require("refactoring").debug.cleanup()<CR>]],                {"silent"}, "Debug clean up")
         end
     }
     -- }}} Intellisense

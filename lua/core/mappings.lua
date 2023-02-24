@@ -29,7 +29,7 @@ map("n", [[<leader>q]], [[:lua require("buf").quickfixToggle()<CR>]], {"silent"}
 map("n", [[\\]], [[z=1<CR><CR>]], {"silent"}, "Quick spell fix")
 -- Expand region
 map("n", [[<A-a>]], [[:lua require("expandRegion").expandShrink("n", 1)<CR>]],  {"silent"}, "Expand selection")
-map("n", [[<A-s>]], [[<Nop>]])
+map("n", [[<A-s>]], [[<Nop>]], "which_key_ignore")
 map("x", [[<A-a>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), 1)<CR>]],  {"silent"}, "Expand selection")
 map("x", [[<A-s>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), -1)<CR>]], {"silent"}, "Shrink selection")
 -- Interesting word {{{
@@ -110,7 +110,10 @@ map("x", [[Z]],  [[<Plug>ZealVisual]], "Zeal look up selected")
 map("x", [[<C-s>]], [[:lua require("selection").visualSub()<CR>]],        {"silent"}, "Substitue selected in command line")
 -- HistoryStartup
 map("n", [[<C-s>]], [[:lua require("historyStartup").display(true)<CR>]], {"silent"}, "Enter HistoryStartup")
--- Extraction
+-- Extraction {{{
+-- map("n", [[<Plug>RefactorOperator]], function ()
+    -- return vim.fn.luaeval [[require("RefactorOperator").expr()]]
+-- end, {"silent", "expr"}, "Refactor operator")
 map("n", [[<Plug>Extract]], function ()
     return vim.fn.luaeval[[
     require("operator").expr(
@@ -119,44 +122,16 @@ map("n", [[<Plug>Extract]], function ()
         "<Plug>Extract")
     ]]
 end, {"silent", "expr"}, "Extract operator")
-
-map("x", [[<Plug>ExtractVisual]],
-luaRHS[[:lua
-    vim.fn["repeat#setreg"](t"<Plug>ExtractVisual", vim.v.register);
-
-    local vMotion = require("operator").vMotion(true);
-    table.insert(vMotion, "<Plug>ExtractVisual");
-    require("extraction").operator(vMotion)<CR>]],
-{"silent"}, "Extract selected")
-
-map("n", [[<Plug>ExtractVisual]], function ()
-    vim.fn["repeat#setreg"](t"<Plug>ExtractVisual", vim.v.register)
-    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
-
-    local vMotion = require("operator").vMotion(true)
-    table.insert(vMotion, "<Plug>ExtractVisual")
-    require("extraction").operator(vMotion)
-end, {"silent"}, "Extract selected")
-
--- map("n", [[gc]], [[<Plug>Extract]], "Extract operator")
--- TODO: implement with visualreapet?
--- map("x", [[<Plug>fallbackC]], [[<CMD>norm! gvC<CR>]])
--- map("x", [[C]],  [[visualmode() == "^V" ? "" : "\<Plug>ExtractVisual"]], {"expr"}, "Extract selected")
--- Print file info
+map("n", [[gf]],  [[<Plug>Extract]], "Extract operator")
+-- }}} Extraction
 map("n", [[<C-g>]],
 [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<CR>]],
 {"silent"}, "Display file info")
--- Indent {{{
 map("n", [[<S-Tab>]], [[:lua require("tabSwitcher").main()<CR>]], "Change tab size")
--- TODO:
--- map("x", [[g<]], [[Change selected lines' indent to 0]], "Change tab size")
--- map("x", [[g>]], [[Adapt indents of selected lines to current buffer by z=]], {"noremap"}, "Change tab size")
-
--- }}} Indent
 -- Delete & Change & Replace {{{
 -- Delete
-map("n", [[dj]], [[<Nop>]])
-map("n", [[dk]], [[<Nop>]])
+map("n", [[dj]], [[<Nop>]], "which_key_ignore")
+map("n", [[dk]], [[<Nop>]], "which_key_ignore")
 map("n", [[<Plug>DeleteUnderForward]],
     [[:lua require("changeUnder").init("diw", 1, "<Plug>DeleteUnderForward")<CR>]],
     {"silent"}, "Delete the whold word under curosr, then highlight it forward")
@@ -338,8 +313,10 @@ map("n", [[g<CR>]],   [[<CMD>lua require("breakLine").main()<CR>]], {"silent"}, 
 -- }}} Trailing character
 
 -- Pageup/Pagedown
-map({"n", "x"},  [[<C-e>]], [[<C-y>]], {"noremap"}, "Scroll up")
-map({"n", "x"},  [[<C-d>]], [[<C-e>]], {"noremap"}, "Scroll down")
+map({"n", "x"}, [[<C-f>]], [[<Nop>]], "which_key_ignore")
+map("",         [[<C-h>]], [[<Nop>]], "which_key_ignore")
+map({"n", "x"}, [[<C-e>]], [[<C-y>]], {"noremap"}, "Scroll up")
+map({"n", "x"}, [[<C-d>]], [[<C-e>]], {"noremap"}, "Scroll down")
 map("t", [[<C-e>]], [[<C-\><C-n><C-y>]], "Scroll up")
 map("t", [[<C-d>]], [[<C-\><C-n><C-d>]], "Scroll down")
 
@@ -381,18 +358,21 @@ map("i",        [[<A-->]],  [[<C-\><C-O>:wincmd -<CR>]], {"silent"}, "Decrease w
 
 -- Buffers
 map("n", [[<C-w>O]], [[:lua require("buf").closeOther()<CR>]], {"silent"}, "Wipe other buffer")
-map("n", [[<A-h>]],  [[<CMD>bp<CR>]], {"silent"},    "Previous buffer")
-map("n", [[<A-l>]],  [[<CMD>bn<CR>]], {"silent"},    "Next buffer")
+map("n", [[<C-Tab>]],   [[<CMD>bp<CR>]], {"silent"}, "Previous buffer")
+map("n", [[<C-S-Tab>]], [[<CMD>bn<CR>]], {"silent"}, "Next buffer")
+map("n", [[<A-h>]],     [[<CMD>bp<CR>]], {"silent"}, "Previous buffer")
+map("n", [[<A-l>]],     [[<CMD>bn<CR>]], {"silent"}, "Next buffer")
 -- Tab
 map({"n", "x"}, [[<A-C-h>]],    [[<CMD>tabp<CR>]],    {"silent"}, "Previous tab")
 map({"n", "x"}, [[<A-C-l>]],    [[<CMD>tabn<CR>]],    {"silent"}, "Next tab")
 map({"n", "x"}, [[<C-W><C-o>]], [[<CMD>tabonly<CR>]], {"silent"}, "Tab only")
 -- }}} Buffer & Window & Tab
 -- Folding {{{
-map("",  [[zj]], [[<Nop>]])
-map("",  [[zk]], [[<Nop>]])
+map("",  [[zj]], [[<Nop>]], "which_key_ignore")
+map("",  [[zk]], [[<Nop>]], "which_key_ignore")
 map("",  [[[Z]], [[zk]], {"noremap"}, "Previous fold(integral)")
 map("",  [[]Z]], [[zj]], {"noremap"}, "Next fold(integral)")
+-- TODO: record in jumplist
 map("",  [[[z]], [[<CMD>call EnhanceFoldJump("previous", 1, 0)<CR>]], {"silent", "noremap"}, "Previous fold")
 map("",  [[[z]], [[<CMD>call EnhanceFoldJump("previous", 1, 0)<CR>]], {"silent", "noremap"}, "Previous fold")
 map("",  [[]z]], [[<CMD>call EnhanceFoldJump("next",     1, 0)<CR>]], {"silent", "noremap"}, "Next fold")
@@ -401,11 +381,11 @@ map("n", [[zd]], [[<CMD>call EnhanceFoldHL("", 800, "EnhanceDelete")<CR>]], {"si
 map("n", [[cz]], [[<CMD>call EnhanceFoldHL("", 0, "EnhanceChange")<CR>]],   {"silent"}, "Change fold")
 map("n", [[zc]], [[<CMD>call EnhanceFoldHL("", 0, "EnhanceChange")<CR>]],   {"silent"}, "Change fold")
 map("n", [[g{]], [[<CMD>lua require("trailingChar").main(vim.fn.mode(),   "{")<CR>]], {"silent"}, "Add fold marker start")
+map("x", [[g{]], [[:lua require("trailingChar").main(vim.fn.visualmode(), "{")<CR>]], {"silent"}, "Add fold marker start")
 map("n", [[g}]], [[<CMD>lua require("trailingChar").main(vim.fn.mode(),   "}")<CR>]], {"silent"}, "Add fold marker end")
-map("n", [[g{]], [[:lua require("trailingChar").main(vim.fn.visualmode(), "{")<CR>]], {"silent"}, "Add fold marker start")
-map("n", [[g}]], [[:lua require("trailingChar").main(vim.fn.visualmode(), "}")<CR>]], {"silent"}, "Add fold marker end")
+map("x", [[g}]], [[:lua require("trailingChar").main(vim.fn.visualmode(), "}")<CR>]], {"silent"}, "Add fold marker end")
 
-map("",  [[<leader>z]], [[<CMD>call EnhanceFoldHL("No fold marker found", 500, "")<CR>]], {"silent"}, "Highlight current fold marker")
+map("", [[<leader>z]], [[<CMD>call EnhanceFoldHL("No fold marker found", 500, "")<CR>]], {"silent"}, "Highlight current fold marker")
 map("", [[zm]], [[zMzz]], {"noremap"}, "Close all folds recursively")
 map("", [[zr]], [[zRzz]], {"noremap"}, "Open all folds recursively")
 map("", [[zM]], [[zmzz]], {"noremap"}, "Close folds recursively")
@@ -436,6 +416,7 @@ map({"i","n"}, [[<F3>]], function ()
         vim.opt.paste = true
     end
 end, "Toogle paste mode")
+
 -- <C-z/v/s> {{{
 map("n", [[<C-z>]], [[u]], "Undo") -- test
 map("x", [[<C-z>]], [[<esc>u]], "Undo")
@@ -499,10 +480,10 @@ map("n", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("n", "up")<CR>]],  
 map("x", [[<A-j>]], [[:lua require("yankPut").VSCodeLineMove("v", "down")<CR>]], {"silent"}, "Move line down")
 map("x", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("v", "up")<CR>]],   {"silent"}, "Move line up")
 -- Copy line
-map("n", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank("n", "down")<CR>]],                 {"silent"}, "Copy line down")
-map("n", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank("n", "up")<CR>]],                   {"silent"}, "Copy line up")
 map("i", [[<A-S-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "down")<CR>]],       {"silent"}, "Copy line down")
 map("i", [[<A-S-k>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "up")<CR>]],         {"silent"}, "Copy line up")
+map("n", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank("n", "down")<CR>]],                 {"silent"}, "Copy line down")
+map("n", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank("n", "up")<CR>]],                   {"silent"}, "Copy line up")
 map("x", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "down")<CR>]], {"silent"}, "Copy line down")
 map("x", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "up")<CR>]],   {"silent"}, "Copy line up")
 -- }}} Mimic the VSCode move/copy line up/down behavior
