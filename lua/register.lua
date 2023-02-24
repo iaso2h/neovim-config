@@ -146,16 +146,20 @@ M.saveReg = function() -- {{{
     end
     M.restoreReg = function()
         if nonDefaultContent and nonDefaultContent ~= "" then
+            ---@diagnostic disable-next-line: param-type-mismatch
             fn.setreg(nonDefaultName, nonDefaultContent, nonDefaultType)
         end
 
         if starContent ~= "" then
+            ---@diagnostic disable-next-line: param-type-mismatch
             fn.setreg('*', starContent,    starType)
         end
         if plusContent ~= "" then
+            ---@diagnostic disable-next-line: param-type-mismatch
             fn.setreg('+', plusContent,    plusType)
         end
         if unnamedContent ~= "" then
+            ---@diagnostic disable-next-line: param-type-mismatch
             fn.setreg('"', unnamedContent, unnamedType)
         end
 

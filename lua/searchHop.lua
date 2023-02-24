@@ -39,45 +39,6 @@ M.cycleSearch = function(exCMD)
 end
 
 
---- Search func wraps around the native //? exCMD
----@param exCMD string "/" or "?"
-M.input = function(exCMD)
-    local placeholder
-    if exCMD == "/" then
-        placeholder = "/\\v"
-    elseif exCMD == "?" then
-        placeholder = "?\\v"
-    end
-
-    local ok, input, msg
-    ok, input = pcall(fn.input, "", placeholder)
-    if not ok then
-        msg = input
-        if msg == "Keyboard interrupt" then
-            return
-        else
-            vim.notify(msg, vim.log.levels.ERROR)
-        end
-    end
-
-    ok, msg = pcall(vim.cmd, input)
-    if not ok then
-        if vim.startswith(msg, "Vim:E486") then
-            api.nvim_echo({{"Pattern not found: " .. input}}, false, {})
-        else
-            vim.notify(msg, vim.log.levels.ERROR)
-        end
-    else
-        local searchDict = fn.searchcount()
-        if searchDict.total ~= 0 and searchDict.current == 0 then
-           vim.cmd "norm! n"
-        end
-        vim.cmd("norm! zv:" .. t[[<C-\>e<Esc>]])
-        M.echoSearch()
-    end
-end
-
-
 --- Search func wraps around the native //? exCMD in Visual mode
 ---@param exCMD string "/" or "?"
 M.searchSelected = function(exCMD)

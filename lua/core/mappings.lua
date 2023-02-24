@@ -159,7 +159,7 @@ map("n", [[<Plug>ReplaceExpr]],
 )
 
 map("n", [[<Plug>ReplaceCurLine]], function ()
-    require("replace").replaceSave()
+    require("replace").saveCountReg()
 
     vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register)
 
@@ -170,10 +170,10 @@ map("n", [[<Plug>ReplaceCurLine]], function ()
     require("replace").operator{"line", "V", "<Plug>ReplaceCurLine", true}
 end, {"noremap", "silent"}, "Replace current line")
 
--- HACK: function passed in to arg will ignore current selected region
+-- NOTE: function passed in to arg will ignore current selected region
 
 -- map("x", [[<Plug>ReplaceVisual]], function ()
-    -- require("replace").replaceSave()
+    -- require("replace").saveCountReg()
 
     -- vim.fn["repeat#setreg"](t"<Plug>ReplaceVisual", vim.v.register)
 
@@ -188,7 +188,7 @@ end, {"noremap", "silent"}, "Replace current line")
 
 map("x", [[<Plug>ReplaceVisual]],
     luaRHS[[
-    :lua require("replace").replaceSave();
+    :lua require("replace").saveCountReg();
 
     vim.fn["repeat#setreg"](t"<Plug>ReplaceVisual", vim.v.register);
 
@@ -203,7 +203,7 @@ map("x", [[<Plug>ReplaceVisual]],
     {"noremap", "silent"}, "Replace selected")
 
 map("n", [[<Plug>ReplaceVisual]], function ()
-    require("replace").replaceSave()
+    require("replace").saveCountReg()
 
     vim.fn["repeat#setreg"](t"<Plug>ReplaceVisual", vim.v.register)
 
@@ -238,9 +238,25 @@ map("n", [[grN]], [[<Plug>ReplaceUnderBackward]], "Replace the whold word under 
 -- Inquery word
 map("n", [[<leader>i]], [=[[I]=], "Inquery word under cursor")
 map("x", [[<leader>i]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selection").getSelect("string", false), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquery selected words")
--- Fast mark & resotre
--- TODO: zz seems unneccessary when mark position in still in range of editor window
-map("n", [[M]], [[`mzzzv]], "Restore mark M")
+-- Fast mark resotre
+map("n", [[M]], function ()
+    local bufNr = vim.api.nvim_get_current_buf()
+    local winID = vim.api.nvim_get_current_win()
+    local marks = vim.fn.getmarklist(bufNr)
+    for _, mark in ipairs(marks) do
+        if mark.mark == "'m" then
+            -- mark.pos format: {bufnum, lnum, col, off}
+            -- mark.pos is (1, 1) indexed
+            local winInfo = vim.fn.getwininfo(winID)[1]
+            if mark.pos[2] >= winInfo.topline and mark.pos[2] <= winInfo.botline then
+                vim.cmd[[norm! `mzv]]
+            else
+                vim.cmd[[norm! `mzzzv]]
+            end
+            break
+        end
+    end
+end, "Restore mark M")
 -- Changelist jumping
 map("n", [[<A-o>]], [[:lua require("historyHop").main("changelist", -1)<CR>]], {"silent"}, "Previous change")
 map("n", [[<A-i>]], [[:lua require("historyHop").main("changelist", 1)<CR>]],  {"silent"}, "Next change")
@@ -261,8 +277,6 @@ map("x", [[?]], [[:lua require("searchHop").searchSelected("?")<CR>]], {"silent"
 map("x", [[*]], [[/]], "Search selected forward")
 map("x", [[#]], [[?]], "Search selected backward")
 -- Regex very magic
--- map("n", [[/]], [[:lua require("searchHop").input("/")<CR>]], {"silent"}, "Search forward")
--- map("n", [[?]], [[:lua require("searchHop").input("?")<CR>]], {"silent"}, "Search backward")
 map("n", [[/]], [[/\v]], {"noremap"}, "Search forward")
 map("n", [[?]], [[?\v]], {"noremap"}, "Search backward")
 map("n", [[n]], [[:lua require("searchHop").cycleSearch("n")<CR>]], {"silent"}, "Cycle through search result forward")
@@ -271,7 +285,6 @@ map("n", [[N]], [[:lua require("searchHop").cycleSearch("N")<CR>]], {"silent"}, 
 map("n", [[<leader>h]], [[<CMD>noh<CR>]], {"silent"}, "Clear highlight")
 map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"}, "Disable highlight")
 -- Visual selection
--- TODO: add visual mapping
 map("n", [[go]],    [[:lua require("selection").cornerSelection(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
 map("n", [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
 -- }}} Search & Jumping
