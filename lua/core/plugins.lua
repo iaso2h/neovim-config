@@ -667,16 +667,12 @@ use {
         event  = "BufAdd",
         requires = {
             "plenary.nvim",
-            {
-                "hrsh7th/cmp-nvim-lsp",
-                event  = "BufAdd",
-            }
         },
     }
     use {
         'folke/neodev.nvim',
         ft     = "lua",
-        config = [[ require("neodev").setup(); require("config.nvim-lspconfig")() ]]
+        config = [[ require("neodev").setup(); require("config.nvim-lspconfig").config() ]]
     }
     use 'rafamadriz/friendly-snippets'
     use {

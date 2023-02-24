@@ -1,9 +1,10 @@
-vim.opt.formatoptions = "nmM1pcjlq"
+-- Overwrite setting set by runtime/ftplugin/lua.vim
+vim.opt.formatoptions = "cr/qn2mM1jpl"
 
-vim.api.nvim_buf_set_keymap(0, "n", [[gK]],         [[:lua nlua.keyword_program()<cr>]], {silent = true})
-vim.api.nvim_buf_set_keymap(0, "n", [[g==]],        [[<plug>(Luadev-RunLine)]],          {})
-vim.api.nvim_buf_set_keymap(0, "v", [[g=]],         [[<plug>(Luadev-Run)]],              {})
-vim.api.nvim_buf_set_keymap(0, "n", [[g=iw]],       [[<plug>(Luadev-RunWord)]],          {})
-vim.api.nvim_buf_set_keymap(0, "i", [[<C-x><C-l>]], [[<plug>(Luadev-Complete)]],         {})
+bmap(0, "n", [[gK]],         [[<CMD>lua nlua.keyword_program()<cr>]], {"silent"}, "Lookup in Neovim help")
+bmap(0, "n", [[g==]],        [[<plug>(Luadev-RunLine)]],  "Luadev run line")
+bmap(0, "v", [[g=]],         [[<plug>(Luadev-Run)]],      "Luadev runline")
+bmap(0, "n", [[g=iw]],       [[<plug>(Luadev-RunWord)]],  "Luadev run word")
+bmap(0, "i", [[<C-x><C-l>]], [[<plug>(Luadev-Complete)]], "Luadev complete")
 
-vim.api.nvim_buf_set_option(0, "textwidth", 78)
+vim.opt.textwidth = 80

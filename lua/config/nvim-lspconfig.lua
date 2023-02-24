@@ -1,4 +1,25 @@
-return function()
+local M = {}
+
+
+M.getFormatRange = function ()
+    local mode = vim.fn.visualmode()
+    if mode == "\22" then
+        return vim.notify("Doesn't support for visual block mode", vim.log.levels.WARN)
+    end
+    local curBufNr = vim.api.nvim_get_current_buf()
+    local startPos = vim.api.nvim_buf_get_mark(curBufNr, "<")
+    local endPos   = vim.api.nvim_buf_get_mark(curBufNr, ">")
+    -- It desn't matter the endpos range is out of scope
+    -- if mode == "V" then
+        -- local endline  = vim.api.nvim_buf_get_lines(curBufNr,
+            -- endPos[1] - 1, endPos[1], false)[1]
+        -- endPos = {M.cursorPos[1], #endline - 1}
+    -- end
+    return {start = startPos, ["end"] = endPos}
+end
+
+
+M.config = function()
     local lsp       = vim.lsp
     local fn        = vim.fn
     local lspConfig = require("lspconfig")
@@ -37,10 +58,15 @@ return function()
         bmap(bufNr, "n", "<leader>rn", [[<CMD>lua vim.lsp.buf.rename()<CR>]],           {"silent"}, "LSP rename")
         bmap(bufNr, "n", [[K]],        [[<CMD>lua vim.lsp.buf.hover()<CR>]],            {"silent"}, "LSP hover")
         bmap(bufNr, "n", [[<C-p>]],    [[<CMD>lua vim.lsp.buf.signature_help()<CR>]],   {"silent"}, "LSP signature help")
-        bmap(bufNr, "n", [[<A-f>]],    [[<CMD>lua vim.lsp.buf.format{async=true}<CR>]], {"silent"}, "LSP format")
         -- bmap(bufNr, "n", [=[<leader>wa]=], vim.lsp.buf.add_workspace_folder, "LSP add workspace folder")
         -- bmap(bufNr, "n", [=[<leader>wr]=], vim.lsp.buf.remove_workspace_folder, "LSP remove workspace folder")
         -- bmap(bufNr, "n", [=[<leader>wl]=], Print(vim.lsp.buf.list_workspace_folders, "LSP list workspace folder")
+
+        -- Bring back the gqq for formatting comments and stuff, use <A-f> to
+        -- formating file
+        bmap(bufNr, "n", [[<A-f>]],    [[<CMD>lua vim.lsp.buf.format{async=true}<CR>]], {"silent"}, "LSP format")
+        bmap(bufNr, "x", [[<A-f>]],    [[:lua vim.lsp.buf.format{async=true,range=require("config.nvim-lspconfig").getFormatRange()}<CR>]], {"silent"}, "LSP format")
+        vim.opt.formatexpr = ""
     end -- }}}
 
     -- LSP config override {{{
@@ -230,9 +256,11 @@ return function()
     end
 
     -- Setup servers {{{
+    local ok, _ = pcall(require, "cmp_nvim_lsp")
+    local capabilities = ok and require("cmp_nvim_lsp").default_capabilities() or {}
     local basicConfig = {
         -- enable snippet support
-        capabilities = require("cmp_nvim_lsp").default_capabilities(),
+        capabilities = capabilities,
         -- map buffer local keybindings when the language server attaches
         on_attach    = onAttach
     }
@@ -246,3 +274,4 @@ return function()
 
 end
 
+return M
