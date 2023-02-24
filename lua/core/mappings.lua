@@ -426,6 +426,16 @@ for i=0, 9 do
 end
 -- }}} Folding
 -- MS behavior {{{
+-- Paste mode
+map({"i","n"}, [[<F3>]], function ()
+    if vim.o.paste then
+        vim.api.nvim_echo({{"Paste mode off", "Moremsg"}}, false, {})
+        vim.opt.paste = false
+    else
+        vim.api.nvim_echo({{"Paste mode on", "Moremsg"}}, false, {})
+        vim.opt.paste = true
+    end
+end, "Toogle paste mode")
 -- <C-z/v/s> {{{
 map("n", [[<C-z>]], [[u]], "Undo") -- test
 map("x", [[<C-z>]], [[<esc>u]], "Undo")
