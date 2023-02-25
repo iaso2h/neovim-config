@@ -72,9 +72,8 @@ if not vim.g.vscode then
     autocmd!
     autocmd VimEnter             * nested lua require("historyStartup").display()
 
-    autocmd BufWinEnter          * lua require("cursorRecall").main()
+  " autocmd BufWinEnter          * lua require("cursorRecall").main()
     autocmd BufWritePre          * lua require"util".trimSpaces(); require"util".trailingEmptyLine()
-    autocmd BufEnter             * lua require("historyStartup").deleteBuf()
     autocmd FocusGained          * checktime
   " autocmd BufAdd               * lua require("consistantTab").adaptBufTab()
 
@@ -89,11 +88,6 @@ if not vim.g.vscode then
     autocmd FileType              git  setlocal nofoldenable
     autocmd FileType              json setlocal conceallevel=0 concealcursor=
 
-    autocmd BufReadPre,BufNewFile *.jsx       setlocal filetype=jypescript
-    autocmd BufReadPre,BufNewFile *.tsx       setlocal filetype=typescript
-    autocmd BufReadPre,BufNewFile *.twig      setlocal filetype=twig.html
-    autocmd BufReadPre,BufNewFile *.gitignore setlocal filetype=gitignore
-    autocmd BufReadPre,BufNewFile config      setlocal filetype=config
     " Related work: https://github.com/RRethy/nvim-sourcerer
     autocmd BufWritePost          *.lua,*.vim lua require("reloadConfig").reload()
     augroup END
