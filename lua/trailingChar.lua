@@ -38,7 +38,7 @@ local function findCommentNode(cursorPos, lastNode, lineLen)
             return commentTick
         end
 
-        local range = {node:range()}
+        local range = { node:range() }
 
         if range[1] == cursorPos[1] and node:id() == lastNode:id() then
             i = range[4]
@@ -67,7 +67,7 @@ end
 ---@param cursorPos table (0, 0) based. Row(Line) and column.
 ---@param line string The value of current line
 ---@param char string The character to be added
-local trailingMarker = function (cursorPos, line, char)
+local trailingMarker = function(cursorPos, line, char)
     local commentStr
     local ok, msg = pcall(string.gsub, vim.bo.commentstring, "%s+%%s$", "")
     if not ok then
@@ -82,7 +82,7 @@ local trailingMarker = function (cursorPos, line, char)
         trailingMarkerFallback(commentStr, char, line)
     end
     -- Convert to (0, 0) based
-    cursorPos = {cursorPos[1] - 1, cursorPos[2]}
+    cursorPos = { cursorPos[1] - 1, cursorPos[2] }
 
 
     -- Use treesitter to find comment node
@@ -106,7 +106,7 @@ local trailingMarker = function (cursorPos, line, char)
         if char == "{" then
             newLine = line .. " {{{"
         else
-            local commentStrIdx = {string.find(line, commentStr, 1, true)}
+            local commentStrIdx = { string.find(line, commentStr, 1, true) }
             if not next(commentStrIdx) then
                 return vim.notify("Failed to index comment string in: " .. line, vim.log.levels.ERROR)
             end
@@ -117,7 +117,6 @@ local trailingMarker = function (cursorPos, line, char)
                 newLine = string.sub(line, 1, commentStrIdx[2]) ..
                     " }}}" .. string.sub(line, commentStrIdx[2] + 1, -1)
             end
-
         end
 
 
@@ -142,7 +141,7 @@ function M.main(vimMode, char) -- {{{
     local cursorPos = api.nvim_win_get_cursor(0)
     local lines
     if vimMode == "n" then
-        lines = api.nvim_buf_get_lines(0, cursorPos[1] - 1,cursorPos[1], false)[1]
+        lines = api.nvim_buf_get_lines(0, cursorPos[1] - 1, cursorPos[1], false)[1]
 
         if char == "{" or char == "}" then
             trailingMarker(cursorPos, lines, char)
@@ -199,10 +198,10 @@ function M.main(vimMode, char) -- {{{
                     table.insert(lines, #lines, newLine)
                 else
                     newLine = indentCopy(endPos[1]) .. commentStr .. " }}}" .. note
-                    lines[#lines+1] = newLine
+                    lines[#lines + 1] = newLine
                 end
-            -- Inline fold marker
             else
+                -- Inline fold marker
                 if note == "" then
                     newLine = " " .. commentStr .. note .. " {{{"
                 else
@@ -228,4 +227,3 @@ function M.main(vimMode, char) -- {{{
 end -- }}}
 
 return M
-

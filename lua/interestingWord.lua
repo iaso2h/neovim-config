@@ -223,7 +223,7 @@ M.clearColor = function()
     local curWinID = api.nvim_get_current_win()
     if not M.hlIDs[curWinID] then
         cmd "noa echohl MoreMsg"
-        local answer = fn.confirm("There're no match set in thisi window, do you want perform a clearmatch() anyway?",
+        local answer = fn.confirm("There're no match set in this window, do you want perform a clearmatch() anyway?",
             ">>> &Yes\n&No", 2, "Question")
         cmd "noa echohl None"
         if answer == 1 then

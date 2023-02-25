@@ -439,8 +439,8 @@ function M.operator(args) -- {{{
     -- Replace with new content
     local regionReplace
     ok, msg = pcall(replace, motionType, vimMode, reg, regionMotion, M.curBufNr)
+    ---@diagnostic disable-next-line: param-type-mismatch
     if not ok then
-        ---@diagnostic disable-next-line: param-type-mismatch
         vim.notify(msg, vim.log.levels.ERROR)
     else
         regionReplace = msg

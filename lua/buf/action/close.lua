@@ -1,5 +1,4 @@
 local fn    = vim.fn
-local cmd   = vim.cmd
 local api   = vim.api
 local util  = require("buf.util")
 local var   = require("buf.var")
@@ -19,12 +18,12 @@ local function saveModified(bufNr) -- {{{
         return true
     else
         if api.nvim_buf_get_option(bufNr, "modified") then
-            cmd "noa echohl MoreMsg"
+            vim.cmd "noa echohl MoreMsg"
             local answer = fn.confirm("Save modification?",
                 ">>> &Save\n&Discard\n&Cancel", 3, "Question")
-            cmd "noa echohl None"
+            vim.cmd "noa echohl None"
             if answer == 1 then
-                cmd "noa update"
+                vim.cmd "noa update"
                 return true
             elseif answer == 2 then
                 return true
@@ -101,7 +100,7 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
             if util.bufCnt() ~= 1 then
                 util.bufWipe(var.bufNr)
             else
-                cmd("q!")
+                vim.cmd("q!")
             end
             return true
         end
@@ -156,7 +155,7 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         -- NOTE: If this evaluated to true, then the current length of bufNrtble
         -- has been reduced to 1, #bufNrTbl is just a value of previous state
         if util.winCnt() == 2 and bufInstanceCnt == 2 and util.bufCnt() == 2 then
-            cmd "only"
+            vim.cmd "only"
         end
 
         -- After finishing buffer wiping, prevent Neovim from setting the
@@ -167,7 +166,7 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
             for _ = 1, util.bufCnt() - 1 + specInstanceCnt do
                 if vim.tbl_contains(unwantedBufType, vim.bo.buftype) then
                     -- HACK: can still switch to a special buffer
-                    cmd "bp"
+                    vim.cmd "bp"
                 else
                     break
                 end

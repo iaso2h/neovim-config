@@ -1,5 +1,4 @@
 local fn   = vim.fn
-local cmd  = vim.cmd
 local api  = vim.api
 local M = {whichKeyDocs = {}}
 
@@ -102,7 +101,7 @@ function Vim2Lua(mode) -- {{{
         t[commandRep]          = true
         t[userCommandStartRep] = true
 
-        for str, bool in pairs(t) do if bool then cmd(str) end end
+        for str, bool in pairs(t) do if bool then vim.cmd(str) end end
         api.nvim_win_set_cursor(0, curPos)
         -- }}} Change vim script syntax into lua
     elseif mode == "map" then
@@ -158,7 +157,7 @@ function Vim2Lua(mode) -- {{{
         local cursor = api.nvim_win_get_cursor(0)
         api.nvim_buf_set_lines(0, cursor[1] - 1, cursor[1], {false},
                                {luaMapping})
-        cmd "noh"
+        vim.cmd "noh"
         -- setKey("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", {noremap = true, silent = true})
         -- setKey('n', 'j', "v:count == 0 ? 'gj' : 'j'", {noremap= true, expr = true, silent = true})
         -- setKey(0, 'i', '<C-Space>','pumvisible() ? "<C-e>" : "<Plug>(completion_trigger)"', {expr=true})
@@ -178,17 +177,17 @@ function M.addJump(action, reservedCount, funArg) -- {{{
         if reservedCount then
             local saveCount = vim.v.count
             if saveCount ~= 0 then
-                cmd [[normal! m`]]
-                for _ = 1, saveCount do cmd("normal! " .. action) end
+                vim.cmd [[normal! m`]]
+                for _ = 1, saveCount do vim.cmd("normal! " .. action) end
             else
-                cmd("normal! " .. action)
+                vim.cmd("normal! " .. action)
             end
         else
-            cmd("normal! " .. action)
+            vim.cmd("normal! " .. action)
         end
     elseif type(action) == "function" then
         if not funArg then return end
-        cmd [[normal! m`]]
+        vim.cmd [[normal! m`]]
         action(funArg)
     end
 end -- }}}
@@ -292,7 +291,7 @@ function M.trailingEmptyLine() -- {{{
 
     if api.nvim_buf_get_lines(0, -2, -1, false)[1] ~= "" then
         local saveView = fn.winsaveview()
-        cmd('keepjumps normal! G')
+        vim.cmd('keepjumps normal! G')
         api.nvim_put({""}, "l", true, false)
         fn.winrestview(saveView)
     end
@@ -319,12 +318,12 @@ function M.trimSpaces(strTbl, silent, prefix) -- {{{
         local saveView = fn.winsaveview()
         silent = silent or true
         if silent then
-            cmd [[noa keeppatterns %s#\s\+$##e]]
+            vim.cmd [[noa keeppatterns %s#\s\+$##e]]
         else
-            cmd [[noa keeppatterns %s#\s\+$##e]]
+            vim.cmd [[noa keeppatterns %s#\s\+$##e]]
             local result = fn.execute [[g#\s\+$#p]]
             local count = #M.matchAll(result, [[\n]])
-            cmd [[noa keeppatterns %s#\s\+$##e]]
+            vim.cmd [[noa keeppatterns %s#\s\+$##e]]
             api.nvim_echo({{count .. " line[s] trimmed", "Moremsg"}}, false, {})
         end
         fn.winrestview(saveView)
@@ -400,7 +399,7 @@ function M.visualSelection(returnType, returnNormal) -- {{{
         lines[1]      = lines[1]:sub(selectStart[2] + 1)
     end
 
-    if returnNormal then cmd("norm! " .. t"<Esc>") end
+    if returnNormal then vim.cmd("norm! " .. t"<Esc>") end
     if returnType == "list" then
         return lines
     elseif returnType == "string" then
@@ -485,9 +484,9 @@ function M.splitExist()
     local ui        = api.nvim_list_uis()[1]
     -- Based on vim.o.guifont = "更纱黑体 Mono SC Nerd:h13"
     if fn.has("win32") == 1 then
-        if winCount == 2 and 232/2 < ui["width"] then cmd [[noautocmd wincmd L]] end
+        if winCount == 2 and 232/2 < ui["width"] then vim.cmd [[noautocmd wincmd L]] end
     elseif fn.has("unix") == 1 then
-        if winCount == 2 and 284/2 < ui["width"] then cmd [[noautocmd wincmd L]] end
+        if winCount == 2 and 284/2 < ui["width"] then vim.cmd [[noautocmd wincmd L]] end
     end
 end
 

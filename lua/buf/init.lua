@@ -4,6 +4,7 @@
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
 -- Version: 0.0.25
 -- Last Modified: 2022-01-25
+-- TODO: jump to relative buf in quickfix?
 local fn  = vim.fn
 local cmd = vim.cmd
 local api = vim.api
@@ -22,7 +23,6 @@ end
 
 
 M.restoreClosedBuf = function()
-    Print(var.lastClosedFilePath)
     if var.lastClosedFilePath then
         cmd(string.format("e %s", var.lastClosedFilePath))
     end
@@ -48,8 +48,8 @@ M.quickfixToggle = function () -- {{{
 end -- }}}
 
 
-M.newSplit = function (func, funcArgList, bufnamePat, bufListed, scratchBuf)
-    require("buf.action.newSplit").init(func, funcArgList, bufnamePat, bufListed, scratchBuf)
+M.newSplit = function(...)
+    require("buf.action.newSplit").init(...)
 end
 
 return M

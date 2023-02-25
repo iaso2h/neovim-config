@@ -282,7 +282,7 @@ theme.lsp = {
     LspReferenceRead  = {bg = p.n3},
     LspReferenceWrite = {bg = p.n3},
 
-    FloatBorder = {fg = p.n10, bg = p.n0, style = "bold"},
+    FloatBorder = {fg = p.n3b, bg = p.n0, style = "bold"},
 }
 
 

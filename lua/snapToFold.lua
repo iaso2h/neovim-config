@@ -7,7 +7,7 @@
 local api  = vim.api
 local fn   = vim.fn
 local util = require("util")
-local M = {}
+local M    = {}
 
 
 --- Get the next non-folded line number. If topline is already a non-folded
@@ -32,12 +32,12 @@ local getNextNonFoldLine = function(topline, botline)
                     topline = topline + 1
                     if fn.foldlevel(topline) == 0 then break end
                 end
-            -- The fold is closed
             else
+                -- The fold is closed
                 topline = closedEnd + 1
             end
-        -- Not inside a fold
         else
+            -- Not inside a fold
             break
         end
     end
@@ -51,16 +51,16 @@ end
 ---@param topline number
 ---@param botline number
 ---@return table Ex: {1, 34}
-local getNonFoldRegion = function (topline, botline)
+local getNonFoldRegion = function(topline, botline)
     for i = topline, botline, 1 do
         if fn.foldlevel(i) ~= 0 then
             -- If the first line is also a fold line
-            return {topline, i - 1}
+            return { topline, i - 1 }
         end
     end
 
     -- No folds in the whole range
-    return {topline, botline}
+    return { topline, botline }
 end
 
 
@@ -69,7 +69,7 @@ end
 ---@param topline number
 ---@param botline number
 ---@return table Ex: {{1, 34}, {54, 131}, {185, 202}}
-local getAllNonFoldRegion = function (topline, botline)
+local getAllNonFoldRegion = function(topline, botline)
     local region
     local nextTopline = topline
     local nonFoldRegion = {}
@@ -89,8 +89,8 @@ local getAllNonFoldRegion = function (topline, botline)
 
             if nextTopline == botline then break end
 
-        -- Stop when range[2] is the botline
         else
+            -- Stop when range[2] is the botline
             break
         end
     end
@@ -105,15 +105,15 @@ end
 ---@param cursorPos table  Cursor info retrieved by calling nvim_win_set_cursor
 ---@param lineNr    number Destination line number
 local function snapToLine(curWinNr, curBufNr, cursorPos, lineNr)
-    local regionEndTextLen = #api.nvim_buf_get_lines(curBufNr,lineNr-1,lineNr,false)[1]
+    local regionEndTextLen = #api.nvim_buf_get_lines(curBufNr, lineNr - 1, lineNr, false)[1]
     if regionEndTextLen - 1 < cursorPos[2] then
         if regionEndTextLen == 0 then
-            api.nvim_win_set_cursor(curWinNr, {lineNr, 0})
+            api.nvim_win_set_cursor(curWinNr, { lineNr, 0 })
         else
-            api.nvim_win_set_cursor(curWinNr, {lineNr, regionEndTextLen - 1})
+            api.nvim_win_set_cursor(curWinNr, { lineNr, regionEndTextLen - 1 })
         end
     else
-        api.nvim_win_set_cursor(curWinNr, {lineNr, cursorPos[2]})
+        api.nvim_win_set_cursor(curWinNr, { lineNr, cursorPos[2] })
     end
 end
 
@@ -132,7 +132,7 @@ end
 local highlightLines = function(curBufNr, lineNrs)
     for _, lineNr in ipairs(lineNrs) do
         local lineLen = #api.nvim_buf_get_lines(curBufNr, lineNr - 1, lineNr, false)[1]
-        util.nvimBufAddHl(curBufNr, {lineNr, 0}, {lineNr, lineLen - 1}, "V", "Search", 500)
+        util.nvimBufAddHl(curBufNr, { lineNr, 0 }, { lineNr, lineLen - 1 }, "V", "Search", 500)
     end
 end
 
@@ -145,7 +145,7 @@ end
 --- the exCMD will act like a right hand side of a normal mapping
 ---@param threshold number Multiplied by the Neovim window height to get the
 --- minimum number for the snap taking palce
-M.main = function (exCMD, snapEnable, threshold)
+M.main = function(exCMD, snapEnable, threshold)
     --
     -- {
     -- botline = 12,
@@ -181,7 +181,7 @@ M.main = function (exCMD, snapEnable, threshold)
     threshold = threshold or 1
 
     -- Initiation
-    local curWinNr    = api.nvim_get_current_win()
+    local curWinNr = api.nvim_get_current_win()
     local curBufNr = api.nvim_get_current_buf()
     -- (1, 0) based table
     local cursorPos = api.nvim_win_get_cursor(curWinNr)
@@ -199,7 +199,7 @@ M.main = function (exCMD, snapEnable, threshold)
     -- No visible folds in Neovim window
     if #nonFoldRegions == 1 and nonFoldRegions[1][1] == winInfo.topline and nonFoldRegions[1][2] == winInfo.botline then
         -- Do nothing
-        return api.nvim_echo({{"No visible folds in sight"}}, false, {})
+        return api.nvim_echo({ { "No visible folds in sight" } }, false, {})
     end
 
     -- Check which region cursor resides in
@@ -220,8 +220,8 @@ M.main = function (exCMD, snapEnable, threshold)
     local topLineNr = cursorRegion[1] == winInfo.topline and winInfo.topline or cursorRegion[1] - 1
     local botLineNr = cursorRegion[2] == winInfo.botline and winInfo.botline or cursorRegion[2] + 1
     -- Get distances from cursor to both ends
-    local distTop = util.posDist({topLineNr, cursorPos[2]}, cursorPos)
-    local distBot = util.posDist({botLineNr, cursorPos[2]}, cursorPos)
+    local distTop = util.posDist({ topLineNr, cursorPos[2] }, cursorPos)
+    local distBot = util.posDist({ botLineNr, cursorPos[2] }, cursorPos)
     -- Compare distance
     if distTop < distBot then
         if topLineNr ~= winInfo.topline and

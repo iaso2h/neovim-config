@@ -47,13 +47,18 @@ require("bufferline").setup {
         -- NOTE: this will be called a lot so don"t do any heavy processing here
         custom_filter = function(buf_number)
             -- filter out filetypes you don"t want to see
-            if vim.bo[buf_number].filetype ~= "help" then
-                return true
+            local ft = vim.bo[buf_number].filetype
+            if ft == "help" then
+                return false
+            elseif ft == "qf" then
+                return false
             end
             -- filter out by buffer name
-            if vim.fn.bufname(buf_number) ~= "nowrite" then
-                return true
+            local bt = vim.fn.bufname(buf_number)
+            if bt == "nowrite" then
+                return false
             end
+            return true
             -- filter out based on arbitrary rules
             -- e.g. filter out vim wiki buffer from tabline in your work repo
             -- if vim.fn.getcwd() == "<work-repo>" and vim.bo[buf_number].filetype ~= "wiki" then

@@ -3,10 +3,11 @@
         "prefix": "vimhead",
         "body": [
             "local fn  = vim.fn",
-            "local cmd = vim.cmd",
             "local api = vim.api",
             "local M   = {}",
-            ""
+            "$0",
+            "",
+            "return M"
         ],
         "description": "vim head local variables"
     },
@@ -44,20 +45,30 @@
         ],
         "description": "vim confirm() in lua"
     },
+    "vimpcall": {
+        "prefix": "pcallv",
+        "body": [
+            "local ok, msg = pcall(${1:func}, ${2:args})",
+            "${3:if not ok then",
+            "\tvim.notify(msg, vim.log.levels.ERROR)}",
+            "${4:\thandler(ok, err)\nelse\n\tsuccess(ok, err)\nend}"
+        ],
+        "description": "pcall statement"
+    },
+    "viminput": {
+        "prefix": "viminput",
+        "body": [
+            "vim.ui.input({prompt = \"${1:Prompt text}: \"}, function(input)",
+            "\t$0",
+            "end)"
+        ],
+        "description": "vim ui input"
+    },
     "do return": {
         "prefix": "dor",
         "body": [
             "do return end"
         ],
         "description": "do return end"
-    },
-    "vimpcall": {
-        "prefix": "pcallv",
-        "body": [
-            "local ok, msg = pcall(${1:func}, ${2:args})",
-            "${3:if not ok then vim.notify(msg, vim.log.levels.ERROR)} end",
-            "${4:\thandler(ok, err)\nelse\n\tsuccess(ok, err)\nend}"
-        ],
-        "description": "pcall statement"
     }
 }

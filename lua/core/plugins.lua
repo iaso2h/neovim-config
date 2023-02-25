@@ -69,7 +69,7 @@ use {
 }
 use {
     'nvim-treesitter/playground',
-    requires = "nvim-treesitter",
+    after    = "nvim-treesitter",
     cmd      = "TSPlaygroundToggle",
     keys     = {{"n", "gH"}},
     config   = function()
@@ -99,7 +99,7 @@ use {
 }
 use {
     'romgrk/nvim-treesitter-context',
-    requires = "nvim-treesitter",
+    after    = "nvim-treesitter",
     event    = {"CursorHold", "CursorHoldI"},
     config   = [[require("treesitter-context").setup()]]
 }
@@ -108,7 +108,6 @@ use {
     -- TODO:
     -- 'HiPhish/nvim-ts-rainbow2',
     event    = "BufAdd",
-    requires = "nvim-treesitter",
     after    = "nvim-treesitter",
     config   = function()
         require("nvim-treesitter.configs").setup{
@@ -131,8 +130,8 @@ use {
 }
 use {
     "nvim-treesitter/nvim-treesitter-textobjects",
-    event    = "BufAdd",
-    requires = {
+    event = "BufAdd",
+    after = {
         "nvim-treesitter",
         "gitsigns.nvim"
     },
@@ -141,7 +140,7 @@ use {
 use {
     'windwp/nvim-ts-autotag',
     event    = "InsertEnter",
-    requires = "nvim-treesitter",
+    after    = "nvim-treesitter",
     ft       = {"html", "javascript", "javascriptreact", "typescriptreact", "svelte", "vue"},
     config   = [[require("nvim-treesitter.configs").setup {autotag = {enable = true}}]]
 }
@@ -294,9 +293,9 @@ use {
     }
     use {
         'danymat/neogen',
-        requires = "nvim-treesitter",
-        keys     = {{"n", "gcd"}},
-        config   = function()
+        after  = "nvim-treesitter",
+        keys   = {{"n", "gcd"}},
+        config = function()
             require("neogen").setup {
                 enabled             = true,
                 input_after_comment = true,
@@ -431,7 +430,6 @@ use {
     }
     use {
         'preservim/nerdcommenter',
-        event = "BufAdd",
         keys  = {
             {"x", [[<A-/>]]},
             {"n", [[<A-/>]]},
@@ -526,8 +524,9 @@ use {
     use {
         'nvim-telescope/telescope.nvim',
         module_pattern = "telescope.*",
-        cmd      = "Telescope",
-        keys     = {
+        after = "plenary.nvim",
+        cmd  = "Telescope",
+        keys = {
             {"n", [[<C-f>l]]},  {"n", [[<C-f>E]]},  {"n", [[<C-f>e]]},    {"n", [[<C-f>f]]},
             {"n", [[<C-f>F]]},  {"n", [[<C-f>w]]},  {"n", [[<C-f>W]]},    {"n", [[<A-C-j>]]},
             {"n", [[<A-C-k>]]}, {"n", [[<C-h>/]]},  {"n", [[<C-h>v]]},    {"n", [[<C-h>o]]},
@@ -537,15 +536,12 @@ use {
 
             {"n", [[<C-f>o]]},  {"n", [[<C-f>O]]},  {"n", [[<leader>e]]}, {"n", [[<leader>E]]},
         },
-        requires = {
-            "plenary.nvim",
-        },
         config = conf "nvim-telescope"
     }
     use {
         'nvim-telescope/telescope-symbols.nvim',
-        module   = "telescope",
-        requires = "telescope.nvim"
+        module = "telescope",
+        after  = "telescope.nvim"
     }
     -- }}} Telescope
     -- UI {{{
@@ -554,9 +550,9 @@ use {
         config = conf "nvim-web-devicons"
     }
     use {
-        disable = true,
         'yamatsum/nvim-nonicons',
-        requires = "nvim-web-devicons",
+        disable = true,
+        after = "nvim-web-devicons",
         config = [[require("nvim-nonicons").setup()]]
     }
     use {
@@ -566,16 +562,16 @@ use {
     use {
         -- TODO: use the main brach
         'NTBBloodbath/galaxyline.nvim',
-        event    = "BufAdd",
-        requires = "nvim-web-devicons",
-        config   = conf "nvim-galaxyline"
+        event  = "BufAdd",
+        after  = "nvim-web-devicons",
+        config = conf "nvim-galaxyline"
     }
 
     use {
         'akinsho/bufferline.nvim',
-        event    = "BufAdd",
-        requires = "nvim-web-devicons",
-        config   = conf "nvim-bufferline".config
+        event  = "BufAdd",
+        after  = "nvim-web-devicons",
+        config = conf "nvim-bufferline".config
     }
     use {
         'NvChad/nvim-colorizer.lua',
@@ -609,15 +605,15 @@ use {
     }
     use {
         'folke/todo-comments.nvim',
-        event    = "BufAdd",
-        requires = "nvim-web-devicons",
-        config   = conf "nvim-todo-comments"
+        event  = "BufAdd",
+        after  = "nvim-web-devicons",
+        config = conf "nvim-todo-comments"
     }
     use {
         'kyazdani42/nvim-tree.lua',
-        keys     = {{"n", "<C-w>e"}},
-        requires = "nvim-web-devicons",
-        config   = conf "nvim-tree"
+        keys   = {{"n", "<C-w>e"}},
+        after  = "nvim-web-devicons",
+        config = conf "nvim-tree"
     }
     use {
         'stevearc/dressing.nvim',
@@ -653,22 +649,18 @@ use {
     }
     use {
         'williamboman/mason-lspconfig.nvim',
-        requires = {
-            "mason.nvim",
-        },
+        after  = "mason.nvim",
         config = conf("nvim-mason-lspconfig").config
     }
     use {
         'neovim/nvim-lspconfig',
-        event  = "BufAdd",
-        requires = {
-            "plenary.nvim",
-        },
+        event = "BufAdd",
     }
     use {
         'folke/neodev.nvim',
-        ft     = "lua",
-        config = [[ require("neodev").setup(); require("config.nvim-lspconfig").config() ]]
+        requires = "nvim-lspconfig",
+        after    = {"nvim-lspconfig", "plenary.nvim", "cmp-nvim-lsp"},
+        config   = [[ require("neodev").setup(); require("config.nvim-lspconfig").config() ]]
     }
     use 'rafamadriz/friendly-snippets'
     use {
@@ -683,17 +675,17 @@ use {
     }
     use {
         'hrsh7th/nvim-cmp',
-        requires = "LuaSnip",
+        after  = "LuaSnip",
         config = conf "nvim-cmp"
     }
     use {
         'hrsh7th/cmp-nvim-lsp',
-        requires = "nvim-cmp"
+        after = "nvim-cmp"
     }
     use {
         "tzachar/cmp-tabnine",
         event = "InsertEnter",
-        requires = "nvim-cmp",
+        after = "nvim-cmp",
         run = function()
             if jit.os == "Windows" then
                 vim.cmd "!powershell ./install.ps1'"
@@ -705,7 +697,7 @@ use {
     use {
         "saadparwaiz1/cmp_luasnip",
         event = "InsertEnter",
-        requires = "nvim-cmp",
+        after = "nvim-cmp",
         run = function()
             if jit.os == "Windows" then
                 vim.cmd "!powershell ./install.ps1'"
@@ -717,23 +709,23 @@ use {
     use {
         "hrsh7th/cmp-buffer",
         event = "InsertEnter",
-        requires = "nvim-cmp",
+        after = "nvim-cmp",
     }
     use {
         "hrsh7th/cmp-path",
         event = "InsertEnter",
-        requires = "nvim-cmp",
+        after = "nvim-cmp",
     }
     use {
         "hrsh7th/cmp-cmdline",
         event = "InsertEnter",
-        requires = "nvim-cmp",
+        after = "nvim-cmp",
     }
     use {
         'folke/trouble.nvim',
-        rquires = "nvim-lspconfig",
-        cmd     = "Trouble",
-        config  = function()
+        after  = "nvim-lspconfig",
+        cmd    = "Trouble",
+        config = function()
             require("trouble").setup {
                 position    = "bottom",  -- position of the list can be: bottom, top, left, right
                 height      = 15,        -- height of the trouble list when position is top or bottom
@@ -782,7 +774,7 @@ use {
                     information = "",
                     other       = "﫠"
                 },
-                use_lsp_diagnostic_signs = true -- enabling this will use the signs defined in your lsp client
+                use_diagnostic_signs = true -- enabling this will use the signs defined in your lsp client
             }
         end
     }
@@ -816,8 +808,7 @@ use {
     }
     use {
         'ThePrimeagen/refactoring.nvim',
-        event    = "BufAdd",
-        requires = {
+        after = {
             "plenary.nvim",
             "nvim-treesitter"
         },
@@ -839,7 +830,7 @@ use {
     -- Debug {{{
     use {
         'bfredl/nvim-luadev',
-        ft   = "lua",
+        ft = "lua",
     }
     use {
         'dstein64/vim-startuptime',
@@ -905,6 +896,7 @@ use {
     }
     use {
         'michaelb/sniprun',
+        disable = jit.os == "Windows",
         run = 'bash ./install.sh',
         cmd = {"SnipRun", "SnipReset", "SnipReplMemoryClean", "SnipTerminate", "SnipInfo", "SnipClose"},
         config = function ()
@@ -952,7 +944,7 @@ use {
             }
         end,
     }
-    -- use 'sakhnik/nvim-gdb', {'do': ':!./install.sh'}
+    -- use 'CRAG666/code_runner.nvim'
     -- }}} Debug
     -- Language support {{{
     -- Lua

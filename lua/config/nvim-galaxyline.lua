@@ -227,7 +227,7 @@ gls.left[6] = {
 }
 
 -- Third Buble
-if fn.has("unix") == 1 then
+-- if fn.has("unix") == 1 then
     gls.left[7] = {
         GitIcon = {
             provider  = function() return ' ' end,
@@ -247,7 +247,7 @@ if fn.has("unix") == 1 then
             separator_highlight = {'NONE',colors.bright_bg1},
         }
     }
-end
+-- end
 
 gls.left[9] = {
     DiffAdd = {
