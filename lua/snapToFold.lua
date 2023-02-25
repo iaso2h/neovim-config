@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Snap to closest fold in sight then execute an Ex command or
 -- a function
--- Version: 0.0.4
--- Last Modified: 2023-2-22
+-- Version: 0.0.5
+-- Last Modified: 2023-2-25
 local api  = vim.api
 local fn   = vim.fn
 local util = require("util")
@@ -224,34 +224,61 @@ M.main = function(exCMD, snapEnable, threshold)
     local distBot = util.posDist({ botLineNr, cursorPos[2] }, cursorPos)
     -- Compare distance
     if distTop < distBot then
-        if topLineNr ~= winInfo.topline and
-            distTop <= (winInfo.height)^2*threshold then
-            -- highlightLines(curBufNr, {topLineNr})
-            snapToLine(curWinNr, curBufNr, cursorPos, topLineNr)
+        if botLineNr == winInfo.botline then
+            -- Snap to bottom instead
+            if distBot <= (winInfo.height) ^ 2 * threshold then
+                snapToLine(curWinNr, curBufNr, cursorPos, botLineNr)
+            else
+                return
+            end
         else
-            return
+            if distTop <= (winInfo.height) ^ 2 * threshold then
+                snapToLine(curWinNr, curBufNr, cursorPos, topLineNr)
+            else
+                return
+            end
         end
     elseif distTop > distBot then
-        if botLineNr ~= winInfo.botline and
-            distBot <= (winInfo.height)^2*threshold then
-            -- highlightLines(curBufNr, {botLineNr})
-            snapToLine(curWinNr, curBufNr, cursorPos, botLineNr)
+        if botLineNr == winInfo.botline then
+            -- Snap to top instead
+            if distTop <= (winInfo.height) ^ 2 * threshold then
+                snapToLine(curWinNr, curBufNr, cursorPos, topLineNr)
+            else
+                return
+            end
         else
-            return
+            if distBot <= (winInfo.height) ^ 2 * threshold then
+                snapToLine(curWinNr, curBufNr, cursorPos, botLineNr)
+            else
+                return
+            end
         end
     else
-        if botLineNr == winInfo.botline or topLineNr == winInfo.topline then return end
-
-        highlightLines(curBufNr, {topLineNr, botLineNr})
-        answer =  fn.confirm("Down or Up?", "&J&K", 0)
-        if answer == 1 then
-            snapToLine(curWinNr, curBufNr, cursorPos, topLineNr)
-        elseif answer == 2 then
-            snapToLine(curWinNr, curBufNr, cursorPos, botLineNr)
+        if topLineNr == winInfo.topline and botLineNr ~= winInfo.botline then
+            -- Snap to bottom instead
+            if distBot <= (winInfo.height) ^ 2 * threshold then
+                snapToLine(curWinNr, curBufNr, cursorPos, botLineNr)
+            else
+                return
+            end
+        elseif topLineNr ~= winInfo.topline and botLineNr == winInfo.botline then
+            -- Snap to top instead
+            if distTop <= (winInfo.height) ^ 2 * threshold then
+                snapToLine(curWinNr, curBufNr, cursorPos, topLineNr)
+            else
+                return
+            end
         else
-            return
+            highlightLines(curBufNr, { topLineNr, botLineNr })
+            answer = fn.confirm("Down or Up?", "&J&K", 0)
+            if answer == 1 then
+                snapToLine(curWinNr, curBufNr, cursorPos, topLineNr)
+            elseif answer == 2 then
+                snapToLine(curWinNr, curBufNr, cursorPos, botLineNr)
+            else
+                return
+            end
         end
-
     end
 
     -- Execute command
