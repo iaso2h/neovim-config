@@ -1,5 +1,5 @@
 # Dependencies
-* `/lua/util.lua`
+* `/lua/keymapUtil.lua`
 * `/lua/yankPut.lua` to reselect last replace region
 * [vim-repeat](https://github.com/tpope/vim-repeat) to make replace operator repeatable in normal mode
 * [vim-visualrepeat](https://github.com/inkarkat/vim-visualrepeat) to make replace visually repeatable in both visual mode and normal mode
