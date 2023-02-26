@@ -77,6 +77,8 @@ if not vim.g.vscode then
     autocmd FocusGained          * checktime
   " autocmd BufAdd               * lua require("consistantTab").adaptBufTab()
 
+    autocmd BufLeave             * lua require("util").getLastWinID()
+
     autocmd BufEnter             term://* startinsert
     autocmd TermOpen             *        startinsert
     autocmd TermOpen             *        setlocal nobuflisted | setlocal nonumber

@@ -764,4 +764,30 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, 
 end
 
 
+M.getLastWinID = function ()
+    local bufNr = api.nvim_get_current_buf()
+    local bufName = api.nvim_buf_get_name(bufNr)
+    local bufType = vim.bo.buftype
+    local winID = api.nvim_get_current_win()
+    local winConfig = api.nvim_win_get_config(winID)
+    -- Non-float window and non-special buffer type and non-scratch buffer file
+    if winConfig.relative == "" and bufType == "" and bufName ~= "" then
+        M.lastWinID = winID
+    end
+    -- if winConfig.relative == "" then
+        -- if bufType == "" then
+            -- if  bufName ~= "" then
+                -- M.lastWinID = winID
+            -- else
+                -- vim.notify("Switch from scratch buffer", vim.log.levels.WARN)
+            -- end
+        -- else
+            -- vim.notify("Switch from special buffer", vim.log.levels.WARN)
+        -- end
+    -- else
+        -- vim.notify("Switch from relative window", vim.log.levels.WARN)
+    -- end
+end
+
+
 return M
