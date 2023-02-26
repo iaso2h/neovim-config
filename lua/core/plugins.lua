@@ -849,12 +849,20 @@ use {
         keys   = {{"n", "<C-q>,"}, {"n", "<C-q>."}},
         config = conf("vim-scriptease").config
     }
+    use {
+        'mfussenegger/nvim-dap',
+        module = "dap",
+        setup  = conf("nvim-dap").setup,
+        config = conf("nvim-dap").config
+    }
     -- use {
-        -- 'mfussenegger/nvim-dap',
-            -- disable = true,
-        -- module = "dap",
-        -- setup  = conf("nvim-dap").setup,
-        -- config = conf("nvim-dap").config
+        -- 'jay-babu/mason-nvim-dap.nvim',
+        -- after  = {"nvim-dap", "mason.nvim"},
+        -- config = function()
+            -- require("mason-nvim-dap").setup{
+                -- ensure_installed = {"python", "codelldb"}
+            -- }
+        -- end
     -- }
     use {
         'rcarriga/nvim-dap-ui',
@@ -891,58 +899,74 @@ use {
         cmd    = {"OSVStart", "OSVStop"},
         config = function()
             vim.cmd [[command! -nargs=0 OSVStop  lua require("osv").stop()]]
-            vim.cmd [[command! -nargs=0 OSVStart lua require("osv").launch()]]
+            vim.cmd [[command! -nargs=0 OSVStart lua require("osv").launch{port=8086}]]
         end
+    }
+    use {
+        'nvim-neotest/neotest',
+        requires = {
+            {
+            "antoinemadec/FixCursorHold.nvim",
+            after = "neotest"
+            },
+            {
+            "nvim-neotest/neotest-plenary",
+            module = "neotest-plenary"
+            },
+            {
+            "nvim-neotest/neotest-python",
+            module = "neotest-python"
+            },
+        },
+        after = {
+            "plenary.nvim",
+            "nvim-treesitter",
+        },
+        cmd = {
+            "NeotestRun",
+            "NeotestStop",
+            "NeotestAttach",
+        },
+        config = function ()
+            vim.cmd [[
+            command! -nargs=0 NeotestRun     lua require("neotest").run.run {strategy = "integrated"}
+            eommand! -nargs=0 NeotestCurrent lua require("neotest").run.run(vim.fn.expand("%"))
+            command! -nargs=0 NeotestStop    lua require("neotest").run.stop()
+            command! -nargs=0 NeotestAttach  lua require("neotest").run.attach()
+            ]]
+            require("neotest").setup {
+                adapters = {
+                    require("neotest-python") {
+                        dap = { justMyCode = false },
+                    },
+                    require("neotest-plenary"),
+                },
+            }
+        end
+    }
+    use {
+        'vim-test/vim-test',
+        cmd = {
+         "TestNearest",
+         "TestFile",
+         "TestSuite",
+         "TestLast",
+         "TestVisit",
+      },
+        setup = function()
+                vim.g["test#strategy"] = {
+                    nearest = 'neovim',
+                    file    = 'dispatch',
+                    suite   = 'basic',
+                }
+            end,
     }
     use {
         'michaelb/sniprun',
         disable = jit.os == "Windows",
-        run = 'bash ./install.sh',
-        cmd = {"SnipRun", "SnipReset", "SnipReplMemoryClean", "SnipTerminate", "SnipInfo", "SnipClose"},
-        config = function ()
-            require'sniprun'.setup{
-                selected_interpreters = {},     --# use those instead of the default for the current filetype
-                repl_enable = {},               --# enable REPL-like behavior for the given interpreters
-                repl_disable = {},              --# disable REPL-like behavior for the given interpreters
-
-                interpreter_options = {},       --# intepreter-specific options, consult docs / :SnipInfo <name>
-
-                --# you can combo different display modes as desired
-                display = {
-                    "Classic",                    --# display results in the command-line  area
-                    "VirtualTextOk",              --# display ok results as virtual text (multiline is shortened)
-
-                    -- "VirtualTextErr",          --# display error results as virtual text
-                    -- "TempFloatingWindow",      --# display results in a floating window
-                    -- "LongTempFloatingWindow",  --# same as above, but only long results. To use with VirtualText__
-                    -- "Terminal",                --# display results in a vertical split
-                    -- "NvimNotify",              --# display with the nvim-notify plugin
-                    -- "Api"                      --# return output to a programming interface
-                },
-
-                --# You can use the same keys to customize whether a sniprun producing
-                --# no output should display nothing or '(no output)'
-                show_no_output = {
-                    "Classic",
-                    "TempFloatingWindow",      --# implies LongTempFloatingWindow, which has no effect on its own
-                },
-
-                -- --# customize highlight groups (setting this overrides colorscheme)
-                -- snipruncolors = {
-                    -- SniprunVirtualTextOk  = {bg="#66eeff",fg="#000000"},
-                    -- SniprunFloatingWinOk  = {fg="#66eeff"},
-                    -- SniprunVirtualTextErr = {bg="#881515",fg="#000000"},
-                    -- SniprunFloatingWinErr = {fg="#881515"},
-                -- },
-
-                --# miscellaneous compatibility/adjustement settings
-                inline_messages = 0,             --# inline_message (0/1) is a one-line way to display messages
-                                --# to workaround sniprun not being able to display anything
-
-                borders = 'single'               --# display borders around floating windows
-                                                --# possible values are 'none', 'single', 'double', or 'shadow'
-            }
-        end,
+        run    = 'bash ./install.sh',
+        cmd    = {"SnipRun", "SnipReset", "SnipReplMemoryClean", "SnipTerminate", "SnipInfo", "SnipClose"},
+        config = conf "nvim-sniprun"
     }
     -- use 'CRAG666/code_runner.nvim'
     -- }}} Debug

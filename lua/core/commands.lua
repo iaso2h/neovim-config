@@ -1,4 +1,5 @@
 -- Function {{{
+
 vim.g.FiletypeCommentDelimiter = {
     vim    = "\"",
     python = "#",
@@ -62,6 +63,7 @@ function! RemoveLastPathComponent()
     return l:result . l:cmdlineAfterCursor
 endfunction
 ]]
+
 -- }}} Function
 
 -- Auto commands {{{
