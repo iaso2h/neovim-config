@@ -224,7 +224,7 @@ M.main = function(exCMD, snapEnable, threshold)
     local distBot = util.posDist({ botLineNr, cursorPos[2] }, cursorPos)
     -- Compare distance
     if distTop < distBot then
-        if botLineNr == winInfo.botline then
+        if topLineNr == winInfo.topline then
             -- Snap to bottom instead
             if distBot <= (winInfo.height) ^ 2 * threshold then
                 snapToLine(curWinNr, curBufNr, cursorPos, botLineNr)
