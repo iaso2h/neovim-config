@@ -21,8 +21,8 @@ local trailingMarkerFallback = function(commentStr, char, line)
 end
 
 
---- Find if a comment node exist in a line
----@param cursorPos table (0, 0) based. Row(Line) and column.
+--- Find if a comment node exist in a line, start at col 2
+---@param cursorPos table (0, 0) indexing. Row(Line) and column.
 ---@param lastNode object The treesitter object retrieved by calling
 ---ts.get_node_at_post(0, <linenum>, 0)
 ---@param lineLen number The length of current cursor
@@ -32,32 +32,34 @@ local function findCommentNode(cursorPos, lastNode, lineLen)
     local cnt = 0
     local i = 1
     repeat
-        local node = ts.get_node_at_pos(0, cursorPos[1], i)
+        local node = ts.get_node_at_pos(0, cursorPos[1], i) -- This is (0, 0) indexing
         if not node then
             vim.notify("Failed to get treesitter node", vim.log.levels.WARN)
             return commentTick
         end
 
-        local range = { node:range() }
+        -- Break condition 2
+        if node:type() == "comment" then
+            commentTick = true
+            break
+        end
 
-        if range[1] == cursorPos[1] and node:id() == lastNode:id() then
+        local range = { node:range() } -- This is (0, 0) indexing
+        if node:id() == lastNode:id() then
+            -- Next loop start at the end of the same node
             i = range[4]
         else
             i = i + 1
             lastNode = node
         end
 
-        if node:type() == "comment" then
-            commentTick = true
-            break
-        end
-
+        -- Break condition 3
         cnt = cnt + 1
-        if cnt > 50 then
+        if cnt > 20 then
             vim.notify("Reoccured too many times", vim.log.levels.WARN)
             break
         end
-    until i > lineLen
+    until i > lineLen  -- Break condition 1
 
     return commentTick
 end
