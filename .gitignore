@@ -8,7 +8,7 @@ pack/
 packer.nvim/
 lsp/
 
-packer_compiled.lua
+packer_compiled*.lua
 lua/test**
 *.bk
 *~

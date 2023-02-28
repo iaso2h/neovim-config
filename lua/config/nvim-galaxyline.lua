@@ -1,7 +1,7 @@
 -- File: nvim-galaxyline
 -- Author: iaso2h
 -- Description: Statusline configuration
--- Last Modified: 2021-08-22
+-- Last Modified: 2023-2-27
 return function()
 
 local fn  = vim.fn
@@ -11,7 +11,6 @@ local u2char    = require("util").u2char
 local gl        = require("galaxyline")
 local gls       = gl.section
 local condition = require("galaxyline.condition")
--- local extension = require("galaxyline.provider_extensions")
 
 -- Filetype
 gl.short_line_list = {
@@ -21,92 +20,91 @@ gl.short_line_list = {
 }
 
 local colors = {
-    bright_bg1 = '#4C566A',
-    bright_bg2 = '#616e88',
-    bg         = '#3B4252',
-    fg         = '#5E81AC',
-    fg_green   = '#65a380',
-    yellow     = '#EBCB8B',
-    cyan       = '#88C0D0',
-    darkblue   = '#081633',
-    green      = '#A3BE8C',
-    orange     = '#D08770',
-    purple     = '#B48EAD',
-    magenta    = '#C678DD',
-    blue       = '#5E81AC',
-    blue_light = "#81A1C1",
-    red        = '#BF616A',
-    gray       = '#66738e',
-    white      = '#D8DEE9',
+    fg        = "#5E81AC",
+    bg1       = "#3B4252",
+    bg2       = "#4C566A",
+    bg3       = "#616e88",
+    yellow    = "#EBCB8B",
+    cyan      = "#88C0D0",
+    darkblue  = "#081633",
+    green     = "#A3BE8C",
+    orange    = "#D08770",
+    purple    = "#B48EAD",
+    magenta   = "#C678DD",
+    blue      = "#5E81AC",
+    blueLight = "#81A1C1",
+    red       = "#BF616A",
+    gray      = "#66738e",
+    white     = "#D8DEE9",
 }
 
 local alias = {
-    n      = 'NORMAL',
-    i      = 'INSERT',
-    c      = 'COMMAND',
-    V      = 'VISUAL',
-    [''] = 'VISUAL',
-    v      = 'VISUAL',
-    ['r?'] = ':CONFIRM',
-    rm     = '--MORE',
-    R      = 'REPLACE',
-    Rv     = 'VIRTUAL',
-    s      = 'SELECT',
-    S      = 'SELECT',
-    [''] = 'SELECT',
-    ['r']  = 'HIT-ENTER',
-    t      = 'TERMINAL',
-    ['!']  = 'SHELL'
+    n      = "NORMAL",
+    i      = "INSERT",
+    c      = "COMMAND",
+    V      = "VISUAL",
+    [""] = "VISUAL",
+    v      = "VISUAL",
+    ["r?"] = ":CONFIRM",
+    rm     = "--MORE",
+    R      = "REPLACE",
+    Rv     = "VIRTUAL",
+    s      = "SELECT",
+    S      = "SELECT",
+    [""] = "SELECT",
+    ["r"]  = "HIT-ENTER",
+    t      = "TERMINAL",
+    ["!"]  = "SHELL"
 }
 
-local mode_colors = {
+local modeColors = {
     n      = colors.cyan,
     i      = colors.green,
     c      = colors.yellow,
     V      = colors.orange,
-    [''] = colors.orange,
+    [""] = colors.orange,
     v      = colors.orange,
-    ['r?'] = colors.red,
+    ["r?"] = colors.red,
     rm     = colors.red,
     R      = colors.red,
     Rv     = colors.red,
     s      = colors.magenta,
     S      = colors.magenta,
-    [''] = colors.magenta,
-    ['r']  = colors.purple,
+    [""] = colors.magenta,
+    ["r"]  = colors.purple,
     t      = colors.blue,
-    ['!']  = colors.blue
+    ["!"]  = colors.blue
 }
 
 local fileFormatIcons = {
-    locker    = u2char 'f023',
-    unsaved   = u2char 'f693',
-    dos       = u2char 'e70f',
-    unix      = u2char 'f17c',
-    mac       = u2char 'f179',
-    lsp_warn  = u2char 'f071',
-    lsp_error = u2char 'f46e'
+    locker    = u2char "f023",
+    unsaved   = u2char "f693",
+    dos       = u2char "e70f",
+    unix      = u2char "f17c",
+    mac       = u2char "f179",
+    lsp_warn  = u2char "f071",
+    lsp_error = u2char "f46e"
 }
 
 -- Based on 更纱黑体 Mono SC Nerd
 local bufTypeIcons = {
-    help             = '   ',
-    defx             = '   ',
-    ["vim-plug"]     = '  ',
-    vista            = '  ',
-    vista_kind       = '  ',
-    ["dap-repl"]     = '  ',
-    magit            = '   ',
-    fugitive         = '   ',
-    Mundo            = '  ',
-    startify         = '  ',
-    NvimTree         = '  ',
-    ["coc-explorer"] = '  ',
-    qf               = '  ',
+    help             = "   ",
+    defx             = "   ",
+    ["vim-plug"]     = "  ",
+    vista            = "  ",
+    vista_kind       = "  ",
+    ["dap-repl"]     = "  ",
+    magit            = "   ",
+    fugitive         = "   ",
+    Mundo            = "  ",
+    startify         = "  ",
+    NvimTree         = "  ",
+    ["coc-explorer"] = "  ",
+    qf               = "  ",
 }
 
-local separator_left  = ""
-local separator_right = ""
+local circleHalfRight = ""
+local circleHalfLeft  = ""
 
 local hasFileType = function()
     local fileType = vim.bo.filetype
@@ -114,232 +112,228 @@ local hasFileType = function()
     return true
 end
 
+
 local shortLineFileType = function ()
     local fileType = vim.bo.filetype
     return vim.tbl_contains(gl.short_line_list, fileType)
 end
+
 
 local noShortLineFileType = function ()
     local fileType = vim.bo.filetype
     return not vim.tbl_contains(gl.short_line_list, fileType)
 end
 
--- First Bubble
+
+local fileInfo = function()
+    local cwd  = vim.fn.getcwd(0)
+    local absoPath = vim.api.nvim_buf_get_name(0)
+    local isRel = string.match(absoPath, cwd) ~= nil
+    local sep = jit.os == "Windows" and "\\" or "/"
+    local fileStr = isRel and
+        fn.expand("%") or
+        string.format("..%s%s", sep, vim.fn.expand("%:t"))
+
+    local isMod = vim.bo.modified and " [+]" or ""
+    local isRead = vim.bo.readonly and " []" or ""
+
+    local ext = vim.fn.expand("%:e")
+    local fileTypeStr = ext ~= vim.bo.filetype and
+        string.format(" | %s ", vim.bo.filetype) or
+        " "
+
+    return fileStr .. isMod .. isRead .. fileTypeStr
+end
+
+
 local vimMode
-gls.left[1] = { -- {{{
-    FirstElement = {
-        provider  = function()
-            vimMode = fn.mode()
-            api.nvim_command("hi GalaxyFirstElement guibg=" .. mode_colors[vimMode])
-            return " "
-        end,
-        highlight = {colors.bg, colors.bg}
-    }
-}
+local changeHLColor = function (hlStr)
+    local cmdStr
+    if vimMode == "c" then
+        cmdStr = string.format("hi %s guibg=%s guifg=%s gui=%s",
+            hlStr, modeColors[vimMode], colors.blue, "bold")
+    elseif vimMode == "n" then
+        cmdStr = string.format("hi %s guibg=%s guifg=%s gui=%s",
+            hlStr, modeColors[vimMode], colors.bg1, "bold")
+    elseif vimMode == "t" or vimMode == "!" then
+        cmdStr = string.format("hi %s guibg=%s guifg=%s gui=%s",
+            hlStr, modeColors[vimMode], colors.white, "bold")
+    else
+        cmdStr = string.format("hi %s guibg=%s guifg=%s gui=%s",
+            hlStr, modeColors[vimMode], colors.white, "bold")
+    end
 
-gls.left[2] = {
-    -- Show buftype when it's available, otherwise show Vimmode instead
-    ViMode = {
+    vim.cmd(cmdStr)
+end
+
+
+local lineInfo = function()
+    local cursorPos = api.nvim_win_get_cursor(0)
+    local totalLineNr = fn.line("$")
+    local lineColumn = string.format("  %d:%d |", cursorPos[1], cursorPos[2] + 1)
+    local percentage
+    if cursorPos[1] == 1 then
+        percentage = " Top "
+    elseif cursorPos[1] == totalLineNr then
+        percentage = " Bot "
+    else
+        percentage = string.format(" %s%% ", math.modf((cursorPos[1]/totalLineNr)*100))
+    end
+
+    local lineInfo = lineColumn .. percentage
+    return lineInfo
+end
+
+
+gls.left[#gls.left+1] = { -- {{{
+    VimMode = {
         provider = function()
-            local fileType = vim.bo.filetype
-            if fileType == "help" then
-                vimMode = fn.mode()
+            vimMode = vim.fn.mode()
 
-                if vimMode == "c" then
-                        api.nvim_command(string.format(
-                        "hi GalaxyViMode guibg=%s guifg=%s",
-                        mode_colors[vimMode],
-                        colors.blue))
-                else
-                    api.nvim_command(string.format(
-                        "hi GalaxyViMode guibg=%s guifg=%s",
-                        mode_colors[vimMode],
-                        colors.white))
-                end
-                return bufTypeIcons[fileType] .. fileType:upper()
+            changeHLColor("GalaxyVimMode")
+
+            if not isTerm then
+                return string.format("  %s %s ", require("nvim-nonicons").get("vim"), alias[vimMode])
             else
-                vimMode = fn.mode()
-
-                if vimMode == "c" then
-                        api.nvim_command(string.format(
-                        "hi GalaxyViMode guibg=%s guifg=%s",
-                        mode_colors[vimMode],
-                        colors.blue))
-                    return " " .. alias[vimMode]
-                elseif vimMode == "t" or vimMode == "!" then
-                    api.nvim_command(string.format(
-                        "hi GalaxyViMode guibg=%s guifg=%s",
-                        mode_colors[vimMode],
-                        colors.white))
-                    return " " .. alias[vimMode]
+                if vimMode == "t" or vimMode == "!" then
+                    return string.format("  %s %s ", require("nvim-nonicons").get("vim"), alias[vimMode])
                 else
-                    api.nvim_command(string.format(
-                        "hi GalaxyViMode guibg=%s guifg=%s",
-                        mode_colors[vimMode],
-                        colors.white))
-                    return " " .. alias[vimMode]
+                    return string.format("   %s ", alias[vimMode])
                 end
             end
         end,
-        highlight = {colors.white, colors.cyan, 'bold'}
+        highlight = {colors.fg, colors.bg1},
     }
 }
 
-gls.left[3] = {
-    ViModeCap = {
+
+gls.left[#gls.left+1] = {
+    VimModeCap = {
         provider = function()
-            vimMode = fn.mode()
-            api.nvim_command("hi GalaxyViModeCap guifg=" .. mode_colors[vimMode])
-            return separator_left .. " "
+            local cmdStr = string.format("hi GalaxyVimModeCap guifg=%s", modeColors[vimMode])
+            vim.cmd(cmdStr)
+
+            return circleHalfRight .. " "
         end,
-        highlight = {colors.fg, colors.bright_bg2},
+        highlight = {colors.fg, colors.bg3},
     }
 }
 
--- Second bubble
-gls.left[4] = {
+gls.left[#gls.left+1] = {
     FileIcon = {
         provider  = "FileIcon",
         condition = condition.buffer_not_empty,
         highlight = {
-            require('galaxyline.providers.fileinfo').get_file_icon_color,
-            colors.bright_bg2
+            require("galaxyline.provider_fileinfo").get_file_icon_color,
+            colors.bg3
         }
     }
 }
 
-gls.left[5] = {
-    FileName = {
-        provider  = 'FileName',
-        -- provider  = {'FileName', 'FileSize'},
+gls.left[#gls.left+1] = {
+    FileInfo = {
+        provider  = fileInfo,
         condition = condition.buffer_not_empty,
-        highlight = {colors.white, colors.bright_bg2}
+        highlight = {colors.white, colors.bg3}
     }
 }
 
-gls.left[6] = {
-    FileNameCap = {
-        provider = function() return "" end,
-        separator           = separator_left,
-        highlight           = {colors.bright_bg2, colors.bright_bg1},
-        separator_highlight = {colors.bright_bg2, colors.bright_bg1},
+gls.left[#gls.left+1] = {
+    FileInfoCap = {
+        provider  = function() return circleHalfRight end,
+        highlight = {colors.bg3, colors.bg2},
     }
 }
 
--- Third Buble
 -- if fn.has("unix") == 1 then
-    gls.left[7] = {
+    gls.left[#gls.left+1] = {
         GitIcon = {
-            provider  = function() return ' ' end,
-            condition = condition.check_git_workspace,
-            separator = ' ',
-            separator_highlight = {'NONE',colors.bright_bg1},
-            highlight = {colors.purple, colors.bright_bg1,'bold'},
+            provider  = function() return " " end,
+            -- condition = condition.check_git_workspace,
+            condition = condition.hide_in_width,
+            highlight = {colors.purple, colors.bg2},
         }
     }
 
-    gls.left[8] = {
-        GitBranch = {
-            provider  = 'GitBranch',
-            condition = condition.check_git_workspace,
-            highlight = {colors.purple, colors.bright_bg1},
-            separator = ' ',
-            separator_highlight = {'NONE',colors.bright_bg1},
-        }
-    }
+    -- gls.left[7] = {
+        -- GitBranch = {
+            -- provider  = "GitBranch",
+            -- condition = condition.check_git_workspace,
+            -- highlight = {colors.purple, colors.bright_bg1},
+            -- separator = " ",
+            -- separator_highlight = {"NONE",colors.bright_bg1},
+        -- }
+    -- }
 -- end
 
-gls.left[9] = {
+gls.left[#gls.left+1] = {
     DiffAdd = {
-        provider  = 'DiffAdd',
+        provider  = "DiffAdd",
         condition = condition.hide_in_width,
-        icon      = IsTerm and ' ' or '',
-        highlight = {colors.green, colors.bright_bg1}
-}
+        icon      = isTerm and " " or "",
+        highlight = {colors.green, colors.bg2}
     }
-gls.left[10] = {
+}
+gls.left[#gls.left+1] = {
     DiffModified = {
-        provider  = 'DiffModified',
+        provider  = "DiffModified",
         condition = condition.hide_in_width,
-        icon      = IsTerm and ' ' or '',
-        highlight = {colors.yellow, colors.bright_bg1}
+        icon      = isTerm and " " or "",
+        highlight = {colors.yellow, colors.bg2}
     }
 }
 
-gls.left[11] = {
+gls.left[#gls.left+1] = {
     DiffRemove = {
-        provider  = 'DiffRemove',
+        provider  = "DiffRemove",
         condition = condition.hide_in_width,
-        icon      = IsTerm and ' ' or '',
-        highlight = {colors.red, colors.bright_bg1}
+        icon      = isTerm and " " or "",
+        highlight = {colors.red, colors.bg2}
     }
 }
 
-gls.left[12] = {
+gls.left[#gls.left+1] = {
     GitCap = {
-        provider            = function() return "" end,
-        separator           = separator_left .. " ",
-        separator_highlight = {colors.bright_bg1, colors.bg},
-        highlight           = {colors.bright_bg1, colors.bg},
+        provider  = function() return circleHalfRight .. " " end,
+        highlight = {colors.bg2, colors.bg1},
     }
 }
 
 
--- Fourth Bubble
-gls.left[13] = {
+gls.left[#gls.left+1] = {
     DiagnosticHint = {
-        provider  = 'DiagnosticHint',
-        icon      = IsTerm and '  ' or ' ',
-        highlight = {colors.blue_light,colors.bg},
+        provider  = "DiagnosticHint",
+        icon      = isTerm and "  " or " ",
+        highlight = {colors.blueLight,colors.bg1},
     }
 }
 
-gls.left[14] = {
+gls.left[#gls.left+1] = {
     DiagnosticInfo = {
-        provider  = 'DiagnosticInfo',
-        icon      = IsTerm and '  ' or ' ',
-        highlight = {colors.blue,colors.bg},
+        provider  = "DiagnosticInfo",
+        icon      = isTerm and "  " or " ",
+        highlight = {colors.blue,colors.bg1},
     }
 }
 
-gls.left[15] = {
+gls.left[#gls.left+1] = {
     DiagnosticWarn = {
-        provider  = 'DiagnosticWarn',
-        icon      = IsTerm and '  ' or ' ',
-        highlight = {colors.yellow, colors.bg}
+        provider  = "DiagnosticWarn",
+        icon      = isTerm and "  " or " ",
+        highlight = {colors.yellow, colors.bg1}
     }
 }
 
-gls.left[16] = {
+gls.left[#gls.left+1] = {
     DiagnosticError = {
-        provider  = 'DiagnosticError',
-        icon      = IsTerm and '  ' or ' ',
-        highlight = {colors.red, colors.bg}
+        provider  = "DiagnosticError",
+        icon      = isTerm and "  " or " ",
+        highlight = {colors.red, colors.bg1}
     }
-}
+} -- }}}
 
--- }}}
 
--- Mid {{{
--- gls.mid[1] = {
-    -- VistaPlugin = {
-        -- provider = function()
-        -- if (vim.b.vista_nearest_method_or_function == nil) then
-            -- return ''
-        -- elseif (vim.b.vista_nearest_method_or_function == '') then
-            -- return ''
-        -- else
-            -- return '  -> '..vim.b.vista_nearest_method_or_function
-        -- end
-        -- end,
-        -- separator = ' ',
-        -- separator_highlight = {colors.purple,colors.bright_bg1},
-        -- condition = condition.buffer_not_empty,
-        -- highlight = {colors.purple, colors.bright_bg1, 'bold'}
-    -- }
--- }
-
--- gls.mid[2] = {
+-- gls.mid[#gls.mid + 1] = { -- {{{
     -- neovimLSPFunc = {
         -- provider = function()
             -- -- lspStatus.update_current_function()
@@ -352,138 +346,123 @@ gls.left[16] = {
         -- end,
         -- highlight = {colors.yellow, colors.bright_bg1}
     -- }
--- }
-
--- }}} Mid
-
-gls.right[1] = { -- {{{
-    FileFormat = {
-        provider = function()
-            if not condition.buffer_not_empty() then return '' end
-            local icon = fileFormatIcons[vim.bo.fileformat] or ' '
-            return string.format(' %s %s ', icon, vim.bo.filetype)
-        end,
-        separator           = separator_right,
-        separator_highlight = {colors.bright_bg2, colors.bg},
-        highlight           = {colors.white, colors.bright_bg2},
-        condition           = hasFileType
-    }
-}
-
-
--- TODO: does parse when in visual mode
--- gls.right[2] = {
-    -- SelectedLineInfo = {
-        -- provider = function()
-            -- local selectStart = vim.api.nvim_buf_get_mark(0, "<")
-            -- local selectEnd = vim.api.nvim_buf_get_mark(0, ">")
-            -- if selectStart[1] == selectEnd[1] then
-                -- return "1 line"
-            -- else
-                -- return tostring(selectEnd[1] - selectStart[1]) .. " lines"
-            -- end
-        -- end,
-        -- highlight = {colors.orange, colors.bright_bg1}
-    -- }
--- }
-
-gls.right[3] = {
-    LineInfo = {
-        provider            = 'LineColumn',
-        separator           = '| ',
-        separator_highlight = {colors.white, colors.bright_bg2},
-        highlight           = {colors.white, colors.bright_bg2}
-    }
-}
-
-
-gls.right[4] = {
-    PerCent = {
-        provider            = 'LinePercent',
-        separator           = '|',
-        separator_highlight = {colors.white, colors.bright_bg2},
-        highlight           = {colors.white, colors.bright_bg2}
-    }
-}
-
--- VistaPlugin = extension.vista_nearest
--- gls.right[3] = {
--- Vista = {
--- provider = VistaPlugin,
--- separator = ' ',
--- separator_highlight = {colors.bright_bg1, colors.bg},
--- highlight = {colors.blue, colors.bg, 'bold'}
--- }
 -- } -- }}}
 
-gls.short_line_left[1] = { -- {{{
-    ShortStart = {
-        provider  = function() return " " end,
-        condition = condition.buffer_not_empty and shortLineFileType,
-        highlight = {colors.white, colors.cyan}
+
+gls.right[#gls.right+1] = { -- {{{
+    EncodingCap = {
+        provider = function()
+            return circleHalfLeft
+        end,
+        highlight = {colors.bg3, colors.bg1},
     }
 }
 
+gls.right[#gls.right+1] = {
+    Encoding = {
+        provider = function()
+            return "  " .. vim.o.encoding .. " "
+        end,
+        highlight = {colors.white, colors.bg3},
+    }
+}
 
-gls.short_line_left[2] = {
+gls.right[#gls.right+1] = {
+    LineInfoCap = {
+        provider = function() return circleHalfLeft end,
+        highlight = "GalaxyVimModeCap"
+    }
+}
+
+gls.right[#gls.right+1] = {
+    LineInfo = {
+        provider = lineInfo,
+        highlight = "GalaxyVimMode"
+    }
+}
+
+-- -- gls.right[#gls.right+1] = {
+    -- -- LineInfo = {
+        -- -- provider            = "LineColumn",
+        -- -- separator           = "| ",
+        -- -- separator_highlight = {colors.white, colors.bright_bg2},
+        -- -- highlight           = {colors.white, colors.bright_bg2}
+    -- -- }
+-- -- }
+--
+--
+-- -- gls.right[#gls.right+1] = {
+    -- -- PerCent = {
+        -- -- provider            = "LinePercent",
+        -- -- separator           = "|",
+        -- -- separator_highlight = {colors.white, colors.bright_bg2},
+        -- -- highlight           = {colors.white, colors.bright_bg2}
+    -- -- }
+-- -- } -- }}}
+
+
+gls.short_line_left[#gls.short_line_left+1] = { -- {{{
     ShortFileType = {
         provider = function()
+            vimMode = vim.fn.mode()
+            changeHLColor("GalaxyShortFileType")
+
             local fileType = vim.bo.filetype
             local bufIcon = bufTypeIcons[fileType]
             if vim.tbl_contains(gl.short_line_list, fileType) then
                 if bufIcon then
-                    return bufIcon .. " " .. vim.bo.filetype:upper() .. " "
+                    return " " .. bufIcon .. " " .. vim.bo.filetype:upper() .. " "
                 else
                     return " " .. vim.bo.filetype:upper() .. " "
                 end
             end
         end,
-        -- condition = condition.buffer_not_empty,
-        highlight = {colors.white, colors.cyan, 'bold'}
+        condition = shortLineFileType,
+        highlight = {colors.fg, colors.bg},
     }
 }
 
-gls.short_line_left[3] = {
-    ShortFileTypeEnd = {
-        provider            = function() return '' end,
-        separator           = separator_left,
-        separator_highlight = {colors.cyan, colors.bg},
-        condition           = condition.buffer_not_empty and shortLineFileType,
-        highlight           = {colors.cyan, colors.bg}
+gls.short_line_left[#gls.short_line_left+1] = {
+    ShortFileTypeCap = {
+        provider = function()
+            vim.cmd("hi GalaxyShortFileTypeCap guifg=" .. modeColors[vimMode])
+            return circleHalfRight
+        end,
+        condition = shortLineFileType,
+        highlight = {colors.fg, colors.bg},
     }
 }
 
 
-gls.short_line_left[4] = {
+gls.short_line_left[#gls.short_line_left+1] = {
     ShortFileIconStart = {
         provider = function() return " " end,
-        highlight = {colors.gray, colors.bg}
+        highlight = {colors.gray, colors.bg1}
     }
 }
 
-gls.short_line_left[5] = {
+gls.short_line_left[#gls.short_line_left+1] = {
     ShortFileIcon = {
         provider  = "FileIcon",
         condition = condition.buffer_not_empty and noShortLineFileType,
-        highlight = {colors.gray, colors.bg}
+        highlight = {colors.gray, colors.bg1}
     }
 }
 
-gls.short_line_left[6] = {
-    ShortFileName = {
-        provider  = {'FileName'},
+gls.short_line_left[#gls.short_line_left+1] = {
+    ShortFileInfo = {
+        provider  = fileInfo,
         condition = condition.buffer_not_empty and noShortLineFileType,
-        highlight = {colors.gray, colors.bg}
+        highlight = {colors.gray, colors.bg1}
     }
 }
 
-gls.short_line_left[7] = {
-    ShortLeftEnd = {
-        provider  = function() return " " end,
-        condition = condition.buffer_not_empty,
-        highlight = {colors.blue, colors.bg}
+gls.short_line_right[#gls.short_line_right+1] = {
+    ShortRightLineInfo = {
+        provider  = lineInfo,
+        condition = condition.buffer_not_empty and noShortLineFileType,
+        highlight = {colors.gray, colors.bg1}
     }
 } --- }}}
 
 end
-

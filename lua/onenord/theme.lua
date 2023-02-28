@@ -1,6 +1,9 @@
 local p     = require("onenord.pallette")
 local theme = {}
 
+-- OPTIM:
+vim.cmd(string.format("hi! @keyword.return guifg=%s guibg=%s gui=italic", p.purple, "#564167"))
+
 -- Syntax highlight {{{
 theme.syntax = {
     Comment        = {fg = p.n3b, style = "italic"},
@@ -9,13 +12,13 @@ theme.syntax = {
     Keyword        = {fg = p.purple, style = "italic"},
     Repeat         = {fg = p.purple, style = "italic"},
     Function       = {fg = p.blue},
-    Identifier     = {fg = p.n4},
+    Identifier     = {fg = p.white},
     Variable       = {link = "Identifier"},
 
     Type           = {fg = p.yellow}, -- int, long, char, etc.
     Typedef        = {fg = p.yellow}, -- A typedef
     StorageClass   = {fg = p.yellow}, -- static, register, volatile, etc.
-    Structure      = {fg = "#00ffe5"}, -- struct, union, enum, etc.
+    Structure      = {fg = p.yellow}, -- struct, union, enum, etc.
     Constant       = {fg = p.orange}, -- any constant
 
     String         = {fg = p.green},
@@ -29,7 +32,7 @@ theme.syntax = {
     Decorator      = {fg = p.orange},
     Annotation     = {link = "Decorator"},
     Label          = {fg = p.red}, -- case, default, etc.
-    Operator       = {fg = p.purple}, -- sizeof", "+", "*", etc.
+    Operator       = {fg = p.n8}, -- sizeof", "+", "*", etc.
     Exception      = {fg = p.purple}, -- try, catch, throw
     PreProc        = {fg = p.yellow}, -- generic Preprocessor
     Include        = {fg = p.purple}, -- preprocessor #include
@@ -105,8 +108,8 @@ theme.editor =  {
     EndOfBuffer = {link = "NonText"},
 
 
-    Cursor       = {fg = p.w, style = "reverse"},
-    CursorIM     = {fg = p.w, style = "reverse"},
+    Cursor       = {fg = p.n6, style = "reverse"},
+    CursorIM     = {fg = p.n6, style = "reverse"},
     CursorColumn = {bg = p.n1},
     CursorLine   = {bg = p.n1},
 
@@ -115,15 +118,6 @@ theme.editor =  {
     DiffChange = {bg = "#3e4d5a"},
     DiffDelete = {bg = "#4b3d48", fg = p.n3},
     DiffText   = {bg = "#526c7a", style = "bold"},
-
-    Folded       = {fg = p.n8,  bg = p.n1, style = "bold"},
-    FoldColumn   = {fg = p.n3},
-    ColorColumn  = {bg = p.n1},
-    LineNr       = {fg = p.n3},
-    CursorLineNr = {fg = p.n4},
-
-
-    SignColumn = {fg = p.n1, bg = p.n0},
 
 
     IncSearch = {fg = p.w, bg = "#ED427C", style = "bold"},
@@ -162,23 +156,34 @@ theme.editor =  {
     SpellRare  = {fg = p.n9,  style = "italic,undercurl"},
 
 
+    Folded       = {fg = p.n8, style = "bold"},
+    FoldColumn   = {fg = p.n3},
+    ColorColumn  = {bg = p.n1},
+    LineNr       = {fg = p.n3},
+    CursorLineNr = {fg = p.n6, style = "bold"},
+
+
+    SignColumn = {fg = p.n1},
+
+
     StatusLine       = {fg = p.n4, bg = p.n2},
     StatusLineNC     = {fg = p.n4, bg = p.n1},
     StatusLineTerm   = {fg = p.n4, bg = p.n2},
     StatusLineTermNC = {fg = p.n4, bg = p.n1},
 
 
-    Tabline     = {fg = p.n4, bg = p.n1},
-    TabLineFill = {fg = p.n4, bg = p.n1},
-    TablineSel  = {fg = p.n8, bg = p.n3},
+    MsgSeparator = {link = "FoldColumn"},
+    VertSplit    = {fg = p.n3},
+
+
+    TabLine     = {fg = p.n4, bg = p.n1},
+    TabLineFill = {fg = p.n4, bg = p.n0},
+    TabLineSel  = {fg = p.n8, bg = p.n3},
 
 
     Title      = {fg = p.n8, style = "bold"},
     SpecialKey = {fg = p.n12},
     Directory  = {fg = p.n7},
-
-
-    VertSplit = {fg = p.n2, bg = p.n0},
 
 
     Visual    = {bg = p.n2, style = "bold"},
@@ -192,71 +197,142 @@ theme.editor =  {
 -- }}} Editor highlight
 
 -- TreeSitter highlight {{{
-theme.treesitter = {
-    TSAttribute          = {fg    = p.cyan},
-    TSBoolean            = {link  = "Boolean"},
-    TSCharacter          = {link  = "String"},
-    TSComment            = {link  = "Comment"},
-    TSConditional        = {link  = "Conditional"},
-    TSConstant           = {link  = "Constant"},
-    TSConstBuiltin       = {fg    = p.cyan},
-    TSConstMacro         = {link  = "TSConstBuiltin"},
-    TSConstructor        = {link  = "Structure"},
-    TSError              = {style = "bold"},
-    TSException          = {link  = "Exception"},
-    TSField              = {fg    = p.n8},
-    TSFloat              = {link  = "Float"},
-    TSFunction           = {link  = "Function"},
-    TSFuncBuiltin        = {fg    = p.cyan},
-    TSFuncMacro          = {link  = "TSFuncBuiltin"},
-    TSInclude            = {link  = "Keyword"},
-    TSKeyword            = {link  = "Keyword"},
-    TSKeywordFunction    = {link  = "Keyword"},
-    TSKeywordOperator    = {link  = "Keyword"},
-    TSKeywordReturn      = {fg    = p.purple, bg = "#564167", style = "italic"},
-    TSLabel              = {link  = "Label"},
-    TSMethod             = {link  = "Function"},
-    TSNamespace          = {link  = "Structure"},
-    TSNone               = {fg    = p.n4},
-    TSNumber             = {link  = "Number"},
-    TSOperator           = {link  = "Operator"},
-    TSParameter          = {link  = "Parameter"},
-    TSParameterReference = {link  = "TSParameter"},
-    TSProperty           = {fg    = "#c4a7e7"},
-    TSPunctDelimiter     = {link  = "Delimiter"},
-    TSPunctBracket       = {fg    = p.n4},
-    TSPunctSpecial       = {link  = "Delimiter"},
-    TSRepeat             = {link  = "Repeat"},
-    TSString             = {link  = "String"},
-    TSStringRegex        = {fg    = p.blue},
-    TSStringEscape       = {fg    = "#A1887F"},
-    TSSymbol             = {fg    = p.n15},
-    TSTag                = {fg    = p.red},
-    TSTagDelimiter       = {fg    = p.red},
-    TSText               = {link  = "Identifier"},
-    TSStrong             = {fg    = p.n4,  style = "bold"},
-    TSEmphasis           = {fg    = p.n4,  style = "bold"},
-    TSUnderline          = {fg    = p.n4,  style = "underline",     sp = p.n4},
-    TSStrike             = {fg    = p.n4,  style = "strikethrough", sp = p.n4},
-    TSTitle              = {fg    = p.n10, style = "bold"},
-    TSLiteral            = {fg    = p.green},
-    TSURI                = {link  = "Underlined"},
-    TSMath               = {fg    = p.n15},
-    TSTextReference      = {link  = "Identifier"},
-    TSEnviroment         = {fg    = p.n15},
-    TSEnviromentName     = {link  = "TSEnviroment"},
-    TSNote               = {fg    = p.n4},
-    TSWarning            = {link  = "WarningMsg"},
-    TSDanger             = {link  = "ErrorMsg"},
-    TSType               = {fg    = p.yellow},
-    TSTypeBuiltin        = {link  = "TSType"},
-    TSVariable           = {link  = "Identifier"},
-    TSVariableBuiltin    = {fg    = p.cyan},
 
-    -- treeSitter-Context
-    TreesitterContext = {bg = p.n1}
+theme.treesitter         = {
+    TSNone               = {fg   = p.n4},
+    TSStrong             = {fg   = p.n4,  style = "bold"},
+    TSStrike             = {fg   = p.n4,  style = "strikethrough"},
+    TSMath               = {fg   = p.n15},
+    TSEnviroment         = {fg   = p.n15},
+    TSEnviromentName     = {link = "TSEnviroment"},
+    TSNote               = {fg   = p.n4},
+    TSWarning            = {link = "WarningMsg"},
+    TSDanger             = {link = "ErrorMsg"},
+
+    TSConstructor        = {link = "Structure"},                 -- For constructor calls and definitions: `= { }` in Lua, and Java constructors.
+    TSConstant           = {link = "Constant"},                  -- For constants
+    TSFloat              = {link = "Float"},                     -- For floats
+    TSNumber             = {link = "Number"},                    -- For all number
+    TSAttribute          = {fg   = p.n15 },                      -- (unstable) TODO: docs
+
+    TSError              = {fg   = p.n6, style = "bold"},        -- For syntax/parser errors.
+    TSException          = {link = "Exception"},                 -- For exception related keywords.
+    TSFuncMacro          = {link = "Marcro"},                    -- For macro defined fuctions (calls and definitions): each `macro_rules` in Rust.
+    TSInclude            = {link = "Include"},                   -- For includes: `#include` in C, `use` or `extern crate` in Rust, or `require` in Lua.
+    TSLabel              = {link = "Label"},                     -- For labels: `label:` in C and `:label:` in Lua.
+    TSOperator           = {link = "Operator"},                  -- For any operator: `+`, but also `->` and `*` in C.
+    TSParameter          = {link = "Parameter"},                 -- For parameters of a function.
+    TSParameterReference = {link = "Parameter"},                 -- For references to parameters of a function.
+    TSPunctDelimiter     = {link = "Delimiter"},                 -- For delimiters ie: `.`
+    TSPunctBracket       = {fg   = p.n8 },                       -- For brackets and parens.
+    TSPunctSpecial       = {fg   = p.n8 },                       -- For special punctutation that does not fall in the catagories before.
+    TSSymbol             = {fg   = p.n15 },                      -- For identifiers referring to symbols or atoms.
+    TSType               = {link = "Type"},                      -- For types.
+    TSTypeBuiltin        = {fg = p.yellow, style = "bold"},      -- For builtin types.
+    TSTag                = {link = "Tag"},                       -- Tags like html tag names.
+    TSTagDelimiter       = {link = "Tag"},                       -- Tag delimiter like `<` `>` `/`
+    TSText               = {link = "Identifier"},                -- For strings considen11 text in a markup language.
+    TSTextReference      = {fg   = p.n15 },                      -- FIXME
+    TSEmphasis           = {fg   = p.n4, style = "bold"},        -- For text to be represented with emphasis.
+    TSUnderline          = {fg   = p.n4, style = "underline", sp = p.n4 },  -- For text to be represented with an underline.
+    TSLiteral            = {link = "Identifier"},                -- Literal text.
+    TSURI                = {fg   = p.n4, style = "underline", sp = p.n4 },  -- Any URI like a link or email.
+    TSAnnotation         = {link = "Decorator"},                 -- For C++/Dart attributes, annotations that can be attached to the code to denote some kind of meta information.
+    ["@constructor"]           = {link = "Structure"},
+    ["@constant"]              = {link = "Constant"},
+    ["@float"]                 = {link = "Float"},
+    ["@number"]                = {link = "Number"},
+    ["@attribute"]             = {fg   = p.n15 },
+    ["@error"]                 = {fg   = p.n6, style = "bold"},
+    ["@exception"]             = {link = "Exception"},
+    ["@funtion.macro"]         = {link = "Marcro"},
+    ["@include"]               = {link = "Include"},
+    ["@label"]                 = {link = "Label"},
+    ["@operator"]              = {link = "Operator"},
+    ["@parameter"]             = {link = "Parameter"},
+    ["@punctuation.delimiter"] = {link = "Delimiter"},
+    ["@punctuation.bracket"]   = {fg   = p.n8 },
+    ["@punctuation.special"]   = {fg   = p.n8 },
+    ["@symbol"]                = {fg   = p.n15 },
+    ["@type"]                  = {link = "Type"},
+    ["@type.builtin"]          = {link = "TSTypeBuiltin"},
+    ["@tag"]                   = {link = "Tag"},
+    ["@tag.delimiter"]         = {link = "Tag"},
+    ["@text"]                  = {link = "Identifier"},
+    ["@text.reference"]        = {link = "TSTextReference"},
+    ["@text.emphasis"]         = {link = "TSEmphasis"},
+    ["@text.underline"]        = {link = "TSUnderline"},
+    ["@text.literal"]          = {link = "TSLiteral"},
+    ["@text.uri"]              = {link = "TSURI"},
+    -- @todo Missing highlights
+    -- @function.call
+    -- @method.call
+    -- @type.qualifier
+    -- @text.strike
+    -- @text.math (e.g. for LaTeX math environments)
+    -- @text.environment (e.g. for text environments of markup languages)
+    -- @text.environment.name (e.g. for the name/the string indicating the type of text environment)
+    -- @text.note
+    -- @text.warning
+    -- @text.danger
+    -- @tag.attribute
+    -- @string.special
 }
--- }}} TreeSitter highlight
+    theme.treesitter.TSVariableBuiltin    = {fg   = p.white, style  = "bold" }
+    theme.treesitter.TSBoolean            = {link = "Boolean"}
+    theme.treesitter.TSConstBuiltin       = {fg   = p.orange, style = "bold" }
+    theme.treesitter.TSConstMacro         = {fg   = p.orange, style = "bold" }
+    theme.treesitter.TSVariable           = {link = "Identifier"}
+    theme.treesitter.TSTitle              = {fg   = p.n10, bg = p.none, style = "bold" }
+    theme.treesitter["@variable"]         = {link = "Identifier"}
+    theme.treesitter["@variable.builtin"] = {link = "TSVariableBuiltin"}
+    theme.treesitter["@variable.global"]  = {link = "TSVariableBuiltin"}
+    theme.treesitter["@boolean"]          = {link = "Boolean"}
+    theme.treesitter["@constant.builtin"] = {link = "TSConstBuiltin"}
+    theme.treesitter["@constant.macro"]   = {link = "TSConstMacro"}
+    theme.treesitter["@text.title"]       = {link = "TSTitle"}
+    theme.treesitter["@text.strong"]      = {link = "TSEmphasis"}
+    -- Comments
+    theme.treesitter.TSComment = {link  = "Comment"}
+    -- Conditional
+    theme.treesitter.TSConditional = {link  = "Conditional"}  -- For keywords related to conditionnals.
+    -- Function names
+    theme.treesitter.TSFunction    = {link = "Function"}      -- For fuction (calls and definitions).
+    theme.treesitter.TSMethod      = {link = "Function"}      -- For method calls and definitions.
+    theme.treesitter.TSFuncBuiltin = {fg   = p.blue, style = "bold"}
+    -- Namespaces and property accessors
+    theme.treesitter.TSNamespace = {fg   = "#00ffe5"}  -- For identifiers referring to modules and namespaces.
+    theme.treesitter.TSField     = {fg   = p.n4 }      -- For fields.
+    theme.treesitter.TSProperty  = {link = "TSField"}  -- Same as `TSField`, but when accessing, not declaring.
+    -- Language keywords
+    theme.treesitter.TSKeyword         = {link = "Keyword"} -- For keywords that don't fall in other categories.
+    theme.treesitter.TSKeywordFunction = {link = "Keyword"}
+    theme.treesitter.TSKeywordReturn   = {fg   = p.purple, bg = "#564167", style = "italic,bold"}
+    theme.treesitter.TSKeyordOperator  = {link = "Keyword"}
+    theme.treesitter.TSRepeat          = {link = "Repeat"} -- For keywords related to loops.
+    -- Strings
+    theme.treesitter.TSString             = {link = "String"}                  -- For strings.
+    theme.treesitter.TSStringRegex        = {fg   = p.n7, style  = "italic" }  -- For regexes.
+    theme.treesitter.TSStringEscape       = {fg   = p.n15, style = "italic" }  -- For escape characters within a string.
+    theme.treesitter.TSCharacter          = {link = "String"}                  -- For characters.
+    theme.treesitter["@comment"]          = {link = "Comment"}
+    theme.treesitter["@conditional"]      = {link = "Conditional"}
+    theme.treesitter["@function"]         = {link = "Function"}
+    theme.treesitter["@method"]           = {link = "Function"}
+    theme.treesitter["@function.builtin"] = {link = "TSFuncBuiltin"}
+    theme.treesitter["@namespace"]        = {link = "TSNamespace"}
+    theme.treesitter["@field"]            = {link = "TSField"}
+    theme.treesitter["@property"]         = {link = "TSField"}
+    theme.treesitter["@keyword"]          = {link = "Keyword"}
+    theme.treesitter["@keyword.function"] = {link = "Keyword"}
+    theme.treesitter["@keyword.return"]   = {link = "TSKeywordReturn"}
+    theme.treesitter["@keyword.operator"] = {link = "Keyword"}
+    theme.treesitter["@repeat"]           = {link = "Repeat"}
+    theme.treesitter["@string"]           = {link = "String"}
+    theme.treesitter["@string.regex"]     = {link = "TSStringRegex"}
+    theme.treesitter["@string.escape"]    = {link = "TSStringEscape"}
+    theme.treesitter["@character"]        = {link = "String"}
+-- }theme.treesitterter highlight
 
 
 theme.lsp = {
@@ -355,7 +431,7 @@ theme.plugins = {
     NvimTreeExecFile         = {fg    = p.n15},
     NvimTreeSpecialFile      = {fg    = p.n9 , style = "underline", sp = p.n9},
     NvimTreeEmptyFolderName  = {fg    = p.n3b},
-    NvimTreeIndentMarker     = {fg    = p.n8},
+    NvimTreeIndentMarker     = {link = "FoldColumn"},
 
     LspDiagnosticsError       = {link = "DiagnosticError"},
     LspDiagnosticsWarning     = {link = "DiagnosticWarn"},
@@ -427,6 +503,11 @@ theme.plugins = {
     VMCursor = {fg = p.w, bg = p.n8, style = "bold"},
     VMInsert = {fg = p.w, bg = p.n14},
     VMMono   = {fg = p.w, bg = p.n11},
+
+    -- https://github.com/nvim-treesitter/nvim-treesitter-context
+    TreesitterContext           = {style = "bold"},
+    TreesitterContextLineNumber = {fg = p.n3b, style = "bold"},
+    TreesitterContextBottom     = {link  = "TreesitterContextLineNumber"}
 }
 
 theme.loadTerminal = function()

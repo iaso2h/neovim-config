@@ -1,7 +1,7 @@
 -- n3b stands for nord3_bright
 local pallette = {
     --16 colors
-    n0             = "#2E3440",
+    n0             = jit.os == "Windows" and "#252A33" or "#2E3440",
     n1             = "#3B4252",
     n2             = "#434C5E",
     n3             = "#4C566A",

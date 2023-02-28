@@ -6,7 +6,7 @@ local M    = {}
 vim.g.mapleader = " "
 
 -- Change font size (GUI client only)
-if not IsTerm then
+if not isTerm then
     map({"n", "x"}, [[<C-->]], [[:lua GuiFontSize = GuiFontSize - 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Increase GUI client font size")
     map({"n", "x"}, [[<C-=>]], [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Decrease GUI client font size")
     map({"n", "x"}, [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent"}, "Restore GUI client font size")
@@ -371,10 +371,10 @@ map("i",        [[<A-->]],  [[<C-\><C-O>:wincmd -<CR>]], {"silent"}, "Decrease w
 
 -- Buffers
 map("n", [[<C-w>O]], [[:lua require("buf").closeOther()<CR>]], {"silent"}, "Wipe other buffer")
-map("n", [[<C-Tab>]],   [[<CMD>bp<CR>]], {"silent"}, "Previous buffer")
-map("n", [[<C-S-Tab>]], [[<CMD>bn<CR>]], {"silent"}, "Next buffer")
-map("n", [[<A-h>]],     [[<CMD>bp<CR>]], {"silent"}, "Previous buffer")
-map("n", [[<A-l>]],     [[<CMD>bn<CR>]], {"silent"}, "Next buffer")
+map("n", [[<C-Tab>]],   [[<CMD>lua require("buf.action.cycle").init(1)<CR>]],  {"silent"}, "Next buffer")
+map("n", [[<C-S-Tab>]], [[<CMD>lua require("buf.action.cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
+map("n", [[<A-h>]],     [[<CMD>lua require("buf.action.cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
+map("n", [[<A-l>]],     [[<CMD>lua require("buf.action.cycle").init(1)<CR>]],  {"silent"}, "Next buffer")
 -- Tab
 map({"n", "x"}, [[<A-C-h>]],    [[<CMD>tabp<CR>]],    {"silent"}, "Previous tab")
 map({"n", "x"}, [[<A-C-l>]],    [[<CMD>tabn<CR>]],    {"silent"}, "Next tab")

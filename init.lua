@@ -14,8 +14,8 @@ end
     -- require("impatient").enable_profile()
 -- end
 
--- Global lua var
-_G.IsTerm = os.getenv("TERM") ~= ""
+-- GUI Detection
+_G.isTerm = vim.api.nvim_list_uis()[1].ext_termcolors
 
 -- Build-in plugin {{{
 -- Disable

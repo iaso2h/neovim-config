@@ -8,11 +8,12 @@ end
 
 local packer = require("packer")
 local conf   = function(moduleString) return require(string.format("config.%s", moduleString)) end
+local configPath = fn.stdpath("config")
 
 
 packer.init{
-    package_root = vim.fn.stdpath("config") .. "/pack",
-    compile_path = vim.fn.stdpath("config") .. "/lua/packer_compiled.lua"
+    package_root = configPath .. "/pack",
+    compile_path = string.format("%s/lua/packer_compiled_%s.lua", configPath, isTerm and "term" or "gui")
 }
 
 packer.startup{function(use, use_rocks)
@@ -551,27 +552,24 @@ use {
     }
     use {
         'yamatsum/nvim-nonicons',
-        disable = true,
-        after = "nvim-web-devicons",
-        config = [[require("nvim-nonicons").setup()]]
+        disable = not isTerm,
+        after   = "nvim-web-devicons",
+        config  = [[require("nvim-nonicons").setup()]]
     }
     use {
         'joshdick/onedark.vim',
         disable = true
     }
     use {
-        -- TODO: use the main brach
-        'NTBBloodbath/galaxyline.nvim',
+        'glepnir/galaxyline.nvim',
         event  = "BufAdd",
         after  = "nvim-web-devicons",
         config = conf "nvim-galaxyline"
     }
-
     use {
-        'akinsho/bufferline.nvim',
-        event  = "BufAdd",
+        'noib3/nvim-cokeline',
         after  = "nvim-web-devicons",
-        config = conf "nvim-bufferline".config
+        config = conf "nvim-cokeline"
     }
     use {
         'NvChad/nvim-colorizer.lua',

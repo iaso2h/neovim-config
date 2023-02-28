@@ -24,7 +24,7 @@ api.nvim_win_set_option(0, "number", true)
 api.nvim_win_set_option(0, "relativenumber", false)
 api.nvim_win_set_option(0, "signcolumn", "no")
 api.nvim_win_set_option(0, "foldcolumn", "0")
--- api.nvim_buf_set_option(0, "buflisted", false)
+api.nvim_buf_set_option(0, "buflisted", false)
 
 api.nvim_create_autocmd({
     "CursorMoved",

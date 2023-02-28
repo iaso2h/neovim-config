@@ -14,6 +14,6 @@ vim.defer_fn(function()
     if not ok1 then vim.notify(msg1, vim.log.levels.ERROR) end
 end, 0)
 
-ok, msg = pcall(require, "packer_compiled")
+ok, msg = pcall(require, string.format("packer_compiled_%s", isTerm and "term" or "gui"))
 if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 
