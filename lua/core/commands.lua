@@ -74,11 +74,12 @@ if not vim.g.vscode then
     autocmd!
     autocmd VimEnter             * nested lua require("historyStartup").display()
 
-  " autocmd BufWinEnter          * lua require("cursorRecall").main()
+    autocmd BufWinEnter          * lua require("cursorRecall").main()
     autocmd BufWritePre          * lua require"util".trimSpaces(); require"util".trailingEmptyLine()
     autocmd FocusGained          * checktime
   " autocmd BufAdd               * lua require("consistantTab").adaptBufTab()
 
+" autocmd BufAdd               * norm! zx | if foldlevel(".") ==
     autocmd BufLeave             * lua require("util").getLastWinID()
 
     autocmd BufEnter             term://* startinsert

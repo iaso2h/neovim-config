@@ -17,7 +17,6 @@ local ignoreFiletype = {
         'hgcommit',
 }
 local fn  = vim.fn
-local cmd = vim.cmd
 local M   = {}
 
 
@@ -38,24 +37,28 @@ function M.main()
     local winend   = fn.line('w$')
     local winstart = fn.line('w0')
 
+    vim.cmd "norm! zx"
+
     if lastpos > 0 and lastpos <= buffend then
         -- Last edit pos is set and is < no of lines in buffer
         if winend == buffend then
             -- Last line in buffer is also last line visible
-            cmd 'normal! g`"'
+            vim.cmd 'normal! g`"'
         elseif buffend - lastpos > ((winend - winstart) / 2) - 1 then
             -- Center cursor on screen if not at bottom
-            cmd 'normal! g`"zz'
+            vim.cmd 'normal! g`"zz'
         else
             -- Otherwise, show as much context as we can
-            cmd('normal! G`"' .. t'<c-e>')
+            vim.cmd('normal! G`"' .. t'<c-e>')
         end
     end
 
     if fn.foldclosed('.') ~= -1 then
         -- Cursor was inside a fold; open it
-        cmd 'normal! zzzv'
+        vim.cmd 'normal! zzzv'
     end
+
+
 end
 
 return M
