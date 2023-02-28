@@ -263,9 +263,6 @@ map("n", [[<A-i>]], [[:lua require("historyHop").main("changelist", 1)<CR>]],  {
 -- History jumping
 map("n", [[<C-o>]], [[<C-o>zzzv]], "Jump forward in jumplist")
 map("n", [[<C-i>]], [[<C-i>zzzv]], "Jump backward in jumplist")
--- Add in jumplist for j/k movement with numerical prefix
-map("n", [[j]], [[:lua require("util").addJump("j", true)<CR>]], {"silent"}, "Down")
-map("n", [[k]], [[:lua require("util").addJump("k", true)<CR>]], {"silent"}, "Up")
 -- Swap default mapping
 map("n", [[*]],  [[g*:lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> forward")
 map("n", [[#]],  [[g#:lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> back")

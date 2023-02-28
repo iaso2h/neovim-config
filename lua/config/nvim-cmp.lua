@@ -183,7 +183,6 @@ return function()
             {name = "nvim_lsp"},
             {name = "buffer"},
             {name = "path"},
-            {name = "cmdline"},
             {name = "luasnip"},
             {name = "cmp_tabnine"},
         },
@@ -195,7 +194,6 @@ return function()
                     nvim_lsp    = "[LSP]",
                     buffer      = "[Buffer]",
                     path        = "[Path]",
-                    cmdline     = "[CMDLine]",
                     luasnip     = "[LuaSnip]",
                     cmp_tabnine = "[Tabnine]",
                 })[entry.source.name]

@@ -166,33 +166,6 @@ function Vim2Lua(mode) -- {{{
 end -- }}}
 
 
--- Function: M.addJump: Add jump location in jumplist before execute specified key
---
--- @param action:        Keystroke string or function
--- @param reservedCount: Boolean value. Number count will be considered when true is provided
--- @param funArg:        Optional funArg
-----
-function M.addJump(action, reservedCount, funArg) -- {{{
-    if type(action) == "string" then
-        if reservedCount then
-            local saveCount = vim.v.count
-            if saveCount ~= 0 then
-                vim.cmd [[normal! m`]]
-                for _ = 1, saveCount do vim.cmd("normal! " .. action) end
-            else
-                vim.cmd("normal! " .. action)
-            end
-        else
-            vim.cmd("normal! " .. action)
-        end
-    elseif type(action) == "function" then
-        if not funArg then return end
-        vim.cmd [[normal! m`]]
-        action(funArg)
-    end
-end -- }}}
-
-
 
 function M.convertMap(mode, lhs, rhs, optsTbl)
     local specArg = ""
@@ -613,15 +586,15 @@ end
 --- number and string for now
 --- @param tbl table list-liked table
 --- @param item number or string
---- @param idxAll boolean whether to return all the indexes as a table
---- @return number or table return table when idxAll is true
-_G.tbl_idx = function(tbl, item, idxAll)
+--- @param returnIdxTbl boolean whether to return all the indexes as a table
+--- @return number|table return table when returnIdxTbl is true
+_G.tbl_idx = function(tbl, item, returnIdxTbl)
     assert(vim.tbl_islist(tbl), "Expect list-liked table")
     assert(type(item) == "string" or type(item) == "number", "Only support indexing string or number")
     local idxTbl = {}
     for idx, i in ipairs(tbl) do
         if i == item then
-            if not idxAll then
+            if not returnIdxTbl then
                 return idx
             else
                 idxTbl[#idxTbl+1] = idx
@@ -629,7 +602,7 @@ _G.tbl_idx = function(tbl, item, idxAll)
         end
     end
 
-    if not idxAll then
+    if not returnIdxTbl then
         return nil
     else
         return idxTbl
@@ -761,6 +734,14 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, 
     else
         return true
     end
+end
+
+
+--- Copy indent of specific line number in current buffer
+---@param lineNr number (1, 0) indexed
+---@return string Corresonding line indent
+M.indentCopy = function(lineNr)
+    return string.rep(" ", fn.indent(lineNr))
 end
 
 

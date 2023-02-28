@@ -100,9 +100,9 @@ use {
 }
 use {
     'romgrk/nvim-treesitter-context',
-    after    = "nvim-treesitter",
-    event    = {"CursorHold", "CursorHoldI"},
-    config   = [[require("treesitter-context").setup()]]
+    after  = "nvim-treesitter",
+    event  = {"CursorHold", "CursorHoldI"},
+    config = [[require("treesitter-context").setup()]]
 }
 use {
     'p00f/nvim-ts-rainbow',
@@ -238,6 +238,11 @@ use {
         end,
     }
     use {
+        'AndrewRadev/switch.vim',
+        cmd   = "Switch",
+        setup = 'map("n", [[gt]], [[<CMD>Switch<CR>]], {"silent"}, "Switch word under cursor")'
+    }
+    use {
         'machakann/vim-sandwich',
         keys = {
             {"x", "S"},
@@ -370,28 +375,30 @@ use {
         config = conf("vim-visual-multi").config
     }
     use {
-        'airblade/vim-rooter',
+        'ahmedkhalf/project.nvim',
         event  = "BufAdd",
         config = function()
-            vim.g.rooter_change_directory_for_non_project_files = "current"
-            vim.g.rooter_patterns = {
-                ".git",
-                "makefile",
-                "*.sln",
-                "build/env.sh",
-                ".vscode",
-                "^config",
-                "^local",
-                }
+            require("project_nvim").setup {
+                detection_methods = { "lsp", "pattern" },
+                ignore_lsp = {},
+                exclude_dirs = {},
+                show_hidden = false,
+                silent_chdir = true,
+                scope_chdir = "global",
+                patterns = {
+                    ".git",
+                    ".hg",
+                    ".svn",
+                    "package.json",
+                    "makefile",
+                    ".vscode",
+                    }
+
+            }
             vim.g.rooter_cd_cmd        = "lcd"
             vim.g.rooter_silent_chdir  = 1
             vim.g.rooter_resolve_links = 1
         end
-    }
-    use {
-        'AndrewRadev/switch.vim',
-        cmd   = "Switch",
-        setup = 'map("n", [[gt]], [[<CMD>Switch<CR>]], {"silent"}, "Switch word under cursor")'
     }
     -- BUG:
     use {
@@ -715,6 +722,7 @@ use {
         after = "nvim-cmp",
     }
     use {
+        disable = true,
         "hrsh7th/cmp-cmdline",
         event = "InsertEnter",
         after = "nvim-cmp",
@@ -901,22 +909,18 @@ use {
         end
     }
     use {
+        'nvim-neotest/neotest-plenary',
+        module = "neotest-plenary"
+    }
+    use {
+        'nvim-neotest/neotest-python',
+        module = "neotest-python"
+    }
+    use {
         'nvim-neotest/neotest',
-        requires = {
-            {
-            "antoinemadec/FixCursorHold.nvim",
-            after = "neotest"
-            },
-            {
-            "nvim-neotest/neotest-plenary",
-            module = "neotest-plenary"
-            },
-            {
-            "nvim-neotest/neotest-python",
-            module = "neotest-python"
-            },
-        },
         after = {
+            "neotest-plenary",
+            "neotest-python",
             "plenary.nvim",
             "nvim-treesitter",
         },
@@ -941,6 +945,10 @@ use {
                 },
             }
         end
+    }
+    use {
+        'antoinemadec/FixCursorHold.nvim',
+        after = "neotest"
     }
     use {
         'vim-test/vim-test',

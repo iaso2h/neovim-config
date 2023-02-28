@@ -56,10 +56,11 @@ local defaultTheme = {
             ["<C-x>"]     = false,
             ["<C-w>"]     = false,
 
-            ["<C-n>"]     = actions.move_selection_next,
-            ["<C-p>"]     = actions.move_selection_previous,
-            ["<Down>"]    = actions.move_selection_next,
-            ["<Up>"]      = actions.move_selection_previous,
+            ["<C-n>"]  = actions.move_selection_next,
+            ["<C-p>"]  = actions.move_selection_previous,
+            ["<Down>"] = actions.move_selection_next,
+            ["<Up>"]   = actions.move_selection_previous,
+            ["<C-g>"]  = actions.move_to_top,
 
             -- https://github.com/nvim-telescope/telescope.nvim/pull/1305
             -- ["<C-u>"] = actions.toggle_preview,
@@ -89,7 +90,7 @@ local defaultTheme = {
             ["<C-x>"]   = false,
             ["<C-j>"]   = false,
             ["<C-k>"]   = false,
-            ["?"]       = false,
+            ["?"] = actions.which_key,
 
             ["<esc>"]   = actions.close,
             ["q"]       = actions.close,
@@ -103,10 +104,12 @@ local defaultTheme = {
             ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
             ["<C-q>"]   = actions.send_selected_to_qflist + actions.open_qflist,
 
-            ["j"]       = actions.move_selection_next,
-            ["k"]       = actions.move_selection_previous,
-            ["<Down>"]  = actions.move_selection_next,
-            ["<Up>"]    = actions.move_selection_previous,
+            ["j"]      = actions.move_selection_next,
+            ["k"]      = actions.move_selection_previous,
+            ["<Down>"] = actions.move_selection_next,
+            ["<Up>"]   = actions.move_selection_previous,
+            ["gg"]     = actions.move_to_top,
+            ["G"]      = actions.move_to_bottom,
 
             ["<A-e>"]   = actions.preview_scrolling_up,
             ["<A-d>"]   = actions.preview_scrolling_down,
