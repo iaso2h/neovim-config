@@ -17,6 +17,20 @@ packer.init{
 }
 
 packer.startup{function(use, use_rocks)
+
+-- packer.startup{function(use_real, use_rocks)
+    -- local use = function(tbl)
+        -- if type(tbl) == "table" and tbl.only then
+            -- local paramTbl = {}
+            -- for key, value in pairs(tbl) do
+                -- if key ~= "only" then
+                    -- paramTbl[key] = value
+                -- end
+            -- end
+            -- use_real(paramTbl)
+        -- end
+    -- end
+
     use 'wbthomason/packer.nvim'
     -- use_rocks 'icecream'
 
