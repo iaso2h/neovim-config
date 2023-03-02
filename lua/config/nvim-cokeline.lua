@@ -58,7 +58,7 @@ return  function()
             space
         },
         sidebar = {
-            filetype = 'NvimTree',
+            filetype = {"NvimTree", "dapui_"},
             components = {
                 {
                     text = "",

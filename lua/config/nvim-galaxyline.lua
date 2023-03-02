@@ -2,7 +2,22 @@
 -- Author: iaso2h
 -- Description: Statusline configuration
 -- Last Modified: 2023-2-27
-return function()
+local M = {}
+
+M.shortLineList = {
+    "term",
+    "qf",
+    "NvimTree",
+    "HistoryStartup",
+    "dap-repl",
+    "dapui_watches",
+    "dapui_console",
+    "dapui_stacks",
+    "dapui_breakpoints",
+    "dapui_scopes",
+}
+
+M.config = function()
 
 local fn  = vim.fn
 local api = vim.api
@@ -13,11 +28,7 @@ local gls       = gl.section
 local condition = require("galaxyline.condition")
 
 -- Filetype
-gl.short_line_list = {
-    "LuaTree", "vista", "dbui", "startify", "term", "fugitive", "fugitiveblame",
-    "plug", "coc-explorer", "Mundo", "MundoDiff", "vim-plug", "qf", "NvimTree",
-    "dap-repl", "HistoryStartup", ""
-}
+gl.short_line_list = require("config.nvim-galaxyline").shortLineList
 
 local colors = {
     fg        = "#5E81AC",
@@ -76,35 +87,24 @@ local modeColors = {
     ["!"]  = colors.blue
 }
 
-local fileFormatIcons = {
-    locker    = u2char "f023",
-    unsaved   = u2char "f693",
-    dos       = u2char "e70f",
-    unix      = u2char "f17c",
-    mac       = u2char "f179",
-    lsp_warn  = u2char "f071",
-    lsp_error = u2char "f46e"
-}
-
 -- Based on 更纱黑体 Mono SC Nerd
 local bufTypeIcons = {
-    help             = "   ",
-    defx             = "   ",
-    ["vim-plug"]     = "  ",
-    vista            = "  ",
-    vista_kind       = "  ",
-    ["dap-repl"]     = "  ",
-    magit            = "   ",
-    fugitive         = "   ",
-    Mundo            = "  ",
-    startify         = "  ",
-    NvimTree         = "  ",
-    ["coc-explorer"] = "  ",
-    qf               = "  ",
+    ["dap-repl"]      = "",
+    dapui_watches     = "",
+    dapui_console     = "",
+    dapui_stacks      = "",
+    dapui_breakpoints = "",
+    dapui_scopes      = "",
+
+    help     = "",
+    NvimTree = "",
+    qf       = "",
 }
 
 local circleHalfRight = ""
 local circleHalfLeft  = ""
+local vimMode
+local tightWinChk = false
 
 local hasFileType = function()
     local fileType = vim.bo.filetype
@@ -128,25 +128,42 @@ end
 local fileInfo = function()
     local cwd  = vim.fn.getcwd(0)
     local absoPath = vim.api.nvim_buf_get_name(0)
+    if absoPath == "" then return vim.bo.filetype .. " " end
+
     local isRel = string.match(absoPath, cwd) ~= nil
-    local sep = jit.os == "Windows" and "\\" or "/"
-    local fileStr = isRel and
-        fn.expand("%") or
-        string.format("..%s%s", sep, vim.fn.expand("%:t"))
 
-    local isMod = vim.bo.modified and " [+]" or ""
-    local isRead = vim.bo.readonly and " []" or ""
+    -- Get file path string
+    local winWidth = api.nvim_win_get_width(0)
+    local fileStr
+    if isRel then
+        fileStr = fn.expand("%")
+        -- 11 is what vimmode text is command plus space of icons
+        tightWinChk = #fileStr + 11 > winWidth/2
 
-    local ext = vim.fn.expand("%:e")
-    local fileTypeStr = ext ~= vim.bo.filetype and
-        string.format(" | %s ", vim.bo.filetype) or
-        " "
+        fileStr = tightWinChk and fn.pathshorten(fileStr, 1) or fileStr
+    else
+        local sep = jit.os == "Windows" and "\\" or "/"
 
-    return fileStr .. isMod .. isRead .. fileTypeStr
+        fileStr = string.format("..%s%s", sep, vim.fn.expand("%:t"))
+        -- 11 is what vimmode text is command plus space of icons
+        tightWinChk = #fileStr + 11 > winWidth/2
+    end
+
+    if tightWinChk then
+        return fileStr .. " "
+    else
+        local isMod = vim.bo.modified and " [+]" or ""
+        local isRead = vim.bo.readonly and " []" or ""
+
+        local ext = vim.fn.expand("%:e")
+        local fileTypeStr = ext ~= vim.bo.filetype and
+            string.format(" | %s ", vim.bo.filetype) or
+            " "
+        return fileStr .. isMod .. isRead .. fileTypeStr
+    end
 end
 
 
-local vimMode
 local changeHLColor = function (hlStr)
     local cmdStr
     if vimMode == "c" then
@@ -185,7 +202,12 @@ local lineInfo = function()
 end
 
 
-gls.left[#gls.left+1] = { -- {{{
+local hideInTight = function()
+    return not tightWinChk
+end
+
+
+gls.left[1] = { -- {{{
     VimMode = {
         provider = function()
             vimMode = vim.fn.mode()
@@ -269,16 +291,16 @@ gls.left[#gls.left+1] = {
 gls.left[#gls.left+1] = {
     DiffAdd = {
         provider  = "DiffAdd",
-        condition = condition.hide_in_width,
-        icon      = isTerm and " " or "",
+        condition = hideInTight,
+        icon      = "  ",
         highlight = {colors.green, colors.bg2}
     }
 }
 gls.left[#gls.left+1] = {
     DiffModified = {
         provider  = "DiffModified",
-        condition = condition.hide_in_width,
-        icon      = isTerm and " " or "",
+        condition = hideInTight,
+        icon      = "  ",
         highlight = {colors.yellow, colors.bg2}
     }
 }
@@ -286,8 +308,8 @@ gls.left[#gls.left+1] = {
 gls.left[#gls.left+1] = {
     DiffRemove = {
         provider  = "DiffRemove",
-        condition = condition.hide_in_width,
-        icon      = isTerm and " " or "",
+        condition = hideInTight,
+        icon      = "  ",
         highlight = {colors.red, colors.bg2}
     }
 }
@@ -303,7 +325,7 @@ gls.left[#gls.left+1] = {
 gls.left[#gls.left+1] = {
     DiagnosticHint = {
         provider  = "DiagnosticHint",
-        icon      = isTerm and "  " or " ",
+        icon      = "  ",
         highlight = {colors.blueLight,colors.bg1},
     }
 }
@@ -311,7 +333,7 @@ gls.left[#gls.left+1] = {
 gls.left[#gls.left+1] = {
     DiagnosticInfo = {
         provider  = "DiagnosticInfo",
-        icon      = isTerm and "  " or " ",
+        icon      = "  ",
         highlight = {colors.blue,colors.bg1},
     }
 }
@@ -319,7 +341,7 @@ gls.left[#gls.left+1] = {
 gls.left[#gls.left+1] = {
     DiagnosticWarn = {
         provider  = "DiagnosticWarn",
-        icon      = isTerm and "  " or " ",
+        icon      = "  ",
         highlight = {colors.yellow, colors.bg1}
     }
 }
@@ -327,13 +349,13 @@ gls.left[#gls.left+1] = {
 gls.left[#gls.left+1] = {
     DiagnosticError = {
         provider  = "DiagnosticError",
-        icon      = isTerm and "  " or " ",
+        icon      = "  ",
         highlight = {colors.red, colors.bg1}
     }
 } -- }}}
 
 
--- gls.mid[#gls.mid + 1] = { -- {{{
+-- gls.mid[1] = { -- {{{
     -- neovimLSPFunc = {
         -- provider = function()
             -- -- lspStatus.update_current_function()
@@ -349,7 +371,7 @@ gls.left[#gls.left+1] = {
 -- } -- }}}
 
 
-gls.right[#gls.right+1] = { -- {{{
+gls.right[1] = { -- {{{
     EncodingCap = {
         provider = function()
             return circleHalfLeft
@@ -363,6 +385,7 @@ gls.right[#gls.right+1] = {
         provider = function()
             return "  " .. vim.o.encoding .. " "
         end,
+        condition = hideInTight,
         highlight = {colors.white, colors.bg3},
     }
 }
@@ -401,7 +424,7 @@ gls.right[#gls.right+1] = {
 -- -- } -- }}}
 
 
-gls.short_line_left[#gls.short_line_left+1] = { -- {{{
+gls.short_line_left[1] = { -- {{{
     ShortFileType = {
         provider = function()
             vimMode = vim.fn.mode()
@@ -411,9 +434,9 @@ gls.short_line_left[#gls.short_line_left+1] = { -- {{{
             local bufIcon = bufTypeIcons[fileType]
             if vim.tbl_contains(gl.short_line_list, fileType) then
                 if bufIcon then
-                    return " " .. bufIcon .. " " .. vim.bo.filetype:upper() .. " "
+                    return "  " .. bufIcon .. " " .. vim.bo.filetype:upper() .. " "
                 else
-                    return " " .. vim.bo.filetype:upper() .. " "
+                    return "  " .. vim.bo.filetype:upper() .. " "
                 end
             end
         end,
@@ -422,7 +445,7 @@ gls.short_line_left[#gls.short_line_left+1] = { -- {{{
     }
 }
 
-gls.short_line_left[#gls.short_line_left+1] = {
+gls.short_line_left[2] = {
     ShortFileTypeCap = {
         provider = function()
             vim.cmd("hi GalaxyShortFileTypeCap guifg=" .. modeColors[vimMode])
@@ -434,14 +457,14 @@ gls.short_line_left[#gls.short_line_left+1] = {
 }
 
 
-gls.short_line_left[#gls.short_line_left+1] = {
+gls.short_line_left[3] = {
     ShortFileIconStart = {
         provider = function() return " " end,
         highlight = {colors.gray, colors.bg1}
     }
 }
 
-gls.short_line_left[#gls.short_line_left+1] = {
+gls.short_line_left[4] = {
     ShortFileIcon = {
         provider  = "FileIcon",
         condition = condition.buffer_not_empty and noShortLineFileType,
@@ -449,7 +472,7 @@ gls.short_line_left[#gls.short_line_left+1] = {
     }
 }
 
-gls.short_line_left[#gls.short_line_left+1] = {
+gls.short_line_left[5] = {
     ShortFileInfo = {
         provider  = fileInfo,
         condition = condition.buffer_not_empty and noShortLineFileType,
@@ -457,7 +480,7 @@ gls.short_line_left[#gls.short_line_left+1] = {
     }
 }
 
-gls.short_line_right[#gls.short_line_right+1] = {
+gls.short_line_right[1] = {
     ShortRightLineInfo = {
         provider  = lineInfo,
         condition = condition.buffer_not_empty and noShortLineFileType,
@@ -466,3 +489,5 @@ gls.short_line_right[#gls.short_line_right+1] = {
 } --- }}}
 
 end
+
+return M

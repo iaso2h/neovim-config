@@ -1,5 +1,5 @@
--- n3b stands for nord3_bright
 local pallette = {
+    -- n3b stands for nord3_bright
     --16 colors
     n0             = jit.os == "Windows" and "#252A33" or "#2E3440",
     n1             = "#3B4252",
@@ -42,8 +42,8 @@ local pallette = {
 
 -- Enable contrast sidebars, floating windows and popup menus
 -- if vim.g.nord_contrast == true then
-    pallette.sidebar = pallette.nord1_gui
-    pallette.float = pallette.nord1_gui
+    pallette.sidebar = pallette.n0
+    pallette.float = pallette.n1
 -- else
     -- pallette.sidebar = pallette.nord0_gui
     -- pallette.float = pallette.nord0_gui
@@ -52,7 +52,7 @@ local pallette = {
 -- if vim.g.nord_cursorline_transparent == true then
     -- pallette.cursorlinefg = pallette.nord0_gui
 -- else
-    pallette.cursorlinefg = pallette.nord1_gui
+    pallette.cursorlinefg = pallette.n1
 -- end
 
 return pallette

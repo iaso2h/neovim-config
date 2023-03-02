@@ -262,12 +262,12 @@ function M.trailingEmptyLine() -- {{{
     end
     if not TrailEmptyLineChk then return end
 
-    if api.nvim_buf_get_lines(0, -2, -1, false)[1] ~= "" then
-        local saveView = fn.winsaveview()
-        vim.cmd('keepjumps normal! G')
-        api.nvim_put({""}, "l", true, false)
-        fn.winrestview(saveView)
-    end
+    -- if api.nvim_buf_get_lines(0, -2, -1, false)[1] ~= "" then
+        -- local saveView = fn.winsaveview()
+        -- vim.cmd('keepjumps normal! G')
+        -- api.nvim_put({""}, "l", true, false)
+        -- fn.winrestview(saveView)
+    -- end
 end -- }}}
 
 ----
@@ -318,7 +318,6 @@ end -- }}}
 -- independantly, restoreReg can be accessed after saveReg is called
 ----
 function M.saveReg() -- {{{
-    vim.notify("Soon will be deprecated", vim.log.levels.WARN)
     local unnamedContent = fn.getreg('"', 1)
     local unnamedType    = fn.getregtype('"')
     local starContent    = fn.getreg('*', 1)
@@ -586,7 +585,7 @@ end
 --- number and string for now
 --- @param tbl table list-liked table
 --- @param item number or string
---- @param returnIdxTbl boolean whether to return all the indexes as a table
+--- @param returnIdxTbl? boolean whether to return all the indexes as a table
 --- @return number|table return table when returnIdxTbl is true
 _G.tbl_idx = function(tbl, item, returnIdxTbl)
     assert(vim.tbl_islist(tbl), "Expect list-liked table")
@@ -682,7 +681,7 @@ end
 --- @param hlGroup    string     Highlight group name
 --- @param hlTimeout  number     Determine how long the highlight will be clear
 --- after being created
---- @param presNS     number|nil Otional ID of the preserved namespace, in which the
+--- @param presNS     number|nil Optional ID of the preserved namespace, in which the
 --- preserved extmark will be stored to keep track of highlight content
 --- @return number|boolean Return integer or true when successful, which is the
 --- ID of the preserved namespace of the content defined by. Return false when

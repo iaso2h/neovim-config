@@ -52,7 +52,7 @@ opt.showbreak = "⤷ "
 
 opt.foldcolumn = "auto:4"
 -- HACK: Tackle sign column boucing from time to time
-opt.signcolumn = "auto:4"
+opt.signcolumn = "auto:2-4"
 opt.foldmethod = "expr"
 opt.foldexpr   = "EnhanceFoldExpr()"
 opt.formatoptions = "cr/qn2mM1jpl" -- reassignment need to be implemented in after/ftplugin

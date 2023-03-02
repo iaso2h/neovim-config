@@ -1,104 +1,22 @@
--- TODO: tabnine priority
 return function()
-    local completionItemKind = {
-        -- -- UbuntuMono
-        -- Text          = "",
-        -- Method        = "",
-        -- Function      = "",
-        -- Constructor   = "",
-        -- Field         = "ﰠ",
-        -- Variable      = "",
-        -- Class         = "ﴯ",
-        -- Interface     = "",
-        -- Module        = "",
-        -- Property      = "ﰠ",
-        -- Unit          = "塞",
-        -- Value         = "",
-        -- Enum          = "",
-        -- Keyword       = "",
-        -- Snippet       = "",
-        -- Color         = "",
-        -- File          = "",
-        -- Reference     = "",
-        -- Folder        = "",
-        -- EnumMember    = "",
-        -- Constant      = "",
-        -- Struct        = "",
-        -- Event         = "",
-        -- Operator      = "",
-        -- TypeParameter = "",
-        Text = "",
-        Method = "",
-        Function = "",
-        Constructor = "",
-        Field = "",
-        Variable = "",
-        Class = "ﴯ",
-        Interface = "",
-        Module = "",
-        Property = "ﰠ",
-        Unit = "",
-        Value = "",
-        Enum = "",
-        Keyword = "",
-        Snippet = "",
-        Color = "",
-        File = "",
-        Reference = "",
-        Folder = "",
-        EnumMember = "",
-        Constant = "",
-        Struct = "",
-        Event = "",
-        Operator = "",
-        TypeParameter = ""
-        -- VS Code
-        -- Text = '  ',
-        -- Method = '  ',
-        -- Function = '  ',
-        -- Constructor = '  ',
-        -- Field = '  ',
-        -- Variable = '  ',
-        -- Class = '  ',
-        -- Interface = '  ',
-        -- Module = '  ',
-        -- Property = '  ',
-        -- Unit = '  ',
-        -- Value = '  ',
-        -- Enum = '  ',
-        -- Keyword = '  ',
-        -- Snippet = '  ',
-        -- Color = '  ',
-        -- File = '  ',
-        -- Reference = '  ',
-        -- Folder = '  ',
-        -- EnumMember = '  ',
-        -- Constant = '  ',
-        -- Struct = '  ',
-        -- Event = '  ',
-        -- Operator = '  ',
-        -- TypeParameter = '  ',
-}
-
     local cmp     = require("cmp")
     local luasnip = require("luasnip")
 
     cmp.setup{
-
         enabled = function()
-            -- Disable for (telescope)prompt
+            -- Disable for (telescope)prompt, dap
             if vim.bo.buftype == "prompt" then
-                return false
+                if package.loaded["dap"] and not(require("cmp_dap").is_dap_buffer()) then
+                    return true
+                else
+                    return false
+                end
             end
             -- Disable completion in comments
             local context = require("cmp.config.context")
             -- keep command mode completion enabled when cursor is in a comment
-            if vim.api.nvim_get_mode().mode == 'c' then
-                return true
-            else
-                return not context.in_treesitter_capture("comment")
-                and not context.in_syntax_group("Comment")
-            end
+            return not context.in_treesitter_capture("comment")
+            and not context.in_syntax_group("Comment")
         end,
         completion = {
             completeopt = "menu,menuone,noinsert",
@@ -111,6 +29,7 @@ return function()
         window = {
             completion = cmp.config.window.bordered{
                 winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:PmenuSel',
+                col_offset = -3,
                 scrollbar = {
                     thumb_char = "│",
                     position = "edge",
@@ -126,32 +45,25 @@ return function()
             ["<C-p>"] = cmp.mapping.select_prev_item(),
             ["<C-n>"] = cmp.mapping.select_next_item(),
             ["<Tab>"] = cmp.mapping(function(fallback)
-                if package.loaded["neogen"] and require("neogen").jumpable() then
-                    vim.api.nvim_feedkeys(t[[<cmd>lua require("neogen").jump_next()<CR>]], "", true)
+                if cmp.visible() then
+                    cmp.select_next_item()
                 elseif luasnip.expand_or_jumpable() then
                     luasnip.expand_or_jump()
+                elseif package.loaded["neogen"] and require("neogen").jumpable() then
+                    vim.api.nvim_feedkeys(t[[<cmd>lua require("neogen").jump_next()<CR>]], "", true)
                 else
                     fallback()
                 end
             end, {"i", "s"}),
             ["<S-Tab>"] = cmp.mapping(function(fallback)
-                if package.loaded["neogen"] and require("neogen").jumpable() then
-                    vim.api.nvim_feedkeys(t[[<cmd>lua require("neogen").jump_prev()<CR>]], "", true)
-                elseif luasnip.jumpable(-1) then
+                if luasnip.jumpable(-1) then
                     luasnip.jump(-1)
+                elseif package.loaded["neogen"] and require("neogen").jumpable() then
+                    vim.api.nvim_feedkeys(t[[<cmd>lua require("neogen").jump_prev()<CR>]], "", true)
                 else
                     fallback()
                 end
             end, {"i", "s"}),
-            ["<C-Space>"] = function(_)
-                if cmp.visible() then
-                    require("cmp.utils.autocmd").emit("InsertLeave")
-                else
-                    -- TODO: better trigger mechanics
-                    vim.api.nvim_feedkeys(t"<C-n>", "n", true)
-
-                end
-            end,
             ["<C-i>"] = function(fallback)
                 if cmp.visible() then
                     require("cmp.utils.autocmd").emit("InsertLeave")
@@ -163,45 +75,53 @@ return function()
                 if cmp.visible() then
                     cmp.abort()
                 end
-                vim.api.nvim_feedkeys(t"<End>", "n", true)
+                vim.api.nvim_feedkeys(t"<End>", "n", false)
             end,
             ["<CR>"]  = cmp.mapping.confirm{
                 select   = true,
                 behavior = cmp.ConfirmBehavior.Replace,
             },
-            ["<C-CR>"] = function()
-                if cmp.visible() then
-                    cmp.abort()
-                    vim.api.nvim_feedkeys("o", "n", true)
-                else
-                    vim.api.nvim_feedkeys("<CR>", "n", true)
-                end
-            end
         },
 
         sources = {
             {name = "nvim_lsp"},
             {name = "buffer"},
             {name = "path"},
+            -- {name = "cmd_line"},
             {name = "luasnip"},
             {name = "cmp_tabnine"},
         },
 
         formatting = {
+            fields = {"kind", "abbr", "menu"},
             format = function(entry, vimItem)
-                vimItem.kind = completionItemKind[vimItem.kind] .. " " .. vimItem.kind
-                vimItem.menu = ({
-                    nvim_lsp    = "[LSP]",
-                    buffer      = "[Buffer]",
-                    path        = "[Path]",
-                    luasnip     = "[LuaSnip]",
-                    cmp_tabnine = "[Tabnine]",
-                })[entry.source.name]
+                local maxWidth = 40
+                if #vimItem.abbr > maxWidth then
+                    vimItem.abbr = string.sub(vimItem.abbr, 1, maxWidth - 1) .. require("util.icon").ui.Ellipsis
+                end
+                vimItem.menu = vimItem.kind
+                vimItem.kind = require("util.icon").kind[vimItem.kind]
+                -- vimItem.menu = ({
+                    -- nvim_lsp    = "[LSP]",
+                    -- buffer      = "[Buffer]",
+                    -- path        = "[Path]",
+                    -- luasnip     = "[LuaSnip]",
+                    -- cmp_tabnine = "[Tabnine]",
+                -- })[entry.source.name]
                 return vimItem
             end
         },
         keyword_length   = 2,
         default_behavior = cmp.ConfirmBehavior.Replace,
     }
+
+    require("cmp").setup.filetype(
+        {"dap-repl", "dapui_watches", "dapui_hover"},
+        {
+            sources = {
+                { name = "dap" },
+            },
+        }
+    )
 end
 

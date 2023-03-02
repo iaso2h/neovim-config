@@ -573,7 +573,7 @@ use {
     }
     use {
         'yamatsum/nvim-nonicons',
-        disable = not isTerm,
+        disable = isTerm,
         after   = "nvim-web-devicons",
         config  = [[require("nvim-nonicons").setup()]]
     }
@@ -585,7 +585,7 @@ use {
         'glepnir/galaxyline.nvim',
         event  = "BufAdd",
         after  = "nvim-web-devicons",
-        config = conf "nvim-galaxyline"
+        config = conf "nvim-galaxyline".config
     }
     use {
         'noib3/nvim-cokeline',
@@ -630,6 +630,7 @@ use {
     }
     use {
         'kyazdani42/nvim-tree.lua',
+        lock = true,
         keys   = {{"n", "<C-w>e"}},
         after  = "nvim-web-devicons",
         config = conf "nvim-tree"
@@ -694,8 +695,8 @@ use {
     }
     use {
         'hrsh7th/nvim-cmp',
-        after  = "LuaSnip",
-        config = conf "nvim-cmp"
+        after    = "LuaSnip",
+        config   = conf "nvim-cmp"
     }
     use {
         'hrsh7th/cmp-nvim-lsp',
@@ -732,12 +733,6 @@ use {
     }
     use {
         "hrsh7th/cmp-path",
-        event = "InsertEnter",
-        after = "nvim-cmp",
-    }
-    use {
-        disable = true,
-        "hrsh7th/cmp-cmdline",
         event = "InsertEnter",
         after = "nvim-cmp",
     }
@@ -818,10 +813,7 @@ use {
                     "lsp",
                     "treesitter",
                 },
-                filetypes_denylist = {
-                    "fugitive",
-                    "dap"
-                },
+                filetypes_denylist = require("config.nvim-galaxyline").shortLineList,
                 min_count_to_highlight = 2
             }
         end
@@ -886,7 +878,6 @@ use {
     -- }
     use {
         'rcarriga/nvim-dap-ui',
-            disable = true,
         after  = "nvim-dap",
         config = conf "nvim-dap-ui"
     }

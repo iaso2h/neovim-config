@@ -136,13 +136,10 @@ theme.editor =  {
     Question    = {fg = p.n8, style = "italic"},
 
 
-    -- 2023-2-16
-    -- Pmenu      = {fg = p.n4, bg = p.n2},
-    -- PmenuSel   = {fg = p.w,  bg = p.n8, style = "bold"},
-    Pmenu      = {fg = p.n4, bg = p.n1},
-    PmenuSel   = {fg = p.w,  bg = p.n3, style = "bold"},
-    PmenuSbar  = {fg = p.n4, bg = p.n3},
-    PmenuThumb = {fg = p.n4, bg = p.n10},
+    Pmenu      = {fg = p.n4,   bg = p.n1},
+    PmenuSel   = {fg = "NONE", bg = p.n2,   style = "bold"},
+    PmenuSbar  = {fg = p.n4,   bg = p.n3},
+    PmenuThumb = {fg = p.n4,   bg = p.n10},
     WildMenu   = {link = "PmenuSel"},
 
 
@@ -299,7 +296,7 @@ theme.treesitter         = {
     -- Function names
     theme.treesitter.TSFunction    = {link = "Function"}      -- For fuction (calls and definitions).
     theme.treesitter.TSMethod      = {link = "Function"}      -- For method calls and definitions.
-    theme.treesitter.TSFuncBuiltin = {fg   = p.blue, style = "bold"}
+    theme.treesitter.TSFuncBuiltin = {fg   = p.cyan, style = "bold"}
     -- Namespaces and property accessors
     theme.treesitter.TSNamespace = {fg   = "#00ffe5"}  -- For identifiers referring to modules and namespaces.
     theme.treesitter.TSField     = {fg   = p.n4 }      -- For fields.
@@ -332,10 +329,9 @@ theme.treesitter         = {
     theme.treesitter["@string.regex"]     = {link = "TSStringRegex"}
     theme.treesitter["@string.escape"]    = {link = "TSStringEscape"}
     theme.treesitter["@character"]        = {link = "String"}
--- }theme.treesitterter highlight
+-- }}}
 
-
-theme.lsp = {
+theme.lsp = { -- {{{
     DiagnosticError                = {fg = p.n11},
     DiagnosticUnderlineError       = {style = "undercurl", sp = p.n11},
     DiagnosticWarn                 = {fg = p.n13},
@@ -359,10 +355,9 @@ theme.lsp = {
     LspReferenceWrite = {bg = p.n3},
 
     FloatBorder = {fg = p.n3b, bg = p.n0, style = "bold"},
-}
+} -- }}}
 
-
-theme.plugins = {
+theme.plugins = { -- {{{
 
     -- https://github.com/folke/trouble.nvim
     LspTroubleText   = {fg = p.n4},
@@ -416,11 +411,13 @@ theme.plugins = {
 
     -- https://github.com/kyazdani42/nvim-tree.lua
     NvimTreeNormal           = {fg    = p.n4, bg = p.sidebar},
-    NvimTreeFolderName       = {fg    = p.n4},
+    NvimTreeFolderName       = {fg    = p.white},
     NvimTreeFolderIcon       = {link  = "NvimTreeFolderName"},
     NvimTreeRootFolder       = {fg    = p.n10, style = "bold"},
-    NvimTreeOpenedFolderName = {style = "bold,underline", sp = p.n8},
+    NvimTreeOpenedFolderName = {fg    = p.w,  style = "bold,italic"},
+    NvimTreeOpenedFolderIcon = {link  = "NvimTreeOpenedFolderName"},
     NvimTreeOpenedFile       = {link  = "NvimTreeOpenedFolderName"},
+    NvimTreeGitIgnored       = {fg    = p.n3},
     NvimTreeGitNew           = {fg    = p.n14},
     NvimTreeGitDirty         = {fg    = p.n13},
     NvimTreeGitRenamed       = {fg    = p.n13},
@@ -439,12 +436,12 @@ theme.plugins = {
     LspDiagnosticsHint        = {link = "DiagnosticHint"},
 
     -- https://github.com/folke/which-key.nvim
-    -- WhichKey =          {fg = p.n4 , style = "bold"},
-    -- WhichKeyGroup =     {fg = p.n4},
-    -- WhichKeyDesc =      {fg = p.n7, style = "italic"},
-    -- WhichKeySeperator = {fg = p.n4},
-    -- WhichKeyFloating =  {bg = p.float},
-    -- WhichKeyFloat =     {bg = p.float},
+    WhichKey =          {fg = p.n4 , style = "bold"},
+    WhichKeyGroup =     {fg = p.n4},
+    WhichKeyDesc =      {fg = p.n7, style = "italic"},
+    WhichKeySeperator = {fg = p.n4},
+    WhichKeyFloating =  {link = "FloatBorder"},
+    WhichKeyFloat =     {link = "FloatBorder"},
 
     -- https://github.com/lukas-reineke/indent-blankline.nvim
     IndentBlanklineChar        = {link = "SignColumn"},
@@ -474,7 +471,7 @@ theme.plugins = {
 
     -- HistoryStartup
     HistoryStartupCreate   = {fg = p.n10, style = "bold"},
-    HistoryStartupFileRoot = {fg = p.n8,  style = "italic"},
+    HistoryStartupFileRoot = {fg = p.n8,  style = "bold"},
 
     -- https://github.com/kosayoda/nvim-lightbulb
     LightBulbVirtualText = {link = "NormalFloat"},
@@ -482,12 +479,37 @@ theme.plugins = {
 
     -- https://github.com/hrsh7th/nvim-cmp
     CmpItemAbbr           = {fg = p.n4},
-    -- CmpItemAbbrDeprecated = {fg = p.n3b, style = "italic"},
-    CmpItemAbbrMatch      = {fg = p.n13, style = "bold"},
+    CmpItemAbbrDeprecated = {fg = p.n3,  bg = "NONE", style = "strikethrough" },
+    CmpItemAbbrMatch      = {fg = p.n13, bg = "NONE", style = "bold"},
     CmpItemAbbrMatchFuzzy = {link = "CmpItemAbbrMatch"},
-    -- CmpItemAbbrMatchFuzzy = {fg = p.n8, style = "bold"},
     CmpItemKind           = {fg = p.n15},
-    CmpItemMenu           = {link = "CmpItemAbbr"},
+    CmpItemMenu           = {fg = p.n3b,  bg = "NONE", style = "italic" },
+    -- https://github.com/hrsh7th/nvim-cmp/wiki/Menu-Appearance#how-to-add-visual-studio-code-codicons-to-the-menu
+    CmpItemKindField         = {fg = p.dark_red},
+    CmpItemKindProperty      = {link = "CmpItemKindField"},
+    CmpItemKindEvent         = {fg = p.dark_red},
+    CmpItemKindText          = {fg = p.green},
+    CmpItemKindEnum          = {fg = p.yellow},
+    CmpItemKindKeyword       = {fg = p.purple},
+    CmpItemKindConstant      = {fg = p.orange},
+    CmpItemKindConstructor   = {fg = p.yellow},
+    CmpItemKindReference     = {fg = p.n13},
+    CmpItemKindFunction      = {fg = p.blue},
+    CmpItemKindStruct        = {fg = p.purple},
+    CmpItemKindClass         = {fg = p.blue},
+    CmpItemKindModule        = {link = "TSNamespace"},
+    CmpItemKindOperator      = {link = "Operator"},
+    CmpItemKindVariable      = {fg = p.n8},
+    CmpItemKindFile          = {fg = p.n4},
+    CmpItemKindUnit          = {fg = "#D4A959"},
+    CmpItemKindSnippet       = {fg = "#D4A959"},
+    CmpItemKindFolder        = {link = "CmpItemKindFile"},
+    CmpItemKindMethod        = {fg = p.blue},
+    CmpItemKindValue         = {fg = p.n9},
+    CmpItemKindEnumMember    = {fg = p.yellow},
+    CmpItemKindInterface     = {fg = "#58B5A8"},
+    CmpItemKindColor         = {fg = "#58B5A8"},
+    CmpItemKindTypeParameter = {fg = p.orange},
 
     -- https://github.com/ray-x/lsp_signature.nvim
     LspSignatureActiveParameter = {link = "CmpItemAbbrMatch"},
@@ -507,8 +529,12 @@ theme.plugins = {
     -- https://github.com/nvim-treesitter/nvim-treesitter-context
     TreesitterContext           = {style = "bold"},
     TreesitterContextLineNumber = {fg = p.n3b, style = "bold"},
-    TreesitterContextBottom     = {link  = "TreesitterContextLineNumber"}
-}
+    TreesitterContextBottom     = {link  = "TreesitterContextLineNumber"},
+
+    -- https://github.com/mfussenegger/nvim-dap/
+    DapStoppedLine  = {bg = "#615A57"},
+    DapLogPointLine = {bg = "#50636E"},
+} -- }}}
 
 theme.loadTerminal = function()
     vim.g.terminal_color_0  = p.n1

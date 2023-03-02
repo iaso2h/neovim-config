@@ -1,4 +1,5 @@
 return function()
+local icon = require("util.icon")
 
 require("nvim-tree").setup { -- BEGIN_DEFAULT_OPTS
     auto_reload_on_write = true,
@@ -127,28 +128,27 @@ require("nvim-tree").setup { -- BEGIN_DEFAULT_OPTS
                 modified = true,
             },
             glyphs = {
-                    default  = "",
-                    symlink  = "",
-                    bookmark = "",
-                    modified = "*",
-                    folder = {
-                        arrow_closed = "",
-                        arrow_open   = "",
-                        default      = "",
-                        open         = "",
-                        empty        = "",
-                        empty_open   = "",
-                        symlink      = "",
-                        symlink_open = "",
+                    default  = icon.ui.Text,
+                    symlink  = icon.ui.FileSymlink,
+                    bookmark = icon.ui.BookMark,
+                folder = {
+                    arrow_closed = icon.ui.TriangleShortArrowRight,
+                    arrow_open   = icon.ui.TriangleShortArrowDown,
+                    default      = icon.ui.Folder,
+                    open         = icon.ui.FolderOpen,
+                    empty        = icon.ui.EmptyFolder,
+                    empty_open   = icon.ui.EmptyFolderOpen,
+                    symlink      = icon.ui.FolderSymlink,
+                    symlink_open = icon.ui.FolderOpen,
                 },
                 git = {
-                    unstaged  = "",
-                    staged    = "",
-                    unmerged  = "",
-                    renamed   = "",
-                    untracked = "",
-                    deleted   = "",
-                    ignored   = "◌",
+                    unstaged  = icon.git.FileUnstaged,
+                    staged    = icon.git.FileStaged,
+                    unmerged  = icon.git.FileUnmerged,
+                    renamed   = icon.git.FileRenamed,
+                    untracked = icon.git.FileUntracked,
+                    deleted   = icon.git.FileDeleted,
+                    ignored   = icon.git.FileIgnored,
                 },
             },
         },
