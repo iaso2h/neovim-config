@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Snap to closest fold in sight then execute an Ex command or
 -- a function
--- Version: 0.0.5
--- Last Modified: 2023-2-25
+-- Version: 0.0.6
+-- Last Modified: 2023-3-1
 local api  = vim.api
 local fn   = vim.fn
 local util = require("util")
@@ -215,7 +215,6 @@ M.main = function(exCMD, snapEnable, threshold)
     end
 
     -- Check dist from cursor line to both region ends then snap to the closest one
-    local answer
     -- Make sure topLineNr and botLineNr do not fall out of region
     local topLineNr = cursorRegion[1] == winInfo.topline and winInfo.topline or cursorRegion[1] - 1
     local botLineNr = cursorRegion[2] == winInfo.botline and winInfo.botline or cursorRegion[2] + 1
@@ -238,6 +237,9 @@ M.main = function(exCMD, snapEnable, threshold)
                 return
             end
         end
+
+        -- Execute command
+        exeCommand(exCMD)
     elseif distTop > distBot then
         if botLineNr == winInfo.botline then
             -- Snap to top instead
@@ -253,6 +255,9 @@ M.main = function(exCMD, snapEnable, threshold)
                 return
             end
         end
+
+        -- Execute command
+        exeCommand(exCMD)
     else
         if topLineNr == winInfo.topline and botLineNr ~= winInfo.botline then
             -- Snap to bottom instead
@@ -261,6 +266,9 @@ M.main = function(exCMD, snapEnable, threshold)
             else
                 return
             end
+
+            -- Execute command
+            exeCommand(exCMD)
         elseif topLineNr ~= winInfo.topline and botLineNr == winInfo.botline then
             -- Snap to top instead
             if distTop <= (winInfo.height) ^ 2 * threshold then
@@ -268,27 +276,35 @@ M.main = function(exCMD, snapEnable, threshold)
             else
                 return
             end
+
+            -- Execute command
+            exeCommand(exCMD)
         else
-            highlightLines(curBufNr, { topLineNr, botLineNr })
-            answer = fn.confirm("Down or Up?", "&J&K", 0)
-            if answer == 1 then
-                snapToLine(curWinNr, curBufNr, cursorPos, topLineNr)
-            elseif answer == 2 then
-                snapToLine(curWinNr, curBufNr, cursorPos, botLineNr)
-            else
-                return
-            end
+            vim.ui.select({"Up", "Down"}, {
+                prompt = "Select up or down"
+                },
+                function (choice)
+                    if choice == "Down" then
+                        snapToLine(curWinNr, curBufNr, cursorPos, botLineNr)
+                    elseif choice == "Up" then
+                        snapToLine(curWinNr, curBufNr, cursorPos, topLineNr)
+                    else
+                        return
+                    end
+
+                    -- Execute command
+                    exeCommand(exCMD)
+
+                    -- Debug
+                    -- Print(cursorPos)
+                    -- Print(cursosRegion)
+
+                    -- Print(winInfo)
+                end
+            )
         end
     end
 
-    -- Execute command
-    exeCommand(exCMD)
-
-    -- Debug
-    -- Print(cursorPos)
-    -- Print(cursosRegion)
-
-    -- Print(winInfo)
 end
 
 return M
