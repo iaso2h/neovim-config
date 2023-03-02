@@ -21,8 +21,17 @@ local function findCandi(bufTbl, currentBufIdx, direction)
 end
 
 
+--- Get all listed buffers. Just like what you see in the :ls command
+---@param direction number Set to 1 to jump to next buffer, -1 to previous buffer
 M.init = function(direction)
-    -- Get all listed buffers. Just like what you see in the :ls command
+    if not vim.bo.buflisted then
+        if direction == 1 then
+            return vim.cmd[[bn]]
+        else
+            return vim.cmd[[bp]]
+        end
+    end
+
     local bufTbl = api.nvim_list_bufs()
     local cond = function (buf)
         return api.nvim_buf_get_option(buf, "buflisted")

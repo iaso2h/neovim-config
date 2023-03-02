@@ -74,7 +74,8 @@ if not vim.g.vscode then
     autocmd!
     autocmd VimEnter             * nested lua require("historyStartup").display()
 
-    autocmd BufWinEnter          * lua require("cursorRecall").main()
+    autocmd BufWinEnter          * lua require("buf.action.cursorRecall").main()
+    autocmd BufWritePost         * normal! zv
     autocmd BufWritePre          * lua require"util".trimSpaces(); require"util".trailingEmptyLine()
     autocmd FocusGained          * checktime
   " autocmd BufAdd               * lua require("consistantTab").adaptBufTab()
@@ -103,7 +104,7 @@ end
 -- Commands {{{
 vim.cmd [[
 command! -nargs=+ -complete=command  Echo PP strftime('%c') . ": " . <args>
-command! -nargs=+ -complete=command  Redir call luaeval('require("redir").catch(_A)', <q-args>)
+command! -nargs=+ -complete=command  Redir call luaeval('require("buf.action.redir").catch(_A)', <q-args>)
 command! -nargs=0 -range ExtractSelection lua require("extractSelection").main(vim.fn.visualmode())
 command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | setl norevins
 command! -nargs=0 CD     execute "cd " . expand("%:p:h")

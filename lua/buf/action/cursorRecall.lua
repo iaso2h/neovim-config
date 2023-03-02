@@ -1,9 +1,9 @@
 -- File: cursorRecall
 -- Author: iaso2h
 -- Description: Derived from and simplified:
--- https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
--- Version: 0.0.2
--- Last Modified: 2021-09-25
+-- Credit: https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
+-- Version: 0.0.3
+-- Last Modified: 2023-3-2
 
 local ignoreBuftype = {
         'quickfix',
@@ -34,18 +34,15 @@ function M.main()
 
     local lastpos  = fn.line('`"')
     local buffend  = fn.line('$')
-    local winend   = fn.line('w$')
-    local winstart = fn.line('w0')
-
-    vim.cmd "norm! zx"
 
     if lastpos > 0 and lastpos <= buffend then
-        -- Last edit pos is set and is < no of lines in buffer
+        local winend   = fn.line('w$')
+        local winstart = fn.line('w0')
+        -- Last edit pos is set and is less than the number of lines in this buffer
         if winend == buffend then
-            -- Last line in buffer is also last line visible
+            -- Last line in buffer is also the last line visible in this window
             vim.cmd 'normal! g`"'
         elseif buffend - lastpos > ((winend - winstart) / 2) - 1 then
-            -- Center cursor on screen if not at bottom
             vim.cmd 'normal! g`"zz'
         else
             -- Otherwise, show as much context as we can
@@ -55,7 +52,7 @@ function M.main()
 
     if fn.foldclosed('.') ~= -1 then
         -- Cursor was inside a fold; open it
-        vim.cmd 'normal! zzzv'
+        vim.cmd 'normal! zvzz'
     end
 
 
