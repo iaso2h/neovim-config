@@ -26,6 +26,7 @@ theme.syntax = {
     Number         = {fg = p.orange}, -- a number constant: 5
     Boolean        = {fg = p.orange}, -- a boolean constant: TRUE, false
     Float          = {fg = p.orange}, -- a floating point constant: 2.3e10
+    FloatBorder    = {fg = p.n3b, bg = p.n0, style = "bold"},
 
     Statement      = {fg = p.purple, style = "italic"}, -- any statement
     Parameter      = {fg = p.orange}, -- function parameter
@@ -354,7 +355,6 @@ theme.lsp = { -- {{{
     LspReferenceRead  = {bg = p.n3},
     LspReferenceWrite = {bg = p.n3},
 
-    FloatBorder = {fg = p.n3b, bg = p.n0, style = "bold"},
 } -- }}}
 
 theme.plugins = { -- {{{
@@ -428,7 +428,7 @@ theme.plugins = { -- {{{
     NvimTreeExecFile         = {fg    = p.n15},
     NvimTreeSpecialFile      = {fg    = p.n9 , style = "underline", sp = p.n9},
     NvimTreeEmptyFolderName  = {fg    = p.n3b},
-    NvimTreeIndentMarker     = {link = "FoldColumn"},
+    NvimTreeIndentMarker     = {link  = "FoldColumn"},
 
     LspDiagnosticsError       = {link = "DiagnosticError"},
     LspDiagnosticsWarning     = {link = "DiagnosticWarn"},
@@ -455,6 +455,50 @@ theme.plugins = { -- {{{
     -- https://github.com/mfussenegger/nvim-dap
     DapBreakpoint = {fg = p.n14},
     DapStopped    = {fg = p.n15},
+
+    -- https://github.com/rcarriga/nvim-dap-ui
+    DapUINormal                  = {link = "Normal"},
+    DapUIVariable                = {fg   = p.n9},
+    DapUIScope                   = {fg   = p.n14, style = "bold"},
+    DapUIType                    = {fg   = p.orange},
+    DapUIValue                   = {link = "Identifier"},
+    DapUIModifiedValue           = {fg   = p.orange, style = "bold"},
+    DapUIDecoration              = {fg   = p.n8},
+    DapUIThread                  = {fg   = p.n14},
+    DapUIStoppedThread           = {fg   = p.n14, style = "bold"},
+    DapUIFrameName               = {link = "NormalFloat"},
+    DapUISource                  = {fg   = p.purple},
+    DapUILineNumber              = {fg   = p.n13},
+    DapUIFloatNormal             = {link = "NormalFloat"},
+    DapUIFloatBorder             = {link = "FloatBorder"},
+    DapUIWatchesError            = {link = "DiagnosticError"},
+    DapUIWatchesEmpty            = {link = "DiagnosticWarn"},
+    DapUIWatchesValue            = {fg   = p.n14},
+    DapUIBreakpointsPath         = {link = "DapUIStoppedThread"},
+    DapUIBreakpointsInfo         = {fg   = p.n14},
+    DapUIBreakpointsCurrentLine  = {fg   = p.n14, style = "bold"},
+    DapUIBreakpointsLine         = {link = "DapUILineNumber"},
+    DapUIBreakpointsDisabledLine = {fg   = p.n3b},
+    DapUICurrentFrameName        = {link = "DapUIBreakpointsCurrentLine"},
+    DapUIStepOver                = {fg   = p.n9},
+    DapUIStepInto                = {fg   = p.n9},
+    DapUIStepBack                = {fg   = p.n9},
+    DapUIStepOut                 = {fg   = p.n9},
+    DapUIStop                    = {fg   = p.n11},
+    DapUIPlayPause               = {fg   = p.n14},
+    DapUIRestart                 = {fg   = p.n14},
+    DapUIUnavailable             = {fg   = p.n3b},
+    DapUIWinSelect               = {fg   = p.n9},
+    DapUIEndofBuffer             = {link = "EndOfBuffer"},
+    DapUINormalNC                = {link = "Normal"},
+    DapUIPlayPauseNC             = {link = "DapUIPlayPause"},
+    DapUIRestartNC               = {link = "DapUIRestart"},
+    DapUIStopNC                  = {link = "DapUIStop"},
+    DapUIUnavailableNC           = {link = "DapUIUnavailable"},
+    DapUIStepOverNC              = {link = "DapUIStepOver"},
+    DapUIStepIntoNC              = {link = "DapUIStepInto"},
+    DapUIStepBackNC              = {link = "DapUIStepBack"},
+    DapUIStepOutNC               = {link = "DapUIStepOut"},
 
     -- https://github.com/phaazon/hop.nvim
     HopNextKey   = {link = "IncSearch"},

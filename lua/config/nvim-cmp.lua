@@ -4,19 +4,23 @@ return function()
 
     cmp.setup{
         enabled = function()
-            -- Disable for (telescope)prompt, dap
+            -- Disable it for (telescope)prompt, enable it for dap
             if vim.bo.buftype == "prompt" then
-                if package.loaded["dap"] and not(require("cmp_dap").is_dap_buffer()) then
+                if package.loaded["dap"] and require("cmp_dap").is_dap_buffer() then
                     return true
                 else
                     return false
                 end
             end
+
             -- Disable completion in comments
             local context = require("cmp.config.context")
-            -- keep command mode completion enabled when cursor is in a comment
-            return not context.in_treesitter_capture("comment")
-            and not context.in_syntax_group("Comment")
+            if context.in_treesitter_capture("comment")
+                or context.in_syntax_group("Comment") then
+                return false
+            else
+                return true
+            end
         end,
         completion = {
             completeopt = "menu,menuone,noinsert",

@@ -877,19 +877,13 @@ use {
     }
     use {
         'mfussenegger/nvim-dap',
-        module = "dap",
-        setup  = conf("nvim-dap").setup,
-        config = conf("nvim-dap").config
+        keys   = {{"n", "<leader>db"}},
+        config = conf "nvim-dap"
     }
-    -- use {
-        -- 'jay-babu/mason-nvim-dap.nvim',
-        -- after  = {"nvim-dap", "mason.nvim"},
-        -- config = function()
-            -- require("mason-nvim-dap").setup{
-                -- ensure_installed = {"python", "codelldb"}
-            -- }
-        -- end
-    -- }
+    use {
+        'rcarriga/cmp-dap',
+        after  = {"nvim-cmp", "nvim-dap"},
+    }
     use {
         'rcarriga/nvim-dap-ui',
         after  = "nvim-dap",
@@ -920,8 +914,6 @@ use {
     }
     use {
         'jbyuki/one-small-step-for-vimkind',
-        module = "osv",
-        cmd    = {"OSVStart", "OSVStop"},
         config = function()
             vim.cmd [[command! -nargs=0 OSVStop  lua require("osv").stop()]]
             vim.cmd [[command! -nargs=0 OSVStart lua require("osv").launch{port=8086}]]
