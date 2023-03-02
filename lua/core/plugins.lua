@@ -549,20 +549,17 @@ use {
         after = "plenary.nvim",
         cmd  = "Telescope",
         keys = {
-            {"n", [[<C-f>l]]},  {"n", [[<C-f>E]]},  {"n", [[<C-f>e]]},    {"n", [[<C-f>f]]},
-            {"n", [[<C-f>F]]},  {"n", [[<C-f>w]]},  {"n", [[<C-f>W]]},    {"n", [[<A-C-j>]]},
-            {"n", [[<A-C-k>]]}, {"n", [[<C-h>/]]},  {"n", [[<C-h>v]]},    {"n", [[<C-h>o]]},
-            {"n", [[<C-h>i]]},  {"n", [[<C-h>q]]},  {"n", [[<C-h>m]]},    {"n", [[<C-h>k]]},
-            {"n", [[<C-h>c]]},  {"n", [[<C-h>h]]},  {"n", [[<C-h>H]]},    {"n", [[<C-h>l]]},
-            {"n", [[<C-f>gc]]}, {"n", [[<C-f>gC]]}, {"n", [[<C-f>gs]]},   {"n", [[<leader>b]]},
-
-            {"n", [[<C-f>o]]},  {"n", [[<C-f>O]]},  {"n", [[<leader>e]]}, {"n", [[<leader>E]]},
+            { "n", [[<C-f>a]] },  { "n", [[<C-f>E]] },  { "n", [[<C-f>e]] }, { "n", [[<C-f>f]] },
+            { "n", [[<C-f>F]] },  { "n", [[<C-f>w]] },  { "n", [[<C-f>W]] }, { "n", [[<C-f>/]] },
+            { "n", [[<C-f>?]] },  { "n", [[<C-f>v]] },  { "n", [[<C-f>j]] }, { "n", [[<C-f>']] },
+            { "n", [[<C-f>m]] },  { "n", [[<C-f>k]] },  { "n", [[<C-f>c]] }, { "n", [[<C-f>C]] },
+            { "n", [[<C-f>h]] },  { "n", [[<C-f>H]] },  { "n", [[<C-f>r]] }, { "n", [[<C-f>gc]] },
+            { "n", [[<C-f>gC]] }, { "n", [[<C-f>gs]] }, { "n", [[<C-f>b]] },
         },
         config = conf "nvim-telescope"
     }
     use {
         'nvim-telescope/telescope-symbols.nvim',
-        module = "telescope",
         after  = "telescope.nvim"
     }
     -- }}} Telescope
@@ -680,7 +677,17 @@ use {
         'folke/neodev.nvim',
         requires = "nvim-lspconfig",
         after    = {"nvim-lspconfig", "plenary.nvim", "cmp-nvim-lsp"},
-        config   = [[ require("neodev").setup(); require("config.nvim-lspconfig").config() ]]
+        config   = function()
+            require("neodev").setup{
+                library = { plugins = {
+                    "nvim-dap-ui",
+                    "plenary",
+                    "nvim-treesitter",
+                },
+                types = true },
+            }
+            require("config.nvim-lspconfig").config()
+    end
     }
     use 'rafamadriz/friendly-snippets'
     use {
@@ -843,6 +850,13 @@ use {
     use {
         'bfredl/nvim-luadev',
         ft = "lua",
+        config = function()
+            vim.api.nvim_create_autocmd("BufEnter",{
+                pattern = "\\[nvim-lua\\]",
+                command = [[lua vim.opt_local.relativenumber = true]],
+                once    = true,
+            })
+        end
     }
     use {
         'dstein64/vim-startuptime',

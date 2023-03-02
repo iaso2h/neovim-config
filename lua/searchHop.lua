@@ -53,5 +53,39 @@ M.searchSelected = function(exCMD)
     api.nvim_win_set_cursor(0, cursorPos)
 end
 
+
+--- Execute ex command then center the screent situationally
+---@param exCMD string Ex command
+---@param feedkeyChk boolean Use the ex command to feed keys
+M.centerHop = function(exCMD, feedkeyChk)
+    local winID     = api.nvim_get_current_win()
+    local prevBufNr = api.nvim_get_current_buf()
+
+    -- Execute the command first
+    if feedkeyChk then
+        api.nvim_feedkeys(exCMD, "n", true)
+    else
+        local ok, msg = pcall(vim.cmd, "norm! " .. exCMD)
+        if not ok then
+            local idx = select(2,string.find(msg, "E%d+: "))
+            msg = string.sub(msg, idx + 1, -1)
+            vim.notify(msg, vim.log.levels.INFO)
+        end
+    end
+
+    local postBufNr = api.nvim_get_current_buf()
+
+    -- Jump to a different buffer
+    if prevBufNr ~= postBufNr then return end
+
+    -- Make sure cursor does not sit on a fold line
+    vim.cmd[[norm! zv]]
+
+    local postCursorPos = api.nvim_win_get_cursor(winID)
+    local winInfo = vim.fn.getwininfo(winID)[1]
+    if postCursorPos[1] < winInfo.topline or postCursorPos[1] > winInfo.botline then
+        vim.cmd [[norm! zz]]
+    end
+end
 return M
 

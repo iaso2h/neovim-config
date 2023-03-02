@@ -239,30 +239,12 @@ map("n", [[grN]], [[<Plug>ReplaceUnderBackward]], "Replace the whold word under 
 map("n", [[<leader>i]], [=[[I]=], "Inquery word under cursor")
 map("x", [[<leader>i]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selection").getSelect("string", false), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquery selected words")
 -- Fast mark resotre
-map("n", [[M]], function ()
-    local bufNr = vim.api.nvim_get_current_buf()
-    local winID = vim.api.nvim_get_current_win()
-    local marks = vim.fn.getmarklist(bufNr)
-    for _, mark in ipairs(marks) do
-        if mark.mark == "'m" then
-            -- mark.pos format: {bufnum, lnum, col, off}
-            -- mark.pos is (1, 1) indexed
-            local winInfo = vim.fn.getwininfo(winID)[1]
-            if mark.pos[2] >= winInfo.topline and mark.pos[2] <= winInfo.botline then
-                vim.cmd[[norm! `mzv]]
-            else
-                vim.cmd[[norm! `mzzzv]]
-            end
-            break
-        end
-    end
-end, "Restore mark M")
--- Changelist jumping
-map("n", [[<A-o>]], [[:lua require("historyHop").main("changelist", -1)<CR>]], {"silent"}, "Previous change")
-map("n", [[<A-i>]], [[:lua require("historyHop").main("changelist", 1)<CR>]],  {"silent"}, "Next change")
--- History jumping
-map("n", [[<C-o>]], [[<C-o>zzzv]], "Jump forward in jumplist")
-map("n", [[<C-i>]], [[<C-i>zzzv]], "Jump backward in jumplist")
+map("n", [[M]], [[<CMD>lua require("searchHop").centerHop("`m", false)<CR>]], "Restore mark M")
+-- Changelist/Jumplist jumping
+map("n", [[<A-o>]], [[<CMD>lua require("searchHop").centerHop("g;", false)<CR>]], {"silent"}, "Older change")
+map("n", [[<A-i>]], [[<CMD>lua require("searchHop").centerHop("g,", false)<CR>]], {"silent"}, "Newer change")
+map("n", [[<C-o>]], [[<CMD>lua require("searchHop").centerHop("<C-o>", true)<CR>]], {"silent"}, "Older jump")
+map("n", [[<C-i>]], [[<CMD>lua require("searchHop").centerHop("<C-i>", true)<CR>]], {"silent"}, "Newer jump")
 -- Swap default mapping
 map("n", [[*]],  [[g*:lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> forward")
 map("n", [[#]],  [[g#:lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> back")
@@ -283,7 +265,7 @@ map("n", [[<leader>h]], [[<CMD>noh<CR>]], {"silent"}, "Clear highlight")
 map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"}, "Disable highlight")
 -- Visual selection
 map("n", [[go]],    [[:lua require("selection").cornerSelection(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
-map("n", [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
+map({"n", "x"}, [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
 -- }}} Search & Jumping
 -- Scratch file
 map("n", [[<C-n>]], [[<CMD>new<CR>]], {"silent"}, "New buffer")
@@ -373,9 +355,11 @@ map("n", [[<C-S-Tab>]], [[<CMD>lua require("buf.action.cycle").init(-1)<CR>]], {
 map("n", [[<A-h>]],     [[<CMD>lua require("buf.action.cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
 map("n", [[<A-l>]],     [[<CMD>lua require("buf.action.cycle").init(1)<CR>]],  {"silent"}, "Next buffer")
 -- Tab
-map({"n", "x"}, [[<A-C-h>]],    [[<CMD>tabp<CR>]],    {"silent"}, "Previous tab")
-map({"n", "x"}, [[<A-C-l>]],    [[<CMD>tabn<CR>]],    {"silent"}, "Next tab")
-map({"n", "x"}, [[<C-W><C-o>]], [[<CMD>tabonly<CR>]], {"silent"}, "Tab only")
+map({"n", "x"}, [[<C-t>%]], [[<CMD>tabnew %<CR>]], {"silent"}, "New tab showing current buffer")
+map({"n", "x"}, [[<C-t>n]], [[<CMD>tabnew<CR>]],   {"silent"}, "New tab")
+map({"n", "x"}, [[<C-t>h]], [[<CMD>tabp<CR>]],     {"silent"}, "Previous tab")
+map({"n", "x"}, [[<C-t>l]], [[<CMD>tabn<CR>]],     {"silent"}, "Next tab")
+map({"n", "x"}, [[<C-t>o]], [[<CMD>tabonly<CR>]],  {"silent"}, "Tab only")
 -- }}} Buffer & Window & Tab
 -- Folding {{{
 map("",  [[zj]], [[<Nop>]], "which_key_ignore")

@@ -211,8 +211,8 @@ M.info = function () -- {{{
     -- Create win
     local padding = string.rep(" ", 1)
     local winWidth = 35
-    local winHeight = 11 + string.len(padding) +
-        math.ceil(string.len(bufName) / winWidth) +
+    local winHeight = 11 + #padding +
+        math.ceil(#bufName / winWidth) +
         math.ceil((string.len(itemInfo.text) + 5) / winWidth)
 
     local anchorVer = qfBotlineNr - qfCursorPos[1] < winHeight + 1 and "S" or "N"
