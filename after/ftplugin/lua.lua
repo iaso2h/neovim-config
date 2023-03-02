@@ -7,4 +7,13 @@ bmap(0, "x", [[g=]],         [[<plug>(Luadev-Run)]],      "Luadev runline")
 bmap(0, "n", [[g=iw]],       [[<plug>(Luadev-RunWord)]],  "Luadev run word")
 bmap(0, "i", [[<C-x><C-l>]], [[<plug>(Luadev-Complete)]], "Luadev complete")
 
+---@diagnostic disable: assign-type-mismatch
+-- credit: https://github.com/sam4llis/nvim-lua-gf
+vim.opt_local.include = [[\v<((do|load)file|require|reload)[^''"]*[''"]\zs[^''"]+]]
+vim.opt_local.includeexpr = "substitute(v:fname,'\\.','/','g')"
+vim.opt_local.suffixesadd:prepend ".lua"
+vim.opt_local.suffixesadd:prepend "init.lua"
+for _, path in pairs(vim.api.nvim_list_runtime_paths()) do
+    vim.opt_local.path:append(path .. "/lua")
+end
 vim.opt.textwidth = 80

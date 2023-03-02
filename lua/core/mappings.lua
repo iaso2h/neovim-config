@@ -122,7 +122,8 @@ map("n", [[<Plug>Extract]], function ()
         "<Plug>Extract")
     ]]
 end, {"silent", "expr"}, "Extract operator")
-map("n", [[gf]],  [[<Plug>Extract]], "Extract operator")
+map("n", [[gf]], [[<Plug>Extract]], "Extract operator")
+map("n", [[gF]], [[gf]], {"noremap"}, "Go to file")
 -- }}} Extraction
 map("n", [[<C-g>]],
 [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<CR>]],
