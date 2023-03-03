@@ -1,7 +1,8 @@
 -- Author: iaso2h
 -- Description: Cfilter in lua way
--- Version: 0.0.8
--- Last Modified: 2023-2-26
+-- Version: 0.0.9
+-- Last Modified: 2023-3-3
+-- TODO: quifix convert into a window localist
 local fn  = vim.fn
 local api = vim.api
 local M   = {
@@ -112,7 +113,7 @@ end
 --- a specific line, of which line number is decided by vim.v.count
 ---@param closeQuickfix boolean
 M.cc = function(closeQuickfix, useWinCall) -- {{{
-    local savedLastWinID = require("util").lastWinID
+    local savedLastWinID = _G._lastWinID
     local qfWinID        = api.nvim_get_current_win()
     -- In some cases the autocmd for retriving the last window id before
     -- entering into the quifix is not working well, then we have to use the
@@ -123,8 +124,10 @@ M.cc = function(closeQuickfix, useWinCall) -- {{{
     local itemNr      = vim.v.count == 0 and qfCursorPos[1] or vim.v.count
     local qfItem      = fn.getqflist()[itemNr]
     if qfItem.valid == 0 or not api.nvim_buf_is_valid(qfItem.bufnr) then return end
+    if not api.nvim_buf_is_valid(qfItem.bufnr) then vim.notify("Buffer is no longer valid") end
+    -- TODO: highlight the invalid item?
 
-    local itemPos     = {qfItem.lnum, qfItem.col - 1}
+    local itemPos = {qfItem.lnum, qfItem.col - 1}
 
     -- Validating that savedLastWinID is the window to be switched, and making
     -- sure it is focused
