@@ -48,6 +48,9 @@ function M.main()
             -- Otherwise, show as much context as we can
             vim.cmd('normal! G`"' .. t'<c-e>')
         end
+    else
+        -- Jump to recent last change instead
+        require("searchHop").centerHop("g;", false, false)
     end
 
     if fn.foldclosed('.') ~= -1 then

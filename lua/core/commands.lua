@@ -1,3 +1,17 @@
+local api = vim.api
+local M = {
+    augroup = {}
+}
+local augroup = function(...)
+    return api.nvim_create_augroup(...)
+end
+local au = function(...)
+    return api.nvim_create_autocmd(...)
+end
+local excmd = function(...)
+    return api.nvim_create_user_command(...)
+end
+
 -- Function {{{
 
 vim.g.FiletypeCommentDelimiter = {
@@ -12,31 +26,33 @@ vim.g.FiletypeCommentDelimiter = {
     conf   = "\\/\\/",
     lua    = "--",
 }
+
 if not vim.g.vscode then
     vim.g.enhanceFoldStartPat = {
-        vim    = '\\s\\{-}\\"[^\\"]\\{-}{{{[^\\"]*$',
-        python = '\\s\\{-}\\"[^#]\\{-}{{{[^#]*$',
-        c      = '\\s\\{-}//.\\{-}{{{.*$',
-        cpp    = '\\s\\{-}//.\\{-}{{{.*$',
-        json   = '\\s\\{-}//.\\{-}{{{.*$',
-        conf   = '\\s\\{-}//.\\{-}{{{.*$',
-        lua    = '\\s\\{-}--.\\{-}{{{.*$',
-        sh     = '\\s\\{-}\\"[^#]\\{-}{{{[^#]*$',
-        zsh    = '\\s\\{-}\\"[^#]\\{-}{{{[^#]*$',
-        fish   = '\\s\\{-}\\"[^#]\\{-}{{{[^#]*$',
+        vim    = [=[\s*".*{{{[^]'",\\;]*$]=],
+        python = [=[\s*#.*{{{[^]'",\\;]*$]=],
+        c      = [=[\s*//.*{{{[^]'",\\;]*$]=],
+        cpp    = [=[\s*//.*{{{[^]'",\\;]*$]=],
+        json   = [=[\s*//.*{{{[^]'",\\;]*$]=],
+        conf   = [=[\s*//.*{{{[^]'",\\;]*$]=],
+        lua    = [=[\s*--.*{{{[^]'",\\;]*$]=],
+        sh     = [=[\s*#.*{{{[^]'",\\;]*$]=],
+        zsh    = [=[\s*#.*{{{[^]'",\\;]*$]=],
+        fish   = [=[\s*#.*{{{[^]'",\\;]*$]=],
     }
     vim.g.enhanceFoldEndPat = {
-        vim    = '\\s\\{-}\\"[^\\"]\\{-}}}}[^\\"]*$',
-        python = '\\s\\{-}\\"[^#"]\\{-}}}}[^#]*$',
-        c      = '\\s\\{-}//.\\{-}}}}.*$',
-        cpp    = '\\s\\{-}//.\\{-}}}}.*$',
-        json   = '\\s\\{-}//.\\{-}}}}.*$',
-        conf   = '\\s\\{-}//.\\{-}}}}.*$',
-        lua    = '\\s\\{-}--.\\{-}}}}.*$',
-        sh     = '\\s\\{-}\\"[^#"]\\{-}}}}[^#]*$',
-        zsh    = '\\s\\{-}\\"[^#"]\\{-}}}}[^#]*$',
-        fish   = '\\s\\{-}\\"[^#"]\\{-}}}}[^#]*$',
+        vim    = [=[\s*".*}}}[^]'",\\;]*$]=],
+        python = [=[\s*#.*}}}[^]'",\\;]*$]=],
+        c      = [=[\s*//.*}}}[^]'",\\;]*$]=],
+        cpp    = [=[\s*//.*}}}[^]'",\\;]*$]=],
+        json   = [=[\s*//.*}}}[^]'",\\;]*$]=],
+        conf   = [=[\s*//.*}}}[^]'",\\;]*$]=],
+        lua    = [=[\s*--.*}}}[^]'",\\;]*$]=],
+        sh     = [=[\s*#.*}}}[^]'",\\;]*$]=],
+        zsh    = [=[\s*#.*}}}[^]'",\\;]*$]=],
+        fish   = [=[\s*#.*}}}[^]'",\\;]*$]=],
     }
+
     vim.cmd [[
     function! EnhanceFoldExpr()
         let line = getline(v:lnum)
@@ -51,84 +67,246 @@ if not vim.g.vscode then
     ]]
 end
 
-vim.cmd [[
-function! RemoveLastPathComponent()
-    let l:cmdlineBeforeCursor = strpart(getcmdline(), 0, getcmdpos() - 1)
-    let l:cmdlineAfterCursor  = strpart(getcmdline(), getcmdpos() - 1)
-    PP l:cmdlineAfterCursor
-    PP l:cmdlineBeforeCursor
-    let l:cmdlineRoot         = fnamemodify(cmdlineBeforeCursor, ':r')
-    let l:result              = (l:cmdlineBeforeCursor ==# l:cmdlineRoot ? substitute(l:cmdlineBeforeCursor, '\%(\\ \|[\\/]\@!\f\)\+[\\/]\=$\|.$', '', '') : l:cmdlineRoot)
-    call setcmdpos(strlen(l:result) + 1)
-    return l:result . l:cmdlineAfterCursor
-endfunction
-]]
+
+if isTerm then
+    vim.cmd [[
+    function! RemoveLastPathComponent()
+        let l:cmdlineBeforeCursor = strpart(getcmdline(), 0, getcmdpos() - 1)
+        let l:cmdlineAfterCursor  = strpart(getcmdline(), getcmdpos() - 1)
+        PP l:cmdlineAfterCursor
+        PP l:cmdlineBeforeCursor
+        let l:cmdlineRoot         = fnamemodify(cmdlineBeforeCursor, ':r')
+        let l:result              = (l:cmdlineBeforeCursor ==# l:cmdlineRoot ? substitute(l:cmdlineBeforeCursor, '\%(\\ \|[\\/]\@!\f\)\+[\\/]\=$\|.$', '', '') : l:cmdlineRoot)
+        call setcmdpos(strlen(l:result) + 1)
+        return l:result . l:cmdlineAfterCursor
+    endfunction
+    ]]
+end
 
 -- }}} Function
 
+
 -- Auto commands {{{
-if not vim.g.vscode then
-    -- TODO: Monitor file changed and prevent fold close
-    vim.cmd[[
-    augroup fileType
-    autocmd!
-    autocmd VimEnter             * nested lua require("historyStartup").display()
+au("vimEnter", {
+    desc     = "Display history on startup",
+    callback = function ()
+        require("historyStartup").display()
+    end
+})
 
-    autocmd BufWinEnter          * lua require("buf.action.cursorRecall").main()
-    autocmd BufWritePost         * normal! zv
-    autocmd BufWritePre          * lua require"util".trimSpaces(); require"util".trailingEmptyLine()
-    autocmd FocusGained          * checktime
-  " autocmd BufAdd               * lua require("consistantTab").adaptBufTab()
+-- Minimal terminal filetype
+local augroupTerm = augroup("myTerminal", {clear = true})
+au("TermOpen", {
+    group    = augroupTerm,
+    desc     = "Minimal filetype settings for terminal",
+    callback = function()
+        vim.opt_local.buflisted = false
+        vim.opt_local.number = false
+        vim.cmd[[startinsert]]
+    end
+})
+au("BufEnter", {
+    group   = augroupTerm,
+    pattern = "term://*",
+    desc    = "Start insert on entering terminal",
+    command = "startinsert"
+})
 
-" autocmd BufAdd               * norm! zx | if foldlevel(".") ==
-    autocmd BufLeave             * lua require("util").getLastWinID()
 
-    autocmd BufEnter             term://* startinsert
-    autocmd TermOpen             *        startinsert
-    autocmd TermOpen             *        setlocal nobuflisted | setlocal nonumber
+local augroupWrite = augroup("myWriting", {clear = true})
+au("BufWritePre", {
+    group   = augroupWrite,
+    desc     = "Clean up the code before saving",
+    callback = function ()
+        require("util").trimSpaces()
+    end
+})
+au("BufWritePost", {
+    group   = augroupWrite,
+    desc    = "Avoiding folding after making modification on a buffer for the first time",
+    command = "normal! zv"
+})
+au("BufWritePre", {
+    group   = augroupWrite,
+    pattern = "*.lua,*.vim",
+    desc     = "Reload configuration after saving lua/vim files",
+    callback = function ()
+        -- Similar work: https://github.com/RRethy/nvim-sourcerer
+        require("reloadConfig").reload()
+    end
+})
 
-  " autocmd BufEnter             *.txt,COMMIT_EDITMSG,index lua require("util").splitExist()
 
-  " autocmd CursorHold            *.c,*.h,*.cpp,*.cc,*.vim :call HLCIOFunc()
-    autocmd FileType              java setlocal includeexpr=substitute(v:fname,'\\.','/','g')
-    autocmd FileType              git  setlocal nofoldenable
-    autocmd FileType              json setlocal conceallevel=0 concealcursor=
+au("BufWinEnter", {
+    desc     = "Place the cursor on the last position",
+    callback = function ()
+        -- Credit: https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
+        require("buf.action.cursorRecall").main()
+    end
+})
 
-    " Related work: https://github.com/RRethy/nvim-sourcerer
-    autocmd BufWritePost          *.lua,*.vim lua require("reloadConfig").reload()
-    augroup END
-    ]]
-end
+au("FocusGained", {
+    desc    = "Check and file changes after regaining focus",
+    command = "checktime"
+})
+
+au("BufLeave", {
+    desc    = "Record the current window id before leaving the current buffer",
+    callback = function ()
+        if not vim.bo.buflisted then return end
+        local bufNr = api.nvim_get_current_buf()
+        local bufName = api.nvim_buf_get_name(bufNr)
+        local bufType = vim.bo.buftype
+        local winID = api.nvim_get_current_win()
+        local winConfig = api.nvim_win_get_config(winID)
+        -- Non-float window and non-special buffer type and non-scratch buffer file
+        if winConfig.relative == "" and bufType == "" and bufName ~= "" then
+            _G._lastWinID = winID
+        end
+        -- DEBUG:
+        -- if winConfig.relative == "" then
+            -- if bufType == "" then
+                -- if  bufName ~= "" then
+                    -- M.lastWinID = winID
+                -- else
+                    -- vim.notify("Switch from scratch buffer", vim.log.levels.WARN)
+                -- end
+            -- else
+                -- vim.notify("Switch from special buffer", vim.log.levels.WARN)
+            -- end
+        -- else
+            -- vim.notify("Switch from relative window", vim.log.levels.WARN)
+        -- end
+    end
+})
+
+au("BufWinEnter", {
+    desc     = "Place the cursor on the last position",
+    callback = function ()
+        -- Credit: https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
+        require("buf.action.cursorRecall").main()
+    end
+})
+
+
+-- autocmd BufAdd               * lua require("consistantTab").adaptBufTab()
+-- autocmd BufEnter             *.txt,COMMIT_EDITMSG,index lua require("util").splitExist()
+
+-- autocmd CursorHold            *.c,*.h,*.cpp,*.cc,*.vim :call HLCIOFunc()
 -- }}} Auto commands
 
 -- Commands {{{
-vim.cmd [[
-command! -nargs=+ -complete=command  Echo PP strftime('%c') . ": " . <args>
-command! -nargs=+ -complete=command  Redir call luaeval('require("buf.action.redir").catch(_A)', <q-args>)
-command! -nargs=0 -range ExtractSelection lua require("extractSelection").main(vim.fn.visualmode())
-command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | setl norevins
-command! -nargs=0 CD     execute "cd " . expand("%:p:h")
-command! -nargs=0 E      up | mkview | e! | loadview
-command! -nargs=0 O      browse oldfiles
-command! -nargs=0 Dofile lua require("reloadConfig").luaLoadFile()
-
-command! -nargs=0 MyVimedit edit    $MYVIMRC
-command! -nargs=0 MyVimsrc  luafile $MYVIMRC
-
-command! -nargs=0 -range DeleteEmptyLines '<,'>g#^\s*$#d
-
-command! -nargs=0 TrimSpaces              call TrimSpaces()
-command! -nargs=0 TrimSpacesToggle        lua  if type(TrimSpacesChk) == "nil" then TrimSpacesChk = TrimSpacesChk or true end; TrimSpacesChk = not TrimSpacesChk; vim.api.nvim_echo({{string.format("%s",TrimSpacesChk), "Moremsg"}}, false, {})
-command! -nargs=0 TrailingEmptyLineToggle lua  if type(TrailEmptyLineChk) == "nil" then TrailEmptyLineChk = TrailEmptyLineChk or true end; TrailEmptyLineChk = not TrailEmptyLineChk; vim.api.nvim_echo({{string.format("%s",TrailEmptyLineChk), "Moremsg"}}, false, {})
-
-command! -nargs=+ -bang Cfilter call v:lua.qFilter(v:true,  <q-args>, <q-bang>)
-command! -nargs=+ -bang Lfilter call v:lua.qFilter(v:false, <q-args>, <q-bang>)
-
-command! -nargs=0 -range Reverse     lua require("selection").mirror()
-command! -nargs=0 -range Runselected lua require("selection").runSelected()
-]]
 if jit.os == "Windows" then
-    vim.cmd [[command! -nargs=0 PS terminal powershell]]
+    excmd("PS", [[terminal powershell]], {
+        desc     = "Open powershell",
+        nargs    = 0,
+    })
 end
--- }}} Commands
 
+excmd("Echo", [[PP strftime('%c') . ": " . <args>]], {
+    desc     = "Echo from Scriptease plug-ins",
+    nargs    = "+",
+    complete = "command",
+})
+
+excmd("Redir", function(opts)
+    require("buf.action.redir").catch(opts.args)
+end, {
+    desc     = "Echo from Scriptease plug-ins",
+    nargs    = "+",
+    complete = "command",
+})
+
+excmd("ExtractSelection", function()
+    require("extractSelection").main(vim.fn.visualmode())
+end, {
+    desc     = "Extract selection to a new file",
+    range    = true,
+    nargs    = 0,
+})
+
+-- command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | setl norevins
+excmd("Reverse", function()
+    require("selection").mirror()
+end, {
+    desc     = "Reverse selection",
+    range    = true,
+    nargs    = 0,
+})
+
+excmd("RunSelection", function()
+    require("selection").runSelected()
+end, {
+    desc     = "Run selection in lua syntax",
+    range    = true,
+    nargs    = 0,
+})
+
+excmd("Cfilter", function(opts)
+    qFilter(true,  opts.args, opts.bang)
+end, {
+    desc  = "Filter quickfix window",
+    bang  = true,
+    nargs = "+",
+})
+
+excmd("Lfilter", function(opts)
+    qFilter(true,  opts.args, opts.bang)
+end, {
+    desc  = "Filter localfix window",
+    bang  = true,
+    nargs = "+",
+})
+
+excmd("CD", [[execute "lcd " . expand("%:p:h")]], {
+    desc  = "Change the current working directory to the current buffer locally",
+    nargs = 0,
+})
+
+excmd("E", function (opts)
+    vim.cmd [[noa mkview]]
+    if not opts.bang then
+        vim.cmd [[update! | e]]
+    else
+        vim.cmd [[e!]]
+    end
+    vim.cmd [[loadview]]
+end, {
+    desc  = "Reopen the the current file while maintaining the window layout",
+    bang  = true,
+    nargs = 0,
+})
+
+excmd("O", [[browse oldfiles]], {
+    desc  = "Browse the oldfiles then prompt",
+    nargs = 0,
+})
+
+excmd("Dofile", function ()
+    require("reloadConfig").luaLoadFile()
+end, {
+    desc  = "Reload the current file in lua/vim runtime",
+    nargs = 0,
+})
+
+excmd("O", [[browse oldfiles]], {
+    desc  = "Browse the oldfiles then prompt",
+    nargs = 0,
+})
+
+excmd("OnSaveTrimSpaces", function ()
+    _G._trimSpacesChk = _G._trimSpacesChk or true
+    _G._trimSpacesChk = not _G._trimSpacesChk
+    vim.api.nvim_echo({ { string.format("OnSaveTrimSpaces: %s", _G._trimSpacesChk), "Moremsg" } }, false, {})
+end, {
+    desc  = "Toggle trimming spaces on save",
+    nargs = 0,
+})
+
+excmd("TrimBufferSpaces", function ()
+    require("util").trimSpaces()
+end, {
+    desc  = "Toggle trimming spaces on save",
+    nargs = 0,
+})
+-- }}} Commands

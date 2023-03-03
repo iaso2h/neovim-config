@@ -254,22 +254,6 @@ end
 -- }}} Match enhance
 
 
-function M.trailingEmptyLine() -- {{{
-    if vim.bo.modified == false then return end
-
-    if type(TrailEmptyLineChk) == "nil" then
-        TrailEmptyLineChk = TrailEmptyLineChk or false
-    end
-    if not TrailEmptyLineChk then return end
-
-    -- if api.nvim_buf_get_lines(0, -2, -1, false)[1] ~= "" then
-        -- local saveView = fn.winsaveview()
-        -- vim.cmd('keepjumps normal! G')
-        -- api.nvim_put({""}, "l", true, false)
-        -- fn.winrestview(saveView)
-    -- end
-end -- }}}
-
 ----
 -- Function: M.trimSpaces :Trim all trailing white spaces in current buffer
 --
@@ -280,10 +264,8 @@ end -- }}}
 -- @return:       return table of trimmed string, otherwise return 0
 ----
 function M.trimSpaces(strTbl, silent, prefix) -- {{{
-    if type(TrimSpacesChk) == "nil" then
-        TrimSpacesChk = TrimSpacesChk or true
-    end
-    if not TrimSpacesChk then return end
+    _G._trimSpacesChk = _G._trimSpacesChk or true
+    if not _G._trimSpacesChk then return end
 
     if vim.bo.modified == false then return end
 
@@ -741,32 +723,6 @@ end
 ---@return string Corresonding line indent
 M.indentCopy = function(lineNr)
     return string.rep(" ", fn.indent(lineNr))
-end
-
-
-M.getLastWinID = function ()
-    local bufNr = api.nvim_get_current_buf()
-    local bufName = api.nvim_buf_get_name(bufNr)
-    local bufType = vim.bo.buftype
-    local winID = api.nvim_get_current_win()
-    local winConfig = api.nvim_win_get_config(winID)
-    -- Non-float window and non-special buffer type and non-scratch buffer file
-    if winConfig.relative == "" and bufType == "" and bufName ~= "" then
-        M.lastWinID = winID
-    end
-    -- if winConfig.relative == "" then
-        -- if bufType == "" then
-            -- if  bufName ~= "" then
-                -- M.lastWinID = winID
-            -- else
-                -- vim.notify("Switch from scratch buffer", vim.log.levels.WARN)
-            -- end
-        -- else
-            -- vim.notify("Switch from special buffer", vim.log.levels.WARN)
-        -- end
-    -- else
-        -- vim.notify("Switch from relative window", vim.log.levels.WARN)
-    -- end
 end
 
 

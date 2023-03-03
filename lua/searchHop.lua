@@ -57,7 +57,8 @@ end
 --- Execute ex command then center the screent situationally
 ---@param exCMD string Ex command
 ---@param feedkeyChk boolean Use the ex command to feed keys
-M.centerHop = function(exCMD, feedkeyChk)
+---@param suppressMsgChk boolean
+M.centerHop = function(exCMD, feedkeyChk, suppressMsgChk)
     local winID     = api.nvim_get_current_win()
     local prevBufNr = api.nvim_get_current_buf()
 
@@ -66,7 +67,7 @@ M.centerHop = function(exCMD, feedkeyChk)
         api.nvim_feedkeys(exCMD, "n", true)
     else
         local ok, msg = pcall(vim.cmd, "norm! " .. exCMD)
-        if not ok then
+        if not ok and suppressMsgChk then
             local idx = select(2,string.find(msg, "E%d+: "))
             msg = string.sub(msg, idx + 1, -1)
             vim.notify(msg, vim.log.levels.INFO)
