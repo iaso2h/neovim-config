@@ -15,7 +15,7 @@ function M.main(selectText)
         local urlStart
         local urlEnd
         local curLine
-        local sep = jit.os == "Windows" and "\\" or "/"
+        local sep = _G._os == "Windows" and "\\" or "/"
 
         if fn.expand("%:p") == fn.stdpath("config") .. string.format("%slua%score%splugins.lua", sep, sep, sep) then
             -- Support for jumping to neovim plugin in github.com
@@ -90,9 +90,9 @@ function M.main(selectText)
 
     -- Visual mode with selected text provided
     else
-        if jit.os == "Windows" then
+        if _G._os == "Windows" then
             fn.system("explorer " .. selectText)
-        elseif jit.os == "Linux" then
+        elseif _G._os == "Linux" then
             if fn.expand("%:p") == fn.stdpath("config") .. "/lua/core/plugins.lua" then
                 selectText = "https://github.com/" .. selectText
             end

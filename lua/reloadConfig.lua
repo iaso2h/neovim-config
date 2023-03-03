@@ -27,7 +27,7 @@ local configPathForceDirLoadTbl    = {configPath:joinpath("lua", "onenord")}
 local configPathForceDirLoadStrTbl = vim.tbl_map(function (i)
     return i.filename end, configPathForceDirLoadTbl)
 local luaModulePath       = configPath:joinpath("lua")
-local sep                 = jit.os == "Windows" and "\\" or "/"
+local sep                 = _G._os == "Windows" and "\\" or "/"
 
 
 local function upperCaseWindowsDrive(fullPathStr)
@@ -319,7 +319,7 @@ local luaChkLoadedOpenAndMod = function (fileStrs)
     for _, s in ipairs(fileStrs) do
         for _, n in ipairs(bufNrTbl) do
             local bufName = api.nvim_buf_get_name(n)
-            if jit.os == "Windows" then
+            if _G._os == "Windows" then
                 bufName = upperCaseWindowsDrive(bufName)
             end
             if n ~= bufNrCur and string.match(bufName, s) and
@@ -400,7 +400,7 @@ M.luaLoadFile = function(luaModule, checkLuaDir) -- {{{
     if not path then return end
     if not luaModule then
         luaModule = fn.expand("%:p")
-        if jit.os == "Windows" then
+        if _G._os == "Windows" then
             luaModule = upperCaseWindowsDrive(luaModule)
         end
     end
@@ -416,7 +416,7 @@ M.luaLoadFile = function(luaModule, checkLuaDir) -- {{{
         srcPath = path:new(luaModule)
         assert(srcPath:is_file(), "Invalid string of file path")
 
-        if jit.os ~= "Windows" then
+        if _G._os ~= "Windows" then
             assert(string.match(srcPath.filename, luaModulePath.filename) and
                 vim.endswith(srcPath.filename, ".lua"), "Unsuppoted file path")
         else
@@ -605,7 +605,7 @@ M.reload = function() -- {{{
     if not path then return end
     local srcFullPathStr = fn.expand("%:p")
     -- Uppercase the first character in Windows
-    if jit.os == "Windows" then
+    if _G._os == "Windows" then
         srcFullPathStr = upperCaseWindowsDrive(srcFullPathStr)
     end
     local srcPath = path:new(srcFullPathStr)

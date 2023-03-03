@@ -55,9 +55,9 @@ function M.openTerminal(newBufNr) -- {{{
         -- Clear the scratch buffer
         cmd("noa bwipe! " .. newBufNr)
     else                         -- Create new buffer instance
-        if jit.os == "Windows" then
+        if _G._os == "Windows" then
             cmd "terminal powershell"
-        elseif jit.os == "Linux" then
+        elseif _G._os == "Linux" then
             cmd "terminal"
         end
     end

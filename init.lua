@@ -7,11 +7,12 @@ if vim.fn.has("nvim-0.8.3") ~= 1 then
     return
 end
 
--- GUI Detection
-_G.isTerm = vim.api.nvim_list_uis()[1].ext_termcolors
+pcall(vim.cmd, [[language en_US]])
 
--- Build-in plugin {{{
--- Disable
+_G._os = vim.loop.os_uname().sysname
+_G._isTerm = vim.api.nvim_list_uis()[1].ext_termcolors
+
+-- Disable build-in plugin
 vim.g.loaded_2html_plugin      = 1
 vim.g.loaded_getscript         = 1
 vim.g.loaded_getscriptPlugin   = 1
@@ -45,7 +46,6 @@ vim.g.load_doxygen_syntax= 1
 vim.g.doxygen_enhanced_color = 1
 -- msql.vim
 vim.g.msql_sql_query = 1
--- }}} Build-in plugin
 
 local ok, msg = pcall(require, "util"); if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 ok, msg = pcall(require, "keymapUtil"); if not ok then vim.notify(msg, vim.log.levels.ERROR) end

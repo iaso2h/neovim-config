@@ -142,7 +142,7 @@ local fileInfo = function()
 
         fileStr = tightWinChk and fn.pathshorten(fileStr, 1) or fileStr
     else
-        local sep = jit.os == "Windows" and "\\" or "/"
+        local sep = _G._os == "Windows" and "\\" or "/"
 
         fileStr = string.format("..%s%s", sep, vim.fn.expand("%:t"))
         -- 11 is what vimmode text is command plus space of icons
@@ -214,7 +214,7 @@ gls.left[1] = { -- {{{
 
             changeHLColor("GalaxyVimMode")
 
-            if not isTerm then
+            if not _G._isTerm then
                 return string.format("  %s %s ", require("nvim-nonicons").get("vim"), alias[vimMode])
             else
                 if vimMode == "t" or vimMode == "!" then

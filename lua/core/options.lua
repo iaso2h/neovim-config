@@ -18,8 +18,8 @@ opt.shiftwidth  = 4
 opt.softtabstop = 4
 opt.tabstop     = 4
 
-if jit.os == "Windows" then
-    -- o.clipboard = "unnamed"
+if _G._os == "Windows" then
+    o.clipboard = "unnamed"
 else
     opt.clipboard = "unnamed,unnamedplus"
 end
@@ -118,7 +118,7 @@ opt.guifont = string.format("%s%s:h%s", GuiFont, GuiFallbackFont, GuiFontSize)
 opt.guicursor = "n-v-sm:block,i-c-ci-ve:ver25,r-cr:hor20,o:hor50"
 -- }}} Basic settings
 -- OS varied settings {{{
-if jit.os == "Windows" then
+if _G._os == "Windows" then
     -- o.shell="powershell"
     -- o.shellquote="shellpipe= shellxquote="
     -- o.shellcmdflag="-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command"
@@ -133,7 +133,7 @@ if jit.os == "Windows" then
             api.nvim_err_write("Python path not found\n")
         end
     end
-elseif jit.os == "Linux" then
+elseif _G._os == "Linux" then
     local linuxPython = "/usr/bin/python3"
     api.nvim_set_var("python3_host_prog", linuxPython)
     if fn.executable(linuxPython) == 0 then

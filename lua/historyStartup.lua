@@ -27,7 +27,7 @@ M.display = function(force)
     if vim.bo.filetype == "HistoryStartup" then return end
 
     for _, fileStr in pairs(vim.v.oldfiles) do
-        if jit.os ~= "Windows" then
+        if _G._os ~= "Windows" then
             if vim.loop.fs_stat(fileStr) then
                 table.insert(lines, fileStr)
             end

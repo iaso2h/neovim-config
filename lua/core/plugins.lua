@@ -13,7 +13,7 @@ local configPath = fn.stdpath("config")
 
 packer.init{
     package_root = configPath .. "/pack",
-    compile_path = string.format("%s/lua/packer_compiled_%s.lua", configPath, isTerm and "term" or "gui")
+    compile_path = string.format("%s/lua/packer_compiled_%s.lua", configPath, _G._isTerm and "term" or "gui")
 }
 
 packer.startup{function(use, use_rocks)
@@ -524,7 +524,7 @@ use {
     }
     use {
         'yamatsum/nvim-nonicons',
-        disable = isTerm,
+        disable = _G._isTerm,
         after   = "nvim-web-devicons",
         config  = [[require("nvim-nonicons").setup()]]
     }
@@ -648,7 +648,7 @@ use {
         "L3MON4D3/LuaSnip",
         run      = "make install_jsregexp",
         config = function ()
-            local sep = jit.os == "Windows" and "\\" or "/"
+            local sep = _G._os == "Windows" and "\\" or "/"
             local mySnippets = vim.fn.stdpath("config") .. sep .. "snippets"
             require("luasnip.loaders.from_vscode").lazy_load()
             require("luasnip.loaders.from_vscode").lazy_load { paths = { mySnippets } }
@@ -693,9 +693,9 @@ use {
         event = "InsertEnter",
         after = "nvim-cmp",
         run = function()
-            if jit.os == "Windows" then
+            if _G._os == "Windows" then
                 vim.cmd "!powershell ./install.ps1'"
-            elseif jit.os == "linux" then
+            elseif _G._os == "linux" then
                 vim.cmd "!./install.sh"
             end
         end,
@@ -705,9 +705,9 @@ use {
         event = "InsertEnter",
         after = "nvim-cmp",
         run = function()
-            if jit.os == "Windows" then
+            if _G._os == "Windows" then
                 vim.cmd "!powershell ./install.ps1'"
-            elseif jit.os == "linux" then
+            elseif _G._os == "linux" then
                 vim.cmd "!./install.sh"
             end
         end,
@@ -959,7 +959,7 @@ use {
     }
     use {
         'michaelb/sniprun',
-        disable = jit.os == "Windows",
+        disable = _G._os == "Windows",
         run    = 'bash ./install.sh',
         cmd    = {"SnipRun", "SnipReset", "SnipReplMemoryClean", "SnipTerminate", "SnipInfo", "SnipClose"},
         config = conf "nvim-sniprun"
@@ -1007,8 +1007,8 @@ use {
         disable = ex("lazygit"),
         setup = [[vim.g.conflict_marker_enable_mappings = 0; vim.g.conflict_marker_enable_highlight = 1]],
         config = function ()
-            map("x", "]x", [[<Plug>(conflict-marker-next-hunk)]])
-            map("x", "[x", [[<Plug>(conflict-marker-prev-hunk)]])
+            map("x", "]x", [[<Plug>(conflict-marker-next-hunk)]], "Next conflict marker")
+            map("x", "[x", [[<Plug>(conflict-marker-prev-hunk)]], "Previous conflict marker")
         end
         -- disable = true,
         -- keys    = "}x, ]x, ct, co, cn, cb",

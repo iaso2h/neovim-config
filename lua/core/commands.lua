@@ -69,7 +69,7 @@ if not vim.g.vscode then
 end
 
 
-if isTerm then
+if _G._isTerm then
     vim.cmd [[
     function! RemoveLastPathComponent()
         let l:cmdlineBeforeCursor = strpart(getcmdline(), 0, getcmdpos() - 1)
@@ -197,7 +197,7 @@ au("BufWinEnter", {
 -- }}} Auto commands
 
 -- Commands {{{
-if jit.os == "Windows" then
+if _G._os == "Windows" then
     excmd("PS", [[terminal powershell]], {
         desc     = "Open powershell",
         nargs    = 0,

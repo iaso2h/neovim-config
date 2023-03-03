@@ -172,7 +172,7 @@ M.config = function()
         }
         -- TODO: breaking change in clangd path
         local binaryExt       = {macOS = "", Linux = "", Windows = ".exe"}
-        local sep             = jit.os == "Windows" and "\\" or "/"
+        local sep             = _G._os == "Windows" and "\\" or "/"
         local dataPath   = path:new(fn.stdpath("data"))
         local clangdGenericPath = dataPath:joinpath("lsp_servers/clangd")
         local clangdPathStr     = fn.glob(clangdGenericPath.filename .. sep .. "clangd_*")
@@ -180,7 +180,7 @@ M.config = function()
             return {}
         else
             local clangdBinPath = path:new(clangdPathStr):joinpath("bin", "clangd")
-            local clangdBinStr  = clangdBinPath.filename .. binaryExt[jit.os]
+            local clangdBinStr  = clangdBinPath.filename .. binaryExt[_G._os]
             table.insert(cmdStr, 1, clangdBinStr)
             return cmdStr
         end
