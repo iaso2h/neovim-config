@@ -247,10 +247,10 @@ map("n", [[<A-i>]], [[<CMD>lua require("searchHop").centerHop("g,", false, false
 map("n", [[<C-o>]], [[<CMD>lua require("searchHop").centerHop("<C-o>", true, false)<CR>]], {"silent"}, "Older jump")
 map("n", [[<C-i>]], [[<CMD>lua require("searchHop").centerHop("<C-i>", true, false)<CR>]], {"silent"}, "Newer jump")
 -- Swap default mapping
-map("n", [[*]],  [[g*:lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> forward")
-map("n", [[#]],  [[g#:lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> back")
-map("n", [[g#]], [[#:lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
-map("n", [[g*]], [[*:lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
+map("n", [[*]],  [[g*zv:lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> forward")
+map("n", [[#]],  [[g#zv:lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> back")
+map("n", [[g#]], [[#zv:lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
+map("n", [[g*]], [[*zv:lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
 -- Search visual selected
 map("x", [[/]], [[:lua require("searchHop").searchSelected("/")<CR>]], {"silent"}, "Search selected forward")
 map("x", [[?]], [[:lua require("searchHop").searchSelected("?")<CR>]], {"silent"}, "Search selected backward")
@@ -313,9 +313,11 @@ map({"n", "x"}, [[<C-d>]], [[<C-e>]], {"noremap"}, "Scroll down")
 map("t", [[<C-e>]], [[<C-\><C-n><C-y>]], "Scroll up")
 map("t", [[<C-d>]], [[<C-\><C-n><C-d>]], "Scroll down")
 
-map({"n", "x"}, [[<A-e>]], [[<PageUp>]],   "Scroll one window up")
-map({"n", "x"}, [[<A-d>]], [[<PageDown>]], "Scroll one window down")
-map("t", [[<A-e>]], [[<C-\><C-n><PageUp>]], "Scroll one window up")
+map({"n", "x"}, [[%]], [[M]], {"noremap"}, "Jump to the middle of the screen")
+
+map({"n", "x"}, [[<A-e>]], [[<PageUp>]],      "Scroll one window up")
+map({"n", "x"}, [[<A-d>]], [[<PageDown>]],    "Scroll one window down")
+map("t", [[<A-e>]], [[<C-\><C-n><PageUp>]],   "Scroll one window up")
 map("t", [[<A-d>]], [[<C-\><C-n><PageDown>]], "Scroll one window down")
 
 -- Macro

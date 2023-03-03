@@ -17,4 +17,5 @@ if not TelescopeOverrideBufMap then
 end
 
 
+-- TODO: Open in floating win or newtab
 TelescopeOverrideBufMap("n", [[?]], [[:<C-u>Redir lua Print(require("telescope.actions.state").get_selected_entry())<CR>]])

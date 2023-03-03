@@ -1,4 +1,26 @@
-return function()
+local M = { }
+
+M.filetypeSetup = function ()
+    local winInfo = vim.fn.getwininfo()
+    for _, win in ipairs(winInfo) do
+        local ft = vim.api.nvim_buf_get_option(win.bufnr, "filetype")
+        if tbl_idx(require("config.nvim-galaxyline").shortLineList, ft, false) then
+            vim.api.nvim_win_set_option(win.winid, "cursorline", false)
+            if ft == "dap-repl" then
+                vim.api.nvim_create_autocmd("BufEnter",{
+                    buffer  = win.bufnr,
+                    desc    = "Start insert mode in dap-repl window",
+                    command = "startinsert"
+                })
+            end
+        end
+    end
+
+    M.filetypeSetupChk = true
+end
+
+M.config = function()
+    local M     = require("config.nvim-dap-ui")
     local icon  = require("util.icon")
     local dapui = require("dapui")
     local dap   = require("dap")
@@ -95,20 +117,7 @@ return function()
     dap.listeners.after.event_initialized["dapui_config"] = function()
         dapui.open()
 
-        local winInfo = vim.fn.getwininfo()
-        for _, win in ipairs(winInfo) do
-            local ft = vim.api.nvim_buf_get_option(win.bufnr, "filetype")
-            if tbl_idx(require("config.nvim-galaxyline").shortLineList, ft, false) then
-                vim.api.nvim_win_set_option(win.winid, "cursorline", false)
-                if ft == "dap-repl" then
-                    vim.api.nvim_create_autocmd("BufEnter",{
-                        buffer  = win.bufnr,
-                        desc    = "Start insert mode in dap-repl window",
-                        command = "startinsert"
-                    })
-                end
-            end
-        end
+        M.filetypeSetup()
     end
 
     -- local onMove = function (signal)
@@ -119,5 +128,10 @@ return function()
     -- dap.listeners.before.event_terminated['dapui_config'] = function() dapui.close() end
     -- dap.listeners.before.event_exited['dapui_config'] = function() dapui.close() end
 
-    map("n", [[<C-w>d]], [[<CMD>lua require("dapui").toggle {layout=nil,reset=true} end<CR>]], {"silent"}, "Dap UI toggle")
+    map("n", [[<C-w>d]], [[<CMD>lua require("dapui").toggle {layout=nil,reset=true}<CR>]], {"silent"}, "Dap UI toggle")
+
+    M.filetypeSetup()
 end
+
+
+return M

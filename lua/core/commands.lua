@@ -203,6 +203,11 @@ if jit.os == "Windows" then
     })
 end
 
+excmd("W", [[noa w]], {
+    desc     = "Write without autocmd",
+    nargs    = 0,
+})
+
 excmd("DeleteEmptyLines", [['<,'>g#^\s*$#d]], {
     desc     = "Delete empty lines from selection",
     nargs    = 0,

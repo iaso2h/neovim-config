@@ -254,7 +254,7 @@ use {
     use {
         'AndrewRadev/switch.vim',
         cmd   = "Switch",
-        setup = 'map("n", [[gt]], [[<CMD>Switch<CR>]], {"silent"}, "Switch word under cursor")'
+        setup = 'map("n", [[<leader>s]], [[<CMD>Switch<CR>]], {"silent"}, "Switch word under cursor")'
     }
     use {
         'machakann/vim-sandwich',
@@ -377,18 +377,6 @@ use {
         end
     }
     use {
-        'mg979/vim-visual-multi',
-        keys = {
-                {"n", ",j"},
-                {"n", ",k"},
-                {"n", ",m"},
-                {"n", ",a"},
-                {"n", ",d"}
-            },
-        setup  = conf("vim-visual-multi").setup,
-        config = conf("vim-visual-multi").config
-    }
-    use {
         'ahmedkhalf/project.nvim',
         event  = "BufAdd",
         config = function()
@@ -412,42 +400,6 @@ use {
             vim.g.rooter_cd_cmd        = "lcd"
             vim.g.rooter_silent_chdir  = 1
             vim.g.rooter_resolve_links = 1
-        end
-    }
-    -- BUG:
-    use {
-        'windwp/nvim-autopairs',
-        disable = true,
-        require = "nvim-treesitter",
-        config  = function()
-            require('nvim-autopairs').setup {
-                disable_filetype        = {"TelescopePrompt", "dap-repl"},
-                disable_in_macro        = true,
-                disable_in_visualblock  = false,
-                disable_in_replace_mode = true,
-                ignored_next_char         = [=[[%w%%%'%[%"%.%`%$]]=],
-                enable_moverighR          = true,
-                enable_afterquote         = true,   -- add bracket pairs after quote
-                enable_check_bracket_line = true,  -- check bracket in same line
-                enable_bracket_in_quote   = true,
-                enable_abbr               = true, -- trigger abbreviation
-                break_undo = true, -- switch for basic rule break undo sequence
-                check_ts   = false,
-                map_cr  = true,
-                map_bs  = true,
-                map_c_h = false,
-                map_c_w = false,
-                fast_wrap = {
-                    map            = '<M-e>',
-                    chars          = {'{', '[', '(', '"', "'"},
-                    pattern        = [=[[%'%"%>%]%)%}%,]]=],
-                    end_key        = '$',
-                    keys           = 'qwertyuiopzxcvbnmasdfghjkl',
-                    check_comma    = true,
-                    highlight      = 'Search',
-                    highlight_grey = 'Comment'
-                },
-            }
         end
     }
     use {
@@ -516,6 +468,7 @@ use {
         'szw/vim-maximizer',
         keys = {
             {"n", [[<C-w>m]]},
+            {"i", [[<C-w>m]]},
             {"x", [[<C-w>m]]},
             {"t", [[<C-w>m]]},
         },
@@ -523,6 +476,7 @@ use {
         config = function()
             map({"n", "x"},  [[<C-w>m]], [[<CMD>MaximizerToggle<CR>]],  {"silent"}, "Maximize window")
             map("t",         [[<C-w>m]], [[<A-n>:MaximizerToggle<CR>]], {"silent"}, "Maximize window")
+            map("i",         [[<C-w>m]], [[<C-o>:MaximizerToggle<CR>]], {"noremap", "silent"}, "Maximize window")
         end
     }
     use {
@@ -585,7 +539,7 @@ use {
         config = conf "nvim-galaxyline".config
     }
     use {
-        'noib3/nvim-cokeline',
+        'iaso2h/nvim-cokeline',
         after  = "nvim-web-devicons",
         config = conf "nvim-cokeline"
     }
@@ -701,8 +655,33 @@ use {
         end
     }
     use {
+        'windwp/nvim-autopairs',
+        after  = {"nvim-treesitter"},
+        config = function()
+            require('nvim-autopairs').setup {
+                disable_filetype        = {"TelescopePrompt", "dap-repl"},
+                disable_in_macro        = true,
+                disable_in_visualblock  = false,
+                disable_in_replace_mode = true,
+                ignored_next_char         = [=[[%w%%%'%[%"%.%`%$]]=],
+                enable_moveright          = true,
+                enable_afterquote         = true,   -- add bracket pairs after quote
+                enable_check_bracket_line = true,   -- check bracket in same line
+                enable_bracket_in_quote   = false,
+                enable_abbr               = false,  -- trigger abbreviation
+                break_undo = true, -- switch for basic rule break undo sequence
+                check_ts   = true,
+                map_cr  = true,
+                map_bs  = true,
+                map_c_h = false,
+                map_c_w = false,
+                fast_wrap = {},
+            }
+        end
+    }
+    use {
         'hrsh7th/nvim-cmp',
-        after    = "LuaSnip",
+        after    = {"LuaSnip", "nvim-autopairs"},
         config   = conf "nvim-cmp"
     }
     use {
@@ -887,7 +866,7 @@ use {
     use {
         'rcarriga/nvim-dap-ui',
         after  = "nvim-dap",
-        config = conf "nvim-dap-ui"
+        config = conf "nvim-dap-ui".config
     }
     use {
         -- TODO: hlGroup
@@ -989,6 +968,10 @@ use {
     -- }}} Debug
     -- Language support {{{
     -- Lua
+    use {
+        'rohanorton/lua-gf.nvim',
+        ft = "lua"
+    }
     use {
         'davisdude/vim-love-docs',
         disable = true,

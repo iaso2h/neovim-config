@@ -49,6 +49,7 @@ local defaultTheme = {
     -- Developer configurations: Not meant for general override
     buffer_previewer_maker = require("telescope.previewers").buffer_previewer_maker,
 
+    -- Ation list: https: //github.com/nvim-telescope/telescope.nvim/blob/master/lua/telescope/actions/init.lua
     mappings = {
         i = {
             ["<C-u>"]     = false,
@@ -73,13 +74,14 @@ local defaultTheme = {
             ["<C-v>"]     = actions.select_vertical,
             ["<C-t>"]     = actions.select_tab,
 
-            ["<Tab>"]     = actions.toggle_selection + actions.move_selection_worse,
-            ["<S-Tab>"]   = actions.toggle_selection + actions.move_selection_better,
             ["<C-q>"]     = actions.send_to_qflist + actions.open_qflist,
 
             ["<C-Space>"] = actions.complete_tag,
             ["<C-j>"]     = actions.cycle_history_next,
             ["<C-k>"]     = actions.cycle_history_prev,
+
+            ["<C-f>"]     = actions.results_scrolling_up,
+            ["<C-b>"]     = actions.results_scrolling_down,
 
             ["<A-e>"]     = actions.preview_scrolling_up,
             ["<A-d>"]     = actions.preview_scrolling_down,
@@ -100,9 +102,11 @@ local defaultTheme = {
             ["<C-v>"]   = actions.select_vertical,
             ["<C-t>"]   = actions.select_tab,
 
-            ["<Tab>"]   = actions.toggle_selection + actions.move_selection_worse,
-            ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
-            ["<C-q>"]   = actions.send_selected_to_qflist + actions.open_qflist,
+            ["v"]         = actions.toggle_selection,
+            ["<Tab>"]     = actions.add_selection,
+            ["<S-Tab>"]   = actions.remove_selection,
+            ["<A-S-Tab>"] = actions.drop_all,
+            ["<C-q>"]     = actions.send_selected_to_qflist + actions.open_qflist,
 
             ["j"]      = actions.move_selection_next,
             ["k"]      = actions.move_selection_previous,
@@ -111,8 +115,10 @@ local defaultTheme = {
             ["gg"]     = actions.move_to_top,
             ["G"]      = actions.move_to_bottom,
 
-            ["<A-e>"]   = actions.preview_scrolling_up,
-            ["<A-d>"]   = actions.preview_scrolling_down,
+            ["<C-f>"] = actions.results_scrolling_up,
+            ["<C-b>"] = actions.results_scrolling_down,
+            ["<A-e>"] = actions.preview_scrolling_up,
+            ["<A-d>"] = actions.preview_scrolling_down,
 
             ["z"]       = actions.move_to_middle,
         },

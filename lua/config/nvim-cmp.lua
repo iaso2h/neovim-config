@@ -2,7 +2,7 @@ return function()
     local cmp     = require("cmp")
     local luasnip = require("luasnip")
 
-    cmp.setup{
+    local configArgs = {
         enabled = function()
             -- Disable it for (telescope)prompt, enable it for dap
             if vim.bo.buftype == "prompt" then
@@ -118,14 +118,23 @@ return function()
         keyword_length   = 2,
         default_behavior = cmp.ConfirmBehavior.Replace,
     }
+-- If you want insert `(` after select function or method item
 
-    require("cmp").setup.filetype(
-        {"dap-repl", "dapui_watches", "dapui_hover"},
+    cmp.setup(configArgs)
+    cmp.setup.filetype(
+        {"dap-repl", "dapui_watches"},
         {
             sources = {
                 { name = "dap" },
             },
         }
     )
+
+    local cmpAutopairs = require("nvim-autopairs.completion.cmp")
+    cmp.event:on(
+        "confirm_done",
+        cmpAutopairs.on_confirm_done()
+    )
+
 end
 

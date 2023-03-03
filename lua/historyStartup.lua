@@ -1,15 +1,15 @@
 -- File: historyStartup
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
--- Version: 0.0.8
--- Last Modified: 2023-2-25
+-- Version: 0.0.9
+-- Last Modified: 2023-3-3
 local api = vim.api
 local fn  = vim.fn
 local M   = {
-    curBuf = nil,
-    lastBuf = nil,
-    curWin = nil,
-    oldBuf = nil
+    curBuf = -1,
+    lastBuf = -1,
+    curWin = -1,
+    oldBuf = -1
 }
 local lines = {"< New Buffer >"}
 

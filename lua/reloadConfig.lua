@@ -6,7 +6,12 @@
 local fn   = vim.fn
 local api  = vim.api
 local cmd  = vim.cmd
-local path = require("plenary.path")
+local ok, path = pcall(require, "plenary.path")
+if not ok then
+    path = nil
+    return
+end
+
 local loop = vim.loop
 local flattenTbl = {}
 local M    = {}
@@ -392,6 +397,7 @@ end
 --- @param checkLuaDir boolean Default is true. Set this to true to check whether the other lua
 ---        module in the same directory
 M.luaLoadFile = function(luaModule, checkLuaDir) -- {{{
+    if not path then return end
     if not luaModule then
         luaModule = fn.expand("%:p")
         if jit.os == "Windows" then
@@ -425,6 +431,8 @@ M.luaLoadFile = function(luaModule, checkLuaDir) -- {{{
                 vim.endswith(srcPath.filename, ".lua"), "Unsuppoted file path")
         end
     else
+        -- TODO: add black list
+        if string.find(luaModule.filename, "nvim-galaxyline") then return end
         srcPath = luaModule
     end
 
@@ -481,6 +489,8 @@ end -- }}}
 --- @param checkLoadedFirst boolean Set this to true to make sure directory
 ---        module is loaded before reloading
 M.luaLoadDir = function(srcPath, dirStr, checkLoadedFirst) -- {{{
+    if not path then return end
+
     assert(type(dirStr) == "string", "Expect string value, got " .. type(dirStr))
     local dirPath = path:new(dirStr)
     assert(dirPath:is_dir() == true, "Invalid dirPath: " .. dirStr)
@@ -592,6 +602,7 @@ end -- }}}
 -- @param module: String value of module path
 ----
 M.reload = function() -- {{{
+    if not path then return end
     local srcFullPathStr = fn.expand("%:p")
     -- Uppercase the first character in Windows
     if jit.os == "Windows" then

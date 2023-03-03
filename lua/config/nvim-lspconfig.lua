@@ -34,38 +34,29 @@ M.config = function()
     ----
 
     local onAttach = function(client, bufNr) -- {{{
-        -- TODO:
-        -- bmap(bufNr, "n", [[<A-n>]],   [[<CMD>lua require("util").addJump(require("illuminate").next_reference, false, {wrap = true})<CR>]],                 {"silent"})
-        -- bmap(bufNr, "n", [[<A-S-n>]], [[<CMD>lua require("util").addJump(require("illuminate").next_reference, false, {reverse = true, wrap = true})<CR>]], {"silent"})
-
         -- Mappings
-        -- bmap(bufNr, "n", [[gd]], require('telescope.builtin').lsp_definitions, "Telescope LSP definition")
-        -- bmap(bufNr, "n", [[gD]], require('telescope.builtin').lsp_type_definitions, "Telescope LSP definition")
-        -- bmap(bufNr, "n", [[gR]], require('telescope.builtin').lsp_references, "Telescope LSP references")
-        -- bmap(bufNr, "n", [[gi]], require('telescope.builtin').lsp_implementations, "Telescope LSP implementation)
         bmap(bufNr, "n", [[<C-f>o]], [[<CMD>lua require('telescope.builtin').lsp_document_symbols()<CR>]],  {"silent"}, "Telescope LSP document symbols")
         bmap(bufNr, "n", [[<C-f>O]], [[<CMD>lua require('telescope.builtin').lsp_workspace_symbols()<CR>]], {"silent"}, "Telescope LSP workspace symbols")
 
-        bmap(bufNr, "n", [=[ga]=],        [[<CMD>lua vim.lsp.buf.code_action()<CR>]],     {"silent"}, "LSP code action")
-        bmap(bufNr, "n", [=[gd]=],        [[<CMD>lua vim.lsp.buf.definition()<CR>]],      {"silent"}, "LSP definition")
-        bmap(bufNr, "n", [=[gD]=],        [[<CMD>lua vim.lsp.buf.type_definition()<CR>]], {"silent"}, "LSP type definition")
-        bmap(bufNr, "n", [=[gi]=],        [[<CMD>lua vim.lsp.buf.implementation()<CR>]],  {"silent"}, "LSP implementation")
-        bmap(bufNr, "n", [=[<leader>D]=], [[<CMD>lua vim.lsp.buf.declaration()<CR>]],     {"silent"}, "LSP documentation")
-        bmap(bufNr, "n", [=[<leader>R]=], function()
-            QuickfixSwitchWin = true
-            vim.lsp.buf.references{includeDeclaration = false}
-        end, "LSP references")
-        bmap(bufNr, "n", "<leader>rn", [[<CMD>lua vim.lsp.buf.rename()<CR>]],           {"silent"}, "LSP rename")
-        bmap(bufNr, "n", [[K]],        [[<CMD>lua vim.lsp.buf.hover()<CR>]],            {"silent"}, "LSP hover")
-        bmap(bufNr, "n", [[<C-p>]],    [[<CMD>lua vim.lsp.buf.signature_help()<CR>]],   {"silent"}, "LSP signature help")
+        bmap(bufNr, "n", [[ga]], [[<CMD>lua vim.lsp.buf.code_action()<CR>]],     {"silent"}, "LSP code action")
+        bmap(bufNr, "n", [[gd]], [[<CMD>lua vim.lsp.buf.definition()<CR>]],      {"silent"}, "LSP definition")
+        bmap(bufNr, "n", [[gD]], [[<CMD>lua vim.lsp.buf.declaration()<CR>]],     {"silent"}, "LSP documentation")
+        bmap(bufNr, "n", [[gt]], [[<CMD>lua vim.lsp.buf.type_definition()<CR>]], {"silent"}, "LSP type definition")
+        bmap(bufNr, "n", [[gi]], [[<CMD>lua vim.lsp.buf.implementation()<CR>]],  {"silent"}, "LSP implementation")
+
+        bmap(bufNr, "n", "<leader>r", [[<CMD>lua vim.lsp.buf.rename()<CR>]],         {"silent"}, "LSP rename")
+        bmap(bufNr, "n", [[K]],       [[<CMD>lua vim.lsp.buf.hover()<CR>]],          {"silent"}, "LSP hover")
+        bmap(bufNr, "n", [[<C-p>]],   [[<CMD>lua vim.lsp.buf.signature_help()<CR>]], {"silent"}, "LSP signature help")
+
+        bmap(bufNr, "n", [[<C-q>r]], [[<CMD>lua vim.lsp.buf.references{includeDeclaration=true}<CR>]], {"silent"}, "LSP references")
         -- bmap(bufNr, "n", [=[<leader>wa]=], vim.lsp.buf.add_workspace_folder, "LSP add workspace folder")
         -- bmap(bufNr, "n", [=[<leader>wr]=], vim.lsp.buf.remove_workspace_folder, "LSP remove workspace folder")
         -- bmap(bufNr, "n", [=[<leader>wl]=], Print(vim.lsp.buf.list_workspace_folders, "LSP list workspace folder")
 
         -- Bring back the gqq for formatting comments and stuff, use <A-f> to
         -- formating file
-        bmap(bufNr, "n", [[<A-f>]],    [[<CMD>lua vim.lsp.buf.format{async=true}<CR>]], {"silent"}, "LSP format")
-        bmap(bufNr, "x", [[<A-f>]],    [[:lua vim.lsp.buf.format{async=true,range=require("config.nvim-lspconfig").getFormatRange()}<CR>]], {"silent"}, "LSP format")
+        bmap(bufNr, "n", [[<A-f>]], [[<CMD>lua vim.lsp.buf.format{async=true}<CR>]], {"silent"}, "LSP format")
+        bmap(bufNr, "x", [[<A-f>]], [[:lua vim.lsp.buf.format{async=true,range=require("config.nvim-lspconfig").getFormatRange()}<CR>]], {"silent"}, "LSP format")
         vim.opt.formatexpr = ""
     end -- }}}
 

@@ -191,6 +191,10 @@ theme.editor =  {
     healthError   = {fg = p.n11, bg = p.n1},
     healthSuccess = {fg = p.n14, bg = p.n1},
     healthWarning = {fg = p.n13, bg = p.n1},
+
+    helpHyperTextEntry = {fg = p.n14, style = "bold"},
+    helpHyperTextJump  = {fg = p.n9, style = "bold"},
+    helpSpecial        = {fg = p.orange,}
 }
 -- }}} Editor highlight
 
@@ -276,7 +280,7 @@ theme.treesitter         = {
     -- @tag.attribute
     -- @string.special
 }
-    theme.treesitter.TSVariableBuiltin    = {fg   = p.white, style  = "bold" }
+    theme.treesitter.TSVariableBuiltin    = {fg   = p.cyan, style  = "bold" }
     theme.treesitter.TSBoolean            = {link = "Boolean"}
     theme.treesitter.TSConstBuiltin       = {fg   = p.orange, style = "bold" }
     theme.treesitter.TSConstMacro         = {fg   = p.orange, style = "bold" }
@@ -297,7 +301,7 @@ theme.treesitter         = {
     -- Function names
     theme.treesitter.TSFunction    = {link = "Function"}      -- For fuction (calls and definitions).
     theme.treesitter.TSMethod      = {link = "Function"}      -- For method calls and definitions.
-    theme.treesitter.TSFuncBuiltin = {fg   = p.cyan, style = "bold"}
+    theme.treesitter.TSFuncBuiltin = {link = "TSVariableBuiltin"}
     -- Namespaces and property accessors
     theme.treesitter.TSNamespace = {fg   = "#00ffe5"}  -- For identifiers referring to modules and namespaces.
     theme.treesitter.TSField     = {fg   = p.n4 }      -- For fields.
@@ -317,7 +321,7 @@ theme.treesitter         = {
     theme.treesitter["@conditional"]      = {link = "Conditional"}
     theme.treesitter["@function"]         = {link = "Function"}
     theme.treesitter["@method"]           = {link = "Function"}
-    theme.treesitter["@function.builtin"] = {link = "TSFuncBuiltin"}
+    theme.treesitter["@function.builtin"] = {link = "TSVariableBuiltin"}
     theme.treesitter["@namespace"]        = {link = "TSNamespace"}
     theme.treesitter["@field"]            = {link = "TSField"}
     theme.treesitter["@property"]         = {link = "TSField"}
