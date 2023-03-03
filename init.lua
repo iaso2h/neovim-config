@@ -7,13 +7,6 @@ if vim.fn.has("nvim-0.8.3") ~= 1 then
     return
 end
 
--- TODO: Interupt when Go and C compiler isn't installed
-
--- local impatient, msg = pcall(require, "impatient")
--- if impatient then
-    -- require("impatient").enable_profile()
--- end
-
 -- GUI Detection
 _G.isTerm = vim.api.nvim_list_uis()[1].ext_termcolors
 

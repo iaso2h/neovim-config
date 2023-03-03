@@ -203,6 +203,12 @@ if jit.os == "Windows" then
     })
 end
 
+excmd("DeleteEmptyLines", [['<,'>g#^\s*$#d]], {
+    desc     = "Delete empty lines from selection",
+    nargs    = 0,
+    range    = true,
+})
+
 excmd("Echo", [[PP strftime('%c') . ": " . <args>]], {
     desc     = "Echo from Scriptease plug-ins",
     nargs    = "+",

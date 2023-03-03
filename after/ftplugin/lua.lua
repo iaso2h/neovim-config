@@ -1,7 +1,7 @@
 -- Overwrite setting set by runtime/ftplugin/lua.vim
-vim.opt.formatoptions = "cr/qn2mM1jpl"
+vim.opt.formatoptions = _G._Myformatoptions
 
-bmap(0, "n", [[gK]],         [[<CMD>lua nlua.keyword_program()<cr>]], {"silent"}, "Lookup in Neovim help")
+bmap(0, "n", [[gK]],         [[<CMD>lua require("luaKeywordHelp")()<cr>]], {"silent"}, "Lookup in Neovim help")
 bmap(0, "n", [[g==]],        [[<plug>(Luadev-RunLine)]],  "Luadev run line")
 bmap(0, "x", [[g=]],         [[<plug>(Luadev-Run)]],      "Luadev runline")
 bmap(0, "n", [[g=iw]],       [[<plug>(Luadev-RunWord)]],  "Luadev run word")

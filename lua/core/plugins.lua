@@ -996,12 +996,6 @@ use {
         ft      = "lua"
     }
     use {
-        'iaso2h/nlua.nvim',
-        branch = "iaso2h",
-        ft     = "lua",
-        config = [[vim.g.nlua_keywordprg_map_key = "<C-S-q>"]]
-    }
-    use {
         'nanotee/luv-vimdocs',
         ft = "lua"
     }

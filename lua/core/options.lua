@@ -55,7 +55,8 @@ opt.foldcolumn = "auto:4"
 opt.signcolumn = "auto:2-4"
 opt.foldmethod = "expr"
 opt.foldexpr   = "EnhanceFoldExpr()"
-opt.formatoptions = "cr/qn2mM1jpl" -- reassignment need to be implemented in after/ftplugin
+_G._Myformatoptions = "cr/qn2mM1jpl"
+opt.formatoptions = _G._Myformatoptions -- NOTE: Might change on loading different types of ftplugins
 
 opt.inccommand = "nosplit"
 opt.gdefault   = true
