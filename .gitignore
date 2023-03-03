@@ -15,4 +15,6 @@ lua/test**
 *.py
 *temp*
 *.snippets
-
+*session*
+.luarc.json
+debug.lua

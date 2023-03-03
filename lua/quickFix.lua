@@ -1,6 +1,6 @@
 -- Author: iaso2h
 -- Description: Cfilter in lua way
--- Version: 0.0.9
+-- Version: 0.0.10
 -- Last Modified: 2023-3-3
 -- TODO: quifix convert into a window localist
 local fn  = vim.fn
@@ -123,9 +123,18 @@ M.cc = function(closeQuickfix, useWinCall) -- {{{
     local qfCursorPos = api.nvim_win_get_cursor(qfWinID)
     local itemNr      = vim.v.count == 0 and qfCursorPos[1] or vim.v.count
     local qfItem      = fn.getqflist()[itemNr]
-    if qfItem.valid == 0 or not api.nvim_buf_is_valid(qfItem.bufnr) then return end
-    if not api.nvim_buf_is_valid(qfItem.bufnr) then vim.notify("Buffer is no longer valid") end
+    if not next(qfItem) then
+        -- qf items are created by pressing gO in help docs?
+        return vim.notify("No qf items available", vim.log.levels.INFO)
+    end
+
+    if qfItem.valid == 0 or not qfItem.bunr or
+            not api.nvim_buf_is_valid(qfItem.bufnr) then
+        return
+    end
+
     -- TODO: highlight the invalid item?
+    if not api.nvim_buf_is_valid(qfItem.bufnr) then vim.notify("Buffer is no longer valid") end
 
     local itemPos = {qfItem.lnum, qfItem.col - 1}
 
@@ -207,9 +216,12 @@ M.info = function () -- {{{
     local qfWinInfo = fn.getwininfo(qfWinId)
     qfWinInfo = #qfWinInfo == 1 and qfWinInfo[1] or qfWinInfo
     local qfBotlineNr = qfWinInfo.botline
+
     local qfItems = fn.getqflist()
     local itemInfo = qfItems[qfCursorPos[1]]
-    local bufName  = fn.bufname(itemInfo.bufnr)
+    local bufName
+    local ok, _  = pcall(fn.bufname, itemInfo.bufnr)
+    if not ok then bufName = "" end
 
     -- Create win
     local padding = string.rep(" ", 1)

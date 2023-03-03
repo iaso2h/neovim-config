@@ -55,6 +55,7 @@ if not vim.g.vscode then
 
     vim.cmd [[
     function! EnhanceFoldExpr()
+        " BUG: let line = nvim_get_current_line()
         let line = getline(v:lnum)
         if match(line, g:enhanceFoldStartPat[&filetype]) > -1
             return "a1"
@@ -153,7 +154,7 @@ au("FocusGained", {
 au("BufLeave", {
     desc    = "Record the current window id before leaving the current buffer",
     callback = function ()
-        if not vim.bo.buflisted then return end
+        -- if not vim.bo.buflisted then return end
         local bufNr = api.nvim_get_current_buf()
         local bufName = api.nvim_buf_get_name(bufNr)
         local bufType = vim.bo.buftype
