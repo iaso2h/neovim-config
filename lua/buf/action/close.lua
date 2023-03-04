@@ -23,7 +23,7 @@ local function saveModified(bufNr) -- {{{
                 ">>> &Save\n&Discard\n&Cancel", 3, "Question")
             vim.cmd "noa echohl None"
             if answer == 1 then
-                vim.cmd "noa update"
+                vim.cmd "noa update!"
                 return true
             elseif answer == 2 then
                 return true
@@ -34,7 +34,6 @@ local function saveModified(bufNr) -- {{{
             return true
         end
     end
-
 end -- }}}
 
 

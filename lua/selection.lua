@@ -62,21 +62,6 @@ function M.cornerSelection(bias) -- {{{
 end -- }}}
 
 
---- Substitute selected area
-M.visualSub = function()
-    ---@diagnostic disable-next-line: param-type-mismatch
-    local str = string.gsub(M.getSelect("string", false), [[\]], [[\\]])
-    api.nvim_feedkeys(string.format([[:s#\V%s]], str), "nt", false)
-end
-
-
-M.mirror = function()
-    cmd("norm! gvd")
-    local keyStr = "i" .. string.reverse(fn.getreg("-", 1)) .. t"<ESC>"
-    api.nvim_feedkeys(keyStr, "tn", true)
-end
-
-
 --- Get the text of selected area
 ---@param returnType string Set to decide to return "string" or "list"
 ---@param exitToNormal boolean Set to decide to return in Normal mode in Neovim
@@ -121,25 +106,6 @@ M.getSelect = function(returnType, exitToNormal) -- {{{
     ---@diagnostic disable-next-line: missing-return
     end
 end -- }}}
-
-
---- Run selected code
-M.runSelected = function()
-    if not vim.bo.filetype == "lua" then
-       return vim.notify("Only support in Lua file", vim.log.levels.WARN)
-    end
-
-    local lineStr = require("selection").getSelect("string", false)
-    local vimMode = fn.visualmode()
-
-    if vimMode == "\22" then
-        return vim.notify("Blockwise visual mode is not supported", vim.log.levels.WARN)
-    elseif vimMode == "V" then
-        lineStr = string.gsub(lineStr, "\n", "")
-    end
-
-    vim.cmd("lua " .. lineStr)
-end
 
 
 return M

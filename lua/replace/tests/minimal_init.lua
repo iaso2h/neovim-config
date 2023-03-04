@@ -11,7 +11,7 @@ vim.opt.runtimepath:append(packagePathHead .. "vim-repeat")
 vim.opt.runtimepath:append(packagePathHead .. "vim-visualrepeat")
 
 require("replace").suppressMessage = true
-require("keymapUtil")
+require("util.keymap")
 
 -- Mapping
 map("n", [[<Plug>ReplaceOperatorInplace]], function ()

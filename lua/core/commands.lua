@@ -1,4 +1,5 @@
 local api = vim.api
+local fn  = vim.fn
 local M = {
     augroup = {}
 }
@@ -127,7 +128,7 @@ au("BufWritePost", {
     desc    = "Avoiding folding after making modification on a buffer for the first time",
     command = "normal! zv"
 })
-au("BufWritePre", {
+au("BufWritePost", {
     group   = augroupWrite,
     pattern = "*.lua,*.vim",
     desc     = "Reload configuration after saving lua/vim files",
@@ -238,16 +239,37 @@ end, {
 })
 
 -- command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | setl norevins
-excmd("Reverse", function()
-    require("selection").mirror()
+excmd("Reverse", function(opts)
+    if opts.range == 0 then return end
+    if fn.visualmode() == "V" then
+        return vim.notify("Not support visual line mode", vim.log.levels.WARN)
+    end
+    vim.cmd("norm! gvd")
+    local keyStr = "i" .. string.reverse(fn.getreg("-", 1)) .. t"<ESC>"
+    api.nvim_feedkeys(keyStr, "tn", true)
 end, {
     desc     = "Reverse selection",
     range    = true,
     nargs    = 0,
 })
 
-excmd("RunSelection", function()
-    require("selection").runSelected()
+excmd("RunSelection", function(opts)
+    if vim.bo.filetype ~= "lua" then
+       return vim.notify("Only support in Lua file", vim.log.levels.WARN)
+    end
+
+    local vimMode = fn.visualmode()
+    if vimMode == "\22" then
+        return vim.notify("Blockwise visual mode is not supported", vim.log.levels.WARN)
+    end
+
+    local lineStr = require("selection").getSelect("string", false)
+    -- TODO: support run multiple lines at the same time
+    if vimMode == "V" then
+        lineStr = string.gsub(lineStr, "\n", "")
+    end
+
+    vim.cmd("lua " .. lineStr)
 end, {
     desc     = "Run selection in lua syntax",
     range    = true,

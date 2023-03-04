@@ -1,9 +1,12 @@
-local cmd = vim.cmd
 local api = vim.api
-local M   = {}
+local M   = {
+    plugMap   = nil,
+    cursorPos = nil,
+    extraArgs = nil
+}
 
 if not LuaExprCallbackSetup then
-    cmd [[
+    vim.cmd [[
     function! LuaExprCallback(...)
         let l:args = deepcopy(a:000)
         call add(l:args, mode())
@@ -16,16 +19,17 @@ end
 function _G.saveCursorPos()
     M.cursorPos = api.nvim_win_get_cursor(0)
 end
---- Expression function that evaluated to return str for mapping
---- @param func            function
---- @param checkModifiable boolean Set this to true if the operator will
----                        modify the buffer
---- @param plugMap         string eg: <Plug>myplug
---- @return string "g@" if successful
+---Expression function that evaluated to return str for mapping
+---@param func            function
+---@param checkModifiable boolean Set this to true if the operator will
+---                       modify the buffer
+---@param plugMap         string e.g: <Plug>myplug
+---@return string "g@" if successful
+-- TODO:use hook func to preserve info
 function M.expr(func, checkModifiable, plugMap)
     if checkModifiable then
         if not vim.o.modifiable or vim.o.readonly then
-            api.nvim_echo({{"Cannot make changes", "MoreMsg"}}, true, {})
+            vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
             return ""
         end
     end
@@ -54,7 +58,7 @@ function M.vMotion(saveCursorChk)
         -- entering commandline mode. Therefor "gv" is exectued here to retrieve it.
         motionType = "line"
         if saveCursorChk then
-            cmd([[noa norm! gvmz]] .. t"<Esc>")
+            vim.cmd([[noa norm! gvmz]] .. t"<Esc>")
             M.cursorPos = api.nvim_buf_get_mark(0, "z")
         end
     elseif visualMode == "\22" then

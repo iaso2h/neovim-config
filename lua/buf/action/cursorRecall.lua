@@ -50,7 +50,7 @@ function M.main()
         end
     else
         -- Jump to recent last change instead
-        require("searchHop").centerHop("g;", false, false)
+        require("searchHop").centerHop("g;", false, true)
     end
 
     if fn.foldclosed('.') ~= -1 then

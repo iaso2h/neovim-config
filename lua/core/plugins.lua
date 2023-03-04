@@ -480,17 +480,6 @@ use {
         end
     }
     use {
-        'simnalamburt/vim-mundo',
-        cmd    = "MundoToggle",
-        keys   = {{"n", "<C-w>u"}},
-        config = function()
-            vim.g.mundo_help               = 1
-            vim.g.mundo_tree_statusline    = 'Mundo'
-            vim.g.mundo_preview_statusline = 'Mundo Preview'
-            map("n", [[<C-W>u]], [[<CMD>MundoToggle<CR>]], {"silent"}, "Open Mundo")
-        end
-    }
-    use {
         'folke/which-key.nvim',
         cmd    = "WhichKey",
         config = conf "nvim-which-key"

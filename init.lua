@@ -12,7 +12,7 @@ pcall(vim.cmd, [[language en_US]])
 _G._os = vim.loop.os_uname().sysname
 _G._isTerm = vim.api.nvim_list_uis()[1].ext_termcolors
 
--- Disable build-in plugin
+-- Disable built-in plugins
 vim.g.loaded_2html_plugin      = 1
 vim.g.loaded_getscript         = 1
 vim.g.loaded_getscriptPlugin   = 1
@@ -48,7 +48,6 @@ vim.g.doxygen_enhanced_color = 1
 vim.g.msql_sql_query = 1
 
 local ok, msg = pcall(require, "util"); if not ok then vim.notify(msg, vim.log.levels.ERROR) end
-ok, msg = pcall(require, "keymapUtil"); if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 
 require "core"
 require "quickFix"

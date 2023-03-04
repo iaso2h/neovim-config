@@ -2,6 +2,8 @@ local fn   = vim.fn
 local api  = vim.api
 local M = {whichKeyDocs = {}}
 
+require("util.keymap")
+
 function Print(...)
     local objects = {}
     for i = 1, select('#', ...) do
@@ -22,149 +24,6 @@ function _G.t(str)
 end
 
 function _G.ex(exec) return fn.executable(exec) == 1 end
-
-
-----
--- Function: Vim2Lua
---
--- @param mode:    string value. "syntax" or "map" mode
--- @param verbose: boolean value, when set true, all opts keyword will be output in "map" mode
--- @return: 0
-----
-function Vim2Lua(mode) -- {{{
-    if mode == "syntax" then
-        -- Change vim script syntax into lua {{{
-        local curPos = api.nvim_win_get_cursor(0)
-        local range = curPos[1] .. ",$"
-        local t = {
-            [range .. "s#^\\(\\s*\\)'\\(.\\{-}\\)':#\1\2 =#e"] = true,
-            [range .. "s#^\\(\\s*\\)\"\\(.\\{-}\\)\":#\1\2 =#e"] = true,
-            [range .. "s#function\\(!\\)\\?\\(.*\\) abort#function\\2#e"] = true,
-            [range .. "s#endfunction#end#e"] = true,
-            [range .. "s#endif#end#e"] = true,
-            [range .. "s#endwhile#end#e"] = true,
-            [range .. "s#endfor#end#e"] = true,
-            [range .. "s/!=[?#]\\?/~=/e"] = true,
-            [range .. "s/==[?#]\\?/==/e"] = true,
-            [range .. "s#||#or#e"] = true,
-            [range .. "s#&&#and#e"] = true,
-            [range .. "s#\\([^ ]\\) !\\(\\w\\)#\\1 not \\1#e"] = true,
-            [range .. "s#|# #e"] = true,
-            [range .. "s#a:##e"] = true,
-            [range .. "s#b:#vim.b.#e"] = true,
-            [range .. "s#w:#vim.w.#e"] = true,
-            [range .. "s#t:#vim.t.#e"] = true,
-            [range .. "s#v:#vim.v.#e"] = true,
-            [range .. "s#\\(let \\)\\?g:#vim.g.#e"] = true,
-            [range .. "s#&buftype#vim.bo.buftype#e"] = true,
-            [range .. "s#&filetype#vim.bo.filetype#e"] = true,
-            [range .. "s#&modified#vim.bo.modified#e"] = true,
-            [range .. "s#&diff#vim.bo.diff#e"] = true,
-            [range .. "s#&\\(\\w\\+\\)#vim.o.\1#e"] = true,
-            [range .. "s#expand(#fn.expand(#e"] = true,
-            [range .. "s#has(#fn.has(#e"] = true
-        }
-        local functionSCallRep    = string.format(range .. [=[s#call <sid>#lua require("%s").#e]=], fn.expand("%:t:r"))
-        local functionSIdRep      = range .. [=[s#^\(\s*\)function\(!\)\? s:\(\w\)#\1function M\.\3#e]=]
-        local functionGIdRep      = range .. [=[s#^\(\s*\)function\(!\)\? \(\u.\)\(.*\)#\1function M\.\l\3\4#e]=]
-        local functionCallRep     = range .. [=[s#^\(\s*\)call \(.*\)#\1\2#e]=]
-        local optionSetRep        = range .. [=[s#^\(\s*\)set \(.*\)#\1\2#e]=]
-        local strConcanationRep   = range .. [=[s# \. # \.\. #e]=]
-        local continueLineRep     = range .. [=[s#^\(\s\+\)\\#\1#e]=]
-        local termStartRep        = range .. [=[s#^\(\s\+\)!\(.\+\)#\1cmd [[\2]]#e]=]
-        local listLenRep          = range .. [=[s/\(str\)len(/#/e]=]
-        local normalRep           = range .. [=[s#\(^\s*\)\(normal!.*\)#\1cmd [[\2]]#e]=]
-        local executeRep          = range .. [=[s#\(\s\+\)execute#\1cmd#e]=]
-        local commentStartRep     = range .. [=[s#^\(\s\{-}\)"#\1--#e]=]
-        local commentStartMarkRep = range .. [=[s#" {{{#-- {{{#e]=]
-        local commentEndMarkRep   = range .. [=[s#" }}}#-- }}}#e]=]
-        local defaultInitRep1     = range .. [=[s#get(g:, "\(.\{-}\)", \(.\{-}\))#vim.g.\1 or \2#e]=]
-        local defaultInitRep2     = range .. [=[s#get(g:, '\(.\{-}\)', \(.\{-}\))#vim.g.\1 or \2#e]=]
-        local commandRep          = range .. [=[s#command!.*#cmd [[&]]#e]=]
-        local userCommandStartRep = range .. [=[s#^\(\s\+\)\(\u.\+\)#\1cmd [[\2]]#e]=]
-        t[strConcanationRep]   = true
-        t[continueLineRep]     = true
-        t[termStartRep]        = true
-        t[listLenRep]          = true
-        t[functionSCallRep]    = true
-        t[functionSIdRep]      = true
-        t[functionGIdRep]      = true
-        t[functionCallRep]    = true
-        t[optionSetRep]        = true
-        t[normalRep]           = true
-        t[executeRep]          = true
-        t[commentStartRep]     = true
-        t[commentStartMarkRep] = true
-        t[commentEndMarkRep]   = true
-        t[defaultInitRep1]     = false
-        t[defaultInitRep2]     = false
-        t[commandRep]          = true
-        t[userCommandStartRep] = true
-
-        for str, bool in pairs(t) do if bool then vim.cmd(str) end end
-        api.nvim_win_set_cursor(0, curPos)
-        -- }}} Change vim script syntax into lua
-    elseif mode == "map" then
-        -- Change vim mapping syntax into lua mapping syntax {{{
-        local curLine = api.nvim_get_current_line()
-        local optKeyword = {}
-        local mapKeyword = fn.matchstr(curLine, "^\\w\\{-}map!\\?")
-        if mapKeyword == "" then do return end end
-        if string.match(curLine, "<silent>") ~= nil then optKeyword["silent"] = true end
-        if string.match(curLine, "<expr>") ~= nil then optKeyword["expr"] = true end
-        if string.match(curLine, "<nowait>") ~= nil then optKeyword["nowait"] = true end
-
-        local mapMode
-        if #mapKeyword == 3 then
-            mapMode = ""
-        elseif #mapKeyword == 4 then
-            mapMode = string.match(mapKeyword, "map!")
-            if not mapMode then
-                mapMode = string.sub(mapKeyword, 1, 1)
-            end
-        elseif #mapKeyword == 7 then
-            optKeyword["noremap"] = true
-            mapMode = ""
-        elseif #mapKeyword == 8 then
-            optKeyword["noremap"] = true
-            mapMode = string.sub(mapKeyword, 1, 1)
-            if mapMode == "m" then mapMode = "!" end
-        else
-            do return end
-        end
-        local mapping = fn.matchstr(curLine,
-                                    [[^[nvicxto]\?\(nore\)\?map!\? \(<expr>\)\? \?\(<silent>\)\? \?\(<expr>\)\? \?\(nowait\)\? \?\zs.*]])
-        if mapping == "" then do return end end
-        local LHS = fn.matchstr(mapping, [[^.\{-}\ze .*$]])
-        local RHS = fn.matchstr(mapping, [[^.\{-} \zs.*]])
-
-        local optString = ""
-        local luaMapping
-        if next(optKeyword) then
-            for optName, val in pairs(optKeyword) do
-                if val then
-                    optString = optString .. '"' .. optName .. '", '
-                end
-            end
-            optString = string.sub(optString, 1, -3)
-            luaMapping = string.format([=[map("%s", [[%s]], [[%s]], {%s})]=],
-                                    mapMode, LHS, RHS, optString)
-        else
-            luaMapping = string.format([=[map("%s", [[%s]], [[%s]])]=],
-                                    mapMode, LHS, RHS)
-        end
-
-        local cursor = api.nvim_win_get_cursor(0)
-        api.nvim_buf_set_lines(0, cursor[1] - 1, cursor[1], {false},
-                               {luaMapping})
-        vim.cmd "noh"
-        -- setKey("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", {noremap = true, silent = true})
-        -- setKey('n', 'j', "v:count == 0 ? 'gj' : 'j'", {noremap= true, expr = true, silent = true})
-        -- setKey(0, 'i', '<C-Space>','pumvisible() ? "<C-e>" : "<Plug>(completion_trigger)"', {expr=true})
-        -- }}} Change vim mapping syntax into lua mapping syntax
-    end
-end -- }}}
-
 
 
 function M.convertMap(mode, lhs, rhs, optsTbl)
@@ -254,15 +113,13 @@ end
 -- }}} Match enhance
 
 
-----
--- Function: M.trimSpaces :Trim all trailing white spaces in current buffer
---
--- @param strTbl: Table of source string need to be trimmed. If no table
---        provided, the whole buffer will be trimmed instead.
--- @param silent: Boolean, default is true. Set this to true to not show trimming result
--- @param prefix: set to true to trim the suffix as well
--- @return:       return table of trimmed string, otherwise return 0
-----
+--- Function: M.trimSpaces :Trim all trailing white spaces in current buffer
+---
+--- @param strTbl table of source string need to be trimmed. If no table
+---        provided, the whole buffer will be trimmed instead.
+--- @param silent boolean Default is true. Set this to true to not show trimming result
+--- @param prefix boolean Set to true to trim the suffix as well
+--- @return:       return table of trimmed string, otherwise return 0
 function M.trimSpaces(strTbl, silent, prefix) -- {{{
     _G._trimSpacesChk = _G._trimSpacesChk or true
     if not _G._trimSpacesChk then return end
@@ -276,7 +133,7 @@ function M.trimSpaces(strTbl, silent, prefix) -- {{{
             vim.cmd [[noa keeppatterns %s#\s\+$##e]]
         else
             vim.cmd [[noa keeppatterns %s#\s\+$##e]]
-            local result = fn.execute [[g#\s\+$#p]]
+            local result = api.nvim_exec([[g#\s\+$#p]], true)
             local count = #M.matchAll(result, [[\n]])
             vim.cmd [[noa keeppatterns %s#\s\+$##e]]
             api.nvim_echo({{count .. " line[s] trimmed", "Moremsg"}}, false, {})
@@ -285,20 +142,20 @@ function M.trimSpaces(strTbl, silent, prefix) -- {{{
     elseif next(strTbl) then
         if prefix then
             strTbl = vim.tbl_map(function(str)
-                return fn.substitute(str, "^\\s\\+", "", "")
+                local result = string.gsub(str, "^%s+", "")
+                return result
             end, strTbl)
         end
         return vim.tbl_map(function(str)
-            return fn.substitute(str, "\\s\\+$", "", "")
+            local result = string.gsub(str, "^%s+", "")
+            return result
         end, strTbl)
     end
 end -- }}}
 
 
-----
--- Function: M.saveReg will save the star registers, plus and unnamed registers
--- independantly, restoreReg can be accessed after saveReg is called
-----
+--- Save the star registers, plus and unnamed registers - independantly,
+--- restoreReg can be accessed after saveReg is called
 function M.saveReg() -- {{{
     local unnamedContent = fn.getreg('"', 1)
     local unnamedType    = fn.getregtype('"')

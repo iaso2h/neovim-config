@@ -126,20 +126,20 @@ if _G._os == "Windows" then
     -- Python executable
     local winPython = fn.expand("$HOME/AppData/Local/Programs/Python/Python38/python.exe")
     api.nvim_set_var("python3_host_prog", winPython)
-    if fn.executable(winPython) == 0 then
+    if ex(winPython) == 0 then
         local pythonPath = (string.gsub(fn.system('python -c "import sys; print(sys.executable)"'),"(\n+$)", ""))
         api.nvim_set_var("python3_host_prog", pythonPath)
-        if not fn.executable(api.nvim_get_var("python3_host_prog")) then
+        if not ex(api.nvim_get_var("python3_host_prog")) then
             api.nvim_err_write("Python path not found\n")
         end
     end
 elseif _G._os == "Linux" then
     local linuxPython = "/usr/bin/python3"
     api.nvim_set_var("python3_host_prog", linuxPython)
-    if fn.executable(linuxPython) == 0 then
+    if ex(linuxPython) == 0 then
         linuxPython = (fn.system('which python3')):gsub("\n+$", "")
         api.nvim_set_var("python3_host_prog", linuxPython)
-        if not fn.executable(api.nvim_get_var("python3_host_prog")) then
+        if not ex(api.nvim_get_var("python3_host_prog")) then
             api.nvim_err_write("Python path not found\n")
         end
     end

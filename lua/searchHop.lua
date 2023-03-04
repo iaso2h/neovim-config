@@ -67,7 +67,7 @@ M.centerHop = function(exCMD, feedkeyChk, suppressMsgChk)
         api.nvim_feedkeys(exCMD, "n", true)
     else
         local ok, msg = pcall(vim.cmd, "norm! " .. exCMD)
-        if not ok and suppressMsgChk then
+        if not ok and not suppressMsgChk then
             local idx = select(2,string.find(msg, "E%d+: "))
             msg = string.sub(msg, idx + 1, -1)
             vim.notify(msg, vim.log.levels.INFO)

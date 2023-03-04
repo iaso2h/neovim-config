@@ -5,6 +5,7 @@ local cmd = vim.cmd
 local var = require("buf.var")
 
 
+
 --- Gather informatioin about buffers and windows for further processing
 M.initBuf = function()
     var.bufName  = api.nvim_buf_get_name(0)
