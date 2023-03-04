@@ -1,8 +1,8 @@
 -- File: extraction
 -- Author: iaso2h
 -- Description: Extract selected content into new variable or new file
--- Version: 0.0.7
--- Last Modified: 2023-2-24
+-- Version: 0.0.8
+-- Last Modified: 2023-3-4
 -- NOTE: Deprecated: Please use refactor.nvim instead for visual line mode
 require("operator")
 local fn   = vim.fn
@@ -123,8 +123,9 @@ local getSrcContent = function() -- {{{
 
         -- util.restoreReg()
         return {srcContent, namespace, extmark, linebreakChk}
-    -- Visual line mode
     else
+        -- Visual line mode
+
         vim.cmd [[noa normal! gvd]]
         srcContent = fn.getreg("\"", 1)
 
@@ -180,48 +181,55 @@ end -- }}}
 
 
 --- Create new file at given path
---- @param newFilePath string value contain new file path
---- @param srcContent  string value of source content of the new file
-local newFile = function(newFilePath, srcContent) -- {{{
-    -- Find slash
-    local byteSlashIndex = util.matchAll(newFilePath, "/")
-    local filePath
+--- @param filePath string value contain new file path
+M.newFile = function(filePath) -- {{{
+    -- Find index of last slash
+    -- local newFilePath = [[C:/user/test\test123\test321.lua]]
+    -- local newFilePath = [[C:/user/test/test123/test321.lua]]
+    -- local newFilePath = [[C:\user/test\new.lua]]
+    -- local newFilePath = [[C:\user\test/new.lua]]
+    local lastFSlash = string.find(string.reverse(filePath), "/")
+    local lastBSlash = string.find(string.reverse(filePath), "\\")
+    local lastSlash
 
-    if not next(byteSlashIndex) then byteSlashIndex = util.matchAll(newFilePath, "\\") end
-
-    if next(byteSlashIndex) then -- Slash exist
-        if byteSlashIndex == #newFilePath - 1 then
-            api.nvim_echo({{"Invalid file path", "WarningMsg"}}, false, {})
-            return
-        end
-        -- Refine file path
-        if newFilePath[1] == "/" or newFilePath[1] == '\\' then
-            filePath = M.cwd .. newFilePath
-        elseif string.sub(newFilePath, 1, 2) == './' then
-            filePath = M.cwd .. string.sub(newFilePath, 2)
-        else
-            filePath = M.cwd .. "/" .. newFilePath
-        end
-        -- Make sure folder created before file creation
-        local absFolder = string.sub(filePath, 1, byteSlashIndex[#byteSlashIndex] + #M.cwd + 1)
-        fn.mkdir(absFolder, "p")
-    else -- Slash does not exist
-        filePath = newFilePath
+    if not lastFSlash and lastBSlash then
+        lastSlash = #filePath - lastBSlash + 1
+    elseif not lastBSlash and lastFSlash then
+        lastSlash = #filePath - lastFSlash + 1
+    elseif lastFSlash and lastBSlash then
+        lastSlash = lastFSlash < lastBSlash and
+            #filePath - lastFSlash + 1 or
+            #filePath - lastBSlash + 1
+    else
+        -- Skip creating folder
     end
 
-    local f = io.open(filePath, "w")
+    -- Creating folder
+    local folderPath
+    if lastSlash then
+        folderPath = string.sub(filePath, 1, lastSlash - 1)
+        -- Make sure folder created before file creation, even if it exists
+        fn.mkdir(folderPath, "p")
+    end
+
+    -- Writing file
+    local f, err = io.open(filePath, "w")
     if not f then
-        api.nvim_echo({{"Unable to create file: " .. filePath, "ErrorMsg"}}, false, {})
+        vim.notify("Unable to create file: " .. filePath, vim.log.levels.ERROR)
+        vim.notify(err, vim.log.levels.ERROR)
         return
     end
-    f:write(srcContent)
+
+    f:write(unpack(getSrcContent()))
     f:close()
-    api.nvim_echo({{"File created: " .. filePath, "false"}}, true, {})
+
+    vim.notify("File created: " .. filePath, vim.log.levels.INFO)
+
     -- Delete selection code
     util.saveReg()
     vim.cmd [[noa normal! gvd]]
     util.restoreReg()
-    local openFileAnswer = fn.confirm("Open and edit new file?", "&Yes\n&No", 1)
+    local openFileAnswer = fn.confirm("Load the new file into buffer?", "&Yes\n&No", 1)
     if openFileAnswer == 1 then vim.cmd("e " .. filePath) end
 end -- }}}
 
@@ -237,7 +245,7 @@ M.newIdentifier = function(newID)
     if M.vimMode == "v" or M.vimMode == "n" then
         return newVar(newID, src, namespace, extmark, linebreakChk)
     elseif M.vimMode == "V" then
-        return newFile(newID, src)
+        return M.newFile(newID)
     end
 end
 
@@ -250,7 +258,7 @@ end
 ---        vimMode    string Vim mode. See `help mode()`
 ---        plugMap    string eg <Plug>myplug
 ---        vimMode     string Vim mode. See `help mode()`
-function M.operator(args) -- {{{
+function M.main(args) -- {{{
     M.vimMode    = args[2]
     M.motionType = args[1]
     if not vim.o.modifiable or vim.o.readonly then
@@ -273,9 +281,12 @@ function M.operator(args) -- {{{
             end
         end)
     elseif M.vimMode == "V" then
-        vim.ui.input({prompt = "Enter new file path: "}, function(input)
+        vim.ui.input({
+            prompt = "Enter new file path: ",
+            default = fn.getcwd(),
+        }, function(input)
             if input and input ~= "" then
-                require("extraction").newIdentifier(input)
+                require("extraction").newFile(input)
             end
         end)
     else

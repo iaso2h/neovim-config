@@ -115,7 +115,7 @@ map("n", [[<C-s>]], [[:lua require("historyStartup").display(true)<CR>]], {"sile
 map("n", [[<Plug>Extract]], function ()
     return vim.fn.luaeval[[
     require("operator").expr(
-        require("extraction").operator,
+        require("extraction").main,
         false,
         "<Plug>Extract")
     ]]
