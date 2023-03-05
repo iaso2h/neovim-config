@@ -1,24 +1,15 @@
-local fn   = vim.fn
-local packerPath = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
-if fn.empty(fn.glob(packerPath)) > 0 then
-    vim.notify("Fetching packer.nvim from github.com", vim.log.levels.WARN)
-    fn.system{"git", "clone", "https://github.com/wbthomason/packer.nvim", packerPath}
-    return vim.notify("Please restart neovim", vim.log.levels.WARN)
-end
-
+local M = {}
+local fn  = vim.fn
+local api = vim.api
 local packer = require("packer")
-local conf   = function(moduleString) return require(string.format("config.%s", moduleString)) end
-local configPath = fn.stdpath("config")
 
 
-packer.init{
-    package_root = configPath .. "/pack",
-    compile_path = string.format("%s/lua/packer_compiled_%s.lua", configPath, _G._isTerm and "term" or "gui")
-}
-
-packer.startup{function(use, use_rocks)
-
--- packer.startup{function(use_real, use_rocks)
+-- Plug-ins configuration
+local conf = function(moduleString)
+    return require(string.format("config.%s", moduleString))
+end
+local configArgs = {function(use, use_rocks) -- {{{
+-- local configArgs = {function(use_real, use_rocks)
     -- local use = function(tbl)
         -- if type(tbl) == "table" and tbl.only then
             -- local paramTbl = {}
@@ -371,6 +362,7 @@ use {
             vim.g.splitjoin_align = 1
             vim.g.splitjoin_curly_brace_padding = 0
         end,
+        -- TODO: split on lua ; syntax
         config = function()
             map("n", [["gS"]], [[<CMD>SplitjoinSplit<CR>]], {"silent"}, "Smart split")
             map("n", [["gJ"]], [[<CMD>SplitjoinJoin<CR>]],  {"silent"}, "Smart join")
@@ -1031,7 +1023,7 @@ use {
         disable = true
     }
     -- }}} Knowlege
-end,
+end, -- }}}
     config = {
         display = {
             prompt_border = 'rounded',
@@ -1044,3 +1036,53 @@ end,
         }
     }
 }
+
+
+local configPath
+local compilePath
+M.setupPacker = function(compileName)
+    local function promptOnMove(msg, func)
+        local waitAu = api.nvim_create_autocmd("CursorMoved", {
+            callback = function ()
+                vim.api.nvim_echo({{os.date("%Y-%m-%d %H:%M  ") .. msg, "WarningMsg"}}, false, {})
+            end
+        })
+        if func then
+            func()
+            api.nvim_del_autocmd(waitAu)
+        end
+    end
+
+    local packerPath = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
+    if fn.empty(fn.glob(packerPath)) > 0 then
+        vim.o.cmdheight = 10
+        if not ex("git") then
+            vim.notify("Can't find git executable", vim.log.levels.WARN)
+            vim.notify("Abort loading Plug-ins settings", vim.log.levels.WARN)
+            return
+        end
+        promptOnMove("Please wait while fetching packer.nvim from github.com", function()
+            fn.system{"git", "clone", "https://github.com/wbthomason/packer.nvim", packerPath}
+        end)
+        return promptOnMove("Please restart neovim")
+    end
+
+    configPath = fn.stdpath("config")
+    compilePath = string.format("%s/lua/%s.lua", configPath, compileName)
+    if fn.empty(fn.glob(packerPath)) > 0 then
+        return promptOnMove([[Please run PackerSync, wail till all process end]])
+    end
+
+end
+
+
+M.configPacker = function()
+    packer.init{
+        package_root = configPath .. "/pack",
+        compile_path = compilePath
+    }
+    packer.startup(configArgs)
+end
+
+
+return M

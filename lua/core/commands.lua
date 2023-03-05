@@ -89,13 +89,6 @@ end
 
 
 -- Auto commands {{{
-au("vimEnter", {
-    desc     = "Display history on startup",
-    callback = function ()
-        require("historyStartup").display()
-    end
-})
-
 -- Minimal terminal filetype
 local augroupTerm = augroup("myTerminal", {clear = true})
 au("TermOpen", {

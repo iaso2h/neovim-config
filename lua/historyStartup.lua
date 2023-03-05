@@ -1,6 +1,7 @@
 -- File: historyStartup
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
+-- Dependencies: 0
 -- Version: 0.0.9
 -- Last Modified: 2023-3-3
 local api = vim.api
