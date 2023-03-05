@@ -276,7 +276,7 @@ end, {
 })
 
 excmd("Cfilter", function(opts)
-    qFilter(true,  opts.args, opts.bang)
+    require("quifix.cfilter").main(true, opts.args, opts.bang)
 end, {
     desc  = "Filter quickfix window",
     bang  = true,
@@ -284,7 +284,7 @@ end, {
 })
 
 excmd("Lfilter", function(opts)
-    qFilter(true,  opts.args, opts.bang)
+    require("quifix.cfilter").main(false, opts.args, opts.bang)
 end, {
     desc  = "Filter localfix window",
     bang  = true,
