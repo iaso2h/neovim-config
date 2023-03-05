@@ -832,7 +832,6 @@ use {
             "PP", "Runtime", "Disarm", "Scriptnames", "Messages",
             "Verbose", "Time", "Breakadd", "Vopen", "Vedit", "Vsplit"
         },
-        keys   = {{"n", "<C-q>,"}, {"n", "<C-q>."}},
         config = conf("vim-scriptease").config
     }
     use {

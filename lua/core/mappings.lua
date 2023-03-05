@@ -18,13 +18,15 @@ map("n", [[]d]], [[]c]], {"noremap", "silent"}, "Go to the next start of a chang
 map("n", [[]c]], [[:noa windo set cc=80<CR>]], {"silent"}, "Turn on colorcolumn")
 map("n", [[[c]], [[:noa windo set cc&<CR>]],   {"silent"}, "Turn off colorcolumn")
 -- Quickfix
-map("n", [[<C-q>g]],    [[:cfirst<CR>zzzv]],    {"silent"}, "Go to first item in quickFix")
-map("n", [[<C-q>G]],    [[:clast<CR>zzzv]],     {"silent"}, "Go to last item in quickFix")
-map("n", [[<C-q>n]],    [[:cnext<CR>zzzv]],     {"silent"}, "Go to next item in quickFix")
-map("n", [[<C-q>N]],    [[:cprevious<CR>zzzv]], {"silent"}, "Go to previous item in quickFix")
-map("n", [[<C-q>l]],    [[:cnfile<CR>]],        {"silent"}, "Go to next file in quickFix")
-map("n", [[<C-q>h]],    [[:cpfile<CR>]],        {"silent"}, "Go to previous file in quickFix")
+map("n", [[<C-q>g]], [[:cfirst<CR>zzzv]],    {"silent"}, "Go to first item in quickFix")
+map("n", [[<C-q>G]], [[:clast<CR>zzzv]],     {"silent"}, "Go to last item in quickFix")
+map("n", [[<C-q>n]], [[:cnext<CR>zzzv]],     {"silent"}, "Go to next item in quickFix")
+map("n", [[<C-q>N]], [[:cprevious<CR>zzzv]], {"silent"}, "Go to previous item in quickFix")
+map("n", [[<C-q>l]], [[:cnfile<CR>]],        {"silent"}, "Go to next file in quickFix")
+map("n", [[<C-q>h]], [[:cpfile<CR>]],        {"silent"}, "Go to previous file in quickFix")
 map("n", [[<leader>q]], [[:lua require("buf").quickfixToggle()<CR>]], {"silent"}, "Quickfix toggle")
+map("n", [[<C-q>,]], [[<CMD>lua require("quickfix.message").main()<CR>]], {"silent"}, "Show messages in quickfix")
+map("n", [[<C-q>.]], [[<CMD>lua require("quickfix.message").main()<CR>]], {"silent"}, "Show messages in quickfix")
 -- Spell corretion
 map("n", [[\\]], [[z=1<CR><CR>]], {"silent"}, "Quick spell fix")
 -- Expand region
