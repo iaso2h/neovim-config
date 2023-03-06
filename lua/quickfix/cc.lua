@@ -81,10 +81,6 @@ M.main = function(fallbackChk, closeQfChk, offset)
         return vim.notify("Buffer isn't valid", vim.log.levels.INFO)
     end
 
-    if not api.nvim_buf_is_valid(qfItem.bufnr) then
-        return vim.notify("Quickfix item isn't valid", vim.log.levels.INFO)
-    end
-
     -- In some cases the autocmd for retriving the last window id before
     -- entering into the quickfix is not working well, then we have to use the
     -- fallback mathod
@@ -112,7 +108,7 @@ M.main = function(fallbackChk, closeQfChk, offset)
     -- Switch buf in the window
     api.nvim_win_call(savedLastWinID, function()
         vim.cmd([[cc ]] .. lineNr)
-        vim.cmd[[norm! zzzv]]
+        vim.cmd[[norm! zvzz]]
     end)
 
     regainFocus(closeQfChk, qfWinID, qfCursorPos, savedLastWinID)
