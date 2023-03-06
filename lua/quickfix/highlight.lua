@@ -10,8 +10,8 @@ M.clear = function(qfBufNr)
             api.nvim_buf_clear_namespace(qfBufNr, ns, 0, -1)
         end
         -- require("todo-comments.highlight").highlight_win(api.nvim_get_current_win(), true)
-    elseif package.loaded["quickfix.message"] then
-        local ns = require("quickfix.message").ns
+    elseif package.loaded["quickfix"] then
+        local ns = require("quickfix").ns
         if ns then
             api.nvim_buf_clear_namespace(qfBufNr, ns, 0, -1)
         end

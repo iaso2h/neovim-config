@@ -1,4 +1,4 @@
--- TODO: quifix convert into a window localist
+-- TODO: quickfix convert into a window localist
 local fn  = vim.fn
 local api = vim.api
 local M   = {
@@ -24,7 +24,9 @@ M.closeFloatWin = function(_) -- {{{
 end -- }}}
 
 
-M.info = function () -- {{{
+--- Display quickfix item info under the current cursor
+---@param printChk boolean Set it to true to print the info table instead
+M.hover = function(printChk) -- {{{
     local qfWinId = api.nvim_get_current_win()
     local qfCursorPos = api.nvim_win_get_cursor(qfWinId)
     local qfWinInfo = fn.getwininfo(qfWinId)
@@ -33,6 +35,9 @@ M.info = function () -- {{{
 
     local qfItems = fn.getqflist()
     local itemInfo = qfItems[qfCursorPos[1]]
+
+    if printChk then return Print(itemInfo) end
+
     local ok, msg  = pcall(fn.bufname, itemInfo.bufnr)
     local bufName = ok and msg or ""
 
@@ -77,6 +82,7 @@ M.info = function () -- {{{
     api.nvim_buf_set_lines(M.bufNr, 0, -1, false, lines)
     api.nvim_buf_set_option(M.bufNr, "modified", false)
     api.nvim_win_set_buf(M.floatWinID, M.bufNr)
+
 end -- }}}
 
 

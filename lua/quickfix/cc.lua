@@ -6,11 +6,11 @@ local M   = {}
 --- 'uselastWin' method for 'switchbuf' option. The vim.v.count will only open
 --- a specific line, of which line number is decided by vim.v.count
 ---@param closeQuickfix boolean
-M.cc = function(closeQuickfix, useWinCall)
+M.main = function(closeQuickfix, useWinCall)
     local savedLastWinID = _G._lastWinID
     local qfWinID        = api.nvim_get_current_win()
     -- In some cases the autocmd for retriving the last window id before
-    -- entering into the quifix is not working well, then we have to use the
+    -- entering into the quickfix is not working well, then we have to use the
     -- fallback mathod
     local fallbackTick   = qfWinID == savedLastWinID
 
@@ -22,13 +22,12 @@ M.cc = function(closeQuickfix, useWinCall)
         return vim.notify("No qf items available", vim.log.levels.INFO)
     end
 
-    if qfItem.valid == 0 or not qfItem.bunr or
+    if qfItem.valid == 0 or qfItem.bufnr == 0 or
             not api.nvim_buf_is_valid(qfItem.bufnr) then
-            -- TODO: highlight the invalid item?
         require("quickfix.highlight").add(
             {qfCursorPos[1]},
             "Comment",
-            api.nvim_create_namespace(M.nsName)
+            api.nvim_create_namespace("myQuickfix")
         )
         return vim.notify("Buffer isn't valid", vim.log.levels.INFO)
     end
@@ -87,7 +86,7 @@ M.cc = function(closeQuickfix, useWinCall)
         if savedLastWinID ~= qfWinID and api.nvim_win_is_valid(qfWinID) then
             api.nvim_win_close(qfWinID, false)
         else
-            -- TODO:
+            -- Cursor is at quickfix window
         end
     end
 
