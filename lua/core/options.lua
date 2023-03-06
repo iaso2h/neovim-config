@@ -52,7 +52,7 @@ opt.showbreak = "⤷ "
 
 opt.foldcolumn = "auto:4"
 -- HACK: Tackle sign column boucing from time to time
-opt.signcolumn = "auto:2-4"
+opt.signcolumn = "yes:1"
 opt.foldmethod = "expr"
 opt.foldexpr   = "EnhanceFoldExpr()"
 _G._Myformatoptions = "cr/qn2mM1jpl"

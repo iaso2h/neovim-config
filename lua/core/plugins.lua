@@ -110,27 +110,6 @@ use {
     config = [[require("treesitter-context").setup()]]
 }
 use {
-    'p00f/nvim-ts-rainbow',
-    -- TODO:
-    -- 'HiPhish/nvim-ts-rainbow2',
-    event    = "BufAdd",
-    after    = "nvim-treesitter",
-    config   = function()
-        require("nvim-treesitter.configs").setup{
-            rainbow = {
-                enable         = true,
-                extended_mode  = true,
-                max_file_lines = 3000,
-                colors         = {
-                    "#cc7000",
-                    "#7a28a3",
-                    "#3a5eca",
-                    }
-            },
-        }
-    end
-}
-use {
     'lewis6991/gitsigns.nvim',
     config = conf "nvim-gitsigns"
 }

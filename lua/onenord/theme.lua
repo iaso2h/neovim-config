@@ -26,7 +26,6 @@ theme.syntax = {
     Number         = {fg = p.orange}, -- a number constant: 5
     Boolean        = {fg = p.orange}, -- a boolean constant: TRUE, false
     Float          = {fg = p.orange}, -- a floating point constant: 2.3e10
-    FloatBorder    = {fg = p.n3b, bg = p.n0, style = "bold"},
 
     Statement      = {fg = p.purple, style = "italic"}, -- any statement
     Parameter      = {fg = p.orange}, -- function parameter
@@ -97,10 +96,10 @@ theme.syntax = {
 -- Editor highlight {{{
 theme.editor =  {
     -- normal text and background color
-    Normal      = {fg = p.n4, bg = p.n0},
-    -- vim.api.nvim_open_win
-    -- NormalFloat = {fg = p.n10, bg = p.n0, style = "bold"},
+    Normal      = {fg = p.n4,  bg = p.n0},
     NormalFloat = {bg = p.n0},
+    FloatBorder = {fg = p.n3b, bg = p.n0},
+    FloatTitle  = {fg = p.n8,  bg = p.n0, style = "bold"},
     TermCursor  = {link = "Normal"},
     -- TermCursorNC
 
@@ -346,6 +345,10 @@ theme.lsp = { -- {{{
     DiagnosticHint                 = {fg = p.n9 },
     DiagnosticUnderlineHint        = {style = "undercurl", sp = p.n9},
 
+    LspDiagnosticsError                = {link = "DiagnosticError"},
+    LspDiagnosticsWarning              = {link = "DiagnosticWarn"},
+    LspDiagnosticsInformation          = {link = "DiagnosticInfo"},
+    LspDiagnosticsHint                 = {link = "DiagnosticHint"},
     LspDiagnosticsDefaultError         = {link = "DiagnosticError"},
     LspDiagnosticsDefaultWarning       = {link = "DiagnosticWarn"},
     LspDiagnosticsDefaultInformation   = {link = "DiagnosticInfo"},
@@ -378,14 +381,9 @@ theme.plugins = { -- {{{
     diffLine      = {fg = p.n3},
     diffIndexLine = {fg = p.n9},
 
-    -- Neogit
-    -- NeogitBranch               = {fg = p.n10},
-    -- NeogitRemote               = {fg = p.n9},
-    -- NeogitHunkHeader           = {fg = p.n8},
-    -- NeogitHunkHeaderHighlight  = {fg = p.n8, bg = p.n1},
-    -- NeogitDiffContextHighlight = {bg = p.n1},
-    -- NeogitDiffDeleteHighlight  = {fg = p.n11, style="reverse"},
-    -- NeogitDiffAddHighlight     = {fg = p.n14, style="reverse"},
+    -- https://github.com/rhysd/git-messenger.vim
+    gitmessengerHeader  = {fg = p.n8, style = "bold"},
+    gitmessengerHistory = {fg = p.n11},
 
     -- https://github.com/lewis6991/gitsigns.nvim
     GitSignsAdd      = {fg = p.n14}, -- diff mode: Added line |diff.txt|
@@ -399,19 +397,18 @@ theme.plugins = { -- {{{
     GitSignsDeleteLn = {fg = p.n11}, -- diff mode: Deleted line |diff.txt|
 
     -- https://github.com/nvim-telescope/telescope.nvim
-    TelescopePromptBorder   = {fg = p.n8, style = "bold"},
-    TelescopePromptPrefix   = {fg = p.n14},
-    TelescopeResultsBorder  = {fg = p.n8, style = "bold"},
-    TelescopePreviewBorder  = {fg = p.n10, style = "bold"},
-    TelescopeSelectionCaret = {fg = p.n10},
-    TelescopeSelection      = {fg = p.w,  bg = p.n8, style = "bold"},
-    -- https://github.com/shaunsingh/nord.nvim/pull/63/files
-    -- TelescopeNormal        = {fg = p.n4, bg = p.n0},
-    -- TelescopeResultsNormal = {fg = p.n4, bg = p.n0},
-    -- TelescopePromptNormal  = {fg = p.n4, bg = p.n0},
-    -- TelescopePreviewNormal = {fg = p.n4, bg = p.n0},
+    TelescopePromptTitle   = {fg = p.n4, style = "bold"},
+    TelescopePromptBorder  = {link = "FloatBorder"},
+    TelescopePromptCounter = {fg = p.n13, style = "bold"},
+    TelescopePromptPrefix  = {fg = p.n13, style = "bold"},
+
+    TelescopePreviewBorder = {link = "FloatBorder"},
+    TelescopePreviewTitle  = {link = "TelescopePromptTitle"},
+
+    TelescopeResultsBorder = {fg = p.n8},
+    TelescopeResultsTitle  = {fg = p.n8, style = "bold"},
+    TelescopeSelection     = {bg = p.n2, style = "bold"},
     TelescopeMatching       = {fg = p.n13},
-    TelescopePromptCounter  = {link = "TelescopeMatching"},
 
     -- https://github.com/kyazdani42/nvim-tree.lua
     NvimTreeNormal           = {fg    = p.n4, bg = p.sidebar},
@@ -429,21 +426,17 @@ theme.plugins = { -- {{{
     NvimTreeGitMerge         = {fg    = p.n15},
     NvimTreeGitDeleted       = {fg    = p.n11},
     NvimTreeImageFile        = {fg    = p.n15},
+    NvimTreeMarkdownFile     = {fg    = p.blue},
     NvimTreeExecFile         = {fg    = p.n15},
     NvimTreeSpecialFile      = {fg    = p.n9 , style = "underline", sp = p.n9},
     NvimTreeEmptyFolderName  = {fg    = p.n3b},
     NvimTreeIndentMarker     = {link  = "FoldColumn"},
 
-    LspDiagnosticsError       = {link = "DiagnosticError"},
-    LspDiagnosticsWarning     = {link = "DiagnosticWarn"},
-    LspDiagnosticsInformation = {link = "DiagnosticInfo"},
-    LspDiagnosticsHint        = {link = "DiagnosticHint"},
-
     -- https://github.com/folke/which-key.nvim
     WhichKey =          {fg = p.n4 , style = "bold"},
     WhichKeyGroup =     {fg = p.n4},
     WhichKeyDesc =      {fg = p.n7, style = "italic"},
-    WhichKeySeperator = {fg = p.n4},
+    WhichKeySeperator = {fg = p.n9},
     WhichKeyFloating =  {link = "FloatBorder"},
     WhichKeyFloat =     {link = "FloatBorder"},
 
@@ -457,8 +450,10 @@ theme.plugins = { -- {{{
     IlluminatedWordWrite = {link = "LspReferenceText"},
 
     -- https://github.com/mfussenegger/nvim-dap
-    DapBreakpoint = {fg = p.n14},
-    DapStopped    = {fg = p.n15},
+    DapBreakpoint   = {fg = p.n14},
+    DapStopped      = {fg = p.n15},
+    DapStoppedLine  = {bg = "#615A57"},
+    DapLogPointLine = {bg = "#50636E"},
 
     -- https://github.com/rcarriga/nvim-dap-ui
     DapUINormal                  = {link = "Normal"},
@@ -568,20 +563,10 @@ theme.plugins = { -- {{{
     SniprunVirtualTextErr = {bg=p.n11,  fg=p.w},
     SniprunFloatingWinErr = {fg=p.n11},
 
-    -- https://github.com/mg979/vim-visual-multi
-    VMExtend = {link = "Visual"},
-    VMCursor = {fg = p.w, bg = p.n8, style = "bold"},
-    VMInsert = {fg = p.w, bg = p.n14},
-    VMMono   = {fg = p.w, bg = p.n11},
-
     -- https://github.com/nvim-treesitter/nvim-treesitter-context
     TreesitterContext           = {style = "bold"},
     TreesitterContextLineNumber = {fg = p.n3b, style = "bold"},
     TreesitterContextBottom     = {link  = "TreesitterContextLineNumber"},
-
-    -- https://github.com/mfussenegger/nvim-dap/
-    DapStoppedLine  = {bg = "#615A57"},
-    DapLogPointLine = {bg = "#50636E"},
 } -- }}}
 
 theme.loadTerminal = function()

@@ -25,15 +25,10 @@ local defaultTheme = {
     selection_strategy = "follow",
 
     sorting_strategy = "ascending",
-    layout_strategy  = "horizontal",
+    layout_strategy  = "vertical",
     layout_config    = {
         prompt_position = "top",
-        -- -- horizontal = {
-            -- -- mirror = true,
-        -- -- },
-        -- -- vertical = {
-            -- -- mirror = true,
-        -- -- },
+        mirror = true
     },
     file_ignore_patterns = {"*.sw?","~$*","*.bak", "*.bk", "*.o","*.so","*.py[co]"},
 
