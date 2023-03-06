@@ -13,7 +13,7 @@ return function()
     map("n", [[<leader>dj]], [[<CMD>lua require("dap").down()<CR>]],  {"silent"}, "Dap frame down")
     map("n", [[<leader>dg]], [[<CMD>lua require("dap").goto_()<CR>]], {"silent"}, "Dap Go to")
 
-    map("n", [[<leader>db]], [[<CMD>lua require("dap").toggle_breakpoint()<CR>]], {"silent"}, "Dap toggle breakpoint")
+    -- map("n", [[<leader>db]], [[<CMD>lua require("dap").toggle_breakpoint()<CR>]], {"silent"}, "Dap toggle breakpoint")
     map("n", [[<leader>dc]], [[<CMD>lua require("dap").set_breakpoint(vim.fn.input("Breakpoint Condition: "), nil, nil, true)<CR>]], {"silent"}, "Dap set conditional break point")
     map("n", [[<leader>dl]], [[<CMD>lua require("dap").set_breakpoint(nil, nil, vim.fn.input("Log point message: "))<CR>]], {"silent"}, "Dap set log point")
     map("n", [[<C-q>d]],     [[<CMD>lua require("dap").list_breakpoints();require("buf").quickfixToggle()<CR>]], {"silent"}, "Dap list breakpoints in quickfix window")

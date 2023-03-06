@@ -35,8 +35,8 @@ M.config = function()
 
     local onAttach = function(client, bufNr) -- {{{
         -- Mappings
-        bmap(bufNr, "n", [[<C-f>o]], [[<CMD>lua require('telescope.builtin').lsp_document_symbols()<CR>]],  {"silent"}, "Telescope LSP document symbols")
-        bmap(bufNr, "n", [[<C-f>O]], [[<CMD>lua require('telescope.builtin').lsp_workspace_symbols()<CR>]], {"silent"}, "Telescope LSP workspace symbols")
+        bmap(bufNr, "n", [[<C-f>o]], [[<CMD>lua require('telescope.builtin').lsp_document_symbols()<CR>]],  {"silent"}, "LSP document symbols")
+        bmap(bufNr, "n", [[<C-f>O]], [[<CMD>lua require('telescope.builtin').lsp_workspace_symbols()<CR>]], {"silent"}, "LSP workspace symbols")
 
         bmap(bufNr, "n", [[ga]], [[<CMD>lua vim.lsp.buf.code_action()<CR>]],     {"silent"}, "LSP code action")
         bmap(bufNr, "n", [[gd]], [[<CMD>lua vim.lsp.buf.definition()<CR>]],      {"silent"}, "LSP definition")
@@ -228,23 +228,6 @@ M.config = function()
     lsp.handlers["textDocument/hover"]         = lsp.with(lsp.handlers.hover,          {border = "rounded"})
     lsp.handlers["textDocument/signatureHelp"] = lsp.with(lsp.handlers.signature_help, {border = "rounded"})
     -- }}} vim.lsp and vim.diagnostic setups
-
-    -- TODO:
-    -- Move to core/mapping.lua
-    -- Diagnostic mapping
-    map("n", [[<C-q>e]], [[<CMD>lua vim.diagnostic.setqflist()<CR>]], {"silent"}, "LSP add workspace folder")
-    map("n", [[[e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to previous diagnostic symbol")
-    map("n", [[]e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to next diagnostic symbol")
-    map("n", [[[E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to previous error")
-    map("n", [[]E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to next error")
-    if TelescopeGlobalState then
-        map("n", [[<leader>e]], [[<CMD>lua require('telescope.builtin').diagnostics{bufnr=0}<CR>]],
-            {"silent"}, "Telescope LSP document diagnostics")
-        map("n", [[<leader>E]], [[<CMD>lua require('telescope.builtin').diagnostics{bufnr=nil}<CR>]],
-        {"silent"}, "Telescope LSP workspace diagnostics")
-    else
-        map("n", [[<leader>e]], [[<CMD>lua vim.diagnostic.open_float()<CR>]], {"silent"}, "LSP diagnostics")
-    end
 
     -- Setup servers {{{
     local ok, _ = pcall(require, "cmp_nvim_lsp")

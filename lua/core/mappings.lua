@@ -11,6 +11,13 @@ if not _G._isTerm then
     map({"n", "x"}, [[<C-=>]], [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Decrease GUI client font size")
     map({"n", "x"}, [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent"}, "Restore GUI client font size")
 end
+-- Diagnostic mapping
+map("n", [[<C-q>e]],    [[<CMD>lua vim.diagnostic.setqflist()<CR>]],  {"silent"}, "LSP add workspace folder")
+map("n", [[<leader>e]], [[<CMD>lua vim.diagnostic.open_float()<CR>]], {"silent"}, "LSP diagnostics")
+map("n", [[[e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to previous diagnostic symbol")
+map("n", [[]e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to next diagnostic symbol")
+map("n", [[[E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to previous error")
+map("n", [[]E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to next error")
 -- Diffmode
 map("n", [[[d]], [[[c]], {"noremap", "silent"}, "Go to the previous start of a change")
 map("n", [[]d]], [[]c]], {"noremap", "silent"}, "Go to the next start of a change")

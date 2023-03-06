@@ -135,6 +135,25 @@ use {
     config = conf "nvim-gitsigns"
 }
 use {
+    'rhysd/git-messenger.vim',
+    key = {{"n", "<C-h>b"}},
+    setup = function()
+        vim.g.git_messenger_no_default_mappings = true
+        vim.g.git_messenger_floating_win_opts = {border = 'single'}
+    end,
+    config = function ()
+        map("n", [[<C-h>b]], [[<Plug>(git-messenger)]], "Git Messenger")
+        vim.api.nvim_create_autocmd("FileType",{
+            pattern  = "gitmessengerpopup",
+            desc     = "Key binding for git messenger",
+            callback = function()
+                map("n", [[<C-o>]], [[o]], "which_key_ignore")
+                map("n", [[<C-i>]], [[O]], "which_key_ignore")
+            end
+        })
+    end
+}
+use {
     "nvim-treesitter/nvim-treesitter-textobjects",
     event = "BufAdd",
     after = {
@@ -484,18 +503,29 @@ use {
         after = "plenary.nvim",
         cmd  = "Telescope",
         keys = {
-            { "n", [[<C-f>a]] },  { "n", [[<C-f>E]] },  { "n", [[<C-f>e]] }, { "n", [[<C-f>f]] },
-            { "n", [[<C-f>F]] },  { "n", [[<C-f>w]] },  { "n", [[<C-f>W]] }, { "n", [[<C-f>/]] },
-            { "n", [[<C-f>?]] },  { "n", [[<C-f>v]] },  { "n", [[<C-f>j]] }, { "n", [[<C-f>']] },
-            { "n", [[<C-f>m]] },  { "n", [[<C-f>k]] },  { "n", [[<C-f>c]] }, { "n", [[<C-f>C]] },
-            { "n", [[<C-f>h]] },  { "n", [[<C-f>H]] },  { "n", [[<C-f>r]] }, { "n", [[<C-f>gc]] },
-            { "n", [[<C-f>gC]] }, { "n", [[<C-f>gs]] }, { "n", [[<C-f>b]] },
+            { "n", [[<C-f>a]] },    { "n", [[<C-f>E]] },  { "n", [[<C-f>e]] }, { "n", [[<C-f>f]] },
+            { "n", [[<C-f>F]] },    { "n", [[<C-f>w]] },  { "n", [[<C-f>W]] }, { "n", [[<C-f>/]] },
+            { "n", [[<C-f>?]] },    { "n", [[<C-f>v]] },  { "n", [[<C-f>j]] }, { "n", [[<C-f>']] },
+            { "n", [[<C-f>m]] },    { "n", [[<C-f>k]] },  { "n", [[<C-f>c]] }, { "n", [[<C-f>C]] },
+            { "n", [[<C-f>h]] },    { "n", [[<C-f>H]] },  { "n", [[<C-f>r]] }, { "n", [[<C-f>gc]] },
+            { "n", [[<C-f>gC]] },   { "n", [[<C-f>gs]] }, { "n", [[<C-f>b]] }, { "n", [[<leader>e]] },
+            { "n", [[<leader>E]] },
         },
         config = conf "nvim-telescope"
     }
     use {
         'nvim-telescope/telescope-symbols.nvim',
         after  = "telescope.nvim"
+    }
+    use {
+        'debugloop/telescope-undo.nvim',
+        keys   = {{"n", [[<C-f>u]]}},
+        after  = "telescope.nvim",
+        config = function ()
+            require("telescope").load_extension("undo")
+            map("n", [[<C-f>u]], [[<CMD>require("telescope").extensions.undo.undo()<CR>]], {"silent"}, "Undo")
+        end
+
     }
     -- }}} Telescope
     -- UI {{{
@@ -834,9 +864,12 @@ use {
         },
         config = conf("vim-scriptease").config
     }
+    map("n", [[<leader>db]], [[<CMD>lua require("dap").toggle_breakpoint()<CR>]], {"silent"}, "Dap toggle breakpoint")
+    -- OPTIM:Dirty workaround to setup keymapping, probably due to the aync requrie
     use {
         'mfussenegger/nvim-dap',
-        keys   = {{"n", "<leader>db"}},
+        module = "dap",
+        -- keys   = {{"n", "<leader>db"}},
         config = conf "nvim-dap"
     }
     use {
