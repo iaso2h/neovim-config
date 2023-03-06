@@ -147,8 +147,11 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         end
         util.bufWipe(var.bufNr)
 
-        -- Always restore window focus
-        api.nvim_set_current_win(var.winID)
+        -- Always restore window focus, window might be unavailable when the
+        -- last buffer is deleted
+        if api.nvim_win_is_valid(var.winID) then
+            api.nvim_set_current_win(var.winID)
+        end
 
         -- Merge when there are two windows sharing the last buffer
         -- NOTE: If this evaluated to true, then the current length of bufNrtble

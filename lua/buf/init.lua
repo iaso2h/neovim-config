@@ -2,11 +2,10 @@
 -- Author: iaso2h
 -- Description: A few of buffer-related utilities
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.25
--- Last Modified: 2022-01-25
+-- Version: 0.0.26
+-- Last Modified: 2023-3-6
 -- TODO: jump to relative buf in quickfix?
 local fn  = vim.fn
-local cmd = vim.cmd
 local api = vim.api
 local var = require("buf.var")
 local M   = {}
@@ -24,7 +23,7 @@ end
 
 M.restoreClosedBuf = function()
     if var.lastClosedFilePath then
-        cmd(string.format("e %s", var.lastClosedFilePath))
+        vim.cmd(string.format("e %s", var.lastClosedFilePath))
     end
 end
 
@@ -32,7 +31,7 @@ end
 M.quickfixToggle = function () -- {{{
     -- Toogle off
     if vim.bo.buftype == "quickfix" then
-        return cmd "q"
+        return api.nvim_win_close(0, false)
     end
 
     -- Toggle on
@@ -43,7 +42,7 @@ M.quickfixToggle = function () -- {{{
         end
     end
 
-    cmd "copen"
+    vim.cmd "copen"
 end -- }}}
 
 
