@@ -18,23 +18,23 @@ M.delete = function (vimMode) -- {{{
         if #qfItems == 0 then return end
 
         -- Backup items
-        require("quickfix.undo").lastItems = qfItems
+        M.lastItems = vim.deepcopy(qfItems)
 
         table.remove(qfItems, itemNr)
-        fn.setqflist({}, "r", {items = qfItems})
+        fn.setqflist({}, " ", {items = qfItems})
 
         -- Neovim will take care of the new position even the row number is out of scope
         api.nvim_win_set_cursor(0, qfCursorPos)
     else
         -- Backup items
-        require("quickfix.undo").lastItems = qfItems
+        M.lastItems = vim.deepcopy(qfItems)
         local startPos = api.nvim_buf_get_mark(0, "<")
         local endPos   = api.nvim_buf_get_mark(0, ">")
 
         for _ = 1, endPos[1] - startPos[1] + 1, 1 do
             table.remove(qfItems, startPos[1])
         end
-        fn.setqflist({}, "r", {items = qfItems})
+        fn.setqflist({}, " ", {items = qfItems})
 
         -- Neovim will take care of the new position even the row number is out of scope
         api.nvim_win_set_cursor(0, startPos)
@@ -43,9 +43,9 @@ end -- }}}
 
 
 M.recovery = function () -- {{{
-    if require("quickfix.undo").lastItems then
-        fn.setqflist({}, "r", {items = require("quickfix.undo").lastItems})
-        require("quickfix.undo").lastItems = nil
+    if M.lastItems then
+        fn.setqflist({}, " ", {items = M.lastItems})
+        M.lastItems = nil
     else
         return
     end

@@ -15,14 +15,15 @@ if lineCount ~= qfCount then
 
     bmap(bufNr, "n", [[q]], [[<CMD>q<CR>]], {"silent"}, "Close quickfix")
 else
-    bmap(bufNr, "n", [[<CR>]], [[:lua require("quickfix.cc").main(false, true)<CR>]], {"silent"}, "Preview current item in quickfix")
-    bmap(bufNr, "n", [[o]],    [[:lua require("quickfix.cc").main(true, true)<CR>]],  {"silent"}, "Open current item in quickfix")
+    bmap(bufNr, "n", [[<CR>]], [[:lua require("quickfix.cc").main(false, false, 0)<CR>]], {"silent"}, "Preview current item in quickfix")
+    bmap(bufNr, "n", [[o]],    [[:lua require("quickfix.cc").main(false, true, 0)<CR>]],  {"silent"}, "Open current item in quickfix")
 
     bmap(bufNr, "n", [[q]], [[:lua vim.cmd"cclose";require("quickfix.highlight").clear()<CR>]], {"silent"}, "Close quickfix")
     bmap(bufNr, "n", [[Q]], [[:lua vim.cmd"cclose";require("quickfix.highlight").clear()<CR>]], {"silent"}, "Close quickfix")
 
     -- Showing floating info
-    bmap(bufNr, "n", [[K]], [[<CMD>lua require("quickfix.info").hover()<CR>]], {"silent"}, "Show quickfix item info")
+    bmap(bufNr, "n", [[gK]], [[<CMD>lua require("quickfix.info").hover(true)<CR>]],  {"silent"}, "Show quickfix item info")
+    bmap(bufNr, "n", [[K]],  [[<CMD>lua require("quickfix.info").hover(false)<CR>]], {"silent"}, "Show quickfix item info")
     api.nvim_create_autocmd({
         "CursorMoved",
         -- Neovim will enter relative buffer temporarily, so "BufLeave" will allways
@@ -38,17 +39,18 @@ else
 end
 
 bmap(bufNr, "n", [[<leader>H]], [[<CMD>lua require("quickfix.highlight").clear()<CR>]], {"silent"}, "Clear known quickfix highlight")
-bmap(bufNr, "n", [[<C-n>]], [[j<CMD>lua require("quickfix.cc").main(false, true)<CR>]], {"noremap", "silent"}, "Next item on quickfix")
-bmap(bufNr, "n", [[<C-p>]], [[k<CMD>lua require("quickfix.cc").main(false, true)<CR>]], {"noremap", "silent"}, "Previous item on quickfix")
+
+bmap(bufNr, "n", [[<C-n>]], [[<CMD>lua require("quickfix.cc").main(false, false, 1)<CR>]], {"noremap", "silent"}, "Next item on quickfix")
+bmap(bufNr, "n", [[<C-p>]], [[<CMD>lua require("quickfix.cc").main(false, false, -1)<CR>]], {"noremap", "silent"}, "Previous item on quickfix")
 
 bmap(bufNr, "n", [[<C-f>]], [[:Cfilter ]],          {"nowait"}, "Filter in quickfix")
 bmap(bufNr, "n", [[%]],     [[<CMD>Cfilter %<CR>]], {"silent"}, "Filter other buffer in quickfix")
 bmap(bufNr, "n", [[#]],     [[<CMD>Cfilter #<CR>]], {"silent"}, "Filter other buffer in quickfix")
 
-bmap(bufNr, "n", [[d]], [[<Nop>]], "which_key_ignore")
-bmap(bufNr, "x", [[d]],  [[:lua require("quickfix.undo").delete("v")<CR>]],    {"silent"}, "Delete selected quickfix items")
-bmap(bufNr, "n", [[dd]], [[:lua require("quickfix.undo").delete("n")<CR>]],    {"silent"}, "Delete quickfix item")
-bmap(bufNr, "n", [[u]],  [[<CMD>lua require("quickfix.undo").recovery()<CR>]], {"silent"}, "Recovery quickfix items")
+bmap(bufNr, "n", [[d]],  [[<Nop>]],                                             "which_key_ignore")
+bmap(bufNr, "x", [[d]],  [[:lua require("quickfix.undo").delete("v")<CR>]],     {"silent"}, "Delete selected quickfix items")
+bmap(bufNr, "n", [[dd]], [[<CMD>lua require("quickfix.undo").delete("n")<CR>]], {"silent"}, "Delete quickfix item under cursor")
+bmap(bufNr, "n", [[u]],  [[<CMD>lua require("quickfix.undo").recovery()<CR>]],  {"silent"}, "Recovery quickfix items")
 
 api.nvim_win_set_option(0, "number", true)
 api.nvim_win_set_option(0, "relativenumber", false)
