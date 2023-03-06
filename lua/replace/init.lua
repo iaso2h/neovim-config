@@ -16,6 +16,7 @@ local M    = {
     motionDirection      = nil,
     restoreNondefaultReg = nil,
     restoreOption        = nil,
+    highlightChangeChk   = nil,
     suppressMessage      = nil,
     option = {hlGroup = "Search", timeout = 250}
 }
@@ -282,10 +283,12 @@ local replace = function(motionType, vimMode, reg, regionMotion, curBufNr) -- {{
 
     -- Create highlight {{{
     -- Creates a new namespace or gets an existing one.
-    require("yankPut").inplacePutNewContentNS = api.nvim_create_namespace("inplacePutNewContent")
-    local newContentExmark = util.nvimBufAddHl(curBufNr, repStart, repEnd,
-            reg.type, M.option.hlGroup, M.option.timeout, require("yankPut").inplacePutNewContentNS)
-    if newContentExmark then require("yankPut").inplacePutNewContentExtmark = newContentExmark end
+    if not (vimMode == "n" and not M.highlightChangeChk) then
+        require("yankPut").inplacePutNewContentNS = api.nvim_create_namespace("inplacePutNewContent")
+        local newContentExmark = util.nvimBufAddHl(curBufNr, repStart, repEnd,
+                reg.type, M.option.hlGroup, M.option.timeout, require("yankPut").inplacePutNewContentNS)
+        if newContentExmark then require("yankPut").inplacePutNewContentExtmark = newContentExmark end
+    end
     -- }}} Create highlight
 
     -- Report change in Neovim statusbar
@@ -455,7 +458,7 @@ function M.operator(args) -- {{{
     -- Curosr {{{
     if vimMode == "n" then
         if not M.cursorPos then
-            -- TODO: Supported in repeat mode?
+            -- TODO: Supported cursor recall in normal mode
         else
             if util.compareDist(M.cursorPos, regionReplace.endPos) <= 0 then
                 -- Avoid curosr out of scope
@@ -558,10 +561,13 @@ function M.operator(args) -- {{{
 end -- }}}
 
 
---- Expression callback for replace operator
---- @param restoreCursorChk boolean Whether to restore the cursor if possible
---- @return string "g@"
-function M.expr(restoreCursorChk) -- {{{
+---Expression callback for replace operator
+---@param restoreCursorChk boolean Whether to restore the cursor if possible
+---@param highlightChangeChk boolean Whether to highlight the change. Only
+--support turnig off highlight changes in vim normal mode!
+---@return string "g@"
+---@return
+function M.expr(restoreCursorChk, highlightChangeChk) -- {{{
     -- TODO: Detect virutal edit
     if not warnRead() then return "" end
 
@@ -575,6 +581,8 @@ function M.expr(restoreCursorChk) -- {{{
     else
         M.cursorPos = nil
     end
+
+    M.highlightChangeChk = highlightChangeChk
 
     -- Evaluate the expression register outside of a function. Because
     -- unscoped variables do not refer to the global scope. Therefore,

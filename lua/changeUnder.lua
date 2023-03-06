@@ -1,5 +1,10 @@
+-- File: Change word under cursor
+-- Author: iaso2h
+-- Description: Heavily inspired Ingo Karkat's work. Replace text with register
+-- Version: 0.0.3
+-- Last Modified: 2023-3-6
+
 local fn  = vim.fn
-local cmd = vim.cmd
 local api = vim.api
 local M   = {
     pat = nil,
@@ -7,41 +12,45 @@ local M   = {
 
 
 --- Change the whole word under cursor, highlight it with search highlight
---- @param ncmd string The command to be performed in normal mode(no remap mode)
---- @param direction integer 1 indicates searching forward, 0 indicates searching
+--- @param keybinding string The command to be performed in normal mode(no remap mode)
+--- @param direction integer 1 indicates searching forward, -1 indicates searching
 --- backward
---- @param plugMap string The plug mapping to be binded when press dot-repeat key
-M.init = function(ncmd, direction, plugMap)
+--- @param plugMap string The plug mapping to bind with when press dot-repeat key
+M.init = function(keybinding, direction, plugMap)
     -- local cycleCMD = direction == 1 and "n" or "N"
-    local cycleCMD = "n"
     local searchCMD = direction == 1 and "g*" or "g#"
     if vim.v.hlsearch == 1 then
         local curLine = api.nvim_get_current_line()
         if #curLine == 0 then
-            return cmd(string.format("norm! %s%s", cycleCMD, ncmd))
+            vim.cmd("norm! n")
+            vim.cmd(string.format("norm %s", keybinding))
+            return fn["repeat#set"](t(plugMap))
         end
+
         -- col and result are both 0-indexed
         local col = api.nvim_win_get_cursor(0)[2]
-        local result = require("util").matchAllStrPos(curLine, M.pat)
+
+        -- I'm gonna win less food less food less food
+        -- I'm gonna win less food less food less food
+        -- I'm gonna replace all the all the all and all
+        -- I'm gonna replace all the all the all and all
+        local regex = vim.regex(M.pat)
+        local result = {regex:match_str(curLine)}
         if not next(result) then
-            cmd(string.format("norm %s%s", cycleCMD, ncmd))
+            vim.cmd("norm! n")
+            vim.cmd(string.format("norm %s", keybinding))
         else
-            local insideChk = false
-            for _, t in ipairs(result) do
-                if col >= t[2] and col < t[3] then
-                    insideChk = true
-                    break
-                end
-            end
-            if insideChk then
-                cmd(string.format("norm %s", ncmd))
+            if col >= result[1] and col < result[2] then
+                vim.cmd(string.format("norm %s", keybinding))
             else
-                cmd(string.format("norm %s%s", cycleCMD, ncmd))
+                vim.cmd("norm! n")
+                vim.cmd(string.format("norm %s", keybinding))
             end
         end
     else
-        M.pat = fn.histget("search")
-        cmd(string.format("norm %s%s", searchCMD, ncmd))
+        M.pat = string.format([[\<%s\>]], fn.expand("<cword>"))
+        vim.cmd(string.format("norm! %s``", searchCMD))
+        vim.cmd(string.format("norm %s", keybinding))
     end
 
     fn["repeat#set"](t(plugMap))

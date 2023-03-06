@@ -154,11 +154,11 @@ map("n", [[cn]], [[v:hlsearch? "cgn" : "g*``cgn"]], {"noremap", "expr"}, "Change
 map("n", [[cN]], [[v:hlsearch? "cgN" : "g#``cgN"]], {"noremap", "expr"}, "Change whole word under cursor, then highlight it backward")
 -- Replace
 map("n", [[<Plug>ReplaceOperatorInplace]], function ()
-    return vim.fn.luaeval [[require("replace").expr(true)]]
+    return vim.fn.luaeval [[require("replace").expr(true, true)]]
 end, {"silent", "expr"}, "Replace operator and restore the cursor position")
 
 map("n", [[<Plug>ReplaceOperator]], function ()
-    return vim.fn.luaeval [[require("replace").expr(false)]]
+    return vim.fn.luaeval [[require("replace").expr(false, false)]]
 end, {"silent", "expr"}, "Replace operator")
 
 map("n", [[<Plug>ReplaceExpr]],
