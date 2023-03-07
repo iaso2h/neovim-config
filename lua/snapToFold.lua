@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Snap to closest fold in sight then execute an Ex command or
 -- a function
--- Version: 0.0.6
--- Last Modified: 2023-3-1
+-- Version: 0.0.7
+-- Last Modified: 2023-3-7
 local api  = vim.api
 local fn   = vim.fn
 local util = require("util")
@@ -16,29 +16,33 @@ local M    = {}
 ---@param botline number
 ---@return number
 local getNextNonFoldLine = function(topline, botline)
-    while topline < botline do
+    local nextline = topline
+    while nextline < botline do
         -- Inside a fold
-        if fn.foldlevel(topline) ~= 0 then
-            local closedEnd = fn.foldclosedend(topline)
+        if fn.foldlevel(nextline) ~= 0 then
+            local closedEnd = fn.foldclosedend(nextline)
 
-            -- The fold is open
             if closedEnd == -1 then
+                -- The fold is open
+
                 -- Find the end of a opened-fold till calling
                 -- vim.fn.foldlevel(nextline) return 0 because the fold is
                 -- already open, and the return value of vim.fn.foldclosedend()
                 -- is always -1 whenever it recieves linenr inside a fold or
                 -- outside
-                while topline < botline do
-                    topline = topline + 1
-                    if fn.foldlevel(topline) == 0 then break end
+                while nextline < botline do
+                    nextline = nextline + 1
+                    if fn.foldlevel(nextline) == 0 then
+                        return nextline
+                    end
                 end
             else
                 -- The fold is closed
-                topline = closedEnd + 1
+                nextline = closedEnd + 1
             end
         else
             -- Not inside a fold
-            break
+            return nextline
         end
     end
 
@@ -69,13 +73,17 @@ end
 ---@param topline number
 ---@param botline number
 ---@return table Ex: {{1, 34}, {54, 131}, {185, 202}}
-local getAllNonFoldRegion = function(topline, botline)
+M.getAllNonFoldRegion = function(topline, botline)
     local region
     local nextTopline = topline
     local nonFoldRegion = {}
 
     -- Make sure the first line is always a nonfoldline
     nextTopline = getNextNonFoldLine(nextTopline, botline)
+    if nextTopline == topline then
+        -- When the topline and botline are all inside a fold region
+        return {}
+    end
 
     while true do
         region = getNonFoldRegion(nextTopline, botline)
@@ -183,7 +191,7 @@ M.main = function(exCMD, snapEnable, threshold)
     -- Initiation
     local curWinNr = api.nvim_get_current_win()
     local curBufNr = api.nvim_get_current_buf()
-    -- (1, 0) based table
+    -- (1, 0) indexed table
     local cursorPos = api.nvim_win_get_cursor(curWinNr)
     if fn.foldlevel(cursorPos[1]) ~= 0 then
         return exeCommand(exCMD)
@@ -194,7 +202,7 @@ M.main = function(exCMD, snapEnable, threshold)
     winInfo = #winInfo == 1 and winInfo[1] or winInfo
 
     -- Get non-folded range inclusively
-    local nonFoldRegions = getAllNonFoldRegion(winInfo.topline, winInfo.botline)
+    local nonFoldRegions = M.getAllNonFoldRegion(winInfo.topline, winInfo.botline)
 
     -- No visible folds in Neovim window
     if #nonFoldRegions == 1 and nonFoldRegions[1][1] == winInfo.topline and nonFoldRegions[1][2] == winInfo.botline then
