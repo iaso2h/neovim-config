@@ -1,9 +1,6 @@
 local p     = require("onenord.pallette")
 local theme = {}
 
--- OPTIM:
-vim.cmd(string.format("hi! @keyword.return guifg=%s guibg=%s gui=italic", p.purple, "#564167"))
-
 -- Syntax highlight {{{
 theme.syntax = {
     Comment        = {fg = p.n3b, style = "italic"},
@@ -479,10 +476,10 @@ theme.plugins = { -- {{{
     DapUIBreakpointsLine         = {link = "DapUILineNumber"},
     DapUIBreakpointsDisabledLine = {fg   = p.n3b},
     DapUICurrentFrameName        = {link = "DapUIBreakpointsCurrentLine"},
-    DapUIStepOver                = {fg   = p.n9},
-    DapUIStepInto                = {fg   = p.n9},
-    DapUIStepBack                = {fg   = p.n9},
-    DapUIStepOut                 = {fg   = p.n9},
+    DapUIStepOver                = {fg   = p.n8},
+    DapUIStepInto                = {fg   = p.n8},
+    DapUIStepBack                = {fg   = p.n8},
+    DapUIStepOut                 = {fg   = p.n8},
     DapUIStop                    = {fg   = p.n11},
     DapUIPlayPause               = {fg   = p.n14},
     DapUIRestart                 = {fg   = p.n14},
@@ -498,6 +495,10 @@ theme.plugins = { -- {{{
     DapUIStepIntoNC              = {link = "DapUIStepInto"},
     DapUIStepBackNC              = {link = "DapUIStepBack"},
     DapUIStepOutNC               = {link = "DapUIStepOut"},
+
+    -- https://github.com/theHamsta/nvim-dap-virtual-text
+    NvimDapVirtualText        = {fg = p.n9, bg = p.n1, style = "italic"},
+    NvimDapVirtualTextChanged = {link = "DapUIModifiedValue"},
 
     -- https://github.com/phaazon/hop.nvim
     HopNextKey   = {link = "IncSearch"},

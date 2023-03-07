@@ -19,7 +19,7 @@ opt.softtabstop = 4
 opt.tabstop     = 4
 
 if _G._os == "Windows" then
-    o.clipboard = "unnamed"
+    opt.clipboard = "unnamed"
 else
     opt.clipboard = "unnamed,unnamedplus"
 end

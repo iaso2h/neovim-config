@@ -10,6 +10,9 @@ end
 pcall(vim.cmd, [[language en_US]])
 
 _G._os = vim.loop.os_uname().sysname
+if string.find(_G._os, "Windows") then
+    _G._os = "Windows"
+end
 _G._isTerm = vim.api.nvim_list_uis()[1].ext_termcolors
 
 -- Disable built-in plugins

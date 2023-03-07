@@ -116,20 +116,18 @@ M.config = function()
 
     dap.listeners.after.event_initialized["dapui_config"] = function()
         dapui.open()
-
+        vim.cmd[[DapVirtualTextEnable]]
         M.filetypeSetup()
     end
-
-    -- local onMove = function (signal)
-        -- if signal == 1 then
-        -- else
-        -- end
-    -- end
-    -- dap.listeners.before.event_terminated['dapui_config'] = function() dapui.close() end
-    -- dap.listeners.before.event_exited['dapui_config'] = function() dapui.close() end
+    -- HACK: not working
+    dap.listeners.before.event_terminated['dapui_config'] = function()
+        vim.cmd[[DapVirtualTextDisable]]
+    end
+    dap.listeners.before.event_exited['dapui_config'] = function()
+        vim.cmd[[DapVirtualTextDisable]]
+    end
 
     map("n", [[<C-w>d]], [[<CMD>lua require("dapui").toggle {layout=nil,reset=true}<CR>]], {"silent"}, "Dap UI toggle")
-
     M.filetypeSetup()
 end
 

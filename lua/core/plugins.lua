@@ -197,6 +197,9 @@ use {
         setup   = conf "vim-matchup".setup,
         config  = conf "vim-matchup".config
     }
+
+    map({"n", "x"}, [[<leader>f]], [[<CMD>lua require("hop").hint_char1()<CR>]], "Hop char")
+    map({"n", "x"}, [[<leader>F]], [[<CMD>lua require("hop").hint_lines()<CR>]], "Hop line")
     use {
         'phaazon/hop.nvim',
         keys = {
@@ -209,8 +212,8 @@ use {
             require('hop').setup{
                 case_insensitive = false
             }
-            map({"n", "x"}, [[<leader>f]], require("hop").hint_char1, "Hop char")
-            map({"n", "x"}, [[<leader>F]], require("hop").hint_lines, "Hop line")
+            -- map({"n", "x"}, [[<leader>f]], [[<CMD>lua require("hop").hint_char1()<CR>]], "Hop char")
+            -- map({"n", "x"}, [[<leader>F]], [[<CMD>lua require("hop").hint_lines()<CR>]], "Hop line")
         end
         }
     use {
@@ -240,10 +243,13 @@ use {
             map("n", [[gxx]], [[<Plug>(ExchangeLine)]],  "Exchange current line")
         end,
     }
+
+    map("n", [[<leader>s]], [[<CMD>Switch<CR>]], {"silent"}, "Switch word under cursor")
     use {
         'AndrewRadev/switch.vim',
-        cmd   = "Switch",
-        setup = 'map("n", [[<leader>s]], [[<CMD>Switch<CR>]], {"silent"}, "Switch word under cursor")'
+        -- setup = function()
+            -- map("n", [[<leader>s]], [[<CMD>Switch<CR>]], {"silent"}, "Switch word under cursor")
+        -- end
     }
     use {
         'machakann/vim-sandwich',
@@ -843,6 +849,7 @@ use {
         },
         config = conf("vim-scriptease").config
     }
+
     map("n", [[<leader>db]], [[<CMD>lua require("dap").toggle_breakpoint()<CR>]], {"silent"}, "Dap toggle breakpoint")
     -- OPTIM:Dirty workaround to setup keymapping, probably due to the aync requrie
     use {
@@ -861,26 +868,32 @@ use {
         config = conf "nvim-dap-ui".config
     }
     use {
-        -- TODO: hlGroup
         'theHamsta/nvim-dap-virtual-text',
-        disable = true,
         after  = "nvim-dap",
+        cmd = {
+            "DapVirtualTextEnable",
+            "DapVirtualTextDisable",
+            "DapVirtualTextToggle",
+            "DapVirtualTextForceRefresh",
+        },
         config = function()
             require("nvim-dap-virtual-text").setup {
-                enabled = true,                      -- enable this plugin (the default)
-                enabled_commands = true,             -- create commands DapVirtualTextEnable, DapVirtualTextDisable, DapVirtualTextToggle, (DapVirtualTextForceRefresh for refreshing when debug adapter did not notify its termination)
-                highlight_changed_variables = true,  -- highlight changed values with NvimDapVirtualTextChanged, else always NvimDapVirtualText
-                highlight_new_as_changed = false,    -- highlight new variables in the same way as changed variables (if highlight_changed_variables)
-                show_stop_reason = true,             -- show stop reason when stopped for exceptions
-                commented = false,                   -- prefix virtual text with comment string
-
+                enabled = true,
+                enabled_commands = true, -- create commands DapVirtualTextEnable, DapVirtualTextDisable, DapVirtualTextToggle, (DapVirtualTextForceRefresh for refreshing when debug adapter did not notify its termination)
+                highlight_changed_variables = true,
+                highlight_new_as_changed = false,
+                show_stop_reason = true,
+                commented = false,             -- prefix virtual text with comment string
+                only_first_definition = true,  -- only show virtual text at first definition (if there are multiple)
+                all_references = false,        -- show virtual text on all all references of the variable (not only definitions)
                 -- experimental features:
-                virt_text_pos = 'eol',               -- position of virtual text, see `:h nvim_buf_set_extmark()`
-                all_frames = false,                  -- show virtual text for all stack frames not only current. Only works for debugpy on my machine.
-                virt_lines = false,                  -- show virtual lines instead of virtual text (will flicker!)
-                virt_text_win_col = nil              -- position the virtual text at a fixed window column (starting from the first text column) ,
-                                                     -- e.g. 80 to position at column 80, see `:h nvim_buf_set_extmark()`
+                virt_text_pos = 'eol',   -- position of virtual text, see `:h nvim_buf_set_extmark()`
+                all_frames = false,      -- show virtual text for all stack frames not only current. Only works for debugpy on my machine.
+                virt_lines = false,      -- show virtual lines instead of virtual text (will flicker!)
+                virt_text_win_col = nil  -- position the virtual text at a fixed window column (starting from the first text column) , e.g. 80 to position at column 80, see `:h nvim_buf_set_extmark()`
             }
+            map("n", [[<leader>dh]], [[<CMD>DapVirtualTextToggle<CR>]], {"silent"}, "Dap virtual text toggle")
+            map("n", [[<leader>dH]], [[<CMD>DapVirtualTextForceRefresh<CR>]], {"silent"}, "Dap virtual text refresh")
         end
     }
     use {
