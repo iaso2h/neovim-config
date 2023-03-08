@@ -2,54 +2,71 @@
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
 -- Dependencies: 0
--- Version: 0.0.9
--- Last Modified: 2023-3-3
+-- Version: 0.0.10
+-- Last Modified: 2023-3-8
 local api = vim.api
 local fn  = vim.fn
 local M   = {
     curBuf = -1,
     lastBuf = -1,
     curWin = -1,
-    oldBuf = -1
+    oldBuf = -1,
 }
-local lines = {"< New Buffer >"}
 
+local resetLine = function ()
+    M.lines = {
+        "< New Buffer >",
+        absolute = {}
+    }
+end
 
 --- Display history in new buffer
---- @param force boolean Force to display historyStartup. Set to it to false
---- when start from autocommand
-M.display = function(force)
-    if (not force and fn.argc() > 0) or
-        #vim.v.oldfiles == 1 then
-
+--- @param refreshChk boolean Set it true to refresh the history files everytime
+M.display = function(refreshChk)
+    if fn.argc() > 0 or #vim.v.oldfiles == 1 then
         return
     end
+
+    if not M.lines then resetLine() end
 
     if vim.bo.filetype == "HistoryStartup" then return end
     M.curWin = api.nvim_get_current_win()
 
-    for _, fileStr in pairs(vim.v.oldfiles) do
+    local relative = {}
+    local absolute = {}
+    for _, absolutePath in pairs(vim.v.oldfiles) do
         if _G._os_uname.sysname ~= "Windows_NT" then
-            if vim.loop.fs_stat(fileStr) then
-                if #fileStr > api.nvim_win_get_width(M.curWin) then
-                    fileStr = fn.pathshorten(fileStr)
+            if vim.loop.fs_stat(absolutePath) then
+                if #absolutePath > api.nvim_win_get_width(M.curWin) then
+                    local relativePath = fn.pathshorten(absolutePath)
+                    table.insert(relative, relativePath)
                 end
-                table.insert(lines, fileStr)
+                table.insert(absolute, absolutePath)
             end
         else
             -- Upper case the first dirver character in Windows
-            fileStr = string.sub(fileStr, 1, 1):upper() .. string.sub(fileStr, 2, -1)
+            absolutePath = string.sub(absolutePath, 1, 1):upper() .. string.sub(absolutePath, 2, -1)
             -- Substitue the / character with the \ one
-            fileStr = string.gsub(fileStr, "/", "\\")
+            absolutePath = string.gsub(absolutePath, "/", "\\")
             -- Filter out duplicates and check validity
-            if not vim.tbl_contains(lines, fileStr) and vim.loop.fs_stat(fileStr) then
-                if #fileStr > api.nvim_win_get_width(M.curWin) then
-                    fileStr = fn.pathshorten(fileStr)
+            if not vim.tbl_contains(absolute, absolutePath) and vim.loop.fs_stat(absolutePath) then
+                if #absolutePath > api.nvim_win_get_width(M.curWin) then
+                    local relativePath = fn.pathshorten(absolutePath)
+                    table.insert(relative, relativePath)
                 end
-                table.insert(lines, fileStr)
+                table.insert(absolute, absolutePath)
             end
         end
     end
+
+
+    if refreshChk then
+        resetLine()
+    end
+    M.lines = {
+        absolute = absolute,
+        relative = relative
+    }
 
     -- Save last opened buffer and restore it after open a new buffer
     if vim.bo.buftype == "" and api.nvim_buf_get_name(0) ~= "" then
@@ -76,7 +93,11 @@ M.display = function(force)
     api.nvim_buf_set_option(M.curBuf, "filetype",   "HistoryStartup")
 
     api.nvim_win_set_buf(M.curWin, M.curBuf)
-    api.nvim_buf_set_lines(M.curBuf, 0, -1, false, lines)
+    if not next(M.lines.relative) then
+        api.nvim_buf_set_lines(M.curBuf, 0, -1, false, M.lines.absolute)
+    else
+        api.nvim_buf_set_lines(M.curBuf, 0, -1, false, M.lines.relative)
+    end
     api.nvim_buf_set_option(M.curBuf, "modifiable", false)
     api.nvim_buf_set_option(M.curBuf, "modified",   false)
 
@@ -104,7 +125,7 @@ end
 
 
 M.execMap = function(key)
-    local target = lines[api.nvim_win_get_cursor(0)[1]]
+    local target = M.lines.absolute[api.nvim_win_get_cursor(0)[1]]
     key = string.lower(key)
 
     if key == "q" then
@@ -114,7 +135,7 @@ M.execMap = function(key)
         if #bufNrTbl == 0 then
             vim.cmd("noa q!")
         else
-            if api.nvim_buf_is_valid(M.lastBuf) then
+            if M.lastBuf and api.nvim_buf_is_valid(M.lastBuf) then
                 api.nvim_win_set_buf(M.curWin, M.lastBuf)
             end
         end
@@ -130,7 +151,7 @@ M.execMap = function(key)
             vim.cmd("noa split")
             vim.cmd("enew")
         else
-            if api.nvim_buf_is_valid(M.lastBuf) then
+            if M.lastBuf and api.nvim_buf_is_valid(M.lastBuf) then
                 api.nvim_win_set_buf(M.curWin, M.lastBuf)
             end
             vim.cmd("split " .. target)
@@ -139,7 +160,7 @@ M.execMap = function(key)
         if target == "< New Buffer >" then
             vim.cmd("vnew")
         else
-            if api.nvim_buf_is_valid(M.lastBuf) then
+            if M.lastBuf and api.nvim_buf_is_valid(M.lastBuf) then
                 api.nvim_win_set_buf(M.curWin, M.lastBuf)
             end
             vim.cmd("vsplit " .. target)
