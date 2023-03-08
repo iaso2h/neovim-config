@@ -1,3 +1,9 @@
+-- File: /buf/close.lua
+-- Author: iaso2h
+-- Description: Delete buffer without change the window layout
+-- Similar Work: https://github.com/ojroques/nvim-bufdel
+-- Version: 0.0.27
+-- Last Modified: 2023-3-8
 local fn    = vim.fn
 local api   = vim.api
 local util  = require("buf.util")
@@ -34,6 +40,7 @@ local function saveModified(bufNr) -- {{{
             return true
         end
     end
+
 end -- }}}
 
 
@@ -66,7 +73,9 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
             -- api.nvim_win_close(var.winID, true)
         -- else
             -- NOTE: more details see ":help buftype"
-            if var.bufType == "nofile" then
+            if vim.bo.filetype == "vim" then
+                api.nvim_win_close(0, false)
+            elseif var.bufType == "nofile" then
                 if var.bufName == "[Command Line]" then
                     -- This buffer shows up When you hit CTRL-F on commandline
                     api.nvim_win_close(var.winID, true)
@@ -192,6 +201,10 @@ function M.init(type) -- {{{
 
             -- NOTE: more details see ":help buftype"
             if var.bufType == "nofile" or var.bufType == "prompt" then
+                -- Commandline expand window which can be accessed by pressing <C-f>
+                if vim.bo.filetype == "vim" then
+                    return api.nvim_win_close(0, false)
+                end
                 -- Override the default behavior, treat it like performing a buffer delete
                 if not bufClose(true, false) then return end
                 -- Make sure no lingering window after buffer being wiped
