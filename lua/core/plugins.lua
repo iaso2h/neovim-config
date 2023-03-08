@@ -247,9 +247,8 @@ use {
     map("n", [[<leader>s]], [[<CMD>Switch<CR>]], {"silent"}, "Switch word under cursor")
     use {
         'AndrewRadev/switch.vim',
-        -- setup = function()
-            -- map("n", [[<leader>s]], [[<CMD>Switch<CR>]], {"silent"}, "Switch word under cursor")
-        -- end
+        cmd = {"Switch"},
+        setup = [[ vim.g.switch_mapping = '' ]]
     }
     use {
         'machakann/vim-sandwich',

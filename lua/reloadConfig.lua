@@ -88,14 +88,14 @@ local luaConfigs = {
                     vim.log.levels.ERROR)
                 vim.notify(msg, vim.log.levels.ERROR)
             end
-            packerCompileQuery()
+            -- packerCompileQuery()
         end
     },
-    {
-        -- Ask whether to compile lua packages for "<NvimConfig> /lua/core/plugins.lua"
-        pathPat = luaModulePath:joinpath("core", "plugins.lua").filename,
-        config  = packerCompileQuery
-    },
+    -- {
+        -- -- Ask whether to compile lua packages for "<NvimConfig> /lua/core/plugins.lua"
+        -- pathPat = luaModulePath:joinpath("core", "plugins.lua").filename,
+        -- config  = packerCompileQuery
+    -- },
     {
         pathPat = luaModulePath:joinpath("onenord").filename,
         config  = function(...)

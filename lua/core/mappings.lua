@@ -230,13 +230,12 @@ map("n", [[gr]],  [[<Plug>ReplaceOperatorInplace]], "Replace operator and restor
 map("n", [[gru]], [[<Plug>ReplaceOperator]],        "Replace operator")
 map("n", [[grr]], [[<Plug>ReplaceCurLine]],         "Replace current line")
 map("x", [[R]],   [[<Plug>ReplaceVisual]],          "Replace selected")
--- TODO: replaceWordUnderCarret
 
 map("n", [[<Plug>ReplaceUnderForward]],
     [[:lua require("changeUnder").init("gruiw", 1, "<Plug>ReplaceUnderForward")<CR>]],
     {"silent"}, "Replace the whold word under curosr, then highlight it forward")
 map("n", [[<Plug>ReplaceUnderBackward]],
-    [[:lua require("changeUnder").init("gruiw", 0, "<Plug>ReplaceUnderBackward")<CR>]],
+    [[:lua require("changeUnder").init("gruiw", -1, "<Plug>ReplaceUnderBackward")<CR>]],
     {"silent"}, "Replace the whold word under curosr, then highlight it backward")
 map("n", [[grn]], [[<Plug>ReplaceUnderForward]], "Replace the whold word under curosr, then highlight it forward")
 map("n", [[grN]], [[<Plug>ReplaceUnderBackward]], "Replace the whold word under curosr, then highlight it backward")
