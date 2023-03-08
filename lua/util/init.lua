@@ -121,8 +121,8 @@ end
 --- @param prefix boolean Set to true to trim the suffix as well
 --- @return:       return table of trimmed string, otherwise return 0
 function M.trimSpaces(strTbl, silent, prefix) -- {{{
-    _G._trimSpacesChk = _G._trimSpacesChk or true
-    if not _G._trimSpacesChk then return end
+    _G._trim_space = _G._trim_space or true
+    if not _G._trim_space then return end
 
     if vim.bo.modified == false then return end
 

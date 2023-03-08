@@ -1,5 +1,4 @@
 local api = vim.api
-local fn  = vim.fn
 local M = {
     augroup = {}
 }
@@ -70,7 +69,7 @@ if not vim.g.vscode then
 end
 
 
-if _G._isTerm then
+if _G._is_term then
     vim.cmd [[
     function! RemoveLastPathComponent()
         let l:cmdlineBeforeCursor = strpart(getcmdline(), 0, getcmdpos() - 1)
@@ -156,7 +155,7 @@ au("BufLeave", {
         local winConfig = api.nvim_win_get_config(winID)
         -- Non-float window and non-special buffer type and non-scratch buffer file
         if winConfig.relative == "" and bufType == "" and bufName ~= "" then
-            _G._lastWinID = winID
+            _G._last_win_id = winID
         end
     end
 })
@@ -314,9 +313,9 @@ excmd("O", [[browse oldfiles]], {
 })
 
 excmd("OnSaveTrimSpaces", function ()
-    _G._trimSpacesChk = _G._trimSpacesChk or true
-    _G._trimSpacesChk = not _G._trimSpacesChk
-    vim.api.nvim_echo({ { string.format("OnSaveTrimSpaces: %s", _G._trimSpacesChk), "Moremsg" } }, false, {})
+    _G._trim_space = _G._trim_space or true
+    _G._trim_space = not _G._trim_space
+    vim.api.nvim_echo({ { string.format("OnSaveTrimSpaces: %s", _G._trim_space), "Moremsg" } }, false, {})
 end, {
     desc  = "Toggle trimming spaces on save",
     nargs = 0,

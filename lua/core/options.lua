@@ -55,8 +55,8 @@ opt.foldcolumn = "auto:4"
 opt.signcolumn = "yes:1"
 opt.foldmethod = "expr"
 opt.foldexpr   = "EnhanceFoldExpr()"
-_G._Myformatoptions = "cr/qn2mM1jpl"
-opt.formatoptions = _G._Myformatoptions -- NOTE: Might change on loading different types of ftplugins
+_G._format_option = "cr/qn2mM1jpl"
+opt.formatoptions = _G._format_option -- NOTE: Might change on loading different types of ftplugins
 
 opt.inccommand = "nosplit"
 opt.gdefault   = true

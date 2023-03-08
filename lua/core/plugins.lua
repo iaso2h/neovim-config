@@ -520,7 +520,7 @@ use {
     }
     use {
         'yamatsum/nvim-nonicons',
-        disable = _G._isTerm,
+        disable = _G._is_term,
         after   = "nvim-web-devicons",
         config  = [[require("nvim-nonicons").setup()]]
     }

@@ -214,7 +214,7 @@ gls.left[1] = { -- {{{
 
             changeHLColor("GalaxyVimMode")
 
-            if not _G._isTerm then
+            if not _G._is_term then
                 return string.format("  %s %s ", require("nvim-nonicons").get("vim"), alias[vimMode])
             else
                 if vimMode == "t" or vimMode == "!" then

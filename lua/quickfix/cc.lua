@@ -84,7 +84,7 @@ M.main = function(fallbackChk, closeQfChk, offset)
     -- In some cases the autocmd for retriving the last window id before
     -- entering into the quickfix is not working well, then we have to use the
     -- fallback mathod
-    local savedLastWinID = _G._lastWinID
+    local savedLastWinID = _G._last_win_id
     local fallbackTick   = qfWinID == savedLastWinID
 
     -- Validating that savedLastWinID is the window to be switched, and making

@@ -30,7 +30,7 @@ local luaModulePath       = configPath:joinpath("lua")
 local sep                 = _G._os_uname.sysname == "Windows_NT" and "\\" or "/"
 
 
-local function upperCaseWindows_NTDrive(fullPathStr)
+local function upperCaseWindowsDrive(fullPathStr)
     if not string.sub(fullPathStr, 1, 1):match("[a-z]") then
         return fullPathStr
     end

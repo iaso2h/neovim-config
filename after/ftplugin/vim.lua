@@ -1,5 +1,5 @@
 -- Overwrite setting set by runtime/ftplugin/vim.vim
-vim.opt.formatoptions = _G._Myformatoptions
+vim.opt.formatoptions = _G._format_option
 if vim.g.loaded_scriptease then
     bmap(0, "n", [[<C-b>u]], [[:lua require("config.vim-scriptease").updateDebug]], {"silent"}, "Update vimscript")
     bmap(0, "n", [[<C-b>a]], [[:<C-u>Breakadd<CR>]],   {"silent"}, "Add breakpoint at cursorline")
