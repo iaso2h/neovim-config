@@ -25,14 +25,13 @@ map("n", [[]d]], [[]c]], {"noremap", "silent"}, "Go to the next start of a chang
 map("n", [[]c]], [[:noa windo set cc=80<CR>]], {"silent"}, "Turn on colorcolumn")
 map("n", [[[c]], [[:noa windo set cc&<CR>]],   {"silent"}, "Turn off colorcolumn")
 -- Quickfix
-map("n", [[<C-q>l]], [[:cnfile<CR>]],        {"silent"}, "Go to next file in quickFix")
-map("n", [[<C-q>h]], [[:cpfile<CR>]],        {"silent"}, "Go to previous file in quickFix")
 map("n", [[<leader>q]], [[<CMD>lua require("quickfix.toggle")(false)<CR>]], {"silent"}, "Toggle quickfix")
 map("n", [[<leader>Q]], [[<CMD>lua require("quickfix.toggle")(true)<CR>]],  {"silent"}, "Close visible quickfix")
 map("n", [[<C-q>g]], [[<CMD>cfirst<CR>zzzv]],    {"silent"}, "Go to first item in quickfix")
 map("n", [[<C-q>G]], [[<CMD>clast<CR>zzzv]],     {"silent"}, "Go to last item in quickfix")
 map("n", [[<C-q>n]], [[<CMD>cnext<CR>zzzv]],     {"silent"}, "Go to next item in quickfix")
 map("n", [[<C-q>N]], [[<CMD>cprevious<CR>zzzv]], {"silent"}, "Go to previous item in quickfix")
+map("n", [[<C-q>l]], [[<CMD>lua require("quickfix.convertToLoc")()<CR>]], {"silent"}, "Convert quickfix into location list")
 map("n", [[<C-q>,]], [[<CMD>lua require("quickfix.message").main()<CR>]], {"silent"}, "Show messages in quickfix")
 map("n", [[<C-q>.]], [[<CMD>lua require("quickfix.message").main()<CR>]], {"silent"}, "Show messages in quickfix")
 -- Spell corretion
