@@ -50,7 +50,9 @@ function M.main()
         end
     else
         -- Jump to recent last change instead
-        require("searchHop").centerHop("g;", false, true)
+        if vim.api.nvim_win_get_cursor(0)[1] == 1 then
+            require("searchHop").centerHop("g;", false, true)
+        end
     end
 
     if fn.foldclosed('.') ~= -1 then
