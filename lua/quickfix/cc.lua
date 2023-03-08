@@ -28,9 +28,13 @@ local regainFocus = function(closeQfChk, qfWinID, qfCursorPos, savedLastWinID)
 end
 
 
-local fallback = function(closeQfChk, lineNr, qfWinID, qfCursorPos)
+local fallback = function(lineNr, ...)
     vim.cmd([[cc ]] .. lineNr)
-    regainFocus(closeQfChk, qfWinID, qfCursorPos)
+    vim.cmd[[norm! zvzz]]
+    if not vim.bo.buflisted then
+        vim.opt_local.buflisted = true
+    end
+    regainFocus(...)
 end
 
 
@@ -63,7 +67,7 @@ M.main = function(fallbackChk, closeQfChk, offset)
     end
 
     -- User the built-in :cc command to open quickfix item
-    if fallbackChk then return fallback(closeQfChk, lineNr, qfWinID, qfCursorPos) end
+    if fallbackChk then return fallback(lineNr, closeQfChk, qfWinID, qfCursorPos) end
 
     local item = require("quickfix.util").getlist()[lineNr]
     if not next(item) then
@@ -106,15 +110,7 @@ M.main = function(fallbackChk, closeQfChk, offset)
     end
 
     -- Switch buf in the window
-    api.nvim_win_call(savedLastWinID, function()
-        vim.cmd([[cc ]] .. lineNr)
-        vim.cmd[[norm! zvzz]]
-    end)
-    if not vim.bo.buflisted then
-        vim.opt_local.buflisted = true
-    end
-
-    regainFocus(closeQfChk, qfWinID, qfCursorPos, savedLastWinID)
+    fallback(lineNr, closeQfChk, qfWinID, qfCursorPos, savedLastWinID)
 end
 
 

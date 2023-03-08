@@ -9,8 +9,9 @@ end
 
 pcall(vim.cmd, [[language en_US]])
 
-_G._os_uname = vim.loop.os_uname()
-_G._is_term = vim.api.nvim_list_uis()[1].ext_termcolors
+_G._os_uname         = vim.loop.os_uname()
+_G._is_term          = vim.api.nvim_list_uis()[1].ext_termcolors
+_G._qf_fallback_open = true
 
 -- Disable built-in plugins
 vim.g.loaded_2html_plugin      = 1

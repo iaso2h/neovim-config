@@ -144,21 +144,23 @@ au("FocusGained", {
     command = "checktime"
 })
 
-au("BufLeave", {
-    desc    = "Record the current window id before leaving the current buffer",
-    callback = function ()
-        -- if not vim.bo.buflisted then return end
-        local bufNr = api.nvim_get_current_buf()
-        local bufName = api.nvim_buf_get_name(bufNr)
-        local bufType = vim.bo.buftype
-        local winID = api.nvim_get_current_win()
-        local winConfig = api.nvim_win_get_config(winID)
-        -- Non-float window and non-special buffer type and non-scratch buffer file
-        if winConfig.relative == "" and bufType == "" and bufName ~= "" then
-            _G._last_win_id = winID
+if not _G._qf_fallback_open then
+    au("BufLeave", {
+        desc    = "Record the current window id before leaving the current buffer",
+        callback = function ()
+            -- if not vim.bo.buflisted then return end
+            local bufNr = api.nvim_get_current_buf()
+            local bufName = api.nvim_buf_get_name(bufNr)
+            local bufType = vim.bo.buftype
+            local winID = api.nvim_get_current_win()
+            local winConfig = api.nvim_win_get_config(winID)
+            -- Non-float window and non-special buffer type and non-scratch buffer file
+            if winConfig.relative == "" and bufType == "" and bufName ~= "" then
+                _G._last_win_id = winID
+            end
         end
-    end
-})
+    })
+end
 
 au("BufWinEnter", {
     desc     = "Place the cursor on the last position",

@@ -1,4 +1,3 @@
--- TODO: quickfix convert into a window localist
 local fn  = vim.fn
 local api = vim.api
 local M   = {
