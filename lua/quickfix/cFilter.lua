@@ -37,7 +37,7 @@ M.main = function(qfChk, pat, bang)
     end
 
     if pat == "%" or pat == "#" then
-        pat = fn.expand("#:t:r")
+        pat = vim.fn.expand("#")
     end
 
     if pat == '' then return end
@@ -47,7 +47,7 @@ M.main = function(qfChk, pat, bang)
     local regex = vim.regex(fn.escape(pat, "\\"))
     if not regex then return end
 
-    if bang == '!' then
+    if bang then
         cond = function(i)
             return (not regex:match_str(i.text)) and (not regex:match_str(fn.bufname(i.bufnr)))
         end
