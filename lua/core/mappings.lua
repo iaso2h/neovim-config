@@ -264,8 +264,6 @@ map("x", [[?]], [[:lua require("searchHop").searchSelected("?")<CR>]], {"silent"
 map("x", [[*]], [[/]], "Search selected forward")
 map("x", [[#]], [[?]], "Search selected backward")
 -- Regex very magic
-map("n", [[/]], [[/\v]], {"noremap"}, "Search forward")
-map("n", [[?]], [[?\v]], {"noremap"}, "Search backward")
 map("n", [[n]], [[:lua require("searchHop").cycleSearch("n")<CR>]], {"silent"}, "Cycle through search result forward")
 map("n", [[N]], [[:lua require("searchHop").cycleSearch("N")<CR>]], {"silent"}, "Cycle through search result backward")
 -- Disable highlight search & Exit visual mode
@@ -524,6 +522,10 @@ map("t", [[<C-w>K]],     [[<A-n><C-w>K:startinsert<CR>]], {"silent"}, "Move the 
 -- TODO: Split terminal in new instance
 -- }}} Mode: Terminal
 -- Mode: Commandline & Insert {{{
+map("i", [[<C-[>]], [[<C-[>l]], {"noremap"}, "which_key_ignore")
+if _G._os_uname.machine == "aarch64" then
+    map("i", [[jj]], [[<C-[>]], "Exit insert mode")
+end
 map("i", [[<S-Tab>]], [[<C-d>]], {"noremap"}, "Delete indent")
 map("i", [[<A-[>]],   [[<C-d>]], {"noremap"}, "Delete indent")
 map("i", [[<A-]>]],   [[<C-t>]], {"noremap"}, "Add indent")

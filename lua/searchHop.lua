@@ -34,7 +34,6 @@ M.cycleSearch = function(exCMD)
     end
 
     vim.cmd("norm! " .. "zv")
-    -- cmd("norm! " .. "zzzv")
     M.echoSearch()
 end
 

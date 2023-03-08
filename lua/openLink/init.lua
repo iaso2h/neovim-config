@@ -42,7 +42,7 @@ function M.main(selectText)
         local curLine
 
 
-        local sep = string.find(_G._os, "Windows") and "\\" or "/"
+        local sep = string.find(_G._os_uname.sysname, "Windows_NT") and "\\" or "/"
         local filePath = fn.expand("%:p")
         local configPath = fn.stdpath("config")
         if 0 > 1 then
@@ -89,9 +89,9 @@ function M.main(selectText)
 
     -- Visual mode with selected text provided
     else
-        if _G._os == "Windows" then
+        if _G._os_uname.sysname == "Windows_NT" then
             fn.system("explorer " .. selectText)
-        elseif _G._os == "Linux" then
+        elseif _G._os_uname.sysname == "Linux" then
             if fn.expand("%:p") == fn.stdpath("config") .. "/lua/core/plugins.lua" then
                 selectText = "https://github.com/" .. selectText
             end

@@ -177,7 +177,7 @@ au("BufWinEnter", {
 -- }}} Auto commands
 
 -- Commands {{{
-if _G._os == "Windows" then
+if _G._os_uname.sysname == "Windows_NT" then
     excmd("PS", [[terminal powershell]], {
         desc     = "Open powershell",
         nargs    = 0,

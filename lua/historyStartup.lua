@@ -26,10 +26,14 @@ M.display = function(force)
     end
 
     if vim.bo.filetype == "HistoryStartup" then return end
+    M.curWin = api.nvim_get_current_win()
 
     for _, fileStr in pairs(vim.v.oldfiles) do
-        if _G._os ~= "Windows" then
+        if _G._os_uname.sysname ~= "Windows_NT" then
             if vim.loop.fs_stat(fileStr) then
+                if #fileStr > api.nvim_win_get_width(M.curWin) then
+                    fileStr = fn.pathshorten(fileStr)
+                end
                 table.insert(lines, fileStr)
             end
         else
@@ -39,12 +43,14 @@ M.display = function(force)
             fileStr = string.gsub(fileStr, "/", "\\")
             -- Filter out duplicates and check validity
             if not vim.tbl_contains(lines, fileStr) and vim.loop.fs_stat(fileStr) then
+                if #fileStr > api.nvim_win_get_width(M.curWin) then
+                    fileStr = fn.pathshorten(fileStr)
+                end
                 table.insert(lines, fileStr)
             end
         end
     end
 
-    M.curWin = api.nvim_get_current_win()
     -- Save last opened buffer and restore it after open a new buffer
     if vim.bo.buftype == "" and api.nvim_buf_get_name(0) ~= "" then
         M.lastBuf = api.nvim_get_current_buf()

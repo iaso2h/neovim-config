@@ -27,10 +27,10 @@ local configPathForceDirLoadTbl    = {configPath:joinpath("lua", "onenord")}
 local configPathForceDirLoadStrTbl = vim.tbl_map(function (i)
     return i.filename end, configPathForceDirLoadTbl)
 local luaModulePath       = configPath:joinpath("lua")
-local sep                 = _G._os == "Windows" and "\\" or "/"
+local sep                 = _G._os_uname.sysname == "Windows_NT" and "\\" or "/"
 
 
-local function upperCaseWindowsDrive(fullPathStr)
+local function upperCaseWindows_NTDrive(fullPathStr)
     if not string.sub(fullPathStr, 1, 1):match("[a-z]") then
         return fullPathStr
     end
@@ -416,11 +416,11 @@ M.luaLoadFile = function(luaModule, checkLuaDir) -- {{{
         srcPath = path:new(luaModule)
         assert(srcPath:is_file(), "Invalid string of file path")
 
-        if _G._os ~= "Windows" then
+        if _G._os_uname.sysname ~= "Windows_NT" then
             assert(string.match(srcPath.filename, luaModulePath.filename) and
                 vim.endswith(srcPath.filename, ".lua"), "Unsuppoted file path")
         else
-            -- Deal with the lowercase Drive character comparision in Windows
+            -- Deal with the lowercase Drive character comparision in Windows_NT
             assert(
                 string.match(
                     string.sub(srcPath.filename, 2, -1),

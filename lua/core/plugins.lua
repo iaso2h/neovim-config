@@ -644,7 +644,7 @@ use {
         "L3MON4D3/LuaSnip",
         run      = "make install_jsregexp",
         config = function ()
-            local sep = _G._os == "Windows" and "\\" or "/"
+            local sep = _G._os_uname.sysname == "Windows_NT" and "\\" or "/"
             local mySnippets = vim.fn.stdpath("config") .. sep .. "snippets"
             require("luasnip.loaders.from_vscode").lazy_load()
             require("luasnip.loaders.from_vscode").lazy_load { paths = { mySnippets } }
@@ -686,12 +686,13 @@ use {
     }
     use {
         "tzachar/cmp-tabnine",
+        disable = _G._os_uname.machine == "aarch64",
         event = "InsertEnter",
         after = "nvim-cmp",
         run = function()
-            if _G._os == "Windows" then
+            if _G._os_uname.sysname == "Windows_NT" then
                 vim.cmd "!powershell ./install.ps1'"
-            elseif _G._os == "linux" then
+            elseif _G._os_uname.sysname == "linux" then
                 vim.cmd "!./install.sh"
             end
         end,
@@ -701,9 +702,9 @@ use {
         event = "InsertEnter",
         after = "nvim-cmp",
         run = function()
-            if _G._os == "Windows" then
+            if _G._os_uname.sysname == "Windows_NT" then
                 vim.cmd "!powershell ./install.ps1'"
-            elseif _G._os == "linux" then
+            elseif _G._os_uname.sysname == "linux" then
                 vim.cmd "!./install.sh"
             end
         end,
@@ -964,7 +965,7 @@ use {
     }
     use {
         'michaelb/sniprun',
-        disable = _G._os == "Windows",
+        disable = _G._os_uname.sysname == "Windows_NT",
         run    = 'bash ./install.sh',
         cmd    = {"SnipRun", "SnipReset", "SnipReplMemoryClean", "SnipTerminate", "SnipInfo", "SnipClose"},
         config = conf "nvim-sniprun"
