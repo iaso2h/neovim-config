@@ -33,7 +33,7 @@ M.main = function ()
   -- vcol = 0
 -- }
 
-    local qfItems = fn.getqflist()
+    local qfItems = require("quickfix.util").getlist()
     for idx, item in ipairs(qfItems) do
         if item.valid ~= 0 and item.bufnr ~= 0 and
             api.nvim_buf_is_valid(item.bufnr) and

@@ -10,7 +10,7 @@ local M = {
 ---@param vimMode string Vim mode. "n" or "v"
 M.delete = function (vimMode) -- {{{
     local qfCursorPos = api.nvim_win_get_cursor(0)
-    local qfItems = fn.getqflist()
+    local qfItems = require("quickfix.util").getlist()
     vim.defer_fn(require("quickfix.highlight").clear, 0)
 
     if vimMode == "n" then

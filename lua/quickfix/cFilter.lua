@@ -21,7 +21,8 @@ local lastFilterPat = ""
 --- @param bang string if bang value is "!", then items not matching the
 ---        pattern will be preserved
 M.main = function(qfChk, pat, bang)
-    local items = qfChk and fn.getqflist() or fn.getloclist(0)
+    local items = require("quickfix.util").getlist()
+    if not next(items) then return end
 
     -- Parsing the pat
     local firstChar = string.sub(pat, 1, 1)

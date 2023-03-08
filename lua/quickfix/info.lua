@@ -33,12 +33,12 @@ M.hover = function(printChk) -- {{{
     qfWinInfo = #qfWinInfo == 1 and qfWinInfo[1] or qfWinInfo
     local qfBotlineNr = qfWinInfo.botline
 
-    local qfItems = fn.getqflist()
+    local qfItems  = require("quickfix.util").getlist()
     local itemInfo = qfItems[qfCursorPos[1]]
 
     if printChk then return Print(itemInfo) end
 
-    local ok, msg  = pcall(fn.bufname, itemInfo.bufnr)
+    local ok, msg = pcall(fn.bufname, itemInfo.bufnr)
     local bufName = ok and msg or ""
 
     -- Create win

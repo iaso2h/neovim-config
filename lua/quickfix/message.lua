@@ -4,7 +4,8 @@ local M   = {
     filterChk = false
 }
 
-M.main = function ()
+--- Pip neovim message into quickfix
+M.main = function()
     local msg = api.nvim_cmd({cmd = "messages"}, {output = true})
     local function split(str, sep)
         local result = {}

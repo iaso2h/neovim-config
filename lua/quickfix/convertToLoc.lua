@@ -2,7 +2,7 @@ return function ()
     local fn  = vim.fn
     local api = vim.api
 
-    local qfItems = fn.getqflist()
+    local qfItems = require("quickfix.util").getlist()
     local winInfo = fn.getwininfo()
     for _, tbl in ipairs(winInfo) do
         if tbl["quickfix"] == 1 then

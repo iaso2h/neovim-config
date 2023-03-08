@@ -48,7 +48,7 @@ M.main = function(fallbackChk, closeQfChk, offset)
     local lineNr
     if offset ~= 0 then
         local lastLine = fn.line("$")
-        lineNr = fn.getqflist({idx = 0}).idx + offset
+        lineNr = require("quickfix.util").getlist({idx = 0}).idx + offset
         if lineNr > lastLine then
             qfCursorPos = {lastLine, qfCursorPos[2]}
             lineNr = lastLine
@@ -65,14 +65,14 @@ M.main = function(fallbackChk, closeQfChk, offset)
     -- User the built-in :cc command to open quickfix item
     if fallbackChk then return fallback(closeQfChk, lineNr, qfWinID, qfCursorPos) end
 
-    local qfItem = fn.getqflist()[lineNr]
-    if not next(qfItem) then
+    local item = require("quickfix.util").getlist()[lineNr]
+    if not next(item) then
         -- qf items are created by pressing gO in help docs?
         return vim.notify("No qf items available", vim.log.levels.INFO)
     end
 
-    if qfItem.valid == 0 or qfItem.bufnr == 0 or
-            not api.nvim_buf_is_valid(qfItem.bufnr) then
+    if item.valid == 0 or item.bufnr == 0 or
+            not api.nvim_buf_is_valid(item.bufnr) then
         require("quickfix.highlight").add(
             {qfCursorPos[1]},
             "Comment",
@@ -102,7 +102,7 @@ M.main = function(fallbackChk, closeQfChk, offset)
             savedLastWinID = api.nvim_get_current_win()
         end
     else
-        api.nvim_win_set_buf(savedLastWinID, qfItem.bufnr)
+        api.nvim_win_set_buf(savedLastWinID, item.bufnr)
     end
 
     -- Switch buf in the window
@@ -110,6 +110,9 @@ M.main = function(fallbackChk, closeQfChk, offset)
         vim.cmd([[cc ]] .. lineNr)
         vim.cmd[[norm! zvzz]]
     end)
+    if not vim.bo.buflisted then
+        vim.opt_local.buflisted = true
+    end
 
     regainFocus(closeQfChk, qfWinID, qfCursorPos, savedLastWinID)
 end
