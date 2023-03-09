@@ -20,10 +20,10 @@ vim.defer_fn(function()
     _G.CoreMappigsStart = false
 end, 0)
 
-local compileName = string.format("packer_compiled_%s", _G._isTerm and "term" or "gui")
+local compileName = string.format("packer_compiled_%s", _G._is_term and "term" or "gui")
 vim.defer_fn(function()
     ok, msg = pcall(require("core.plugins").setupPacker, compileName)
-    if not ok then
+    if not ok and msg then
         return vim.notify(msg, vim.log.levels.ERROR)
     else
         ok, msg = pcall(require("core.plugins").configPacker)

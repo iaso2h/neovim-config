@@ -22,9 +22,6 @@ return function()
     map("n", [[<S-F5>]], [[<CMD>lua require("dap").run_last()<CR>]], "Dap run last")
 
     map("n", [[dK]],     [[<CMD>lua require("dap.ui.widgets").hover()<CR>]],  {"silent"}, "Dap hover")
-
-    -- map("n", [[<F12>]], [[:lua require("dap-python").test_method()<CR>]],          {"silent"})
-    -- map("x", [[<F5>]],  [[<esc>:lua require("dap-python").debug_selection()<CR>]], {"silent"})
     -- }}} General mappings
 
     fn.sign_define("DapBreakpoint", {

@@ -45,7 +45,13 @@ return function()
                     ["[F"] = "@function.outer",
                     ["[]"] = "@class.outer",
                 },
-                -- TODO: use to jump to fold by treesitter
+
+                goto_next = {
+                    ["]d"] = "@conditional.outer",
+                },
+                goto_previous = {
+                    ["[d"] = "@conditional.outer",
+                }
             },
         },
     }

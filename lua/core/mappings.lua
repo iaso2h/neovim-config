@@ -7,9 +7,9 @@ vim.g.mapleader = " "
 
 -- Change font size (GUI client only)
 if not _G._is_term then
-    map({"n", "x"}, [[<C-->]], [[:lua GuiFontSize = GuiFontSize - 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Increase GUI client font size")
-    map({"n", "x"}, [[<C-=>]], [[:lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Decrease GUI client font size")
-    map({"n", "x"}, [[<C-0>]], [[:lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent"}, "Restore GUI client font size")
+    map({"n", "x"}, [[<C-->]], [[<CMD>lua GuiFontSize = GuiFontSize - 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Increase GUI client font size")
+    map({"n", "x"}, [[<C-=>]], [[<CMD>lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Decrease GUI client font size")
+    map({"n", "x"}, [[<C-0>]], [[<CMD>lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent"}, "Restore GUI client font size")
 end
 -- Diagnostic mapping
 map("n", [[<C-q>e]],    [[<CMD>lua vim.diagnostic.setqflist()<CR>]],  {"silent"}, "LSP add workspace folder")
@@ -18,12 +18,9 @@ map("n", [[[e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};v
 map("n", [[]e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to next diagnostic symbol")
 map("n", [[[E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to previous error")
 map("n", [[]E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to next error")
--- Diffmode
-map("n", [[[d]], [[[c]], {"noremap", "silent"}, "Go to the previous start of a change")
-map("n", [[]d]], [[]c]], {"noremap", "silent"}, "Go to the next start of a change")
 -- Colorcolumn
-map("n", [[]c]], [[:noa windo set cc=80<CR>]], {"silent"}, "Turn on colorcolumn")
-map("n", [[[c]], [[:noa windo set cc&<CR>]],   {"silent"}, "Turn off colorcolumn")
+map("n", [[]C]], [[:noa windo set cc=80<CR>]], {"silent"}, "Turn on colorcolumn")
+map("n", [[[C]], [[:noa windo set cc&<CR>]],   {"silent"}, "Turn off colorcolumn")
 -- Quickfix
 map("n", [[<leader>q]], [[<CMD>lua require("quickfix.toggle")(false)<CR>]], {"silent"}, "Toggle quickfix")
 map("n", [[<leader>Q]], [[<CMD>lua require("quickfix.toggle")(true)<CR>]],  {"silent"}, "Close visible quickfix")
@@ -37,7 +34,7 @@ map("n", [[<C-q>.]], [[<CMD>lua require("quickfix.message").main()<CR>]], {"sile
 -- Spell corretion
 map("n", [[\\]], [[z=1<CR><CR>]], {"silent"}, "Quick spell fix")
 -- Expand region
-map("n", [[<A-a>]], [[:lua require("expandRegion").expandShrink("n", 1)<CR>]],  {"silent"}, "Expand selection")
+map("n", [[<A-a>]], [[<CMD>lua require("expandRegion").expandShrink("n", 1)<CR>]],  {"silent"}, "Expand selection")
 map("n", [[<A-s>]], [[<Nop>]], "which_key_ignore")
 map("x", [[<A-a>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), 1)<CR>]],  {"silent"}, "Expand selection")
 map("x", [[<A-s>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), -1)<CR>]], {"silent"}, "Shrink selection")
@@ -70,9 +67,9 @@ end, {"silent"}, "Visual-repeat for interesting words")
 
 map("n", [[gw]],        [[<Plug>InterestingWordOperator]], "Highlight interesting word...")
 map("x", [[gw]],        [[<Plug>InterestingWordVisual]],   "Highlight selected as interesting words")
-map("n", [[gww]],       [[:lua require("interestingWord").reapplyColor()<CR>]], {"silent"}, "Recolor last interesting word")
-map("n", [[<leader>w]], [[:lua require("interestingWord").clearColor()<CR>]],   {"silent"}, "Clear interesting word")
-map("n", [[<leader>W]], [[:lua require("interestingWord").restoreColor()<CR>]], {"silent"}, "Restore interesting word")
+map("n", [[gww]],       [[<CMD>lua require("interestingWord").reapplyColor()<CR>]], {"silent"}, "Recolor last interesting word")
+map("n", [[<leader>w]], [[<CMD>lua require("interestingWord").clearColor()<CR>]],   {"silent"}, "Clear interesting word")
+map("n", [[<leader>W]], [[<CMD>lua require("interestingWord").restoreColor()<CR>]], {"silent"}, "Restore interesting word")
 -- }}} Interesting word
 -- Zeal query {{{
 map("n", [[<Plug>ZealOperator]], function ()
@@ -116,7 +113,7 @@ map("n", [[gZ]], [[<Plug>ZealOperatorGlobal]], "Zeal look up...universally")
 map("x", [[Z]],  [[<Plug>ZealVisual]], "Zeal look up selected")
 -- }}} Zeal query
 -- HistoryStartup
-map("n", [[<C-s>]], [[:lua require("historyStartup").display(true)<CR>]], {"silent"}, "Enter HistoryStartup")
+map("n", [[<C-s>]], [[<CMD>lua require("historyStartup").display(true)<CR>]], {"silent"}, "Enter HistoryStartup")
 -- Extraction {{{
 -- map("n", [[<Plug>RefactorOperator]], function ()
     -- return vim.fn.luaeval [[require("RefactorOperator").expr()]]
@@ -135,7 +132,7 @@ map("n", [[gF]], [[gf]], {"noremap"}, "Go to file")
 map("n", [[<C-g>]],
 [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<CR>]],
 {"silent"}, "Display file info")
-map("n", [[<S-Tab>]], [[:lua require("tabSwitcher").main()<CR>]], "Change tab size")
+map("n", [[<S-Tab>]], [[<CMD>lua require("tabSwitcher").main()<CR>]], "Change tab size")
 -- Delete & Change & Replace {{{
 -- Delete
 map("n", [[dj]], [[<Nop>]], "which_key_ignore")
@@ -253,29 +250,29 @@ map("n", [[<A-i>]], [[<CMD>lua require("searchHop").centerHop("g,", false, false
 map("n", [[<C-o>]], [[<CMD>lua require("searchHop").centerHop("<C-o>", true, false)<CR>]], {"silent"}, "Older jump")
 map("n", [[<C-i>]], [[<CMD>lua require("searchHop").centerHop("<C-i>", true, false)<CR>]], {"silent"}, "Newer jump")
 -- Swap default mapping
-map("n", [[*]],  [[g*zv:lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> forward")
-map("n", [[#]],  [[g#zv:lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> back")
-map("n", [[g#]], [[#zv:lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
-map("n", [[g*]], [[*zv:lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
+map("n", [[*]],  [[g*zv<CMD>lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> forward")
+map("n", [[#]],  [[g#zv<CMD>lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> back")
+map("n", [[g#]], [[#zv<CMD>lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
+map("n", [[g*]], [[*zv<CMD>lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
 -- Search visual selected
 map("x", [[/]], [[:lua require("searchHop").searchSelected("/")<CR>]], {"silent"}, "Search selected forward")
 map("x", [[?]], [[:lua require("searchHop").searchSelected("?")<CR>]], {"silent"}, "Search selected backward")
 map("x", [[*]], [[/]], "Search selected forward")
 map("x", [[#]], [[?]], "Search selected backward")
 -- Regex very magic
-map("n", [[n]], [[:lua require("searchHop").cycleSearch("n")<CR>]], {"silent"}, "Cycle through search result forward")
-map("n", [[N]], [[:lua require("searchHop").cycleSearch("N")<CR>]], {"silent"}, "Cycle through search result backward")
+map("n", [[n]], [[<CMD>lua require("searchHop").cycleSearch("n")<CR>]], {"silent"}, "Cycle through search result forward")
+map("n", [[N]], [[<CMD>lua require("searchHop").cycleSearch("N")<CR>]], {"silent"}, "Cycle through search result backward")
 -- Disable highlight search & Exit visual mode
 map("n", [[<leader>h]], [[<CMD>noh<CR>]], {"silent"}, "Clear highlight")
 map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"}, "Disable highlight")
 -- Visual selection
-map("n", [[go]],    [[:lua require("selection").cornerSelection(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
+map("n", [[go]],    [[<CMD>lua require("selection").cornerSelection(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
 map({"n", "x"}, [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
 -- }}} Search & Jumping
 -- Scratch file
 map("n", [[<C-n>]], [[<CMD>new<CR>]], {"silent"}, "New buffer")
 -- Open/Search in browser
-map("n", [[gl]], [[:lua require("openLink").main()<CR>]], {"silent"}, "Open link")
+map("n", [[gl]], [[<CMD>lua require("openLink").main()<CR>]], {"silent"}, "Open link")
 map("x", [[gl]], [[:lua require("openLink").main(require("selection").getSelect("string", false))<CR>]], {"silent"}, "Open selected as link")
 -- Interrupt
 map("n", [[<C-A-c>]], [[<CMD>call interrupt()<CR>]], {"noremap", "silent"}, "Interrupt")
@@ -339,13 +336,13 @@ map("i", [[<C-r><C-r>]], [[<C-\><C-o>:lua require("register").insertPrompt()<CR>
 
 -- Buffer & Window & Tab{{{
 -- Smart quit
-map("n", [[q]],     [[:lua require("buf").close("window")<CR>]],    {"silent"}, "Close window")
-map("n", [[Q]],     [[:lua require("buf").close("buffer")<CR>]],    {"silent"}, "Close buffer")
-map("n", [[<C-u>]], [[:lua require("buf").restoreClosedBuf()<CR>]], {"silent"}, "Restore last closed buffer")
+map("n", [[q]],     [[<CMD>lua require("buf").close("window")<CR>]],    {"silent"}, "Close window")
+map("n", [[Q]],     [[<CMD>lua require("buf").close("buffer")<CR>]],    {"silent"}, "Close buffer")
+map("n", [[<C-u>]], [[<CMD>lua require("buf").restoreClosedBuf()<CR>]], {"silent"}, "Restore last closed buffer")
 -- Window
 -- TODO:
--- map("n", [[<C-w>s]], [[:lua require("consistantTab").splitCopy("wincmd s")<CR>]], {"silent"})
--- map("n", [[<C-w>v]], [[:lua require("consistantTab").splitCopy("wincmd v")<CR>]], {"silent"})
+-- map("n", [[<C-w>s]], [[<CMD>lua require("consistantTab").splitCopy("wincmd s")<CR>]], {"silent"})
+-- map("n", [[<C-w>v]], [[<CMD>lua require("consistantTab").splitCopy("wincmd v")<CR>]], {"silent"})
 map("n", [[<C-w>V]], [[<CMD>wincmd o | wincmd v<CR>]], {"silent"}, "Split only current window vertically")
 map("n", [[<C-w>S]], [[<CMD>wincmd o | wincmd s<CR>]], {"silent"}, "Split only current window vertically")
 
@@ -356,7 +353,7 @@ map({"n", "x"}, [[<A-->]],  [[<CMD>wincmd -<CR>]],       {"silent"}, "Decrease w
 map("i",        [[<A-->]],  [[<C-\><C-O>:wincmd -<CR>]], {"silent"}, "Decrease window size")
 
 -- Buffers
-map("n", [[<C-w>O]], [[:lua require("buf").closeOther()<CR>]], {"silent"}, "Wipe other buffer")
+map("n", [[<C-w>O]], [[<CMD>lua require("buf").closeOther()<CR>]], {"silent"}, "Wipe other buffer")
 map("n", [[<C-Tab>]],   [[<CMD>lua require("buf.action.cycle").init(1)<CR>]],  {"silent"}, "Next buffer")
 map("n", [[<C-S-Tab>]], [[<CMD>lua require("buf.action.cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
 map("n", [[<A-h>]],     [[<CMD>lua require("buf.action.cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
@@ -444,9 +441,9 @@ map("n", [[<C-S-d>]], [[<CMD>d<CR>]],       {"silent"}, "Detele line")
 map("x", [[<C-S-d>]], [[:d<CR>]],           {"silent"}, "Detele line")
 map("i", [[<C-S-d>]], [[<C-\><C-o>:d<CR>]], {"silent"}, "Detele line")
 -- Highlight New Paste Content
-map("n", [[gy]], [[:lua require("yankPut").lastYankPut("yank")<CR>]], {"silent"}, "Select last yank")
+map("n", [[gy]], [[<CMD>lua require("yankPut").lastYankPut("yank")<CR>]], {"silent"}, "Select last yank")
 map("n", [[gY]], [[gy]], "Select last yank")
-map("n", [[gp]], [[:lua require("yankPut").lastYankPut("put")<CR>]],  {"silent"}, "Select last put")
+map("n", [[gp]], [[<CMD>lua require("yankPut").lastYankPut("put")<CR>]],  {"silent"}, "Select last put")
 map("n", [[gP]], [[gp]], "Select last put")
 -- Inplace join
 map("n", [[J]], function ()
@@ -474,17 +471,17 @@ map("n", [[<leader>cp]], [["0cp]], "Convert put after from register 0")
 map("n", [[<leader>cP]], [["0cP]], "Convert put after from register 0")
 -- Mimic the VSCode move/copy line up/down behavior {{{
 -- Move line
-map("i", [[<A-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineMove("n", "down")<CR>]], {"silent"}, "Move line down")
-map("i", [[<A-k>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineMove("n", "up")<CR>]],   {"silent"}, "Move line up")
-map("n", [[<A-j>]], [[:lua require("yankPut").VSCodeLineMove("n", "down")<CR>]], {"silent"}, "Move line down")
-map("n", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("n", "up")<CR>]],   {"silent"}, "Move line up")
+map("i", [[<A-j>]], [[<C-\><C-o><CMD>lua require("yankPut").VSCodeLineMove("n", "down")<CR>]], {"silent"}, "Move line down")
+map("i", [[<A-k>]], [[<C-\><C-o><CMD>lua require("yankPut").VSCodeLineMove("n", "up")<CR>]],   {"silent"}, "Move line up")
+map("n", [[<A-j>]], [[<CMD>lua require("yankPut").VSCodeLineMove("n", "down")<CR>]], {"silent"}, "Move line down")
+map("n", [[<A-k>]], [[<CMD>lua require("yankPut").VSCodeLineMove("n", "up")<CR>]],   {"silent"}, "Move line up")
 map("x", [[<A-j>]], [[:lua require("yankPut").VSCodeLineMove("v", "down")<CR>]], {"silent"}, "Move line down")
 map("x", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("v", "up")<CR>]],   {"silent"}, "Move line up")
 -- Copy line
 map("i", [[<A-S-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "down")<CR>]],       {"silent"}, "Copy line down")
 map("i", [[<A-S-k>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "up")<CR>]],         {"silent"}, "Copy line up")
-map("n", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank("n", "down")<CR>]],                 {"silent"}, "Copy line down")
-map("n", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank("n", "up")<CR>]],                   {"silent"}, "Copy line up")
+map("n", [[<A-S-j>]], [[<CMD>lua require("yankPut").VSCodeLineYank("n", "down")<CR>]],                 {"silent"}, "Copy line down")
+map("n", [[<A-S-k>]], [[<CMD>lua require("yankPut").VSCodeLineYank("n", "up")<CR>]],                   {"silent"}, "Copy line up")
 map("x", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "down")<CR>]], {"silent"}, "Copy line down")
 map("x", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "up")<CR>]],   {"silent"}, "Copy line up")
 -- }}} Mimic the VSCode move/copy line up/down behavior
@@ -496,9 +493,9 @@ map("n", [[g/]], [[m`:s#\\#\/#e<CR>:noh<CR>g``]],   {"noremap", "silent"}, [[Con
 map("n", [[g\]], [[m`:s#\/#\\\\#e<CR>:noh<CR>g``]], {"noremap", "silent"}, [[Convert / to \]])
 -- Mode: Terminal {{{
 map("t", [[<A-n>]],      [[<C-\><C-n>]], "Enter Normal mode")
-map("n", [[<C-`>]],      [[:lua require("terminal").terminalToggle()<CR>]], {"silent"}, "Terminal toggle")
-map("n", [[<leader>t]],  [[:lua require("terminal").terminalToggle()<CR>]], {"silent"}, "Terminal toggle")
-map("t", [[<C-`>]],      [[<A-n>:lua require("terminal").terminalToggle()<CR>]], {"silent"}, "Toggle Terminal")
+map("n", [[<C-`>]],      [[<CMD>lua require("terminal").terminalToggle()<CR>]], {"silent"}, "Terminal toggle")
+map("n", [[<leader>t]],  [[<CMD>lua require("terminal").terminalToggle()<CR>]], {"silent"}, "Terminal toggle")
+map("t", [[<C-`>]],      [[<A-n><CMD>lua require("terminal").terminalToggle()<CR>]], {"silent"}, "Toggle Terminal")
 map("t", [[<A-h>]],      [[<A-n><A-h>]], "Previous buffer")
 map("t", [[<A-l>]],      [[<A-n><A-l>]], "Next buffer")
 map("t", [[<A-C-h>]],    [[<A-n><A-C-h>]], "Previous tab")

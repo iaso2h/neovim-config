@@ -284,8 +284,6 @@ require("nvim-tree").setup { -- BEGIN_DEFAULT_OPTS
     },
 } -- END_DEFAULT_OPTS
 
-map("n", [[<C-w>e]], [[:lua require("nvim-tree").toggle()<CR>]], {"silent"}, "Toggle Nvim tree")
--- map("n", [[<leader>r]], [[:NvimTreeRefresh<CR>]], {"noremap"})
--- map("n", [[<leader>n]], [[:NvimTreeFindFile<CR>]], {"noremap"})
+map("n", [[<C-w>e]], [[<CMD>lua require("nvim-tree").toggle()<CR>]], {"silent"}, "Toggle Nvim tree")
 
 end

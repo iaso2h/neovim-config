@@ -107,7 +107,7 @@ M.display = function(refreshChk)
             M.curBuf,
             "n",
             key,
-            string.format([=[:lua require("historyStartup").execMap([[%s]])<CR>]=], string.gsub(key, [[<]], [[<lt>]])),
+            string.format([=[<CMD>lua require("historyStartup").execMap([[%s]])<CR>]=], string.gsub(key, [[<]], [[<lt>]])),
             {silent = true}
         )
     end

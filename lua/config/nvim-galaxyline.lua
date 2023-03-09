@@ -4,6 +4,7 @@
 -- Last Modified: 2023-2-27
 local M = {}
 
+-- filetype contained in this list will be consider inactive all the time
 M.shortLineList = {
     "term",
     "qf",
@@ -116,12 +117,6 @@ end
 local shortLineFileType = function ()
     local fileType = vim.bo.filetype
     return vim.tbl_contains(gl.short_line_list, fileType)
-end
-
-
-local noShortLineFileType = function ()
-    local fileType = vim.bo.filetype
-    return not vim.tbl_contains(gl.short_line_list, fileType)
 end
 
 
@@ -432,12 +427,18 @@ gls.short_line_left[1] = { -- {{{
 
             local fileType = vim.bo.filetype
             local bufIcon = bufTypeIcons[fileType]
-            if vim.tbl_contains(gl.short_line_list, fileType) then
-                if bufIcon then
-                    return "  " .. bufIcon .. " " .. vim.bo.filetype:upper() .. " "
-                else
-                    return "  " .. vim.bo.filetype:upper() .. " "
-                end
+            if fileType == "qf" then
+                -- The value of vim.b._is_loc is setuped whenever a qf filetype
+                -- is set via after/ftplugin/qf.lua
+                fileType = vim.b._is_loc and "Location list" or "Quickfix"
+            else
+                fileType:upper()
+            end
+
+            if bufIcon then
+                return "  " .. bufIcon .. " " .. fileType .. " "
+            else
+                return "  " .. fileType .. " "
             end
         end,
         condition = shortLineFileType,
@@ -467,7 +468,9 @@ gls.short_line_left[3] = {
 gls.short_line_left[4] = {
     ShortFileIcon = {
         provider  = "FileIcon",
-        condition = condition.buffer_not_empty and noShortLineFileType,
+        condition = function ()
+            return condition.buffer_not_empty() and not shortLineFileType()
+        end,
         highlight = {colors.gray, colors.bg1}
     }
 }
@@ -475,7 +478,9 @@ gls.short_line_left[4] = {
 gls.short_line_left[5] = {
     ShortFileInfo = {
         provider  = fileInfo,
-        condition = condition.buffer_not_empty and noShortLineFileType,
+        condition = function ()
+            return condition.buffer_not_empty() and not shortLineFileType()
+        end,
         highlight = {colors.gray, colors.bg1}
     }
 }
@@ -483,7 +488,9 @@ gls.short_line_left[5] = {
 gls.short_line_right[1] = {
     ShortRightLineInfo = {
         provider  = lineInfo,
-        condition = condition.buffer_not_empty and noShortLineFileType,
+        condition = function ()
+            return condition.buffer_not_empty() and not shortLineFileType()
+        end,
         highlight = {colors.gray, colors.bg1}
     }
 } --- }}}

@@ -35,11 +35,11 @@ M.config = function()
     local conciseQuifix = function(tbl)
         local api = vim.api
         if tbl then
-            if #tbl.items == 2 and tbl.items[1].filename == tbl.items[2].filename and
-                    tbl.items[1].lnum == tbl.items[2].lnum then
+            if #tbl.items == 1 or (#tbl.items == 2 and tbl.items[1].filename == tbl.items[2].filename and
+                    tbl.items[1].lnum == tbl.items[2].lnum) then
                 -- OPTIM: use vim.fn.bufnr(vim.api.nvim_buf_get_name(0)) to check bufnr?
                 if not (api.nvim_buf_get_name(0) == tbl.items[1].filename) then
-                    vim.cmd([[e ]] .. tbl.items[1].filename)
+                    vim.cmd([[buffer ]] .. tbl.items[1].filename)
                 end
                 api.nvim_win_set_cursor(0, {tbl.items[1].lnum, tbl.items[1].col - 1})
                 vim.cmd [[norm! zv]]
@@ -56,9 +56,6 @@ M.config = function()
         bmap(bufNr, "n", [[<C-f>o]], [[<CMD>lua require('telescope.builtin').lsp_document_symbols()<CR>]],  {"silent"}, "LSP document symbols")
         bmap(bufNr, "n", [[<C-f>O]], [[<CMD>lua require('telescope.builtin').lsp_workspace_symbols()<CR>]], {"silent"}, "LSP workspace symbols")
 
-        bmap(bufNr, "n", [[ga]], function()
-            vim.lsp.buf.code_action { on_list = conciseQuifix }
-        end, { "silent" }, "LSP code action")
         bmap(bufNr, "n", [[gd]], function()
             vim.lsp.buf.definition { on_list = conciseQuifix }
         end, { "silent" }, "LSP definition")
@@ -72,6 +69,7 @@ M.config = function()
             vim.lsp.buf.implementation { on_list = conciseQuifix }
         end, { "silent" }, "LSP implementation")
 
+        bmap(bufNr, "n", [[ga]],      [[<CMD>lua vim.lsp.buf.code_action()<CR>]],    {"silent"}, "LSP code action")
         bmap(bufNr, "n", "<leader>r", [[<CMD>lua vim.lsp.buf.rename()<CR>]],         {"silent"}, "LSP rename")
         bmap(bufNr, "n", [[K]],       [[<CMD>lua vim.lsp.buf.hover()<CR>]],          {"silent"}, "LSP hover")
         bmap(bufNr, "n", [[<C-p>]],   [[<CMD>lua vim.lsp.buf.signature_help()<CR>]], {"silent"}, "LSP signature help")

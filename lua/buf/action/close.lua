@@ -74,7 +74,8 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         -- else
             -- NOTE: more details see ":help buftype"
             if vim.bo.filetype == "vim" then
-                api.nvim_win_close(0, false)
+                vim.cmd[[q]]
+                return true
             elseif var.bufType == "nofile" then
                 if var.bufName == "[Command Line]" then
                     -- This buffer shows up When you hit CTRL-F on commandline
@@ -203,7 +204,8 @@ function M.init(type) -- {{{
             if var.bufType == "nofile" or var.bufType == "prompt" then
                 -- Commandline expand window which can be accessed by pressing <C-f>
                 if vim.bo.filetype == "vim" then
-                    return api.nvim_win_close(0, false)
+                    vim.cmd[[q]]
+                    return
                 end
                 -- Override the default behavior, treat it like performing a buffer delete
                 if not bufClose(true, false) then return end

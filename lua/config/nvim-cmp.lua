@@ -51,10 +51,10 @@ return function()
             ["<Tab>"] = cmp.mapping(function(fallback)
                 if cmp.visible() then
                     cmp.select_next_item()
-                elseif luasnip.expand_or_jumpable() then
+                elseif luasnip.expand_or_locally_jumpable() then
                     luasnip.expand_or_jump()
                 elseif package.loaded["neogen"] and require("neogen").jumpable() then
-                    vim.api.nvim_feedkeys(t[[<cmd>lua require("neogen").jump_next()<CR>]], "", true)
+                    require("neogen").jump_next()
                 else
                     fallback()
                 end
@@ -63,24 +63,25 @@ return function()
                 if luasnip.jumpable(-1) then
                     luasnip.jump(-1)
                 elseif package.loaded["neogen"] and require("neogen").jumpable() then
-                    vim.api.nvim_feedkeys(t[[<cmd>lua require("neogen").jump_prev()<CR>]], "", true)
+                    require("neogen").jump_prev()
                 else
                     fallback()
                 end
             end, {"i", "s"}),
-            ["<C-i>"] = function(fallback)
-                if cmp.visible() then
-                    require("cmp.utils.autocmd").emit("InsertLeave")
-                else
-                    fallback()
-                end
-            end,
             ["<C-e>"] = function(_)
                 if cmp.visible() then
                     cmp.abort()
                 end
                 vim.api.nvim_feedkeys(t"<End>", "n", false)
             end,
+            ["<C-o>"] = function(fallback)
+                if cmp.visible() then
+                    require("cmp.utils.autocmd").emit("InsertLeave")
+                else
+                    fallback()
+                end
+            end,
+            ["<C-i>"] = cmp.mapping.confirm(),
             ["<CR>"]  = cmp.mapping.confirm{
                 select   = true,
                 behavior = cmp.ConfirmBehavior.Replace,
@@ -116,7 +117,7 @@ return function()
             end
         },
         keyword_length   = 2,
-        default_behavior = cmp.ConfirmBehavior.Replace,
+        default_behavior = cmp.ConfirmBehavior.Insert,
     }
 -- If you want insert `(` after select function or method item
 

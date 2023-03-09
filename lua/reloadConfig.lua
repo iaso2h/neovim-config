@@ -319,7 +319,7 @@ local luaChkLoadedOpenAndMod = function (fileStrs)
     for _, s in ipairs(fileStrs) do
         for _, n in ipairs(bufNrTbl) do
             local bufName = api.nvim_buf_get_name(n)
-            if _G._os == "Windows" then
+            if _G._os_uname.sysname == "Windows_NT" then
                 bufName = upperCaseWindowsDrive(bufName)
             end
             if n ~= bufNrCur and string.match(bufName, s) and
@@ -400,7 +400,7 @@ M.luaLoadFile = function(luaModule, checkLuaDir) -- {{{
     if not path then return end
     if not luaModule then
         luaModule = fn.expand("%:p")
-        if _G._os == "Windows" then
+        if _G._os_uname.sysname == "Windows_NT" then
             luaModule = upperCaseWindowsDrive(luaModule)
         end
     end
@@ -605,7 +605,7 @@ M.reload = function() -- {{{
     if not path then return end
     local srcFullPathStr = fn.expand("%:p")
     -- Uppercase the first character in Windows
-    if _G._os == "Windows" then
+    if _G._os_uname.sysname == "Windows_NT" then
         srcFullPathStr = upperCaseWindowsDrive(srcFullPathStr)
     end
     local srcPath = path:new(srcFullPathStr)

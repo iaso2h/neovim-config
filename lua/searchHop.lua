@@ -73,10 +73,10 @@ M.centerHop = function(exCMD, feedkeyChk, suppressMsgChk)
         end
     end
 
-    local postBufNr = api.nvim_get_current_buf()
+    local curBufNr = api.nvim_get_current_buf()
 
     -- Jump to a different buffer
-    if prevBufNr ~= postBufNr then return end
+    if prevBufNr ~= curBufNr then return end
 
     -- Make sure cursor does not sit on a fold line
     vim.cmd[[norm! zv]]

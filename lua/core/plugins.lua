@@ -283,10 +283,6 @@ use {
         end
     }
     use {
-        'michaeljsmith/vim-indent-object',
-        event = "BufAdd"
-    }
-    use {
         'monaqa/dial.nvim',
         keys = {
             {"n", [[<leader><C-a>]]},
@@ -1094,9 +1090,9 @@ M.setupPacker = function(compileName)
     configPath = fn.stdpath("config")
     compilePath = string.format("%s/lua/%s.lua", configPath, compileName)
     if fn.empty(fn.glob(packerPath)) > 0 then
-        return promptOnMove([[Please run PackerSync, wail till all process end]])
+        promptOnMove([[Please run PackerSync, wail till all process end]])
+        return false
     end
-
 end
 
 

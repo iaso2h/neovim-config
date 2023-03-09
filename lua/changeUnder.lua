@@ -30,10 +30,6 @@ M.init = function(keybinding, direction, plugMap)
         -- col and result are both 0-indexed
         local col = api.nvim_win_get_cursor(0)[2]
 
-        -- I'm gonna win less food less food less food
-        -- I'm gonna win less food less food less food
-        -- I'm gonna replace all the all the all and all
-        -- I'm gonna replace all the all the all and all
         local regex = vim.regex(M.pat)
         local result = {regex:match_str(curLine)}
         if not next(result) then

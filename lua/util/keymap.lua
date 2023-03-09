@@ -181,7 +181,6 @@ function _G.bmap(bufNr, mode, lhs, rhs, ...) -- {{{
             vim.notify(
                 string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhsStr),
                 vim.log.levels.ERROR)
-                Print(rhsStr)
             vim.notify(msg, vim.log.levels.ERROR)
             return vim.notify(debug.traceback(), vim.log.levels.ERROR)
         end
