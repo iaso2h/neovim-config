@@ -17,10 +17,21 @@ local ignoreFiletype = {
         'hgcommit',
 }
 local fn  = vim.fn
+local api = vim.api
 local M   = {}
 
 
-function M.main()
+function M.main(args)
+    -- Only handle valid file
+    if not args or args.file == "*" then
+        return
+    end
+
+    -- Only deal with situation where curpos is placed at {1, 0}
+    local cursorPos = api.nvim_win_get_cursor(0)
+    if cursorPos[1] ~= 1 and cursorPos[2] ~= 0 then
+        return
+    end
 
     -- Check filetype and buftype against ignore lists
     if vim.tbl_contains(ignoreBuftype, vim.bo.buftype) or vim.tbl_contains(ignoreFiletype, vim.bo.filetype) then

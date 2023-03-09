@@ -133,9 +133,9 @@ au("BufWritePost", {
 
 au("BufWinEnter", {
     desc     = "Place the cursor on the last position",
-    callback = function ()
+    callback = function(arg)
         -- Credit: https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
-        require("buf.action.cursorRecall").main()
+        require("buf.action.cursorRecall").main(arg)
     end
 })
 

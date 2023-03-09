@@ -1,22 +1,31 @@
-local fn  = vim.fn
 local api = vim.api
-local M   = {}
+local M   = {
+    buftypeBlacklist = {
+        "quickfix"
+    }
+}
 
 
 local function findCandi(bufTbl, currentBufIdx, direction)
     local candiIdx
-    local loopbackTick = false
-    for i = 1, #bufTbl do
+    for i = 1, #bufTbl + 1 do
+        if i == #bufTbl + 1 then return 0 end
+
         candiIdx = currentBufIdx + direction
+        -- Loop through the buffer table
         if direction == -1 and candiIdx == 0 then candiIdx = #bufTbl end
         if direction == 1 and candiIdx == #bufTbl + 1 then candiIdx = 1 end
 
-        local candiBufType = api.nvim_buf_get_option(bufTbl[candiIdx], "buftype")
+        local candiBuftype = api.nvim_buf_get_option(bufTbl[candiIdx], "buftype")
 
         -- Filter out quickfix
-        if candiBufType ~= "quickfix" then return candiIdx end
-
-        if i == #bufTbl then return 0 end
+        for _, buftype in ipairs(M.buftypeBlacklist) do
+            if candiBuftype ~= buftype then
+                return candiIdx
+            else
+                break
+            end
+        end
     end
 end
 
@@ -24,14 +33,9 @@ end
 --- Get all listed buffers. Just like what you see in the :ls command
 ---@param direction number Set to 1 to jump to next buffer, -1 to previous buffer
 M.init = function(direction)
-    if not vim.bo.buflisted then
-        if direction == 1 then
-            return vim.cmd[[bn]]
-        else
-            return vim.cmd[[bp]]
-        end
+    if vim.o.buftype ~= "" and api.nvim_buf_get_name(0) == "" then
+        vim.cmd[[noa keepjump buffer #]]
     end
-
     local bufTbl = api.nvim_list_bufs()
     local cond = function (buf)
         return api.nvim_buf_get_option(buf, "buflisted")
@@ -39,19 +43,16 @@ M.init = function(direction)
     bufTbl = vim.tbl_filter(cond, bufTbl)
 
     local currentBufNr = api.nvim_get_current_buf()
-    local currentBufIdx
-    local ok, msg = pcall(tbl_idx, bufTbl, currentBufNr, false)
-    if not ok then
-        return vim.notify(msg, vim.log.levels.ERROR)
-    else
-        currentBufIdx = msg
-    end
+    local currentBufIdx = tbl_idx(bufTbl, currentBufNr, false)
 
     -- Find the valid candidate
     local candiIdx = findCandi(bufTbl, currentBufIdx, direction)
-    if not candiIdx then vim.notify("Not valid buffer to cycle", vim.log.level.INFO) end
+    if candiIdx == 0 then
+        return vim.notify("No valid buffer to cycle", vim.log.level.INFO)
+    end
 
-    api.nvim_win_set_buf(0, bufTbl[candiIdx])
+    -- Use the Ex command to enter a buffer without writing jumplist
+    vim.cmd([[noa keepjump buffer ]] .. bufTbl[candiIdx])
 end
 
 return M
