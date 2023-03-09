@@ -1,19 +1,24 @@
 -- File: openBrowser
 -- Author: iaso2h
 -- Description: Open url link in browser
--- Version: 0.0.8
--- Last Modified: 2023-3-7
+-- Version: 0.0.9
+-- Last Modified: 2023-3-9
 local fn  = vim.fn
 local api = vim.api
-local M   = {}
-local dev = true
+local M   = {
+    ns = api.nvim_create_namespace('openLink'),
+    highlighTimout = 500,
+    highlightGroup = "Search",
+}
 
 
-
-local function openUrl(url, timeout)
+local function openUrl(url, timeout, bufNr)
     timeout = timeout or 0
 
     vim.defer_fn(function()
+        if timeout ~= 0 and bufNr then
+            api.nvim_buf_clear_namespace(bufNr, M.ns, 0, -1)
+        end
         if fn.has('win32') == 1 then
             fn.system("explorer " .. url)
         elseif fn.has('unix') == 1 then
@@ -24,12 +29,14 @@ end
 
 
 
-local function highlight(urlStart, urlEnd)
-    local curPos   = api.nvim_win_get_cursor(0)
-    local curBufNr = api.nvim_get_current_buf()
-    local urlNS    = api.nvim_create_namespace('openLink')
-    api.nvim_buf_clear_namespace(curBufNr, urlNS, 0, -1)
-    api.nvim_buf_add_highlight(curBufNr, urlNS, "Search", curPos[1] - 1, urlStart, urlEnd)
+--- Highligh area in current line
+---@param bufNr number
+---@param lnum number
+---@param colStart number
+---@param colEnd number
+local function highlight(bufNr, lnum, colStart, colEnd)
+    api.nvim_buf_clear_namespace(bufNr, M.ns, 0, -1)
+    api.nvim_buf_add_highlight(bufNr, M.ns, M.highlightGroup, lnum - 1, colStart, colEnd)
 end
 
 
@@ -39,54 +46,75 @@ function M.main(selectText)
         local url
         local urlStart
         local urlEnd
-        local curLine
+        local curBufNr = api.nvim_get_current_buf()
 
-
-        local sep = string.find(_G._os_uname.sysname, "Windows_NT") and "\\" or "/"
+        local sep = _G._os_uname.sysname == "Windows_NT" and "\\" or "/"
         local filePath = fn.expand("%:p")
         local configPath = fn.stdpath("config")
-        if 0 > 1 then
-            map("n", [[gh]], [[<CMD>lua require("openLink").main()<CR>]], "which_key_ignore")
-        end
 
-
-        if dev or filePath == string.format("%s%slua%score%splugins.lua", configPath, sep, sep, sep) then
+        if filePath == string.format("%s%slua%score%splugins.lua", configPath, sep, sep, sep) then
             url = require("openLink.path.pluginConfig")(configPath, sep)
             if url then
                 return openUrl(url)
             end
         elseif vim.bo.filetype == "packer" then
             -- Support for jumping to related github commit in packer buffer
-            curLine = api.nvim_get_current_line()
-            urlStart, urlEnd = vim.regex [=[Updated \zs.\{-}\/.\{-}\ze:]=]:match_str(curLine)
+            local cursorPos = api.nvim_win_get_cursor(0)
+            local lines = api.nvim_buf_get_lines(0, fn.line("w0"), cursorPos[1], false)
+            local lnum
+            local commitStr
+            local commitIdx
+            local urlIdx
+            for i = #lines, 1, -1 do
+                local line = lines[i]
 
-            if not urlStart then return end
+                -- Find commit string
+                if not commitStr then
+                    local regex = vim.regex([[^\s\+\zs\w\{7}\ze ]])
+                    commitIdx = {regex:match_str(line)}
+                    if next(commitIdx) then
+                        commitStr = string.sub(line, commitIdx[1] + 1, commitIdx[2])
+                        urlStart, urlEnd = unpack(commitIdx)
 
-            url = "https://github.com/" .. string.sub(curLine, urlStart + 1, urlEnd)
+                        -- Highlight the commit string
+                        if M.highlighTimout ~= 0 then
+                            lnum = cursorPos[1] - (#lines - i)
+                            highlight(curBufNr, lnum, urlStart, urlEnd)
+                        end
+                    end
+                end
 
-            local commitStart, commitEnd = vim.regex [=[\.\.\zs.\{7}$]=]:match_str(curLine)
+                -- FInd github repository url
+                urlIdx = {string.find(line, "https://.*$")}
+                if next(urlIdx) then
+                    urlStart, urlEnd = unpack(urlIdx)
+                    url = string.sub(line, urlStart, urlEnd)
 
-            if not urlStart then return vim.notify("Capturing commit string failed", vim.log.levels.ERROR) end
+                    if not commitStr then
+                        -- Highlight the repo url
+                        if M.highlighTimout ~= 0 then
+                            lnum = cursorPos[1] - (#lines - i)
+                            highlight(curBufNr, lnum, urlStart - 1, urlEnd)
+                        end
+                    else
+                        url = url .. "/commit/" .. commitStr
+                    end
 
-            url = url .. string.format([[/commit/%s]], string.sub(curLine, commitStart + 1, commitEnd))
-
-            urlEnd = commitEnd
-
-            highlight(urlStart, urlEnd)
-            return openUrl(url, 500)
+                    return openUrl(url, M.highlighTimout, curBufNr)
+                end
+            end
         else
             -- Support for opening normal http[s] link
-            curLine = api.nvim_get_current_line()
-            urlStart, urlEnd = vim.regex [=[[a-z]*:\/\/[^ >,;]*]=]:match_str(curLine)
+            local cursorLine = api.nvim_get_current_line()
+            local cursorPos = api.nvim_win_get_cursor(0)
+            urlStart, urlEnd = vim.regex([=[[a-z]*:\/\/[^ >,;]*]=]):match_str(cursorLine)
 
-            if not urlStart then return end
-
-            url = string.sub(curLine, urlStart + 1, urlEnd)
-
-            highlight(urlStart, urlEnd)
-            return openUrl(url, 500)
+            if urlStart then
+                url = string.sub(cursorLine, urlStart + 1, urlEnd)
+                highlight(curBufNr, cursorPos[1], urlStart, urlEnd)
+                return openUrl(url, M.highlighTimout, curBufNr)
+            end
         end
-
     -- Visual mode with selected text provided
     else
         if _G._os_uname.sysname == "Windows_NT" then
