@@ -14,8 +14,9 @@ local M   = {
 }
 
 local resetLine = function ()
+    -- TODO: ? to trigger manupage
     M.lines = {
-        "< New Buffer >",
+        firstline = {"< New Buffer >"},
         absolute = {}
     }
 end
@@ -63,10 +64,8 @@ M.display = function(refreshChk)
     if refreshChk then
         resetLine()
     end
-    M.lines = {
-        absolute = absolute,
-        relative = relative
-    }
+    M.lines.absolute = absolute
+    M.lines.relative = relative
 
     -- Save last opened buffer and restore it after open a new buffer
     if vim.bo.buftype == "" and api.nvim_buf_get_name(0) ~= "" then
@@ -93,10 +92,11 @@ M.display = function(refreshChk)
     api.nvim_buf_set_option(M.curBuf, "filetype",   "HistoryStartup")
 
     api.nvim_win_set_buf(M.curWin, M.curBuf)
+    api.nvim_buf_set_lines(M.curBuf, 0, 1, false, M.lines.firstline)
     if not next(M.lines.relative) then
-        api.nvim_buf_set_lines(M.curBuf, 0, -1, false, M.lines.absolute)
+        api.nvim_buf_set_lines(M.curBuf, 1, -1, false, M.lines.absolute)
     else
-        api.nvim_buf_set_lines(M.curBuf, 0, -1, false, M.lines.relative)
+        api.nvim_buf_set_lines(M.curBuf, 1, -1, false, M.lines.relative)
     end
     api.nvim_buf_set_option(M.curBuf, "modifiable", false)
     api.nvim_buf_set_option(M.curBuf, "modified",   false)
@@ -125,7 +125,7 @@ end
 
 
 M.execMap = function(key)
-    local target = M.lines.absolute[api.nvim_win_get_cursor(0)[1]]
+    local lnum = api.nvim_win_get_cursor(0)[1]
     key = string.lower(key)
 
     if key == "q" then
@@ -139,31 +139,30 @@ M.execMap = function(key)
                 api.nvim_win_set_buf(M.curWin, M.lastBuf)
             end
         end
-
     elseif key == "o" or key == "<cr>" then
-        if target == "< New Buffer >" then
+        if lnum == 1 then
             vim.cmd("enew")
         else
-            vim.cmd("edit " .. target)
+            vim.cmd("edit " .. M.lines.absolute[lnum - 1])
         end
     elseif key == "<c-s>" then
-        if target == "< New Buffer >" then
+        if lnum == 1 then
             vim.cmd("noa split")
             vim.cmd("enew")
         else
             if M.lastBuf and api.nvim_buf_is_valid(M.lastBuf) then
                 api.nvim_win_set_buf(M.curWin, M.lastBuf)
             end
-            vim.cmd("split " .. target)
+            vim.cmd("split " .. M.lines.absolute[lnum - 1])
         end
     elseif key == "<c-v>" then
-        if target == "< New Buffer >" then
+        if lnum == 1 then
             vim.cmd("vnew")
         else
             if M.lastBuf and api.nvim_buf_is_valid(M.lastBuf) then
                 api.nvim_win_set_buf(M.curWin, M.lastBuf)
             end
-            vim.cmd("vsplit " .. target)
+            vim.cmd("vsplit " ..M.lines.absolute[lnum - 1])
         end
     end
 
