@@ -41,6 +41,7 @@ M.config = function()
                 if not (api.nvim_buf_get_name(0) == tbl.items[1].filename) then
                     vim.cmd([[buffer ]] .. tbl.items[1].filename)
                 end
+                vim.cmd [[normal! m`]] -- Register current position in jumplist
                 api.nvim_win_set_cursor(0, {tbl.items[1].lnum, tbl.items[1].col - 1})
                 vim.cmd [[norm! zv]]
             else

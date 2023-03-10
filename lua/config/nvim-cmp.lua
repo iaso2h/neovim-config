@@ -126,6 +126,7 @@ return function()
         {"dap-repl", "dapui_watches"},
         {
             sources = {
+                -- HACK: Not work for lua dapter yet?
                 { name = "dap" },
             },
         }

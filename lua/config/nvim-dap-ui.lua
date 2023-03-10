@@ -119,12 +119,13 @@ M.config = function()
         vim.cmd[[DapVirtualTextEnable]]
         M.filetypeSetup()
     end
-    -- HACK: not working
     dap.listeners.before.event_terminated['dapui_config'] = function()
         vim.cmd[[DapVirtualTextDisable]]
+        dapui.close()
     end
     dap.listeners.before.event_exited['dapui_config'] = function()
         vim.cmd[[DapVirtualTextDisable]]
+        dapui.close()
     end
 
     map("n", [[<C-w>d]], [[<CMD>lua require("dapui").toggle {layout=nil,reset=true}<CR>]], {"silent"}, "Dap UI toggle")

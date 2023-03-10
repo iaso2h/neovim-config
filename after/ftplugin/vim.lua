@@ -2,9 +2,9 @@
 vim.opt.formatoptions = _G._format_option
 if vim.g.loaded_scriptease then
     bmap(0, "n", [[<C-b>u]], [[<CMD>lua require("config.vim-scriptease").updateDebug]], {"silent"}, "Update vimscript")
-    bmap(0, "n", [[<C-b>a]], [[:<C-u>Breakadd<CR>]],   {"silent"}, "Add breakpoint at cursorline")
-    bmap(0, "n", [[<C-b>d]], [[:<C-u>Breakdel *<CR>]], {"silent"}, "Delete all breakpoints")
-    bmap(0, "n", [[<C-b>l]], [[:<C-u>breaklist<CR>]],  {"silent"}, "Display breakpoints")
+    bmap(0, "n", [[<C-b>a]], [[<CMD>Breakadd<CR>]],   {"silent"}, "Add breakpoint at cursorline")
+    bmap(0, "n", [[<C-b>d]], [[<CMD>Breakdel *<CR>]], {"silent"}, "Delete all breakpoints")
+    bmap(0, "n", [[<C-b>l]], [[<CMD>breaklist<CR>]],  {"silent"}, "Display breakpoints")
 end
 
 vim.opt.textwidth = 80

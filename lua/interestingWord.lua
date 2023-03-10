@@ -111,8 +111,8 @@ end
 local applyColor = function(word, opts, curWinID)
     M.hlIDs[curWinID] = M.hlIDs[curWinID] or {}
 
-    local pattern = opts.ignoreCase and
-        string.format([[\V\c%s]], word) or string.format([[\V\C%s]], word)
+    local ignoreCase = opts.ignoreCase and [[\c]] or [[\C]]
+    local pattern = string.format([[\V%s\<%s\>]], ignoreCase, word)
     local hlGroup, guibg = getHLGroup(opts, curWinID)
     local hlID    = fn.matchadd(hlGroup, pattern, opts.priority)
 

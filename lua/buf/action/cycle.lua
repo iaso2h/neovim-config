@@ -33,7 +33,7 @@ end
 --- Get all listed buffers. Just like what you see in the :ls command
 ---@param direction number Set to 1 to jump to next buffer, -1 to previous buffer
 M.init = function(direction)
-    if vim.o.buftype ~= "" and api.nvim_buf_get_name(0) == "" then
+    if vim.o.buftype ~= "" or api.nvim_buf_get_name(0) == "" then
         vim.cmd[[noa keepjump buffer #]]
     end
     local bufTbl = api.nvim_list_bufs()
@@ -44,6 +44,9 @@ M.init = function(direction)
 
     local currentBufNr = api.nvim_get_current_buf()
     local currentBufIdx = tbl_idx(bufTbl, currentBufNr, false)
+    if not currentBufIdx then
+        return vim.notify("Unknown buffer, can't continue", vim.log.levels.ERROR)
+    end
 
     -- Find the valid candidate
     local candiIdx = findCandi(bufTbl, currentBufIdx, direction)

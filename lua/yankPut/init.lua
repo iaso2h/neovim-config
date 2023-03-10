@@ -72,20 +72,20 @@ function M.VSCodeLineMove(vimMode, direction) -- {{{
 
     -- Set defered func. If the cursor is still at the same buffer and
     -- whithin the same line range, then perform a format action
-    M.lineMove.timer = vim.defer_fn(function()
-        local curBufNr = api.nvim_get_current_buf()
-        local curlineNr = fn.getpos(".")[2]
-        if curBufNr == M.lineMove.lastMovePos.bufNr and
-            curlineNr <= M.lineMove.lastMovePos.lineNr[2] and
-            curlineNr >= M.lineMove.lastMovePos.lineNr[1] and
-            vim.o.equalprg == "" then
+    -- M.lineMove.timer = vim.defer_fn(function()
+        -- local curBufNr = api.nvim_get_current_buf()
+        -- local curlineNr = fn.getpos(".")[2]
+        -- if curBufNr == M.lineMove.lastMovePos.bufNr and
+            -- curlineNr <= M.lineMove.lastMovePos.lineNr[2] and
+            -- curlineNr >= M.lineMove.lastMovePos.lineNr[1] and
+            -- vim.o.equalprg == "" then
 
-            cmd [[noautocmd normal! ==]]
-        end
-        cmd [[noautocmd Gitsigns toggle_signs]]
-        M.lineMove.gitsignsLineHl = true
-        M.lineMove.timer = nil
-    end, M.lineMove.timeout)
+            -- cmd [[noautocmd normal! ==]]
+        -- end
+        -- cmd [[noautocmd Gitsigns toggle_signs]]
+        -- M.lineMove.gitsignsLineHl = true
+        -- M.lineMove.timer = nil
+    -- end, M.lineMove.timeout)
 
 end -- }}}
 

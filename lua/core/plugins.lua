@@ -248,7 +248,8 @@ use {
     use {
         'AndrewRadev/switch.vim',
         cmd = {"Switch"},
-        setup = [[ vim.g.switch_mapping = '' ]]
+        setup = [[ vim.g.switch_mapping = '' ]],
+        config = conf "vim-switch"
     }
     use {
         'machakann/vim-sandwich',
@@ -377,7 +378,7 @@ use {
                 exclude_dirs = {},
                 show_hidden = false,
                 silent_chdir = true,
-                scope_chdir = "global",
+                scope_chdir = "win",
                 patterns = {
                     ".git",
                     ".hg",
