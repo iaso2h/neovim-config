@@ -473,17 +473,17 @@ map("n", [[<leader>cP]], [["0cP]], "Convert put after from register 0")
 -- Move line
 map("i", [[<A-j>]], [[<C-\><C-o><CMD>lua require("yankPut").VSCodeLineMove("n", "down")<CR>]], {"silent"}, "Move line down")
 map("i", [[<A-k>]], [[<C-\><C-o><CMD>lua require("yankPut").VSCodeLineMove("n", "up")<CR>]],   {"silent"}, "Move line up")
-map("n", [[<A-j>]], [[<CMD>lua require("yankPut").VSCodeLineMove("n", "down")<CR>]], {"silent"}, "Move line down")
-map("n", [[<A-k>]], [[<CMD>lua require("yankPut").VSCodeLineMove("n", "up")<CR>]],   {"silent"}, "Move line up")
-map("x", [[<A-j>]], [[:lua require("yankPut").VSCodeLineMove("v", "down")<CR>]], {"silent"}, "Move line down")
-map("x", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("v", "up")<CR>]],   {"silent"}, "Move line up")
+map("n", [[<A-j>]], [[<CMD>lua require("yankPut").VSCodeLineMove("n", "down")<CR>]],           {"silent"}, "Move line down")
+map("n", [[<A-k>]], [[<CMD>lua require("yankPut").VSCodeLineMove("n", "up")<CR>]],             {"silent"}, "Move line up")
+map("x", [[<A-j>]], [[:lua require("yankPut").VSCodeLineMove("v", "down")<CR>]],               {"silent"}, "Move line down")
+map("x", [[<A-k>]], [[:lua require("yankPut").VSCodeLineMove("v", "up")<CR>]],                 {"silent"}, "Move line up")
 -- Copy line
-map("i", [[<A-S-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "down")<CR>]],       {"silent"}, "Copy line down")
-map("i", [[<A-S-k>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "up")<CR>]],         {"silent"}, "Copy line up")
-map("n", [[<A-S-j>]], [[<CMD>lua require("yankPut").VSCodeLineYank("n", "down")<CR>]],                 {"silent"}, "Copy line down")
-map("n", [[<A-S-k>]], [[<CMD>lua require("yankPut").VSCodeLineYank("n", "up")<CR>]],                   {"silent"}, "Copy line up")
-map("x", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "down")<CR>]], {"silent"}, "Copy line down")
-map("x", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank(vim.fn.visualmode(), "up")<CR>]],   {"silent"}, "Copy line up")
+map("i", [[<A-S-j>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "down")<CR>]], {"silent"}, "Copy line down")
+map("i", [[<A-S-k>]], [[<C-\><C-o>:lua require("yankPut").VSCodeLineYank("n", "up")<CR>]],   {"silent"}, "Copy line up")
+map("n", [[<A-S-j>]], [[<CMD>lua require("yankPut").VSCodeLineYank("n", "down")<CR>]],       {"silent"}, "Copy line down")
+map("n", [[<A-S-k>]], [[<CMD>lua require("yankPut").VSCodeLineYank("n", "up")<CR>]],         {"silent"}, "Copy line up")
+map("x", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank("v", "down")<CR>]],           {"silent"}, "Copy line down")
+map("x", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank("v", "up")<CR>]],             {"silent"}, "Copy line up")
 -- }}} Mimic the VSCode move/copy line up/down behavior
 
 -- }}} MS bebhave

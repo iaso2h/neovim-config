@@ -54,12 +54,13 @@ function M.vMotion(saveCursorChk)
         motionType = "char"
         if saveCursorChk then M.cursorPos = api.nvim_win_get_cursor(0) end
     elseif visualMode == "V" then
-        -- Because Visual Line Mode the cursor will place at the first column once
-        -- entering commandline mode. Therefor "gv" is exectued here to retrieve it.
+        -- Visual Line Mode the cursor will place at the first column once
+        -- entering commandline mode.
         motionType = "line"
         if saveCursorChk then
-            vim.cmd([[noa norm! gvmz]] .. t"<Esc>")
-            M.cursorPos = api.nvim_buf_get_mark(0, "z")
+            vim.cmd([[noa norm! gv]])
+            M.cursorPos = api.nvim_win_get_cursor(0)
+            vim.cmd([[noa norm! ]] .. t"<Esc>")
         end
     elseif visualMode == "\22" then
         motionType = "block"

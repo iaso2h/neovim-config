@@ -1,8 +1,8 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.16
--- Last Modified: 2023-3-8
+-- Version: 0.1.17
+-- Last Modified: 2023-3-12
 
 local fn       = vim.fn
 local cmd      = vim.cmd
@@ -11,16 +11,6 @@ local util     = require("util")
 local operator = require("operator")
 local register = require("register")
 local M = {
-    lineMove = {
-        lastMovePos = {
-            bufNr = nil,
-            lineNr = nil
-        },
-        timer    = nil,
-        timeout  = 500,
-        gitsignsOn     = package.loaded["gitsigns"] ~= nil,
-        gitsignsLineHl = package.loaded["gitsigns"] ~= nil,
-    },
     hlInterval = 250,
     hlGroup    = "Search"
 }
@@ -31,20 +21,8 @@ function M.VSCodeLineMove(vimMode, direction) -- {{{
     if not vim.bo.modifiable then
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
     end
+    ---@diagnostic disable-next-line: param-type-mismatch
     if fn.foldclosed('.') ~= -1 then return end
-
-    -- Stop previous timer if this func is quick enough to be called again
-    -- before the defered function is called and stop it
-    if M.lineMove.timer then
-        M.lineMove.timer:stop()
-    end
-
-    -- Disable Gitsign.nvim plugin to prevent frequently shrinking or
-    -- expanding in sign column
-    if M.lineMove.gitsignsOn and M.lineMove.gitsignsLineHl then
-        cmd [[noautocmd Gitsigns toggle_signs]]
-        M.lineMove.gitsignsLineHl = false
-    end
 
     if vimMode == "n" then
         if direction == "down" then
@@ -61,104 +39,70 @@ function M.VSCodeLineMove(vimMode, direction) -- {{{
 
         cmd [[noautocmd normal! gv]]
     end
-
-    -- Get line info
-    if vimMode == "n" then
-        M.lineMove.lastMovePos.lineNr = {fn.getpos("'[")[2], fn.getpos("']")[2]}
-    else
-        M.lineMove.lastMovePos.lineNr = {fn.getpos("'<")[2], fn.getpos("'>")[2]}
-    end
-    M.lineMove.lastMovePos.bufNr  = api.nvim_get_current_buf()
-
-    -- Set defered func. If the cursor is still at the same buffer and
-    -- whithin the same line range, then perform a format action
-    -- M.lineMove.timer = vim.defer_fn(function()
-        -- local curBufNr = api.nvim_get_current_buf()
-        -- local curlineNr = fn.getpos(".")[2]
-        -- if curBufNr == M.lineMove.lastMovePos.bufNr and
-            -- curlineNr <= M.lineMove.lastMovePos.lineNr[2] and
-            -- curlineNr >= M.lineMove.lastMovePos.lineNr[1] and
-            -- vim.o.equalprg == "" then
-
-            -- cmd [[noautocmd normal! ==]]
-        -- end
-        -- cmd [[noautocmd Gitsigns toggle_signs]]
-        -- M.lineMove.gitsignsLineHl = true
-        -- M.lineMove.timer = nil
-    -- end, M.lineMove.timeout)
-
 end -- }}}
 
 
--- VSCode yank line {{{
-function M.VSCodeLineYank(vimMode, direction)
+function M.VSCodeLineYank(vimMode, direction) -- {{{
     if not vim.bo.modifiable then
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
     end
-    -- if fn.foldclosed('.') ~= -1 then return end
-    local saveClipboard = api.nvim_get_option("clipboard")
-    -- Set clipboard to "" temporarily to avoid xclip warning
-    vim.opt.clipboard = ""
 
+    if vimMode == "v" then
+        vim.cmd([[noa norm! gv]])
+        local cursorPos = api.nvim_win_get_cursor(0)
+        vim.cmd([[noa norm! ]] .. t"<Esc>")
 
-    register.saveReg()
-
-    -- Duplication {{{
-    if vimMode ~= "n" then
-        cmd [[noautocmd normal! gv]]
-        -- Visual mode {{{
-        local cursor      = api.nvim_win_get_cursor(0)
-        local selectStart = api.nvim_buf_get_mark(0, "<")
-        local selectEnd   = api.nvim_buf_get_mark(0, ">")
-        cmd(string.format("silent! noautocmd %d,%dyank", selectStart[1], selectEnd[1]))
+        local visualStart = api.nvim_buf_get_mark(0, "<")
+        local visualEnd   = api.nvim_buf_get_mark(0, ">")
+        local lineDiff    = visualEnd[1] - visualStart[1] + 1
+        local lines = api.nvim_buf_get_lines(0, visualStart[1] - 1, visualEnd[1], false)
         if direction == "up" then
-            if cursor[1] == selectStart[1] then
-                cmd [[noautocmd put!]]
-                api.nvim_win_set_cursor(0, selectEnd)
-            else
-                cmd [[noautocmd put]]
-                api.nvim_win_set_cursor(0, selectStart)
-            end
-
-            cmd([[noautocmd normal! ]] .. vimMode)
-            api.nvim_win_set_cursor(0, cursor)
-        elseif direction == "down" then
-            if cursor[1] == selectStart[1] then
-                cmd [[noautocmd put!]]
+            if cursorPos[1] == visualStart[1] then
+                api.nvim_put(lines, "l", false, false)
                 api.nvim_win_set_cursor(0, {
-                    selectEnd[1] + selectEnd[1] - selectStart[1] + 1,
-                    selectEnd[2]
+                    visualEnd[1], cursorPos[2]
                 })
-            else
-                cmd [[noautocmd put]]
-                api.nvim_win_set_cursor(0, {selectEnd[1] + 1, selectStart[2]})
+                vim.cmd("noa norm! V")
+                api.nvim_win_set_cursor(0, cursorPos)
+            elseif cursorPos[1] == visualEnd[1] then
+                api.nvim_put(lines, "l", true, false)
+                api.nvim_win_set_cursor(0, visualStart)
+                vim.cmd("noa norm! V")
+                api.nvim_win_set_cursor(0, {visualEnd[1], cursorPos[2]})
             end
-
-            cmd([[noautocmd normal! ]] .. vimMode)
-            api.nvim_win_set_cursor(0, {
-                cursor[1] + selectEnd[1] - selectStart[1] + 1, cursor[2]
-            })
-        end
-        -- }}} Visual mode
-    else
-        -- Normal mode {{{
-        local cursor = api.nvim_win_get_cursor(0)
-        cmd [[noautocmd yank]]
-        if direction == "up" then
-            cmd [[noautocmd put!]]
-            api.nvim_win_set_cursor(0, cursor)
         elseif direction == "down" then
-            cmd [[noautocmd put]]
-            api.nvim_win_set_cursor(0, {cursor[1] + 1, cursor[2]})
+            if cursorPos[1] == visualStart[1] then
+                api.nvim_put(lines, "l", false, false)
+                api.nvim_win_set_cursor(0, {
+                    visualEnd[1] + lineDiff, cursorPos[2]
+                })
+                vim.cmd("noa norm! V")
+                api.nvim_win_set_cursor(0, {
+                    visualEnd[1] + 1, cursorPos[2]
+                })
+            elseif cursorPos[1] == visualEnd[1] then
+                api.nvim_put(lines, "l", true, false)
+                api.nvim_win_set_cursor(0, {
+                    visualEnd[1] + 1, cursorPos[2]
+                })
+                vim.cmd("noa norm! V")
+                api.nvim_win_set_cursor(0, {
+                    visualEnd[1] + lineDiff, cursorPos[2]
+                })
+            end
         end
-        -- }}} Normal mode
+    else
+        local cursorPos = api.nvim_win_get_cursor(0)
+        local currentLine = api.nvim_get_current_line()
+        if direction == "up" then
+            api.nvim_put({currentLine}, "l", false, false)
+            api.nvim_win_set_cursor(0, { cursorPos[1], cursorPos[2] })
+        elseif direction == "down" then
+            api.nvim_put({ currentLine }, "l", true, false)
+            api.nvim_win_set_cursor(0, { cursorPos[1] + 1, cursorPos[2] })
+        end
     end
-    -- }}} Duplication
-
-    register.restoreReg()
-    vim.opt.clipboard = saveClipboard
-end
--- }}} VSCode yank line
+end -- }}}
 
 
 --- Yank text without moving cursor. Also comes with yanked area highlighted
