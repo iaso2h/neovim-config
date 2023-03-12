@@ -147,17 +147,6 @@ function _G.map(mode, lhs, rhs, ...) -- {{{
     if string.match(lhs, "[A-Z]") and modeTbl == "" then
         return api.nvim_del_keymap("s", lhs)
     end
-
-    if CoreMappigsStart then
-        if modeTbl[1] == "" then modeTbl[1] = "all" end
-        for _, m in ipairs(modeTbl) do
-            -- Initiation
-            _G.CoreMappings = _G.CoreMappings or {}
-            CoreMappings[m] = CoreMappings[m] or {}
-
-            CoreMappings[m][#CoreMappings[m]+1] = lhs
-        end
-    end
 end -- }}}
 
 

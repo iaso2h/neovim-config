@@ -147,8 +147,8 @@ map("n", [[dn]], [[<Plug>DeleteUnderForward]], "Delete the whold word under curo
 map("n", [[dN]], [[<Plug>DeleteUnderBackward]], "Delete the whold word under curosr, then highlight it backward")
 map("n", [[d<Space>]], [[<CMD>call setline(".", "")<CR>]],  {"silent"}, "Empty current line,")
 -- Change under cursor
-map("n", [[cn]], [[v:hlsearch? "cgn" : "g*``cgn"]], {"noremap", "expr"}, "Change whole word under cursor, then highlight it forward")
-map("n", [[cN]], [[v:hlsearch? "cgN" : "g#``cgN"]], {"noremap", "expr"}, "Change whole word under cursor, then highlight it backward")
+map("n", [[cn]], [[v:hlsearch? "cgn" : "*``cgn"]], {"noremap", "expr"}, "Change whole word under cursor, then highlight it forward")
+map("n", [[cN]], [[v:hlsearch? "cgN" : "#``cgN"]], {"noremap", "expr"}, "Change whole word under cursor, then highlight it backward")
 -- Replace
 map("n", [[<Plug>ReplaceOperatorInplace]], function ()
     return vim.fn.luaeval [[require("replace").expr(true, true)]]
@@ -250,10 +250,10 @@ map("n", [[<A-i>]], [[<CMD>lua require("searchHop").centerHop("g,", false, false
 map("n", [[<C-o>]], [[<CMD>lua require("searchHop").centerHop("<C-o>", true, false)<CR>]], {"silent"}, "Older jump")
 map("n", [[<C-i>]], [[<CMD>lua require("searchHop").centerHop("<C-i>", true, false)<CR>]], {"silent"}, "Newer jump")
 -- Swap default mapping
-map("n", [[*]],  [[g*zv<CMD>lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> forward")
-map("n", [[#]],  [[g#zv<CMD>lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> back")
-map("n", [[g#]], [[#zv<CMD>lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
-map("n", [[g*]], [[*zv<CMD>lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
+map("n", [[*]],  [[g*``<CMD>lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> forward")
+map("n", [[#]],  [[g#``<CMD>lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> back")
+map("n", [[g#]], [[#``<CMD>lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
+map("n", [[g*]], [[*``<CMD>lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
 -- Search visual selected
 map("x", [[/]], [[:lua require("searchHop").searchSelected("/")<CR>]], {"silent"}, "Search selected forward")
 map("x", [[?]], [[:lua require("searchHop").searchSelected("?")<CR>]], {"silent"}, "Search selected backward")

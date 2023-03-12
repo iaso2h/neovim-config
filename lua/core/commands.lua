@@ -123,10 +123,10 @@ au("BufWritePost", {
 au("BufWritePost", {
     group   = augroupWrite,
     pattern = "*.lua,*.vim",
-    desc     = "Reload configuration after saving lua/vim files",
+    desc     = "Autoreload configuration after saving lua/vim configuration files",
     callback = function ()
         -- Similar work: https://github.com/RRethy/nvim-sourcerer
-        require("reloadConfig").reload()
+        require("autoreload").reload()
     end
 })
 
@@ -303,7 +303,9 @@ excmd("O", [[browse oldfiles]], {
 })
 
 excmd("Dofile", function ()
-    require("reloadConfig").luaLoadFile()
+    if vim.bo.filetype == "lua" then
+        require("autoreload").reload()
+    end
 end, {
     desc  = "Reload the current file in lua/vim runtime",
     nargs = 0,
