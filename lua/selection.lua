@@ -1,10 +1,9 @@
 -- File: selection
 -- Author: iaso2h
 -- Description: Selection Utilities
--- Version: 0.0.10
--- Last Modified: 2023-2-23
+-- Version: 0.0.11
+-- Last Modified: 2023-3-13
 local api = vim.api
-local cmd = vim.cmd
 local fn  = vim.fn
 local M   = {}
 
@@ -45,7 +44,7 @@ function M.cornerSelection(bias) -- {{{
         return
     end
 
-    local closerToEnd = require("util").posDist(selectStartPos, curPos) < require("util").posDist(selectEndPos, curPos)
+    local closerToEnd = require("util").posDist(selectStartPos, curPos) > require("util").posDist(selectEndPos, curPos)
     if bias == 1 then
         if closerToEnd then
             jumpToStart(selectStartPos)
@@ -63,9 +62,9 @@ end -- }}}
 
 
 --- Get the text of selected area
----@param returnType string Set to decide to return "string" or "list"
+---@param returnType   string  Set to decide to return "string" or "list"
 ---@param exitToNormal boolean Set to decide to return in Normal mode in Neovim
----@return string|table Decided by returnType
+---@return string|table|nil Decided by returnType
 M.getSelect = function(returnType, exitToNormal) -- {{{
     if returnType ~= "list" and returnType ~= "string" then
         return vim.notify("Not a supported string value", vim.log.levels.ERROR)
@@ -97,7 +96,7 @@ M.getSelect = function(returnType, exitToNormal) -- {{{
         lines[1]      = lines[1]:sub(selectStart[2] + 1)
     end
 
-    if exitToNormal then cmd("norm! " .. t"<Esc>") end
+    if exitToNormal then vim.cmd("norm! " .. t"<Esc>") end
 
     if returnType == "list" then
         return lines

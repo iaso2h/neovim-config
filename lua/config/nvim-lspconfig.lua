@@ -39,7 +39,8 @@ M.config = function()
                     tbl.items[1].lnum == tbl.items[2].lnum) then
                 -- OPTIM: use vim.fn.bufnr(vim.api.nvim_buf_get_name(0)) to check bufnr?
                 if not (api.nvim_buf_get_name(0) == tbl.items[1].filename) then
-                    vim.cmd([[buffer ]] .. tbl.items[1].filename)
+                    -- vim.cmd([[buffer ]] .. tbl.items[1].filename)
+                    vim.cmd([[e ]] .. tbl.items[1].filename)
                 end
                 vim.cmd [[normal! m`]] -- Register current position in jumplist
                 api.nvim_win_set_cursor(0, {tbl.items[1].lnum, tbl.items[1].col - 1})

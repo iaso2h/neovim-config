@@ -1,5 +1,3 @@
--- NOTE: ripgrep is quired
-
 return function()
 require("todo-comments").setup{
     signs = false, -- show icons in the signs column

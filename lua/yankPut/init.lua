@@ -310,7 +310,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     end
     -- }}} Restoration
 
-    -- Record the register type for the lastYankPut()
+    -- Record the register type for lastYankPut()
     M.lastPutLinewise = regTypeNew == "V" or regTypeNew == "l"
 end --  }}}
 

@@ -17,7 +17,8 @@ local defaultTheme = {
         '--line-number',
         '--column',
         '--smart-case',
-        '--follow'
+        '--follow',
+        '-u'
     },
     prompt_prefix      = "$ ",
     selection_caret    = "  ",
@@ -146,7 +147,7 @@ map("n", [[<C-f>E]], [[<CMD>lua require('telescope.builtin').find_files({no_igno
 map("n", [[<C-f>e]], [[<CMD>lua require('telescope.builtin').find_files({no_ignore=false})<CR>]],
         {"silent"}, "Find all files")
 
-map("n", [[<C-f>f]], [[<CMD>lua require('telescope.builtin').current_buffer_fuzzy_find()<CR>]], {"silent"}, "Current buffer fuzzy find")
+map("n", [[<C-f>f]], [[<CMD>lua require('telescope.builtin').live_grep()<CR>]], {"silent"}, "Live grep")
 map("n", [[<C-f>F]], [[<CMD>lua require('telescope.builtin').live_grep()<CR>]], {"silent"}, "Live grep")
 
 map("n", [[<C-f>w]], [[<CMD>lua require('telescope.builtin').grep_string{word_match=false}<CR>]],

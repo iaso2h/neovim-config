@@ -1,7 +1,7 @@
 -- File: nvim-galaxyline
 -- Author: iaso2h
 -- Description: Statusline configuration
--- Last Modified: 2023-2-27
+-- Last Modified: 2023-3-12
 local M = {}
 
 -- filetype contained in this list will be consider inactive all the time
@@ -23,7 +23,6 @@ M.config = function()
 local fn  = vim.fn
 local api = vim.api
 
-local u2char    = require("util").u2char
 local gl        = require("galaxyline")
 local gls       = gl.section
 local condition = require("galaxyline.condition")
@@ -102,16 +101,11 @@ local bufTypeIcons = {
     qf       = "",
 }
 
+
 local circleHalfRight = ""
 local circleHalfLeft  = ""
 local vimMode
 local tightWinChk = false
-
-local hasFileType = function()
-    local fileType = vim.bo.filetype
-    if not fileType or fileType == "" then return false end
-    return true
-end
 
 
 local shortLineFileType = function ()
@@ -213,7 +207,7 @@ gls.left[1] = { -- {{{
                 return string.format("  %s %s ", require("nvim-nonicons").get("vim"), alias[vimMode])
             else
                 if vimMode == "t" or vimMode == "!" then
-                    return string.format("  %s %s ", require("nvim-nonicons").get("vim"), alias[vimMode])
+                    return string.format("   %s ", alias[vimMode])
                 else
                     return string.format("   %s ", alias[vimMode])
                 end

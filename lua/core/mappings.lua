@@ -454,8 +454,8 @@ map("", [[<Plug>InplaceYank]], function ()
    return vim.fn.luaeval[[require("operator").expr(require("yankPut").inplaceYank, false, "<Plug>InplaceYank")]]
 end, {"expr", "silent"}, "Yank operator")
 
-map("", [[y]], [[<Plug>InplaceYank]], "Yank operator")
-map({"n", "x"}, [[Y]], [[yy]], "Yank line")
+map("",  [[y]], [[<Plug>InplaceYank]], "Yank operator")
+map("n", [[Y]], [[yy]], "Yank line")
 -- Inplace put
 map("n", [[p]], [[:lua require("yankPut").inplacePut("n", "p", false)<CR>]], {"silent"}, "Put after")
 map("x", [[p]], [[:lua require("yankPut").inplacePut("v", "p", false)<CR>]], {"silent"}, "Put after")
