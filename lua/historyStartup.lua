@@ -4,6 +4,7 @@
 -- Dependencies: 0
 -- Version: 0.0.10
 -- Last Modified: 2023-3-8
+-- TODO: strike through the files that are already loaded and listed in Neovim
 local api = vim.api
 local fn  = vim.fn
 local M   = {
@@ -68,7 +69,7 @@ M.display = function(refreshChk)
     M.lines.relative = relative
 
     -- Save last opened buffer and restore it after open a new buffer
-    if vim.bo.buftype == "" and api.nvim_buf_get_name(0) ~= "" then
+    if vim.bo.buftype == "" and nvim_buf_get_name(0) ~= "" then
         M.lastBuf = api.nvim_get_current_buf()
     else
         M.lastBuf = nil

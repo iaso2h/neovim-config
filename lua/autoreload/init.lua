@@ -87,7 +87,7 @@ M.opt.lua.config = { -- {{{
 M.reload = function() -- {{{
     if not p then return end
     local bufNr = api.nvim_get_current_buf()
-    local pathStr = api.nvim_buf_get_name(bufNr)
+    local pathStr = nvim_buf_get_name(bufNr)
     -- Uppercase the first character in Windows
     if _G._os_uname.sysname == "Windows_NT" then
         pathStr = util.upperCaseWindowsDrive(pathStr)

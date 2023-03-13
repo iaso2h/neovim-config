@@ -54,7 +54,7 @@ end
 ---@param direction number Set to 1 to jump to next buffer, -1 to previous buffer
 M.init = function(direction)
     local currentBufNr = api.nvim_get_current_buf()
-    if vim.o.buftype ~= "" or api.nvim_buf_get_name(0) == "" then
+    if vim.o.buftype ~= "" or nvim_buf_get_name(0) == "" then
         -- return vim.cmd[[noa keepjump buffer #]]
         return bufferCycle(currentBufNr, direction)
     end

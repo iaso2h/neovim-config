@@ -8,7 +8,7 @@ local var = require("buf.var")
 
 --- Gather informatioin about buffers and windows for further processing
 M.initBuf = function()
-    var.bufName  = api.nvim_buf_get_name(0)
+    var.bufName  = nvim_buf_get_name(0)
     var.bufNr    = api.nvim_get_current_buf()
     var.bufType  = vim.o.buftype
     var.winID    = api.nvim_get_current_win()

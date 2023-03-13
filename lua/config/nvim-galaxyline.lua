@@ -116,7 +116,7 @@ end
 
 local fileInfo = function()
     local cwd  = vim.fn.getcwd(0)
-    local absoPath = vim.api.nvim_buf_get_name(0)
+    local absoPath = nvim_buf_get_name(0)
     if absoPath == "" then return vim.bo.filetype .. " " end
 
     local isRel = string.match(absoPath, cwd) ~= nil
