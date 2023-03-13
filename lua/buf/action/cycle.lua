@@ -1,3 +1,10 @@
+-- File: cycle.lua
+-- Author: iaso2h
+-- Description: Improved bp and bn
+-- Version: 0.0.3
+-- Last Modified: 2023-3-13
+
+
 local api = vim.api
 local M   = {
     buftypeBlacklist = {
@@ -6,10 +13,27 @@ local M   = {
 }
 
 
+local bufferCycle = function(currentBufNr, direction)
+    repeat
+        if direction == 1 then
+            vim.cmd[[noa keepjump bn]]
+        else
+            vim.cmd[[noa keepjump bp]]
+        end
+
+        local bufNr = api.nvim_get_current_buf()
+        local bufType = api.nvim_buf_get_option(bufNr, "buftype")
+        if bufType == "" or bufType == "nofile" then
+            return
+        end
+    until bufNr == currentBufNr
+end
+
+
 local function findCandi(bufTbl, currentBufIdx, direction)
     local candiIdx
-    for i = 1, #bufTbl + 1 do
-        if i == #bufTbl + 1 then return 0 end
+    for i = 1, #bufTbl do
+        if i == #bufTbl then return 0 end
 
         candiIdx = currentBufIdx + direction
         -- Loop through the buffer table
@@ -19,12 +43,8 @@ local function findCandi(bufTbl, currentBufIdx, direction)
         local candiBuftype = api.nvim_buf_get_option(bufTbl[candiIdx], "buftype")
 
         -- Filter out quickfix
-        for _, buftype in ipairs(M.buftypeBlacklist) do
-            if candiBuftype ~= buftype then
-                return candiIdx
-            else
-                break
-            end
+        if not vim.tbl_contains(M.buftypeBlacklist, candiBuftype) then
+            return candiIdx
         end
     end
 end
@@ -33,16 +53,18 @@ end
 --- Get all listed buffers. Just like what you see in the :ls command
 ---@param direction number Set to 1 to jump to next buffer, -1 to previous buffer
 M.init = function(direction)
+    local currentBufNr = api.nvim_get_current_buf()
     if vim.o.buftype ~= "" or api.nvim_buf_get_name(0) == "" then
-        vim.cmd[[noa keepjump buffer #]]
+        -- return vim.cmd[[noa keepjump buffer #]]
+        return bufferCycle(currentBufNr, direction)
     end
+
     local bufTbl = api.nvim_list_bufs()
     local cond = function (buf)
         return api.nvim_buf_get_option(buf, "buflisted")
     end
     bufTbl = vim.tbl_filter(cond, bufTbl)
 
-    local currentBufNr = api.nvim_get_current_buf()
     local currentBufIdx = tbl_idx(bufTbl, currentBufNr, false)
     if not currentBufIdx then
         return vim.notify("Unknown buffer, can't continue", vim.log.levels.ERROR)
