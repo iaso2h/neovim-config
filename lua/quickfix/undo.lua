@@ -21,7 +21,7 @@ M.delete = function (vimMode) -- {{{
         M.lastItems = vim.deepcopy(qfItems)
 
         table.remove(qfItems, itemNr)
-        fn.setqflist({}, " ", {items = qfItems})
+        fn.setqflist({}, "r", {items = qfItems})
 
         -- Neovim will take care of the new position even the row number is out of scope
         api.nvim_win_set_cursor(0, qfCursorPos)
@@ -34,7 +34,7 @@ M.delete = function (vimMode) -- {{{
         for _ = 1, endPos[1] - startPos[1] + 1, 1 do
             table.remove(qfItems, startPos[1])
         end
-        fn.setqflist({}, " ", {items = qfItems})
+        fn.setqflist({}, "r", {items = qfItems})
 
         -- Neovim will take care of the new position even the row number is out of scope
         api.nvim_win_set_cursor(0, startPos)
@@ -44,7 +44,7 @@ end -- }}}
 
 M.recovery = function () -- {{{
     if M.lastItems then
-        fn.setqflist({}, " ", {items = M.lastItems})
+        fn.setqflist({}, "r", {items = M.lastItems})
         M.lastItems = nil
     else
         return

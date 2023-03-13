@@ -70,7 +70,7 @@ M.main = function()
     end
 
     require("quickfix.highlight").clear()
-    fn.setqflist({}, " ", {title = "qfMessage", items = qfTbl})
+    fn.setqflist({}, "r", {title = "qfMessage", items = qfTbl})
 
     vim.cmd [[copen]]
 

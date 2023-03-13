@@ -44,7 +44,7 @@ M.main = function ()
             qfItems[idx].text = api.nvim_buf_get_lines(item.bufnr, item.lnum - 1, item.lnum, false)[1]
         end
     end
-    fn.setqflist({}, " ", {items = qfItems})
+    fn.setqflist({}, "r", {items = qfItems})
 end
 
 return M

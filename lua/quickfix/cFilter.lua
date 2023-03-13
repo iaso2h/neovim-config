@@ -76,9 +76,9 @@ M.main = function(qfChk, pat, bang)
 
     -- Populate new items
     if qfChk then
-        fn.setqflist({}, " ", {items = newItems})
+        fn.setqflist({}, "r", {items = newItems})
     else
-        fn.setloclist(0, {}, " ", {items = newItems})
+        fn.setloclist(0, {}, "r", {items = newItems})
     end
 
     -- Optional step need to do for todo-comment

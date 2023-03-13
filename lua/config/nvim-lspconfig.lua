@@ -45,7 +45,7 @@ M.config = function()
                 api.nvim_win_set_cursor(0, {tbl.items[1].lnum, tbl.items[1].col - 1})
                 vim.cmd [[norm! zv]]
             else
-                fn.setqflist({}, " ", {items = tbl.items, title = tbl.title})
+                fn.setqflist({}, "r", {items = tbl.items, title = tbl.title})
                 require("quickfix.toggle")(false)
             end
         end
