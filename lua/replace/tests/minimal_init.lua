@@ -4,8 +4,7 @@ vim.opt.runtimepath:append(configPath)
 
 -- Add plenary.nvim, vim-repeat, vim-visualrepeat in your runtime path. In my
 -- case, I manage them via packer.nvim
-local sep = _G._os_uname.sysname == "Windows_NT" and "\\" or "/"
-local packagePathHead = configPath .. sep .. "pack" .. sep .. "packer" .. sep .. "opt" .. sep
+local packagePathHead = configPath .. _G._sep .. "pack" .. _G._sep .. "packer" .. _G._sep .. "opt" .. _G._sep
 vim.opt.runtimepath:append(packagePathHead .. "plenary.nvim")
 vim.opt.runtimepath:append(packagePathHead .. "vim-repeat")
 vim.opt.runtimepath:append(packagePathHead .. "vim-visualrepeat")

@@ -9,10 +9,6 @@ end
 
 pcall(vim.cmd, [[language en_US]])
 
-_G._os_uname         = vim.loop.os_uname()
-_G._is_term          = vim.api.nvim_list_uis()[1].ext_termcolors
-_G._qf_fallback_open = true
-
 -- Disable built-in plugins
 vim.g.loaded_2html_plugin      = 1
 vim.g.loaded_getscript         = 1
@@ -48,6 +44,14 @@ vim.g.doxygen_enhanced_color = 1
 -- msql.vim
 vim.g.msql_sql_query = 1
 
-local ok, msg = pcall(require, "util"); if not ok then vim.notify(msg, vim.log.levels.ERROR) end
+local ok, msg = pcall(require, "global")
+if not ok then
+    return vim.notify(msg, vim.log.levels.ERROR)
+end
+
+ok, msg = pcall(require, "util")
+if not ok then
+    return vim.notify(msg, vim.log.levels.ERROR)
+end
 
 require "core"

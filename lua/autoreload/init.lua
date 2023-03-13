@@ -13,7 +13,7 @@ if not ok then
 end
 
 local M    = {
-    configPath = p:new(fn.stdpath("config")),
+    configPath = p:new(_G._configPath),
     opt = {
         lua = { }
     }

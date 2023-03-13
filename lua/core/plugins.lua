@@ -640,8 +640,7 @@ use {
         "L3MON4D3/LuaSnip",
         run      = "make install_jsregexp",
         config = function ()
-            local sep = _G._os_uname.sysname == "Windows_NT" and "\\" or "/"
-            local mySnippets = vim.fn.stdpath("config") .. sep .. "snippets"
+            local mySnippets = vim.fn.stdpath("config") .. _G._sep .. "snippets"
             require("luasnip.loaders.from_vscode").lazy_load()
             require("luasnip.loaders.from_vscode").lazy_load { paths = { mySnippets } }
         end
@@ -1059,7 +1058,6 @@ end, -- }}}
 }
 
 
-local configPath
 local compilePath
 M.setupPacker = function(compileName)
     local function promptOnMove(msg, func)
@@ -1088,8 +1086,7 @@ M.setupPacker = function(compileName)
         return promptOnMove("Please restart neovim")
     end
 
-    configPath = fn.stdpath("config")
-    compilePath = string.format("%s/lua/%s.lua", configPath, compileName)
+    compilePath = string.format("%s/lua/%s.lua", _G._configPath, compileName)
     if fn.empty(fn.glob(packerPath)) > 0 then
         promptOnMove([[Please run PackerSync, wail till all process end]])
         return false
@@ -1099,7 +1096,7 @@ end
 
 M.configPacker = function()
     packer.init{
-        package_root = configPath .. "/pack",
+        package_root = _G._configPath .. "/pack",
         compile_path = compilePath
     }
     packer.startup(configArgs)

@@ -48,12 +48,10 @@ function M.main(selectText)
         local urlEnd
         local curBufNr = api.nvim_get_current_buf()
 
-        local sep = _G._os_uname.sysname == "Windows_NT" and "\\" or "/"
         local filePath = fn.expand("%:p")
-        local configPath = fn.stdpath("config")
 
-        if filePath == string.format("%s%slua%score%splugins.lua", configPath, sep, sep, sep) then
-            url = require("openLink.path.pluginConfig")(configPath, sep)
+        if filePath == string.format("%s%slua%score%splugins.lua", _G._configPath, _G._sep, _G._sep, _G._sep) then
+            url = require("openLink.path.pluginConfig")(_G._configPath, _G._sep)
             if url then
                 return openUrl(url)
             end

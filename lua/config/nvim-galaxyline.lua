@@ -131,9 +131,7 @@ local fileInfo = function()
 
         fileStr = tightWinChk and fn.pathshorten(fileStr, 1) or fileStr
     else
-        local sep = _G._os_uname.sysname == "Windows_NT" and "\\" or "/"
-
-        fileStr = string.format("..%s%s", sep, vim.fn.expand("%:t"))
+        fileStr = string.format("..%s%s", _G._sep, vim.fn.expand("%:t"))
         -- 11 is what vimmode text is command plus space of icons
         tightWinChk = #fileStr + 11 > winWidth/2
     end
