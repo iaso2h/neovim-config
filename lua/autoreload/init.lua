@@ -1,8 +1,8 @@
 -- File: reloadConfig
 -- Author: iaso2h
 -- Description: reload lua package or vim file at Neovim configuration directory
--- Version: 0.0.21
--- Last Modified: 2023-3-12
+-- Version: 0.0.23
+-- Last Modified: 2023-3-13
 local fn   = vim.fn
 local api  = vim.api
 local util = require("autoreload.util")
@@ -20,7 +20,7 @@ local M    = {
 }
 M.opt.lua.moduleSearchPath = M.configPath:joinpath("lua")
 M.opt.lua.blacklist = {
-    M.configPath:joinpath("lua", "config", "nvim-galaxyline").filename
+    M.configPath:joinpath("lua", "config", "nvim-galaxyline.lua").filename
 }
 M.opt.lua.setup = { }
 M.opt.lua.config = { -- {{{
@@ -29,9 +29,6 @@ M.opt.lua.config = { -- {{{
         pathPat  = M.opt.lua.moduleSearchPath:joinpath("config").filename,
         unloadOnlyChk = false,
         callback = function(path, callback)
-            if string.match(path.filename, "nvim-galaxyline") then
-                return
-            end
 
             local err = function(msg)
                 vim.notify("Error detect while calling callback function at: " .. path.filename,

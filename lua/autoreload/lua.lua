@@ -101,6 +101,7 @@ local checkOtherOpenMod = function (allAbsStr, topParentStr)
                 "%s%sinit.lua", absStr, util.sep, "init.lua"))
 
             if bufnr == -1 then
+                -- fn.bufnr() will return -1 if buffer doesn't exist
                 local tailStr = util.getTail(absStr)
                 ---@diagnostic disable-next-line: param-type-mismatch
                 bufnr = fn.bufnr(string.format(
@@ -241,11 +242,12 @@ end -- }}}
 ---@param path object Plenary path object. Lua module file
 ---@param opt table Options table initilized in reload/init.lua
 M.loadDir = function(path, opt) -- {{{
-    -- Get the first direct sub folder under <configpath>/lua/
+    -- Get the top parent folder under <configpath>/lua/
     local allParentStr = path:parents()
     local moduleSearchPathStr = opt.moduleSearchPath.filename
     local i = tbl_idx(allParentStr, moduleSearchPathStr)
-    local topParentStr = allParentStr[i - 1]
+    local topParentStr     = allParentStr[i - 1]
+    local topParentTailStr = util.getTail(topParentStr)
 
     local allRelStr = vim.tbl_flatten((getAllRelStr(topParentStr, moduleSearchPathStr)))
     local allAbsStr = vim.tbl_map(function(relStr)
@@ -262,6 +264,11 @@ M.loadDir = function(path, opt) -- {{{
         relStr = relStr:gsub(".lua$", "")
         return relStr
     end, allRelStr)
+
+    -- Avoid the first lua directory module loaded as "<dirname>.lua" instead as "<dirname>"
+    if not package.loaded[allModule[1]] then
+        allModule[1] = allModule[1] .. ".lua"
+    end
 
     -- Only unload and reload module found in the package.loaded table
     local allLoadedModule = vim.tbl_filter(function(module)
@@ -297,7 +304,9 @@ M.loadDir = function(path, opt) -- {{{
             local absStr = allAbsStr[moduleIdx]
 
             local fileChk
-            if relStr:sub(-4, -1) == ".lua" then
+            -- When moduleIdx == 1, even if the file ends with ".lua", it's
+            -- still considered as a directory module
+            if moduleIdx ~= 1 and relStr:sub(-4, -1) == ".lua" then
                 fileChk = true
             else
                 fileChk = false
