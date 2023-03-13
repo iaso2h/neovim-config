@@ -522,14 +522,14 @@ theme.plugins = { -- {{{
     LightBulbFloatWin    = {link = "NormalFloat"},
 
     -- https://github.com/hrsh7th/nvim-cmp
-    CmpItemAbbr           = {fg = p.n4},
-    CmpItemAbbrDeprecated = {fg = p.n3,  bg = "NONE", style = "strikethrough" },
-    CmpItemAbbrMatch      = {fg = p.n13, bg = "NONE", style = "bold"},
+    CmpItemAbbr           = {fg = p.white},
+    CmpItemAbbrDeprecated = {fg = p.white,  bg = "NONE", style = "strikethrough" },
+    CmpItemAbbrMatch      = {fg = p.w, bg = "NONE", style = "bold"},
     CmpItemAbbrMatchFuzzy = {link = "CmpItemAbbrMatch"},
     CmpItemKind           = {fg = p.n15},
     CmpItemMenu           = {fg = p.n3b,  bg = "NONE", style = "italic" },
     -- https://github.com/hrsh7th/nvim-cmp/wiki/Menu-Appearance#how-to-add-visual-studio-code-codicons-to-the-menu
-    CmpItemKindField         = {fg = p.dark_red},
+    CmpItemKindField         = {fg = p.cyan},
     CmpItemKindProperty      = {link = "CmpItemKindField"},
     CmpItemKindEvent         = {fg = p.dark_red},
     CmpItemKindText          = {fg = p.green},
@@ -546,7 +546,7 @@ theme.plugins = { -- {{{
     CmpItemKindVariable      = {fg = p.n8},
     CmpItemKindFile          = {fg = p.n4},
     CmpItemKindUnit          = {fg = "#D4A959"},
-    CmpItemKindSnippet       = {fg = "#D4A959"},
+    CmpItemKindSnippet       = {fg = p.purple},
     CmpItemKindFolder        = {link = "CmpItemKindFile"},
     CmpItemKindMethod        = {fg = p.blue},
     CmpItemKindValue         = {fg = p.n9},

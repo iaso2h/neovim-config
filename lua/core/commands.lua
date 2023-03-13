@@ -305,6 +305,27 @@ excmd("O", [[browse oldfiles]], {
 excmd("Dofile", function ()
     if vim.bo.filetype == "lua" then
         require("autoreload").reload()
+excmd("Q", function (opts)
+    local saveCMD = opts.bang and "noa bufdo update | " or "noa "
+    local sessionName = opts.args or "01"
+    vim.cmd(string.format("mksession! %s/session/%s.vim",
+        vim.fn.stdpath("config"), sessionName))
+    vim.cmd(saveCMD .. "qa!")
+end, {
+    desc  = "Quit and save the session",
+    nargs = "?",
+    bang  = true,
+})
+
+excmd("Se", function (opts)
+    local sessionName = opts.args or "01"
+    vim.cmd(string.format("so %s/session/%s.vim",
+        vim.fn.stdpath("config"), sessionName))
+end, {
+    desc  = "Load session",
+    nargs = "?",
+})
+
     end
 end, {
     desc  = "Reload the current file in lua/vim runtime",

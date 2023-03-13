@@ -73,6 +73,7 @@ M.main = function()
     fn.setqflist({}, "r", {title = "qfMessage", items = qfTbl})
 
     vim.cmd [[copen]]
+    vim.cmd [[clast]]
 
     vim.defer_fn(function()
         require("quickfix.highlight").add(

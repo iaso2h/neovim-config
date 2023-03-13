@@ -35,15 +35,20 @@ M.config = function()
     local conciseQuifix = function(tbl)
         local api = vim.api
         if tbl then
-            if #tbl.items == 1 or (#tbl.items == 2 and tbl.items[1].filename == tbl.items[2].filename and
-                    tbl.items[1].lnum == tbl.items[2].lnum) then
-                -- OPTIM: use vim.fn.bufnr(vim.api.nvim_buf_get_name(0)) to check bufnr?
-                if not (api.nvim_buf_get_name(0) == tbl.items[1].filename) then
-                    -- vim.cmd([[buffer ]] .. tbl.items[1].filename)
-                    vim.cmd([[e ]] .. tbl.items[1].filename)
+            local i = tbl.items[1]
+            if #tbl.items == 1 or (#tbl.items == 2 and
+                                    i.filename == tbl.items[2].filename and
+                                    i.lnum == tbl.items[2].lnum) then
+                local currentBufNr = api.nvim_get_current_buf()
+                -- item.bufnr can be nil!
+                local itemBufNr = fn.bufnr(i.filename)
+                if currentBufNr ~= itemBufNr then
+                    -- local openExcmd = api.nvim_buf_get_option(i.bufnr, "buflisted") and "buffer" or "edit"
+                    local openExcmd = "edit"
+                    vim.cmd(string.format("%s %s", openExcmd, i.filename))
                 end
                 vim.cmd [[normal! m`]] -- Register current position in jumplist
-                api.nvim_win_set_cursor(0, {tbl.items[1].lnum, tbl.items[1].col - 1})
+                api.nvim_win_set_cursor(0, {i.lnum, i.col - 1})
                 vim.cmd [[norm! zv]]
             else
                 fn.setqflist({}, "r", {items = tbl.items, title = tbl.title})

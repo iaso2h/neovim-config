@@ -22,9 +22,9 @@ return function()
                 return true
             end
         end,
-        completion = {
-            completeopt = "menu,menuone,noinsert",
-        },
+        preselect        = cmp.PreselectMode.None,
+        keyword_length   = 2,
+        default_behavior = cmp.ConfirmBehavior.Insert,
         snippet = {
             expand = function(args)
                 require('luasnip').lsp_expand(args.body)
@@ -46,8 +46,16 @@ return function()
         mapping = {
             ["<A-e>"] = cmp.mapping.scroll_docs(-4),
             ["<A-d>"] = cmp.mapping.scroll_docs(4),
-            ["<C-p>"] = cmp.mapping.select_prev_item(),
-            ["<C-n>"] = cmp.mapping.select_next_item(),
+            ["<C-p>"] = function()
+                if cmp.visible() then
+                    cmp.select_prev_item()
+                end
+            end,
+            ["<C-n>"] = function()
+                if cmp.visible() then
+                    cmp.select_next_item()
+                end
+            end,
             ["<Tab>"] = cmp.mapping(function(fallback)
                 if cmp.visible() then
                     cmp.select_next_item()
@@ -68,20 +76,17 @@ return function()
                     fallback()
                 end
             end, {"i", "s"}),
-            ["<C-e>"] = function(_)
+            ["<C-e>"] = function()
                 if cmp.visible() then
                     cmp.abort()
                 end
                 vim.api.nvim_feedkeys(t"<End>", "n", false)
             end,
-            ["<C-o>"] = function(fallback)
+            ["<C-i>"] = function()
                 if cmp.visible() then
                     require("cmp.utils.autocmd").emit("InsertLeave")
-                else
-                    fallback()
                 end
             end,
-            ["<C-i>"] = cmp.mapping.confirm(),
             ["<CR>"]  = cmp.mapping.confirm{
                 select   = true,
                 behavior = cmp.ConfirmBehavior.Replace,
@@ -116,8 +121,6 @@ return function()
                 return vimItem
             end
         },
-        keyword_length   = 2,
-        default_behavior = cmp.ConfirmBehavior.Insert,
     }
 -- If you want insert `(` after select function or method item
 
