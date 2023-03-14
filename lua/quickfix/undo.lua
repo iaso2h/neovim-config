@@ -11,6 +11,7 @@ local M = {
 M.delete = function (vimMode) -- {{{
     local qfCursorPos = api.nvim_win_get_cursor(0)
     local qfItems = require("quickfix.util").getlist()
+    local qfLastline = fn.line("$")
     vim.defer_fn(require("quickfix.highlight").clear, 0)
 
     if vimMode == "n" then
@@ -24,7 +25,11 @@ M.delete = function (vimMode) -- {{{
         fn.setqflist({}, "r", {items = qfItems})
 
         -- Neovim will take care of the new position even the row number is out of scope
-        api.nvim_win_set_cursor(0, qfCursorPos)
+        if qfCursorPos[1] == qfLastline then
+            api.nvim_win_set_cursor(0, {qfCursorPos[1] - 1, qfCursorPos[2]})
+        else
+            api.nvim_win_set_cursor(0, qfCursorPos)
+        end
     else
         -- Backup items
         M.lastItems = vim.deepcopy(qfItems)
@@ -37,7 +42,11 @@ M.delete = function (vimMode) -- {{{
         fn.setqflist({}, "r", {items = qfItems})
 
         -- Neovim will take care of the new position even the row number is out of scope
-        api.nvim_win_set_cursor(0, startPos)
+        if endPos[1] == qfLastline then
+            api.nvim_win_set_cursor(0, {startPos[1] - 1, startPos[2]})
+        else
+            api.nvim_win_set_cursor(0, startPos)
+        end
     end
 end -- }}}
 
