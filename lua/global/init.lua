@@ -1,5 +1,9 @@
+require("global.keymap")
+
+
 local fn  = vim.fn
 local api = vim.api
+
 
 _G._os_uname         = vim.loop.os_uname()
 _G._is_term          = vim.api.nvim_list_uis()[1].ext_termcolors
@@ -9,13 +13,24 @@ _G._qf_fallback_open = true
 _G._trim_space       = true
 
 
-_G.isFloatWin = function(winID)
-    return api.nvim_win_get_config(winID and winID or 0).relative ~= ""
+_G.Print = function(...)
+    local objects = {}
+    for i = 1, select('#', ...) do
+        local v = select(i, ...)
+        table.insert(objects, vim.inspect(v))
+    end
+    if #objects == 1 and type(objects[1]) == "table" then
+        require("pprint").pprint(objects[1])
+    else
+        print(table.concat(objects, '\n'))
+    end
+
+    return ...
 end
 
 
-_G.t = function(str)
-    return api.nvim_replace_termcodes(str, true, true, true)
+_G.isFloatWin = function(winID)
+    return api.nvim_win_get_config(winID and winID or 0).relative ~= ""
 end
 
 
@@ -163,68 +178,6 @@ _G.tbl_idx = function(tbl, item, returnIdxTbl)
 end
 
 
-----
--- Function: _G.luaRHS: Let you write rhs of mapping in a comafortable way
-
--- Before:
-            -- map("n", [[<Plug>ReplaceCurLine]], [[:lua vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register); require("replace").replaceSave(); if require("replace").regType == "=" then vim.g.ReplaceExpr = vim.fn.getreg("=") end; vim.cmd("norm! V" .. vim.v.count1 .. "_" .. "<lt>Esc>"); require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>]], {"silent"})
-
--- After:
-            -- map("n", [[<Plug>ReplaceCurLine]],
-                -- luaRHS[[
-                -- :lua vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register);
-
-                -- require("replace").replaceSave();
-                -- if require("replace").regType == "=" then
-                    -- vim.g.ReplaceExpr = vim.fn.getreg("=")
-                -- end;
-
-                -- vim.cmd("norm! V" .. vim.v.count1 .. "_" .. "<lt>Esc>");
-
-                -- require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>
-                -- ]],
-                -- {"silent"})
---
--- @param str: RHS mapping
--- @return: nil
-----
-_G.luaRHS = function(str)
-    assert(type(str) == "string", "Expected string value")
-
-    local strTbl = vim.split(str, "\n", false)
-    strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
-        local concnStr = string.gsub(table.concat(strTbl, " "), "%s+", " ")
-
-    return tostring(
-        concnStr:sub(1, 1) == " " and
-        concnStr:sub(2, -1) or concnStr:sub(1, -1))
-end
-
-
-_G.vimRHS = function(str)
-    assert(type(str) == "string", "Expected string value")
-
-    local strTbl = vim.split(str, "\n", false)
-    strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
-        local concnStr = string.gsub(table.concat(strTbl, "<Bar> "), "%s+", " ")
-
-    return tostring(
-        concnStr:sub(1, 1) == " " and
-        concnStr:sub(2, -1) or concnStr:sub(1, -1))
-end
-
-
-_G.stringCount = function(str, pattern)
-    local count = 0
-    local init = 0
-    while true do
-        init = string.find(str, pattern, init + 1)
-        if not init then return count end
-        count = count + 1
-    end
-end
-
-
 --- Unify sepator in value returned by vim.api.nvim_buf_get_name()
 ---@vararg any Same as vim.api.nvim_buf_get_name()
 _G.nvim_buf_get_name = function(bufNr)
@@ -241,5 +194,3 @@ _G.nvim_buf_get_name = function(bufNr)
         return api.nvim_buf_get_name(bufNr)
     end
 end
-
-

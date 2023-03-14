@@ -123,7 +123,7 @@ end
 ---@vararg ... table|string    Optional table value contain `h:map-arguments` strings
 --- that will be convert into table then passed into vim.api.nvim_set_keymap.
 --- Optional key mapping description
-function _G.map(mode, lhs, rhs, ...) -- {{{
+function _G.map(mode, lhs, rhs, ...)
     -- Behavior difference between vim.keymap.set() and api.nvim_set_keymap()
     -- https://github.com/neovim/neovim/commit/6d41f65aa45f10a93ad476db01413abaac21f27d
     -- New api.nvim_set_keymap(): https://github.com/neovim/neovim/commit/b411f436d3e2e8a902dbf879d00fc5ed0fc436d3
@@ -147,7 +147,7 @@ function _G.map(mode, lhs, rhs, ...) -- {{{
     if string.match(lhs, "[A-Z]") and modeTbl == "" then
         return api.nvim_del_keymap("s", lhs)
     end
-end -- }}}
+end
 
 
 --- Handy mapping func that wrap around the vim.api.nvim_set_keymap()
@@ -158,7 +158,7 @@ end -- }}}
 ---@vararg ...  table|string     Optional table value contain `h:map-arguments` strings
 --- that will be convert into table then passed into vim.api.nvim_set_keymap.
 --- Optional key mapping description
-function _G.bmap(bufNr, mode, lhs, rhs, ...) -- {{{
+function _G.bmap(bufNr, mode, lhs, rhs, ...)
     assert(type(bufNr) == "number", "#1 argument is not a valid number")
     local opts, doc = argCheck(lhs, rhs, {...})
 
@@ -180,4 +180,60 @@ function _G.bmap(bufNr, mode, lhs, rhs, ...) -- {{{
     if string.match(lhs, "[A-Z]") and modeTbl == "" then
         return api.nvim_buf_del_keymap(bufNr, "s", lhs)
     end
-end -- }}}
+end
+
+
+_G.t = function(str)
+    return api.nvim_replace_termcodes(str, true, true, true)
+end
+
+
+----
+-- Function: _G.luaRHS: Let you write rhs of mapping in a comafortable way
+
+-- Before:
+            -- map("n", [[<Plug>ReplaceCurLine]], [[:lua vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register); require("replace").replaceSave(); if require("replace").regType == "=" then vim.g.ReplaceExpr = vim.fn.getreg("=") end; vim.cmd("norm! V" .. vim.v.count1 .. "_" .. "<lt>Esc>"); require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>]], {"silent"})
+
+-- After:
+            -- map("n", [[<Plug>ReplaceCurLine]],
+                -- luaRHS[[
+                -- :lua vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register);
+
+                -- require("replace").replaceSave();
+                -- if require("replace").regType == "=" then
+                    -- vim.g.ReplaceExpr = vim.fn.getreg("=")
+                -- end;
+
+                -- vim.cmd("norm! V" .. vim.v.count1 .. "_" .. "<lt>Esc>");
+
+                -- require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>
+                -- ]],
+                -- {"silent"})
+--
+-- @param str: RHS mapping
+-- @return: nil
+----
+_G.luaRHS = function(str)
+    assert(type(str) == "string", "Expected string value")
+
+    local strTbl = vim.split(str, "\n", false)
+    strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
+        local concnStr = string.gsub(table.concat(strTbl, " "), "%s+", " ")
+
+    return tostring(
+        concnStr:sub(1, 1) == " " and
+        concnStr:sub(2, -1) or concnStr:sub(1, -1))
+end
+
+
+_G.vimRHS = function(str)
+    assert(type(str) == "string", "Expected string value")
+
+    local strTbl = vim.split(str, "\n", false)
+    strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
+        local concnStr = string.gsub(table.concat(strTbl, "<Bar> "), "%s+", " ")
+
+    return tostring(
+        concnStr:sub(1, 1) == " " and
+        concnStr:sub(2, -1) or concnStr:sub(1, -1))
+end

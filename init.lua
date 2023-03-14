@@ -49,7 +49,6 @@ if not ok then
     return vim.notify(msg, vim.log.levels.ERROR)
 end
 
-ok, msg = pcall(require, "util")
 if not ok then
     return vim.notify(msg, vim.log.levels.ERROR)
 end

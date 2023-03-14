@@ -2,23 +2,6 @@ local fn   = vim.fn
 local api  = vim.api
 local M = {whichKeyDocs = {}}
 
-require("util.keymap")
-
-function Print(...)
-    local objects = {}
-    for i = 1, select('#', ...) do
-        local v = select(i, ...)
-        table.insert(objects, vim.inspect(v))
-    end
-    if #objects == 1 and type(objects[1]) == "table" then
-        require("pprint").pprint(objects[1])
-    else
-        print(table.concat(objects, '\n'))
-    end
-
-    return ...
-end
-
 
 function M.convertMap(mode, lhs, rhs, optsTbl)
     local specArg = ""
