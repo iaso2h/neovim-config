@@ -268,7 +268,7 @@ map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"}, "Disabl
 -- Matchit
 map("n", [[gm]], [[%]], {"silent"}, "Go to match parenthesis")
 -- Visual selection
-map("n", [[go]],    [[<CMD>lua require("selection").cornerSelection(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
+map("n", [[go]], [[<CMD>lua require("selection").cornerSelection(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
 map({"n", "x"}, [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
 -- }}} Search & Jumping
 -- Scratch file

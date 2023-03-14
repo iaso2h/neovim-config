@@ -32,19 +32,32 @@ end
 ---@param bias number 1 or -1. Set to 1 will make cursor jump to the closest
 --- corner. Set to -1 to make cursor jump to furthest corner
 function M.cornerSelection(bias) -- {{{
-    local curPos         = api.nvim_win_get_cursor(0)
+    local cursorPos      = api.nvim_win_get_cursor(0)
     local selectStartPos = api.nvim_buf_get_mark(0, "<")
     if selectStartPos[1] == 0 then return end  -- Sanity check
     local selectEndPos   = api.nvim_buf_get_mark(0, ">")
-    if curPos[1] == selectStartPos[1] then
-        api.nvim_win_set_cursor(0, selectEndPos)
-        return
-    elseif curPos[1] == selectEndPos[1] then
-        api.nvim_win_set_cursor(0, selectStartPos)
-        return
+    local disToStart = require("util").posDist(selectStartPos, cursorPos)
+    local disToEnd   = require("util").posDist(selectEndPos, cursorPos)
+
+    -- Out of selection region. Snap to the closest one
+    if not require("util").withinRegion(cursorPos, selectStartPos, selectEndPos) then
+        if disToStart < disToEnd then
+            return api.nvim_win_set_cursor(0, selectStartPos)
+        else
+            return api.nvim_win_set_cursor(0, selectEndPos)
+        end
     end
 
-    local closerToEnd = require("util").posDist(selectStartPos, curPos) > require("util").posDist(selectEndPos, curPos)
+    if selectEndPos[1] ~= selectStartPos[1] then
+        if cursorPos[1] == selectStartPos[1] then
+            return api.nvim_win_set_cursor(0, selectEndPos)
+        elseif cursorPos[1] == selectEndPos[1] then
+            return api.nvim_win_set_cursor(0, selectStartPos)
+        end
+    end
+
+    -- Within of selection region. Snap to furthest one
+    local closerToEnd = disToStart > disToEnd
     if bias == 1 then
         if closerToEnd then
             jumpToStart(selectStartPos)
