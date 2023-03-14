@@ -4,13 +4,15 @@ vim.opt.runtimepath:append(configPath)
 
 -- Add plenary.nvim, vim-repeat, vim-visualrepeat in your runtime path. In my
 -- case, I manage them via packer.nvim
-local packagePathHead = configPath .. _G._sep .. "pack" .. _G._sep .. "packer" .. _G._sep .. "opt" .. _G._sep
+local sep = vim.loop.os_uname().sysname == "Windows_NT" and "\\" or "/"
+local packagePathHead = configPath .. sep .. "pack" .. sep .. "packer" .. sep .. "opt" .. sep
 vim.opt.runtimepath:append(packagePathHead .. "plenary.nvim")
 vim.opt.runtimepath:append(packagePathHead .. "vim-repeat")
 vim.opt.runtimepath:append(packagePathHead .. "vim-visualrepeat")
 
 require("replace").suppressMessage = true
-require("util.keymap")
+require("global.keymap")
+require("util.test")
 
 -- Mapping
 map("n", [[<Plug>ReplaceOperatorInplace]], function ()
@@ -71,6 +73,6 @@ map("n", [[<Plug>ReplaceVisual]], function ()
 end, {"noremap", "silent"}, "Visual-repeat for replaced selected")
 
 map("n", [[gr]],  [[<Plug>ReplaceOperatorInplace]], "Replace operator and restore the cursor position")
-map("n", [[gru]], [[<Plug>ReplaceOperator]],              "Replace operator")
-map("n", [[grr]], [[<Plug>ReplaceCurLine]],               "Replace current line")
-map("x", [[R]],   [[<Plug>ReplaceVisual]],                "Replace selected")
+map("n", [[gru]], [[<Plug>ReplaceOperator]],        "Replace operator")
+map("n", [[grr]], [[<Plug>ReplaceCurLine]],         "Replace current line")
+map("x", [[R]],   [[<Plug>ReplaceVisual]],          "Replace selected")

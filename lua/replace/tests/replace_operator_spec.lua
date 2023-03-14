@@ -1,400 +1,481 @@
-local api = vim.api
-local fn  = vim.fn
-
-
-local function findCursorIndicator(cursorChar, inputTbl)
-    -- Init cursor startup position if cursor indicator exist
-    local cursorPos
-    local lines = {}
-    for idx, line in ipairs(inputTbl) do
-        local col = string.find(line, cursorChar, 1, true)
-        if col then
-            -- {1, 0} index based, ready for vim.api.nvim_win_set_cursor()
-            cursorPos = {idx - 1, col - 1}
-        else
-            lines[#lines+1] = line
-        end
-    end
-
-    return cursorPos, lines
-end
-
-
-local function setUpBuffer(input, filetype) -- {{{
-    local bufNr = api.nvim_create_buf(false, true)
-    local cursorPos, lines = findCursorIndicator("^", vim.split(input, "\n"))
-
-    api.nvim_buf_set_option(bufNr, 'filetype', filetype)
-    api.nvim_win_set_buf(0, bufNr)
-    api.nvim_buf_set_lines(bufNr, 0, -1, true, lines)
-
-    if cursorPos then
-        -- fn.setpos(".", {bufNr, cursorPos[1], cursorPos[2] + 1})
-        api.nvim_win_set_cursor(0, cursorPos)
-        return cursorPos
-    else
-        return {1, 0}
-    end
-
-end -- }}}
-
-
---- Run command and then assert the output with expected
---- @param feedkeys string Commands to execute in Neovim
---- @param expected string Multi-lines content of the output
-local runCommandAndAssert = function(feedkeys, expected) -- {{{
-    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(feedkeys, true, true, true),
-                        "x", false)
-    local resultLines = vim.api.nvim_buf_get_lines(0, 0, vim.api.nvim_buf_line_count(0), false)
-    local expectCursorPos, expectedLines = findCursorIndicator("^", vim.split(expected, "\n"), false)
-
-    assert.are.same(expectedLines, resultLines)
-    if expectCursorPos and next(expectCursorPos) then
-        local resultCursorPos = vim.api.nvim_win_get_cursor(0)
-        assert.are.same(expectCursorPos, resultCursorPos)
-    end
-end -- }}}
-
-
 -- NOTE: http://olivinelabs.com/busted/
-describe('Replace operator', function() -- {{{
-    -- NOTE: not supported in plenary
+local initLines
 
+local outputLines
+local outputCursorPos
 
-    -- before_each(function()
-    -- end)
+local expectedLines
+local expectedCursorPos
+local expectedDotLines
+local cursorIndicatorChar = "^"
 
-    -- after_each(function()
-    -- end)
+describe([[Register type is "v". ]], function()
 
-    -- teardown(function()
-    -- NOTE: not supported in plenary
-    -- end)
-
-    describe('Register type is "v": ', function()
-
-        describe('left-right-motions: ', function() -- {{{
-            it("replace with \"l\" motion", function() -- {{{
-                local input = [[
+    describe([[Left-right-motions. ]], function() -- {{{
+        it([[Replace with "l" motion]], function() -- {{{
+            initLines = [[
     if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
                             ^
             ]]
-                local expected = [[
+            expectedLines = [[
     if reg.type == "v" or (robbing.type == "V" and linesCnt == 1) then
                             ^
             ]]
-                local expectedDot = [[
+            expectedDotLines = [[
     if reg.type == "v" or (rushing and robbing.type == "V" and linesCnt == 1) then
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "obbin", "c")
-                runCommandAndAssert([["agrl]], expected)
-                -- replace, via dot
-                fn.setreg("a", "ushing and ro", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"h\" motion", function() -- {{{
-                local input = [[
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg([[a]], "obbin", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agrl]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg([[a]], "ushing and ro", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with h motion]], function() -- {{{
+            initLines = [[
     if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
                             ^
             ]]
-                local expected = [[
+            expectedLines = [[
     if reg.type == "v" or (dogleg.type == "V" and linesCnt == 1) then
                             ^
             ]]
-                local expectedDot = [[
+            expectedDotLines = [[
     if reg.type == "v" or (frandrogleg.type == "V" and linesCnt == 1) then
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "dogl", "c")
-                runCommandAndAssert([["agrh]], expected)
-                -- replace, via dot
-                fn.setreg("a", "frandr", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"$\" motion", function() -- {{{
-                local input = [[
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg([[a]], "dogl", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agrh]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg([[a]], "frandr", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with $ motion]], function() -- {{{
+            initLines = [[
     if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
                             ^
             ]]
-                local expected = [[
+            expectedLines = [[
     if reg.type == "v" or (ruthless
                             ^
             ]]
-                local expectedDot = [[
+            expectedDotLines = [[
     if reg.type == "v" or (room
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "uthless", "c")
-                runCommandAndAssert([["agr$]], expected)
-                -- replace, via dot
-                fn.setreg("a", "oom", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"Te\" motion", function() -- {{{
-                local input = [[
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg([[a]], "uthless", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr$]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg([[a]], "oom", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with Te motion]], function() -- {{{
+            initLines = [[
     if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
                             ^
             ]]
-                local expected = [[
+            expectedLines = [[
     if reg.typescript peg.type == "V" and linesCnt == 1) then
                ^
             ]]
-                local expectedDot = [[
+            expectedDotLines = [[
     if reg.typer's script peg.type == "V" and linesCnt == 1) then
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "script p", "c")
-                runCommandAndAssert([["agrTe]], expected)
-                -- replace, via dot
-                fn.setreg("a", "r's ", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg([[a]], "script p", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agrTe]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg([[a]], "r's ", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
         end) -- }}}
+    end) -- }}}
 
-        describe('up-down-motions: ', function() -- {{{
-            it("replace with \"3j\" motion", function() -- {{{
-                local input = [[
-        if reindentCnt < 0 then
-            reg.content = string.gsub(reg.content, "▲" .. reindents, "")
-                   ^
+    describe('Up-down-motions. ', function() -- {{{
+        it([[Replace with 3j motion]], function() -- {{{
+            initLines = [[
+    if reindentCnt < 0 then
+        reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+            ^
+        if lineCnt ~= 1 then
+            reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
+        elseif reindentCnt > 0 then
+            reg.content = reindents .. reg.content
             if lineCnt ~= 1 then
-                reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
-            elseif reindentCnt > 0 then
-                reg.content = reindents .. reg.content
-                if lineCnt ~= 1 then
-                    reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
-                end
+                reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
             end
+        end
             ]]
-                local expected = [[
-        if reindentCnt < 0 then
-            nulla sunt exuis nsunt velit enim.
-                   ^
-                reg.content = reindents .. reg.content
-                if lineCnt ~= 1 then
-                    reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
-                end
-            end
-            ]]
-                local expectedDot = [[
-        if reindentCnt < 0 then
-            Lorem ipsum dolor sit amet.
-                end
-            end
-            ]]
-
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "c")
-                runCommandAndAssert([["agr3j]], expected)
-                -- replace, via dot
-                fn.setreg("a", "Lorem ipsum dolor sit amet.", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
-
-            it("replace with \"3k\" motion", function() -- {{{
-                local input = [[
-if reindentCnt < 0 then
-    reg.content = string.gsub(reg.content, "▲" .. reindents, "")
-            if lineCnt ~= 1 then
-                reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
-                    elseif reindentCnt > 0 then
-                        reg.content = reindents .. reg.content
-                            if lineCnt ~= 1 then
-                                end
-        reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
-                                                               ^
-                                        end
-            ]]
-                local expected = [[
-if reindentCnt < 0 then
-    reg.content = string.gsub(reg.content, "▲" .. reindents, "")
-            if lineCnt ~= 1 then
-                reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
-                    elseif reindentCnt > 0 then
+            expectedLines = [[
+    if reindentCnt < 0 then
         nulla sunt exuis nsunt velit enim.
-        ^
-                                        end
-            ]]
-                local expectedDot = [[
-if reindentCnt < 0 then
-    reg.content = string.gsub(reg.content, "▲" .. reindents, "")
-        Lorem ipsum dolor sit amet.
-                                        end
-            ]]
-
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "c")
-                runCommandAndAssert([["agr3k]], expected)
-                -- replace, via dot
-                fn.setreg("a", "Lorem ipsum dolor sit amet.", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
-
-            it("replace with \"4k\" motion", function() -- {{{
-                local input = [[
-if reindentCnt < 0 then
-    reg.content = string.gsub(reg.content, "▲" .. reindents, "")
-            if lineCnt ~= 1 then
-                reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
-                    elseif reindentCnt > 0 then
-                        reg.content = reindents .. reg.content
-                            if lineCnt ~= 1 then
-                                end
-        reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
-                                        end
-                                         ^
-            ]]
-                local expected = [[
-if reindentCnt < 0 then
-    reg.content = string.gsub(reg.content, "▲" .. reindents, "")
-            if lineCnt ~= 1 then
-                reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
-                    elseif reindentCnt > 0 then
-                                        endif
-                                        ^
-            ]]
-                local expectedDot = [[
-if reindentCnt < 0 then
-                                        fidne
-            ]]
-
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "endif", "c")
-                runCommandAndAssert([["agr4k]], expected)
-                -- replace, via dot
-                fn.setreg("a", "fidne", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
-
-            it("replace with \"_\" motion", function() -- {{{
-                local input = [[
-            if lineCnt ~= 1 then
-                    ^
-                reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
-            elseif reindentCnt > 0 then
-                reg.content = reindents .. reg.content
-                if lineCnt ~= 1 then
-                    reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
-                end
-            end
-            ]]
-                local expected = [[
-            foo
             ^
-                reg.content = reindents .. reg.content
-                if lineCnt ~= 1 then
-                    reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
-                end
+            reg.content = reindents .. reg.content
+            if lineCnt ~= 1 then
+                reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
             end
+        end
             ]]
-                local expectedDot = [[
-            bar
-                    reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
-                end
+            expectedDotLines = [[
+    if reindentCnt < 0 then
+        Lorem ipsum dolor sit amet.
             end
+        end
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "foo", "c")
-                runCommandAndAssert([["agr3_]], expected)
-                -- replace, via dot
-                fn.setreg("a", "bar", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg([[a]], "nulla sunt exuis nsunt velit enim.", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr3j]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg([[a]], "Lorem ipsum dolor sit amet.", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
         end) -- }}}
 
-        describe('word-motions: ', function() -- {{{
-            it("replace with \"2W\" motion", function() -- {{{
-                local input = [[
-            reg.content = string.gsub(reg.content, "▲" .. reindents, "")
-                                 ^
+        it([[Replace with 3k motion]], function() -- {{{
+            initLines = [[
+    if reindentCnt < 0 then
+        reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+        if lineCnt ~= 1 then
+            reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
+                elseif reindentCnt > 0 then
+                    reg.content = reindents .. reg.content
+                        if lineCnt ~= 1 then
+                            end
+    reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
+                                                        ^
+                                    end
             ]]
-                local expected = [[
-            reg.content = string.find(val1, 2 .. reindents, "")
-                                 ^
+            expectedLines = [[
+    if reindentCnt < 0 then
+        reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+        if lineCnt ~= 1 then
+            reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
+                elseif reindentCnt > 0 then
+    nulla sunt exuis nsunt velit enim.
+    ^
+                                    end
             ]]
-                local expectedDot = [[
-            reg.content = string.global_sub(arg1, 55 .. reindents, "")
+            expectedDotLines = [[
+    if reindentCnt < 0 then
+        reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+    Lorem ipsum dolor sit amet.
+                                    end
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "find(val1, 2 ", "c")
-                runCommandAndAssert([["agr2W]], expected)
-                -- replace, via dot
-                fn.setreg("a", "global_sub(arg1, 55 ", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"4ge\" motion", function() -- {{{
-                local input = [[
-local reindentCnt = reindent(reg, regionMotion, motionDirection)
-    if indent ~=0 then
-        fn.setreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
-            ^
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr3k]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "Lorem ipsum dolor sit amet.", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with 4k motion]], function() -- {{{
+            initLines = [[
+    if reindentCnt < 0 then
+        reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+        if lineCnt ~= 1 then
+            reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
+                elseif reindentCnt > 0 then
+                    reg.content = reindents .. reg.content
+                        if lineCnt ~= 1 then
+                            end
+    reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
+                                    end
+                                    ^
             ]]
-                local expected = [[
-local reindentCnt = reindent(reg, regionMotion, motionDirection)
-    if indent ~= getreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
+            expectedLines = [[
+    if reindentCnt < 0 then
+        reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+        if lineCnt ~= 1 then
+            reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
+                elseif reindentCnt > 0 then
+                                    endif
+                                    ^
+            ]]
+            expectedDotLines = [[
+    if reindentCnt < 0 then
+                                    fidne
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "endif", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr4k]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "fidne", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with _ motion]], function() -- {{{
+            initLines = [[
+        if lineCnt ~= 1 then
+                ^
+            reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
+        elseif reindentCnt > 0 then
+            reg.content = reindents .. reg.content
+            if lineCnt ~= 1 then
+                reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
+            end
+        end
+            ]]
+            expectedLines = [[
+        foo
+        ^
+            reg.content = reindents .. reg.content
+            if lineCnt ~= 1 then
+                reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
+            end
+        end
+            ]]
+            expectedDotLines = [[
+        bar
+                reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
+            end
+        end
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foo", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr3_]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "bar", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+    end) -- }}}
+
+    describe('Word-motions. ', function() -- {{{
+        it([[Replace with 2W motion]], function() -- {{{
+            initLines = [[
+        reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+                             ^
+            ]]
+            expectedLines = [[
+        reg.content = string.find(val1, 2 .. reindents, "")
+                             ^
+            ]]
+            expectedDotLines = [[
+        reg.content = string.global_sub(arg1, 55 .. reindents, "")
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "find(val1, 2 ", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr2W]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "global_sub(arg1, 55 ", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with 4ge motion]], function() -- {{{
+            initLines = [[
+    local reindentCnt = reindent(reg, regionMotion, motionDirection)
+        if indent ~=0 then
+            fn.setreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
                 ^
             ]]
-                local expectedDot = [[
-local reindentCnt = reindent(reg, regionMotion, motionDirection + getreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
+            expectedLines = [[
+    local reindentCnt = reindent(reg, regionMotion, motionDirection)
+        if indent ~= getreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
+                    ^
             ]]
+            expectedDotLines = [[
+    local reindentCnt = reindent(reg, regionMotion, motionDirection + getreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", " ge", "c")
-                runCommandAndAssert([["agr4ge]], expected)
-                -- replace, via dot
-                fn.setreg("a", " + ", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"5b\" motion", function() -- {{{
-                local input = [[
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", " ge", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr4ge]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", " + ", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with 5b motion]], function() -- {{{
+            initLines = [[
 if M then
         fn.set
             reg = {
                 name
                   ^
             ]]
-                local expected = [[
+            expectedLines = [[
 if M then
         fn.call_me
            ^
             ]]
-                local expectedDot = [[
+            expectedDotLines = [[
 It said: call_me
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "call_", "c")
-                runCommandAndAssert([["agr5b]], expected)
-                -- replace, via dot
-                fn.setreg("a", "It said: ", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"6b\" motion", function() -- {{{
-                local input = [[
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "call_", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr5b]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "It said: ", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with 6b motion]], function() -- {{{
+            initLines = [[
     if vimMode == "n" then
         if not M.cursorPos then
             else
@@ -402,31 +483,44 @@ It said: call_me
                     if motionDirection == 1 then
                                         ^
             ]]
-                local expected = [[
+            expectedLines = [[
     if vimMode == "n" then
         if not M.cursorPos then
             else
                 if number ~= 1 then
                    ^
             ]]
-                local expectedDot = [[
+            expectedDotLines = [[
     if vimMode == "n" then
         if not factor + number ~= 1 then
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "number ~", "c")
-                runCommandAndAssert([["agr6b]], expected)
-                -- replace, via dot
-                fn.setreg("a", "factor + ", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "number ~", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr6b]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "factor + ", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
         end) -- }}}
+    end) -- }}}
 
-        describe('object-motions: ', function() -- {{{
-            it("replace with \"3{\" motion", function() -- {{{
-                local input = [[
+    describe('Object-motions. ', function() -- {{{
+        it([[Replace with 3{ motion]], function() -- {{{
+            initLines = [[
         if motionType == "line" then
             local reindentCnt = reindent(reg, regionMotion, motionDirection)
             local lineCnt     = stringCount(reg.content, "\n")
@@ -459,7 +553,7 @@ It said: call_me
         return true
               ^
             ]]
-                local expected = [[
+            expectedLines = [[
         if motionType == "line" then
             local reindentCnt = reindent(reg, regionMotion, motionDirection)
             local lineCnt     = stringCount(reg.content, "\n")
@@ -480,7 +574,7 @@ It said: call_me
 while true
 ^
             ]]
-                local expectedDot = [[
+            expectedDotLines = [[
         if motionType == "line" then
             local reindentCnt = reindent(reg, regionMotion, motionDirection)
             local lineCnt     = stringCount(reg.content, "\n")
@@ -491,18 +585,31 @@ while true
 foobar
 while true
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "while", "c")
-                runCommandAndAssert([["agr3{]], expected)
-                -- replace, via dot
-                fn.setreg("a", "foobar", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"4}\" motion", function() -- {{{
-                local input = [[
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "while", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr3{]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foobar", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with 4} motion]], function() -- {{{
+            initLines = [[
         if motionType == "line" then
             local reindentCnt = reindent(reg, regionMotion, motionDirection)
             local lineCnt     = stringCount(reg.content, "\n")
@@ -535,7 +642,7 @@ while true
 
         return true
             ]]
-                local expected = [[
+            expectedLines = [[
         if motionType == "line" then
             local reindentCnt = reindent(reg, regionMotion, motionDirection)
             local lineCnt     = foo
@@ -557,447 +664,665 @@ while true
 
         return true
             ]]
-                local expectedDot = [[
+            expectedDotLines = [[
         if motionType == "line" then
             local reindentCnt = reindent(reg, regionMotion, motionDirection)
             local lineCnt     = bar
 
         return true
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "foo", "c")
-                runCommandAndAssert([["agr4}]], expected)
-                -- replace, via dot
-                fn.setreg("a", "bar", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foo", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr4}]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "bar", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+    end) -- }}}
+
+    describe('Text-objects. ', function() -- {{{
+        it([[Replace with iw motion]], function() -- {{{
+            initLines = [[
+    api.nvim_win_set_cursor(0, {M.cursorPos[1], #cursorLine})
+                                                      ^
+            ]]
+            expectedLines = [[
+    api.nvim_win_set_cursor(0, {M.cursorPos[1], #foo})
+                                                 ^
+            ]]
+            expectedDotLines = [[
+    api.nvim_win_set_cursor(0, {M.cursorPos[1], #bar})
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foo", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agriw]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "bar", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
         end) -- }}}
 
-        describe('text-objects: ', function() -- {{{
-            it("replace with \"iw\" motion", function() -- {{{
-                local input = [[
-        api.nvim_win_set_cursor(0, {M.cursorPos[1], #cursorLine})
-                                                          ^
-            ]]
-                local expected = [[
-        api.nvim_win_set_cursor(0, {M.cursorPos[1], #foo})
+        it([[Replace with a) motion, charwise]], function() -- {{{
+            initLines = [[
+        api.nvim_win_set_cursor(0, {regionReplace.startPos[1], newCol - 1})
                                                      ^
             ]]
-                local expectedDot = [[
-        api.nvim_win_set_cursor(0, {M.cursorPos[1], #bar})
+            expectedLines = [[
+        api.nvim_win_set_cursor(2 * (index - 1))
+                               ^
             ]]
+            expectedDotLines = [[
+        api.nvim_win_set_cursor[index]
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "foo", "c")
-                runCommandAndAssert([["agriw]], expected)
-                -- replace, via dot
-                fn.setreg("a", "bar", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"a)\" motion, charwise", function() -- {{{
-                local input = [[
-            api.nvim_win_set_cursor(0, {regionReplace.startPos[1], newCol - 1})
-                                                         ^
-            ]]
-                local expected = [[
-            api.nvim_win_set_cursor(2 * (index - 1))
-                                   ^
-            ]]
-                local expectedDot = [[
-            api.nvim_win_set_cursor[index]
-            ]]
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "(2 * (index - 1))", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agra)]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "(2 * (index - 1))", "c")
-                runCommandAndAssert([["agra)]], expected)
-                -- replace, via dot
-                fn.setreg("a", "[index]", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "[index]", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
 
-            it("replace with \"a)\" motion, linewise", function() -- {{{
-                local input = [[
-            local repEndLine = api.nvim_buf_get_lines(curBufNr,
-                regionReplace.endPos[1] - 1, regionReplace.endPos[1], false)[1]
-                                   ^
+        it([[Replace with a) motion, linewise]], function() -- {{{
+            initLines = [[
+        local repEndLine = api.nvim_buf_get_lines(curBufNr,
+            regionReplace.endPos[1] - 1, regionReplace.endPos[1], false)[1]
+                               ^
             ]]
-                local expected = [[
-            local repEndLine = api.nvim_buf_get_lines(bufNr, start, end, true)[1]
-                                                     ^
+            expectedLines = [[
+        local repEndLine = api.nvim_buf_get_lines(bufNr, start, end, true)[1]
+                                                 ^
             ]]
-                local expectedDot = [[
-            local repEndLine = api.nvim_buf_get_lines_tbl[1]
+            expectedDotLines = [[
+        local repEndLine = api.nvim_buf_get_lines_tbl[1]
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "(bufNr, start, end, true)", "c")
-                runCommandAndAssert([["agra)]], expected)
-                -- replace, via dot
-                fn.setreg("a", "_tbl", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"a<\" motion, linewise", function() -- {{{
-                local input = [[
-<ul class="something" keyattr="attr and class has no highlight anymore">
-    <li class="workaround"
-        keyattr="linebreaks">text</li>
-                  ^
-</ul>
-            ]]
-                local expected = [[
-<ul class="something" keyattr="attr and class has no highlight anymore">
-    <List name="foo">text</li>
-    ^
-</ul>
-            ]]
-                local expectedDot = [[
-<ul class="something" keyattr="attr and class has no highlight anymore">
-    </li>text</li>
-</ul>
-            ]]
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "(bufNr, start, end, true)", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agra)]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", '<List name="foo">', "c")
-                runCommandAndAssert([["agra<]], expected)
-                -- replace, via dot
-                fn.setreg("a", "</li>", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "_tbl", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
 
-            it("replace with \"i<\" motion, charwise", function() -- {{{
-                local input = [[
+        it([[Replace with a< motion, linewise]], function() -- {{{
+            initLines = [[
+    <ul class="something" keyattr="attr and class has no highlight anymore">
+        <li class="workaround"
+    keyattr="linebreaks">text</li>
+              ^
+    </ul>
+            ]]
+            expectedLines = [[
+    <ul class="something" keyattr="attr and class has no highlight anymore">
+        <List name="foo">text</li>
+        ^
+    </ul>
+            ]]
+            expectedDotLines = [[
+    <ul class="something" keyattr="attr and class has no highlight anymore">
+        </li>text</li>
+    </ul>
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", '<List name="foo">', "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agra<]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "</li>", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with i< motion, charwise]], function() -- {{{
+            initLines = [[
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-             ^
-  <meta name="viewport" content="width= device-width , initial-scale= 1.0 ">
-  <title> Document </title>
+    <meta charset="UTF-8">
+               ^
+    <meta name="viewport" content="width= device-width , initial-scale= 1.0 ">
+    <title> Document </title>
 </head>
 <body>
-  <div>
+    <div>
             ]]
-                local expected = [[
+            expectedLines = [[
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta none>
-   ^
-  <meta name="viewport" content="width= device-width , initial-scale= 1.0 ">
-  <title> Document </title>
+    <meta none>
+     ^
+    <meta name="viewport" content="width= device-width , initial-scale= 1.0 ">
+    <title> Document </title>
 </head>
 <body>
-  <div>
+    <div>
             ]]
-                local expectedDot = [[
+            expectedDotLines = [[
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <foobar>
-  <meta name="viewport" content="width= device-width , initial-scale= 1.0 ">
-  <title> Document </title>
+    <foobar>
+    <meta name="viewport" content="width= device-width , initial-scale= 1.0 ">
+    <title> Document </title>
 </head>
 <body>
-  <div>
+    <div>
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "meta none", "c")
-                runCommandAndAssert([["agri<]], expected)
-                -- replace, via dot
-                fn.setreg("a", "foobar", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"i<\" motion, linewise", function() -- {{{
-                local input = [[
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "meta none", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agri<]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foobar", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with i< motion, linewise]], function() -- {{{
+            initLines = [[
 <ul class="something"
              ^
     keyattr="attr and class has no highlight anymore">
 </ul>
             ]]
-                local expected = [[
+            expectedLines = [[
 <URL>
  ^
 </ul>
             ]]
-                local expectedDot = [[
+            expectedDotLines = [[
 </ul>
 </ul>
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "URL", "c")
-                runCommandAndAssert([["agri<]], expected)
-                -- replace, via dot
-                fn.setreg("a", "/ul", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"i{\" motion, charwise", function() -- {{{
-                local input = [[
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "URL", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agri<]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "/ul", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with i{ motion, charwise]], function() -- {{{
+            initLines = [[
     local opts = {hlGroup = "Search", timeout = 250}
                   ^
             ]]
-                local expected = [[
+            expectedLines = [[
     local opts = {timeout = 150}
                   ^
             ]]
-                local expectedDot = [[
+            expectedDotLines = [[
     local opts = {vimMode = 'n'}
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "timeout = 150", "c")
-                runCommandAndAssert([["agri{]], expected)
-                -- replace, via dot
-                fn.setreg("a", "vimMode = 'n'", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"i{\" motion, linewise", function() -- {{{
-                local input = [[
-        regionMotion = {
-            startPos = api.nvim_buf_get_mark(curBufNr, "["),
-            endPos   = api.nvim_buf_get_mark(curBufNr, "]")
-                           ^
-        }
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "timeout = 150", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agri{]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "vimMode = 'n'", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with i{ motion, linewise]], function() -- {{{
+            initLines = [[
+    regionMotion = {
+        startPos = api.nvim_buf_get_mark(curBufNr, "["),
+        endPos   = api.nvim_buf_get_mark(curBufNr, "]")
+                       ^
+    }
             ]]
-                local expected = [[
-        regionMotion = {
-            foo
-            ^
-        }
+            expectedLines = [[
+    regionMotion = {
+        foo
+        ^
+    }
             ]]
-                local expectedDot = [[
-        regionMotion = {
-            bar
-        }
+            expectedDotLines = [[
+    regionMotion = {
+        bar
+    }
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "foo", "c")
-                runCommandAndAssert([["agri{]], expected)
-                -- replace, via dot
-                fn.setreg("a", "bar", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"i[\" motion, charwise", function() -- {{{
-                local input = [[
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foo", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agri{]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "bar", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with i[ motion, charwise]], function() -- {{{
+            initLines = [[
 api.nvim_buf_add_highlight(curBufNr, repHLNS, opts["hlGroup"], lineNr, cols[1], cols[2])
                                                      ^
             ]]
-                local expected = [[
+            expectedLines = [[
 api.nvim_buf_add_highlight(curBufNr, repHLNS, opts[myHighlightGroup], lineNr, cols[1], cols[2])
                                                      ^
             ]]
-                local expectedDot = [[
+            expectedDotLines = [[
 api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols[2])
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "myHighlightGroup", "c")
-                runCommandAndAssert([["agri[]], expected)
-                -- replace, via dot
-                fn.setreg("a", "'foo'", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"i\"\" motion, test1", function() -- {{{
-                local input = [[
-            it("replace", function()
-                     ^
-            ]]
-                local expected = [[
-            it("bar", function()
-                ^
-            ]]
-                local expectedDot = [[
-            it("foobar", function()
-            ]]
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "myHighlightGroup", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([=["agri[]]=])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
 
-                setUpBuffer(input, "lua")
-                assert.are.same(api.nvim_win_get_cursor(0), {1, 21})
-                -- replace
-                fn.setreg("a", "bar", "c")
-                runCommandAndAssert([["agri"]], expected)
-                -- replace, via dot
-                fn.setreg("a", "foobar", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
-
-            it("replace with \"i\"\" motion, test2", function() -- {{{
-                local input = [[
-        fn["repeat#set"](t"<Plug>ReplaceExpr")
-                     ^
-            ]]
-                local expected = [[
-        fn["addSortedDataToTable"](t"<Plug>ReplaceExpr")
-                     ^
-            ]]
-                local expectedDot = [[
-        fn["foobar"](t"<Plug>ReplaceExpr")
-            ]]
-
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "addSortedDataToTable", "c")
-                runCommandAndAssert([["agri"]], expected)
-                -- replace, via dot
-                fn.setreg("a", "foobar", "c")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "'foo'", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
         end) -- }}}
 
-        describe('mark-motions: ', function() -- {{{
-            it("replace with \"`m\" motion, charwise", function() -- {{{
-                local input = [[
+        it([[Replace with i" motion, test1]], function() -- {{{
+            initLines = [[
+        it("replace", function()
+                ^
+            ]]
+            expectedLines = [[
+        it("bar", function()
+            ^
+            ]]
+            expectedDotLines = [[
+        it("foobar", function()
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "bar", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agri"]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foobar", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+
+        end) -- }}}
+
+        it([[Replace with i" motion, test2]], function() -- {{{
+            initLines = [[
+    fn["repeat#set"](t"<Plug>ReplaceExpr")
+                 ^
+            ]]
+            expectedLines = [[
+    fn["addSortedDataToTable"](t"<Plug>ReplaceExpr")
+                 ^
+            ]]
+            expectedDotLines = [[
+    fn["foobar"](t"<Plug>ReplaceExpr")
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "addSortedDataToTable", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([["agri"]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foobar", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+    end) -- }}}
+
+    describe('Mark-motions. ', function() -- {{{
+        it([[Replace with `m motion, charwise]], function() -- {{{
+            initLines = [[
         local fn   = vim.fn
         local cmd  = vim.cmd
                          ^
         local api  = vim.api
-                ]]
-                    local expected = [[
+            ]]
+            expectedLines = [[
         local fn   = vim.lsp.cmd
                          ^
         local api  = vim.api
-                ]]
-                    local expectedDot = [[
+            ]]
+            expectedDotLines = [[
 find
         local api  = vim.api
-                ]]
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                    setUpBuffer(input, "lua")
-                    -- replace
-                    vim.cmd("norm! mm")
-                    fn.setreg("a", "lsp.", "c")
-                    runCommandAndAssert([[gg"agr`m]], expected)
-                    -- replace, via dot
-                    vim.cmd("norm! 0")
-                    fn.setreg("a", "fin", "c")
-                    runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.cmd("norm! mm")
+            vim.fn.setreg("a", "lsp.", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[gg"agr`m]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.cmd("norm! 0")
+            vim.fn.setreg("a", "fin", "c")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
         end) -- }}}
-    end)
+    end) -- }}}
+end)
 
-    describe('-----------------------------------', function()
-        it("-----------------------------------", function()
+describe('-----------------------------------', function()
+    it("-----------------------------------", function()
         end)
-    end)
+end)
 
-    describe('Register type is "V": ', function()
+describe('Register type is "V". ', function()
 
-        describe('left-right-motions: ', function() -- {{{
-            it("replace with \"l\" motion", function() -- {{{
-                local input = [[
-    if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
-                            ^
+    describe('Left-right-motions. ', function() -- {{{
+        it([[Replace with l motion]], function() -- {{{
+            initLines = [[
+            if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
+                                    ^
             ]]
-                local expected = [[
-    if reg.type == "v" or (rubbing.type == "V" and linesCnt == 1) then
-                            ^
+            expectedLines = [[
+            if reg.type == "v" or (rubbing.type == "V" and linesCnt == 1) then
+                                    ^
             ]]
-                local expectedDot = [[
-    if reg.type == "v" or (rashingbbing.type == "V" and linesCnt == 1) then
+            expectedDotLines = [[
+            if reg.type == "v" or (rashingbbing.type == "V" and linesCnt == 1) then
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                -- NOTE: same results
-                -- fn.setreg("a", "o\nbbin\n", "V")
-                fn.setreg("a", "ubbin", "V")
-                runCommandAndAssert([["agrl]], expected)
-                -- replace, via dot
-                fn.setreg("a", "ashing", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"h\" motion", function() -- {{{
-                local input = [[
-    if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
-                            ^
-            ]]
-                local expected = [[
-    if reg.type == "v" or (foobareg.type == "V" and linesCnt == 1) then
-                            ^
-            ]]
-                local expectedDot = [[
-    if reg.type == "v" or (test_Foobareg.type == "V" and linesCnt == 1) then
-            ]]
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "foobar", "v")
-                runCommandAndAssert([["agrh]], expected)
-                -- replace, via dot
-                fn.setreg("a", "test_F", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "ubbin", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agrl]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
 
-            it("replace with \"$\" motion", function() -- {{{
-                local input = [[
-    if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
-                            ^
-            ]]
-                local expected = [[
-    if reg.type == "v" or (ruthless
-                            ^
-            ]]
-                local expectedDot = [[
-    if reg.type == "v" or (room
-            ]]
-
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "uthless", "V")
-                runCommandAndAssert([["agr$]], expected)
-                -- replace, via dot
-                fn.setreg("a", "oom", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
-
-            it("replace with \"Te\" motion", function() -- {{{
-                local input = [[
-    if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
-                            ^
-            ]]
-                local expected = [[
-    if reg.typescript peg.type == "V" and linesCnt == 1) then
-               ^
-            ]]
-                local expectedDot = [[
-    if reg.typer's luascript peg.type == "V" and linesCnt == 1) then
-            ]]
-
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "script p", "V")
-                runCommandAndAssert([["agrTe]], expected)
-                -- replace, via dot
-                fn.setreg("a", "                                  r's lua      \n\t         ", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "ashing", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
         end) -- }}}
 
-        describe('up-down-motions: ', function() -- {{{
-            it("replace with \"3j\" motion", function() -- {{{
-                local input = [[
+        it([[Replace with h motion]], function() -- {{{
+            initLines = [[
+            if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
+                                    ^
+            ]]
+            expectedLines = [[
+            if reg.type == "v" or (foobareg.type == "V" and linesCnt == 1) then
+                                    ^
+            ]]
+            expectedDotLines = [[
+            if reg.type == "v" or (test_Foobareg.type == "V" and linesCnt == 1) then
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foobar", "v")
+            outputLines, outputCursorPos     = feedkeysOutput([["agrh]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "test_F", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+        end) -- }}}
+
+        it([[Replace with $ motion]], function() -- {{{
+            initLines = [[
+            if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
+                                    ^
+            ]]
+            expectedLines = [[
+            if reg.type == "v" or (ruthless
+                                    ^
+            ]]
+            expectedDotLines = [[
+            if reg.type == "v" or (room
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "uthless", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr$]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "oom", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with Te motion]], function() -- {{{
+            initLines = [[
+            if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
+                                    ^
+            ]]
+            expectedLines = [[
+            if reg.typescript peg.type == "V" and linesCnt == 1) then
+                       ^
+            ]]
+            expectedDotLines = [[
+            if reg.typer's luascript peg.type == "V" and linesCnt == 1) then
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "script p", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agrTe]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "                                  r's lua      \n\t         ", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+    end) -- }}}
+
+    describe('Up-down-motions. ', function() -- {{{
+        it([[Replace with 3j motion]], function() -- {{{
+            initLines = [[
         if reindentCnt < 0 then
             reg.content = string.gsub(reg.content, "▲" .. reindents, "")
-                   ^
+                ^
             if lineCnt ~= 1 then
                 reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
             elseif reindentCnt > 0 then
@@ -1007,36 +1332,49 @@ find
                 end
             end
             ]]
-                local expected = [[
+            expectedLines = [[
         if reindentCnt < 0 then
             nulla sunt exuis nsunt velit enim.
-                   ^
+                ^
                 reg.content = reindents .. reg.content
                 if lineCnt ~= 1 then
                     reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
                 end
             end
             ]]
-                local expectedDot = [[
+            expectedDotLines = [[
         if reindentCnt < 0 then
             Lorem ipsum dolor sit amet.
                 end
             end
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "V")
-                runCommandAndAssert([["agr3j]], expected)
-                -- replace, via dot
-                fn.setreg("a", "Lorem ipsum dolor sit amet.", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"3k\" motion", function() -- {{{
-                local input = [[
-if reindentCnt < 0 then
-    reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr3j]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "Lorem ipsum dolor sit amet.", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with 3k motion]], function() -- {{{
+            initLines = [[
+        if reindentCnt < 0 then
+            reg.content = string.gsub(reg.content, "▲" .. reindents, "")
             if lineCnt ~= 1 then
                 reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
                     elseif reindentCnt > 0 then
@@ -1044,12 +1382,12 @@ if reindentCnt < 0 then
                             if lineCnt ~= 1 then
                                 end
         reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
-                                                               ^
+                                                            ^
                                         end
             ]]
-                local expected = [[
-if reindentCnt < 0 then
-    reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+            expectedLines = [[
+        if reindentCnt < 0 then
+            reg.content = string.gsub(reg.content, "▲" .. reindents, "")
             if lineCnt ~= 1 then
                 reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
                     elseif reindentCnt > 0 then
@@ -1057,26 +1395,39 @@ if reindentCnt < 0 then
         ^
                                         end
             ]]
-                local expectedDot = [[
-if reindentCnt < 0 then
-    reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+            expectedDotLines = [[
+        if reindentCnt < 0 then
+            reg.content = string.gsub(reg.content, "▲" .. reindents, "")
         Lorem ipsum dolor sit amet.
                                         end
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "V")
-                runCommandAndAssert([["agr3k]], expected)
-                -- replace, via dot
-                fn.setreg("a", "Lorem ipsum dolor sit amet.", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"4k\" motion", function() -- {{{
-                local input = [[
-if reindentCnt < 0 then
-    reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr3k]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "Lorem ipsum dolor sit amet.", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with 4k motion]], function() -- {{{
+            initLines = [[
+        if reindentCnt < 0 then
+            reg.content = string.gsub(reg.content, "▲" .. reindents, "")
             if lineCnt ~= 1 then
                 reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
                     elseif reindentCnt > 0 then
@@ -1085,33 +1436,46 @@ if reindentCnt < 0 then
                                 end
         reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
                                         end
-                                         ^
+                                        ^
             ]]
-                local expected = [[
-if reindentCnt < 0 then
-    reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+            expectedLines = [[
+        if reindentCnt < 0 then
+            reg.content = string.gsub(reg.content, "▲" .. reindents, "")
             if lineCnt ~= 1 then
                 reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
                     elseif reindentCnt > 0 then
                                         endif
                                         ^
             ]]
-                local expectedDot = [[
-if reindentCnt < 0 then
+            expectedDotLines = [[
+        if reindentCnt < 0 then
                                         fidne
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "endif", "V")
-                runCommandAndAssert([["agr4k]], expected)
-                -- replace, via dot
-                fn.setreg("a", "fidne", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"_\" motion", function() -- {{{
-                local input = [[
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "endif", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr4k]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "fidne", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with _ motion]], function() -- {{{
+            initLines = [[
             if lineCnt ~= 1 then
                     ^
                 reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
@@ -1122,7 +1486,7 @@ if reindentCnt < 0 then
                 end
             end
             ]]
-                local expected = [[
+            expectedLines = [[
             foo
             ^
                 reg.content = reindents .. reg.content
@@ -1131,626 +1495,882 @@ if reindentCnt < 0 then
                 end
             end
             ]]
-                local expectedDot = [[
+            expectedDotLines = [[
             bar
                     reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
                 end
             end
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "foo", "V")
-                runCommandAndAssert([["agr3_]], expected)
-                -- replace, via dot
-                fn.setreg("a", "bar", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foo", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr3_]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "bar", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+    end) -- }}}
+
+    describe('Word-motions. ', function() -- {{{
+        it([[Replace with 2W motion]], function() -- {{{
+            initLines = [[
+        reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+                             ^
+            ]]
+            expectedLines = [[
+        reg.content = string.find(val1, val2, val3.. reindents, "")
+                             ^
+            ]]
+            expectedDotLines = [[
+        reg.content = string.global_sub(arg1, arg2,val3.. reindents, "")
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "find(val1, val2, val3\t", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr2W]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "global_sub(arg1, arg2,\n", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
         end) -- }}}
 
-        describe('word-motions: ', function() -- {{{
-            it("replace with \"2W\" motion", function() -- {{{
-                local input = [[
-            reg.content = string.gsub(reg.content, "▲" .. reindents, "")
-                                 ^
+        it([[Replace with 4ge motion]], function() -- {{{
+            initLines = [[
+    local reindentCnt = reindent(reg, regionMotion, motionDirection)
+        if indent ~=0 then
+    fn.setreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
+        ^
             ]]
-                local expected = [[
-            reg.content = string.find(val1, val2, val3.. reindents, "")
-                                 ^
+            expectedLines = [[
+    local reindentCnt = reindent(reg, regionMotion, motionDirection)
+        if indent ~=getreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
+                    ^
             ]]
-                local expectedDot = [[
-            reg.content = string.global_sub(arg1, arg2,val3.. reindents, "")
+            expectedDotLines = [[
+    local reindentCnt = reindent(reg, regionMotion, motionDirection+ getreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
             ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "find(val1, val2, val3\t", "V")
-                runCommandAndAssert([["agr2W]], expected)
-                -- replace, via dot
-                fn.setreg("a", "global_sub(arg1, arg2,\n", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"4ge\" motion", function() -- {{{
-                local input = [[
-local reindentCnt = reindent(reg, regionMotion, motionDirection)
-    if indent ~=0 then
-        fn.setreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
-            ^
-            ]]
-                local expected = [[
-local reindentCnt = reindent(reg, regionMotion, motionDirection)
-    if indent ~=getreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
-                ^
-            ]]
-                local expectedDot = [[
-local reindentCnt = reindent(reg, regionMotion, motionDirection+ getreg(reg.name, string.rep(" ", indent) .. reg.content, reg.type)
-            ]]
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "ge", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr4ge]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "ge", "V")
-                runCommandAndAssert([["agr4ge]], expected)
-                -- replace, via dot
-                fn.setreg("a", " + g               \t             ", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", " + g               \t             ", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
 
-            it("replace with \"5b\" motion", function() -- {{{
-                local input = [[
+        it([[Replace with 5b motion]], function() -- {{{
+            initLines = [[
 if M then
-        fn.set
-            reg = {
-                name
-                  ^
-            ]]
-                local expected = [[
+    fn.set
+        reg = {
+            name
+              ^
+        ]]
+            expectedLines = [[
 if M then
-        fn.help_me
-           ^
-            ]]
-                local expectedDot = [[
+    fn.help_me
+       ^
+        ]]
+            expectedDotLines = [[
 foobar_help_me
-            ]]
+        ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "help_", "V")
-                runCommandAndAssert([["agr5b]], expected)
-                -- replace, via dot
-                fn.setreg("a", "\tfoobar_\t", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"6b\" motion", function() -- {{{
-                local input = [[
-    if vimMode == "n" then
-        if not M.cursorPos then
-            else
-                if not cursorNS then
-                    if motionDirection == 1 then
-                                        ^
-            ]]
-                local expected = [[
-    if vimMode == "n" then
-        if not M.cursorPos then
-            else
-                if number ~= 1 then
-                   ^
-            ]]
-                local expectedDot = [[
-    if vimMode == "n" then
-        if not M.factor +number ~= 1 then
-            ]]
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "help_", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr5b]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "number ~", "V")
-                runCommandAndAssert([["agr6b]], expected)
-                -- replace, via dot
-                fn.setreg("a", "M.factor +\t", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "\tfoobar_\t", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
         end) -- }}}
 
-        describe('object-motions: ', function() -- {{{
-            it("replace with \"3{\" motion", function() -- {{{
-                local input = [[
-        if motionType == "line" then
-            local reindentCnt = reindent(reg, regionMotion, motionDirection)
-            local lineCnt     = stringCount(reg.content, "\n")
+        it([[Replace with 6b motion]], function() -- {{{
+            initLines = [[
+        if vimMode == "n" then
+    if not M.cursorPos then
+        else
+            if not cursorNS then
+                if motionDirection == 1 then
+                                    ^
+            ]]
+            expectedLines = [[
+        if vimMode == "n" then
+    if not M.cursorPos then
+        else
+            if number ~= 1 then
+               ^
+            ]]
+            expectedDotLines = [[
+        if vimMode == "n" then
+    if not M.factor +number ~= 1 then
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-            -- Reindent the lines if counts do not match up
-            if reindentCnt and reindentCnt ~= 0 then
-                local reindents = string.rep(" ", math.abs(reindentCnt))
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-                if reindentCnt < 0 then
-                    reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "number ~", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr6b]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
 
-                    if lineCnt ~= 1 then
-                        reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
-                    end
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "M.factor +\t ", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+    end) -- }}}
 
-                elseif reindentCnt > 0 then
-                    reg.content = reindents .. reg.content
+    describe('Object-motions. ', function() -- {{{
+        it([[Replace with 3{ motion]], function() -- {{{
+            initLines = [[
+    if motionType == "line" then
+        local reindentCnt = reindent(reg, regionMotion, motionDirection)
+        local lineCnt     = stringCount(reg.content, "\n")
 
-                    if lineCnt ~= 1 then
-                        reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
-                    end
+        -- Reindent the lines if counts do not match up
+        if reindentCnt and reindentCnt ~= 0 then
+            local reindents = string.rep(" ", math.abs(reindentCnt))
+
+            if reindentCnt < 0 then
+                reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+
+                if lineCnt ~= 1 then
+                    reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
+                end
+
+            elseif reindentCnt > 0 then
+                reg.content = reindents .. reg.content
+
+                if lineCnt ~= 1 then
+                    reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
                 end
             end
-
-            fn.setreg(reg.name, string.sub(reg.content, 1, -2), "V")
-        else
-            fn.setreg(reg.name, vim.trim(reg.content), "v")
         end
 
-        return true
-              ^
-            ]]
-                local expected = [[
-        if motionType == "line" then
-            local reindentCnt = reindent(reg, regionMotion, motionDirection)
-            local lineCnt     = stringCount(reg.content, "\n")
+        fn.setreg(reg.name, string.sub(reg.content, 1, -2), "V")
+    else
+        fn.setreg(reg.name, vim.trim(reg.content), "v")
+    end
 
-            -- Reindent the lines if counts do not match up
-            if reindentCnt and reindentCnt ~= 0 then
-                local reindents = string.rep(" ", math.abs(reindentCnt))
+    return true
+          ^
+        ]]
+            expectedLines = [[
+    if motionType == "line" then
+        local reindentCnt = reindent(reg, regionMotion, motionDirection)
+        local lineCnt     = stringCount(reg.content, "\n")
 
-                if reindentCnt < 0 then
-                    reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+        -- Reindent the lines if counts do not match up
+        if reindentCnt and reindentCnt ~= 0 then
+            local reindents = string.rep(" ", math.abs(reindentCnt))
 
-                    if lineCnt ~= 1 then
-                        reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
-                    end
+            if reindentCnt < 0 then
+                reg.content = string.gsub(reg.content, "▲" .. reindents, "")
 
-                elseif reindentCnt > 0 then
-                    reg.content = reindents .. reg.content
+                if lineCnt ~= 1 then
+                    reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
+                end
+
+            elseif reindentCnt > 0 then
+                reg.content = reindents .. reg.content
 while true
 ^
-            ]]
-                local expectedDot = [[
-        if motionType == "line" then
-            local reindentCnt = reindent(reg, regionMotion, motionDirection)
-            local lineCnt     = stringCount(reg.content, "\n")
+        ]]
+            expectedDotLines = [[
+    if motionType == "line" then
+        local reindentCnt = reindent(reg, regionMotion, motionDirection)
+        local lineCnt     = stringCount(reg.content, "\n")
 
-            -- Reindent the lines if counts do not match up
-            if reindentCnt and reindentCnt ~= 0 then
-                local reindents = string.rep(" ", math.abs(reindentCnt))
+        -- Reindent the lines if counts do not match up
+        if reindentCnt and reindentCnt ~= 0 then
+            local reindents = string.rep(" ", math.abs(reindentCnt))
 foobar2021
 while true
-            ]]
+        ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "while", "V")
-                runCommandAndAssert([["agr3{]], expected)
-                -- replace, via dot
-                fn.setreg("a", "foobar2021", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"4}\" motion", function() -- {{{
-                local input = [[
-        if motionType == "line" then
-            local reindentCnt = reindent(reg, regionMotion, motionDirection)
-            local lineCnt     = stringCount(reg.content, "\n")
-                                ^
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "while", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr3{]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
 
-            -- Reindent the lines if counts do not match up
-            if reindentCnt and reindentCnt ~= 0 then
-                local reindents = string.rep(" ", math.abs(reindentCnt))
-
-                if reindentCnt < 0 then
-                    reg.content = string.gsub(reg.content, "▲" .. reindents, "")
-
-                    if lineCnt ~= 1 then
-                        reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
-                    end
-
-                elseif reindentCnt > 0 then
-                    reg.content = reindents .. reg.content
-
-                    if lineCnt ~= 1 then
-                        reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
-                    end
-                end
-            end
-
-            fn.setreg(reg.name, string.sub(reg.content, 1, -2), "V")
-        else
-            fn.setreg(reg.name, vim.trim(reg.content), "v")
-        end
-
-        return true
-            ]]
-                local expected = [[
-        if motionType == "line" then
-            local reindentCnt = reindent(reg, regionMotion, motionDirection)
-            local lineCnt     = foo
-                                ^
-
-                elseif reindentCnt > 0 then
-                    reg.content = reindents .. reg.content
-
-                    if lineCnt ~= 1 then
-                        reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
-                    end
-                end
-            end
-
-            fn.setreg(reg.name, string.sub(reg.content, 1, -2), "V")
-        else
-            fn.setreg(reg.name, vim.trim(reg.content), "v")
-        end
-
-        return true
-            ]]
-                local expectedDot = [[
-        if motionType == "line" then
-            local reindentCnt = reindent(reg, regionMotion, motionDirection)
-            local lineCnt     = bar
-
-        return true
-            ]]
-
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "foo", "V")
-                runCommandAndAssert([["agr4}]], expected)
-                -- replace, via dot
-                fn.setreg("a", "bar", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foobar2021", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
         end) -- }}}
 
-        describe('text-objects: ', function() -- {{{
-            it("replace with \"iw\" motion", function() -- {{{
-                local input = [[
-        api.nvim_win_set_cursor(0, {M.cursorPos[1], #cursorLine})
-                                                          ^
-            ]]
-                local expected = [[
-        api.nvim_win_set_cursor(0, {M.cursorPos[1], #foo})
+        it([[Replace with 4} motion]], function() -- {{{
+            initLines = [[
+    if motionType == "line" then
+        local reindentCnt = reindent(reg, regionMotion, motionDirection)
+        local lineCnt     = stringCount(reg.content, "\n")
+                            ^
+
+        -- Reindent the lines if counts do not match up
+        if reindentCnt and reindentCnt ~= 0 then
+            local reindents = string.rep(" ", math.abs(reindentCnt))
+
+            if reindentCnt < 0 then
+                reg.content = string.gsub(reg.content, "▲" .. reindents, "")
+
+                if lineCnt ~= 1 then
+                    reg.content = string.gsub(reg.content, "\n" .. reindents, "\n")
+                end
+
+            elseif reindentCnt > 0 then
+                reg.content = reindents .. reg.content
+
+                if lineCnt ~= 1 then
+                    reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
+                end
+            end
+        end
+
+        fn.setreg(reg.name, string.sub(reg.content, 1, -2), "V")
+    else
+        fn.setreg(reg.name, vim.trim(reg.content), "v")
+    end
+
+    return true
+        ]]
+            expectedLines = [[
+    if motionType == "line" then
+        local reindentCnt = reindent(reg, regionMotion, motionDirection)
+        local lineCnt     = foo
+                            ^
+
+            elseif reindentCnt > 0 then
+                reg.content = reindents .. reg.content
+
+                if lineCnt ~= 1 then
+                    reg.content = string.gsub(reg.content, "\n", "\n" .. reindents)
+                end
+            end
+        end
+
+        fn.setreg(reg.name, string.sub(reg.content, 1, -2), "V")
+    else
+        fn.setreg(reg.name, vim.trim(reg.content), "v")
+    end
+
+    return true
+        ]]
+            expectedDotLines = [[
+    if motionType == "line" then
+        local reindentCnt = reindent(reg, regionMotion, motionDirection)
+        local lineCnt     = bar
+
+    return true
+        ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foo", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agr4}]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "bar", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+    end) -- }}}
+
+    describe('Text-objects. ', function() -- {{{
+        it([[Replace with iw motion]], function() -- {{{
+            initLines = [[
+    api.nvim_win_set_cursor(0, {M.cursorPos[1], #cursorLine})
+                                                      ^
+        ]]
+            expectedLines = [[
+    api.nvim_win_set_cursor(0, {M.cursorPos[1], #foo})
+                                                 ^
+        ]]
+            expectedDotLines = [[
+    api.nvim_win_set_cursor(0, {M.cursorPos[1], #bar})
+        ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foo", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agriw]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "bar", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with a) motion, charwise]], function() -- {{{
+            initLines = [[
+        api.nvim_win_set_cursor(0, {regionReplace.startPos[1], newCol - 1})
                                                      ^
-            ]]
-                local expectedDot = [[
-        api.nvim_win_set_cursor(0, {M.cursorPos[1], #bar})
-            ]]
+        ]]
+            expectedLines = [[
+        api.nvim_win_set_cursor(2 * (index - 1))
+                               ^
+        ]]
+            expectedDotLines = [[
+        api.nvim_win_set_cursor[index]
+        ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "foo", "V")
-                runCommandAndAssert([["agriw]], expected)
-                -- replace, via dot
-                fn.setreg("a", "bar", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"a)\" motion, charwise", function() -- {{{
-                local input = [[
-            api.nvim_win_set_cursor(0, {regionReplace.startPos[1], newCol - 1})
-                                                         ^
-            ]]
-                local expected = [[
-            api.nvim_win_set_cursor(2 * (index - 1))
-                                   ^
-            ]]
-                local expectedDot = [[
-            api.nvim_win_set_cursor[index]
-            ]]
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "(2 * (index - 1))", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agra)]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "(2 * (index - 1))", "V")
-                runCommandAndAssert([["agra)]], expected)
-                -- replace, via dot
-                fn.setreg("a", "[index]", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "[index]", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
 
-            it("replace with \"a)\" motion, linewise", function() -- {{{
-                local input = [[
-            local repEndLine = api.nvim_buf_get_lines(curBufNr,
-                regionReplace.endPos[1] - 1, regionReplace.endPos[1], false)[1]
-                                   ^
-            ]]
-                local expected = [[
-            local repEndLine = api.nvim_buf_get_lines(bufNr, start, end, true)[1]
-                                                     ^
-            ]]
-                local expectedDot = [[
-            local repEndLine = api.nvim_buf_get_lines_tbl[1]
-            ]]
+        it([[Replace with a) motion, linewise]], function() -- {{{
+            initLines = [[
+        local repEndLine = api.nvim_buf_get_lines(curBufNr,
+            regionReplace.endPos[1] - 1, regionReplace.endPos[1], false)[1]
+                               ^
+        ]]
+            expectedLines = [[
+        local repEndLine = api.nvim_buf_get_lines(bufNr, start, end, true)[1]
+                                                 ^
+        ]]
+            expectedDotLines = [[
+        local repEndLine = api.nvim_buf_get_lines_tbl[1]
+        ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "(bufNr, start, end, true)", "V")
-                runCommandAndAssert([["agra)]], expected)
-                -- replace, via dot
-                fn.setreg("a", "_tbl", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"a<\" motion, linewise", function() -- {{{
-                local input = [[
-<ul class="something" keyattr="attr and class has no highlight anymore">
-    <li class="workaround"
-        keyattr="linebreaks">text</li>
-                  ^
-</ul>
-            ]]
-                local expected = [[
-<ul class="something" keyattr="attr and class has no highlight anymore">
-    <List name="foo">text</li>
-    ^
-</ul>
-            ]]
-                local expectedDot = [[
-<ul class="something" keyattr="attr and class has no highlight anymore">
-    </li>text</li>
-</ul>
-            ]]
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "(bufNr, start, end, true)", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agra)]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", '<List name="foo">', "V")
-                runCommandAndAssert([["agra<]], expected)
-                -- replace, via dot
-                fn.setreg("a", "</li>", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "_tbl", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
 
-            it("replace with \"i<\" motion, charwise", function() -- {{{
-                local input = [[
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-             ^
-  <meta name="viewport" content="width= device-width , initial-scale= 1.0 ">
-  <title> Document </title>
-</head>
-<body>
-  <div>
-            ]]
-                local expected = [[
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta none>
-   ^
-  <meta name="viewport" content="width= device-width , initial-scale= 1.0 ">
-  <title> Document </title>
-</head>
-<body>
-  <div>
-            ]]
-                local expectedDot = [[
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <foobar>
-  <meta name="viewport" content="width= device-width , initial-scale= 1.0 ">
-  <title> Document </title>
-</head>
-<body>
-  <div>
-            ]]
-
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "meta none", "V")
-                runCommandAndAssert([["agri<]], expected)
-                -- replace, via dot
-                fn.setreg("a", "foobar", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
-
-            it("replace with \"i<\" motion, linewise", function() -- {{{
-                local input = [[
-<ul class="something"
-             ^
-    keyattr="attr and class has no highlight anymore">
-</ul>
-            ]]
-                local expected = [[
-<URL>
- ^
-</ul>
-            ]]
-                local expectedDot = [[
-</ul>
-</ul>
-            ]]
-
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "URL", "V")
-                runCommandAndAssert([["agri<]], expected)
-                -- replace, via dot
-                fn.setreg("a", "/ul", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
-
-            it("replace with \"i{\" motion, charwise", function() -- {{{
-                local input = [[
-    local opts = {hlGroup = "Search", timeout = 250}
-                  ^
-            ]]
-                local expected = [[
-    local opts = {timeout = 150}
-                  ^
-            ]]
-                local expectedDot = [[
-    local opts = {vimMode = 'n'}
-            ]]
-
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "timeout = 150", "V")
-                runCommandAndAssert([["agri{]], expected)
-                -- replace, via dot
-                fn.setreg("a", "vimMode = 'n'", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
-
-            it("replace with \"i{\" motion, linewise", function() -- {{{
-                local input = [[
-        regionMotion = {
-            startPos = api.nvim_buf_get_mark(curBufNr, "["),
-            endPos   = api.nvim_buf_get_mark(curBufNr, "]")
-                           ^
-        }
-            ]]
-                local expected = [[
-        regionMotion = {
-            foo
+        it([[Replace with a< motion, linewise]], function() -- {{{
+            initLines = [[
+    <ul class="something" keyattr="attr and class has no highlight anymore">
+        <li class="workaround"
+    keyattr="linebreaks">text</li>
             ^
-        }
-            ]]
-                local expectedDot = [[
-        regionMotion = {
-            bar
-        }
-            ]]
+    </ul>
+        ]]
+            expectedLines = [[
+    <ul class="something" keyattr="attr and class has no highlight anymore">
+        <List name="foo">text</li>
+        ^
+    </ul>
+        ]]
+            expectedDotLines = [[
+    <ul class="something" keyattr="attr and class has no highlight anymore">
+        </li>text</li>
+    </ul>
+        ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "foo", "V")
-                runCommandAndAssert([["agri{]], expected)
-                -- replace, via dot
-                fn.setreg("a", "bar", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"i[\" motion, charwise", function() -- {{{
-                local input = [[
-api.nvim_buf_add_highlight(curBufNr, repHLNS, opts["hlGroup"], lineNr, cols[1], cols[2])
-                                                     ^
-            ]]
-                local expected = [[
-api.nvim_buf_add_highlight(curBufNr, repHLNS, opts[myHighlightGroup], lineNr, cols[1], cols[2])
-                                                     ^
-            ]]
-                local expectedDot = [[
-api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols[2])
-            ]]
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", '<List name="foo">', "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agra<]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "myHighlightGroup", "V")
-                runCommandAndAssert([["agri[]], expected)
-                -- replace, via dot
-                fn.setreg("a", "'foo'", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "</li>", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
 
-            it("replace with \"i[\" motion, linewise", function() -- {{{
-                local input = [==[[[
-    elseif vimMode == "n" then
-                foobar
-        if reg.type == "v" then
-                ^
-            if motionType == "line" then
-                local regContentNew = reindent(reg.content, regionMotion, motionDirection, vimMode)
-            ]]]==]
-                local expected = [==[[[
+        it([[Replace with i< motion, charwise]], function() -- {{{
+            initLines = [[
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+               ^
+    <meta name="viewport" content="width= device-width , initial-scale= 1.0 ">
+    <title> Document </title>
+</head>
+<body>
+    <div>
+        ]]
+            expectedLines = [[
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta none>
+     ^
+    <meta name="viewport" content="width= device-width , initial-scale= 1.0 ">
+    <title> Document </title>
+</head>
+<body>
+    <div>
+        ]]
+            expectedDotLines = [[
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <foobar>
+    <meta name="viewport" content="width= device-width , initial-scale= 1.0 ">
+    <title> Document </title>
+</head>
+<body>
+    <div>
+        ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "meta none", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agri<]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foobar", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with i< motion, linewise]], function() -- {{{
+            initLines = [[
+    <ul class="something"
+        ^
+        keyattr="attr and class has no highlight anymore">
+    </ul>
+        ]]
+            expectedLines = [[
+    <URL>
+     ^
+    </ul>
+        ]]
+            expectedDotLines = [[
+    </ul>
+    </ul>
+        ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "URL", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agri<]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "/ul", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with i{ motion, charwise]], function() -- {{{
+            initLines = [[
+        local opts = {hlGroup = "Search", timeout = 250}
+            ^
+        ]]
+            expectedLines = [[
+        local opts = {timeout = 150}
+            ^
+        ]]
+            expectedDotLines = [[
+        local opts = {vimMode = 'n'}
+        ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "timeout = 150", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agri{]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "vimMode = 'n'", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with i{ motion, linewise]], function() -- {{{
+            initLines = [[
+    regionMotion = {
+        startPos = api.nvim_buf_get_mark(curBufNr, "["),
+        endPos   = api.nvim_buf_get_mark(curBufNr, "]")
+                    ^
+    }
+        ]]
+            expectedLines = [[
+    regionMotion = {
+        foo
+        ^
+    }
+        ]]
+            expectedDotLines = [[
+    regionMotion = {
+        bar
+    }
+        ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foo", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agri{]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "bar", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with i[ motion, charwise]], function() -- {{{
+            initLines = [[
+    api.nvim_buf_add_highlight(curBufNr, repHLNS, opts["hlGroup"], lineNr, cols[1], cols[2])
+                                                ^
+        ]]
+            expectedLines = [[
+    api.nvim_buf_add_highlight(curBufNr, repHLNS, opts[myHighlightGroup], lineNr, cols[1], cols[2])
+                                                ^
+        ]]
+            expectedDotLines = [[
+    api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols[2])
+        ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "myHighlightGroup", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([=["agri[]]=])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "'foo'", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+
+        it([[Replace with i[ motion, linewise]], function() -- {{{
+            initLines = [==[[[
+elseif vimMode == "n" then
+            foobar
     if reg.type == "v" then
+            ^
         if motionType == "line" then
-            ]]]==]
-                local expectedDot = [==[[[
-    M.replaceSave = function()
-        end
+            local regContentNew = reindent(reg.content, regionMotion, motionDirection, vimMode)
+        ]]]==]
+            expectedLines = [==[[[
+if reg.type == "v" then
+^
+    if motionType == "line" then
+        ]]]==]
+            expectedDotLines = [==[[[
+M.replaceSave = function()
+    end
 
-            ]]]==]
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", '        if reg.type == "v" then\n            if motionType == "line" then\n', "V")
-                runCommandAndAssert([["agri[]], expected)
-                -- replace, via dot
-                fn.setreg("a", "M.replaceSave = function()\n    end\n   ", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+        ]]]==]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-            it("replace with \"i\"\" motion, test1", function() -- {{{
-                local input = [[
-            it("replace", function()
-                     ^
-            ]]
-                local expected = [[
-            it("bar", function()
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", '        if reg.type == "v" then\n            if motionType == "line" then\n', "V")
+            outputLines, outputCursorPos     = feedkeysOutput([=["agri[]=])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "M.replaceSave = function()\n    end\n   ", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+        end) -- }}}
+
+        it([[Replace with i" motion, test1]], function() -- {{{
+            initLines = [[
+        it("replace", function()
                 ^
-            ]]
-                local expectedDot = [[
-            it("foobar", function()
-            ]]
+        ]]
+            expectedLines = [[
+        it("bar", function()
+            ^
+        ]]
+            expectedDotLines = [[
+        it("foobar", function()
+        ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                setUpBuffer(input, "lua")
-                assert.are.same(api.nvim_win_get_cursor(0), {1, 21})
-                -- replace
-                fn.setreg("a", "bar", "V")
-                runCommandAndAssert([["agri"]], expected)
-                -- replace, via dot
-                fn.setreg("a", "foobar", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-            it("replace with \"i\"\" motion, test2", function() -- {{{
-                local input = [[
-        fn["repeat#set"](t"<Plug>ReplaceExpr")
-                     ^
-            ]]
-                local expected = [[
-        fn["addSortedDataToTable"](t"<Plug>ReplaceExpr")
-                     ^
-            ]]
-                local expectedDot = [[
-        fn["foobar"](t"<Plug>ReplaceExpr")
-            ]]
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "bar", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agri"]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
 
-                setUpBuffer(input, "lua")
-                -- replace
-                fn.setreg("a", "addSortedDataToTable", "V")
-                runCommandAndAssert([["agri"]], expected)
-                -- replace, via dot
-                fn.setreg("a", "foobar", "V")
-                runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foobar", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+
         end) -- }}}
 
-        describe('mark-motions: ', function() -- {{{
-            it("replace with \"`m\" motion, charwise", function() -- {{{
-                local input = [[
-        local fn   = vim.fn
-        local cmd  = vim.cmd
-                         ^
-        local api  = vim.api
-                ]]
-                    local expected = [[
-        local fn   = vim.lsp.cmd
-                         ^
-        local api  = vim.api
-                ]]
-                    local expectedDot = [[
+        it([[Replace with i" motion, test2]], function() -- {{{
+            initLines = [[
+    fn["repeat#set"](t"<Plug>ReplaceExpr")
+                ^
+        ]]
+            expectedLines = [[
+    fn["addSortedDataToTable"](t"<Plug>ReplaceExpr")
+                ^
+        ]]
+            expectedDotLines = [[
+    fn["foobar"](t"<Plug>ReplaceExpr")
+        ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "addSortedDataToTable", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([["agri"]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg("a", "foobar", "V")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
+        end) -- }}}
+    end) -- }}}
+
+    describe('Mark-motions. ', function() -- {{{
+        it([[Replace with `m motion, charwise]], function() -- {{{
+            initLines = [[
+    local fn   = vim.fn
+    local cmd  = vim.cmd
+                     ^
+    local api  = vim.api
+            ]]
+            expectedLines = [[
+    local fn   = vim.lsp.cmd
+                     ^
+    local api  = vim.api
+            ]]
+            expectedDotLines = [[
 find
-        local api  = vim.api
-                ]]
+    local api  = vim.api
+            ]]
+            initLines        = vim.split(initLines, "\n")
+            expectedLines    = vim.split(expectedLines, "\n")
+            expectedDotLines = vim.split(expectedDotLines, "\n")
 
-                    setUpBuffer(input, "lua")
-                    -- replace
-                    vim.cmd("norm! mm")
-                    fn.setreg("a", "lsp.", "V")
-                    runCommandAndAssert([[gg"agr`m]], expected)
-                    -- replace, via dot
-                    vim.cmd("norm! 0")
-                    fn.setreg("a", "fin", "V")
-                    runCommandAndAssert([[.]], expectedDot)
-            end) -- }}}
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+                vim.fn.setreg("a", "lsp.", "V")
+            vim.cmd("norm! mm")
+            outputLines, outputCursorPos     = feedkeysOutput([[gg"agr`m]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(outputCursorPos, expectedCursorPos)
+            assert.are.same(outputLines, expectedLines)
+
+            -- replace, via dot
+            ---@diagnostic disable-next-line: param-type-mismatch
+                vim.fn.setreg("a", "fin", "V")
+            vim.cmd("norm! 0")
+            outputLines, outputCursorPos     = feedkeysOutput([[.]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
+            assert.are.same(outputLines, expectedLines)
         end) -- }}}
-
-    end)
-
-end) -- }}}
-
-
+    end) -- }}}
+end)

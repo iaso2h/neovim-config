@@ -265,7 +265,9 @@ local replace = function(motionType, vimMode, reg, regionMotion, curBufNr) -- {{
     else
         if util.compareDist(regionMotion.startPos, regionMotion.endPos) > 0 then
             -- This's a rare scenario where startpos is fall behind endpos
-            vim.notify("Startpos fall behind endpos", vim.log.levels.ERROR)
+
+            -- HACK: occurred when execute [[gr"agr$]]
+            -- vim.notify("Startpos fall behind endpos", vim.log.levels.ERROR)
             vim.cmd(string.format("noa norm! %sP", regCMD))
         else
             local visualCMD = motionType == "line" and "V" or "v"
