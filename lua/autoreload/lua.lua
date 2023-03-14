@@ -87,10 +87,11 @@ end
 --- Check whether other lua modules under the same lua directory have been
 --opened and modified in other buffers. If any did, prompt the user to save the
 --changes before reloading them all.
----@param allAbsStr    table  Contains all absolute path strings under the top parent folder
----@param topParentStr string String of the top parent folder directly under the
---lua module search path(Deafult: vim.fn.stdpath("config") .. "lua")
-local checkOtherOpenMod = function (allAbsStr, topParentStr)
+---@param allAbsStr        table  Contains all absolute path strings under the
+--top parent folder
+---@param topParentTailStr string String of the top parent folder directly under
+--the lua module search path(Deafult: vim.fn.stdpath("config") .. "lua")
+local checkOtherOpenMod = function (allAbsStr, topParentTailStr)
     local allBufNr = vim.tbl_map(function(absStr)
         local bufnr
         if absStr:sub(-4, -1) ~= ".lua" then
@@ -102,10 +103,9 @@ local checkOtherOpenMod = function (allAbsStr, topParentStr)
 
             if bufnr == -1 then
                 -- fn.bufnr() will return -1 if buffer doesn't exist
-                local tailStr = util.getTail(absStr)
                 ---@diagnostic disable-next-line: param-type-mismatch
                 bufnr = fn.bufnr(string.format(
-                    "%s%s%s.lua", absStr, util.sep, tailStr, ".lua"))
+                    "%s%s%s.lua", absStr, util.sep, topParentTailStr, ".lua"))
             end
         else
             bufnr = fn.bufnr(absStr)
@@ -129,8 +129,8 @@ local checkOtherOpenMod = function (allAbsStr, topParentStr)
     local pluralStr = #allValidBufNr > 1 and "s" or ""
     vim.cmd "noa echohl MoreMsg"
     local answer = fn.confirm(
-        string.format("Save the modification%s for file%s under the same %s directory?",
-            pluralStr, pluralStr, util.getTail(topParentStr)),
+        string.format("Save the modification%s for file%s under the same [%s] directory?",
+            pluralStr, pluralStr, topParentTailStr),
         ">>> &Yes\n&No", 1, "Question")
     vim.cmd "noa echohl None"
     if answer == 1 then
@@ -228,7 +228,7 @@ M.loadFile = function(path, parentPath, opt) -- {{{
             vim.log.levels.INFO)
     else
         vim.notify(
-            string.format("Reload lua package[%s] at: %s", module, path.filename),
+            string.format("Reloading lua package[%s] at: %s", module, path.filename),
             vim.log.levels.INFO)
 
         -- Load configuration AFTER reloading for specific module match the given path
@@ -248,6 +248,7 @@ M.loadDir = function(path, opt) -- {{{
     local i = tbl_idx(allParentStr, moduleSearchPathStr)
     local topParentStr     = allParentStr[i - 1]
     local topParentTailStr = util.getTail(topParentStr)
+    local pathTailRootStr  = util.getTail(path.filename:sub(1, -5))
 
     local allRelStr = vim.tbl_flatten((getAllRelStr(topParentStr, moduleSearchPathStr)))
     local allAbsStr = vim.tbl_map(function(relStr)
@@ -255,7 +256,7 @@ M.loadDir = function(path, opt) -- {{{
     end, allRelStr)
 
     if #allRelStr ~= 1 then
-        checkOtherOpenMod(allAbsStr, topParentStr)
+        checkOtherOpenMod(allAbsStr, topParentTailStr)
     end
 
     -- Convert to module name form valid for require() function call
@@ -264,7 +265,6 @@ M.loadDir = function(path, opt) -- {{{
         relStr = relStr:gsub(".lua$", "")
         return relStr
     end, allRelStr)
-
     -- Avoid the first lua directory module loaded as "<dirname>.lua" instead as "<dirname>"
     if not package.loaded[allModule[1]] then
         allModule[1] = allModule[1] .. ".lua"
@@ -280,6 +280,13 @@ M.loadDir = function(path, opt) -- {{{
     end, allModule)
 
     if #allLoadedModule == 0 then return end
+    -- No need to reload other module except the <dirname>.lua file and the
+    -- init.lua when that module isn't loaded in runtime. Doesn't worth
+    -- reloading the whole directory because of it
+    if pathTailRootStr ~= "init" and pathTailRootStr ~= topParentTailStr and
+        not vim.tbl_contains(allLoadedModule, allModule[tbl_idx(allAbsStr, path.filename)]) then
+        return
+    end
 
     -- Load setup hook
     hook(opt.setup, path)
@@ -296,53 +303,45 @@ M.loadDir = function(path, opt) -- {{{
 
     -- Reloading
     for idx, module in ipairs(allLoadedModule) do
-        -- Prevent some lua modules get imported automatically due to the
-        -- import from the last lua module
-        if not package.loaded[module] then
-            local moduleIdx = tbl_idx(allModule, module)
-            local relStr = allRelStr[moduleIdx]
-            local absStr = allAbsStr[moduleIdx]
+        local moduleIdx = tbl_idx(allModule, module)
+        local relStr = allRelStr[moduleIdx]
+        local absStr = allAbsStr[moduleIdx]
 
-            local fileChk
-            -- When moduleIdx == 1, even if the file ends with ".lua", it's
-            -- still considered as a directory module
-            if moduleIdx ~= 1 and relStr:sub(-4, -1) == ".lua" then
-                fileChk = true
-            else
-                fileChk = false
-            end
+        local fileChkStr
+        -- When moduleIdx == 1, even if the file ends with ".lua", it's
+        -- still considered as a directory module
+        if moduleIdx ~= 1 and relStr:sub(-4, -1) == ".lua" then
+            fileChkStr = " at"
+        else
+            fileChkStr = ""
+        end
+
+        -- Since some sub-module will be imported automatically when module in high
+        -- hierarchy is being imported, what we need to reload those missing parts
+        if not package.loaded[module] then
 
             local ok, msg = require(module)
             if not ok then
-                if fileChk then
-                    vim.notify(
-                        string.format("Error detected while reloading lua package[%s] at: %s", module, absStr),
-                        vim.log.levels.ERROR)
-                else
-                    vim.notify(
-                        string.format("Error detected while reloading lua package[%s]", module),
-                        vim.log.levels.ERROR)
-                end
+                vim.notify(
+                    string.format("Error detected while reloading lua module[%s]%s: %s", module, fileChkStr, absStr),
+                    vim.log.levels.ERROR)
                 vim.notify(" ", vim.log.levels.INFO)
                 vim.notify(msg, vim.log.levels.ERROR)
                 vim.notify(" ", vim.log.levels.INFO)
                 for i = idx, #allLoadedModule, 1 do
                     vim.notify(
-                        string.format("Lua package[%s] has been unloaded", allLoadedModule[i]),
+                        string.format("Lua module[%s] has been unloaded", allLoadedModule[i]),
                         vim.log.levels.INFO)
                 end
             else
-                if fileChk then
-                    vim.notify(string.format("Reload lua package[%s] at: %s",
-                        module, moduleSearchPathStr .. util.sep .. relStr),
-                        vim.log.levels.INFO)
-                else
-                    vim.notify(
-                        string.format("Reload lua package[%s]: %s",
-                        module, moduleSearchPathStr .. util.sep .. relStr),
-                        vim.log.levels.INFO)
-                end
+                vim.notify(string.format([[Reloading lua module[%s]%s: %s]],
+                    module, fileChkStr, moduleSearchPathStr .. util.sep .. relStr),
+                    vim.log.levels.INFO)
             end
+        else
+            vim.notify(string.format([[             require[%s]%s: %s]],
+                module, fileChkStr, moduleSearchPathStr .. util.sep .. relStr),
+                vim.log.levels.INFO)
         end
 
         -- Load configuration AFTER reloading for specific module match the given path

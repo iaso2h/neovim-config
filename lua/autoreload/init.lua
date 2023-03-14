@@ -58,7 +58,7 @@ M.opt.lua.config = { -- {{{
     -- },
     {
         pathPat  = M.opt.lua.moduleSearchPath:joinpath("onenord").filename,
-        unloadOnlyChk = true,
+        unloadOnlyChk = false,
         callback = function(...)
                 vim.defer_fn(function ()
                     vim.cmd [[silent colorscheme onenord]]
