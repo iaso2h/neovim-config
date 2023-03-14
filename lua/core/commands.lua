@@ -1,7 +1,4 @@
 local api = vim.api
-local M = {
-    augroup = {}
-}
 local augroup = function(...)
     return api.nvim_create_augroup(...)
 end
@@ -139,6 +136,7 @@ au("BufWinEnter", {
     end
 })
 
+-- BUG:
 au("FocusGained", {
     desc    = "Check and file changes after regaining focus",
     command = "checktime"
@@ -227,11 +225,11 @@ end, {
 -- command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | setl norevins
 excmd("Reverse", function(opts)
     if opts.range == 0 then return end
-    if fn.visualmode() == "V" then
+    if vim.fn.visualmode() == "V" then
         return vim.notify("Not support visual line mode", vim.log.levels.WARN)
     end
     vim.cmd("norm! gvd")
-    local keyStr = "i" .. string.reverse(fn.getreg("-", 1)) .. t"<ESC>"
+    local keyStr = "i" .. string.reverse(vim.fn.getreg("-", 1)) .. t"<ESC>"
     api.nvim_feedkeys(keyStr, "tn", true)
 end, {
     desc     = "Reverse selection",
@@ -244,7 +242,7 @@ excmd("RunSelection", function(opts)
        return vim.notify("Only support in Lua file", vim.log.levels.WARN)
     end
 
-    local vimMode = fn.visualmode()
+    local vimMode = vim.fn.visualmode()
     if vimMode == "\22" then
         return vim.notify("Blockwise visual mode is not supported", vim.log.levels.WARN)
     end

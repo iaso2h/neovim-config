@@ -74,11 +74,13 @@ return function()
 
 
     -- example: make gitsigns.nvim movement repeatable with ; and , keys.
-    local gs = require("gitsigns")
-    -- make sure forward function comes first
-    local next_hunk_repeat, prev_hunk_repeat = ts_repeat_move.make_repeatable_move_pair(gs.next_hunk, gs.prev_hunk)
-    -- Or, use `make_repeatable_move` or `set_last_move` functions for more
-    -- control. See the code for instructions.
-    vim.keymap.set({ "n", "x", "o" }, "]h", next_hunk_repeat)
-    vim.keymap.set({ "n", "x", "o" }, "[h", prev_hunk_repeat)
+    if package.loaded.gitsigns then
+        local gs = require("gitsigns")
+        -- make sure forward function comes first
+        local next_hunk_repeat, prev_hunk_repeat = ts_repeat_move.make_repeatable_move_pair(gs.next_hunk, gs.prev_hunk)
+        -- Or, use `make_repeatable_move` or `set_last_move` functions for more
+        -- control. See the code for instructions.
+        vim.keymap.set({ "n", "x", "o" }, "]h", next_hunk_repeat)
+        vim.keymap.set({ "n", "x", "o" }, "[h", prev_hunk_repeat)
+    end
 end

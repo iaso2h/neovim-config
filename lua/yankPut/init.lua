@@ -113,7 +113,6 @@ end -- }}}
 ---        plugMap    string eg: <Plug>myplug
 ---        vimMode    string Vim mode. See: `:help mode()`
 function M.inplaceYank(args) -- {{{
-    -- TODO add opts
     -- opts = opts or {hlGroup="Search", timeout=500}
     local opts = {hlGroup=M.hlGroup, timeout=M.hlInterval}
     local motionType = args[1]

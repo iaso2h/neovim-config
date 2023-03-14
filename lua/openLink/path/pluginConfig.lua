@@ -1,8 +1,4 @@
 local api = vim.api
-local ts = require("vim.treesitter")
-if not ts.language.add(vim.bo.filetype) then
-    return nil
-end
 
 
 local getClosestTopNonFoldLine = function(topline, cursorline)
@@ -17,6 +13,7 @@ end
 
 local findTsNode = function(nodetype, roughResult)
     -- Find parent node at the same line as the initNode is
+    local ts = require("vim.treesitter")
     local initNode = ts.get_node{ bufNr = 0, pos = {roughResult.row - 1, roughResult.col - 1} }
     local initLine = initNode:range() -- (0, 0) indexed
     local parentNode

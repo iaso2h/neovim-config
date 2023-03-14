@@ -188,7 +188,7 @@ M.config = function()
     -- }}} Vimscript
     -- Clangd {{{
     -- https://github.com/llvm/llvm-project/tree/main/clang-tools-extra/clangd
-    local findClangd = function() -- {{{
+    local findClangd = function()
         local cmdStr = {
             "--all-scopes-completion",
             "--background-index",
@@ -218,7 +218,7 @@ M.config = function()
             return cmdStr
         end
 
-    end -- }}}
+    end
 
     local clangdCMD = findClangd()
     if clangdCMD ~= "" then
@@ -241,6 +241,15 @@ M.config = function()
         }
     end
     -- }}} Clangd
+    if _G._os_uname.sysname == "Windows_NT" then
+        servers.marksman = {
+            cmd = {
+                [[C:\Users\Hashub\AppData\Local\nvim-data\mason\packages\marksman\marksman.exe]],
+                "server"
+            }
+
+        }
+    end
     -- }}} LSP config override
 
     -- vim.lsp and vim.diagnostic setups {{{

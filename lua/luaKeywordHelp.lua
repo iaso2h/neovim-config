@@ -7,28 +7,38 @@ return function(word)
     -- TODO: This is kind of a lame hack... since you could rename `vim.api` -> `a` or similar
     if string.find(word, 'vim.api') then
         local _, finish = string.find(word, 'vim.api.')
-        local api_function = string.sub(word, finish + 1)
-        vim.cmd(string.format('help %s', api_function))
+        if finish then
+            local api_function = string.sub(word, finish + 1)
+            vim.cmd(string.format('help %s', api_function))
+        end
         return
     elseif string.find(word, 'vim.treesitter') then
         local _, finish = string.find(word, 'vim.api.')
-        local api_function = string.sub(word, finish + 1)
-        vim.cmd(string.format('help %s', api_function))
+        if finish then
+            local api_function = string.sub(word, finish + 1)
+            vim.cmd(string.format('help %s', api_function))
+        end
         return
     elseif string.find(word, 'vim.lsp') then
         local _, finish = string.find(word, 'vim.lsp.')
-        local api_function = string.sub(word, finish + 1)
-        vim.cmd(string.format('help %s', api_function))
+        if finish then
+            local api_function = string.sub(word, finish + 1)
+            vim.cmd(string.format('help %s', api_function))
+        end
         return
     elseif string.find(word, 'vim.loop') then
         local _, finish = string.find(word, 'vim.loop.')
-        local api_function = string.sub(word, finish + 1)
-        vim.cmd(string.format('help %s', api_function))
+        if finish then
+            local api_function = string.sub(word, finish + 1)
+            vim.cmd(string.format('help %s', api_function))
+        end
         return
     elseif string.find(word, 'vim.fn') then
         local _, finish = string.find(word, 'vim.fn.')
-        local api_function = string.sub(word, finish + 1) .. '()'
-        vim.cmd(string.format('help %s', api_function))
+        if finish then
+            local api_function = string.sub(word, finish + 1) .. '()'
+            vim.cmd(string.format('help %s', api_function))
+        end
         return
     else
         -- TODO: This should be exact match only. Not sure how to do that with `:help`

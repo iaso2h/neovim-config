@@ -255,10 +255,6 @@ M.loadDir = function(path, opt) -- {{{
         return moduleSearchPathStr .. util.sep .. relStr
     end, allRelStr)
 
-    if #allRelStr ~= 1 then
-        checkOtherOpenMod(allAbsStr, topParentTailStr)
-    end
-
     -- Convert to module name form valid for require() function call
     local allModule = vim.tbl_map(function(relStr)
         relStr = relStr:gsub(util.sep, ".")
@@ -286,6 +282,11 @@ M.loadDir = function(path, opt) -- {{{
     if pathTailRootStr ~= "init" and pathTailRootStr ~= topParentTailStr and
         not vim.tbl_contains(allLoadedModule, allModule[tbl_idx(allAbsStr, path.filename)]) then
         return
+    end
+
+    -- Prompt to save other buffers under the same directory when they are modified
+    if #allRelStr ~= 1 then
+        checkOtherOpenMod(allAbsStr, topParentTailStr)
     end
 
     -- Load setup hook
