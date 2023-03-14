@@ -265,6 +265,8 @@ map("n", [[N]], [[<CMD>lua require("searchHop").cycleSearch("N")<CR>]], {"silent
 -- Disable highlight search & Exit visual mode
 map("n", [[<leader>h]], [[<CMD>noh<CR>]], {"silent"}, "Clear highlight")
 map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"}, "Disable highlight")
+-- Matchit
+map("n", [[gm]], [[%]], {"silent"}, "Go to match parenthesis")
 -- Visual selection
 map("n", [[go]],    [[<CMD>lua require("selection").cornerSelection(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
 map({"n", "x"}, [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
@@ -313,8 +315,6 @@ map({"n", "x"}, [[<C-e>]], [[<C-y>]], {"noremap"}, "Scroll up")
 map({"n", "x"}, [[<C-d>]], [[<C-e>]], {"noremap"}, "Scroll down")
 map("t", [[<C-e>]], [[<C-\><C-n><C-y>]], "Scroll up")
 map("t", [[<C-d>]], [[<C-\><C-n><C-d>]], "Scroll down")
-
-map({"n", "x"}, [[%]], [[M]], {"noremap"}, "Jump to the middle of the screen")
 
 map({"n", "x"}, [[<A-e>]], [[<PageUp>]],      "Scroll one window up")
 map({"n", "x"}, [[<A-d>]], [[<PageDown>]],    "Scroll one window down")

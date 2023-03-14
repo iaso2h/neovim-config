@@ -126,8 +126,8 @@ use {
             pattern  = "gitmessengerpopup",
             desc     = "Key binding for git messenger",
             callback = function()
-                map("n", [[<C-o>]], [[o]], "which_key_ignore")
-                map("n", [[<C-i>]], [[O]], "which_key_ignore")
+                bmap(0, "n", [[<C-o>]], [[o]], "which_key_ignore")
+                bmap(0, "n", [[<C-i>]], [[O]], "which_key_ignore")
             end
         })
     end
@@ -190,13 +190,15 @@ use {
             map("n", [[<A-S-c>]], [[<CMD>lua require("caseSwitcher").cycleDefaultCMDList()<CR>]], "Cycle cases reset")
         end,
     }
-    use {
-        'andymass/vim-matchup',
-        event   = "BufAdd",
-        require = "nvim-treesitter",
-        setup   = conf "vim-matchup".setup,
-        config  = conf "vim-matchup".config
-    }
+    -- Performance issue: https://github.com/andymass/vim-matchup/issues/227
+    -- use {
+        -- disable = true,
+        -- 'andymass/vim-matchup',
+        -- event   = "BufAdd",
+        -- require = "nvim-treesitter",
+        -- setup   = conf "vim-matchup".setup,
+        -- config  = conf "vim-matchup".config
+    -- }
 
     map({"n", "x"}, [[<leader>f]], [[<CMD>lua require("hop").hint_char1()<CR>]], "Hop char")
     map({"n", "x"}, [[<leader>F]], [[<CMD>lua require("hop").hint_lines()<CR>]], "Hop line")
@@ -217,6 +219,7 @@ use {
         end
         }
     use {
+        disable = true,
         fn.stdpath("config") .. "/lua/compileRun",
         cmd  = {"Run", "Compile"},
         keys = {"F9", "<S-F9>"},
@@ -284,6 +287,7 @@ use {
         end
     }
     use {
+        disable = true,
         'monaqa/dial.nvim',
         keys = {
             {"n", [[<leader><C-a>]]},
