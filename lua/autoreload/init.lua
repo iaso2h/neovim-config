@@ -3,33 +3,32 @@
 -- Description: reload lua package or vim file at Neovim configuration directory
 -- Version: 0.0.23
 -- Last Modified: 2023-3-13
-local fn   = vim.fn
-local api  = vim.api
-local util = require("autoreload.util")
+local fn    = vim.fn
+local api   = vim.api
+local util  = require("autoreload.util")
 local ok, p = pcall(require, "plenary.path")
 if not ok then
     p = nil
     return
 end
 
-local M    = {
+local M                    = {
     configPath = p:new(_G._configPath),
     opt = {
-        lua = { }
+        lua = {}
     }
 }
 M.opt.lua.moduleSearchPath = M.configPath:joinpath("lua")
-M.opt.lua.blacklist = {
+M.opt.lua.blacklist        = {
     M.configPath:joinpath("lua", "config", "nvim-galaxyline.lua").filename
 }
-M.opt.lua.setup = { }
-M.opt.lua.config = { -- {{{
+M.opt.lua.setup            = {}
+M.opt.lua.config           = { -- {{{
     {
         -- Call the config func from "<NvimConfig>/lua/config/" if it's callable
-        pathPat  = M.opt.lua.moduleSearchPath:joinpath("config").filename,
+        pathPat       = M.opt.lua.moduleSearchPath:joinpath("config").filename,
         unloadOnlyChk = false,
-        callback = function(path, callback)
-
+        callback      = function(path, callback)
             local err = function(msg)
                 vim.notify("Error detect while calling callback function at: " .. path.filename,
                     vim.log.levels.ERROR)
@@ -41,7 +40,7 @@ M.opt.lua.config = { -- {{{
                 ok, msg = pcall(callback)
                 if not ok then return err(msg) end
             elseif type(callback) == "table" then
-                for _, func in ipairs({"setup", "config"}) do
+                for _, func in ipairs({ "setup", "config" }) do
                     if vim.is_callable(callback[func]) then
                         ok, msg = pcall(callback.config)
                         if not ok then return err(msg) end
@@ -52,27 +51,27 @@ M.opt.lua.config = { -- {{{
         end
     },
     -- {
-        -- -- Ask whether to compile lua packages for "<NvimConfig> /lua/core/plugins.lua"
-        -- pathPat = luaModulePath:joinpath("core", "plugins.lua").filename,
-        -- config  = packerCompileQuery
+    -- -- Ask whether to compile lua packages for "<NvimConfig> /lua/core/plugins.lua"
+    -- pathPat = luaModulePath:joinpath("core", "plugins.lua").filename,
+    -- config  = packerCompileQuery
     -- },
     {
-        pathPat  = M.opt.lua.moduleSearchPath:joinpath("onenord").filename,
+        pathPat       = M.opt.lua.moduleSearchPath:joinpath("onenord").filename,
         unloadOnlyChk = false,
-        callback = function(...)
-                vim.defer_fn(function ()
-                    vim.cmd [[silent colorscheme onenord]]
-                end, 0)
-            end
+        callback      = function(...)
+            vim.defer_fn(function()
+                vim.cmd [[silent colorscheme onenord]]
+            end, 0)
+        end
     },
     {
-        pathPat  = M.opt.lua.moduleSearchPath:joinpath("core", "option.lua").filename,
+        pathPat       = M.opt.lua.moduleSearchPath:joinpath("core", "option.lua").filename,
         unloadOnlyChk = false,
-        callback = function(...)
-                vim.defer_fn(function ()
-                    vim.cmd [[silent colorscheme onenord]]
-                end, 0)
-            end
+        callback      = function(...)
+            vim.defer_fn(function()
+                vim.cmd [[silent colorscheme onenord]]
+            end, 0)
+        end
     }
 } -- }}}
 -- Force files that match those patterns to be treated as individual lua file
@@ -106,7 +105,7 @@ M.reload = function() -- {{{
             M.configPath:joinpath("lua", "core"),
             M.configPath:joinpath("lua", "config"),
         }
-        local overrideFileModuleStr = vim.tbl_map(function (i) return i.filename end, overrideFileModulePath)
+        local overrideFileModuleStr = vim.tbl_map(function(i) return i.filename end, overrideFileModulePath)
 
         -- Only reloading lua module from: <nvimconfigpath>/lua/
         if not string.match(path.filename, M.opt.lua.moduleSearchPath.filename) then return end
@@ -115,7 +114,7 @@ M.reload = function() -- {{{
         local parentPath = path:parent()
         local parentStr = parentPath.filename
         if parentStr ~= M.opt.lua.moduleSearchPath.filename and
-                not vim.tbl_contains(overrideFileModuleStr, parentStr) then
+            not vim.tbl_contains(overrideFileModuleStr, parentStr) then
             -- The lua module is a directory
             l.loadDir(path, M.opt.lua)
         else
@@ -125,7 +124,6 @@ M.reload = function() -- {{{
     elseif vim.bo.filetype == "vim" then
         require("autoreload.vim")(path, M.configPath)
     end
-
 end -- }}}
 
 return M

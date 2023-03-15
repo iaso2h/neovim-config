@@ -28,7 +28,6 @@ M.config = function ()
     map("o", [[am]],      [[<Plug>(matchup-a%)]], "Matchup a% text object")
     map("o", [[im]],      [[<Plug>(matchup-i%)]], "Matchup i% text object")
     -- Inclusive
-    -- TODO: optimize with treesitter
     map("",  [[<C-m>]],   [[<Plug>(matchup-%)]], "Matchup forward inclusive")
     map("",  [[<C-S-m>]], [[<Plug>(matchup-g%)]], "Matchup backward inclusive")
     -- Exclusive

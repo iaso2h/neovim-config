@@ -15,6 +15,7 @@ local findTsNode = function(nodetype, roughResult)
     -- Find parent node at the same line as the initNode is
     local ts = require("vim.treesitter")
     local initNode = ts.get_node{ bufNr = 0, pos = {roughResult.row - 1, roughResult.col - 1} }
+    if not initNode then return end
     local initLine = initNode:range() -- (0, 0) indexed
     local parentNode
     local parentNodeLine
@@ -37,7 +38,7 @@ local findTsNode = function(nodetype, roughResult)
 end
 
 
-local regexMatch = function(sep, configPath, cursorPos, roughResult, funcNode)
+local regexMatch = function(cursorPos, roughResult, funcNode)
     -- Pass the function line along with the correspoding offet lines to find the
     -- keyword
     local funcNodeLineIdx = #roughResult.lines - (cursorPos[1] - (funcNode:range() + 1))
@@ -58,7 +59,7 @@ local regexMatch = function(sep, configPath, cursorPos, roughResult, funcNode)
             elseif roughResult.configFile then
                 local configName = string.sub(line, urlStart + 2, urlEnd - 1)
                 local cmdStr = string.format("e %s%slua%sconfig%s%s.lua",
-                    configPath, sep, sep, sep, configName)
+                    _G._configPath, _G._sep, _G._sep, _G._sep, configName)
                 vim.cmd(cmdStr)
                 return
             end
@@ -67,14 +68,15 @@ local regexMatch = function(sep, configPath, cursorPos, roughResult, funcNode)
 end
 
 
-return function(configPath, sep)
+return function()
     local fn = vim.fn
     local cursorPos  = api.nvim_win_get_cursor(0)
 
     -- Avoid parsing through too many lines when there are folded lines above the cursor
     local topline = getClosestTopNonFoldLine(fn.line("w0"), cursorPos[1])
     local halfWinTopline = cursorPos[1] - math.floor(api.nvim_win_get_height(0) / 2)
-    if not topline or halfWinTopline < topline then
+    halfWinTopline = halfWinTopline < 1 and 1 or halfWinTopline
+    if not topline or halfWinTopline > topline then
         topline = halfWinTopline
     else
         topline = topline
@@ -111,7 +113,7 @@ return function(configPath, sep)
                 roughResult.lineOffset = 1
                 -- Precise pattern is use for regex pattern matching after a ts
                 -- node is found
-                roughResult.precisePat = [[^\s*\zs\('\|"\)\w.\{-}\/.\{-}\('\|"\)]]
+                roughResult.precisePat = [[^\s*\(use\)\?\s*\zs\('\|"\)\w.\{-}\/.\{-}\('\|"\)]]
                 roughResult.githubRepo = true
             elseif confIdx then
                 roughResult.col = confIdx
@@ -126,7 +128,7 @@ return function(configPath, sep)
             if funcNode then
                 -- Use the regex to match against the keyword and compose a url
                 -- string to return
-                return regexMatch(sep, configPath, cursorPos, roughResult, funcNode)
+                return regexMatch(cursorPos, roughResult, funcNode)
             else
                 -- Entering the next iteration of for loop
             end

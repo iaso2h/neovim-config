@@ -20,8 +20,10 @@ opt.tabstop     = 4
 
 if _G._os_uname.sysname == "Windows_NT" then
     opt.clipboard = "unnamed"
+    opt.keywordprg = ":help"
 elseif _G._os_uname.machine ~= "aarch64" then
     opt.clipboard = "unnamed,unnamedplus"
+    opt.keywordprg = ":Man"
 end
 
 opt.cmdheight  = 2

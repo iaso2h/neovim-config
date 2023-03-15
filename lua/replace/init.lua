@@ -86,7 +86,7 @@ end -- }}}
 --- @param motionDirection number 1 indicate motion like "j, w, f" is moving
 --- forward -1 indicates motion is moving backward
 --- @param vimMode string Vim mode
---- @return string/boolean Value of changed register content or false if no
+--- @return string Value of changed register content or false if no
 --- content changed
 --- when reindentation is successful
 local reindent = function(regContent, regionMotion, motionDirection, vimMode) -- {{{
@@ -111,13 +111,13 @@ local reindent = function(regContent, regionMotion, motionDirection, vimMode) --
     end
 
     -- Get reindent count
-    local reindent = bufferIndent - register.getIndent(regContent)
+    local count = bufferIndent - register.getIndent(regContent)
 
     -- Reindent the lines if counts do not match up
-    if reindent ~= 0 then
-        return register.reindent(reindent, regContent)
+    if count ~= 0 then
+        return register.reindent(count, regContent)
     else
-        return false
+        return ""
     end
 end -- }}}
 
@@ -154,7 +154,7 @@ local matchRegType = function(motionType, vimMode, reg, regionMotion, motionDire
         -- Adapt register for blockwise replace.
         -- TODO: tests required
 
-        local lines    = vim.split(reg.content, "\n", false)
+        local lines    = vim.split(reg.content, "\n", {trimempty = true})
         local linesCnt = #lines
 
         if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
@@ -164,7 +164,7 @@ local matchRegType = function(motionType, vimMode, reg, regionMotion, motionDire
             if height > 1 then
                 local linesConcn = {}
                 for _ = 1, height, 1 do
-                    linesConcn = tbl_merge(linesConcn, lines)
+                    linesConcn = vim.list_extend(linesConcn, lines)
                 end
 
                 local regContentNew = table.concat(linesConcn, "\n")
@@ -185,7 +185,7 @@ local matchRegType = function(motionType, vimMode, reg, regionMotion, motionDire
             if motionType == "line" then
                 local regContentNew = reindent(reg.content, regionMotion, motionDirection, vimMode)
                 -- Reindent register content when it's available
-                if regContentNew then
+                if regContentNew ~= "" then
                     ---@diagnostic disable-next-line: param-type-mismatch
                     fn.setreg(reg.name, regContentNew, "v")
                     reg.content = regContentNew
@@ -204,7 +204,7 @@ local matchRegType = function(motionType, vimMode, reg, regionMotion, motionDire
             if motionType == "line" then
                 local regContentNew = reindent(reg.content, regionMotion, motionDirection, vimMode)
                 -- Reindent register content when it's available
-                if regContentNew then
+                if regContentNew ~= "" then
                     if vim.endswith(regContentNew, "\n") then
                         regContentNew = string.sub(regContentNew, 1, -2)
                     end
@@ -235,7 +235,7 @@ local matchRegType = function(motionType, vimMode, reg, regionMotion, motionDire
     elseif vimMode == "V" then
         local regContentNew = reindent(reg.content, regionMotion, motionDirection, vimMode)
         -- Reindent register content when it's available
-        if regContentNew then
+        if regContentNew ~= "" then
             fn.setreg(reg.name, regContentNew, reg.type)
             reg.content = regContentNew
         end
@@ -243,6 +243,8 @@ local matchRegType = function(motionType, vimMode, reg, regionMotion, motionDire
     else
         -- TODO: more vimMode and tests
     end
+
+    return true
 end -- }}}
 
 
@@ -444,8 +446,8 @@ function M.operator(args) -- {{{
     -- Replace with new content
     local regionReplace
     ok, msg = pcall(replace, motionType, vimMode, reg, regionMotion, M.curBufNr)
-    ---@diagnostic disable-next-line: param-type-mismatch
     if not ok then
+        ---@diagnostic disable-next-line: param-type-mismatch
         vim.notify(msg, vim.log.levels.ERROR)
     else
         regionReplace = msg
@@ -568,7 +570,6 @@ end -- }}}
 ---@param highlightChangeChk boolean Whether to highlight the change. Only
 --support turnig off highlight changes in vim normal mode!
 ---@return string "g@"
----@return
 function M.expr(restoreCursorChk, highlightChangeChk) -- {{{
     -- TODO: Detect virutal edit
     if not warnRead() then return "" end

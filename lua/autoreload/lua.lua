@@ -7,15 +7,15 @@ local M    = {
 }
 
 
-local packerCompileQuery = function(...)
-    local answer = fn.confirm("Update packages?", "&Sync\ncom&Pile\n&No", 3)
+-- local packerCompileQuery = function(...)
+    -- local answer = fn.confirm("Update packages?", "&Sync\ncom&Pile\n&No", 3)
 
-    if answer == 1 then
-        vim.cmd [[PackerSync]]
-    elseif answer == 2 then
-        vim.cmd [[PackerCompile]]
-    end
-end
+    -- if answer == 1 then
+        -- vim.cmd [[PackerSync]]
+    -- elseif answer == 2 then
+        -- vim.cmd [[PackerCompile]]
+    -- end
+-- end
 
 
 local getAllRelStr

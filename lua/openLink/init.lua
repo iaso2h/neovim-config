@@ -51,7 +51,7 @@ function M.main(selectText)
         local filePath = fn.expand("%:p")
 
         if filePath == string.format("%s%slua%score%splugins.lua", _G._configPath, _G._sep, _G._sep, _G._sep) then
-            url = require("openLink.path.pluginConfig")(_G._configPath, _G._sep)
+            url = require("openLink.path.pluginConfig")()
             if url then
                 return openUrl(url)
             end

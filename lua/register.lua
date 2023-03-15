@@ -26,11 +26,9 @@ end -- }}}
 
 --- Prompt for inserting register
 M.insertPrompt = function() -- {{{
-    -- TODO: Custom register completion prompt
     local regexAll = vim.regex(M.all)
     local reg
     vim.cmd [[noa reg]]
-
     vim.cmd [[noa echohl Moremsg]]
     repeat
         local ok, msg = pcall(fn.input, "Register: ")
@@ -43,23 +41,38 @@ M.insertPrompt = function() -- {{{
         else
             reg = msg
         end
-
     until (#reg == 1 and regexAll:match_str(reg)) or vim.notify("    Invalid register name", vim.log.levels.ERROR)
     vim.cmd [[noa echohl None]]
+
+    if reg == "" then return end
 
     -- local regContent = reg == "=" and fn.getreg(reg, 1) or fn.getreg(reg, 0)
     local regType    = fn.getregtype(reg)
     local regContent = fn.getreg(reg, 0)
 
+
     if regType == "" then
         return
     elseif regType == "V" or regType == "line" then
-        regContent = string.gsub(regContent, "\n", "")
-        api.nvim_put({regContent}, "c", true, false)
+        local lines = vim.split(regContent:sub(1, -2), "\n")
+        api.nvim_put(lines, "l", true, false)
     else
         api.nvim_put({regContent}, "c", true, false)
     end
 end -- }}}
+
+
+
+
+local stringCount = function(str, pattern)
+    local count = 0
+    local init = 0
+    while true do
+        init = string.find(str, pattern, init + 1)
+        if not init then return count end
+        count = count + 1
+    end
+end
 
 
 --- Reindent the register content
@@ -145,7 +158,7 @@ M.saveReg = function() -- {{{
         nonDefaultType    = fn.getregtype(nonDefaultName)
     end
     M.restoreReg = function()
-        if nonDefaultContent and nonDefaultContent ~= "" then
+        if nonDefaultContent and nonDefaultContent then
             ---@diagnostic disable-next-line: param-type-mismatch
             fn.setreg(nonDefaultName, nonDefaultContent, nonDefaultType)
         end
@@ -166,6 +179,7 @@ M.saveReg = function() -- {{{
         vim.defer_fn(function() M.restoreReg = nil end, 1000)
     end
 end -- }}}
+
 
 return M
 
