@@ -325,6 +325,7 @@ theme.treesitter         = {
     theme.treesitter["@keyword.function"] = {link = "Keyword"}
     theme.treesitter["@keyword.return"]   = {link = "TSKeywordReturn"}
     theme.treesitter["@keyword.operator"] = {link = "Keyword"}
+    theme.treesitter["@keyword.break"]    = {link = "TSKeywordReturn"}
     theme.treesitter["@repeat"]           = {link = "Repeat"}
     theme.treesitter["@string"]           = {link = "String"}
     theme.treesitter["@string.regex"]     = {link = "TSStringRegex"}

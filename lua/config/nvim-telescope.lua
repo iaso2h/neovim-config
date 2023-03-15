@@ -18,7 +18,7 @@ local defaultTheme = {
         '--column',
         '--smart-case',
         '--follow',
-        '-u'
+        -- '-u'
     },
     prompt_prefix      = "$ ",
     selection_caret    = "  ",

@@ -32,6 +32,7 @@ return function()
                 goto_next_start = {
                     ["]f"] = "@function.outer",
                     ["]]"] = "@class.outer",
+                    ["]z"] = "@fold_marker_end",
                 },
                 goto_next_end = {
                     ["]F"] = "@function.outer",
@@ -40,6 +41,7 @@ return function()
                 goto_previous_start = {
                     ["[f"] = "@function.outer",
                     ["[["] = "@class.outer",
+                    ["[z"] = "@fold_marker_start",
                 },
                 goto_previous_end = {
                     ["[F"] = "@function.outer",
