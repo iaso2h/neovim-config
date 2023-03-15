@@ -29,27 +29,19 @@ _G.Print = function(...)
 end
 
 
-_G.isFloatWin = function(winID)
-    return api.nvim_win_get_config(winID and winID or 0).relative ~= ""
-end
-
-
 _G.ex = function(exec) return fn.executable(exec) == 1 end
 
 
-----
--- Function: _G.tbl_remove: Remove value from list-liked lua table
---
--- @param tbl:          List-liked table
--- @param srcVal:       Srouce value to be look up and removed
--- @param removeAllChk: Boolean value, default is true. Whether to remove the
---                      all values or not
--- @param cnt:          Integer value, default is 1. Determine how many value
---                      o be removed when firstOnlyChk is false
--- @return: Integer, table or nil. idx of the value. idx of table will be return when there are more
---          than one idx to be return. nil will be return when no idx found
-----
- _G.tbl_remove = function(tbl, srcVal, removeAllChk, cnt)
+--- Remove value from list-liked lua table
+---@param tbl table List-like table
+---@param srcVal any Srouce value to be look up and removed
+---@param removeAllChk boolean|nil Default is true. Whether to remove the
+--all values or not
+---@param cnt number|nil default is 1. Determine how many value
+--will be removed when firstOnlyChk is false
+---@return number|table|nil Index of the value. Index of table will be return
+--when there are more than one idx to be return. nil will be return when no idx found
+local tbl_remove = function(tbl, srcVal, removeAllChk, cnt)
     assert(next(tbl), "Empty table is not allowed")
     assert(vim.tbl_islist(tbl), "Expect list-liked table")
 
@@ -82,19 +74,16 @@ _G.ex = function(exec) return fn.executable(exec) == 1 end
 end
 
 
-----
--- Function: _G.tbl_replace: Replace value1 inside list-liked table with value2
---
--- @param tbl:       List-liked table of which value to be replaced
--- @param repVal:    Value to replace with
--- @param srcVal:    Source value to be replaced
--- @param repAllChk: Boolean value, default is true. Whether to replace all value or not
--- @param cnt:       Integer value, default is 1. Determine how many srcVal
---                   will be replaced
--- @param alertOnFail: Boolean value, default is false. Whether to alert when
--- replace failed
--- @return: nil
-----
+--- Replace value1 inside list-like table with value2
+---@param tbl       table   List-like table of which value to be replaced
+---@param repVal    any     Value to replace with
+---@param srcVal    any     Source value to be replaced
+---@param repAllChk boolean Default is true. Whether to replace all value or not
+---@param cnt       number  Default is 1. Determine how many srcVal
+--will be replaced
+---@param alertOnFail boolean Default is false. Whether to alert when
+--replace failed
+---@return nil
 _G.tbl_replace = function(tbl, repVal, srcVal, repAllChk, cnt, alertOnFail)
     repAllChk = repAllChk or true
     cnt = cnt or 1
@@ -127,26 +116,6 @@ _G.tbl_replace = function(tbl, repVal, srcVal, repAllChk, cnt, alertOnFail)
         end
     end
 
-end
-
-
-----
--- Function: _G.tbl_merge: Concanate two or more list like table
---
--- @param ...: Table
-----
-_G.tbl_merge = function(...)
-    local tblConcanated = {}
-    for i = 1, select('#', ...) do
-        local tbl = select(i, ...)
-        assert(vim.tbl_islist(tbl), "Only list-liked table allowed")
-        if next(tbl) then
-            for _, value in ipairs(tbl) do
-                tblConcanated[#tblConcanated+1] = value
-            end
-        end
-    end
-    return tblConcanated
 end
 
 

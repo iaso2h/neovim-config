@@ -63,91 +63,90 @@ local configArgs = {function(use, use_rocks) -- {{{
         module_pattern = "plenary.*"
     }
     -- }}} Dependencies
--- Treesitter {{{
-use {
-    'nvim-treesitter/nvim-treesitter',
-    run = function()
-        require('nvim-treesitter.install').update({with_sync = true})
-        ---@diagnostic disable-next-line: undefined-global
-        ts_update()
-    end,
-    config = conf "nvim-treesitter"
-}
-use {
-    'nvim-treesitter/playground',
-    after    = "nvim-treesitter",
-    cmd      = "TSPlaygroundToggle",
-    keys     = {{"n", "gH"}},
-    config   = function()
-        require "nvim-treesitter.configs".setup {
-            playground = {
-                enable          = true,
-                disable         = {},
-                updatetime      = 25,    -- Debounced time for highlighting nodes in the playground from source code
-                persist_queries = false, -- Whether the query persists across vim sessions
-                keybindings     = {
-                    toggle_query_editor       = 'o',
-                    toggle_hl_groups          = 'i',
-                    toggle_injected_languages = 't',
-                    toggle_anonymous_nodes    = 'a',
-                    toggle_language_display   = 'I',
-                    focus_language            = 'f',
-                    unfocus_language          = 'F',
-                    update                    = 'R',
-                    goto_node                 = '<CR>',
-                    show_help                 = '?',
-                },
+    -- Treesitter {{{
+    use {
+        'nvim-treesitter/nvim-treesitter',
+        run = function()
+            require('nvim-treesitter.install').update({with_sync = true})
+            ---@diagnostic disable-next-line: undefined-global
+            ts_update()
+        end,
+        config = conf "nvim-treesitter"
+    }
+    use {
+        'nvim-treesitter/playground',
+        after    = "nvim-treesitter",
+        cmd      = "TSPlaygroundToggle",
+        keys     = {{"n", "gH"}},
+        config   = function()
+            require "nvim-treesitter.configs".setup {
+                playground = {
+                    enable          = true,
+                    disable         = {},
+                    updatetime      = 25,    -- Debounced time for highlighting nodes in the playground from source code
+                    persist_queries = false, -- Whether the query persists across vim sessions
+                    keybindings     = {
+                        toggle_query_editor       = 'o',
+                        toggle_hl_groups          = 'i',
+                        toggle_injected_languages = 't',
+                        toggle_anonymous_nodes    = 'a',
+                        toggle_language_display   = 'I',
+                        focus_language            = 'f',
+                        unfocus_language          = 'F',
+                        update                    = 'R',
+                        goto_node                 = '<CR>',
+                        show_help                 = '?',
+                    },
+                }
             }
-        }
 
-        map("n", [[gH]], [[<CMD>TSHighlightCapturesUnderCursor<CR>]], {"silent"}, "Show Tree sitter highlight group")
-    end
-}
-use {
-    'romgrk/nvim-treesitter-context',
-    after  = "nvim-treesitter",
-    event  = {"CursorHold", "CursorHoldI"},
-    config = [[require("treesitter-context").setup()]]
-}
-use {
-    'lewis6991/gitsigns.nvim',
-    config = conf "nvim-gitsigns"
-}
-use {
-    'rhysd/git-messenger.vim',
-    key = {{"n", "<C-h>b"}},
-    setup = function()
-        vim.g.git_messenger_no_default_mappings = true
-        vim.g.git_messenger_floating_win_opts = {border = 'single'}
-    end,
-    config = function ()
-        map("n", [[<C-h>b]], [[<Plug>(git-messenger)]], "Git Messenger")
-        vim.api.nvim_create_autocmd("FileType",{
-            pattern  = "gitmessengerpopup",
-            desc     = "Key binding for git messenger",
-            callback = function()
-                bmap(0, "n", [[<C-o>]], [[o]], "which_key_ignore")
-                bmap(0, "n", [[<C-i>]], [[O]], "which_key_ignore")
-            end
-        })
-    end
-}
-use {
-    "nvim-treesitter/nvim-treesitter-textobjects",
-    event = "BufAdd",
-    after = {
-        "nvim-treesitter",
-        "gitsigns.nvim"
-    },
-    config = conf "nvim-treesitter-textobjects"
-}
-use {
-    'windwp/nvim-ts-autotag',
-    event    = "InsertEnter",
-    after    = "nvim-treesitter",
-    ft       = {"html", "javascript", "javascriptreact", "typescriptreact", "svelte", "vue"},
-    config   = [[require("nvim-treesitter.configs").setup {autotag = {enable = true}}]]
-}
+            map("n", [[gH]], [[<CMD>TSHighlightCapturesUnderCursor<CR>]], {"silent"}, "Show Tree sitter highlight group")
+        end
+    }
+    use {
+        'romgrk/nvim-treesitter-context',
+        after  = "nvim-treesitter",
+        event  = {"CursorHold", "CursorHoldI"},
+        config = [[require("treesitter-context").setup()]]
+    }
+    use {
+        'lewis6991/gitsigns.nvim',
+        config = conf "nvim-gitsigns"
+    }
+    use {
+        'rhysd/git-messenger.vim',
+        key = {{"n", "<C-h>b"}},
+        setup = function()
+            vim.g.git_messenger_no_default_mappings = true
+            vim.g.git_messenger_floating_win_opts = {border = 'single'}
+        end,
+        config = function ()
+            map("n", [[<C-h>b]], [[<Plug>(git-messenger)]], "Git Messenger")
+            vim.api.nvim_create_autocmd("FileType",{
+                pattern  = "gitmessengerpopup",
+                desc     = "Key binding for git messenger",
+                callback = function()
+                    bmap(0, "n", [[<C-o>]], [[o]], "which_key_ignore")
+                    bmap(0, "n", [[<C-i>]], [[O]], "which_key_ignore")
+                end
+            })
+        end
+    }
+    use {
+        "nvim-treesitter/nvim-treesitter-textobjects",
+        -- after = {
+            -- "nvim-treesitter",
+            -- "gitsigns.nvim"
+        -- },
+        config = conf "nvim-treesitter-textobjects"
+    }
+    use {
+        'windwp/nvim-ts-autotag',
+        event    = "InsertEnter",
+        after    = "nvim-treesitter",
+        ft       = {"html", "javascript", "javascriptreact", "typescriptreact", "svelte", "vue"},
+        config   = [[require("nvim-treesitter.configs").setup {autotag = {enable = true}}]]
+    }
 
 -- }}} Treesitter
     -- Vim enhancement {{{
@@ -620,29 +619,35 @@ use {
         config = conf("nvim-mason-lspconfig").config
     }
     use {
-        'neovim/nvim-lspconfig',
-        event = "BufAdd",
+        "jay-babu/mason-null-ls.nvim",
+        event = {"BufAdd", "BufNewFile"},
+        after = "mason.nvim",
+        requires = {
+            "jose-elias-alvarez/null-ls.nvim",
+        },
+        config = conf "nvim-null-is"
     }
     use {
         'folke/neodev.nvim',
-        requires = "nvim-lspconfig",
-        after    = {"nvim-lspconfig", "plenary.nvim", "cmp-nvim-lsp"},
+        requires = "neovim/nvim-lspconfig",
+        after    = {"plenary.nvim", "cmp-nvim-lsp"},
         config   = function()
             require("neodev").setup{
-                library = { plugins = {
-                    "nvim-dap-ui",
-                    "plenary",
-                    "nvim-treesitter",
-                },
+                library = {
+                    plugins = {
+                        "nvim-dap-ui",
+                        "plenary",
+                        "nvim-treesitter",
+                    },
                 types = true },
             }
-            require("config.nvim-lspconfig").config()
+            require("config.nvim-lspconfig")()
     end
     }
     use 'rafamadriz/friendly-snippets'
     use {
         "L3MON4D3/LuaSnip",
-        run      = "make install_jsregexp",
+        run    = "make install_jsregexp",
         config = function ()
             local mySnippets = vim.fn.stdpath("config") .. _G._sep .. "snippets"
             require("luasnip.loaders.from_vscode").lazy_load()
@@ -722,58 +727,7 @@ use {
         'folke/trouble.nvim',
         after  = "nvim-lspconfig",
         cmd    = "Trouble",
-        config = function()
-            require("trouble").setup {
-                position    = "bottom",  -- position of the list can be: bottom, top, left, right
-                height      = 15,        -- height of the trouble list when position is top or bottom
-                width       = 50,        -- width of the list when position is left or right
-                icons       = true,      -- use devicons for filenames
-                mode        = "workspace_diagnostics", -- "lsp_workspace_diagnostics", "lsp_document_diagnostics", "quickfix", "lsp_references", "loclist"
-                fold_open   = "",  -- icon used for open folds
-                fold_closed = "",  -- icon used for closed folds
-                group = true,       -- group results by file
-                padding = false,    -- add an extra new line on top of the list
-                action_keys = {
-                    -- key mappings for actions in the trouble list
-                    -- map to {} to remove a mapping, for example:
-                    -- close = {},
-                    close          = "q",                 -- close the list
-                    cancel         = {"<esc>", "<C-o>"},  -- cancel the preview and get back to your last window / buffer / cursor
-                    refresh        = "r",                 -- manually refresh
-                    jump           = {"<CR>", "o"},       -- jump to the diagnostic or open / close folds
-                    open_split     = "<C-s>",             -- open buffer in new split
-                    open_vsplit    = "<C-v>",             -- open buffer in new vsplit
-                    open_tab       = "<C-t>",             -- open buffer in new tab
-                    jump_close     = "O",                 -- jump to the diagnostic and close the list
-                    toggle_mode    = "<Tab>",             -- toggle between "workspace" and "document" diagnostics mode
-                    toggle_preview = "P",                 -- toggle auto_preview
-                    hover          = "K",                 -- opens a small popup with the full multiline message
-                    preview        = "p",                 -- preview the diagnostic location
-
-                    close_folds    = {"zM", "zm"},        -- close all folds
-                    open_folds     = {"zR", "zr"},        -- open all folds
-                    toggle_fold    = "<Leader><Space>",   -- toggle fold of current file
-
-                    previous       = "k",                 -- preview item
-                    next           = "j"                  -- next item
-                },
-
-                indent_lines = true, -- add an indent guide below the fold icons
-                auto_open    = false, -- automatically open the list when you have diagnostics
-                auto_close   = false, -- automatically close the list when you have no diagnostics
-                auto_preview = false, -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
-                auto_fold    = true,  -- automatically fold a file trouble list at creation
-                signs        = {
-                -- icons / text used for a diagnostic
-                    error       = "",
-                    warning     = "",
-                    hint        = "",
-                    information = "",
-                    other       = "﫠"
-                },
-                use_diagnostic_signs = true -- enabling this will use the signs defined in your lsp client
-            }
-        end
+        config = conf "nvim-trouble"
     }
     use {
         'ray-x/lsp_signature.nvim',

@@ -1,0 +1,7 @@
+std = "neovim"
+
+# https://kampfkarren.github.io/selene/lints/index.html
+[lints]
+empty_if = "allow"
+
+# vim:ts=2:sts=2:sw=2

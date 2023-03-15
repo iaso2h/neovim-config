@@ -9,6 +9,7 @@ M.shortLineList = {
     "term",
     "qf",
     "NvimTree",
+    "Trouble",
     "HistoryStartup",
     "dap-repl",
     "dapui_watches",

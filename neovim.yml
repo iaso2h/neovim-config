@@ -1,0 +1,80 @@
+# https://kampfkarren.github.io/selene/usage/std.html
+---
+base: lua51
+
+globals:
+  vim:
+    any: true
+  assert:
+    args:
+      - type: bool
+      - required: false
+        type: string
+  after_each:
+    args:
+      - type: function
+  before_each:
+    args:
+      - type: function
+  describe:
+    args:
+      - type: string
+      - type: function
+  it:
+    args:
+      - type: string
+      - type: function
+
+  map:
+    args:
+      - type: any
+      - type: string
+      - type: any
+      - required: false
+        type: ...
+  bmap:
+    args:
+      - type: number
+      - type: any
+      - type: string
+      - type: any
+      - required: false
+        type: ...
+
+  luaRHS:
+    args:
+      - type: string
+  t:
+    args:
+      - type: string
+
+  Print:
+    args:
+      - type: ...
+
+  ex:
+    args:
+      - type: string
+
+  tbl_idx:
+    args:
+      - type: table
+      - type: number
+      - type: bool
+        required: false
+  tbl_replace:
+    args:
+      - type: table
+      - type: any
+      - type: any
+      - type: bool
+        required: false
+      - type: number
+        required: false
+      - type: bool
+        required: false
+  nvim_buf_get_name:
+    args:
+      - type: number
+
+# vim:ts=2:sts=2:sw=2

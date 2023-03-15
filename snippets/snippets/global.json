@@ -9,5 +9,10 @@
             "-- Last Modified: $5"
         ],
         "description": "File infomation"
+    },
+    "modeline": {
+        "prefix": "modeline",
+        "body": [ "vim:ts=2:sts=2:sw=2:ft=$0" ],
+        "description": "Write vim modeline"
     }
 }
