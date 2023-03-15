@@ -451,7 +451,7 @@ local configArgs = {function(use, use_rocks) -- {{{
                 char_blankline   = "▏",
                 context_char     = "▏",
                 buftype_exclude  = {"terminal"},
-                filetype_exclude = {"help", "startify", "NvimTree", "Trouble", "packer"},
+                filetype_exclude = require("config.nvim-galaxyline").shortLineList,
                 bufname_exclude  = {"*.md"},
                 char_highlight_list = {"SignColumn"},
                 show_current_context           = true,
@@ -769,7 +769,7 @@ local configArgs = {function(use, use_rocks) -- {{{
         config = function()
             require("refactoring").setup{}
             map("x", [[gf]],  [[<CMD>lua require("refactoring").select_refactor()<CR>]],              {"silent"}, "Extract selected")
-            map("n", [[gfp]], [[<CMD>lua require("refactoring").debug.print_var{normal = true}<CR>]], {"silent"}, "Debug print vairiable under cursor")
+            map("n", [[gfp]], [[<CMD>lua require("refactoring").debug.print_var{normal = true}<CR>]], {"silent"}, "Debug print variable under cursor")
             map("n", [[gfv]], [[<CMD>lua require("refactoring").debug.printf{below = false}<CR>]],    {"silent"}, "Debug printf")
             map("n", [[gfc]], [[<CMD>lua require("refactoring").debug.cleanup()<CR>]],                {"silent"}, "Debug clean up")
         end
@@ -805,7 +805,7 @@ local configArgs = {function(use, use_rocks) -- {{{
     }
 
     map("n", [[<leader>db]], [[<CMD>lua require("dap").toggle_breakpoint()<CR>]], {"silent"}, "Dap toggle breakpoint")
-    -- OPTIM:Dirty workaround to setup keymapping, probably due to the aync requrie
+    -- OPTIM:Dirty workaround to setup keymapping, probably due to the async require
     use {
         'mfussenegger/nvim-dap',
         module = "dap",

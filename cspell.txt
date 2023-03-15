@@ -28,3 +28,4 @@ buftype
 jsdoc 
 emmylua 
 camelsnek 
+opfunc 
