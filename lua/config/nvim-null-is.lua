@@ -2,17 +2,6 @@ return function()
     local null_ls = require "null-ls"
     local mason_null_is = require "mason-null-ls"
 
-    mason_null_is.setup {
-        ensure_installed = {
-            "stylua", "selene",
-            "deno",
-            "black",
-            "beautysh",
-            "write-good",
-        },
-        automatic_installation = true,
-    }
-
     local onAttach = function(client, bufNr)
         if client.supports_method("textDocument/formatting") then
             bmap(bufNr, "n", [[<A-f>]], [[<CMD>lua vim.lsp.buf.format{async=true}<CR>]], { "silent" }, "Format")
@@ -22,35 +11,136 @@ return function()
         end
     end
 
-    null_ls.setup {
-        -- Not supported by mason.
-        sources = {
-            null_ls.builtins.formatting.emacs_scheme_mode
+
+    local selene = null_ls.builtins.diagnostics.selene.with { -- {{{
+        extra_args = function(params)
+            local results = vim.fs.find({ "selene.toml" }, {
+                upward = true,
+                path = vim.api.nvim_buf_get_name(0),
+            })
+            if #results == 0 then
+                return params
+            else
+                return { "--config", results[1] }
+            end
+        end,
+        filter = function(diagnostic)
+            if not diagnostic.message then return true end
+            local filterMsg = {
+                [[use of `_G` is not allowed]],
+            }
+            for _, msg in ipairs(filterMsg) do
+                 if string.match(diagnostic.message, msg) then
+                     return false
+                 end
+            end
+            return true
+        end
+    } -- }}}
+    vim.g.cspellEnable = false -- {{{
+    vim.api.nvim_create_user_command("CSpellEnable", function ()
+        vim.g.cspellEnable = not vim.g.cspellEnable
+        local state = vim.g.cspellEnable and "Enabled" or "Disabled"
+        vim.api.nvim_echo({ { string.format("CSpell has been %s", state), "Moremsg" } }, false, {})
+    end, {
+        desc  = "Toggle CSpell checking",
+        nargs = 0,
+    })
+
+    local cspell = null_ls.builtins.diagnostics.cspell.with {
+        extra_args = {
+            -- "--gitignore",
+            "--config",
+            string.format([[%s%scspell.json]], _G._configPath, _G._sep),
         },
-        -- diagnostics_format = "[#{c}] #{m} (#{s})",
-        on_attach = onAttach
+        runtime_condition = function() return vim.g.cspellEnable end,
+        diagnostics_postprocess = function(diagnostic)
+            diagnostic.severity = vim.diagnostic.severity.WARN
+        end
     }
 
-    mason_null_is.setup_handlers {
-        function(source_name, methods)
-            -- all sources with no handler get passed here To keep the original
-            -- functionality of `automatic_setup = true`, please add the below.
-            require("mason-null-ls.automatic_setup")(source_name, methods)
-        end,
-        selene = function(source_name, methods)
-            null_ls.register(null_ls.builtins.diagnostics.selene.with {
-                extra_args = function(params)
-                    local results = vim.fs.find({ "selene.toml" }, {
-                        upward = true,
-                        path = vim.api.nvim_buf_get_name(0),
-                    })
-                    if #results == 0 then
-                        return params
-                    else
-                        return { "--config", results[1] }
+    -- Add new word to ignore dictionary {{{
+    -- Credit: https://zenn.dev/kawarimidoll/articles/2e99432d27eda3
+    local cspellAppend = function(opts)
+        local word = opts.args
+        if not word or word == "" then
+            word = vim.fn.expand("<cword>"):lower()
+        end
+
+        local filePath = string.format("%s%scspell.txt", _G._configPath, _G._sep)
+        io.popen(string.format("echo %s >> %s", word, filePath))
+        vim.notify(string.format([["%s" is appended to user dictionary.]], word), vim.log.levels.INFO)
+
+        if vim.o.modifiable then
+            vim.api.nvim_set_current_line(vim.api.nvim_get_current_line())
+        end
+    end
+
+    vim.api.nvim_create_user_command("CSpellAppend", cspellAppend, { nargs = "?", bang = true })
+
+    local cspellAppendAction = {
+        method = null_ls.methods.CODE_ACTION,
+        filetypes = {},
+        generator = {
+            fn = function(_)
+                local cursorPos = vim.api.nvim_win_get_cursor(0)
+                local lnum = cursorPos[1] - 1
+                local col  = cursorPos[2]
+
+                local diagnostics = vim.diagnostic.get(0, { lnum = lnum })
+
+                local word = ""
+                local regex = "^Unknown word %((%w+)%)$"
+                for _, v in pairs(diagnostics) do
+                    -- HACK: v.end_col will be 0 if same error occurred on the
+                    -- same line
+                    if v.source == "cspell" and v.col <= col and col <= v.end_col and string.match(v.message, regex) then
+                        word = string.gsub(v.message, regex, "%1"):lower()
+                        break
                     end
                 end
-            })
-        end,
+
+                if word == "" then
+                    return
+                end
+
+                return {
+                    {
+                        title = 'Append "' .. word .. '" to user dictionary',
+                        action = function()
+                            cspellAppend({ args = word })
+                        end,
+                    },
+                }
+            end,
+        },
+    } -- }}} Add new word to ignore dictionary
+    -- }}}
+
+    local builtinSource = {
+        cspellAppend      = cspellAppendAction,
+        emacs_scheme_mode = null_ls.builtins.formatting.emacs_scheme_mode
+    }
+    for _, source in pairs(builtinSource) do null_ls.register(source) end
+
+    -- Auto setup by mason
+    local handlerArgs = {
+        cspell            = function() null_ls.register(cspell) end,
+        stylua            = function() null_ls.register(null_ls.builtins.formatting.stylua) end,
+        selene            = function() null_ls.register(selene) end,
+        deno              = function() null_ls.register(null_ls.builtins.formatting.deno_fmt) end,
+        black             = function() null_ls.register(null_ls.builtins.formatting.black) end,
+        beautysh          = function() null_ls.register(null_ls.builtins.formatting.beautysh) end,
+        ["write-good"]    = function() null_ls.register(null_ls.builtins.formatting.emacs_scheme_mode) end,
+    }
+    mason_null_is.setup {
+        ensure_installed = vim.tbl_keys(handlerArgs),
+        automatic_installation = true,
+    }
+    require("mason-null-ls").setup_handlers(handlerArgs)
+
+    null_ls.setup {
+        -- diagnostics_format = "[#{c}] #{m} (#{s})",
+        on_attach = onAttach
     }
 end
