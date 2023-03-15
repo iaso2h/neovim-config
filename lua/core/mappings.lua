@@ -274,8 +274,8 @@ map({"n", "x"}, [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
 -- Scratch file
 map("n", [[<C-n>]], [[<CMD>new<CR>]], {"silent"}, "New buffer")
 -- Open/Search in browser
-map("n", [[gl]], [[<CMD>lua require("openLink").main()<CR>]], {"silent"}, "Open link")
-map("x", [[gl]], [[:lua require("openLink").main(require("selection").getSelect("string", false))<CR>]], {"silent"}, "Open selected as link")
+map("n", [[gl]], [[<CMD>lua require("getLink").main()<CR>]], {"silent"}, "Open link")
+map("x", [[gl]], [[:lua require("getLink").main(require("selection").getSelect("string", false))<CR>]], {"silent"}, "Open selected as link")
 -- Interrupt
 map("n", [[<C-A-c>]], [[<CMD>call interrupt()<CR>]], {"noremap", "silent"}, "Interrupt")
 -- Paragraph & Block navigation

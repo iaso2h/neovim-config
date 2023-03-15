@@ -11,7 +11,7 @@ local getClosestTopNonFoldLine = function(topline, cursorline)
 end
 
 
-local findTsNode = function(nodetype, roughResult)
+local findTsNode = function(roughResult)
     -- Find parent node at the same line as the initNode is
     local ts = require("vim.treesitter")
     local initNode = ts.get_node{ bufNr = 0, pos = {roughResult.row - 1, roughResult.col - 1} }
@@ -19,14 +19,14 @@ local findTsNode = function(nodetype, roughResult)
     local initLine = initNode:range() -- (0, 0) indexed
     local parentNode
     local parentNodeLine
-    if initNode:type() == nodetype then
+    if initNode:type() == roughResult.nodeType then
         return initNode
     else
         local node = initNode
         repeat
             parentNode = node:parent()
             parentNodeLine = parentNode:range() -- (0, 0) indexed
-            if parentNode:type() == nodetype then
+            if parentNode:type() == roughResult.nodeType then
                 return parentNode
             end
 
@@ -86,45 +86,52 @@ return function()
     -- Find the keyword string roughly upward from cursorline
     local useIdx
     local confIdx
+    local requireIdx
     for i = #lines, 1, -1 do
         local line = lines[i]
+
         -- Support for capturing a Github repository string after a use()
-        -- function call, then opening up the URL address
-        useIdx  = string.find(line, "use%W")
+        -- function call or a requires attribute, then opening up the URL
+        -- address
+        useIdx     = string.find(line, "use%W")
+        requireIdx = string.find(line, "requires%W")
         -- Support for opening the neovim plugin configuration file after a
         -- setup or a config attribute
-        confIdx = string.find(line, "conf%W")
+        confIdx    = string.find(line, "conf%W")
 
-        if useIdx or confIdx then
+        if useIdx or confIdx or requireIdx then
 
             -- whatever appears first will decide the the precise pattern to match against
-            local roughResult = {}
-            roughResult.lines = lines
-            roughResult.row = cursorPos[1] - (#lines - i)
+            local roughResult = {
+                lines = lines,
+                lineOffset = 0,
+                row = cursorPos[1] - (#lines - i)
+            }
 
-            if useIdx then
-                roughResult.col = useIdx
-                -- Take the next line adjecent to "use()" into account
+            if useIdx or requireIdx then
+                roughResult.col = requireIdx or useIdx
+                -- Take the next line adjacent to "use() / requires = " into account
                 -- eg:
-                -- line 187: use {
+                -- line 187: use/requires = {
                 -- line 188: 'phaazon/hop.nvim',
                 -- line 189: ..
                 -- line 190: }
                 roughResult.lineOffset = 1
                 -- Precise pattern is use for regex pattern matching after a ts
                 -- node is found
-                roughResult.precisePat = [[^\s*\(use\)\?\s*\zs\('\|"\)\w.\{-}\/.\{-}\('\|"\)]]
+                roughResult.nodeType   = requireIdx and "field" or "function_call"
+                roughResult.precisePat = [[^\s*\(use\|requires\)\?\s*\zs\('\|"\)\w.\{-}\/.\{-}\('\|"\)]]
                 roughResult.githubRepo = true
             elseif confIdx then
                 roughResult.col = confIdx
-                roughResult.lineOffset = 0
 
+                roughResult.nodeType   = "function_call"
                 roughResult.precisePat = [[\(config\|setup\).\{-}=.\{-}conf[ (]\{-}\zs\('\|"\).*\('\|"\)]]
                 roughResult.configFile = true
             end
 
             -- Confirm that the rough result is the identifier of a function call
-            local funcNode = findTsNode("function_call", roughResult)
+            local funcNode = findTsNode(roughResult)
             if funcNode then
                 -- Use the regex to match against the keyword and compose a url
                 -- string to return

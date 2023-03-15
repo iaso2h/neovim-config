@@ -1,12 +1,12 @@
--- File: openBrowser
+-- File: o
 -- Author: iaso2h
 -- Description: Open url link in browser
--- Version: 0.0.9
--- Last Modified: 2023-3-9
+-- Version: 0.0.10
+-- Last Modified: 2023-3-15
 local fn  = vim.fn
 local api = vim.api
 local M   = {
-    ns = api.nvim_create_namespace('openLink'),
+    ns = api.nvim_create_namespace('getLink'),
     highlighTimout = 500,
     highlightGroup = "Search",
 }
@@ -51,7 +51,8 @@ function M.main(selectText)
         local filePath = fn.expand("%:p")
 
         if filePath == string.format("%s%slua%score%splugins.lua", _G._configPath, _G._sep, _G._sep, _G._sep) then
-            url = require("openLink.path.pluginConfig")()
+            -- TODO: support repo link in requires
+            url = require("getLink.path.pluginConfig")()
             if url then
                 return openUrl(url)
             end

@@ -44,7 +44,7 @@ return function()
     -- a custom vim function name to open preview page
     -- this function will receive url as param
     -- default is empty
-    -- vim.g.mkdp_browserfunc = [[require("openLink").main]]
+    -- vim.g.mkdp_browserfunc = [[require("getLink").main]]
     vim.g.mkdp_browserfunc = ''
     -- options for markdown render
     -- mkivim.t. markdown-it options for render
