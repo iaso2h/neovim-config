@@ -7,4 +7,4 @@ if vim.g.loaded_scriptease then
     bmap(0, "n", [[<C-b>l]], [[<CMD>breaklist<CR>]],  {"silent"}, "Display breakpoints")
 end
 
-vim.opt.textwidth = 80
+vim.opt.textwidth = 78

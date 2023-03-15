@@ -168,7 +168,7 @@ function M.main(vimMode, char) -- {{{
             -- Get user note
             local note
             vim.cmd [[noa echohl Moremsg]]
-            ok, msg = pcall(fn.input, "Input note: ")
+            ok, msg = pcall(fn.input, "Comment for fold marker: ")
             vim.cmd [[noa echohl None]]
             if not ok then
                 if string.find(msg, "Keyboard interrupt") then

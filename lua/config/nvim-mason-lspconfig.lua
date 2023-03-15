@@ -21,10 +21,7 @@ M.config = function()
         -- A list of servers to automatically install if they're not already
         -- installed. Example: { "rust_analyzer@nightly", "lua_ls" }
         -- This setting has no relation with the `automatic_installation` setting.
-        ensure_installed = {
-            unpack(vim.tbl_keys(require("config.nvim-mason-lspconfig").servers))
-            -- unpack(M.servers)
-        },
+        ensure_installed = vim.tbl_keys(require("config.nvim-mason-lspconfig").servers),
         -- Whether servers that are set up (via lspconfig) should be automatically
         -- installed if they're not already installed.
         -- This setting has no relation with the `ensure_installed` setting.

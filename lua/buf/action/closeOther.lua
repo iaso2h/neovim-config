@@ -70,6 +70,9 @@ function M.init() -- {{{
     for _, bufNr in ipairs(var.bufNrTbl) do
         if api.nvim_buf_is_valid(bufNr) then util.bufWipe(bufNr) end
     end
+    if package.loaded["cokeline"] then
+        require('cokeline/augroups').toggle()
+    end
 end -- }}}
 
 return M
