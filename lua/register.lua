@@ -1,8 +1,8 @@
 -- File: trailingChar
 -- Author: iaso2h
 -- Description: Add character at the end of line
--- Version: 0.0.4
--- Last Modified: 2023-2-23
+-- Version: 0.0.5
+-- Last Modified: 2023-3-16
 local fn  = vim.fn
 local api = vim.api
 local M = {
@@ -25,7 +25,7 @@ end -- }}}
 
 
 --- Prompt for inserting register
-M.insertPrompt = function() -- {{{
+M.insertPrompt = function(vimMode) -- {{{
     local regexAll = vim.regex(M.all)
     local reg
     vim.cmd [[noa reg]]
@@ -41,10 +41,20 @@ M.insertPrompt = function() -- {{{
         else
             reg = msg
         end
-    until (#reg == 1 and regexAll:match_str(reg)) or vim.notify("    Invalid register name", vim.log.levels.ERROR)
-    vim.cmd [[noa echohl None]]
 
-    if reg == "" then return end
+        -- Allow quick cancle by pressing return key only
+        if reg == "" then return end
+
+        -- Allow more specific put command in normal mode
+        if vimMode == "n" and #reg == 2 then
+            local exCMD = reg:sub(2, 2)
+            if exCMD:lower() == "p" and regexAll:match_str(reg:sub(1, 1)) then
+                -- Use remap keybinding
+                return api.nvim_feedkeys('"' .. reg, "m", false)
+            end
+        end
+    until (#reg == 1 and regexAll:match_str(reg)) or vim.notify("    Invalid register name", vim.log.levels.WARN)
+    vim.cmd [[noa echohl None]]
 
     -- local regContent = reg == "=" and fn.getreg(reg, 1) or fn.getreg(reg, 0)
     local regType    = fn.getregtype(reg)
