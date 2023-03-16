@@ -5,20 +5,19 @@ local M   = {
     extraArgs = nil
 }
 
-if not LuaExprCallbackSetup then
-    vim.cmd [[
-    function! LuaExprCallback(...)
-        let l:args = deepcopy(a:000)
-        call add(l:args, mode())
-        return v:lua.Opfunc(l:args)
-    endfunction
-    ]]
-    LuaExprCallbackSetup = true
-end
+vim.cmd [[
+function! LuaExprCallback(...)
+    let l:args = deepcopy(a:000)
+    call add(l:args, mode())
+    return v:lua._opfunc(l:args)
+endfunction
+]]
 
 function _G.saveCursorPos()
     M.cursorPos = api.nvim_win_get_cursor(0)
 end
+
+
 ---Expression function that evaluated to return str for mapping
 ---@param func            function
 ---@param checkModifiable boolean Set this to true if the operator will
@@ -35,7 +34,7 @@ function M.expr(func, checkModifiable, plugMap)
     end
     if vim.v.register == "=" then return "" end
 
-    Opfunc       = func
+    _G._opfunc   = func
     M.plugMap    = plugMap
     M.cursorPos  = api.nvim_win_get_cursor(0)
     vim.o.opfunc = "LuaExprCallback"

@@ -134,6 +134,7 @@ map("n", [[<C-g>]],
 {"silent"}, "Display file info")
 map("n", [[<S-Tab>]], [[<CMD>lua require("tabSwitcher").main()<CR>]], "Change tab size")
 -- Delete & Change & Replace {{{
+-- Delete & Change & Replace & Exchange {{{
 -- Delete
 map("n", [[dj]], [[<Nop>]], "which_key_ignore")
 map("n", [[dk]], [[<Nop>]], "which_key_ignore")
@@ -236,7 +237,13 @@ map("n", [[<Plug>ReplaceUnderBackward]],
     {"silent"}, "Replace the whold word under curosr, then highlight it backward")
 map("n", [[grn]], [[<Plug>ReplaceUnderForward]], "Replace the whold word under curosr, then highlight it forward")
 map("n", [[grN]], [[<Plug>ReplaceUnderBackward]], "Replace the whold word under curosr, then highlight it backward")
--- }}} Delete & Change & Replace
+-- Exchange
+map("n", [[<Plug>exchangeOperatorInplace]], function ()
+    return vim.fn.luaeval [[require("exchange").expr(true, true)]]
+end, {"silent", "expr"}, "exchange operator and restore the cursor position")
+
+map("n", [[gx]],  [[<Plug>exchangeOperatorInplace]], "exchange operator and restore the cursor position")
+-- }}} Delete & Change & Replace & Exchange
 -- Search & Jumping {{{
 -- In case of mistouching
 -- Inquery word

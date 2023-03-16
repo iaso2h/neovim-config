@@ -417,7 +417,7 @@ function M.operator(args) -- {{{
     saveOption()
     -- }}} Saving cursor position, motion count, motion region and register
 
-    -- Gather more register info {{{
+    -- Gather more register
     local reg
     if M.regName == "=" then
         -- TODO: tests required
@@ -436,7 +436,6 @@ function M.operator(args) -- {{{
             content = fn.getreg(M.regName, 1)
         }
     end
-    -- }}} Gather more register info
 
     -- Match the motionType type with register type
     local ok, msg = pcall(matchRegType, motionType, vimMode, reg, regionMotion, motionDirection)
@@ -453,7 +452,7 @@ function M.operator(args) -- {{{
         regionReplace = msg
     end
 
-    -- Restoration {{{
+    -- Restoration
     -- Register
     register.restoreReg()
     -- Options
@@ -539,9 +538,8 @@ function M.operator(args) -- {{{
         -- TODO: visual-blcok mode parse
     end
     -- }}} Curosr
-    -- }}} Restoration
 
-    -- Mapping repeating {{{
+    -- Mapping repeating
     if vimMode ~= "n" then
         vim.fn["repeat#setreg"](t(plugMap), M.regName);
     end
@@ -560,8 +558,6 @@ function M.operator(args) -- {{{
     end
     -- Visual repeating
     fn["visualrepeat#set"](t"<Plug>ReplaceVisual")
-
-    -- }}} Mapping repeating
 end -- }}}
 
 
@@ -574,7 +570,7 @@ function M.expr(restoreCursorChk, highlightChangeChk) -- {{{
     -- TODO: Detect virutal edit
     if not warnRead() then return "" end
 
-    Opfunc = M.operator
+    _opfunc = M.operator
     vim.o.opfunc = "LuaExprCallback"
 
     if restoreCursorChk then

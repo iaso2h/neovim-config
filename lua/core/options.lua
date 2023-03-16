@@ -146,6 +146,7 @@ elseif _G._os_uname.sysname == "Linux" then
     end
 end
 -- }}} OS varied settings
+
 -- Neovide settings {{{
 if vim.g.neovide then
     vim.g.neovide_confirm_quit                = false

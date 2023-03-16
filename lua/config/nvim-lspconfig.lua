@@ -47,7 +47,7 @@ return function()
         end, { "silent" }, "LSP definition")
         bmap(bufNr, "n", [[gD]], function()
             vim.lsp.buf.declaration { on_list = conciseQuifix }
-        end, { "silent" }, "LSP documentation")
+        end, { "silent" }, "LSP declaration")
         bmap(bufNr, "n", [[gt]], function()
             vim.lsp.buf.type_definition { on_list = conciseQuifix }
         end, { "silent" }, "LSP type definition")

@@ -203,6 +203,7 @@ local configArgs = {function(use, use_rocks) -- {{{
     map({"n", "x"}, [[<leader>F]], [[<CMD>lua require("hop").hint_lines()<CR>]], "Hop line")
     use {
         'phaazon/hop.nvim',
+        module = "hop",
         keys = {
             {"n", [[<leader>f]]},
             {"x", [[<leader>f]]},
@@ -234,6 +235,7 @@ local configArgs = {function(use, use_rocks) -- {{{
     }
     use {
         'tommcdo/vim-exchange',
+        disable = true,
         keys = {
             {"n", [[gx]]},
             {"x", [[X]]},
@@ -398,47 +400,20 @@ local configArgs = {function(use, use_rocks) -- {{{
         end
     }
     use {
-        'preservim/nerdcommenter',
+        'numToStr/Comment.nvim',
         keys  = {
-            {"x", [[<A-/>]]},
-            {"n", [[<A-/>]]},
-            {"n", [[gco]]},
-            {"n", [[gcO]]},
-
+            {"n", [[gc]]},
             {"n", [[gcc]]},
             {"x", [[C]]},
-
-            {"n", [[gcc]]},
-            {"x", [[gcc]]},
-            {"n", [[gcn]]},
-            {"x", [[gcn]]},
-
-            {"n", [[gci]]},
-            {"x", [[gci]]},
-
-            {"n", [[gcs]]},
-            {"x", [[gcs]]},
 
             {"n", [[gcy]]},
             {"x", [[gcy]]},
 
-            {"n", [[gc$]]},
+            {"n", [[gco]]},
+            {"n", [[gcO]]},
             {"n", [[gcA]]},
-            {"n", [[gcI]]},
-
-            {"x", [[<A-/>]]},
-            {"n", [[<A-/>]]},
-
-            {"n", [[gcn]]},
-            {"x", [[gcn]]},
-            {"n", [[gcb]]},
-            {"x", [[gcb]]},
-
-            {"n", [[gcu]]},
-            {"x", [[gcu]]},
         },
-        setup  = [[vim.api.nvim_set_var("NERDCreateDefaultMappings", 0)]],
-        config = conf("vim-nerdcommenter").config,
+        config = conf "nvim-comment"
     }
     use {
         'lukas-reineke/indent-blankline.nvim',
@@ -731,9 +706,9 @@ local configArgs = {function(use, use_rocks) -- {{{
     }
     use {
         'ray-x/lsp_signature.nvim',
-        event  = "InsertEnter",
         config = function()
             require("lsp_signature").setup{
+                bind           = true,
                 hint_enable    = false,
                 always_trigger = true,
                 doc_lines      = 12

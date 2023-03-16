@@ -46,7 +46,7 @@ end -- }}}
 function M.expr(restoreCursorChk) -- {{{
     if not warnRead() then return "" end
 
-    Opfunc = M.operator
+    _opfunc = M.operator
     vim.o.opfunc = "LuaExprCallback"
 
     if restoreCursorChk then
