@@ -482,7 +482,7 @@ local configArgs = {function(use, use_rocks) -- {{{
         after  = "telescope.nvim",
         config = function ()
             require("telescope").load_extension("undo")
-            map("n", [[<C-f>u]], [[<CMD>require("telescope").extensions.undo.undo()<CR>]], {"silent"}, "Undo")
+            map("n", [[<C-f>u]], [[<CMD>lua require("telescope").extensions.undo.undo()<CR>]], {"silent"}, "Undo")
         end
 
     }

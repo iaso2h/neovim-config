@@ -29,8 +29,7 @@ map("n", [[<C-q>G]], [[<CMD>clast<CR>zzzv]],     {"silent"}, "Go to last item in
 map("n", [[<C-q>n]], [[<CMD>cnext<CR>zzzv]],     {"silent"}, "Go to next item in quickfix")
 map("n", [[<C-q>N]], [[<CMD>cprevious<CR>zzzv]], {"silent"}, "Go to previous item in quickfix")
 map("n", [[<C-q>l]], [[<CMD>lua require("quickfix.convertToLoc")()<CR>]], {"silent"}, "Convert quickfix into location list")
-map("n", [[<C-q>,]], [[<CMD>lua require("quickfix.message").main()<CR>]], {"silent"}, "Show messages in quickfix")
-map("n", [[<C-q>.]], [[<CMD>lua require("quickfix.message").main()<CR>]], {"silent"}, "Show messages in quickfix")
+map("n", [[<C-q>m]], [[<CMD>lua require("quickfix.message").main()<CR>]], {"silent"}, "Show messages in quickfix")
 -- Spell corretion
 map("n", [[\\]], [[z=1<CR><CR>]], {"silent"}, "Quick spell fix")
 -- Expand region
@@ -133,7 +132,6 @@ map("n", [[<C-g>]],
 [[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<CR>]],
 {"silent"}, "Display file info")
 map("n", [[<S-Tab>]], [[<CMD>lua require("tabSwitcher").main()<CR>]], "Change tab size")
--- Delete & Change & Replace {{{
 -- Delete & Change & Replace & Exchange {{{
 -- Delete
 map("n", [[dj]], [[<Nop>]], "which_key_ignore")
@@ -273,7 +271,7 @@ map("n", [[N]], [[<CMD>lua require("searchHop").cycleSearch("N")<CR>]], {"silent
 map("n", [[<leader>h]], [[<CMD>noh<CR>]], {"silent"}, "Clear highlight")
 map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"}, "Disable highlight")
 -- Matchit
-map("", [[gm]], [[%]], {"silent"}, "Go to match parenthesis")
+map("", [[<C-m>]], [[%]], {"silent"}, "Go to match parenthesis")
 -- Visual selection
 map("n", [[go]], [[<CMD>lua require("selection").cornerSelection(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
 map({"n", "x"}, [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
@@ -304,20 +302,21 @@ map("n", [[g:]], [[<CMD>lua require("trailingChar").main("n", ":")<CR>]],  {"sil
 map("x", [[g:]], [[:lua require("trailingChar").main("v", ":")<CR>]],      {"silent"}, "Add trailing :")
 map("n", [[g"]], [[<CMD>lua require("trailingChar").main("n", "\"")<CR>]], {"silent"}, 'Add trailing "')
 map("x", [[g"]], [[:lua require("trailingChar").main("v", "\"")<CR>]],     {"silent"}, 'Add trailing "')
-map("n", [[g']], [[<CMD>lua require("trailingChar").main("n", "'")<CR>]],  {"silent"}, "Add trailing '")
-map("x", [[g']], [[:lua require("trailingChar").main("v", "'")<CR>]],      {"silent"}, "Add trailing '")
+-- map("n", [[g']], [[<CMD>lua require("trailingChar").main("n", "'")<CR>]],  {"silent"}, "Add trailing '")
+-- map("x", [[g']], [[:lua require("trailingChar").main("v", "'")<CR>]],      {"silent"}, "Add trailing '")
 map("n", [[g(]], [[<CMD>lua require("trailingChar").main("n", "(")<CR>]],  {"silent"}, "Add trailing (")
 map("x", [[g(]], [[:lua require("trailingChar").main("v", "(")<CR>]],      {"silent"}, "Add trailing (")
 map("n", [[g)]], [[<CMD>lua require("trailingChar").main("n", ")")<CR>]],  {"silent"}, "Add trailing )")
 map("x", [[g)]], [[:lua require("trailingChar").main("v", ")")<CR>]],      {"silent"}, "Add trailing )")
+map("n", [[g>]], [[<CMD>lua require("trailingChar").main("n", ">")<CR>]],  {"silent"}, "Add trailing >")
 map("n", [[g<C-CR>]], [[<CMD>call append(line("."),   repeat([""], v:count1))<CR>]], {"silent"}, "Add new line below")
 map("n", [[g<S-CR>]], [[<CMD>call append(line(".")-1, repeat([""], v:count1))<CR>]], {"silent"}, "Add new line above")
 map("n", [[g<CR>]],   [[<CMD>lua require("breakLine").main()<CR>]], {"silent"}, "Break line at cursor")
 -- }}} Trailing character
 
 -- Pageup/Pagedown
-map({"n", "x"}, [[<C-f>]], [[<Nop>]], "which_key_ignore")
-map("",         [[<C-h>]], [[<Nop>]], "which_key_ignore")
+map("", [[<C-f>]], [[<Nop>]], "which_key_ignore")
+map("", [[<C-h>]], [[<Nop>]], "which_key_ignore")
 map({"n", "x"}, [[<C-e>]], [[<C-y>]], {"noremap"}, "Scroll up")
 map({"n", "x"}, [[<C-d>]], [[<C-e>]], {"noremap"}, "Scroll down")
 map("t", [[<C-e>]], [[<C-\><C-n><C-y>]], "Scroll up")
@@ -332,14 +331,17 @@ map("t", [[<A-d>]], [[<C-\><C-n><PageDown>]], "Scroll one window down")
 map("n", [[<A-q>]], [[q]], {"noremap"}, "Macro")
 
 -- Messages
-map("n", [[g>]], [[<CMD>messages<CR>]], {"silent"}, "Clear messages")
+
+map({"n", "x"}, [[g<]], [[:s#^\s*\ze\S## | noh<CR>]], {"silent"}, "Clear all indents")
+map("n", [[gm]], [[g<]], {"noremap"}, "Clear messages")
+map("n", [[gM]], [[<CMD>messages<CR>]], {"silent"}, "Clear messages")
 map("n", [[<leader>,]], [[<CMD>execute 'messages clear<Bar>echohl Moremsg<Bar>echo "Message clear"<Bar>echohl None'<CR>]], "Clear messages")
 map("n", [[<leader>.]], [[<CMD>execute 'messages clear<Bar>echohl Moremsg<Bar>echo "Message clear"<Bar>echohl None'<CR>]], "Clear messages")
 
 -- Register
 map({"n", "x"}, [[<leader>']], [[:lua require("register").clear()<CR>]], {"silent"}, "Clear registers")
-map({"n", "x"}, [[g']], [[<CMD>reg<CR>]], {"silent"}, "Registers in prompt");
-map("i", [[<C-r><C-r>]], [[<C-\><C-o>:lua require("register").insertPrompt()<CR>]], {"silent"}, "Registers in prompt")
+map("n", [[g']], [[<CMD>lua require("register").insertPrompt("n")<CR>]], {"silent"}, "Registers in prompt");
+map("i", [[<C-r><C-r>]], [[<C-\><C-o><CMD>lua require("register").insertPrompt("i")<CR>]], {"silent"}, "Registers in prompt")
 
 -- Buffer & Window & Tab{{{
 -- Smart quit
@@ -347,9 +349,6 @@ map("n", [[q]],     [[<CMD>lua require("buf").close("window")<CR>]],    {"silent
 map("n", [[Q]],     [[<CMD>lua require("buf").close("buffer")<CR>]],    {"silent"}, "Close buffer")
 map("n", [[<C-u>]], [[<CMD>lua require("buf").restoreClosedBuf()<CR>]], {"silent"}, "Restore last closed buffer")
 -- Window
--- TODO:
--- map("n", [[<C-w>s]], [[<CMD>lua require("consistantTab").splitCopy("wincmd s")<CR>]], {"silent"})
--- map("n", [[<C-w>v]], [[<CMD>lua require("consistantTab").splitCopy("wincmd v")<CR>]], {"silent"})
 map("n", [[<C-w>V]], [[<CMD>wincmd o | wincmd v<CR>]], {"silent"}, "Split only current window vertically")
 map("n", [[<C-w>S]], [[<CMD>wincmd o | wincmd s<CR>]], {"silent"}, "Split only current window vertically")
 
@@ -375,11 +374,6 @@ map({"n", "x"}, [[<C-t>o]], [[<CMD>tabonly<CR>]],  {"silent"}, "Tab only")
 -- Folding {{{
 map("",  [[zj]], [[<Nop>]], "which_key_ignore")
 map("",  [[zk]], [[<Nop>]], "which_key_ignore")
-map("",  [[[Z]], [[zk]], {"noremap"}, "Previous fold(integral)")
-map("",  [[]Z]], [[zj]], {"noremap"}, "Next fold(integral)")
--- TODO: record in jumplist
--- map("",  [[[z]], [[<CMD>call EnhanceFoldJump("previous", 1, 0)<CR>]], {"silent", "noremap"}, "Previous fold")
--- map("",  [[]z]], [[<CMD>call EnhanceFoldJump("next",     1, 0)<CR>]], {"silent", "noremap"}, "Next fold")
 map("n", [[dz]], [[<CMD>call EnhanceFoldHL("", 800, "EnhanceDelete")<CR>]], {"silent"}, "Delete fold")
 map("n", [[zd]], [[<CMD>call EnhanceFoldHL("", 800, "EnhanceDelete")<CR>]], {"silent"}, "Delete fold")
 map("n", [[cz]], [[<CMD>call EnhanceFoldHL("", 0, "EnhanceChange")<CR>]],   {"silent"}, "Change fold")

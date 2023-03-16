@@ -17,6 +17,7 @@ M.shortLineList = {
     "dapui_stacks",
     "dapui_breakpoints",
     "dapui_scopes",
+    "help"
 }
 
 M.config = function()

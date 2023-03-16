@@ -1,7 +1,7 @@
 ; extends
 ;; https://tree-sitter.github.io/tree-sitter/using-parsers#query-syntax
 ;; :h treesitter-query
-;; https: //github.com/nvim-treesitter/nvim-treesitter/blob/master/queries/lua/highlights.scm
+;; https://github.com/nvim-treesitter/nvim-treesitter/blob/master/queries/lua/highlights.scm
 ;; version: #11b2d43
 (break_statement) @keyword.break
 
@@ -12,7 +12,7 @@
   (identifier) @variable.builtin
   (#any-of? @variable.builtin "self" "string" "table" "vim")
   )
- (#set! "priority" 200)
+ (#set! "priority" 130)
  )
 
 (
@@ -25,25 +25,33 @@
             "rawequal" "rawget" "rawset" "require" "select" "setfenv" "setmetatable"
             "tonumber" "tostring" "type" "unpack" "xpcall")
   )
- (#set! "priority" 200)
+ (#set! "priority" 150)
  )
+
+(function_call name: (identifier) @function.call(#set! "priority" 140))
+
+(function_call name: (dot_index_expression field: (identifier) @function.call)(#set! "priority" 140))
+(function_declaration name: (dot_index_expression field: (identifier) @function)(#set! "priority" 140))
+
+(method_index_expression method: (identifier) @method.call(#set! "priority" 140))
 
 ;;Field
 (
  (field name: (identifier) @field)
- (#set! "priority" 200)
+ (#set! "priority" 130)
  )
 
 (
  (dot_index_expression field: (identifier) @field)
- (#set! "priority" 200)
+ (#set! "priority" 130)
  )
 
 ;;Constant
 (
  (identifier) @constant
  (#lua-match? @constant "^[A-Z][A-Z_0-9]*$")
- (#set! "priority" 200)
+ (#set! "priority" 130)
  )
 
+((parameters (identifier) @parameter)(#set! "priority" 130))
 ;; vim:ts=2:sts=2:sw=2:ft=scheme
