@@ -83,7 +83,6 @@ end
 
 -- }}} Function
 
-
 -- Auto commands {{{
 -- Minimal terminal filetype
 local augroupTerm = augroup("myTerminal", {clear = true})
@@ -117,15 +116,18 @@ au("BufWritePost", {
     desc    = "Avoiding folding after making modification on a buffer for the first time",
     command = "normal! zv"
 })
-au("BufWritePost", {
-    group   = augroupWrite,
-    pattern = "*.lua,*.vim",
-    desc     = "Autoreload configuration after saving lua/vim configuration files",
-    callback = function ()
-        -- Similar work: https://github.com/RRethy/nvim-sourcerer
-        require("autoreload").reload()
-    end
-})
+
+if _G._autorealod then
+    au("BufWritePost", {
+        group   = augroupWrite,
+        pattern = "*.lua,*.vim",
+        desc     = "Autoreload configuration after saving lua/vim configuration files",
+        callback = function ()
+            -- Similar work: https://github.com/RRethy/nvim-sourcerer
+            require("autoreload").reload()
+        end
+    })
+end
 
 
 au("BufWinEnter", {
@@ -255,9 +257,8 @@ excmd("RunSelection", function(opts)
 
     vim.cmd("lua " .. lineStr)
 end, {
-    desc     = "Run selection in lua syntax",
-    range    = true,
-    nargs    = 0,
+    desc  = "Run selection in lua syntax",
+    range = true,
 })
 
 excmd("Cfilter", function(opts)
@@ -277,8 +278,7 @@ end, {
 })
 
 excmd("CD", [[execute "lcd " . expand("%:p:h")]], {
-    desc  = "Change the current working directory to the current buffer locally",
-    nargs = 0,
+    desc = "Change the current working directory to the current buffer locally",
 })
 
 excmd("E", function (opts)
@@ -290,15 +290,11 @@ excmd("E", function (opts)
     end
     vim.cmd [[loadview]]
 end, {
-    desc  = "Reopen the the current file while maintaining the window layout",
-    bang  = true,
-    nargs = 0,
+    desc = "Reopen the the current file while maintaining the window layout",
+    bang = true,
 })
 
-excmd("O", [[browse oldfiles]], {
-    desc  = "Browse the oldfiles then prompt",
-    nargs = 0,
-})
+excmd("O", [[browse oldfiles]], { desc = "Browse the oldfiles then prompt", })
 
 excmd("Q", function (opts)
     local saveCMD = opts.bang and "noa bufdo update | " or "noa "
@@ -332,34 +328,26 @@ excmd("Dofile", function (opts)
                 package.loaded[moduleName .. ".lua"] = nil
             end
         end
+        vim.cmd [[luafile %]]
     elseif ft == "vim" then
     end
 
-    require("autoreload").reload()
+    if _G._autorealod then
+        require("autoreload").reload()
+    end
 end, {
-    desc  = "Reload the current file in lua/vim runtime",
-    nargs = 0,
-    bang  = true
+    desc = "Reload the current file in lua/vim runtime",
+    bang = true
 })
 
-excmd("O", [[browse oldfiles]], {
-    desc  = "Browse the oldfiles then prompt",
-    nargs = 0,
-})
-
+excmd("O", [[browse oldfiles]], { desc = "Browse the oldfiles then prompt", })
 excmd("OnSaveTrimSpaces", function ()
     _G._trim_space = _G._trim_space or true
     _G._trim_space = not _G._trim_space
     vim.api.nvim_echo({ { string.format("OnSaveTrimSpaces: %s", _G._trim_space), "Moremsg" } }, false, {})
-end, {
-    desc  = "Toggle trimming spaces on save",
-    nargs = 0,
-})
+end, { desc = "Toggle trimming spaces on save", })
 
 excmd("TrimBufferSpaces", function ()
     require("util").trimSpaces()
-end, {
-    desc  = "Toggle trimming spaces on save",
-    nargs = 0,
-})
+end, { desc = "Toggle trimming spaces on save", })
 -- }}} Commands

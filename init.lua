@@ -1,7 +1,7 @@
-if vim.fn.has("nvim-0.9.0") ~= 1 then
+if vim.fn.has("nvim-0.8.3") ~= 1 then
     vim.notify(" ", vim.log.levels.WARN)
     vim.notify(" ", vim.log.levels.WARN)
-    vim.notify("Neovim with 0.9.0 or higher build version required", vim.log.levels.WARN)
+    vim.notify("Neovim with 0.8.3 or higher build version required", vim.log.levels.WARN)
     vim.notify(" ", vim.log.levels.WARN)
     vim.notify(" ", vim.log.levels.WARN)
     return

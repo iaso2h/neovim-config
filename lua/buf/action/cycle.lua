@@ -73,7 +73,7 @@ M.init = function(direction)
     -- Find the valid candidate
     local candiIdx = findCandi(bufTbl, currentBufIdx, direction)
     if candiIdx == 0 then
-        return vim.notify("No valid buffer to cycle", vim.log.level.INFO)
+        return vim.notify("No valid buffer to cycle", vim.log.levels.INFO)
     end
 
     -- Use the Ex command to enter a buffer without writing jumplist

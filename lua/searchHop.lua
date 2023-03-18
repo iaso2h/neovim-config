@@ -44,7 +44,7 @@ M.searchSelected = function(exCMD)
     local cursorPos = api.nvim_win_get_cursor(0)
     local selectedStr = fn.escape(
         require("selection").getSelect("string", true),
-        [[\]]
+        [[\/.]]
     )
     selectedStr = exCMD .. [[\V]] .. selectedStr
     vim.cmd(selectedStr)
