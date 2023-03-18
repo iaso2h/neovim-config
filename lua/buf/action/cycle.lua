@@ -24,6 +24,7 @@ local bufferCycle = function(currentBufNr, direction)
         local bufNr = api.nvim_get_current_buf()
         local bufType = api.nvim_buf_get_option(bufNr, "buftype")
         if bufType == "" or bufType == "nofile" then
+            api.nvim_exec_autocmds("BufWinEnter", {modeline = false, buffer = bufNr})
             return
         end
     until bufNr == currentBufNr
@@ -78,6 +79,7 @@ M.init = function(direction)
 
     -- Use the Ex command to enter a buffer without writing jumplist
     vim.cmd([[noa keepjump buffer ]] .. bufTbl[candiIdx])
+    api.nvim_exec_autocmds("BufWinEnter", {modeline = false, buffer = bufTbl[candiIdx]})
 end
 
 return M
