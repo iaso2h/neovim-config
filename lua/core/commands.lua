@@ -117,7 +117,7 @@ au("BufWritePost", {
     command = "normal! zv"
 })
 
-if _G._autorealod then
+if _G._autoreload then
     au("BufWritePost", {
         group   = augroupWrite,
         pattern = "*.lua,*.vim",
@@ -169,12 +169,6 @@ au("BufWinEnter", {
         require("buf.action.cursorRecall").main()
     end
 })
-
-
--- autocmd BufAdd               * lua require("consistantTab").adaptBufTab()
--- autocmd BufEnter             *.txt,COMMIT_EDITMSG,index lua require("util").splitExist()
-
--- autocmd CursorHold            *.c,*.h,*.cpp,*.cc,*.vim :call HLCIOFunc()
 -- }}} Auto commands
 
 -- Commands {{{
@@ -196,7 +190,7 @@ excmd("DeleteEmptyLines", [['<,'>g#^\s*$#d]], {
     range    = true,
 })
 
-excmd("Echo", [[PP strftime('%c') . ": " . <args>]], {
+excmd([[PP strftime('%c') . ": " . <args>]], "Echo", {
     desc     = "Echo from Scriptease plug-ins",
     nargs    = "+",
     complete = "command",
@@ -224,7 +218,6 @@ end, {
     nargs    = 0,
 })
 
--- command! -nargs=0 -range Backward setl revins | execute "norm! gvc\<C-r>\"" | setl norevins
 excmd("Reverse", function(opts)
     if opts.range == 0 then return end
     if vim.fn.visualmode() == "V" then
@@ -269,9 +262,9 @@ end, {
     nargs = "+",
 })
 
-excmd("Lfilter", function(opts)
+excmd(function(opts)
     require("quickfix.cfilter").main(false, opts.args, opts.bang)
-end, {
+end, "Lfilter", {
     desc  = "Filter localfix window",
     bang  = true,
     nargs = "+",
@@ -299,8 +292,12 @@ excmd("O", [[browse oldfiles]], { desc = "Browse the oldfiles then prompt", })
 excmd("Q", function (opts)
     local saveCMD = opts.bang and "noa bufdo update | " or "noa "
     local sessionName = opts.args or "01"
-    vim.cmd(string.format("mksession! %s/session/%s.vim",
-        vim.fn.stdpath("config"), sessionName))
+    local sessionDir  = _G._configPath .. _G._sep .. "session"
+    if not vim.loop.fs_stat(sessionDir) then
+        vim.fn.mkdir(sessionDir, "p")
+    end
+    vim.cmd(string.format("mksession! %s/%s.vim", sessionDir, sessionName))
+
     vim.cmd(saveCMD .. "qa!")
 end, {
     desc  = "Quit and save the session",
@@ -332,7 +329,7 @@ excmd("Dofile", function (opts)
     elseif ft == "vim" then
     end
 
-    if _G._autorealod then
+    if _G._autoreload then
         require("autoreload").reload()
     end
 end, {

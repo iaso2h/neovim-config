@@ -36,7 +36,7 @@ _G.ex = function(exec) return fn.executable(exec) == 1 end
 
 --- Remove value from list-liked lua table
 ---@param tbl table List-like table
----@param srcVal any Srouce value to be look up and removed
+---@param srcVal any Source value to be look up and removed
 ---@param removeAllChk boolean|nil Default is true. Whether to remove the
 --all values or not
 ---@param cnt number|nil default is 1. Determine how many value

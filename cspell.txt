@@ -29,3 +29,17 @@ jsdoc
 emmylua 
 camelsnek 
 opfunc 
+bufdo
+mkview
+cfilter
+redir
+excmd
+strftime
+lfilter
+buflisted
+cmdline
+fnamemodify
+getcmdline
+getcmdpos
+setcmdpos
+islist
