@@ -28,7 +28,7 @@ theme.syntax = {
     Parameter      = {fg = p.orange}, -- function parameter
     Decorator      = {fg = p.orange},
     Annotation     = {link = "Decorator"},
-    Label          = {fg = p.red}, -- case, default, etc.
+    Label          = {fg = p.red, style = "bold"}, -- case, default, etc.
     Operator       = {fg = p.n8}, -- sizeof", "+", "*", etc.
     Exception      = {fg = p.purple}, -- try, catch, throw
     PreProc        = {fg = p.yellow}, -- generic Preprocessor
@@ -108,7 +108,7 @@ theme.editor =  {
     Cursor       = {fg = p.n6, style = "reverse"},
     CursorIM     = {fg = p.n6, style = "reverse"},
     CursorColumn = {bg = p.n1},
-    CursorLine   = {bg = p.n1},
+    CursorLine   = {bg = p.n1d},
 
 
     DiffAdd    = {bg = "#43514b"},
@@ -188,9 +188,10 @@ theme.editor =  {
     healthSuccess = {fg = p.n14, bg = p.n1},
     healthWarning = {fg = p.n13, bg = p.n1},
 
-    helpHyperTextEntry = {fg = p.n14, style = "bold"},
-    helpHyperTextJump  = {fg = p.n9, style = "bold"},
-    helpSpecial        = {fg = p.orange,}
+    helpHyperTextEntry = {link = "Label"},
+    helpHyperTextJump  = {fg = p.n15},
+    helpSpecial        = {fg = p.orange},
+    helpHeader         = {fg = p.n10, style = "bold"}
 }
 -- }}} Editor highlight
 
@@ -230,10 +231,10 @@ theme.treesitter         = {
     TSTag                = {link = "Tag"},                       -- Tags like html tag names.
     TSTagDelimiter       = {link = "Tag"},                       -- Tag delimiter like `<` `>` `/`
     TSText               = {link = "Identifier"},                -- For strings considen11 text in a markup language.
-    TSTextReference      = {fg   = p.n15 },                      -- FIXME
+    TSTextReference      = {link = "helpHyperTextJump"},         -- FIXME
     TSEmphasis           = {fg   = p.n4, style = "bold"},        -- For text to be represented with emphasis.
     TSUnderline          = {fg   = p.n4, style = "underline", sp = p.n4 },  -- For text to be represented with an underline.
-    TSLiteral            = {link = "Identifier"},                -- Literal text.
+    TSLiteral            = {link = "Comment"},                   -- Help document code.
     TSURI                = {fg   = p.n4, style = "underline", sp = p.n4 },  -- Any URI like a link or email.
     TSAnnotation         = {link = "Decorator"},                 -- For C++/Dart attributes, annotations that can be attached to the code to denote some kind of meta information.
     ["@constructor"]           = {link = "Structure"},
@@ -281,7 +282,7 @@ theme.treesitter         = {
     theme.treesitter.TSConstBuiltin       = {fg   = p.orange, style = "bold" }
     theme.treesitter.TSConstMacro         = {fg   = p.orange, style = "bold" }
     theme.treesitter.TSVariable           = {link = "Identifier"}
-    theme.treesitter.TSTitle              = {fg   = p.n10, bg = p.none, style = "bold" }
+    theme.treesitter.TSTitle              = {link = "helpHeader"}
     theme.treesitter["@variable"]         = {link = "Identifier"}
     theme.treesitter["@variable.builtin"] = {link = "TSVariableBuiltin"}
     theme.treesitter["@variable.global"]  = {link = "TSVariableBuiltin"}
