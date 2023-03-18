@@ -10,7 +10,7 @@ return  function()
                 return buffer.is_focused and getHex("Normal", "fg") or getHex("Comment", "fg")
             end,
             bg = function(buffer)
-                return buffer.is_focused and getHex("ColorColumn", "bg") or getHex("Normal", "bg")
+                return buffer.is_focused and getHex("StatusLine", "bg") or getHex("Normal", "bg")
             end,
         },
         components = {

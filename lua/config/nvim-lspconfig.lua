@@ -146,6 +146,7 @@ return function()
                 workspace = {
                     -- Make the server aware of Neovim runtime files
                     library = vim.api.nvim_get_runtime_file("", true),
+                    checkThirdParty = false,
                     maxPreload      = 2000,
                     preloadFileSize = 1000,
                     ignoreDir       = {".vscode", ".git"},

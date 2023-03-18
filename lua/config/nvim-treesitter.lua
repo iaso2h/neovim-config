@@ -1,6 +1,7 @@
 return function()
     require("nvim-treesitter.configs").setup{
-        -- ensure_installed = "maintained",
+        -- Possible highlighter exception for vim ejection:
+        -- https://github.com/nvim-treesitter/nvim-treesitter/issues/3317
         ensure_installed = {
             "c", "cpp", "cmake", "lua", "json", "toml",
             "python", "bash", "fish", "ruby", "regex", "css", "html",
@@ -13,8 +14,6 @@ return function()
             enable = true,
             disable = function(lang, buf)
                 -- Filetype Exclude
-                if vim.o.filetype == "help" then return true end
-
                 local max_filesize = 100 * 1024 -- 100 KB
                 local ok, stats = pcall(vim.loop.fs_stat, nvim_buf_get_name(buf))
                 if ok and stats and stats.size > max_filesize then

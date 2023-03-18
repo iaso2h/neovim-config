@@ -119,7 +119,7 @@ return function()
 
     local builtinSource = {
         cspellAppend      = cspellAppendAction,
-        emacs_scheme_mode = null_ls.builtins.formatting.emacs_scheme_mode
+        -- emacs_scheme_mode = null_ls.builtins.formatting.emacs_scheme_mode
     }
     for _, source in pairs(builtinSource) do null_ls.register(source) end
 
