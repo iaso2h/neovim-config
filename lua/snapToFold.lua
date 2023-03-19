@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Snap to closest fold in sight then execute an Ex command or
 -- a function
--- Version: 0.0.7
--- Last Modified: 2023-3-7
+-- Version: 0.0.8
+-- Last Modified: 2023-3-20
 local api  = vim.api
 local fn   = vim.fn
 local util = require("util")
@@ -18,8 +18,8 @@ local M    = {}
 local getNextNonFoldLine = function(topline, botline)
     local nextline = topline
     while nextline < botline do
-        -- Inside a fold
         if fn.foldlevel(nextline) ~= 0 then
+            -- Inside a fold
             local closedEnd = fn.foldclosedend(nextline)
 
             if closedEnd == -1 then
@@ -28,7 +28,7 @@ local getNextNonFoldLine = function(topline, botline)
                 -- Find the end of a opened-fold till calling
                 -- vim.fn.foldlevel(nextline) return 0 because the fold is
                 -- already open, and the return value of vim.fn.foldclosedend()
-                -- is always -1 whenever it recieves linenr inside a fold or
+                -- is always -1 whenever it receives lineNr inside a fold or
                 -- outside
                 while nextline < botline do
                     nextline = nextline + 1
@@ -46,7 +46,7 @@ local getNextNonFoldLine = function(topline, botline)
         end
     end
 
-    return topline
+    return -1
 end
 
 
@@ -80,9 +80,9 @@ M.getAllNonFoldRegion = function(topline, botline)
 
     -- Make sure the first line is always a nonfoldline
     nextTopline = getNextNonFoldLine(nextTopline, botline)
-    if nextTopline == topline then
-        -- When the topline and botline are all inside a fold region
-        return {}
+    if nextTopline == -1 then
+        -- There is no non-folded line available
+        return nonFoldRegion
     end
 
     while true do
@@ -94,6 +94,9 @@ M.getAllNonFoldRegion = function(topline, botline)
             local nextLine = region[2] + 1
             -- Make sure next line is always a nonfoldline and continue the loop
             nextTopline = getNextNonFoldLine(nextLine, botline)
+            if nextTopline == -1 then
+                return nonFoldRegion
+            end
 
             if nextTopline == botline then break end
 
@@ -137,22 +140,14 @@ local function exeCommand(exCMD)
 end
 
 
-local highlightLines = function(curBufNr, lineNrs)
-    for _, lineNr in ipairs(lineNrs) do
-        local lineLen = #api.nvim_buf_get_lines(curBufNr, lineNr - 1, lineNr, false)[1]
-        util.nvimBufAddHl(curBufNr, { lineNr, 0 }, { lineNr, lineLen - 1 }, "V", "Search", 500)
-    end
-end
-
-
 --- Snap to the closest fold and execute a Ex command or a function
 ---@param exCMD string|function An Ex command or a function. Note that it will
----be exectuted right away if the cursor is right above a fold start or a fold
+---be executed right away if the cursor is right above a fold start or a fold
 ---end
 ---@param snapEnable boolean Whether to enable the snap. If this set to false,
 --- the exCMD will act like a right hand side of a normal mapping
 ---@param threshold number Multiplied by the Neovim window height to get the
---- minimum number for the snap taking palce
+--- minimum number for the snap taking place
 M.main = function(exCMD, snapEnable, threshold)
     --
     -- {
@@ -245,9 +240,6 @@ M.main = function(exCMD, snapEnable, threshold)
                 return
             end
         end
-
-        -- Execute command
-        exeCommand(exCMD)
     elseif distTop > distBot then
         if botLineNr == winInfo.botline then
             -- Snap to top instead
@@ -263,9 +255,6 @@ M.main = function(exCMD, snapEnable, threshold)
                 return
             end
         end
-
-        -- Execute command
-        exeCommand(exCMD)
     else
         if topLineNr == winInfo.topline and botLineNr ~= winInfo.botline then
             -- Snap to bottom instead
@@ -274,9 +263,6 @@ M.main = function(exCMD, snapEnable, threshold)
             else
                 return
             end
-
-            -- Execute command
-            exeCommand(exCMD)
         elseif topLineNr ~= winInfo.topline and botLineNr == winInfo.botline then
             -- Snap to top instead
             if distTop <= (winInfo.height) ^ 2 * threshold then
@@ -284,35 +270,19 @@ M.main = function(exCMD, snapEnable, threshold)
             else
                 return
             end
-
-            -- Execute command
-            exeCommand(exCMD)
         else
-            vim.ui.select({"Up", "Down"}, {
-                prompt = "Select up or down"
-                },
-                function (choice)
-                    if choice == "Down" then
-                        snapToLine(curWinNr, curBufNr, cursorPos, botLineNr)
-                    elseif choice == "Up" then
-                        snapToLine(curWinNr, curBufNr, cursorPos, topLineNr)
-                    else
-                        return
-                    end
-
-                    -- Execute command
-                    exeCommand(exCMD)
-
-                    -- Debug
-                    -- Print(cursorPos)
-                    -- Print(cursosRegion)
-
-                    -- Print(winInfo)
-                end
-            )
+            local answer = fn.confirm("Select direction: ", "&Up\n&Down", 0, "Info")
+            if answer == 1 then
+                snapToLine(curWinNr, curBufNr, cursorPos, topLineNr)
+            elseif answer == 2 then
+                snapToLine(curWinNr, curBufNr, cursorPos, botLineNr)
+            end
         end
+
     end
 
+    -- Last but not least
+    exeCommand(exCMD)
 end
 
 return M
