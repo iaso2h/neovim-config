@@ -86,8 +86,6 @@ opt.sessionoptions = "buffers,curdir,folds,help,resize,slash,tabpages,winpos,win
 opt.undofile       = true
 opt.backup         = false
 opt.swapfile       = false
-opt.writebackup    = false
-
 
 opt.wildignore     = vim.o.wildignore .. "*/tmp/*,*.so,*.swp,*.zip,*.db,*.sqlite,*.bak"
 opt.wildignorecase = true

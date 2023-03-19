@@ -161,14 +161,6 @@ if not _G._qf_fallback_open then
         end
     })
 end
-
-au("BufWinEnter", {
-    desc     = "Place the cursor on the last position",
-    callback = function ()
-        -- Credit: https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
-        require("buf.action.cursorRecall").main()
-    end
-})
 -- }}} Auto commands
 
 -- Commands {{{

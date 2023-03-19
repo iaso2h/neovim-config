@@ -369,6 +369,7 @@ local pluginArgs = { -- {{{
     -- UI {{{
     {
         "kyazdani42/nvim-web-devicons",
+        priority = 100
     },
     {
         "yamatsum/nvim-nonicons",

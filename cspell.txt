@@ -56,3 +56,6 @@ bufnr
 noautocmd
 rshift
 setqflist
+winnr
+winid
+tabnr
