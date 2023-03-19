@@ -649,6 +649,10 @@ local pluginArgs = { -- {{{
         lazy = true,
         dependencies = {
             "nvim-dap-virtual-text",
+            {
+                "rcarriga/nvim-dap-ui",
+                config = conf "nvim-dap-ui".config,
+            },
             "rcarriga/cmp-dap",
             "one-small-step-for-vimkind"
         },
@@ -656,11 +660,6 @@ local pluginArgs = { -- {{{
             map("n", [[<leader>db]], [[<CMD>lua require("dap").toggle_breakpoint()<CR>]], {"silent"}, "Dap toggle breakpoint")
         end,
         config = conf "nvim-dap",
-    },
-    {
-        "rcarriga/nvim-dap-ui",
-        lazy = true,
-        config = conf "nvim-dap-ui".config,
     },
     {
         "theHamsta/nvim-dap-virtual-text",
@@ -692,7 +691,7 @@ local pluginArgs = { -- {{{
     },
     {
         "jbyuki/one-small-step-for-vimkind",
-        lazy = true,
+        ft = "lua",
         init = function()
             vim.api.nvim_create_user_command("OSVStop", function()
                 require("osv").stop()

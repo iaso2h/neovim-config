@@ -6,7 +6,7 @@ local api = vim.api
 
 
 _G._os_uname         = vim.loop.os_uname()
-_G._is_term          = vim.api.nvim_list_uis()[1].ext_termcolors
+_G._is_term          = vim.fn.has("gui_running") == 1
 _G._sep              = _G._os_uname.sysname == "Windows_NT" and "\\" or "/"
 _G._configPath       = fn.stdpath("config")
 _G._qf_fallback_open = true
