@@ -68,7 +68,7 @@ opt.lazyredraw = true
 opt.matchpairs = "[:],{:},(:),《:》,（:）,【:】,“:”,‘:’"
 
 opt.jumpoptions = "stack"
-opt.scrolloff   = 7
+opt.scrolloff   = 10
 
 opt.number        = true
 opt.ruler         = false

@@ -90,7 +90,7 @@ local pluginArgs = { -- {{{
         event  = "BufAdd",
         config = function() require("treesitter-context").setup() end,
     },
-    --
+
     {
         "nvim-treesitter/nvim-treesitter-textobjects",
         dependencies = {
@@ -109,21 +109,21 @@ local pluginArgs = { -- {{{
     -- }}} Treesitter
     -- Vim enhancement {{{
     {
-        'tpope/vim-eunuch',
+        "tpope/vim-eunuch",
         cmd = {"Delete", "Unlink", "Remove", "Move", "Rename", "Chmod", "Mkdir", "Cfind", "Lfind", "Clocate", "Llocate", "SudoEdit", "SudoWrite", "Wall", "W"}
     },
     {
-        'skywind3000/asyncrun.vim',
+        "skywind3000/asyncrun.vim",
         cmd    = {"AsyncRun", "AsyncStop"},
         config = conf "vim-asyncrun"
     },
     {
-        'bkad/camelcasemotion',
+        "bkad/camelcasemotion",
         event = "BufAdd",
-        init  = function() vim.g.camelcasemotion_key = ',' end
+        init  = function() vim.g.camelcasemotion_key = "," end
     },
     {
-        'zatchheems/vim-camelsnek',
+        "zatchheems/vim-camelsnek",
         keys = {
             {[[<A-c>]], mode = "x"},
             {[[<A-c>]], mode = "n"},
@@ -140,7 +140,7 @@ local pluginArgs = { -- {{{
         end,
     },
     {
-        'phaazon/hop.nvim',
+        "phaazon/hop.nvim",
         keys = {
             {[[<leader>f]], mode = "n"},
             {[[<leader>f]], mode = "x"},
@@ -152,22 +152,22 @@ local pluginArgs = { -- {{{
             map({"x", mode = "n"}, [[<leader>F]], [[<CMD>lua require("hop").hint_lines()<CR>]], "Hop line")
         end,
         config = function()
-            require('hop').setup{
+            require("hop").setup{
                 case_insensitive = false
             }
         end
     },
     {
-        'AndrewRadev/switch.vim',
+        "AndrewRadev/switch.vim",
         cmd  = {"Switch"},
         init = function()
             map("n", [[<leader>s]], [[<CMD>Switch<CR>]], {"silent"}, "Switch word under cursor")
-            vim.g.switch_mapping = ''
+            vim.g.switch_mapping = ""
         end,
         config = conf "vim-switch"
     },
     {
-        'machakann/vim-sandwich',
+        "machakann/vim-sandwich",
         keys = {
             {"S",  mode = "x"},
             {"gs", mode = "n"},
@@ -178,7 +178,7 @@ local pluginArgs = { -- {{{
         config = conf "vim-sandwich".config
     },
     {
-        'junegunn/vim-easy-align',
+        "junegunn/vim-easy-align",
         keys = {
             {"A", mode = "x"},
             -- {"ga", mode = "n"},
@@ -199,7 +199,7 @@ local pluginArgs = { -- {{{
         end
     },
     {
-        'danymat/neogen',
+        "danymat/neogen",
         dependencies = { "nvim-treesitter" },
         keys   = {{"gcd", mode = "n"}},
         config = function()
@@ -248,7 +248,7 @@ local pluginArgs = { -- {{{
         end,
     },
     {
-        'AndrewRadev/splitjoin.vim',
+        "AndrewRadev/splitjoin.vim",
         keys = { {"gS", mode = "n"}, {"gJ", mode = "n"} },
         init = function()
             vim.g.splitjoin_align = 1
@@ -261,7 +261,7 @@ local pluginArgs = { -- {{{
         end
     },
     {
-        'ahmedkhalf/project.nvim',
+        "ahmedkhalf/project.nvim",
         event = "BufAdd",
         init  = function()
             vim.g.rooter_cd_cmd        = "lcd"
@@ -288,7 +288,7 @@ local pluginArgs = { -- {{{
         end
     },
     {
-        'numToStr/Comment.nvim',
+        "numToStr/Comment.nvim",
         keys = {
             {[[gc]], mode = "n"},
             {[[gcc]], mode = "n"},
@@ -304,7 +304,7 @@ local pluginArgs = { -- {{{
         config = conf "nvim-comment"
     },
     {
-        'lukas-reineke/indent-blankline.nvim',
+        "lukas-reineke/indent-blankline.nvim",
         dependencies = { "nvim-treesitter" },
         event  = "BufAdd",
         config = function()
@@ -313,7 +313,7 @@ local pluginArgs = { -- {{{
                 char             = "▏",
                 char_blankline   = "▏",
                 context_char     = "▏",
-                buftype_exclude  = {"terminal"},
+                buftype_exclude  = {"terminal", "nofile"},
                 filetype_exclude = require("config.nvim-galaxyline").shortLineList,
                 bufname_exclude  = {"*.md"},
                 char_highlight_list = {"SignColumn"},
@@ -323,7 +323,7 @@ local pluginArgs = { -- {{{
         end,
     },
     {
-        'szw/vim-maximizer',
+        "szw/vim-maximizer",
         cmd  = "MaximizerToggle",
         init = function()
             map("n", [[<C-w>m]], [[<CMD>MaximizerToggle<CR>]],      {"silent"}, "Maximize window")
@@ -332,14 +332,14 @@ local pluginArgs = { -- {{{
         end
     },
     {
-        'folke/which-key.nvim',
+        "folke/which-key.nvim",
         cmd    = "WhichKey",
         config = conf "nvim-which-key"
     },
     -- }}} Vim enhancement
     -- Telescope {{{
     {
-        'nvim-telescope/telescope.nvim',
+        "nvim-telescope/telescope.nvim",
         lazy = true,
         cmd  = "Telescope",
         keys = {
@@ -354,12 +354,12 @@ local pluginArgs = { -- {{{
         config = conf "nvim-telescope"
     },
     {
-        'nvim-telescope/telescope-symbols.nvim',
+        "nvim-telescope/telescope-symbols.nvim",
         dependencies = { "telescope.nvim" },
         lazy = true,
     },
     {
-        'debugloop/telescope-undo.nvim',
+        "debugloop/telescope-undo.nvim",
         dependencies = { "telescope.nvim" },
         keys   = {[[<C-f>u]], mode = "n"},
         config = function ()
@@ -370,27 +370,27 @@ local pluginArgs = { -- {{{
     -- }}} Telescope
     -- UI {{{
     {
-        'kyazdani42/nvim-web-devicons',
+        "kyazdani42/nvim-web-devicons",
     },
     {
-        'yamatsum/nvim-nonicons',
+        "yamatsum/nvim-nonicons",
         dependencies = { "nvim-web-devicons" },
         cond   = not _G._is_term,
         config = function() require("nvim-nonicons").setup() end,
     },
     {
-        'glepnir/galaxyline.nvim',
+        "glepnir/galaxyline.nvim",
         dependencies = { "nvim-web-devicons" },
         event  = "BufAdd",
         config = conf("nvim-galaxyline").config,
     },
     {
-        'iaso2h/nvim-cokeline',
+        "iaso2h/nvim-cokeline",
         dependencies = { "nvim-web-devicons" },
         config = conf "nvim-cokeline",
     },
     {
-        'NvChad/nvim-colorizer.lua',
+        "NvChad/nvim-colorizer.lua",
         event  = "BufAdd",
         config = function()
             require("colorizer").setup {
@@ -420,26 +420,26 @@ local pluginArgs = { -- {{{
         end
     },
     {
-        'folke/todo-comments.nvim',
+        "folke/todo-comments.nvim",
         dependencies = { "nvim-web-devicons" },
         event  = "BufAdd",
         config = conf "nvim-todo-comments",
     },
     {
-        'kyazdani42/nvim-tree.lua',
+        "kyazdani42/nvim-tree.lua",
         dependencies = { "nvim-web-devicons" },
         keys   = {{"<C-w>e", mode = "n"}},
         config = conf "nvim-tree",
     },
     {
-        'stevearc/dressing.nvim',
+        "stevearc/dressing.nvim",
         event  = "BufAdd",
         config = conf "nvim-dressing"
     },
     -- }}} UI
     -- Intellisense {{{
     {
-        'williamboman/mason.nvim',
+        "williamboman/mason.nvim",
         config = function()
             require("mason").setup {
                 ui = {
@@ -460,7 +460,7 @@ local pluginArgs = { -- {{{
         end,
     },
     {
-        'williamboman/mason-lspconfig.nvim',
+        "williamboman/mason-lspconfig.nvim",
         dependencies = { "mason.nvim" },
         config = conf("nvim-mason-lspconfig").config,
     },
@@ -475,7 +475,7 @@ local pluginArgs = { -- {{{
         config = conf "nvim-null-is",
     },
     {
-        'folke/neodev.nvim',
+        "folke/neodev.nvim",
         dependencies = {
             "neovim/nvim-lspconfig",
             "plenary.nvim",
@@ -495,7 +495,7 @@ local pluginArgs = { -- {{{
         end,
     },
     {
-        'folke/trouble.nvim',
+        "folke/trouble.nvim",
         dependencies = { "nvim-lspconfig", },
         cmd    = "Trouble",
         config = conf "nvim-trouble",
@@ -503,7 +503,7 @@ local pluginArgs = { -- {{{
 
     {
         "L3MON4D3/LuaSnip",
-        dependencies = { 'rafamadriz/friendly-snippets', },
+        dependencies = { "rafamadriz/friendly-snippets", },
         build  = "make install_jsregexp",
         event  = "BufAdd",
         config = function ()
@@ -513,11 +513,11 @@ local pluginArgs = { -- {{{
         end,
     },
     {
-        'windwp/nvim-autopairs',
+        "windwp/nvim-autopairs",
         dependencies = { "nvim-treesitter" },
         event  = "BufAdd",
         config = function()
-            require('nvim-autopairs').setup {
+            require("nvim-autopairs").setup {
                 disable_filetype        = {"TelescopePrompt", "dap-repl"},
                 disable_in_macro        = true,
                 disable_in_visualblock  = false,
@@ -539,11 +539,11 @@ local pluginArgs = { -- {{{
         end,
     },
     {
-        'hrsh7th/nvim-cmp',
+        "hrsh7th/nvim-cmp",
         dependencies = {
             "nvim-autopairs",
             "nvim-lspconfig",
-            'hrsh7th/cmp-nvim-lsp',
+            "hrsh7th/cmp-nvim-lsp",
             "hrsh7th/cmp-buffer",
             "hrsh7th/cmp-path",
             {
@@ -561,19 +561,20 @@ local pluginArgs = { -- {{{
                 "saadparwaiz1/cmp_luasnip",
                 build = function()
                     if _G._os_uname.sysname == "Windows_NT" then
-                        vim.cmd "!powershell ./install.ps1'"
+                        vim.cmd "!powershell ./install.ps1"
                     elseif _G._os_uname.sysname == "linux" then
                         vim.cmd "!./install.sh"
                     end
                 end,
-                dependencies = { 'LuaSnip' }
+                dependencies = { "LuaSnip" }
             },
         },
         config = conf "nvim-cmp",
     },
     {
-        'ray-x/lsp_signature.nvim',
+        "ray-x/lsp_signature.nvim",
         dependencies = { "nvim-lspconfig" },
+        -- event  = "InsertEnter",
         config = function()
             require("lsp_signature").setup{
                 bind           = true,
@@ -584,7 +585,7 @@ local pluginArgs = { -- {{{
         end,
     },
     {
-        'RRethy/vim-illuminate',
+        "RRethy/vim-illuminate",
         event = "BufAdd",
         config = function()
             require("illuminate").configure{
@@ -598,7 +599,7 @@ local pluginArgs = { -- {{{
         end
     },
     {
-        'ThePrimeagen/refactoring.nvim',
+        "ThePrimeagen/refactoring.nvim",
         dependencies = {
             "plenary.nvim",
             "nvim-treesitter"
@@ -620,7 +621,7 @@ local pluginArgs = { -- {{{
     -- }}} Intellisense
     -- Debug {{{
     {
-        'bfredl/nvim-luadev',
+        "bfredl/nvim-luadev",
         ft = "lua",
         config = function()
             vim.api.nvim_create_autocmd("BufEnter",{
@@ -631,15 +632,14 @@ local pluginArgs = { -- {{{
         end
     },
     {
-        'dstein64/vim-startuptime',
+        "dstein64/vim-startuptime",
         cmd  = "StartupTime",
         init = function() vim.g.startuptime_tries = 20 end
     },
-    -- 'lewis6991/impatient.nvim',
     {
-        'iaso2h/vim-scriptease',
-        branch = 'ftplugin',
-        ft     = 'vim',
+        "iaso2h/vim-scriptease",
+        branch = "ftplugin",
+        ft     = "vim",
         cmd    = {
             "PP", "Runtime", "Disarm", "Scriptnames", "Messages",
             "Verbose", "Time", "Breakadd", "Vopen", "Vedit", "Vsplit"
@@ -648,7 +648,23 @@ local pluginArgs = { -- {{{
     },
 
     {
-        'theHamsta/nvim-dap-virtual-text',
+        "mfussenegger/nvim-dap",
+        dependencies = {
+            "nvim-dap-virtual-text",
+            "rcarriga/cmp-dap"
+        },
+        init = function()
+            map("n", [[<leader>db]], [[<CMD>lua require("dap").toggle_breakpoint()<CR>]], {"silent"}, "Dap toggle breakpoint")
+        end,
+        config = conf "nvim-dap",
+    },
+    {
+        "rcarriga/nvim-dap-ui",
+        lazy = true,
+        config = conf "nvim-dap-ui".config,
+    },
+    {
+        "theHamsta/nvim-dap-virtual-text",
         cmd = {
             "DapVirtualTextEnable",
             "DapVirtualTextDisable",
@@ -666,7 +682,7 @@ local pluginArgs = { -- {{{
                 only_first_definition = true,  -- only show virtual text at first definition (if there are multiple)
                 all_references = false,        -- show virtual text on all all references of the variable (not only definitions)
                 -- experimental features:
-                virt_text_pos = 'eol',   -- position of virtual text, see `:h nvim_buf_set_extmark()`
+                virt_text_pos = "eol",   -- position of virtual text, see `:h nvim_buf_set_extmark()`
                 all_frames = false,      -- show virtual text for all stack frames not only current. Only works for debugpy on my machine.
                 virt_lines = false,      -- show virtual lines instead of virtual text (will flicker!)
                 virt_text_win_col = nil  -- position the virtual text at a fixed window column (starting from the first text column) , e.g. 80 to position at column 80, see `:h nvim_buf_set_extmark()`
@@ -676,39 +692,22 @@ local pluginArgs = { -- {{{
         end
     },
     {
-        'mfussenegger/nvim-dap',
-        lazy = true,
-        dependencies = {
-            "nvim-dap-virtual-text",
-            "rcarriga/cmp-dap"
-        },
+        "jbyuki/one-small-step-for-vimkind",
         init = function()
-            map("n", [[<leader>db]], [[<CMD>lua require("dap").toggle_breakpoint()<CR>]], {"silent"}, "Dap toggle breakpoint")
-        end,
-        config = conf "nvim-dap",
-    },
-    {
-        'rcarriga/nvim-dap-ui',
-        dependencies = { 'mfussenegger/nvim-dap' },
-        config = conf "nvim-dap-ui".config,
-    },
-    {
-        'jbyuki/one-small-step-for-vimkind',
-        config = function()
             vim.api.nvim_create_user_command("OSVStop", function()
-                require("osv").stop()
+                require("osv.init").stop()
             end, { desc  = "Stop Neovim OSV dapter", })
             vim.api.nvim_create_user_command("OSVStart", function()
-                require("osv").launch{port=8086}
+                require("osv.init").launch{port=8086}
             end, { desc  = "Launch Neovim OSV dapter", })
         end
     },
     {
-        'nvim-neotest/neotest',
+        "nvim-neotest/neotest",
         dependencies = {
-            'nvim-neotest/neotest-plenary',
-            'nvim-neotest/neotest-python',
-            'antoinemadec/FixCursorHold.nvim',
+            "nvim-neotest/neotest-plenary",
+            "nvim-neotest/neotest-python",
+            "antoinemadec/FixCursorHold.nvim",
             "plenary.nvim",
             "nvim-treesitter",
         },
@@ -742,7 +741,7 @@ local pluginArgs = { -- {{{
         end,
     },
     {
-        'vim-test/vim-test',
+        "vim-test/vim-test",
         cmd = {
             "TestNearest",
             "TestFile",
@@ -752,29 +751,29 @@ local pluginArgs = { -- {{{
         },
         init = function()
             vim.g["test#strategy"] = {
-                nearest = 'neovim',
-                file    = 'dispatch',
-                suite   = 'basic',
+                nearest = "neovim",
+                file    = "dispatch",
+                suite   = "basic",
             }
         end,
     },
     {
-        'michaelb/sniprun',
+        "michaelb/sniprun",
         cond   = _G._os_uname.sysname ~= "Windows_NT",
-        build  = 'bash ./install.sh',
+        build  = "bash ./install.sh",
         cmd    = {"SnipRun", "SnipReset", "SnipReplMemoryClean", "SnipTerminate", "SnipInfo", "SnipClose"},
         config = conf "nvim-sniprun"
     },
-    -- 'CRAG666/code_runner.nvim'
+    -- "CRAG666/code_runner.nvim"
     -- }}} Debug
     -- Source control {{{
     {
-        'lewis6991/gitsigns.nvim',
+        "lewis6991/gitsigns.nvim",
         event  = "BufAdd",
         config = conf "nvim-gitsigns"
     },
     {
-        'rhysd/conflict-marker.vim',
+        "rhysd/conflict-marker.vim",
         cond   = not ex("lazygit"),
         init   = function() vim.g.conflict_marker_enable_mappings = 0; vim.g.conflict_marker_enable_highlight = 1 end,
         config = function()
@@ -783,16 +782,16 @@ local pluginArgs = { -- {{{
         end
     },
     {
-        'sindrets/diffview.nvim',
+        "sindrets/diffview.nvim",
         cmd    = "DiffviewOpen",
         config = conf "nvim-diffview",
     },
     {
-        'rhysd/git-messenger.vim',
-        key  = {{"<C-h>b", mode = "n"}},
+        "rhysd/git-messenger.vim",
+        keys = {{"<C-h>b", mode = "n"}},
         init = function()
             vim.g.git_messenger_no_default_mappings = true
-            vim.g.git_messenger_floating_win_opts   = {border = 'rounded'}
+            vim.g.git_messenger_floating_win_opts   = {border = "rounded"}
         end,
         config = function ()
             map("n", [[<C-h>b]], [[<Plug>(git-messenger)]], "Git Messenger")
@@ -809,7 +808,7 @@ local pluginArgs = { -- {{{
     -- }}} Source control
     -- Knowlege {{{
     {
-        'RishabhRD/nvim-cheat.sh',
+        "RishabhRD/nvim-cheat.sh",
         dependencies = {"RishabhRD/popfix"},
         cmd = {"Cheat", "CheatList", "CheatListWithoutComments", "CheatWithoutComments"},
     },
@@ -818,14 +817,14 @@ local pluginArgs = { -- {{{
         cmd = "Exercism"
     },
     {
-        'dahu/VimRegexTutor',
+        "dahu/VimRegexTutor",
         cmd = "VimRegexTutor",
     },
     {
-        'DanilaMihailov/vim-tips-wiki',
+        "DanilaMihailov/vim-tips-wiki",
     }
-}
     -- }}} Knowlege
+}
 local opts = {
     ui = {border = "rounded"}
 }

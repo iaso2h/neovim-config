@@ -108,7 +108,7 @@ theme.editor =  {
     Cursor       = {fg = p.n6, style = "reverse"},
     CursorIM     = {fg = p.n6, style = "reverse"},
     CursorColumn = {bg = p.n1},
-    CursorLine   = {bg = p.n1d},
+    CursorLine   = {bg = p.n1},
 
 
     DiffAdd    = {bg = "#43514b"},
@@ -407,7 +407,7 @@ theme.plugins = { -- {{{
     TelescopeResultsBorder = {fg = p.n8},
     TelescopeResultsTitle  = {fg = p.n8, style = "bold"},
     TelescopeSelection     = {bg = p.n2, style = "bold"},
-    TelescopeMatching       = {fg = p.n13},
+    TelescopeMatching      = {fg = p.n13},
 
     -- https://github.com/kyazdani42/nvim-tree.lua
     NvimTreeNormal           = {fg    = p.n4, bg = p.sidebar},

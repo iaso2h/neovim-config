@@ -179,11 +179,6 @@ if _G._os_uname.sysname == "Windows_NT" then
     })
 end
 
-excmd("W", [[noa w]], {
-    desc     = "Write without autocmd",
-    nargs    = 0,
-})
-
 excmd("DeleteEmptyLines", [['<,'>g#^\s*$#d]], {
     desc     = "Delete empty lines from selection",
     nargs    = 0,
@@ -262,9 +257,9 @@ end, {
     nargs = "+",
 })
 
-excmd(function(opts)
+excmd("Lfilter", function(opts)
     require("quickfix.cfilter").main(false, opts.args, opts.bang)
-end, "Lfilter", {
+end, {
     desc  = "Filter localfix window",
     bang  = true,
     nargs = "+",
@@ -281,7 +276,8 @@ excmd("E", function (opts)
     else
         vim.cmd [[e!]]
     end
-    vim.cmd [[loadview]]
+
+    vim.cmd [[loadview | norm! zv]]
 end, {
     desc = "Reopen the the current file while maintaining the window layout",
     bang = true,
@@ -325,13 +321,14 @@ excmd("Dofile", function (opts)
                 package.loaded[moduleName .. ".lua"] = nil
             end
         end
-        vim.cmd [[luafile %]]
+        if _G._autoreload then
+            require("autoreload").reload()
+        else
+            vim.cmd [[luafile %]]
+        end
     elseif ft == "vim" then
     end
 
-    if _G._autoreload then
-        require("autoreload").reload()
-    end
 end, {
     desc = "Reload the current file in lua/vim runtime",
     bang = true

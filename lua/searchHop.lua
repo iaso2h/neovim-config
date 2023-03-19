@@ -12,7 +12,7 @@ M.echoSearch = function()
     if searchDict.current == 1 or
             math.abs(searchDict.current - searchDict.total) == 0 then
         -- When search reaches the end
-        api.nvim_echo({{echoStr, "CmpItemAbbrMatch"}}, false, {})
+        api.nvim_echo({{echoStr, "TelescopePromptCounter"}}, false, {})
     else
         api.nvim_echo({{echoStr}}, false, {})
     end

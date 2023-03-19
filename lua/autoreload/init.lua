@@ -21,7 +21,9 @@ local M                    = {
 M.opt.lua.moduleSearchPath = M.configPath:joinpath("lua")
 M.opt.lua.blacklist        = {
     M.configPath:joinpath("lua", "config", "nvim-galaxyline.lua").filename,
-    M.configPath:joinpath("lua", "config", "nvim-null-is.lua").filename
+    M.configPath:joinpath("lua", "config", "nvim-null-is.lua").filename,
+    M.configPath:joinpath("lua", "core", "plugins.lua").filename,
+    M.configPath:joinpath("lua", "core", "init.lua").filename
 }
 M.opt.lua.setup            = {}
 M.opt.lua.config           = { -- {{{
@@ -48,14 +50,8 @@ M.opt.lua.config           = { -- {{{
                     end
                 end
             end
-            -- packerCompileQuery()
         end
     },
-    -- {
-    -- -- Ask whether to compile lua packages for "<NvimConfig> /lua/core/plugins.lua"
-    -- pathPat = luaModulePath:joinpath("core", "plugins.lua").filename,
-    -- config  = packerCompileQuery
-    -- },
     {
         pathPat       = M.opt.lua.moduleSearchPath:joinpath("onenord").filename,
         unloadOnlyChk = false,
@@ -75,8 +71,7 @@ M.opt.lua.config           = { -- {{{
         end
     }
 } -- }}}
--- Force files that match those patterns to be treated as individual lua file
--- module even if they are coming from a the lua directory module
+
 
 
 ----

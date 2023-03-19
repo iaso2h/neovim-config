@@ -5,18 +5,11 @@
 ;; version: #11b2d43
 (break_statement) @keyword.break
 
-(break_statement) @keyword.break
-
-(
- (
-  (identifier) @variable.builtin
+((identifier) @variable.builtin
   (#any-of? @variable.builtin "self" "string" "table" "vim")
-  )
- (#set! "priority" 130)
- )
+  (#set! "priority" 130))
 
-(
- (function_call
+(function_call
   (identifier) @function.builtin
   (#any-of? @function.builtin
             ;; built-in functions in Lua 5.1
@@ -24,34 +17,35 @@
             "load" "loadfile" "loadstring" "module" "next" "pairs" "pcall" "print"
             "rawequal" "rawget" "rawset" "require" "select" "setfenv" "setmetatable"
             "tonumber" "tostring" "type" "unpack" "xpcall")
-  )
- (#set! "priority" 150)
- )
+  (#set! "priority" 150))
 
-(function_call name: (identifier) @function.call(#set! "priority" 140))
+(function_call
+  name: (identifier) @function.call
+  (#set! "priority" 140))
 
-(function_call name: (dot_index_expression field: (identifier) @function.call)(#set! "priority" 140))
-(function_declaration name: (dot_index_expression field: (identifier) @function)(#set! "priority" 140))
+(function_call
+  name: (dot_index_expression field: (identifier) @function.call)
+  (#set! "priority" 140))
 
-(method_index_expression method: (identifier) @method.call(#set! "priority" 140))
+(function_declaration
+  name: (dot_index_expression field: (identifier) @function)
+  (#set! "priority" 140))
+
+(method_index_expression
+  method: (identifier) @method.call
+  (#set! "priority" 140))
 
 ;;Field
-(
- (field name: (identifier) @field)
- (#set! "priority" 130)
- )
+((field name: (identifier) @field)
+  (#set! "priority" 130))
 
-(
- (dot_index_expression field: (identifier) @field)
- (#set! "priority" 130)
- )
+((dot_index_expression field: (identifier) @field)
+  (#set! "priority" 130))
 
 ;;Constant
-(
- (identifier) @constant
- (#lua-match? @constant "^[A-Z][A-Z_0-9]*$")
- (#set! "priority" 130)
- )
+((identifier) @constant
+  (#lua-match? @constant "^[A-Z][A-Z_0-9]*$")
+  (#set! "priority" 130))
 
-((parameters (identifier) @parameter)(#set! "priority" 130))
-;; vim:ts=2:sts=2:sw=2:ft=scheme
+((parameters (identifier) @parameter)
+  (#set! "priority" 130))

@@ -11,7 +11,7 @@ _G._sep              = _G._os_uname.sysname == "Windows_NT" and "\\" or "/"
 _G._configPath       = fn.stdpath("config")
 _G._qf_fallback_open = true
 _G._trim_space       = true
-_G._autoreload       = false
+_G._autoreload       = true
 _G._enablePlugin     = true
 
 

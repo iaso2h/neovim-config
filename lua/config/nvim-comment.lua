@@ -5,7 +5,7 @@ return function()
         ---Whether the cursor should stay at its position
         sticky = true,
         ---Lines to be ignored while (un)comment
-        ignore = nil,
+        ignore = "^%s*$",
         mappings = {
             ---Operator-pending mapping; `gcc` `gbc` `gc[count]{motion}` `gb[count]{motion}`
             basic = false,
