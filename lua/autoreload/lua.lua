@@ -114,9 +114,9 @@ local checkOtherOpenMod = function (allAbsStr, topParentTailStr)
         return bufnr
     end, allAbsStr)
 
-    local currentbufNr = api.nvim_get_current_buf()
+    local currentBufNr = api.nvim_get_current_buf()
     local allValidBufNr = vim.tbl_filter(function(bufNr)
-        if bufNr ~= -1 and bufNr ~= currentbufNr and api.nvim_buf_get_option(bufNr, "modified") then
+        if bufNr ~= -1 and bufNr ~= currentBufNr and api.nvim_buf_get_option(bufNr, "modified") then
             return true
         else
             return false
@@ -194,7 +194,7 @@ end
 --- Reload a file lua module
 ---@param path       object Plenary path object. Lua module file
 ---@param parentPath object Plenary path object. Parent folder of the lua module file
----@param opt        table  Options table initilized in reload/init.lua
+---@param opt        table  Options table initialized in reload/init.lua
 M.loadFile = function(path, parentPath, opt) -- {{{
     -- Load setup hook
     hook(opt.setup, path)
@@ -240,7 +240,7 @@ end -- }}}
 
 --- Reload a lua directory module
 ---@param path object Plenary path object. Lua module file
----@param opt table Options table initilized in reload/init.lua
+---@param opt table Options table initialized in reload/init.lua
 M.loadDir = function(path, opt) -- {{{
     -- Get the top parent folder under <configpath>/lua/
     local allParentStr = path:parents()

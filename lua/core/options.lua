@@ -42,6 +42,9 @@ opt.cursorline = true
 -- o.diffopt        = "context:10000,filler,closeoff,vertical,algorithm:patience"
 opt.diffopt    = "context:100,algorithm:histogram,internal,indent-heuristic,filler,closeoff,iwhite,vertical"
 
+if _G._os_uname.machine == "aarch64" then
+    vim.cmd [[language en_US]]
+end
 opt.langmenu      = "en"
 opt.fileencodings = "utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1"
 opt.modelineexpr  = true

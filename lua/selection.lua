@@ -102,7 +102,7 @@ M.getSelect = function(returnType, exitToNormal) -- {{{
         end
     end
 
-    -- Needed to remove the last character to make it match the visual selction
+    -- Needed to remove the last character to make it match the visual selection
     if vim.o.selection == "exclusive" then selectEnd[2] = selectEnd[2] - 1 end
     if mode == "v" then
         lines[#lines] = lines[#lines]:sub(1, selectEnd[2] + 1)

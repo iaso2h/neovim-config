@@ -82,14 +82,14 @@ local validateCandidates = function()
     if #M.candidates == 0 then return false end
 
     if api.nvim_get_current_buf() == M.curBufNr
-        -- Compare the visual seleted region with the last candidate
+        -- Compare the visual selected region with the last candidate
         and (M.candidateIdx <= #M.candidates and M.candidateIdx >= 1) then
-        local posStart = api.nvim_buf_get_mark(M.curBufNr, "<")
-        local posEnd   = api.nvim_buf_get_mark(M.curBufNr, ">")
-        local cand     = M.candidates[M.candidateIdx]
+        local posStart  = api.nvim_buf_get_mark(M.curBufNr, "<")
+        local posEnd    = api.nvim_buf_get_mark(M.curBufNr, ">")
+        local candidate = M.candidates[M.candidateIdx]
 
-        if util.compareDist(posStart, cand.posStart) == 0
-            and util.compareDist(posEnd, cand.posEnd) == 0 then
+        if util.compareDist(posStart, candidate.posStart) == 0
+            and util.compareDist(posEnd, candidate.posEnd) == 0 then
             return true
         else
             return false
@@ -104,26 +104,26 @@ end
 --- @param opts table option table
 --- @param direction number 1 indicates expand, -1 indicates shrink
 local getCandidate = function(opts, direction)
-    local lastCand = M.candidates[M.candidateIdx]
+    local lastCandidate = M.candidates[M.candidateIdx]
     M.candidateIdx = M.candidateIdx + direction
 
     if M.candidateIdx - #M.candidates == 1 then
         -- Target index is out of scope. No more new candidate can be
         -- generated for textobject type candidate, but treesitter might still
         -- can get new parent node dynamically
-        if lastCand.type == "textObj" then
+        if lastCandidate.type == "textObj" then
             -- Text Object
             -- Do not generate any more candidates when reach maximum index
             vim.notify("No more candidates", vim.log.levels.INFO)
 
-            selectRegion(opts, lastCand)
+            selectRegion(opts, lastCandidate)
         else
             -- Treesitter
             -- Try to get new treesitter node candidate
             -- NOTE: pairNode and parentNode might be empty
-            local startNode, pairNode, parentNode = ts.getParentNode(lastCand.nodes)
+            local startNode, pairNode, parentNode = ts.getParentNode(lastCandidate.nodes)
             if startNode then
-                M.candidates[#M.candidates+1] = ts.getNodeCandidate(startNode, pairNode, parentNode, lastCand)
+                M.candidates[#M.candidates+1] = ts.getNodeCandidate(startNode, pairNode, parentNode, lastCandidate)
             else
                 vim.notify("No more candidates", vim.log.levels.INFO)
             end
@@ -152,7 +152,7 @@ local computeCandidate = function(opts, direction)
     local startNode, pairNode, parentNode
     if opts.treesitterExtent then
         startNode = ts.getCursorNode(M.cursorPos)
-        -- Check code block if the treesitter node matches the compouned statement
+        -- Check code block if the treesitter node matches the compound statement
         if cbPairs["ts_" .. startNode:type()] then
             startNode, pairNode, parentNode = ts.getPairNode(startNode)
         end
@@ -176,12 +176,12 @@ local computeCandidate = function(opts, direction)
 end
 
 
---- Start the expanding and shrinking of regioin
+--- Start the expanding and shrinking of region
 --- @param vimMode string
 --- @param direction number 1 indicates expand, -1 indicates shrink
 --- @param opts table option table
 M.expandShrink = function(vimMode, direction, opts)
-    -- Doen't support visual block or visual line mode
+    -- Don't support visual block or visual line mode
     if vimMode == "\22" or vimMode == "V" then return end
     opts = opts or optsDefault
 

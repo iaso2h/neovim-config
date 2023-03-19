@@ -6,8 +6,7 @@ return function()
         if client.supports_method("textDocument/formatting") then
             bmap(bufNr, "n", [[<A-f>]], [[<CMD>lua vim.lsp.buf.format{async=true}<CR>]], { "silent" }, "Format")
             bmap(bufNr, "x", [[<A-f>]],
-[[:lua vim.lsp.buf.format{async=true,range={start=vim.api.nvim_buf_get_mark(0,"<"),["end"]=vim.api.nvim_buf_get_mark(0, ">")}}<CR>]],
-                { "silent" }, "Format")
+[[:lua vim.lsp.buf.format{async=true,range={start=vim.api.nvim_buf_get_mark(0,"<"),["end"]=vim.api.nvim_buf_get_mark(0, ">")}}<CR>]], { "silent" }, "Format selection")
         end
     end
 
@@ -45,23 +44,21 @@ return function()
             return true
         end
     } -- }}}
-    vim.g.cspellEnable = false -- {{{
+    vim.g._cspellEnable = true -- {{{
     vim.api.nvim_create_user_command("CSpellToggle", function()
-        vim.g.cspellEnable = not vim.g.cspellEnable
-        local state = vim.g.cspellEnable and "Enabled" or "Disabled"
+        vim.g._cspellEnable = not vim.g._cspellEnable
+        local state = vim.g._cspellEnable and "Enabled" or "Disabled"
         vim.api.nvim_echo({ { string.format("CSpell has been %s", state), "Moremsg" } }, false, {})
     end, {
         desc  = "Toggle CSpell checking",
-        nargs = 0,
     })
-
     local cspell = null_ls.builtins.diagnostics.cspell.with {
         extra_args = {
             "--gitignore",
             "--config",
             string.format([[%s%scspell.json]], _G._configPath, _G._sep),
         },
-        runtime_condition = function() return vim.g.cspellEnable end,
+        runtime_condition = function() return vim.g._cspellEnable end,
         diagnostics_postprocess = function(diagnostic)
             if type(diagnostic) ~= "table" then return end
             diagnostic.severity = vim.diagnostic.severity.WARN

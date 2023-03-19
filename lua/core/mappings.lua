@@ -244,10 +244,10 @@ map("n", [[gx]],  [[<Plug>exchangeOperatorInplace]], "exchange operator and rest
 -- }}} Delete & Change & Replace & Exchange
 -- Search & Jumping {{{
 -- In case of mistouching
--- Inquery word
+-- Inquiry word
 map("n", [[<leader>i]], [=[[I]=], "Inquery word under cursor")
 map("x", [[<leader>i]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selection").getSelect("string", false), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquery selected words")
--- Fast mark resotre
+-- Fast mark restore
 map("n", [[M]], [[<CMD>lua require("searchHop").centerHop("`m", false)<CR>]], "Restore mark M")
 -- Changelist/Jumplist jumping
 map("n", [[<A-o>]], [[<CMD>lua require("searchHop").centerHop("g;", false, false)<CR>]], {"silent"}, "Older change")
@@ -314,7 +314,7 @@ map("n", [[g<S-CR>]], [[<CMD>call append(line(".")-1, repeat([""], v:count1))<CR
 map("n", [[g<CR>]],   [[<CMD>lua require("breakLine").main()<CR>]], {"silent"}, "Break line at cursor")
 -- }}} Trailing character
 
--- Pageup/Pagedown
+-- PageUp/PageDown
 map("", [[<C-f>]], [[<Nop>]], "which_key_ignore")
 map("", [[<C-h>]], [[<Nop>]], "which_key_ignore")
 map({"n", "x"}, [[<C-e>]], [[<C-y>]], {"noremap"}, "Scroll up")
@@ -412,7 +412,7 @@ map({"i","n"}, [[<F3>]], function ()
         vim.api.nvim_echo({{"Paste mode on", "Moremsg"}}, false, {})
         vim.opt.paste = true
     end
-end, "Toogle paste mode")
+end, "Toggle paste mode")
 
 -- <C-z/v/s> {{{
 map("n", [[<C-z>]], [[u]], "Undo") -- test
@@ -432,13 +432,13 @@ map("i", [[<C-v>]], [[<C-r>*]], "Put")
 map("i", [[<C-s>]], [[<C-\><C-o>:w<CR>]], "Write")
 -- }}} <C-z/x/v/s>
 -- Save as..
-vim.cmd [[command! -nargs=0 Saveas echohl Moremsg | echo "CWD: ".getcwd() | execute input("", "saveas ") | echohl None<CR> | e!]]
-map("n", [[<C-S-s>]], [[<CMD>Saveas<CR>]],       {"silent"}, "Save as")
-map("i", [[<C-S-s>]], [[<C-\><C-o>:Saveas<CR>]], {"silent"}, "Save as")
+vim.cmd [[command! -nargs=0 SaveAs echohl Moremsg | echo "CWD: ".getcwd() | execute input("", "save as ") | echohl None<CR> | e!]]
+map("n", [[<C-S-s>]], [[<CMD>SaveAs<CR>]],       {"silent"}, "Save as")
+map("i", [[<C-S-s>]], [[<C-\><C-o>:SaveAs<CR>]], {"silent"}, "Save as")
 -- Delete
-map("n", [[<C-S-d>]], [[<CMD>d<CR>]],       {"silent"}, "Detele line")
-map("x", [[<C-S-d>]], [[:d<CR>]],           {"silent"}, "Detele line")
-map("i", [[<C-S-d>]], [[<C-\><C-o>:d<CR>]], {"silent"}, "Detele line")
+map("n", [[<C-S-d>]], [[<CMD>d<CR>]],       {"silent"}, "Delete line")
+map("x", [[<C-S-d>]], [[:d<CR>]],           {"silent"}, "Delete line")
+map("i", [[<C-S-d>]], [[<C-\><C-o>:d<CR>]], {"silent"}, "Delete line")
 -- Highlight New Paste Content
 map("n", [[gy]], [[<CMD>lua require("yankPut").lastYankPut("yank")<CR>]], {"silent"}, "Select last yank")
 map("n", [[gY]], [[gy]], "Select last yank")
@@ -485,7 +485,7 @@ map("x", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank("v", "down")<CR>]
 map("x", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank("v", "up")<CR>]],             {"silent"}, "Copy line up")
 -- }}} Mimic the VSCode move/copy line up/down behavior
 
--- }}} MS bebhave
+-- }}} MS behavior
 
 -- Convert \ into /
 map("n", [[g/]], [[m`:s#\\#\/#e<CR>:noh<CR>g``]],   {"noremap", "silent"}, [[Convert \ to /]])

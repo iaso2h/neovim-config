@@ -1,16 +1,13 @@
-local api = vim.api
-
-
 -- Setup lazy.nvim package {{{
 local function promptOnMove(msg, func)
-    local waitAu = api.nvim_create_autocmd({"CursorMoved", "BufEnter"}, {
+    local waitAu = vim.api.nvim_create_autocmd({"CursorMoved", "BufEnter"}, {
         callback = function ()
             vim.api.nvim_echo({{os.date("%Y-%m-%d %H:%M  ") .. msg, "WarningMsg"}}, false, {})
         end
     })
     if func then
         func()
-        api.nvim_del_autocmd(waitAu)
+        vim.api.nvim_del_autocmd(waitAu)
     end
 end
 
@@ -40,6 +37,7 @@ local conf = function(moduleString)
     return require(string.format("config.%s", moduleString))
 end
 local pluginArgs = { -- {{{
+    -- https://github.com/folke/lazy.nvim#-plugin-spec
     -- Dependencies {{{
     "nvim-lua/plenary.nvim",
     "inkarkat/vim-visualrepeat",
@@ -500,7 +498,6 @@ local pluginArgs = { -- {{{
         cmd    = "Trouble",
         config = conf "nvim-trouble",
     },
-
     {
         "L3MON4D3/LuaSnip",
         dependencies = { "rafamadriz/friendly-snippets", },
@@ -605,7 +602,7 @@ local pluginArgs = { -- {{{
             "nvim-treesitter"
         },
         keys = {
-            {"gf", mode = "x"},
+            {"gf",  mode = "x"},
             {"gfp", mode = "n"},
             {"gfv", mode = "n"},
             {"gfc", mode = "n"}
@@ -649,9 +646,11 @@ local pluginArgs = { -- {{{
 
     {
         "mfussenegger/nvim-dap",
+        lazy = true,
         dependencies = {
             "nvim-dap-virtual-text",
-            "rcarriga/cmp-dap"
+            "rcarriga/cmp-dap",
+            "one-small-step-for-vimkind"
         },
         init = function()
             map("n", [[<leader>db]], [[<CMD>lua require("dap").toggle_breakpoint()<CR>]], {"silent"}, "Dap toggle breakpoint")
@@ -693,13 +692,14 @@ local pluginArgs = { -- {{{
     },
     {
         "jbyuki/one-small-step-for-vimkind",
+        lazy = true,
         init = function()
             vim.api.nvim_create_user_command("OSVStop", function()
-                require("osv.init").stop()
+                require("osv").stop()
             end, { desc  = "Stop Neovim OSV dapter", })
             vim.api.nvim_create_user_command("OSVStart", function()
-                require("osv.init").launch{port=8086}
-            end, { desc  = "Launch Neovim OSV dapter", })
+                require("osv").launch { config_file = _G._configPath .. _G._sep .. "init.lua", port = 8086 }
+            end, { desc  = "Launch Neovim OSV dapter"})
         end
     },
     {
@@ -832,7 +832,7 @@ local opts = {
 vim.api.nvim_create_user_command("LazyPlugin", function()
     vim.cmd( "cd " .. vim.fn.stdpath("data") .. "/lazy")
     vim.notify("Change directory to Lazy plug-ins path", vim.log.levels.INFO)
-end, { desc  = "Change dre", })
+end, { desc  = "Change directory to lazy plug-ins path", })
 
 vim.opt.rtp:prepend(lazyPath)
 require("lazy").setup(pluginArgs, opts)

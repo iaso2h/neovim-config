@@ -22,7 +22,7 @@ end
 ---@param func            function
 ---@param checkModifiable boolean Set this to true if the operator will
 ---                       modify the buffer
----@param plugMap         string e.g: <Plug>myplug
+---@param plugMap         string e.g: <Plug>myPlug
 ---@return string "g@" if successful
 -- TODO:use hook func to preserve info
 function M.expr(func, checkModifiable, plugMap)

@@ -12,7 +12,8 @@ local operator = require("operator")
 local register = require("register")
 local M = {
     hlInterval = 250,
-    hlGroup    = "Search"
+    hlGroup    = "Search",
+    hlEnable   = true
 }
 -- TODO: test cases
 
@@ -158,8 +159,29 @@ function M.inplaceYank(args) -- {{{
     -- Create highlight {{{
     -- Creates a new namespace or gets an existing one.
     M.lastYankNS = api.nvim_create_namespace("inplacePutNewContent")
-    local newContentExmark = util.nvimBufAddHl(curBufNr, posStart, posEnd,
-        fn.getregtype(), opts.hlGroup, opts.timeout)
+    local newContentExmark
+    if M.hlEnable then
+        newContentExmark = util.nvimBufAddHl(
+            curBufNr,
+            posStart,
+            posEnd,
+            fn.getregtype(),
+            opts.hlGroup,
+            opts.timeout)
+    else
+        -- Conver into (0, 0) index
+        posStart = {posStart[1] - 1, posStart[2]}
+        posEnd   = {posEnd[1] - 1, posEnd[2]}
+        newContentExmark = api.nvim_buf_set_extmark(
+            curBufNr,
+            M.lastYankNS,
+            posStart[1],
+            posStart[2],
+            {
+                end_row = posEnd[1],
+                end_col = posEnd[2]
+            })
+    end
     if newContentExmark then M.lastYankExtmark = newContentExmark end
     -- }}} Create highlight
 
@@ -290,7 +312,30 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     local posEnd = api.nvim_buf_get_mark(curBufNr, "]")
     -- Creates a new namespace or gets an existing one.
     M.inplacePutNewContentNS = api.nvim_create_namespace("inplacePutNewContent")
-    local newContentExmark = util.nvimBufAddHl(curBufNr, posStart, posEnd, regTypeNew, opts.hlGroup, opts.timeout, M.inplacePutNewContentNS)
+    local newContentExmark
+    if M.hlEnable then
+        newContentExmark = util.nvimBufAddHl(
+            curBufNr,
+            posStart,
+            posEnd,
+            regTypeNew,
+            opts.hlGroup,
+            opts.timeout,
+            M.inplacePutNewContentNS)
+    else
+        -- Conver into (0, 0) index
+        posStart = {posStart[1] - 1, posStart[2]}
+        posEnd   = {posEnd[1] - 1, posEnd[2]}
+        newContentExmark = api.nvim_buf_set_extmark(
+            curBufNr,
+            M.inplacePutNewContentNS,
+            posStart[1],
+            posStart[2],
+            {
+                end_row = posEnd[1],
+                end_col = posEnd[2]
+            })
+    end
     if newContentExmark then M.inplacePutNewContentExtmark = newContentExmark end
     -- }}} Create highlight
 

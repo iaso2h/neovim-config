@@ -42,7 +42,7 @@ M.insertPrompt = function(vimMode) -- {{{
             reg = msg
         end
 
-        -- Allow quick cancle by pressing return key only
+        -- Allow quick cancel by pressing return key only
         if reg == "" then return end
 
         -- Allow more specific put command in normal mode
@@ -87,7 +87,7 @@ end
 
 --- Reindent the register content
 --- @param indentOffset integer Can be negative integer. How many indents
---- the source register content going to be prefixed or trimed
+--- the source register content going to be prefixed or trimmed
 --- @param srcContent string The content return by vim.fn.getreg()
 --- @return string Reindented register content
 M.reindent = function(indentOffset, srcContent) -- {{{
@@ -151,7 +151,7 @@ end -- }}}
 
 ----
 -- Function: M.saveReg will save the star registers, plus and unnamed registers
--- independantly, restoreReg can be accessed after saveReg is called
+-- independently, restoreReg can be accessed after saveReg is called
 ----
 M.saveReg = function() -- {{{
     local unnamedContent = fn.getreg('"', 1)

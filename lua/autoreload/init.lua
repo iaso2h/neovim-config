@@ -3,7 +3,6 @@
 -- Description: reload lua package or vim file at Neovim configuration directory
 -- Version: 0.0.23
 -- Last Modified: 2023-3-13
-local fn    = vim.fn
 local api   = vim.api
 local util  = require("autoreload.util")
 local ok, p = pcall(require, "plenary.path")
@@ -25,8 +24,8 @@ M.opt.lua.blacklist        = {
     M.configPath:joinpath("lua", "core", "plugins.lua").filename,
     M.configPath:joinpath("lua", "core", "init.lua").filename
 }
-M.opt.lua.setup            = {}
-M.opt.lua.config           = { -- {{{
+M.opt.lua.setup  = {}
+M.opt.lua.config = { -- {{{
     {
         -- Call the config func from "<NvimConfig>/lua/config/" if it's callable
         pathPat       = M.opt.lua.moduleSearchPath:joinpath("config").filename,
@@ -103,7 +102,7 @@ M.reload = function() -- {{{
         }
         local overrideFileModuleStr = vim.tbl_map(function(i) return i.filename end, overrideFileModulePath)
 
-        -- Only reloading lua module from: <nvimconfigpath>/lua/
+        -- Only reloading lua module from: <nvimConfigPath>/lua/
         if not string.match(path.filename, M.opt.lua.moduleSearchPath.filename) then return end
 
         local l = require("autoreload.lua")

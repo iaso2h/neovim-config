@@ -53,7 +53,7 @@ local saveOption = function() -- {{{
     local saveClipboard
     local saveSelection
 
-    -- BUG: somehow it will triger xclipboard warning
+    -- BUG: somehow it will trigger xclipboard warning
     -- if api.nvim_get_option("clipboard") ~= "" then
 
         -- saveClipboard = vim.o.clipboard
@@ -82,7 +82,7 @@ end -- }}}
 --- first line from both register and buffer matchup.
 --- @param regContent string Value of register content
 --- @param regionMotion table Contain start and end position of operator
---- movement. {1, 0} indexedontains
+--- movement. {1, 0} index
 --- @param motionDirection number 1 indicate motion like "j, w, f" is moving
 --- forward -1 indicates motion is moving backward
 --- @param vimMode string Vim mode
@@ -135,7 +135,7 @@ end -- }}}
 --- otherwise return false
 local matchRegType = function(motionType, vimMode, reg, regionMotion, motionDirection) -- {{{
     -- NOTE:"\<C-v>" for vimMode in vimscript is evaluated as "\22" in lua, which represents blockwise motion
-    -- NOTE:"\0261" in vimscript is evaluated as "\0221" in lua, which represents blockwise-vusal register
+    -- NOTE:"\0261" in vimscript is evaluated as "\0221" in lua, which represents blockwise-visual register
     -- Vim mode
     --  ├── block mode
     --  │    └── ...
@@ -162,12 +162,12 @@ local matchRegType = function(motionType, vimMode, reg, regionMotion, motionDire
             -- the line to match the height of the blockwise selection.
             local height = regionMotion.startPos[1] - regionMotion.endPos[1] + 1
             if height > 1 then
-                local linesConcn = {}
+                local linesConcat = {}
                 for _ = 1, height, 1 do
-                    linesConcn = vim.list_extend(linesConcn, lines)
+                    linesConcat = vim.list_extend(linesConcat, lines)
                 end
 
-                local regContentNew = table.concat(linesConcn, "\n")
+                local regContentNew = table.concat(linesConcat, "\n")
                 ---@diagnostic disable-next-line: param-type-mismatch
                 fn.setreg(reg.name, regContentNew, "b")
                 reg.content = regContentNew
@@ -318,7 +318,7 @@ end -- }}}
 --- motionType     string  Motion type by which how the operator perform.
 --- Can be "line", "char" or "block"
 --- vimMode        string  Vim mode. See: `:help mode()`
---- plugMap        string  eg: <Plug>myplug
+--- plugMap        string  eg: <Plug>myPlug
 --- replaceLineChk boolean
 function M.operator(args) -- {{{
     if not warnRead() then return end
@@ -564,7 +564,7 @@ end -- }}}
 ---Expression callback for replace operator
 ---@param restoreCursorChk boolean Whether to restore the cursor if possible
 ---@param highlightChangeChk boolean Whether to highlight the change. Only
---support turnig off highlight changes in vim normal mode!
+--support turning off highlight changes in vim normal mode!
 ---@return string "g@"
 function M.expr(restoreCursorChk, highlightChangeChk) -- {{{
     -- TODO: Detect virutal edit

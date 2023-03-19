@@ -7,7 +7,6 @@ if vim.fn.has("nvim-0.8.3") ~= 1 then
     return
 end
 
-pcall(vim.cmd, [[language en_US]])
 
 -- Disable built-in plugins
 vim.g.loaded_2html_plugin      = 1
@@ -45,10 +44,6 @@ vim.g.doxygen_enhanced_color = 1
 vim.g.msql_sql_query = 1
 
 local ok, msg = pcall(require, "global")
-if not ok then
-    return vim.notify(msg, vim.log.levels.ERROR)
-end
-
 if not ok then
     return vim.notify(msg, vim.log.levels.ERROR)
 end

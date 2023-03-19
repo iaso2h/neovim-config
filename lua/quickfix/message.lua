@@ -60,7 +60,8 @@ M.main = function()
             errorLineTbl[#errorLineTbl+1] = #qfTbl
         else
             if string.find(m, [[^E%d+: .*:$]]) or
-                string.find(m, [[^stack traceback:]])
+                string.find(m, [[^stack traceback:]]) or
+                string.find(m, [[^Error executing l?L?ua]])
                 then
                 -- Checking indent in the follow iteration
                 errorLineTbl[#errorLineTbl+1] = #qfTbl

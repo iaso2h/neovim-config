@@ -1,6 +1,6 @@
-local fn   = vim.fn
-local api  = vim.api
-local M = {whichKeyDocs = {}}
+local fn  = vim.fn
+local api = vim.api
+local M   = {}
 
 
 function M.convertMap(mode, lhs, rhs, optsTbl)
@@ -28,6 +28,7 @@ function M.convertMap(mode, lhs, rhs, optsTbl)
     end
     return mapString
 end
+
 
 function M.readInitLua()
     local targetF = io.open("C:/users/hashub/desktop/convertedmap1.vim", "w")
@@ -130,7 +131,7 @@ function M.trimSpaces(strTbl, silent, prefix) -- {{{
 end -- }}}
 
 
---- Save the star registers, plus and unnamed registers - independantly,
+--- Save the star registers, plus and unnamed registers - independently,
 --- restoreReg can be accessed after saveReg is called
 function M.saveReg() -- {{{
     local unnamedContent = fn.getreg('"', 1)
@@ -179,7 +180,7 @@ function M.visualSelection(returnType, returnNormal) -- {{{
     if #lines == 0 then
         return {""}
     end
-    -- Needed to remove the last character to make it match the visual selction
+    -- Needed to remove the last character to make it match the visual selection
     if vim.o.selection == "exclusive" then selectEnd[2] = selectEnd[2] - 1 end
     if mode == "v" then
         lines[#lines] = lines[#lines]:sub(1, selectEnd[2] + 1)
@@ -195,7 +196,7 @@ function M.visualSelection(returnType, returnNormal) -- {{{
 end -- }}}
 
 
---- Caculate the distance from pos1 to pos2
+--- Calculate the distance from pos1 to pos2
 ---@param pos1       table      {1, 0} based number. Can be retrieved by calling vim.api.nvim_buf_get_mark()
 ---@param pos2       table      Same as pos1
 ---@param biasFactor number|nil
@@ -279,7 +280,7 @@ end
 
 
 --- Create highlights for region in a buffer. The region is defined by two
---- tables containg position info represent the start and the end
+--- tables containing position info represent the start and the end
 --- respectively. The region can be multi-lines across in a buffer
 --- @param bufNr      number     Buffer number/handler
 --- @param posStart   table      (1, 0)-indexed values from vim.api.nvim_buf_get_mark()
@@ -305,7 +306,7 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, 
     if presNS then
         local ok, msg = pcall(api.nvim_buf_set_extmark, bufNr, presNS,
             posStart[1], posStart[2], {end_line = posEnd[1], end_col = posEnd[2]})
-        -- End function calling if exmark is out of scope
+        -- End function calling if extmark is out of scope
         if not ok then
             vim.notify(msg, vim.log.levels.WARN)
             return false
@@ -316,7 +317,7 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, 
 
     -- Creates a new namespace or gets an existing one.
     local hlNS = api.nvim_create_namespace('myHighlight')
-    -- Always clear all namespaced obejcts
+    -- Always clear all namespaced objects
     api.nvim_buf_clear_namespace(bufNr, hlNS, 0, -1)
 
     -- Add highlight
@@ -345,7 +346,7 @@ end
 
 --- Copy indent of specific line number in current buffer
 ---@param lineNr number (1, 0) indexed
----@return string Corresonding line indent
+---@return string Corresponding line indent
 M.indentCopy = function(lineNr)
     return string.rep(" ", fn.indent(lineNr))
 end

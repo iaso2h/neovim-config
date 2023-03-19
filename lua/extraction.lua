@@ -20,7 +20,7 @@ end
 reset()
 
 
-local langAssignOper = {
+local langAssignOperator = {
     go = " := "
 }
 local langSuffix = {
@@ -146,8 +146,8 @@ local newVar = function(lhs, rhs, namespace, extmark, linebreakChk) -- {{{
     local prefix = getPrefix(lang, lhs)
     local suffix = langSuffix[lang] or ""
     suffix = suffix and suffix or ""
-    local assignOper = langAssignOper[lang]
-    assignOper = assignOper and assignOper or " = "
+    local assignOperator = langAssignOperator[lang]
+    assignOperator = assignOperator and assignOperator or " = "
     -- Retrieve RHS source location
     -- (0, 0) indexed
     local rhsExtmark = api.nvim_buf_get_extmark_by_id(0, namespace, extmark, {details = true})
@@ -159,7 +159,7 @@ local newVar = function(lhs, rhs, namespace, extmark, linebreakChk) -- {{{
     local indentWidth = fn.indent(rhsStart[1] + 1)
     local newLine = string.format("%s%s%s%s%s%s",
         string.rep(" ", indentWidth),
-        prefix, lhs, assignOper, rhs, suffix)
+        prefix, lhs, assignOperator, rhs, suffix)
     api.nvim_put({newLine}, "l", false, false)
 
     -- Set location in jump list
@@ -256,7 +256,7 @@ end
 ---        motionType string Motion type by which how the operator perform.
 ---                    Can be "line", "char" or "block"
 ---        vimMode    string Vim mode. See `help mode()`
----        plugMap    string eg <Plug>myplug
+---        plugMap    string eg <Plug>myPlug
 ---        vimMode     string Vim mode. See `help mode()`
 function M.main(args) -- {{{
     M.vimMode    = args[2]

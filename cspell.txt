@@ -45,3 +45,14 @@ setcmdpos
 islist
 tsnode
 bufs
+pumvisible
+inplace
+getcwd
+echohl
+wincmd
+xclipboard
+strs
+bufnr
+noautocmd
+rshift
+setqflist

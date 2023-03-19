@@ -250,7 +250,7 @@ end, {
 })
 
 excmd("Cfilter", function(opts)
-    require("quickfix.cfilter").main(true, opts.args, opts.bang)
+    require("quickfix.cFilter").main(true, opts.args, opts.bang)
 end, {
     desc  = "Filter quickfix window",
     bang  = true,
@@ -258,7 +258,7 @@ end, {
 })
 
 excmd("Lfilter", function(opts)
-    require("quickfix.cfilter").main(false, opts.args, opts.bang)
+    require("quickfix.cFilter").main(false, opts.args, opts.bang)
 end, {
     desc  = "Filter localfix window",
     bang  = true,
@@ -286,7 +286,7 @@ end, {
 excmd("O", [[browse oldfiles]], { desc = "Browse the oldfiles then prompt", })
 
 excmd("Q", function (opts)
-    local saveCMD = opts.bang and "noa bufdo update | " or "noa "
+    local saveCMD = opts.bang and "noa " or "noa bufdo update | "
     local sessionName = opts.args or "01"
     local sessionDir  = _G._configPath .. _G._sep .. "session"
     if not vim.loop.fs_stat(sessionDir) then

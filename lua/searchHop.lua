@@ -53,7 +53,7 @@ M.searchSelected = function(exCMD)
 end
 
 
---- Execute ex command then center the screent situationally
+--- Execute ex command then center the screen situationally
 ---@param exCMD string Ex command
 ---@param feedkeyChk boolean Use the ex command to feed keys
 ---@param suppressMsgChk boolean
