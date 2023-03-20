@@ -658,6 +658,8 @@ local pluginArgs = { -- {{{
             "one-small-step-for-vimkind"
         },
         init = function()
+            map("n", [[<leader>dc]], [[<CMD>lua require("dap").set_breakpoint(vim.fn.input("Breakpoint Condition: "), nil, nil, true)<CR>]], {"silent"}, "Dap set conditional break point")
+            map("n", [[<leader>dl]], [[<CMD>lua require("dap").set_breakpoint(nil, nil, vim.fn.input("Log point message: "))<CR>]], {"silent"}, "Dap set log point")
             map("n", [[<leader>db]], [[<CMD>lua require("dap").toggle_breakpoint()<CR>]], {"silent"}, "Dap toggle breakpoint")
         end,
         config = conf "nvim-dap",
@@ -774,7 +776,7 @@ local pluginArgs = { -- {{{
     },
     {
         "rhysd/conflict-marker.vim",
-        cond   = not ex("lazygit"),
+        cond   = not require("util").ex("lazygit"),
         init   = function() vim.g.conflict_marker_enable_mappings = 0; vim.g.conflict_marker_enable_highlight = 1 end,
         config = function()
             map("x", "]x", [[<Plug>(conflict-marker-next-hunk)]], "Next conflict marker")
@@ -806,15 +808,11 @@ local pluginArgs = { -- {{{
         end
     },
     -- }}} Source control
-    -- Knowlege {{{
+    -- Knowledge {{{
     {
         "RishabhRD/nvim-cheat.sh",
         dependencies = {"RishabhRD/popfix"},
         cmd = {"Cheat", "CheatList", "CheatListWithoutComments", "CheatWithoutComments"},
-    },
-    {
-        "AndrewRadev/exercism.vim",
-        cmd = "Exercism"
     },
     {
         "dahu/VimRegexTutor",
@@ -823,7 +821,7 @@ local pluginArgs = { -- {{{
     {
         "DanilaMihailov/vim-tips-wiki",
     }
-    -- }}} Knowlege
+    -- }}} Knowledge
 }
 local opts = {
     ui = {border = "rounded"}

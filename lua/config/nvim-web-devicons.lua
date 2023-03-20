@@ -1,5 +1,6 @@
 return function()
     require'nvim-web-devicons'.setup {
+        default = true,
         override = {
             html = {
                 icon = "",
@@ -76,11 +77,6 @@ return function()
                 color = "#019833",
                 name = "Vimrc",
             },
-            [".vimrc"] = {
-                icon = "",
-                color = "#019833",
-                name = "Vimrc"
-            },
             ["_gvimrc"] = {
                 icon = "",
                 color = "#019833",
@@ -97,6 +93,5 @@ return function()
                 name = "Executable"
             },
         },
-        default = true
     }
 end

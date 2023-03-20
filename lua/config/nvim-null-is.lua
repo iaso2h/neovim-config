@@ -15,7 +15,7 @@ return function()
         extra_args = function(params)
             local results = vim.fs.find({ "selene.toml" }, {
                 upward = true,
-                path = vim.api.nvim_buf_get_name(0),
+                path = nvim_buf_get_name(0),
             })
             if #results == 0 then
                 return params
@@ -53,6 +53,7 @@ return function()
         desc  = "Toggle CSpell checking",
     })
     local cspell = null_ls.builtins.diagnostics.cspell.with {
+        disabled_filetypes = require("config.nvim-galaxyline").shortLineList,
         extra_args = {
             "--gitignore",
             "--config",
@@ -125,7 +126,6 @@ return function()
 
     local builtinSource = {
         cspellAppend      = cspellAppendAction,
-        -- emacs_scheme_mode = null_ls.builtins.formatting.emacs_scheme_mode
     }
     for _, source in pairs(builtinSource) do null_ls.register(source) end
 
