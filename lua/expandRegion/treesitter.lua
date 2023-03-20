@@ -8,25 +8,6 @@ local M       = {}
 local codeBlockPairBlackList = {"python"}
 
 
---- Get treesitter node under cursor position
---- @param cursorPos table cursor position
---- @return object treesitter node
-M.getCursorNode = function(cursorPos)
-    if not package.loaded["nvim-treesitter.parsers"] then return false end
-    local parsers = require("nvim-treesitter.parsers")
-    local tsUtils = require("nvim-treesitter.ts_utils")
-
-    if not parsers.has_parser() then return false end
-
-    cursorPos = api.nvim_win_get_cursor(0)
-    local cursorRange = {cursorPos[1] - 1, cursorPos[2]}
-
-    local rootNode = tsUtils.get_root_for_position(unpack(cursorRange))
-    if not rootNode then return false end
-    return rootNode:named_descendant_for_range(cursorRange[1], cursorRange[2], cursorRange[1], cursorRange[2])
-end
-
-
 --- Get the region range of a treesitter node
 --- @param tsNode object treesitter node
 --- @param getStrNodeContent boolean set it true to subtract the region to the
@@ -52,7 +33,7 @@ end
 
 --- Get the two treesitter nodes at the start and end of a code block
 --- determined by a parentNode
---- @param parentNode two treesitter node objects or just one treesitter when
+--- @param parentNode userdata two treesitter node objects or just one treesitter when
 ---        there is only one child node for the parentNode
 M.getPairNode = function(parentNode)
     -- The first node at code block determined by parentNode

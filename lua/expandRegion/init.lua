@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Expand region in visual character mode.
 -- For treesitter support, only tested on python, lua, c files
--- Version: 0.0.17
--- Last Modified: 2021-10-11
+-- Version: 0.0.18
+-- Last Modified: 2023-3-20
 local fn   = vim.fn
 local cmd  = vim.cmd
 local api  = vim.api
@@ -148,10 +148,17 @@ end
 --- Compute and generate candidates table, which contain info about the start and end of regions
 --- @param opts table option table
 --- @param direction number 1 indicates expand, -1 indicates shrink
+--- @return boolean, string
 local computeCandidate = function(opts, direction)
+    if not package.loaded["nvim-treesitter.parsers"] or
+        not require("nvim-treesitter.parsers").has_parser() then
+        return false, "Need Tree-sitter support"
+    end
+
     local startNode, pairNode, parentNode
     if opts.treesitterExtent then
-        startNode = ts.getCursorNode(M.cursorPos)
+        startNode = vim.treesitter.get_node()
+        if not startNode then return false, "Unable to find Tree-sitter node at cursor position" end
         -- Check code block if the treesitter node matches the compound statement
         if cbPairs["ts_" .. startNode:type()] then
             startNode, pairNode, parentNode = ts.getPairNode(startNode)
