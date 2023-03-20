@@ -2,7 +2,7 @@
 --     local bufNrTbl = vim.api.nvim_list_bufs()
 --     for _, bufNr in ipairs(bufNrTbl) do
 --         local pluginFilePath = string.format("%s%slua%score%splugins.lua", _G._configPath, _G._sep, _G._sep, _G._sep)
---         if vim.api.nvim_buf_get_name(bufNr) == pluginFilePath then
+--         if nvim_buf_get_name(bufNr) == pluginFilePath then
 --             return bufNr
 --         end
 --     end
@@ -102,7 +102,12 @@ end
 return function(bufNr, cursorPos, fallback)
     -- Get buffer number from buffer list
     -- bufNr = getBuf()
-    if bufNr == -1 then return end
+    -- if bufNr == -1 then return end
+    -- Need Tree-sitter support
+    if not package.loaded["nvim-treesitter.parsers"] or
+        not require("nvim-treesitter.parsers").has_parser() then
+        return fallback(bufNr, cursorPos)
+    end
 
     local fieldNodes = getArgFieldNodes(bufNr)
     if not next(fieldNodes) then
@@ -114,11 +119,9 @@ return function(bufNr, cursorPos, fallback)
 
     -- Convert cursorPos into (0, 0) index
     local cursor = {cursorPos[1] - 1 ,cursorPos[2]}
-    local cursorRange = {}
     local pluginIdx = 0
     for i, range in ipairs(pluginInfo.ranges) do
         if cursor[1] >= range[1] and cursor[1] <= range[3] then
-            cursorRange = range
             pluginIdx   = i
             break
         end

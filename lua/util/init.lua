@@ -3,6 +3,9 @@ local api = vim.api
 local M   = {}
 
 
+M.ex = function(exec) return fn.executable(exec) == 1 end
+
+
 function M.convertMap(mode, lhs, rhs, optsTbl)
     local specArg = ""
     local noremap = ""
@@ -97,7 +100,7 @@ end
 ---        provided, the whole buffer will be trimmed instead.
 --- @param silent boolean Default is true. Set this to true to not show trimming result
 --- @param prefix boolean Set to true to trim the suffix as well
---- @return:       return table of trimmed string, otherwise return 0
+--- @return  table | nil Return table of trimmed string, otherwise return 0
 function M.trimSpaces(strTbl, silent, prefix) -- {{{
     if not _G._trim_space then return end
 

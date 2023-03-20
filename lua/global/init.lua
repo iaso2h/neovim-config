@@ -4,15 +4,24 @@ require("global.keymap")
 local fn  = vim.fn
 local api = vim.api
 
-
-_G._os_uname         = vim.loop.os_uname()
-_G._is_term          = vim.fn.has("gui_running") == 1
-_G._sep              = _G._os_uname.sysname == "Windows_NT" and "\\" or "/"
-_G._configPath       = fn.stdpath("config")
-_G._qf_fallback_open = true
-_G._trim_space       = true
-_G._autoreload       = true
-_G._enablePlugin     = true
+local init = function(initValue, optName) -- {{{
+    if optName then
+        vim.api.nvim_create_user_command("Toggle" .. optName, function()
+            vim.g._cspellEnable = not vim.g._cspellEnable
+            local state = vim.g._cspellEnable and "Enabled" or "Disabled"
+            vim.api.nvim_echo({ { string.format("%s has been %s", optName, state), "Moremsg" } }, false, {})
+        end, {})
+    end
+    return initValue
+end -- }}}
+_G._os_uname         = init(vim.loop.os_uname())
+_G._is_term          = init(vim.fn.has("gui_running") == 1)
+_G._sep              = init(_G._os_uname.sysname == "Windows_NT" and "\\" or "/")
+_G._configPath       = init(fn.stdpath("config"))
+_G._qf_fallback_open = init(true, "QuickFixFallbackOpen")
+_G._trim_space       = init(true, "QuickTrimSpace")
+_G._autoreload       = init(true, "Autoreload")
+_G._enablePlugin     = init(true)
 
 
 _G.Print = function(...)
@@ -29,9 +38,6 @@ _G.Print = function(...)
 
     return ...
 end
-
-
-_G.ex = function(exec) return fn.executable(exec) == 1 end
 
 
 --- Remove value from list-liked lua table
@@ -109,7 +115,7 @@ _G.tbl_replace = function(tbl, repVal, srcVal, repAllChk, cnt, alertOnFail)
             end
         end
     else
-        -- Bacause when table with one element have its very only element
+        -- Because when table with one element have its very only element
         -- set to nil, the table will also became nil
         if idx == 1 then
             tbl = {repVal}
@@ -149,17 +155,12 @@ _G.tbl_idx = function(tbl, item, returnIdxTbl)
 end
 
 
---- Unify sepator in value returned by vim.api.nvim_buf_get_name()
+--- Unify separator in value returned by vim.api.nvim_buf_get_name()
 ---@vararg any Same as vim.api.nvim_buf_get_name()
 _G.nvim_buf_get_name = function(bufNr)
     if _G._os_uname.sysname == "Windows_NT" then
         local name = api.nvim_buf_get_name(bufNr)
         local retName = name:gsub("/", _G._sep)
-        -- local retName, count = name:gsub("/", _G._sep)
-        -- if count ~= 0 then
-            -- vim.notify("vim.api.nvim_buf_get_name() just return a ununified sepator", vim.log.levels.ERROR)
-            -- Print(name)
-        -- end
         return retName
     else
         return api.nvim_buf_get_name(bufNr)

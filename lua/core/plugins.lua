@@ -14,7 +14,7 @@ end
 local lazyPath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazyPath) then
     vim.o.cmdheight = 10
-    if not ex("git") then
+    if not require("util").ex("git") then
         vim.notify("Can't find git executable", vim.log.levels.WARN)
         vim.notify("Loading Plug-ins settings abort", vim.log.levels.WARN)
         return
@@ -369,7 +369,8 @@ local pluginArgs = { -- {{{
     -- UI {{{
     {
         "kyazdani42/nvim-web-devicons",
-        priority = 100
+        priority = 100,
+        config = conf "nvim-web-devicons"
     },
     {
         "yamatsum/nvim-nonicons",

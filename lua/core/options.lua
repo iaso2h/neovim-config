@@ -1,6 +1,7 @@
 local fn  = vim.fn
 local api = vim.api
 local opt = vim.opt
+local ex  = require("util").ex
 
 -- let &path.="src/include,/usr/include/AL,"
 if ex("rg") then

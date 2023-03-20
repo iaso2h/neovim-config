@@ -29,7 +29,7 @@ local function openUrl(url, timeout, bufNr)
 end
 
 
---- Highligh area in current line
+--- Highlight area in current line
 ---@param bufNr number
 ---@param lnum number
 ---@param colStart number

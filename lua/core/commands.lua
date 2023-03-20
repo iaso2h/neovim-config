@@ -313,14 +313,26 @@ excmd("Dofile", function (opts)
                 package.loaded[moduleName .. ".lua"] = nil
             end
         end
+
+        local filePath = nvim_buf_get_name(0)
+        local idx = {string.find(
+            filePath,
+            _G._configPath .. _G._sep .. "lua" .. _G._sep)}
+        if next(idx) then
+            local tail = filePath:sub(idx[2] + 1, -1)
+            local root = tail:sub(1, -5)
+            local moduleName = root:gsub(_G._sep, ".")
+            require(moduleName)
+        else
+            vim.cmd("luafile " .. filePath)
+        end
+
         if _G._autoreload then
             require("autoreload").reload()
-        else
-            vim.cmd [[luafile %]]
         end
     elseif ft == "vim" then
+        vim.cmd [[source %]]
     end
-
 end, {
     desc = "Reload the current file in lua/vim runtime",
     bang = true

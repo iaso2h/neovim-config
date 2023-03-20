@@ -1,1 +1,17 @@
-{"language":"en","dictionaries":["programming"],"allowCompoundWords":true,"ignoreRegExpList":["%\\w\\w"],"version":"0.2","dictionaryDefinitions":[{"name":"programming","path":".\/cspell.txt"}]}
+{
+    "language": "en",
+    "dictionaries": [
+        "programming"
+    ],
+    "allowCompoundWords": true,
+    "ignoreRegExpList": [
+        "%\\w"
+    ],
+    "version": "0.2",
+    "dictionaryDefinitions": [
+        {
+            "name": "programming",
+            "path": ".\/cspell.txt"
+        }
+    ]
+}
