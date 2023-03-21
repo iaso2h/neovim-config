@@ -2,7 +2,7 @@ function! s:isCurrentLineEmpty()
     return !len(getline('.'))
 endfunction
 " isCurrentLineEmpty
-" TODO camelcase convert tool
+" TODO: camelcase convert tool
 
 function! s:inside()
     keepjumps normal! gg^
@@ -24,15 +24,15 @@ endfunction
 let s:save_cpo = &cpo
 set cpo&vim
 
-" onoremap <silent> <Plug>(textObjInsideAll) :<C-U>call <SID>inside()<CR>
-" omap <silent> ie <Plug>(textObjInsideAll)
+onoremap <silent> <Plug>(textObjInsideAll) :<C-U>call <SID>inside()<CR>
+omap <silent> ig <Plug>(textObjInsideAll)
 xnoremap <silent> <Plug>(textObjInsideAll) :<C-U>call <SID>inside()<CR>
-xmap <silent> ie <Plug>(textObjInsideAll)
+xmap <silent> ig <Plug>(textObjInsideAll)
 
-" onoremap <silent> <Plug>(textObjectAroundAll) :<C-U>call <SID>around()<CR>
-" omap <silent> ae <Plug>(textObjectAroundAll)
+onoremap <silent> <Plug>(textObjectAroundAll) :<C-U>call <SID>around()<CR>
+omap <silent> ag <Plug>(textObjectAroundAll)
 xnoremap <silent> <Plug>(textObjectAroundAll) :<C-U>call <SID>around()<CR>
-xmap <silent> ae <Plug>(textObjectAroundAll)
+xmap <silent> ag <Plug>(textObjectAroundAll)
 
 
 let &cpo = s:save_cpo

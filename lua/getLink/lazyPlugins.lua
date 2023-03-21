@@ -138,7 +138,7 @@ return function(bufNr, cursorPos, fallback)
 
     -- Plugin configuration use table specification
     local node = pluginInfo.nodes[pluginIdx]
-    local configPat = vim.regex [[\(config\|init\).\{-}=.\{-}conf[ (]\{-}\zs\('\|"\).*\('\|"\)]]
+    local configRegex = vim.regex [[\(config\|init\).\{-}=.\{-}require[ (]\{-}\('\|"\)config\.\zs.*\ze\('\|"\)]]
     local configPath = {}
     for n in node:iter_children() do
         if n:named() and n:type() == "field" then
@@ -146,9 +146,9 @@ return function(bufNr, cursorPos, fallback)
             if range[1] <= cursorPos[1] then
                 local text = getNodeText(bufNr, range, 0, 0, "")
                 ---@diagnostic disable-next-line: need-check-nil
-                local idx = {configPat:match_str(text)}
+                local idx = {configRegex:match_str(text)}
                 if next(idx) then
-                    local configName = text:sub(idx[1] + 2, idx[2] - 1)
+                    local configName = text:sub(idx[1] + 1, idx[2])
                     configPath[#configPath+1] = string.format("e %s%slua%sconfig%s%s.lua",
                         _G._configPath, _G._sep, _G._sep, _G._sep, configName)
                 end

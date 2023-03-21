@@ -98,7 +98,6 @@ opt.splitright     = true
 opt.switchbuf      = "uselast"
 
 -- GUI
--- cmd [[colorscheme onedarknord]]
 vim.cmd [[colorscheme onenord]]
 -- GuiFont = "VictorMono NFM"
 GuiFont = "Cascadia Code"

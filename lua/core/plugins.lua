@@ -33,9 +33,6 @@ end
 -- }}} Setup lazy.nvim package
 
 -- Plug-ins configuration
-local conf = function(moduleString)
-    return require(string.format("config.%s", moduleString))
-end
 local pluginArgs = { -- {{{
     -- https://github.com/folke/lazy.nvim#-plugin-spec
     -- Dependencies {{{
@@ -51,7 +48,7 @@ local pluginArgs = { -- {{{
             ---@diagnostic disable-next-line: undefined-global
             ts_update()
         end,
-        config = conf "nvim-treesitter",
+        config = require("config.nvim-treesitter"),
     },
     {
         "nvim-treesitter/playground",
@@ -95,7 +92,7 @@ local pluginArgs = { -- {{{
             "nvim-treesitter",
             "gitsigns.nvim"
         },
-        config = conf "nvim-treesitter-textobjects",
+        config = require("config.nvim-treesitter-textobjects"),
     },
     {
         "windwp/nvim-ts-autotag",
@@ -113,7 +110,7 @@ local pluginArgs = { -- {{{
     {
         "skywind3000/asyncrun.vim",
         cmd    = {"AsyncRun", "AsyncStop"},
-        config = conf "vim-asyncrun"
+        config = require("config.vim-asyncrun")
     },
     {
         "bkad/camelcasemotion",
@@ -161,7 +158,7 @@ local pluginArgs = { -- {{{
             map("n", [[<leader>s]], [[<CMD>Switch<CR>]], {"silent"}, "Switch word under cursor")
             vim.g.switch_mapping = ""
         end,
-        config = conf "vim-switch"
+        config = require("config.vim-switch")
     },
     {
         "machakann/vim-sandwich",
@@ -171,8 +168,8 @@ local pluginArgs = { -- {{{
             {"cs", mode = "n"},
             {"ds", mode = "n"},
         },
-        init   = conf "vim-sandwich".setup,
-        config = conf "vim-sandwich".config
+        init   = require("config.vim-sandwich").setup,
+        config = require("config.vim-sandwich").config
     },
     {
         "junegunn/vim-easy-align",
@@ -297,8 +294,11 @@ local pluginArgs = { -- {{{
             {[[gco]], mode = "n"},
             {[[gcO]], mode = "n"},
             {[[gcA]], mode = "n"},
+
+            {[[gci]], mode = "n"},
+            {[[gci]], mode = "x"},
         },
-        config = conf "nvim-comment"
+        config = require("config.nvim-comment")
     },
     {
         "lukas-reineke/indent-blankline.nvim",
@@ -331,7 +331,7 @@ local pluginArgs = { -- {{{
     {
         "folke/which-key.nvim",
         cmd    = "WhichKey",
-        config = conf "nvim-which-key"
+        config = require("config.nvim-which-key")
     },
     -- }}} Vim enhancement
     -- Telescope {{{
@@ -348,7 +348,7 @@ local pluginArgs = { -- {{{
             {[[<C-f>gC]], mode = "n"}, {[[<C-f>gs]], mode = "n"}, {[[<C-f>b]], mode = "n"}, {[[<C-f>d]], mode = "n"},
             {[[<C-f>D]], mode = "n"},
         },
-        config = conf "nvim-telescope"
+        config = require("config.nvim-telescope")
     },
     {
         "nvim-telescope/telescope-symbols.nvim",
@@ -369,7 +369,7 @@ local pluginArgs = { -- {{{
     {
         "kyazdani42/nvim-web-devicons",
         priority = 100,
-        config = conf "nvim-web-devicons"
+        config = require("config.nvim-web-devicons")
     },
     {
         "yamatsum/nvim-nonicons",
@@ -381,12 +381,12 @@ local pluginArgs = { -- {{{
         "glepnir/galaxyline.nvim",
         dependencies = { "nvim-web-devicons" },
         event  = "BufAdd",
-        config = conf("nvim-galaxyline").config,
+        config = require("config.nvim-galaxyline").config,
     },
     {
         "iaso2h/nvim-cokeline",
         dependencies = { "nvim-web-devicons" },
-        config = conf "nvim-cokeline",
+        config = require("config.nvim-cokeline"),
     },
     {
         "NvChad/nvim-colorizer.lua",
@@ -422,18 +422,18 @@ local pluginArgs = { -- {{{
         "folke/todo-comments.nvim",
         dependencies = { "nvim-web-devicons" },
         event  = "BufAdd",
-        config = conf "nvim-todo-comments",
+        config = require("config.nvim-todo-comments"),
     },
     {
         "kyazdani42/nvim-tree.lua",
         dependencies = { "nvim-web-devicons" },
         keys   = {{"<C-w>e", mode = "n"}},
-        config = conf "nvim-tree",
+        config = require("config.nvim-tree"),
     },
     {
         "stevearc/dressing.nvim",
         event  = "BufAdd",
-        config = conf "nvim-dressing"
+        config = require("config.nvim-dressing")
     },
     -- }}} UI
     -- Intellisense {{{
@@ -461,7 +461,7 @@ local pluginArgs = { -- {{{
     {
         "williamboman/mason-lspconfig.nvim",
         dependencies = { "mason.nvim" },
-        config = conf("nvim-mason-lspconfig").config,
+        config = require("config.nvim-mason-lspconfig").config,
     },
     {
         "jay-babu/mason-null-ls.nvim",
@@ -471,7 +471,7 @@ local pluginArgs = { -- {{{
             "jose-elias-alvarez/null-ls.nvim",
             "mason.nvim"
         },
-        config = conf "nvim-null-is",
+        config = require("config.nvim-null-is"),
     },
     {
         "folke/neodev.nvim",
@@ -490,14 +490,14 @@ local pluginArgs = { -- {{{
                     },
                 types = true },
             }
-            conf("nvim-lspconfig")()
+            require("config.nvim-lspconfig")()
         end,
     },
     {
         "folke/trouble.nvim",
         dependencies = { "nvim-lspconfig", },
         cmd    = "Trouble",
-        config = conf "nvim-trouble",
+        config = require("config.nvim-trouble"),
     },
     {
         "L3MON4D3/LuaSnip",
@@ -569,7 +569,7 @@ local pluginArgs = { -- {{{
                 dependencies = { "LuaSnip" }
             },
         },
-        config = conf "nvim-cmp",
+        config = require("config.nvim-cmp"),
     },
     {
         "ray-x/lsp_signature.nvim",
@@ -582,6 +582,10 @@ local pluginArgs = { -- {{{
                 always_trigger = true,
                 doc_lines      = 12
             }
+            map("n", "<A-p>", [[<CMD>lua require("lsp_signature").toggle_float_win()<CR>]],
+                { "silent" },            "Toggle signature")
+            map("i", "<A-p>", [[<C-o><CMD>lua require("lsp_signature").toggle_float_win()<CR>]],
+                { "silent", "noremap" }, "Toggle signature")
         end,
     },
     {
@@ -659,7 +663,7 @@ local pluginArgs = { -- {{{
             "PP", "Runtime", "Disarm", "Scriptnames", "Messages",
             "Verbose", "Time", "Breakadd", "Vopen", "Vedit", "Vsplit"
         },
-        config = conf("vim-scriptease").config
+        config = require("config.vim-scriptease").config
     },
 
     {
@@ -668,7 +672,7 @@ local pluginArgs = { -- {{{
         dependencies = {
             {
                 "rcarriga/nvim-dap-ui",
-                config = conf "nvim-dap-ui".config,
+                config = require("config.nvim-dap-ui").config,
             },
             "nvim-dap-virtual-text",
             "cmp-dap",
@@ -679,7 +683,7 @@ local pluginArgs = { -- {{{
             map("n", [[<leader>dl]], [[<CMD>lua require("dap").set_breakpoint(nil, nil, vim.fn.input("Log point message: "))<CR>]], {"silent"}, "Dap set log point")
             map("n", [[<leader>db]], [[<CMD>lua require("dap").toggle_breakpoint()<CR>]], {"silent"}, "Dap toggle breakpoint")
         end,
-        config = conf "nvim-dap",
+        config = require("config.nvim-dap"),
     },
     {
         "theHamsta/nvim-dap-virtual-text",
@@ -781,7 +785,7 @@ local pluginArgs = { -- {{{
         cond   = _G._os_uname.sysname ~= "Windows_NT",
         build  = "bash ./install.sh",
         cmd    = {"SnipRun", "SnipReset", "SnipReplMemoryClean", "SnipTerminate", "SnipInfo", "SnipClose"},
-        config = conf "nvim-sniprun"
+        config = require("config.nvim-sniprun")
     },
     -- "CRAG666/code_runner.nvim"
     -- }}} Debug
@@ -796,7 +800,7 @@ local pluginArgs = { -- {{{
     {
         "lewis6991/gitsigns.nvim",
         event  = "BufAdd",
-        config = conf "nvim-gitsigns"
+        config = require("config.nvim-gitsigns")
     },
     {
         "rhysd/conflict-marker.vim",
@@ -810,7 +814,7 @@ local pluginArgs = { -- {{{
     {
         "sindrets/diffview.nvim",
         cmd    = "DiffviewOpen",
-        config = conf "nvim-diffview",
+        config = require("config.nvim-diffview"),
     },
     {
         "rhysd/git-messenger.vim",

@@ -1,8 +1,8 @@
 -- File: trailingChar
 -- Author: iaso2h
 -- Description: Add character at the end of line
--- Version: 0.0.5
--- Last Modified: 2023-2-23
+-- Version: 0.0.6
+-- Last Modified: 2023-3-21
 local api = vim.api
 local fn  = vim.fn
 local ts  = vim.treesitter
@@ -32,7 +32,7 @@ local function findCommentNode(cursorPos, lastNode, lineLen)
     local cnt = 0
     local i = 1
     repeat
-        local node = ts.get_node_at_pos(0, cursorPos[1], i) -- This is (0, 0) indexing
+        local node = ts.get_node(0, cursorPos[1], i) -- This is (0, 0) indexing
         if not node then
             vim.notify("Failed to get treesitter node", vim.log.levels.WARN)
             return commentTick
@@ -89,7 +89,7 @@ local trailingMarker = function(cursorPos, line, char)
 
     -- Use treesitter to find comment node
     -- Get node across line
-    local lastNode = ts.get_node_at_pos(0, cursorPos[1], 0)
+    local lastNode = ts.get_node(0, cursorPos[1], 0)
 
     if not lastNode then
         vim.notify("Failed to get treesitter node. Using fallback func", vim.log.levels.WARN)

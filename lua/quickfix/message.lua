@@ -70,7 +70,9 @@ M.main = function()
         end
     end
 
-    if #qfTbl == 0 then return end
+    if #qfTbl == 0 then
+        return vim.notify("No messages", vim.log.levels.INFO)
+    end
 
     require("quickfix.highlight").clear()
     fn.setqflist({}, "r", {title = "qfMessage", items = qfTbl})
