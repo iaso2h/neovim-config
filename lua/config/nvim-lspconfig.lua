@@ -1,3 +1,4 @@
+-- https://github.com/neovim/nvim-lspconfig
 return function()
     local lsp       = vim.lsp
     local fn        = vim.fn
@@ -160,6 +161,19 @@ return function()
         }
     }
     -- }}} Lua
+    servers.fennel_language_server = {
+        settings = {
+            fennel = {
+                workspace = {
+                    library = vim.api.nvim_list_runtime_paths(),
+                },
+                diagnostics = {
+                    globals = {"vim"}
+                }
+            }
+        }
+        
+    }
     -- Vimscript {{{
     -- npm install -g vim-language-server
     vim.g.markdown_fenced_languages = {
@@ -233,6 +247,7 @@ return function()
         }
     end
     -- }}} Clangd
+
     if _G._os_uname.sysname == "Windows_NT" then
         servers.marksman = {
             cmd = {

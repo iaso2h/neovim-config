@@ -435,6 +435,58 @@ local pluginArgs = { -- {{{
         event  = "BufAdd",
         config = require("config.nvim-dressing")
     },
+    {
+        "HiPhish/nvim-ts-rainbow2",
+        event  = "BufAdd",
+        dependencies = {"nvim-treesitter"},
+        config = function()
+            require("nvim-treesitter.configs").setup {
+            rainbow = {
+                enable = true,
+                -- list of languages you want to disable the plugin for
+                disable = {
+                        -- All available query listed in here
+                        -- https://github.com/HiPhish/nvim-ts-rainbow2/tree/master/queriesnull
+                        "c",
+                        "c_sharp",
+                        -- "clojure",
+                        -- "commonlisp",
+                        "cpp",
+                        "css",
+                        -- "fennel",
+                        "go",
+                        "html",
+                        "java",
+                        "javascript",
+                        "json",
+                        "json5",
+                        "jsonc",
+                        "latex",
+                        "lua",
+                        "make",
+                        "markdown",
+                        "python",
+                        -- "query",
+                        -- "racket",
+                        -- "regex",
+                        "rst",
+                        "rust",
+                        -- "scheme",
+                        "scss",
+                        "tsx",
+                        "typescript",
+                        "vim",
+                        "vue",
+                        "yaml",
+                    },
+                    -- Which query to use for finding delimiters
+                    query = "rainbow-parens",
+                    -- Highlight the entire buffer all at once
+                    strategy = require("ts-rainbow").strategy["local"],
+                }
+            }
+        end
+    },
     -- }}} UI
     -- Intellisense {{{
     {
@@ -857,7 +909,7 @@ local opts = {
     concurrency = 5
 }
 
-vim.api.nvim_create_user_command("LazyPlugin", function()
+vim.api.nvim_create_user_command("CDLazyPlugin", function()
     vim.cmd( "cd " .. vim.fn.stdpath("data") .. "/lazy")
     vim.notify("Change directory to Lazy plug-ins path", vim.log.levels.INFO)
 end, { desc  = "Change directory to lazy plug-ins path", })

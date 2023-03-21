@@ -127,6 +127,12 @@ return function()
     local builtinSource = {
         cspellAppend      = cspellAppendAction,
     }
+    if _G._os_uname.sysname == "Linux" then
+        builtinSource.fnlfmt = null_ls.builtins.formatting.fnlfmt.with {
+            command = [[/home/iaso2h/Project/Github/fnlfmt/fnlfmt]],
+        }
+    end
+
     for _, source in pairs(builtinSource) do null_ls.register(source) end
 
     -- Auto setup by mason
