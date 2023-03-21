@@ -85,8 +85,8 @@ M.reload = function() -- {{{
     -- Check filetype
     if vim.bo.filetype == "lua" then
         -- Check blacklist
-        for _, pat in ipairs(M.opt.lua.blacklist) do
-            if string.match(path.filename, pat) then
+        for _, i in ipairs(M.opt.lua.blacklist) do
+            if i == path.filename or string.match(path.filename, i) then
                 return
             end
         end
