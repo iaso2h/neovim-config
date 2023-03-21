@@ -14,6 +14,7 @@ M.servers = {
     tsserver = {},
     vimls = {},
     yamlls = {},
+    fennel_language_server = {},
 }
 
 M.config = function()

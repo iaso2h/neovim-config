@@ -268,7 +268,9 @@ map("x", [[#]], [[?]], "Search selected backward")
 map("n", [[n]], [[<CMD>lua require("searchHop").cycleSearch("n")<CR>]], {"silent"}, "Cycle through search result forward")
 map("n", [[N]], [[<CMD>lua require("searchHop").cycleSearch("N")<CR>]], {"silent"}, "Cycle through search result backward")
 -- Disable highlight search & Exit visual mode
-map("n", [[<leader>h]], [[<CMD>noh<CR>]], {"silent"}, "Clear highlight")
+map("",  [[<C-l>]], [[<Nop>]], "which_key_ignore")
+map("",  [[<leader>H]], [[<C-l>]],                           {"noremap", "silent"}, "Refresh screen")
+map("n", [[<leader>h]], [[<CMD>noh<CR>]],                    {"silent"}, "Clear highlight")
 map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"}, "Disable highlight")
 -- Matchit
 map("", [[<C-m>]], [[%]], {"silent"}, "Go to match parenthesis")

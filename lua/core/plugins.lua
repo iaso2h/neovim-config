@@ -544,6 +544,7 @@ local pluginArgs = { -- {{{
             "hrsh7th/cmp-nvim-lsp",
             "hrsh7th/cmp-buffer",
             "hrsh7th/cmp-path",
+            "PaterJason/cmp-conjure",
             "rcarriga/cmp-dap",
             {
                 "tzachar/cmp-tabnine",
@@ -619,6 +620,20 @@ local pluginArgs = { -- {{{
     },
     -- }}} Intellisense
     -- Debug {{{
+    {
+        "Olical/conjure",
+        dependencies = { "cmp-conjure" },
+        init = function()
+            vim.g["conjure#mapping#prefix"] = " "
+            vim.g["conjure#mapping#eval_comment_current_form"] = "ecc"
+            vim.g["conjure#mapping#eval_replace_form"]         = "eR"
+            vim.g["conjure#mapping#eval_motion"]               = "ge"
+
+            vim.g["conjure#log#wrap"]                   = true
+            vim.g["conjure#log#fold#enabled"]           = true
+            vim.g["conjure#log#jump_to_latest#enabled"] = true
+        end
+    },
     {
         "bfredl/nvim-luadev",
         cond = false,
@@ -770,6 +785,13 @@ local pluginArgs = { -- {{{
     },
     -- "CRAG666/code_runner.nvim"
     -- }}} Debug
+    -- Language specs {{{
+    {
+        "guns/vim-sexp",
+        ft = {"clojure", "scheme", "lisp", "timl", "fennel", "query"},
+        init = require("config.vim-sexp")
+    },
+    -- }}} Language specs
     -- Source control {{{
     {
         "lewis6991/gitsigns.nvim",

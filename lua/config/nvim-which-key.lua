@@ -80,7 +80,9 @@ return function ()
         triggers = {
             "<C-f>",
             "<C-h>",
-            "<leader>"
+            "<leader>",
+            "<leader>e",
+            "<leader>l"
         },
         disable = {
             buftypes = {},

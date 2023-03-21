@@ -55,10 +55,14 @@ return function()
             vim.lsp.buf.implementation { on_list = conciseQuifix }
         end, { "silent" }, "LSP implementation")
 
-        bmap(bufNr, "n", [[ga]],      [[<CMD>lua vim.lsp.buf.code_action()<CR>]],    {"silent"}, "LSP code action")
-        bmap(bufNr, "n", "<leader>r", [[<CMD>lua vim.lsp.buf.rename()<CR>]],         {"silent"}, "LSP rename")
-        bmap(bufNr, "n", [[K]],       [[<CMD>lua vim.lsp.buf.hover()<CR>]],          {"silent"}, "LSP hover")
-        bmap(bufNr, "n", [[<C-p>]],   [[<CMD>lua vim.lsp.buf.signature_help()<CR>]], {"silent"}, "LSP signature help")
+        bmap(bufNr, "n", [[<leader>a]],
+            [[<CMD>lua vim.lsp.buf.code_action()<CR>]],    {"silent"}, "LSP code action")
+        bmap(bufNr, "n", "<leader>rn",
+            [[<CMD>lua vim.lsp.buf.rename()<CR>]],         {"silent"}, "LSP rename")
+        bmap(bufNr, "n", [[K]],
+            [[<CMD>lua vim.lsp.buf.hover()<CR>]],          {"silent"}, "LSP hover")
+        bmap(bufNr, "n", [[<C-p>]],
+            [[<CMD>lua vim.lsp.buf.signature_help()<CR>]], {"silent"}, "LSP signature help")
 
         bmap(bufNr, "n", [[<C-q>r]], [[<CMD>lua vim.lsp.buf.references{includeDeclaration=true}<CR>]], {"silent"}, "LSP references")
         -- bmap(bufNr, "n", [=[<leader>wa]=], vim.lsp.buf.add_workspace_folder, "LSP add workspace folder")
