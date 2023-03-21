@@ -25,7 +25,7 @@ end
 --- Display history in new buffer
 --- @param refreshChk boolean Set it true to refresh the history files everytime
 M.display = function(refreshChk)
-    if fn.argc() > 0 or #vim.v.oldfiles == 1 then
+    if not refreshChk and fn.argc() > 0 or #vim.v.oldfiles == 1 then
         return
     end
 
