@@ -505,7 +505,7 @@ local pluginArgs = { -- {{{
         build  = "make install_jsregexp",
         event  = "BufAdd",
         config = function ()
-            local mySnippets = _G._configPath .. _G._sep .. "snippets"
+            local mySnippets = _G._config_path .. _G._sep .. "snippets"
             require("luasnip.loaders.from_vscode").lazy_load()
             require("luasnip.loaders.from_vscode").lazy_load { paths = { mySnippets } }
         end,
@@ -516,7 +516,8 @@ local pluginArgs = { -- {{{
         event  = "BufAdd",
         config = function()
             require("nvim-autopairs").setup {
-                disable_filetype        = {"TelescopePrompt", "dap-repl"},
+                disable_filetype        = vim.list_extend(
+                    {"TelescopePrompt", "dap-repl"}, _G._lisp_language),
                 disable_in_macro        = true,
                 disable_in_visualblock  = false,
                 disable_in_replace_mode = true,
@@ -721,7 +722,7 @@ local pluginArgs = { -- {{{
                 require("osv").stop()
             end, { desc  = "Stop Neovim OSV dapter", })
             vim.api.nvim_create_user_command("OSVStart", function()
-                require("osv").launch { config_file = _G._configPath .. _G._sep .. "init.lua", port = 8086 }
+                require("osv").launch { config_file = _G._config_path .. _G._sep .. "init.lua", port = 8086 }
             end, { desc  = "Launch Neovim OSV dapter"})
         end
     },
@@ -792,7 +793,7 @@ local pluginArgs = { -- {{{
     -- Language specs {{{
     {
         "guns/vim-sexp",
-        ft = {"clojure", "scheme", "lisp", "timl", "fennel", "query"},
+        ft = _G._lisp_language,
         init = require("config.vim-sexp")
     },
     -- }}} Language specs

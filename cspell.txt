@@ -62,3 +62,11 @@ tabnr
 dapui
 onenord
 cascadia
+timl
+nofile
+clangd
+pyright
+venv
+numhl
+linehl
+texthl

@@ -57,7 +57,7 @@ return function()
         extra_args = {
             "--gitignore",
             "--config",
-            string.format([[%s%scspell.json]], _G._configPath, _G._sep),
+            string.format([[%s%scspell.json]], _G._config_path, _G._sep),
         },
         runtime_condition = function() return vim.g._cspellEnable end,
         diagnostics_postprocess = function(diagnostic)
@@ -74,7 +74,7 @@ return function()
             word = vim.fn.expand("<cword>"):lower()
         end
 
-        local filePath = string.format("%s%scspell.txt", _G._configPath, _G._sep)
+        local filePath = string.format("%s%scspell.txt", _G._config_path, _G._sep)
         io.popen(string.format("echo %s >> %s", word, filePath))
         vim.notify(string.format([["%s" is appended to user dictionary.]], word), vim.log.levels.INFO)
 

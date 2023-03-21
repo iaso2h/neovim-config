@@ -280,7 +280,7 @@ excmd("O", [[browse oldfiles]], { desc = "Browse the oldfiles then prompt", })
 excmd("Q", function (opts)
     local saveCMD = opts.bang and "noa " or "noa bufdo update | "
     local sessionName = opts.args or "01"
-    local sessionDir  = _G._configPath .. _G._sep .. "session"
+    local sessionDir  = _G._config_path .. _G._sep .. "session"
     if not vim.loop.fs_stat(sessionDir) then
         vim.fn.mkdir(sessionDir, "p")
     end
@@ -317,7 +317,7 @@ excmd("Dofile", function (opts)
         local filePath = nvim_buf_get_name(0)
         local idx = {string.find(
             filePath,
-            _G._configPath .. _G._sep .. "lua" .. _G._sep)}
+            _G._config_path .. _G._sep .. "lua" .. _G._sep)}
         if next(idx) then
             local tail = filePath:sub(idx[2] + 1, -1)
             local root = tail:sub(1, -5)

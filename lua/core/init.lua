@@ -20,7 +20,7 @@ vim.defer_fn(function()
     _G.CoreMappigsStart = false
 end, 0)
 
-if _G._enablePlugin then
+if _G._enable_plugin then
     vim.defer_fn(function()
         ok, msg = pcall(require, "core.plugins")
         if not ok then

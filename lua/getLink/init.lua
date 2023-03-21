@@ -45,7 +45,7 @@ local getUrl = function(bufNr, cursorPos)
     local urlStart, urlEnd = vim.regex[=[[a-z]*:\/\/[^ >,;]*]=]:match_str(cursorLine)
     if urlStart then
         local url = string.sub(cursorLine, urlStart + 1, urlEnd)
-        highlight(bufNr, cursorPos[1], urlStart, urlEnd - 1)
+        highlight(bufNr, cursorPos[1], urlStart, urlEnd)
         return url
     end
     return ""
@@ -61,7 +61,7 @@ function M.main(selectText)
 
         local filePath = fn.expand("%:p")
 
-        if filePath == string.format("%s%slua%score%splugins.lua", _G._configPath, _G._sep, _G._sep, _G._sep) then
+        if filePath == string.format("%s%slua%score%splugins.lua", _G._config_path, _G._sep, _G._sep, _G._sep) then
             url = require("getLink.lazyPlugins")(curBufNr, cursorPos, getUrl)
             if type(url) == "string" and url ~= "" then
                 if string.find(url, "http") then

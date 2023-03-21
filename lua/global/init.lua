@@ -17,12 +17,13 @@ end -- }}}
 _G._os_uname         = init(vim.loop.os_uname())
 _G._is_term          = init(vim.fn.has("gui_running") == 1)
 _G._sep              = init(_G._os_uname.sysname == "Windows_NT" and "\\" or "/")
-_G._configPath       = init(fn.stdpath("config"))
+_G._config_path      = init(fn.stdpath("config"))
 _G._format_option    = init("cr/qn2mM1jpl")
 _G._qf_fallback_open = init(true, "QuickFixFallbackOpen")
 _G._trim_space       = init(true, "QuickTrimSpace")
 _G._autoreload       = init(true, "Autoreload")
-_G._enablePlugin     = init(true)
+_G._enable_plugin    = init(true)
+_G._lisp_language    = init{"clojure", "scheme", "lisp", "timl", "fennel", "query", "racket", "janet"}
 
 
 _G.Print = function(...)

@@ -1,7 +1,7 @@
 -- local getBuf = function()
 --     local bufNrTbl = vim.api.nvim_list_bufs()
 --     for _, bufNr in ipairs(bufNrTbl) do
---         local pluginFilePath = string.format("%s%slua%score%splugins.lua", _G._configPath, _G._sep, _G._sep, _G._sep)
+--         local pluginFilePath = string.format("%s%slua%score%splugins.lua", _G._config_path, _G._sep, _G._sep, _G._sep)
 --         if nvim_buf_get_name(bufNr) == pluginFilePath then
 --             return bufNr
 --         end
@@ -150,7 +150,7 @@ return function(bufNr, cursorPos, fallback)
                 if next(idx) then
                     local configName = text:sub(idx[1] + 1, idx[2])
                     configPath[#configPath+1] = string.format("e %s%slua%sconfig%s%s.lua",
-                        _G._configPath, _G._sep, _G._sep, _G._sep, configName)
+                        _G._config_path, _G._sep, _G._sep, _G._sep, configName)
                 end
             else
                 break
