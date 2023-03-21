@@ -14,7 +14,8 @@ require("todo-comments").setup{
         WARN = { icon = " ", color = "warning",   alt = {"WARNING",     "XXX"} },
         NOTE = { icon = " ", color = "hint",      alt = {"INFO",        "DEBUG"} },
         TEST = { icon = "⏲ ", color = "test",      alt = { "TESTING", "PASSED",      "FAILED" } },
-        PERF = { icon = " ", alt = {"OPTIM", "PERFORMANCE", "OPTIMIZE"} }
+        PERF = { icon = " ", alt = {"OPTIM", "PERFORMANCE", "OPTIMIZE"} },
+        LUARUN = { icon = " ", color = "hint"}
     },
       gui_style = {
         fg = "NONE", -- The gui style to use for the fg highlight group.

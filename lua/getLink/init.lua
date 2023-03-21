@@ -1,8 +1,8 @@
 -- File: o
 -- Author: iaso2h
 -- Description: Open url link in browser
--- Version: 0.0.11
--- Last Modified: 2023-3-19
+-- Version: 0.0.12
+-- Last Modified: 2023-3-22
 local fn  = vim.fn
 local api = vim.api
 local M   = {
@@ -40,11 +40,10 @@ local function highlight(bufNr, lnum, colStart, colEnd)
 end
 
 
-local getUrl = function(bufNr, cursorPos)
-    local cursorLine = api.nvim_get_current_line()
-    local urlStart, urlEnd = vim.regex[=[[a-z]*:\/\/[^ >,;]*]=]:match_str(cursorLine)
+local getUrl = function(bufNr, cursorPos, curLine)
+    local urlStart, urlEnd = vim.regex[=[[a-z]*:\/\/[^ >,;]*]=]:match_str(curLine)
     if urlStart then
-        local url = string.sub(cursorLine, urlStart + 1, urlEnd)
+        local url = string.sub(curLine, urlStart + 1, urlEnd)
         highlight(bufNr, cursorPos[1], urlStart, urlEnd)
         return url
     end
@@ -56,8 +55,9 @@ function M.main(selectText)
     if not selectText then
         -- Normal mode with no selected text provided
         local url
-        local curBufNr = api.nvim_get_current_buf()
+        local curBufNr  = api.nvim_get_current_buf()
         local cursorPos = api.nvim_win_get_cursor(0)
+        local curLine   = api.nvim_get_current_line()
 
         local filePath = fn.expand("%:p")
 
@@ -70,9 +70,12 @@ function M.main(selectText)
                     vim.cmd(url)
                 end
             end
+        elseif string.match(curLine, [[^%s*--%s*LUARUN:]]) then
+            local idx = {string.find(curLine, [[^%s*--%s*LUARUN:]])}
+            vim.cmd("lua " .. curLine:sub(idx[2] + 1, -1))
         else
             -- Support for opening normal http[s] link
-            url = getUrl(curBufNr, cursorPos)
+            url = getUrl(curBufNr, cursorPos, curLine)
             if url ~= "" then openUrl(url, M.highlightTimout, curBufNr) end
         end
     else

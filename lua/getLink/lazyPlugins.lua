@@ -106,13 +106,13 @@ return function(bufNr, cursorPos, fallback)
     -- Need Tree-sitter support
     if not package.loaded["nvim-treesitter.parsers"] or
         not require("nvim-treesitter.parsers").has_parser() then
-        return fallback(bufNr, cursorPos)
+        return fallback(bufNr, cursorPos, vim.api.nvim_get_current_line())
     end
 
     local fieldNodes = getArgFieldNodes(bufNr)
     if not next(fieldNodes) then
         -- Use fallback when no tsNodes found
-        return fallback(bufNr, cursorPos)
+        return fallback(bufNr, cursorPos, vim.api.nvim_get_current_line())
     end
 
     local pluginInfo = getPluginInfo(bufNr, fieldNodes)
@@ -128,7 +128,7 @@ return function(bufNr, cursorPos, fallback)
     end
     -- Use fallback when cursor is not in any tsNode range
     if pluginIdx == 0 then
-        return fallback(bufNr, cursorPos)
+        return fallback(bufNr, cursorPos, vim.api.nvim_get_current_line())
     end
 
     if not pluginInfo.tableCheck[pluginIdx] then
