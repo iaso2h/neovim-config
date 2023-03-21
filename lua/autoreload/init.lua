@@ -22,7 +22,7 @@ M.opt.lua.blacklist        = {
     M.configPath:joinpath("lua", "config", "nvim-galaxyline.lua").filename,
     M.configPath:joinpath("lua", "config", "nvim-null-is.lua").filename,
     M.configPath:joinpath("lua", "core", "plugins.lua").filename,
-    M.configPath:joinpath("lua", "core", "init.lua").filename
+    M.configPath:joinpath("lua", "core", "init.lua").filename,
 }
 M.opt.lua.setup  = {}
 M.opt.lua.config = { -- {{{
@@ -52,16 +52,7 @@ M.opt.lua.config = { -- {{{
         end
     },
     {
-        pathPat       = M.opt.lua.moduleSearchPath:joinpath("onenord").filename,
-        unloadOnlyChk = false,
-        callback      = function(...)
-            vim.defer_fn(function()
-                vim.cmd [[silent colorscheme onenord]]
-            end, 0)
-        end
-    },
-    {
-        pathPat       = M.opt.lua.moduleSearchPath:joinpath("core", "option.lua").filename,
+        pathPat       = M.opt.lua.moduleSearchPath:joinpath("core", "options.lua").filename,
         unloadOnlyChk = false,
         callback      = function(...)
             vim.defer_fn(function()
@@ -94,7 +85,11 @@ M.reload = function() -- {{{
     -- Check filetype
     if vim.bo.filetype == "lua" then
         -- Check blacklist
-        if vim.tbl_contains(M.opt.lua.blacklist, path.filename) then return end
+        for _, pat in ipairs(M.opt.lua.blacklist) do
+            if string.match(path.filename, pat) then
+                return
+            end
+        end
 
         local overrideFileModulePath = {
             M.configPath:joinpath("lua", "core"),

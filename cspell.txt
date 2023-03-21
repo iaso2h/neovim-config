@@ -60,3 +60,4 @@ winnr
 winid
 tabnr
 dapui
+onenord

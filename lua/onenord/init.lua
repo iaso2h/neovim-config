@@ -1,4 +1,10 @@
--- Load the theme
+-- Unload lua modules
+for _, m in ipairs { "onenord", "onenord.lua", "onenord.pallette",
+    "onenord.theme", "onenord.util" } do
+    if package.loaded[m] then
+        package.loaded[m] = nil
+    end
+end
 local util = require("onenord.util")
 local theme = require('onenord.theme')
 -- Set the theme environment
