@@ -1,7 +1,7 @@
 -- File: cycle.lua
 -- Author: iaso2h
 -- Description: Improved bp and bn
--- Version: 0.0.4
+-- Version: 0.0.5
 -- Last Modified: 2023-3-21
 
 
@@ -15,16 +15,17 @@ local M   = {
 
 local bufferCycle = function(currentBufNr, direction)
     repeat
+        -- Deliberately leave track on jumplist so that you can traceback to
+        -- the help file or other non-standard buffer via <C-o>
         if direction == 1 then
-            vim.cmd[[noa keepjump bn]]
+            vim.cmd[[bn]]
         else
-            vim.cmd[[noa keepjump bp]]
+            vim.cmd[[bp]]
         end
 
         local bufNr = api.nvim_get_current_buf()
         local bufType = api.nvim_buf_get_option(bufNr, "buftype")
         if bufType == "" or bufType == "nofile" then
-            api.nvim_exec_autocmds("BufWinEnter", {modeline = false, buffer = bufNr})
             return
         end
     until bufNr == currentBufNr
@@ -66,7 +67,6 @@ M.init = function(direction)
     if (_G.cokeline and type(_G.cokeline) == "table" and
         vim.tbl_contains(bufTbl, currentBufNr)) or
         vim.o.buftype ~= "" or nvim_buf_get_name(0) == "" then
-        -- return vim.cmd[[noa keepjump buffer #]]
         return bufferCycle(currentBufNr, direction)
     end
 
