@@ -21,9 +21,9 @@ local function openUrl(url, timeout, bufNr)
             api.nvim_buf_clear_namespace(bufNr, M.ns, 0, -1)
         end
         if fn.has('win32') == 1 then
-            fn.system("explorer " .. url)
+            fn.system{"explorer", url}
         elseif fn.has('unix') == 1 then
-            fn.system("xdg-open '" .. url .. "'")
+            fn.system{"xdg-open", url}
         end
     end, timeout)
 end
@@ -78,12 +78,12 @@ function M.main(selectText)
     else
         -- Visual mode with selected text provided
         if _G._os_uname.sysname == "Windows_NT" then
-            fn.system("explorer " .. selectText)
+            fn.system{"explorer", selectText}
         elseif _G._os_uname.sysname == "Linux" then
             if fn.expand("%:p") == fn.stdpath("config") .. "/lua/core/plugins.lua" then
                 selectText = "https://github.com/" .. selectText
             end
-                fn.system("xdg-open '" .. selectText .. "'")
+                fn.system{"xdg-open", selectText}
         end
     end
 end

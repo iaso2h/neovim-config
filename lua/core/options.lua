@@ -38,10 +38,10 @@ opt.concealcursor = "nc"
 
 opt.cpoptions:append"q;"
 opt.cursorline = true
--- o.colorcolumn = 80
+opt.guicursor  = "n-v-sm:block,i-c-ci-ve:ver25,r-cr:hor20,o:hor50"
 
 -- o.diffopt        = "context:10000,filler,closeoff,vertical,algorithm:patience"
-opt.diffopt    = "context:100,algorithm:histogram,internal,indent-heuristic,filler,closeoff,iwhite,vertical"
+opt.diffopt = "context:100,algorithm:histogram,internal,indent-heuristic,filler,closeoff,iwhite,vertical"
 
 if _G._os_uname.machine == "aarch64" then
     vim.cmd [[language en_US]]
@@ -60,7 +60,6 @@ opt.foldcolumn = "auto:4"
 opt.signcolumn = "yes:1"
 opt.foldmethod = "expr"
 opt.foldexpr   = "EnhanceFoldExpr()"
-_G._format_option = "cr/qn2mM1jpl"
 opt.formatoptions = _G._format_option -- NOTE: Might change on loading different types of ftplugins
 
 opt.inccommand = "nosplit"
@@ -91,7 +90,6 @@ opt.swapfile       = false
 opt.wildignore     = vim.o.wildignore .. "*/tmp/*,*.so,*.swp,*.zip,*.db,*.sqlite,*.bak"
 opt.wildignorecase = true
 
-vim.g.winminheight = 2
 opt.winminwidth    = 3
 opt.winheight      = 3
 opt.winhighlight   = "NormalNC:WinNormalNC"
@@ -117,8 +115,6 @@ else
 end
 GuiFontSizeDefault = GuiFontSize
 opt.guifont = string.format("%s%s:h%s", GuiFont, GuiFallbackFont, GuiFontSize)
-
-opt.guicursor = "n-v-sm:block,i-c-ci-ve:ver25,r-cr:hor20,o:hor50"
 -- }}} Basic settings
 -- OS varied settings {{{
 if _G._os_uname.sysname == "Windows_NT" then
@@ -130,7 +126,8 @@ if _G._os_uname.sysname == "Windows_NT" then
     local winPython = fn.expand("$HOME/AppData/Local/Programs/Python/Python38/python.exe")
     api.nvim_set_var("python3_host_prog", winPython)
     if ex(winPython) == 0 then
-        local pythonPath = (string.gsub(fn.system('python -c "import sys; print(sys.executable)"'),"(\n+$)", ""))
+        local pythonPath = (string.gsub(
+            fn.system {"python", "-c", "'import sys; print(sys.executable)'"},"(\n+$)", ""))
         api.nvim_set_var("python3_host_prog", pythonPath)
         if not ex(api.nvim_get_var("python3_host_prog")) then
             api.nvim_err_write("Python path not found\n")
@@ -140,7 +137,7 @@ elseif _G._os_uname.sysname == "Linux" then
     local linuxPython = "/usr/bin/python3"
     api.nvim_set_var("python3_host_prog", linuxPython)
     if ex(linuxPython) == 0 then
-        linuxPython = (fn.system('which python3')):gsub("\n+$", "")
+        linuxPython = (fn.system {"which", "python3"}):gsub("\n+$", "")
         api.nvim_set_var("python3_host_prog", linuxPython)
         if not ex(api.nvim_get_var("python3_host_prog")) then
             api.nvim_err_write("Python path not found\n")

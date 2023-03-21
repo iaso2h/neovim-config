@@ -1,8 +1,6 @@
 ; extends
-;; https://tree-sitter.github.io/tree-sitter/using-parsers#query-syntax
-;; :h treesitter-query
-;; https://github.com/nvim-treesitter/nvim-treesitter/blob/master/queries/lua/highlights.scm
-;; version: #11b2d43
+;; https://github.com/MunifTanjim/tree-sitter-lua
+;; commit: #0fc8996
 (break_statement) @keyword.break
 
 ((identifier) @variable.builtin

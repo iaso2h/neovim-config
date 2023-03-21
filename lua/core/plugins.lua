@@ -108,7 +108,7 @@ local pluginArgs = { -- {{{
     -- Vim enhancement {{{
     {
         "tpope/vim-eunuch",
-        cmd = {"Delete", "Unlink", "Remove", "Move", "Rename", "Chmod", "Mkdir", "Cfind", "Lfind", "Clocate", "Llocate", "SudoEdit", "SudoWrite", "Wall", "W"}
+        cmd = {"Delete", "Unlink", "Remove", "Move", "Rename", "Chmod", "Mkdir", "Cfind", "Lfind", "Clocate", "Llocate", "SudoEdit", "SudoWrite", "Wall"}
     },
     {
         "skywind3000/asyncrun.vim",
@@ -146,8 +146,7 @@ local pluginArgs = { -- {{{
             {[[<leader>F]], mode = "x"},
         },
         init = function()
-            map({"x", mode = "n"}, [[<leader>f]], [[<CMD>lua require("hop").hint_char1()<CR>]], "Hop char")
-            map({"x", mode = "n"}, [[<leader>F]], [[<CMD>lua require("hop").hint_lines()<CR>]], "Hop line")
+            map("", [[<leader>f]], [[:lua require("hop").hint_char1()<CR>]], "Hop char")
         end,
         config = function()
             require("hop").setup{
@@ -341,13 +340,13 @@ local pluginArgs = { -- {{{
         lazy = true,
         cmd  = "Telescope",
         keys = {
-            {[[<C-f>E]], mode = "n"},  {[[<C-f>e]], mode = "n"},  {[[<C-f>f]], mode = "n"},
+            {[[<C-f>a]], mode = "n"},  {[[<C-f>e]], mode = "n"},  {[[<C-f>E]], mode = "n"}, {[[<C-f>f]], mode = "n"},
             {[[<C-f>F]], mode = "n"},  {[[<C-f>w]], mode = "n"},  {[[<C-f>W]], mode = "n"}, {[[<C-f>/]], mode = "n"},
             {[[<C-f>?]], mode = "n"},  {[[<C-f>v]], mode = "n"},  {[[<C-f>j]], mode = "n"}, {[[<C-f>']], mode = "n"},
             {[[<C-f>m]], mode = "n"},  {[[<C-f>k]], mode = "n"},  {[[<C-f>c]], mode = "n"}, {[[<C-f>C]], mode = "n"},
             {[[<C-f>h]], mode = "n"},  {[[<C-f>H]], mode = "n"},  {[[<C-f>r]], mode = "n"}, {[[<C-f>gc]], mode = "n"},
-            {[[<C-f>gC]], mode = "n"}, {[[<C-f>gs]], mode = "n"}, {[[<C-f>b]], mode = "n"}, {[[<leader>e]], mode = "n"},
-            {[[<leader>E]], mode = "n"},
+            {[[<C-f>gC]], mode = "n"}, {[[<C-f>gs]], mode = "n"}, {[[<C-f>b]], mode = "n"}, {[[<C-f>d]], mode = "n"},
+            {[[<C-f>D]], mode = "n"},
         },
         config = conf "nvim-telescope"
     },
@@ -545,6 +544,7 @@ local pluginArgs = { -- {{{
             "hrsh7th/cmp-nvim-lsp",
             "hrsh7th/cmp-buffer",
             "hrsh7th/cmp-path",
+            "rcarriga/cmp-dap",
             {
                 "tzachar/cmp-tabnine",
                 cond  = _G._os_uname.machine ~= "aarch64",
@@ -621,6 +621,7 @@ local pluginArgs = { -- {{{
     -- Debug {{{
     {
         "bfredl/nvim-luadev",
+        cond = false,
         ft = "lua",
         config = function()
             vim.api.nvim_create_autocmd("BufEnter",{
@@ -650,12 +651,12 @@ local pluginArgs = { -- {{{
         "mfussenegger/nvim-dap",
         lazy = true,
         dependencies = {
-            "nvim-dap-virtual-text",
             {
                 "rcarriga/nvim-dap-ui",
                 config = conf "nvim-dap-ui".config,
             },
-            "rcarriga/cmp-dap",
+            "nvim-dap-virtual-text",
+            "cmp-dap",
             "one-small-step-for-vimkind"
         },
         init = function()
@@ -825,7 +826,8 @@ local pluginArgs = { -- {{{
     -- }}} Knowledge
 }
 local opts = {
-    ui = {border = "rounded"}
+    ui = {border = "rounded"},
+    concurrency = 5
 }
 
 vim.api.nvim_create_user_command("LazyPlugin", function()
