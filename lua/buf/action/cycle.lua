@@ -1,8 +1,8 @@
 -- File: cycle.lua
 -- Author: iaso2h
 -- Description: Improved bp and bn
--- Version: 0.0.3
--- Last Modified: 2023-3-13
+-- Version: 0.0.4
+-- Last Modified: 2023-3-21
 
 
 local api = vim.api
@@ -55,16 +55,29 @@ end
 ---@param direction number Set to 1 to jump to next buffer, -1 to previous buffer
 M.init = function(direction)
     local currentBufNr = api.nvim_get_current_buf()
-    if vim.o.buftype ~= "" or nvim_buf_get_name(0) == "" then
+    local bufTbl
+    if _G.cokeline and type(_G.cokeline) == "table" then
+        bufTbl = vim.tbl_map(function(buffer)
+            return buffer.number
+        end, _G.cokeline.visible_buffers)
+    end
+
+    -- Deal with non-standard buffer
+    if (_G.cokeline and type(_G.cokeline) == "table" and
+        vim.tbl_contains(bufTbl, currentBufNr)) or
+        vim.o.buftype ~= "" or nvim_buf_get_name(0) == "" then
         -- return vim.cmd[[noa keepjump buffer #]]
         return bufferCycle(currentBufNr, direction)
     end
 
-    local bufTbl = api.nvim_list_bufs()
-    local cond = function (buf)
-        return api.nvim_buf_get_option(buf, "buflisted")
+    -- Create buffer table when data from cokeline is unavailable
+    if not(_G.cokeline and type(_G.cokeline) == "table") then
+        bufTbl = api.nvim_list_bufs()
+        local cond = function (buf)
+            return api.nvim_buf_get_option(buf, "buflisted")
+        end
+        bufTbl = vim.tbl_filter(cond, bufTbl)
     end
-    bufTbl = vim.tbl_filter(cond, bufTbl)
 
     local currentBufIdx = tbl_idx(bufTbl, currentBufNr, false)
     if not currentBufIdx then

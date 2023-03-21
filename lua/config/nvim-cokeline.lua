@@ -67,8 +67,6 @@ return  function()
             }
         },
     }
-    -- map("n", [[<A-h>]],   [[<Plug>(cokeline-focus-prev)]],  "Cokeline focus previous")
-    -- map("n", [[<A-l>]],   [[<Plug>(cokeline-focus-next)]],  "Cokeline focus next")
-    map("n", [[<A-S-h>]], [[<Plug>(cokeline-switch-prev)]], "Cokeline switch previous")
-    map("n", [[<A-S-l>]], [[<Plug>(cokeline-switch-next)]], "Cokeline switch next")
+    map("n", [[<A-S-,>]], [[<Plug>(cokeline-switch-prev)]], "Cokeline switch previous")
+    map("n", [[<A-S-.>]], [[<Plug>(cokeline-switch-next)]], "Cokeline switch next")
 end

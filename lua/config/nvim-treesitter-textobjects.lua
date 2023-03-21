@@ -20,10 +20,10 @@ return function()
             swap = {
                 enable = true,
                 swap_next = {
-                    ["<A-.>"] = "@parameter.inner",
+                    ["<A-h>"] = "@parameter.inner",
                 },
                 swap_previous = {
-                    ["<A-,>"] = "@parameter.inner",
+                    ["<A-l>"] = "@parameter.inner",
                 },
             },
             move = {
