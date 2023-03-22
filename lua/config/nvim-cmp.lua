@@ -23,7 +23,7 @@ return function()
             end
         end,
         preselect        = cmp.PreselectMode.None,
-        keyword_length   = 2,
+        keyword_length   = 3,
         default_behavior = cmp.ConfirmBehavior.Insert,
         snippet = {
             expand = function(args)

@@ -583,9 +583,7 @@ local pluginArgs = { -- {{{
                 always_trigger = true,
                 doc_lines      = 12
             }
-            map("n", "<A-p>", [[<CMD>lua require("lsp_signature").toggle_float_win()<CR>]],
-                { "silent" },            "Toggle signature")
-            map("i", "<A-p>", [[<C-o><CMD>lua require("lsp_signature").toggle_float_win()<CR>]],
+            map("i", "<A-o>", [[<C-o><CMD>lua require("lsp_signature").toggle_float_win()<CR>]],
                 { "silent", "noremap" }, "Toggle signature")
         end,
     },
@@ -790,13 +788,64 @@ local pluginArgs = { -- {{{
     },
     -- "CRAG666/code_runner.nvim"
     -- }}} Debug
-    -- Language specs {{{
+    -- Fennel {{{
+    {
+        "rktjmp/hotpot.nvim",
+        config = function()
+            require("hotpot").setup {
+                -- allows you to call `(require :fennel)`.
+                -- recommended you enable this unless you have another fennel in your path.
+                -- you can always call `(require :hotpot.fennel)`.
+                provide_require_fennel = true,
+                -- show fennel compiler results in when editing fennel files
+                enable_hotpot_diagnostics = true,
+                -- compiler options are passed directly to the fennel compiler, see
+                -- fennels own documentation for details.
+                compiler = {
+                    -- options passed to fennel.compile for modules, defaults to {}
+                    modules = {
+                        -- not default but recommended, align lua lines with fnl source
+                        -- for more debuggable errors, but less readable lua.
+                        -- correlate = true
+                    },
+                    -- options passed to fennel.compile for macros, defaults as shown
+                    macros = {
+                        env = "_COMPILER", -- MUST be set along with any other options
+                        -- you may wish to disable fennels macro-compiler sandbox in some cases,
+                        -- this allows access to tables like `vim` or `os` inside macro functions.
+                        -- See fennels own documentation for details on these options.
+                        compilerEnv = _G,
+                        allowGlobals = false,
+                    }
+                }
+            }
+        end
+    },
     {
         "guns/vim-sexp",
         ft = _G._lisp_language,
         init = require("config.vim-sexp")
     },
-    -- }}} Language specs
+    {
+        "gpanders/nvim-parinfer",
+        ft = _G._lisp_language,
+        init = function ()
+            vim.g.parinfer_enabled = true
+            vim.g.parinfer_no_maps = true
+            vim.g.parinfer_mode = "smart"
+        end,
+        config = function ()
+            -- map("n", [[<leader>L]], [[<CMD>lua vim.b.parinfer_enabled=not(vim.b.parinfer_enabled)<CR>]], "Parinfer Toggle")
+            map("n", [[<leader>L]], function()
+                if vim.b.parinfer_enabled == nil then
+                    vim.b.parinfer_enabled = true
+                end
+                vim.b.parinfer_enabled = not vim.b.parinfer_enabled
+                vim.api.nvim_echo({ { string.format("vim.b.parinfer_enabled: %s", vim.b.parinfer_enabled), "Moremsg" } }, false, {})
+            end, "Parinfer Toggle")
+        end
+    },
+    -- }}} Fennel
     -- Source control {{{
     {
         "lewis6991/gitsigns.nvim",
