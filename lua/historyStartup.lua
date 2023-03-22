@@ -15,7 +15,7 @@ local M   = {
 }
 
 local resetLine = function ()
-    -- TODO: ? to trigger manupage
+    -- TODO: ? to trigger menupage
     M.lines = {
         firstline = {"< New Buffer >"},
         absolute = {}
@@ -46,9 +46,9 @@ M.display = function(refreshChk)
                 table.insert(absolute, absolutePath)
             end
         else
-            -- Upper case the first dirver character in Windows
+            -- Upper case the first drive character in Windows
             absolutePath = string.sub(absolutePath, 1, 1):upper() .. string.sub(absolutePath, 2, -1)
-            -- Substitue the / character with the \ one
+            -- Substitute the / character with the \ one
             absolutePath = string.gsub(absolutePath, "/", "\\")
             -- Filter out duplicates and check validity
             if not vim.tbl_contains(absolute, absolutePath) and vim.loop.fs_stat(absolutePath) then
@@ -102,7 +102,7 @@ M.display = function(refreshChk)
     api.nvim_buf_set_option(M.curBuf, "modifiable", false)
     api.nvim_buf_set_option(M.curBuf, "modified",   false)
 
-    -- Key mapppings
+    -- Key mappings
     for _, key in ipairs {"o", "<C-s>", "<C-v>", "<CR>", "q"} do
         api.nvim_buf_set_keymap(
             M.curBuf,
@@ -113,7 +113,7 @@ M.display = function(refreshChk)
         )
     end
 
-    -- Don't creat the self-destroy AutoCMD yet for the first time leaving historyStartup
+    -- Don't create the self-destroy AutoCMD yet for the first time leaving historyStartup
     if M.curBuf ~= 1 then
         api.nvim_create_autocmd(
             "BufReadPost", {

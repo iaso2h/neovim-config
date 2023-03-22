@@ -480,11 +480,13 @@ gls.short_line_left[5] = {
     }
 }
 
+local whiteList = {"help"}
 gls.short_line_right[1] = {
     ShortRightLineInfo = {
         provider  = lineInfo,
         condition = function ()
-            return condition.buffer_not_empty() and not shortLineFileType()
+            return vim.tbl_contains(whiteList, vim.bo.filetype) or
+                (condition.buffer_not_empty() and not shortLineFileType())
         end,
         highlight = {colors.gray, colors.bg1}
     }

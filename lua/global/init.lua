@@ -23,7 +23,7 @@ _G._qf_fallback_open = init(true, "QuickFixFallbackOpen")
 _G._trim_space       = init(true, "QuickTrimSpace")
 _G._autoreload       = init(true, "Autoreload")
 _G._enable_plugin    = init(true)
-_G._lisp_language    = init{"clojure", "scheme", "lisp", "timl", "fennel", "query", "racket", "janet"}
+_G._lisp_language    = init {"clojure", "scheme", "lisp", "racket", "hy", "fennel", "janet", "carp", "wast", "yuck"}
 
 
 _G.Print = function(...)

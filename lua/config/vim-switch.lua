@@ -37,8 +37,6 @@ return function ()
         end
     })
 
-    -- OPTIM: dirty workaround. Filetype event with pattern set to "fennel"
-    -- doesn't work :(
     api.nvim_create_autocmd("FileType", {
         pattern = "fennel",
         desc    = "Additional switch dictionary for Fennel",

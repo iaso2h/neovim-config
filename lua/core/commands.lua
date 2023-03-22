@@ -124,7 +124,9 @@ if _G._autoreload then
         desc     = "Autoreload configuration after saving lua/vim configuration files",
         callback = function ()
             -- Similar work: https://github.com/RRethy/nvim-sourcerer
-            require("autoreload").reload()
+            if _G._autoreload then
+                require("autoreload").reload()
+            end
         end
     })
 end
@@ -261,6 +263,10 @@ excmd("CD", [[execute "lcd " . expand("%:p:h")]], {
     desc = "Change the current working directory to the current buffer locally",
 })
 
+excmd("CDRuntime", [[execute "lcd $VIMRUNTIME"]], {
+    desc = "Change the current working directory to the current buffer locally",
+})
+
 excmd("E", function (opts)
     vim.cmd [[noa mkview]]
     if not opts.bang then
@@ -279,12 +285,12 @@ excmd("O", [[browse oldfiles]], { desc = "Browse the oldfiles then prompt", })
 
 excmd("Q", function (opts)
     local saveCMD = opts.bang and "noa " or "noa bufdo update | "
-    local sessionName = opts.args or "01"
-    local sessionDir  = _G._config_path .. _G._sep .. "session"
+    local sessionName = opts.args == "" and "01" or opts.args
+    local sessionDir  = vim.fn.stdpath("state") .. _G._sep .. "my_session" .. _G._sep
     if not vim.loop.fs_stat(sessionDir) then
         vim.fn.mkdir(sessionDir, "p")
     end
-    vim.cmd(string.format("mksession! %s/%s.vim", sessionDir, sessionName))
+    vim.cmd(string.format("mksession! %s%s.vim", sessionDir, sessionName))
 
     vim.cmd(saveCMD .. "qa!")
 end, {
@@ -294,9 +300,23 @@ end, {
 })
 
 excmd("Se", function (opts)
-    local sessionName = opts.args or "01"
-    vim.cmd(string.format("so %s/session/%s.vim",
-        vim.fn.stdpath("config"), sessionName))
+    local sessionName = opts.args == "" and "01" or opts.args
+    local sessionDir  = vim.fn.stdpath("state") .. _G._sep .. "my_session" .. _G._sep
+    vim.cmd(string.format("so %s%s%s%s.vim",
+        sessionDir, _G._sep, _G._sep, sessionName))
+
+    -- Delete invalid buffers
+    vim.defer_fn(function()
+        local bufTbl = api.nvim_list_bufs()
+        local cond = function(buf)
+            return api.nvim_buf_get_option(buf, "buflisted") and
+                not vim.loop.fs_stat(vim.api.nvim_buf_get_name(buf))
+        end
+        bufTbl = vim.tbl_filter(cond, bufTbl)
+        for _, buf in ipairs(bufTbl) do
+            vim.api.nvim_buf_delete(buf, {})
+        end
+    end, 0)
 end, {
     desc  = "Load session",
     nargs = "?",
