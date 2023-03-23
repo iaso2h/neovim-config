@@ -632,14 +632,14 @@ local pluginArgs = { -- {{{
             vim.g["conjure#mapping#eval_replace_form"]         = "eR"
             vim.g["conjure#mapping#eval_motion"]               = "ge"
 
-            vim.g["conjure#log#wrap"]                   = true
-            vim.g["conjure#log#fold#enabled"]           = true
-            vim.g["conjure#log#jump_to_latest#enabled"] = true
+            vim.g["conjure#log#wrap"]                     = true
+            vim.g["conjure#log#fold#enabled"]             = true
+            vim.g["conjure#log#jump_to_latest#enabled"]   = true
         end
     },
     {
         "bfredl/nvim-luadev",
-        cond = false,
+        cond = true,
         ft = "lua",
         config = function()
             vim.api.nvim_create_autocmd("BufEnter",{
@@ -902,7 +902,8 @@ local pluginArgs = { -- {{{
     -- }}} Knowledge
 }
 local opts = {
-    ui = {border = "rounded"},
+    root = _G._plugin_root,
+    ui   = {border = "rounded"},
     concurrency = 5
 }
 

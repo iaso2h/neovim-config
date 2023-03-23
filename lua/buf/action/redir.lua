@@ -10,7 +10,7 @@ local M   = {}
 local dump = function(newBufNr, funcArgTbl)
     local output = funcArgTbl[1]
     ---@diagnostic disable-next-line: param-type-mismatch
-    local lines = vim.split(output, "\n", true)
+    local lines = vim.split(output, "\n", {trimempty = true})
     api.nvim_buf_set_lines(newBufNr, 0, -1, false, lines)
     api.nvim_put({output}, "l", false, false)
     api.nvim_put({" "}, "l", true, false)
