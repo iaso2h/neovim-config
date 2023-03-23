@@ -1,4 +1,4 @@
--- Setup lazy.nvim package {{{
+-- Bootstrap lazy.nvim {{{
 local function promptOnMove(msg, func)
     local waitAu = vim.api.nvim_create_autocmd({"CursorMoved", "BufEnter"}, {
         callback = function ()
@@ -30,7 +30,7 @@ if not vim.loop.fs_stat(lazyPath) then
     promptOnMove(os.date("%Y-%m-%d %H:%M  ") .. "Cloning lazy.nvim complete. Please restart Neovim")
     return
 end
--- }}} Setup lazy.nvim package
+-- }}} Bootstrap lazy.nvim
 
 -- Plug-ins configuration
 local pluginArgs = { -- {{{
