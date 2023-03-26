@@ -3,7 +3,6 @@ local api = vim.api
 local M   = {}
 
 local regainFocus = function(closeQfChk, qfWinID, qfCursorPos, savedLastWinID)
-    -- HACK:sometimes the winID where qf is located will change somehow
     if not closeQfChk then
         local ok, msg = pcall(api.nvim_set_current_win, qfWinID)
         if not ok then
@@ -66,15 +65,13 @@ M.main = function(fallbackChk, closeQfChk, offset)
         lineNr = vim.v.count == 0 and qfCursorPos[1] or vim.v.count
     end
 
-    -- User the built-in :cc command to open quickfix item
-    if fallbackChk then return fallback(lineNr, closeQfChk, qfWinID, qfCursorPos) end
-
     local item = require("quickfix.util").getlist()[lineNr]
     if not next(item) then
         -- qf items are created by pressing gO in help docs?
         return vim.notify("No qf items available", vim.log.levels.INFO)
     end
 
+    -- Comment out invalid item
     if item.valid == 0 or item.bufnr == 0 or
             not api.nvim_buf_is_valid(item.bufnr) then
         require("quickfix.highlight").add(
@@ -82,8 +79,11 @@ M.main = function(fallbackChk, closeQfChk, offset)
             "Comment",
             api.nvim_create_namespace("myQuickfix")
         )
-        return vim.notify("Buffer isn't valid", vim.log.levels.INFO)
+        return vim.notify("This item is no longer valid", vim.log.levels.INFO)
     end
+
+    -- User the built-in :cc command to open quickfix item
+    if fallbackChk then return fallback(lineNr, closeQfChk, qfWinID, qfCursorPos) end
 
     -- In some cases the autocmd for retriving the last window id before
     -- entering into the quickfix is not working well, then we have to use the
