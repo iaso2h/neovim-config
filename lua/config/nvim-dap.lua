@@ -4,7 +4,11 @@ return function()
     local icon = require("util.icon")
 
     -- General mappings {{{
-    map("n", [[<leader>c]], [[<CMD>lua require("dap").run_to_cursor()<CR>]], {"silent"}, "Dap run to cursor")
+    map("n", [[<leader>dc]], [[<CMD>lua require("dap").set_breakpoint(vim.fn.input("Breakpoint Condition: "), nil, nil, true)<CR>]], {"silent"}, "Dap set conditional break point")
+    map("n", [[<leader>dl]], [[<CMD>lua require("dap").set_breakpoint(nil, nil, vim.fn.input("Log point message: "))<CR>]], {"silent"}, "Dap set log point")
+    map("n", [[<leader>db]], [[<CMD>lua require("dap").toggle_breakpoint()<CR>]], {"silent"}, "Dap toggle breakpoint")
+
+    map("n", [[<leader>C]], [[<CMD>lua require("dap").run_to_cursor()<CR>]], {"silent"}, "Dap run to cursor")
     map("n", [[<leader>N]], [[<CMD>lua require("dap").step_into()<CR>]],     {"silent"}, "Dap step into")
     map("n", [[<leader>n]], [[<CMD>lua require("dap").step_over()<CR>]],     {"silent"}, "Dap step over")
     map("n", [[<leader>o]], [[<CMD>lua require("dap").step_out()<CR>]],      {"silent"}, "Dap step out")

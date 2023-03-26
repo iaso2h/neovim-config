@@ -14,8 +14,11 @@ M.servers = {
     tsserver = {},
     vimls = {},
     yamlls = {},
-    fennel_language_server = {},
 }
+
+if _G._os_uname.sysname ~= "Windows_NT" then
+    M.servers.shortLineList = {}
+end
 
 M.config = function()
     require("mason-lspconfig").setup {

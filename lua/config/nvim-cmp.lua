@@ -6,7 +6,8 @@ return function()
         enabled = function()
             -- Disable it for (telescope)prompt, enable it for dap
             if vim.bo.buftype == "prompt" then
-                if package.loaded["dap"] and require("cmp_dap").is_dap_buffer() then
+                if package.loaded["dap"] and package.loaded["cmp_dap"] and
+                        require("cmp_dap").is_dap_buffer() then
                     return true
                 else
                     return false
@@ -83,15 +84,6 @@ return function()
     } -- }}}
 
     cmp.setup(configArgs)
-    cmp.setup.filetype(
-        {"dap-repl", "dapui_watches"},
-        {
-            sources = {
-                -- HACK: Not work for lua dapter yet?
-                { name = "dap" },
-            },
-        }
-    )
 
     local cmpAutopairs = require("nvim-autopairs.completion.cmp")
     cmp.event:on(

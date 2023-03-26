@@ -4,7 +4,15 @@ M.filetypeSetup = function ()
     local winInfo = vim.fn.getwininfo()
     for _, win in ipairs(winInfo) do
         local ft = vim.api.nvim_buf_get_option(win.bufnr, "filetype")
-        if vim.tbl_contains(require("config.nvim-galaxyline").shortLineList, ft) then
+
+        if vim.tbl_contains({
+        "dap-repl",
+        "dapui_watches",
+        "dapui_console",
+        "dapui_stacks",
+        "dapui_breakpoints",
+        "dapui_scopes",
+    }, ft) then
             vim.api.nvim_win_set_option(win.winid, "cursorline", false)
             if ft == "dap-repl" then
                 vim.api.nvim_create_autocmd("BufEnter",{
@@ -129,7 +137,6 @@ M.config = function()
     end
 
     map("n", [[<C-w>d]], [[<CMD>lua require("dapui").toggle {layout=nil,reset=true}<CR>]], {"silent"}, "Dap UI toggle")
-    M.filetypeSetup()
 end
 
 

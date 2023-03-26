@@ -654,34 +654,18 @@ local pluginArgs = { -- {{{
         init = function() vim.g.startuptime_tries = 20 end
     },
     {
-        "iaso2h/vim-scriptease",
-        branch = "ftplugin",
-        ft     = "vim",
-        cmd    = {
-            "PP", "Runtime", "Disarm", "Scriptnames", "Messages",
-            "Verbose", "Time", "Breakadd", "Vopen", "Vedit", "Vsplit"
-        },
-        config = require("config.vim-scriptease").config
-    },
-
-    {
         "mfussenegger/nvim-dap",
-        lazy = true,
-        dependencies = {
-            {
-                "rcarriga/nvim-dap-ui",
-                config = require("config.nvim-dap-ui").config,
-            },
-            "nvim-dap-virtual-text",
-            "rcarriga/cmp-dap",
-            "one-small-step-for-vimkind"
+        keys = {
+            { "<leader>db", mode = "n" },
+            { "<leader>dc", mode = "n" },
+            { "<leader>dl", mode = "n" },
         },
-        init = function()
-            map("n", [[<leader>dc]], [[<CMD>lua require("dap").set_breakpoint(vim.fn.input("Breakpoint Condition: "), nil, nil, true)<CR>]], {"silent"}, "Dap set conditional break point")
-            map("n", [[<leader>dl]], [[<CMD>lua require("dap").set_breakpoint(nil, nil, vim.fn.input("Log point message: "))<CR>]], {"silent"}, "Dap set log point")
-            map("n", [[<leader>db]], [[<CMD>lua require("dap").toggle_breakpoint()<CR>]], {"silent"}, "Dap toggle breakpoint")
-        end,
         config = require("config.nvim-dap"),
+    },
+    {
+        "rcarriga/nvim-dap-ui",
+        dependencies = {"nvim-dap"},
+        config = require("config.nvim-dap-ui").config,
     },
     {
         "theHamsta/nvim-dap-virtual-text",
@@ -691,6 +675,7 @@ local pluginArgs = { -- {{{
             "DapVirtualTextToggle",
             "DapVirtualTextForceRefresh",
         },
+        dependencies = {"nvim-dap"},
         config = function()
             require("nvim-dap-virtual-text").setup {
                 enabled = true,
@@ -712,8 +697,28 @@ local pluginArgs = { -- {{{
         end
     },
     {
+        "rcarriga/cmp-dap",
+        dependencies = {"nvim-dap", "nvim-cmp" },
+        config = function()
+            require("cmp").setup.filetype(
+                { "dap-repl", "dapui_watches", "dapui_hover" },
+                {
+                    sources = {
+                        -- HACK: Not work for lua dapter yet?
+                        { name = "dap" },
+                    },
+                }
+            )
+            vim.api.nvim_create_user_command("DapCompletionSupport", function()
+                local text = require("dap").session().capabilities.supportsCompletionsRequest and "true" or "false"
+                vim.api.nvim_echo({{text, "MoreMsg"}}, false, {})
+            end, { desc  = "Check Dap completion support", })
+        end,
+    },
+    {
         "jbyuki/one-small-step-for-vimkind",
         ft = "lua",
+        dependencies = {"nvim-dap"},
         init = function()
             vim.api.nvim_create_user_command("OSVStop", function()
                 require("osv").stop()

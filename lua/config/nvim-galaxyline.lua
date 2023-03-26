@@ -18,7 +18,9 @@ M.shortLineList = {
     "dapui_breakpoints",
     "dapui_scopes",
     "help",
-    "tsplayground"
+    "tsplayground",
+    "DiffviewFiles",
+    "DiffviewFileHistory"
 }
 
 M.config = function()

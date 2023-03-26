@@ -162,27 +162,29 @@ return function()
     }
     -- }}} Lua
     -- Fennel {{{
-    -- HACK:
-    local fennelRuntimePath = {vim.api.nvim_eval("$VIMRUNTIME")}
-    table.insert(fennelRuntimePath, _G._config_path)
-    table.insert(fennelRuntimePath, string.format("%s%sfnl%sruntimestub%s%s",
-                                        _G._config_path,
-                                        _G._sep,
-                                        _G._sep,
-                                        _G._sep,
-                                        _G._sep and "nightly" or "stable"))
-    servers.fennel_language_server = {
-        settings = {
-            fennel = {
-                workspace = {
-                    library = fennelRuntimePath,
-                },
-                diagnostics = {
-                    globals = {"vim"}
+    if _G._os_uname.sysname ~= "Windows_NT" then
+        -- HACK:
+        local fennelRuntimePath = {vim.api.nvim_eval("$VIMRUNTIME")}
+        table.insert(fennelRuntimePath, _G._config_path)
+        table.insert(fennelRuntimePath, string.format("%s%sfnl%sruntimestub%s%s",
+                                            _G._config_path,
+                                            _G._sep,
+                                            _G._sep,
+                                            _G._sep,
+                                            _G._sep and "nightly" or "stable"))
+        servers.fennel_language_server = {
+            settings = {
+                fennel = {
+                    workspace = {
+                        library = fennelRuntimePath,
+                    },
+                    diagnostics = {
+                        globals = {"vim"}
+                    }
                 }
             }
         }
-    }
+    end
     -- }}} Fennel
     -- Vimscript {{{
     -- npm install -g vim-language-server
