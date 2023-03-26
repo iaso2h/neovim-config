@@ -1,6 +1,3 @@
-require("global.keymap")
-
-
 local fn  = vim.fn
 local api = vim.api
 
@@ -14,10 +11,15 @@ local init = function(initValue, optName) -- {{{
     end
     return initValue
 end -- }}}
+-- "NVIM v0.9.0-dev-1248+g204a8b17c"
+local nvimVersion = vim.split(vim.api.nvim_exec("version", true), "\n", {trimempty = true})[1]
+_G._nvim_version, _G._is_nightly = select(3, string.find(nvimVersion, [[v(%d%.%d%.%d)%-(dev?)]]))
+
 _G._os_uname         = init(vim.loop.os_uname())
 _G._is_term          = init(vim.fn.has("gui_running") == 0)
 _G._sep              = init(_G._os_uname.sysname == "Windows_NT" and "\\" or "/")
 _G._config_path      = init(fn.stdpath("config"))
+_G._plugin_root      = init(vim.fn.stdpath("data") .. _G._sep .. "lazy")
 _G._format_option    = init("cr/qn2mM1jpl")
 _G._qf_fallback_open = init(true, "QuickFixFallbackOpen")
 _G._trim_space       = init(true, "QuickTrimSpace")
@@ -25,7 +27,43 @@ _G._autoreload       = init(true, "Autoreload")
 _G._enable_plugin    = init(true)
 _G._lisp_language    = init {"clojure", "scheme", "lisp", "racket", "hy", "fennel", "janet", "carp", "wast", "yuck"}
 
+-- Disable built-in plugins
+vim.g.loaded_2html_plugin      = 1
+vim.g.loaded_getscript         = 1
+vim.g.loaded_getscriptPlugin   = 1
+vim.g.loaded_gzip              = 1
+vim.g.loaded_html_plugin       = 1
+vim.g.loaded_logiPat           = 1
+vim.g.loaded_matchit           = 0
+-- vim.g.loaded_matchparen        = 1
+vim.g.loaded_netrw             = 1
+vim.g.loaded_netrwFileHandlers = 1
+vim.g.loaded_netrwPlugin       = 1
+vim.g.loaded_netrwSettings     = 1
+vim.g.loaded_rrhelper          = 1
+vim.g.loaded_tar               = 1
+vim.g.loaded_tarPlugin         = 1
+vim.g.loaded_tutor_mode_plugin = 1
+vim.g.loaded_vimball           = 1
+vim.g.loaded_vimballPlugin     = 1
+vim.g.loaded_zip               = 1
+vim.g.loaded_zipPlugin         = 1
+-- Toggle embed syntax
+vim.g.vimsyn_embed = 'lPr'
+-- c.vim
+vim.g.c_gnu = 1
+vim.g.c_ansi_typedefs = 1
+vim.g.c_ansi_constants = 1
+vim.g.c_no_comment_fold = 1
+vim.g.c_syntax_for_h = 1
+-- doxygen.vim
+vim.g.load_doxygen_syntax= 1
+vim.g.doxygen_enhanced_color = 1
+-- msql.vim
+vim.g.msql_sql_query = 1
 
+-- Global function {{{
+require("global.keymap")
 _G.Print = function(...)
     local objects = {}
     for i = 1, select('#', ...) do
@@ -168,3 +206,4 @@ _G.nvim_buf_get_name = function(bufNr)
         return api.nvim_buf_get_name(bufNr)
     end
 end
+-- }}} Global function

@@ -1,3 +1,8 @@
+; File: quotePairs
+; Author: iaso2h
+; Description: Auto make "" pair up
+; Version: 0.0.2
+; Last Modified: 2023-3-23
 (local {: pp : strIdxAll} (require "fnlUtil"))
 (local atomList ["list" "sequence" "local"])
 
@@ -50,7 +55,11 @@
                          (cursorCharNext:match "%w")))))
           (do (vim.api.nvim_feedkeys "\"" "nt" false))
             ; (pp "Single insert")
-          (do (vim.api.nvim_feedkeys "\"\"" "nt" false))))))
+          (do (vim.api.nvim_feedkeys (.. "\"\""
+                                         (vim.api.nvim_replace_termcodes "<Left>"
+                                                                   true
+                                                                   true
+                                                                   true)) "nt" false))))))
             ; (pp "Double insert")
 
 

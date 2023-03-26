@@ -36,13 +36,13 @@ local saveOption = function()
     local wrapscan
     local selection
     wrapscan = vim.o.wrapscan
-    vim.opt.wrapscan = false
+    vim.o.wrapscan = false
     selection = vim.o.selection
-    vim.opt.selection = "inclusive"
+    vim.o.selection = "inclusive"
 
-    M.restoreOption = function()
-        vim.opt.wrapscan  = wrapscan
-        vim.opt.selection = selection
+    M.restoreoion = function()
+        vim.o.wrapscan  = wrapscan
+        vim.o.selection = selection
     end
 end
 
