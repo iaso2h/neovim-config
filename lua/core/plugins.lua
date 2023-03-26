@@ -546,7 +546,6 @@ local pluginArgs = { -- {{{
             "hrsh7th/cmp-buffer",
             "hrsh7th/cmp-path",
             "PaterJason/cmp-conjure",
-            "rcarriga/cmp-dap",
             {
                 "tzachar/cmp-tabnine",
                 cond  = _G._os_uname.machine ~= "aarch64",
@@ -674,7 +673,7 @@ local pluginArgs = { -- {{{
                 config = require("config.nvim-dap-ui").config,
             },
             "nvim-dap-virtual-text",
-            "cmp-dap",
+            "rcarriga/cmp-dap",
             "one-small-step-for-vimkind"
         },
         init = function()

@@ -4,7 +4,7 @@ M.filetypeSetup = function ()
     local winInfo = vim.fn.getwininfo()
     for _, win in ipairs(winInfo) do
         local ft = vim.api.nvim_buf_get_option(win.bufnr, "filetype")
-        if tbl_idx(require("config.nvim-galaxyline").shortLineList, ft, false) then
+        if vim.tbl_contains(require("config.nvim-galaxyline").shortLineList, ft) then
             vim.api.nvim_win_set_option(win.winid, "cursorline", false)
             if ft == "dap-repl" then
                 vim.api.nvim_create_autocmd("BufEnter",{
