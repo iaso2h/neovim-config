@@ -136,9 +136,9 @@ require('telescope').setup{
 }
 
 -- Command
-vim.cmd[[
-command! -nargs=0 O lua require('telescope.builtin').oldfiles()
-]]
+vim.api.nvim_create_user_command("O", function()
+    require('telescope.builtin').oldfiles()
+end, {desc = "Browse the oldfiles then prompt"} )
 -- Mappings
 map("n", [[<C-f>a]], [[<CMD>lua require('telescope.builtin').builtin()<CR>]], {"silent"}, "All builtins")
 

@@ -124,7 +124,7 @@ if _G._autoreload then
         desc     = "Autoreload configuration after saving lua/vim configuration files",
         callback = function ()
             -- Similar work: https://github.com/RRethy/nvim-sourcerer
-            if _G._autoreload then
+            if _G._enable_plugin and _G._autoreload then
                 require("autoreload").reload()
             end
         end
@@ -347,7 +347,7 @@ excmd("Dofile", function (opts)
             vim.cmd("luafile " .. filePath)
         end
 
-        if _G._autoreload then
+        if _G._enable_plugin and _G._autoreload then
             require("autoreload").reload()
         end
     elseif ft == "vim" then

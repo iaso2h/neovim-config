@@ -23,6 +23,7 @@ M.opt.lua.blacklist        = {
     M.configPath:joinpath("lua", "config", "nvim-null-is.lua").filename,
     M.configPath:joinpath("lua", "core", "plugins.lua").filename,
     M.configPath:joinpath("lua", "core", "init.lua").filename,
+    -- M.configPath:joinpath("lua", "global").filename,
 }
 M.opt.lua.setup  = {}
 M.opt.lua.config = { -- {{{
@@ -31,6 +32,8 @@ M.opt.lua.config = { -- {{{
         pathPat       = M.opt.lua.moduleSearchPath:joinpath("config").filename,
         unloadOnlyChk = false,
         callback      = function(path, callback)
+            if not _G._enable_plugin then return end
+
             local err = function(msg)
                 vim.notify("Error detect while calling callback function at: " .. path.filename,
                     vim.log.levels.ERROR)

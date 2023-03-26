@@ -1,4 +1,6 @@
-local M = { }
+local M = {
+    winID = { }
+}
 
 M.filetypeSetup = function ()
     local winInfo = vim.fn.getwininfo()
@@ -13,6 +15,7 @@ M.filetypeSetup = function ()
         "dapui_breakpoints",
         "dapui_scopes",
     }, ft) then
+            M.winID[ft] = win.winid
             vim.api.nvim_win_set_option(win.winid, "cursorline", false)
             if ft == "dap-repl" then
                 vim.api.nvim_create_autocmd("BufEnter",{
@@ -26,6 +29,7 @@ M.filetypeSetup = function ()
 
     M.filetypeSetupChk = true
 end
+
 
 M.config = function()
     local M     = require("config.nvim-dap-ui")
@@ -114,14 +118,6 @@ M.config = function()
         }
     } -- }}}
 
-    _G.dapUIToggle = function(bangChk) require("dapui").toggle{layout = nil, reset = bangChk} end
-
-    vim.cmd[[
-        command! -nargs=0 DapUIUpdateRender lua dapui.update_render()
-        command! -nargs=0 -bang DapUIToggle call v:lua.dapUIToggle(<q-bang>)
-    ]]
-
-
     dap.listeners.after.event_initialized["dapui_config"] = function()
         dapui.open()
         vim.cmd[[DapVirtualTextEnable]]
@@ -130,13 +126,56 @@ M.config = function()
     dap.listeners.before.event_terminated['dapui_config'] = function()
         vim.cmd[[DapVirtualTextDisable]]
         dapui.close()
+        M.winID = {}
     end
     dap.listeners.before.event_exited['dapui_config'] = function()
         vim.cmd[[DapVirtualTextDisable]]
         dapui.close()
+        M.winID = {}
     end
 
-    map("n", [[<C-w>d]], [[<CMD>lua require("dapui").toggle {layout=nil,reset=true}<CR>]], {"silent"}, "Dap UI toggle")
+
+    -- key mappings {{{
+    local uiToggle = function(bangChk) require("dapui").toggle{layout = nil, reset = bangChk} end
+
+    local windowFocus = function(filetype) -- {{{
+        if not next(M.winID) then return end
+        if filetype == "dapui_scopes" or filetype ==  "dapui_scopes" or filetype ==  "dapui_scopes" or filetype ==  "dapui_scopes" then
+            if require("dapui.windows").layouts[1]:is_open() then
+                local winid = M.winID[filetype]
+                if vim.api.nvim_win_is_valid(winid) then
+                    vim.api.nvim_set_current_win(winid)
+                else
+                    vim.notify(string.format("The %s window is no longer valid", filetype), vim.log.levels.INFO)
+                end
+            end
+        else
+            if require("dapui.windows").layouts[2]:is_open() then
+                local winid = M.winID[filetype]
+                if vim.api.nvim_win_is_valid(winid) then
+                    vim.api.nvim_set_current_win(winid)
+                else
+                    vim.notify(string.format("The %s window is no longer valid", filetype), vim.log.levels.INFO)
+                end
+            end
+        end
+    end -- }}}
+
+    vim.api.nvim_create_user_command("DapUIUpdateRender", function()
+        dapui.update_render()
+    end, {desc = "Dap UI Update"} )
+    vim.api.nvim_create_user_command("DapUIToggle", function()
+        uiToggle()
+    end, {desc = "Dap UI Toggle"} )
+
+    map("n", [[<C-w>dd]], [[<CMD>lua require("dapui").toggle {layout=nil,reset=true}<CR>]], {"silent"}, "Dap UI toggle")
+    map("n", [[<C-w>ds]], function() windowFocus("dapui_scopes") end,      "Go ot Dap scopes window")
+    map("n", [[<C-w>dw]], function() windowFocus("dapui_watches") end,     "Go ot Dap watches window")
+    map("n", [[<C-w>dS]], function() windowFocus("dapui_stacks") end,      "Go ot Dap stacks window")
+    map("n", [[<C-w>db]], function() windowFocus("dapui_breakpoints") end, "Go ot Dap breakpoints window")
+    map("n", [[<C-w>dr]], function() windowFocus("dap-repl") end,          "Go ot Dap repl window")
+    map("n", [[<C-w>dc]], function() windowFocus("dapui_console") end,     "Go ot Dap console window")
+    -- }}} key mappings
 end
 
 

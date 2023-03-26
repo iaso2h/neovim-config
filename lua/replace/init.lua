@@ -4,6 +4,7 @@
 -- Version: 0.1.6
 -- Last Modified: 2023-2-24
 -- TODO: tests for softtab convert
+-- TODO: disable motion repeat
 local fn       = vim.fn
 local api      = vim.api
 local util     = require("util")

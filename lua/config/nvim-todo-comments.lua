@@ -66,7 +66,8 @@ require("todo-comments").setup{
     },
 }
 
-vim.cmd [[command! -nargs=0 TodoTelescope Telescope todo-comments todo theme=ivy]]
+vim.api.nvim_create_user_command("TodoTelescope", "Telescope todo-comments todo theme=ivy",
+    {desc = "Telescope todo"} )
 map("n", [[<C-f>t]], [[<CMD>TodoTelescope<CR>]], {"silent"}, "Telescope todo")
 map("n", [[<C-q>t]], [[<CMD>TodoQuickFix<CR>]],  {"silent"}, "Toggle todo in quickfix")
 
