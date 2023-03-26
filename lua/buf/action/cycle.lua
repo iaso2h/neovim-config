@@ -1,8 +1,8 @@
 -- File: cycle.lua
 -- Author: iaso2h
 -- Description: Improved bp and bn
--- Version: 0.0.5
--- Last Modified: 2023-3-21
+-- Version: 0.0.6
+-- Last Modified: 2023-3-26
 
 
 local api = vim.api
@@ -81,7 +81,8 @@ M.init = function(direction)
 
     local currentBufIdx = tbl_idx(bufTbl, currentBufNr, false)
     if not currentBufIdx then
-        return vim.notify("Unknown buffer, can't continue", vim.log.levels.ERROR)
+        -- Use fallback function
+        return bufferCycle(currentBufNr, direction)
     end
 
     -- Find the valid candidate
