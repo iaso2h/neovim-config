@@ -70,3 +70,4 @@ venv
 numhl
 linehl
 texthl
+unstage

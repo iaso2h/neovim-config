@@ -138,12 +138,12 @@ map("n", [[dj]], [[<Nop>]], "which_key_ignore")
 map("n", [[dk]], [[<Nop>]], "which_key_ignore")
 map("n", [[<Plug>DeleteUnderForward]],
     [[:lua require("changeUnder").init("diw", 1, "<Plug>DeleteUnderForward")<CR>]],
-    {"silent"}, "Delete the whold word under curosr, then highlight it forward")
+    {"silent"}, "Delete the whole word under cursor, then highlight it forward")
 map("n", [[<Plug>DeleteUnderBackward]],
     [[:lua require("changeUnder").init("diw", 0, "<Plug>DeleteUnderBackward")<CR>]],
-    {"silent"}, "Delete the whold word under curosr, then highlight it backward")
-map("n", [[dn]], [[<Plug>DeleteUnderForward]], "Delete the whold word under curosr, then highlight it forward")
-map("n", [[dN]], [[<Plug>DeleteUnderBackward]], "Delete the whold word under curosr, then highlight it backward")
+    {"silent"}, "Delete the whole word under cursor, then highlight it backward")
+map("n", [[dn]], [[<Plug>DeleteUnderForward]], "Delete the whole word under cursor, then highlight it forward")
+map("n", [[dN]], [[<Plug>DeleteUnderBackward]], "Delete the whole word under cursor, then highlight it backward")
 map("n", [[d<Space>]], [[<CMD>call setline(".", "")<CR>]],  {"silent"}, "Empty current line,")
 -- Change under cursor
 map("n", [[cn]], [[v:hlsearch? "cgn" : "*``cgn"]], {"noremap", "expr"}, "Change whole word under cursor, then highlight it forward")
@@ -229,12 +229,12 @@ map("x", [[R]],   [[<Plug>ReplaceVisual]],          "Replace selected")
 
 map("n", [[<Plug>ReplaceUnderForward]],
     [[:lua require("changeUnder").init("gruiw", 1, "<Plug>ReplaceUnderForward")<CR>]],
-    {"silent"}, "Replace the whold word under curosr, then highlight it forward")
+    {"silent"}, "Replace the whole word under cursor, then highlight it forward")
 map("n", [[<Plug>ReplaceUnderBackward]],
     [[:lua require("changeUnder").init("gruiw", -1, "<Plug>ReplaceUnderBackward")<CR>]],
-    {"silent"}, "Replace the whold word under curosr, then highlight it backward")
-map("n", [[grn]], [[<Plug>ReplaceUnderForward]], "Replace the whold word under curosr, then highlight it forward")
-map("n", [[grN]], [[<Plug>ReplaceUnderBackward]], "Replace the whold word under curosr, then highlight it backward")
+    {"silent"}, "Replace the whole word under cursor, then highlight it backward")
+map("n", [[grn]], [[<Plug>ReplaceUnderForward]], "Replace the whole word under cursor, then highlight it forward")
+map("n", [[grN]], [[<Plug>ReplaceUnderBackward]], "Replace the whole word under cursor, then highlight it backward")
 -- Exchange
 map("n", [[<Plug>exchangeOperatorInplace]], function ()
     return vim.fn.luaeval [[require("exchange").expr(true, true)]]
@@ -245,8 +245,8 @@ map("n", [[gx]],  [[<Plug>exchangeOperatorInplace]], "exchange operator and rest
 -- Search & Jumping {{{
 -- In case of mistouching
 -- Inquiry word
-map("n", [[<leader>i]], [=[[I]=], "Inquery word under cursor")
-map("x", [[<leader>i]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selection").getSelect("string", false), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquery selected words")
+map("n", [[<leader>i]], [=[[I]=], "Inquiry word under cursor")
+map("x", [[<leader>i]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selection").getSelect("string", false), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquiry selected words")
 -- Fast mark restore
 map("n", [[M]], [[<CMD>lua require("searchHop").centerHop("`m", false)<CR>]], "Restore mark M")
 -- Changelist/Jumplist jumping

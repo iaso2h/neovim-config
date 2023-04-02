@@ -17,7 +17,7 @@ M.servers = {
 }
 
 if _G._os_uname.sysname ~= "Windows_NT" then
-    M.servers.shortLineList = {}
+    M.servers.fennel_language_server = {}
 end
 
 M.config = function()
