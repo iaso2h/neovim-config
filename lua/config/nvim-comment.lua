@@ -47,7 +47,7 @@ return function()
             local ll, rr = U.unwrap_cstr(cstr)
             local padding = true
             local is_commented = U.is_commented(ll, rr, padding)
-    
+
             local rcom = {} -- ranges of commented lines
             local cl = s[1] -- current line
             local rs, re = nil, nil -- range start and end
@@ -67,11 +67,11 @@ return function()
             if rs ~= nil then
                 table.insert(rcom, { rs, re })
             end
-    
+
             local cursor_position = vim.api.nvim_win_get_cursor(0)
             local vmark_start = vim.api.nvim_buf_get_mark(0, "<")
             local vmark_end = vim.api.nvim_buf_get_mark(0, ">")
-    
+
             ---Toggle comments on a range of lines
             ---@param sl integer: starting line
             ---@param el integer: ending line
@@ -81,18 +81,18 @@ return function()
                 vim.api.nvim_buf_set_mark(0, "]", el, 0, {})
                 require("Comment.api").locked("toggle.linewise")("")
             end
-    
+
             toggle_lines(s[1], e[1])
             for _, r in ipairs(rcom) do
                 toggle_lines(r[1], r[2]) -- uncomment lines twice to remove previous comment
                 toggle_lines(r[1], r[2])
             end
-    
+
             vim.api.nvim_win_set_cursor(0, cursor_position)
             vim.api.nvim_buf_set_mark(0, "<", vmark_start[1], vmark_start[2], {})
             vim.api.nvim_buf_set_mark(0, ">", vmark_end[1], vmark_end[2], {})
             vim.o.operatorfunc = "v:lua.__flip_flop_comment" -- make it dot-repeatable
-    
+
     end
     map({ "n", "x" }, [[gci]], [[<CMD>set operatorfunc=v:lua.__flip_flop_comment<cr>g@]],
         { "silent" }, "Comment flip flop selection")

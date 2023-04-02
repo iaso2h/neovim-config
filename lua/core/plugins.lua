@@ -284,9 +284,9 @@ local pluginArgs = { -- {{{
     {
         "numToStr/Comment.nvim",
         keys = {
-            {[[gc]], mode = "n"},
+            {[[gc]],  mode = "n"},
             {[[gcc]], mode = "n"},
-            {[[C]], mode = "x"},
+            {[[C]],   mode = "x"},
 
             {[[gcy]], mode = "n"},
             {[[gcy]], mode = "x"},
@@ -496,7 +496,6 @@ local pluginArgs = { -- {{{
     {
         "folke/trouble.nvim",
         dependencies = { "nvim-lspconfig", },
-        cmd    = "Trouble",
         config = require("config.nvim-trouble"),
     },
     {
@@ -867,7 +866,7 @@ local pluginArgs = { -- {{{
     },
     {
         "sindrets/diffview.nvim",
-        cmd    = "DiffviewOpen",
+        -- cmd    = "DiffviewOpen",
         config = require("config.nvim-diffview"),
     },
     {

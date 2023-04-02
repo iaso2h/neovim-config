@@ -49,4 +49,7 @@ return function()
         },
         use_diagnostic_signs = true -- enabling this will use the signs defined in your lsp client
     }
+
+    map("n", "<C-q>t", [[<CMD>TroubleToggle quickfix<CR>]],
+        { "silent", "noremap" }, "Toggle trouble quickfix")
 end
