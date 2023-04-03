@@ -17,10 +17,9 @@ M.filetypeSetup = function ()
     }, ft) then
             M.winID[ft] = win.winid
             vim.api.nvim_win_set_option(win.winid, "cursorline", false)
-            if ft == "dap-repl" then
+            if ft == "dap-repl" or ft == "dapui_watches" then
                 vim.api.nvim_create_autocmd("BufEnter",{
                     buffer  = win.bufnr,
-                    desc    = "Start insert mode in dap-repl window",
                     command = "startinsert"
                 })
             end

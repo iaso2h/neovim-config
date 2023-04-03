@@ -31,7 +31,7 @@ M.main = function()
             -- if string.match(m, [=[%d more line; before]=])
         end, msgTbl)
     end
-    if not next(msgTbl) then end
+    if not next(msgTbl) then return end
 
     local errorLineTbl = {}
     local checkIndent = false
@@ -42,6 +42,14 @@ M.main = function()
             -- Print(string.find(myStr, "^\t"))
             if string.find(m, "^\t") then
                 local indentMsg = string.gsub(m, "^\t", string.rep(" ", vim.o.tabstop))
+                -- Close check in next iteration
+                if m == indentMsg then
+                    checkIndent = false
+                else
+                    m = indentMsg
+                end
+            elseif string.find(m, "^%^I") then
+                local indentMsg = string.gsub(m, "^%^I", string.rep(" ", vim.o.tabstop))
                 -- Close check in next iteration
                 if m == indentMsg then
                     checkIndent = false
@@ -61,7 +69,8 @@ M.main = function()
         else
             if string.find(m, [[^E%d+: .*:$]]) or
                 string.find(m, [[^stack traceback:]]) or
-                string.find(m, [[^Error executing l?L?ua]])
+                string.find(m, [[^Error executing l?L?ua]]) or
+                string.find(m, [[module '.\{-}' not found:$]])
                 then
                 -- Checking indent in the follow iteration
                 errorLineTbl[#errorLineTbl+1] = #qfTbl

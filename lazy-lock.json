@@ -47,7 +47,7 @@
   "nvim-nonicons": { "branch": "main", "commit": "ceda07dc7339f35444b5f4c4016f76a9eb42ac16" },
   "nvim-parinfer": { "branch": "master", "commit": "82bce5798993f4fe5ced20e74003b492490b4fe8" },
   "nvim-tree.lua": { "branch": "master", "commit": "45400cd7e02027937cd5e49845545e606ecf5a1f" },
-  "nvim-treesitter": { "branch": "master", "commit": "06075ecd04892271e6a3fbd5c0d4e89ca6fb8375" },
+  "nvim-treesitter": { "branch": "master", "commit": "cbfa7cae1b38e1b843b2275d633ddbb05a105906" },
   "nvim-treesitter-context": { "branch": "master", "commit": "959265a5d438462dc5d3dde215b915109c3d6fcb" },
   "nvim-treesitter-textobjects": { "branch": "master", "commit": "b55fe6175f0001347a433c9df358c8cbf8a4e90f" },
   "nvim-ts-autotag": { "branch": "main", "commit": "25698e4033cd6cd3745454bfc837dd670eba0480" },
@@ -79,4 +79,3 @@
   "vim-tips-wiki": { "branch": "master", "commit": "02b9c34bea465bdc79dfb5144270ae6dd098376a" },
   "vim-visualrepeat": { "branch": "master", "commit": "9488f66b80c6f9583cac25b03651725e2dcd7437" },
   "which-key.nvim": { "branch": "main", "commit": "4b73390eec680b4c061ea175eb32c0ff3412271d" }
-}
