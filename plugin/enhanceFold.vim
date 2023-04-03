@@ -1,15 +1,14 @@
 " File: enhanceFold.vim
 " Author: iaso2h
-" Description: Enhnace origin fold feature, mainly focus on markder fold method
-" Version: 0.0.7
-" Last Modified: 2021-04-06
+" Description: Enhance origin fold feature, mainly focus on markder fold method
+" Version: 0.0.8
+" Last Modified: 2023-04-03
 
-" Initiation {{{
+" Initiation
 let g:enhanceFoldInit = 1
 let g:enhanceFoldStartHLID = 9138
 let g:enhanceFoldEndHLID = 9139
 let g:enhanceFoldPriority = get(g:, "enhanceFoldPriority", 30)
-" }}} Initiation
 
 ""
 " Function: EnhanceFold
@@ -23,60 +22,12 @@ function! HighlightComment()
     let l:delimiterPosList = MatchAll(getline("."), '"')
 endfunction
 
-function! EnhanceFold(modeType, ...) " {{{
-    let l:saveCursor = getpos('.')
-    let l:curLine = getline(".")
-    if a:modeType ==# "n"
-        if &filetype == "vim"
-            let l:delimiterPosList = MatchAll(getline("."), '"')
-            if len(l:delimiterPosList) % 2 != 0
-                execute "normal! A " . a:1
-            else
-                execute "normal! A " . "\" " . a:1
-            endif
-        else
-            execute "normal! A " . g:FiletypeCommentDelimiter[&filetype] . " " . a:1
-        endif
-        if a:1 == "}}}"
-            execute "normal! zx"
-        endif
-    elseif a:modeType ==# "v" || a:modeType ==# "V"
-        let l:selectStart = getpos("'<")
-        let l:selectEnd = getpos("'>")
-        if l:selectEnd[1] == l:selectStart[1]
-            return 0
-        else
-            if &filetype == "vim"
-                let l:delimiterPosList = MatchAll(getline("."), '"')
-                if len(l:delimiterPosList) % 2 != 0
-                    call cursor(l:selectStart[1], 0)
-                    execute "normal! g_a " . "{{{"
-                    call cursor(l:selectEnd[1], 0)
-                    execute "normal! g_a " . "}}}"
-                else
-                    call cursor(l:selectStart[1], 0)
-                    execute "normal! g_a " . "\" {{{"
-                    call cursor(l:selectEnd[1], 0)
-                    execute "normal! g_a " . "\" }}}"
-                endif
-            else
-                call cursor(l:selectStart[1], 0)
-                execute "normal! g_a " . g:FiletypeCommentDelimiter[&filetype] . " {{{"
-                call cursor(l:selectEnd[1], 0)
-                execute "normal! g_a " . g:FiletypeCommentDelimiter[&filetype] . " }}}"
-            endif
-        endif
-
-        call cursor (l:saveCursor[1], l:saveCursor[2])
-        execute "normal! zx"
-    endif
-endfunction " }}}
 
 ""
 " Function: EnhanceFoldJump: Jump to previous/next fold location inclusively
 "
 " @param direction:   Possible value "previous", "next"
-" @param showWarning: Possible value 0, 1. Whether to show warnning message
+" @param showWarning: Possible value 0, 1. Whether to show warning message
 " when not inside fold scope
 " @param returnVar:   Possbile value 0, 1. Whether to return verbose list when execute successfully
 " Returns: return [1, l:foldPos, l:matchPos] when a:returnVar is set to 1, otherwise return [1] when succeeded, return [0] when failed
@@ -91,7 +42,7 @@ function! EnhanceFoldJump(direction, showWarning, returnVar) " {{{
     let l:cursorPos = getpos(".")
     let l:lastFoldPos = l:cursorPos
     " Get fold position
-    execute "keepjumps normal! " . l:cmd
+    execute "keepjumps normal " . l:cmd
     while 1
         let l:foldPos = getpos(".")
         let l:foldPosLine = getline('.')
@@ -126,12 +77,12 @@ endfunction " }}}
 
 
 ""
-" Function: EnhanceFoldHL Enhence Fold Highlight Light, highlight
+" Function: EnhanceFoldHL Enhance Fold Highlight Light, highlight
 " previous/next fold when cursor within the fold scope
 "
 " @param warningMsg: string value to show when fold scope not found, provided
 " empty string wont't show message when fold scope not found
-" @param time:       milisecond to start the EnhanceFoldRemoveHLMatch() and
+" @param time:       millisecond to start the EnhanceFoldRemoveHLMatch() and
 " the appending function
 " @param funcName:   function name in a string value, this function will be
 " invoke with the EnhanceFoldRemoveHLMatch() function when reaching a:time if
@@ -162,7 +113,7 @@ function! EnhanceFoldHL(warningMsg, time, funcName) " {{{
         if !exists("g:enhanceFoldHLMatch[s:winID]")
             let g:enhanceFoldHLMatch[s:winID] = []
         else
-            " Clear highligh before create highlight
+            " Clear highlight before create highlight
             call EnhanceFoldRemoveHLMatch(a:time)
         endif
     endif
@@ -170,16 +121,16 @@ function! EnhanceFoldHL(warningMsg, time, funcName) " {{{
     let l:foldStartMatchAdd = 0
     let l:foldEndMatchAdd = 0
     let s:foldStartDict = {
-        \ "matchID" : g:enhanceFoldStartHLID,
-        \ "foldPos" : l:foldStartPos,
-        \ "matchPos" : l:foldStartMatchPos,
-        \ "matchAddCheck" : l:foldStartMatchAdd,
+        \ "matchID":       g:enhanceFoldStartHLID,
+        \ "foldPos":       l:foldStartPos,
+        \ "matchPos":      l:foldStartMatchPos,
+        \ "matchAddCheck": l:foldStartMatchAdd,
     \ }
     let s:foldEndDict = {
-        \ "matchID" : g:enhanceFoldEndHLID,
-        \ "foldPos" : l:foldEndPos,
-        \ "matchPos" : l:foldEndMatchPos,
-        \ "matchAddCheck" : l:foldEndMatchAdd,
+        \ "matchID":       g:enhanceFoldEndHLID,
+        \ "foldPos":       l:foldEndPos,
+        \ "matchPos":      l:foldEndMatchPos,
+        \ "matchAddCheck": l:foldEndMatchAdd,
     \ }
     for i in [s:foldStartDict, s:foldEndDict]
         try
@@ -244,7 +195,7 @@ function! EnhanceDelete(...) abort " {{{
         execute printf("%ds#%s##g", l:foldStartPos[1], g:enhanceFoldStartPat[&filetype])
         execute printf("%ds#%s##g", l:foldEndPos[1], g:enhanceFoldEndPat[&filetype])
     endif
-    " Resotre
+    " Restore
     call winrestview(l:saveView)
     if exists("l:saveUnnamedReg") | let @@ = l:saveUnnamedReg | endif
 endfunction " }}}
@@ -258,18 +209,18 @@ function! EnhanceChange(...) abort " {{{
     " }}} Fold marker info
 
     echohl Moremsg
-    let l:newFoldMakrerName = input("New fold marder name: ")
-    if empty(l:newFoldMakrerName)
+    let l:newFoldMarkerName = input("New fold marder name: ")
+    if empty(l:newFoldMarkerName)
         echohl WarningMsg | echo " " | echo "Cancel" | echohl None
         call winrestview(l:saveView)
         return 0
     else
         if s:lineComment == 1
-            let l:newFoldStart = printf("%s %s {{{", g:FiletypeCommentDelimiter[&filetype], l:newFoldMakrerName)
-            let l:newFoldEnd = printf("%s }}} %s", g:FiletypeCommentDelimiter[&filetype], l:newFoldMakrerName)
+            let l:newFoldStart = printf("%s %s {{{", g:FiletypeCommentDelimiter[&filetype], l:newFoldMarkerName)
+            let l:newFoldEnd = printf("%s }}} %s", g:FiletypeCommentDelimiter[&filetype], l:newFoldMarkerName)
         else
-            let l:newFoldStart = printf(" %s %s {{{", g:FiletypeCommentDelimiter[&filetype], l:newFoldMakrerName)
-            let l:newFoldEnd = printf(" %s }}} %s", g:FiletypeCommentDelimiter[&filetype], l:newFoldMakrerName)
+            let l:newFoldStart = printf(" %s %s {{{", g:FiletypeCommentDelimiter[&filetype], l:newFoldMarkerName)
+            let l:newFoldEnd = printf(" %s }}} %s", g:FiletypeCommentDelimiter[&filetype], l:newFoldMarkerName)
         endif
     endif
     echohl None
@@ -285,7 +236,7 @@ function! EnhanceChange(...) abort " {{{
         call cursor(l:foldEndPos[1], l:foldEndPos[2])
         normal! ==
     endif
-    " Resotre
+    " Restore
     if exists("l:saveUnnamedReg") | let @@ = l:saveUnnamedReg | endif
     call winrestview(l:saveView)
 endfunction " }}}
