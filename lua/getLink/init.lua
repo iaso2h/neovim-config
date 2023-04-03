@@ -1,8 +1,8 @@
--- File: o
+-- File: getLink module
 -- Author: iaso2h
--- Description: Open url link in browser
--- Version: 0.0.12
--- Last Modified: 2023-3-22
+-- Description: Get url link in browser
+-- Version: 0.0.13
+-- Last Modified: 2023-4-3
 local fn  = vim.fn
 local api = vim.api
 local M   = {
