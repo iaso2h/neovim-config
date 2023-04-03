@@ -54,13 +54,15 @@
                     (and (cursorChar:match "[.: ([{]")
                          (cursorCharNext:match "%w")))))
           (do (vim.api.nvim_feedkeys "\"" "nt" false))
-            ; (pp "Single insert")
-          (do (vim.api.nvim_feedkeys (.. "\"\""
-                                         (vim.api.nvim_replace_termcodes "<Left>"
-                                                                   true
-                                                                   true
-                                                                   true)) "nt" false))))))
-            ; (pp "Double insert")
+          ; (pp "Single insert")
+          (do
+            (vim.api.nvim_feedkeys "\"\"" "nt" false)
+            (vim.api.nvim_feedkeys (vim.api.nvim_replace_termcodes
+                                      "<Left>"
+                                      true
+                                      true
+                                      true) "nt" false))))))
+          ; (pp "Double insert")))))
 
 
 {: pairUp}
