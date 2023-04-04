@@ -2,11 +2,11 @@
     "fileinfo": {
         "prefix": "fi",
         "body": [
-            "-- File: $1",
-            "-- Author: $2",
-            "-- Description: $3",
-            "-- Version: $4",
-            "-- Last Modified: $5"
+            "File: $1",
+            "Author: $2",
+            "Description: $3",
+            "Version: $4",
+            "Last Modified: $5"
         ],
         "description": "File infomation"
     },

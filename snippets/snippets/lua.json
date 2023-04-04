@@ -48,9 +48,9 @@
     "vimpcall": {
         "prefix": "pcallv",
         "body": [
-            "local ok, msg = pcall(${1:func}, ${2:args})",
+            "local ok, msgOrVal = pcall(${1:func}, ${2:args})",
             "${3:if not ok then",
-            "\tvim.notify(msg, vim.log.levels.ERROR)}",
+            "\tvim.notify(msgOrVal, vim.log.levels.ERROR)}",
             "${4:\thandler(ok, err)\nelse\n\tsuccess(ok, err)\nend}"
         ],
         "description": "pcall statement"
