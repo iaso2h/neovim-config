@@ -27,7 +27,7 @@ the dlemid part
         expectedLines    = vim.split(expectedLines, "\n")
         -- expectedDotLines = vim.split(expectedDotLines, "\n")
         local component = {}
-        component.srcFront  = "mid"
+        component.srcAhead  = "mid"
         component.srcBehind = "dle"
         component.prefix    = "the "
         component.posfix    = " part"
@@ -41,8 +41,11 @@ the dlemid part
         outputLines, outputCursorPos     = feedkeysOutput([[gxb`mgxe]])
         expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
         -- assert.are.same(outputCursorPos, expectedCursorPos)
+        print(vim.inspect(exchange))
         assert.are.same(component, exchange._acrossLineComponent)
         assert.are.same(outputLines, expectedLines)
+        -- Post
+        exchange._acrossLineComponent = {}
 
         -- replace, via dot
         -- outputLines, outputCursorPos     = feedkeysOutput([[.]])
@@ -66,7 +69,7 @@ vim.bufnr.nvim_get_current_buf(api)
         expectedLines    = vim.split(expectedLines, "\n")
         -- expectedDotLines = vim.split(expectedDotLines, "\n")
         local component = {}
-        component.srcFront  = "api"
+        component.srcAhead  = "api"
         component.srcBehind = "bufnr"
         component.prefix    = "vim."
         component.posfix    = ")"
@@ -81,6 +84,8 @@ vim.bufnr.nvim_get_current_buf(api)
         -- assert.are.same(outputCursorPos, expectedCursorPos)
         assert.are.same(component, exchange._acrossLineComponent)
         assert.are.same(outputLines, expectedLines)
+        -- Post
+        exchange._acrossLineComponent = {}
 
         -- replace, via dot
         -- outputLines, outputCursorPos     = feedkeysOutput([[.]])
@@ -104,7 +109,7 @@ vim.api.Outputfeedkeys()
         expectedLines    = vim.split(expectedLines, "\n")
         -- expectedDotLines = vim.split(expectedDotLines, "\n")
         local component = {}
-        component.srcFront  = "feedkeys"
+        component.srcAhead  = "feedkeys"
         component.srcBehind = "Output"
         component.prefix    = "vim.api."
         component.posfix    = "()"
@@ -119,6 +124,8 @@ vim.api.Outputfeedkeys()
         -- assert.are.same(outputCursorPos, expectedCursorPos)
         assert.are.same(component, exchange._acrossLineComponent)
         assert.are.same(outputLines, expectedLines)
+        -- Post
+        exchange._acrossLineComponent = {}
 
         -- replace, via dot
         -- outputLines, outputCursorPos     = feedkeysOutput([[.]])
@@ -142,7 +149,7 @@ Lorem sit dolor ipsum amet
         expectedLines    = vim.split(expectedLines, "\n")
         -- expectedDotLines = vim.split(expectedDotLines, "\n")
         local component = {}
-        component.srcFront  = "ipsum"
+        component.srcAhead  = "ipsum"
         component.srcBehind = "sit"
         component.prefix    = "Lorem "
         component.posfix    = " amet"
@@ -157,6 +164,8 @@ Lorem sit dolor ipsum amet
         -- assert.are.same(outputCursorPos, expectedCursorPos)
         assert.are.same(component, exchange._acrossLineComponent)
         assert.are.same(outputLines, expectedLines)
+        -- Post
+        exchange._acrossLineComponent = {}
 
         -- replace, via dot
         -- outputLines, outputCursorPos     = feedkeysOutput([[.]])
@@ -165,7 +174,7 @@ Lorem sit dolor ipsum amet
     end)
 end)
 
-describe([[Exchange on lines that across the same line.]], function()
+describe([[Exchange on lines that across a mutual line.]], function()
 
     it([[Region1 is ahead of Region2, adjacent]], function()
         initLines = [[
@@ -184,7 +193,7 @@ Lorem ipsum dolor sit amet, officia excepteur
         expectedLines    = vim.split(expectedLines, "\n")
         -- expectedDotLines = vim.split(expectedDotLines, "\n")
         local component = {}
-        component.srcFront  = "sint Lorem ipsum "
+        component.srcAhead  = "sint Lorem ipsum "
         component.srcBehind = "dolor"
         component.prefix    = "        ex fugiat reprehenderit enim labore culpa "
         component.posfix    = " sit amet, officia excepteur"
@@ -199,6 +208,8 @@ Lorem ipsum dolor sit amet, officia excepteur
         -- assert.are.same(outputCursorPos, expectedCursorPos)
         assert.are.same(component, exchange._acrossLineComponent)
         assert.are.same(outputLines, expectedLines)
+        -- Post
+        exchange._acrossLineComponent = {}
 
         -- replace, via dot
         -- outputLines, outputCursorPos     = feedkeysOutput([[.]])
@@ -223,7 +234,7 @@ Lorem ipsum dolor sit amet, officia enimfugiat reprehenderit excepteur ex  labor
         expectedLines    = vim.split(expectedLines, "\n")
         -- expectedDotLines = vim.split(expectedDotLines, "\n")
         local component = {}
-        component.srcFront  = "excepteur ex "
+        component.srcAhead  = "excepteur ex "
         component.srcBehind = "enim"
         component.prefix    = "Lorem ipsum dolor sit amet, officia "
         component.posfix    = " labore culpa sint"
@@ -238,6 +249,8 @@ Lorem ipsum dolor sit amet, officia enimfugiat reprehenderit excepteur ex  labor
         -- assert.are.same(outputCursorPos, expectedCursorPos)
         assert.are.same(component, exchange._acrossLineComponent)
         assert.are.same(outputLines, expectedLines)
+        -- Post
+        exchange._acrossLineComponent = {}
 
         -- replace, via dot
         -- outputLines, outputCursorPos     = feedkeysOutput([[.]])
@@ -252,7 +265,7 @@ publishing it under the OPL!  It has been a great help while writing the user
            ^
         ]]
         expectedLines = [[
-Many thanks to Steve Oualline and New Riders for this book and publishing creating it under the OPL!  It has been a great help while writing the user
+Many thanks to Steve New Riders for thisOualline and  book and publishing creating it under the OPL!  It has been a great help while writing the user
         ]]
     --      expectedDotLines = [[
     -- if reg.type == "v" or (rushing and robbing.type == "V" and linesCnt == 1) then
@@ -261,7 +274,7 @@ Many thanks to Steve Oualline and New Riders for this book and publishing creati
         expectedLines    = vim.split(expectedLines, "\n")
         -- expectedDotLines = vim.split(expectedDotLines, "\n")
         local component = {}
-        component.srcFront  = "creating "
+        component.srcAhead  = "creating "
         component.srcBehind = "this book and publishing "
         component.prefix    = "Many thanks to Steve Oualline and New Riders for "
         component.posfix    = "it under the OPL!  It has been a great help while writing the user"
@@ -271,11 +284,13 @@ Many thanks to Steve Oualline and New Riders for this book and publishing creati
         initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
         -- replace
-        outputLines, outputCursorPos     = feedkeysOutput([[gx4bgxb]])
+        outputLines, outputCursorPos     = feedkeysOutput([[gx4b`[gxb]])
         expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
         -- assert.are.same(outputCursorPos, expectedCursorPos)
         assert.are.same(component, exchange._acrossLineComponent)
         assert.are.same(outputLines, expectedLines)
+        -- Post
+        exchange._acrossLineComponent = {}
 
         -- replace, via dot
         -- outputLines, outputCursorPos     = feedkeysOutput([[.]])
@@ -300,7 +315,7 @@ The manual and reference manual are user Vim Copyright (c) 1988-2003 by Bram
         expectedLines    = vim.split(expectedLines, "\n")
         -- expectedDotLines = vim.split(expectedDotLines, "\n")
         local component = {}
-        component.srcFront  = "Vim"
+        component.srcAhead  = "Vim"
         component.srcBehind = "manual and reference manual are"
         component.prefix    = "The "
         component.posfix    = " Copyright (c) 1988-2003 by Bram"
@@ -310,11 +325,13 @@ The manual and reference manual are user Vim Copyright (c) 1988-2003 by Bram
         initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
         -- replace
-        outputLines, outputCursorPos     = feedkeysOutput([[gx5b2bgxiw]])
+        outputLines, outputCursorPos     = feedkeysOutput([[gx5b`[2bgxiw]])
         expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
         -- assert.are.same(outputCursorPos, expectedCursorPos)
         assert.are.same(component, exchange._acrossLineComponent)
         assert.are.same(outputLines, expectedLines)
+        -- Post
+        exchange._acrossLineComponent = {}
 
         -- replace, via dot
         -- outputLines, outputCursorPos     = feedkeysOutput([[.]])

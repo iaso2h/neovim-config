@@ -1,11 +1,9 @@
--- Add uitl
 local configPath = vim.fn.stdpath("config")
 vim.opt.runtimepath:append(configPath)
 
 -- Add plenary.nvim, vim-repeat, vim-visualrepeat in your runtime path. In my
 -- case, I manage them via packer.nvim
-local sep = vim.loop.os_uname().sysname == "Windows_NT" and "\\" or "/"
-local packagePathHead = configPath .. sep .. "pack" .. sep .. "packer" .. sep .. "opt" .. sep
+local packagePathHead = vim.fn.stdpath("data") .. "/lazy/"
 vim.opt.runtimepath:append(packagePathHead .. "plenary.nvim")
 vim.opt.runtimepath:append(packagePathHead .. "vim-repeat")
 vim.opt.runtimepath:append(packagePathHead .. "vim-visualrepeat")

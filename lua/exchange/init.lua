@@ -1,21 +1,22 @@
 -- File: exchange
 -- Author: iaso2h
 -- Description: exchange operator
--- Version: 0.0.3
--- Last Modified: 2023-3-16
+-- Version: 0.0.4
+-- Last Modified: 2023-4-4-8
 local fn       = vim.fn
 local api      = vim.api
 require("operator")
 local M    = {
-    _dev                 = true,
+    _dev                 = false,
     _suppressMessage     = nil,
     _acrossLineComponent = {},
 
     cursorPos            = nil, -- (1, 0) indexed
     count                = nil,
-    restoreNondefaultReg = nil,
-    highlightChangeChk   = nil,
     srcExtmark = {},
+
+    -- Options
+    highlightChangeChk   = true,
     ns = api.nvim_create_namespace("exchange"),
     option = {RegionHighlightGroup = "IncSearch", timeout = 250}
 }
@@ -39,77 +40,84 @@ local swap = function(motionType, bufNr)
     -- (0, 0) index
     local extmark1 = api.nvim_buf_get_extmark_by_id(bufNr, M.ns, M.srcExtmark[1], {details = true})
     local extmark2 = api.nvim_buf_get_extmark_by_id(bufNr, M.ns, M.srcExtmark[2], {details = true})
-    -- Convert into human readable table
-    local region1 = {
-        startPos = {extmark1[1], extmark1[2]},
-        endPos = {extmark1[3].end_row, extmark1[3].end_col}
+    -- Convert region 1 and region 2 into human readable table
+    local r1 = {
+        Start = {extmark1[1], extmark1[2]},
+        End   = {extmark1[3].end_row, extmark1[3].end_col}
     }
-    local region2 = {
-        startPos = {extmark2[1], extmark2[2]},
-        endPos = {extmark2[3].end_row, extmark2[3].end_col}
+    local r2 = {
+        Start = {extmark2[1], extmark2[2]},
+        End   = {extmark2[3].end_row, extmark2[3].end_col}
     }
 
     if motionType == "char" then -- {{{
         -- Doesn't support overlapping exchange
-        if region1.startPos[1] == region2.startPos[1] and
-            ( (region1.startPos[2] < region2.startPos[2] and region1.endPos[2] > region2.startPos[2]) or
-            (region2.startPos[2] < region1.startPos[2] and region2.endPos[2] > region1.startPos[2]) or
-            region1.endPos[2] == region2.endPos[2] ) then
+        if r1.Start[1] == r2.Start[1] and
+            ( (r1.Start[2] < r2.Start[2] and r1.End[2] > r2.Start[2]) or
+            (r2.Start[2] < r1.Start[2] and r2.End[2] > r1.Start[2]) or
+            r1.End[2] == r2.End[2] ) then
             -- Overlapping in the same line
-            return vim.notify("Doesn't support overlapping exchange in the same line", vim.log.levels.WARN)
-        elseif (region1.startPos[1] < region2.startPos[1] and
-                    ((region1.endPos[1] == region2.startPos[1] and region1.endPos[2] > region2.startPos[2]) or
-                    (region1.endPos[1] > region2.startPos[1]))
+            vim.notify("Doesn't support overlapping exchange in the same line", vim.log.levels.WARN)
+            return false
+        elseif (r1.Start[1] < r2.Start[1] and
+                    ((r1.End[1] == r2.Start[1] and r1.End[2] > r2.Start[2]) or
+                    (r1.End[1] > r2.Start[1]))
                 ) or
-                (region2.startPos[1] < region1.startPos[1] and
-                    ((region2.endPos[1] == region1.startPos[1] and region2.endPos[2] > region1.startPos[2]) or
-                    (region2.endPos[1] > region1.startPos[1]))
+                (r2.Start[1] < r1.Start[1] and
+                    ((r2.End[1] == r1.Start[1] and r2.End[2] > r1.Start[2]) or
+                    (r2.End[1] > r1.Start[1]))
                 ) then
             -- Overlapping in the same line
-            return vim.notify("Doesn't support overlapping exchange across lines", vim.log.levels.WARN)
+            vim.notify("Doesn't support overlapping exchange across lines", vim.log.levels.WARN)
+            return false
         end
 
-        local srcTbl1 = api.nvim_buf_get_text(bufNr, region1.startPos[1], region1.startPos[2], region1.endPos[1], region1.endPos[2] + 1, {})
-        local srcTbl2 = api.nvim_buf_get_text(bufNr, region2.startPos[1], region2.startPos[2], region2.endPos[1], region2.endPos[2] + 1, {})
+        local srcTbl1 = api.nvim_buf_get_text(bufNr, r1.Start[1], r1.Start[2], r1.End[1], r1.End[2] + 1, {})
+        local srcTbl2 = api.nvim_buf_get_text(bufNr, r2.Start[1], r2.Start[2], r2.End[1], r2.End[2] + 1, {})
         -- It's more intuitive to concatenate all element with a space rather than a line break
         local src1 = table.concat(srcTbl1, " ")
         local src2 = table.concat(srcTbl2, " ")
 
-        if region1.endPos[1] < region2.startPos[1] or region1.startPos[1] > region2.endPos[1] then
+        if r1.End[1] < r2.Start[1] or r1.Start[1] > r2.End[1] then
             -- Region1 isn't across the same line number as region2 is
 
-            local src1Prefix = api.nvim_buf_get_text(bufNr, region1.startPos[1], 0, region1.startPos[1], region1.startPos[2], {})[1]
-            local src1Posfix = api.nvim_buf_get_text(bufNr, region1.endPos[1], region1.endPos[2] + 1, region1.endPos[1], -1, {})[1]
-            local src2Prefix = api.nvim_buf_get_text(bufNr, region2.startPos[1], 0, region2.startPos[1], region2.startPos[2], {})[1]
-            local src2Posfix = api.nvim_buf_get_text(bufNr, region2.endPos[1], region2.endPos[2] + 1, region2.endPos[1], -1, {})[1]
+            local src1Prefix = api.nvim_buf_get_text(bufNr, r1.Start[1], 0, r1.Start[1], r1.Start[2], {})[1]
+            local src1Posfix = api.nvim_buf_get_text(bufNr, r1.End[1], r1.End[2] + 1, r1.End[1], -1, {})[1]
+            local src2Prefix = api.nvim_buf_get_text(bufNr, r2.Start[1], 0, r2.Start[1], r2.Start[2], {})[1]
+            local src2Posfix = api.nvim_buf_get_text(bufNr, r2.End[1], r2.End[2] + 1, r2.End[1], -1, {})[1]
             local saveSrc1 = src1
             local saveSrc2 = src2
             src1 = src1Prefix .. saveSrc2 .. src1Posfix
             src2 = src2Prefix .. saveSrc1 .. src2Posfix
-            api.nvim_buf_set_lines(bufNr, region1.startPos[1], region1.endPos[1] + 1, false, {src1})
-            api.nvim_buf_set_lines(bufNr, region2.startPos[1], region2.endPos[1] + 1, false, {src2})
+            if M.highlightChangeChk then
+                vim.defer_fn(function()
+                    api.nvim_buf_set_lines(bufNr, r1.Start[1], r1.End[1] + 1, false, {src1})
+                    api.nvim_buf_set_lines(bufNr, r2.Start[1], r2.End[1] + 1, false, {src2})
+                end, 500)
+            else
+                api.nvim_buf_set_lines(bufNr, r1.Start[1], r1.End[1] + 1, false, {src1})
+                api.nvim_buf_set_lines(bufNr, r2.Start[1], r2.End[1] + 1, false, {src2})
+            end
         else
-            if region2.startPos[1] < region1.startPos[1] or (region1.startPos[1] == region2.startPos[1] and region2.startPos[2] < region1.startPos[2]) then
+            if r2.Start[1] < r1.Start[1] or (r1.Start[1] == r2.Start[1] and r2.Start[2] < r1.Start[2]) then
                 -- Exchange the region values, so that region1 is always
                 -- ahead of region2
-
-                local saveRegion1 = vim.deepcopy(region1)
-                local saveRegion2 = vim.deepcopy(region2)
+                local saveRegion1 = vim.deepcopy(r1)
+                local saveRegion2 = vim.deepcopy(r2)
                 local saveSrc1 = src1
                 local saveSrc2 = src2
-                region1 = saveRegion2
-                region1.endPos[2] = region1.endPos[2]
-                region2 = saveRegion1
+                r1 = saveRegion2
+                r2 = saveRegion1
                 src1 = saveSrc2
                 src2 = saveSrc1
             end
 
             -- Assuming region1 is ahead of region2
-            local prefix = api.nvim_buf_get_text(bufNr, region1.startPos[1], 0, region1.startPos[1], region1.startPos[2], {})[1]
-            local posfix = api.nvim_buf_get_text(bufNr, region2.endPos[1], region2.endPos[2] + 1, region2.endPos[1], -1, {})[1]
-            local middle = api.nvim_buf_get_text(bufNr, region1.endPos[1], region1.endPos[2] + 1, region2.startPos[1], region2.startPos[2], {})[1]
+            local prefix = api.nvim_buf_get_text(bufNr, r1.Start[1], 0, r1.Start[1], r1.Start[2], {})[1]
+            local posfix = api.nvim_buf_get_text(bufNr, r2.End[1], r2.End[2] + 1, r2.End[1], -1, {})[1]
+            local middle = api.nvim_buf_get_text(bufNr, r1.End[1], r1.End[2] + 1, r2.Start[1], r2.Start[2], {})[1]
             if M._dev then
-                M._acrossLineComponent.srcFront  = src1
+                M._acrossLineComponent.srcAhead  = src1
                 M._acrossLineComponent.srcBehind = src2
                 M._acrossLineComponent.prefix    = prefix
                 M._acrossLineComponent.posfix    = posfix
@@ -117,7 +125,13 @@ local swap = function(motionType, bufNr)
             end
             -- Print{prefix, src2, middle, src1, posfix}
             local src = prefix .. src2 .. middle .. src1 .. posfix
-            api.nvim_buf_set_lines(bufNr, region1.startPos[1], region2.endPos[1] + 1, false, {src})
+            if M.highlightChangeChk then
+                vim.defer_fn(function()
+                    api.nvim_buf_set_lines(bufNr, r1.Start[1], r2.End[1] + 1, false, {src})
+                end, 500)
+            else
+                api.nvim_buf_set_lines(bufNr, r1.Start[1], r2.End[1] + 1, false, {src})
+            end
         end
         -- }}}
     else
@@ -139,8 +153,6 @@ function _G._exchangeOperator(args) -- {{{
     local motionType
     local vimMode
     local plugMap
-
-    -- Saving cursor position, motion count, motion region and register  {{{
     local regionMotion
     if type(args) ~= "table" then
         -- For exchange operator exclusively
@@ -157,9 +169,6 @@ function _G._exchangeOperator(args) -- {{{
         }
         plugMap = "<Plug>exchangeOperatorInplace"
     end
-
-    -- }}} Saving cursor position, motion count, motion region and register
-
     local regionRegType = motionType:sub(1, 1) == "c" and "v" or "V"
     local regionStart = regionMotion.startPos
     local regionEnd   = regionMotion.endPos
@@ -175,29 +184,39 @@ function _G._exchangeOperator(args) -- {{{
     end
 
     -- Create extmark
-    local ok, msg = pcall(api.nvim_buf_set_extmark, bufNr, M.ns,
+    local ok, valOrMsg = pcall(api.nvim_buf_set_extmark, bufNr, M.ns,
         regionStart[1], regionStart[2], {end_line = regionEnd[1], end_col = regionEnd[2]})
     -- End function calling if extmark is out of scope
     if not ok then
-        vim.notify(msg, vim.log.levels.WARN)
+        vim.notify(valOrMsg, vim.log.levels.WARN)
         return
     else
-        M.srcExtmark[#M.srcExtmark+1] = msg
+        M.srcExtmark[#M.srcExtmark+1] = valOrMsg
     end
 
     -- Add highlight
-    local region = vim.region(bufNr, regionStart, regionEnd, regionRegType,
-                    vim.o.selection == "inclusive" and true or false)
-    for lineNr, cols in pairs(region) do
-        api.nvim_buf_add_highlight(bufNr, M.ns, M.option.RegionHighlightGroup, lineNr, cols[1], cols[2])
+    if M.highlightChangeChk then
+        local region = vim.region(bufNr, regionStart, regionEnd, regionRegType,
+                        vim.o.selection == "inclusive" and true or false)
+        for lineNr, cols in pairs(region) do
+            api.nvim_buf_add_highlight(bufNr, M.ns, M.option.RegionHighlightGroup, lineNr, cols[1], cols[2])
+        end
     end
 
     if #M.srcExtmark == 2 then
-        vim.defer_fn(function()
-            swap(motionType, bufNr)
+        ok, valOrMsg = pcall(swap, motionType, bufNr)
+        if not ok then
+            vim.notify(valOrMsg, vim.log.levels.ERROR)
+        end
+
+        if M.highlightChangeChk then
+            vim.defer_fn(function()
+                pcall(api.nvim_buf_clear_namespace, bufNr, M.ns, 0, -1)
+            end, 500)
+        else
             pcall(api.nvim_buf_clear_namespace, bufNr, M.ns, 0, -1)
-            M.srcExtmark = {}
-        end, 500)
+        end
+        M.srcExtmark = {}
     end
 
     -- Restoration
