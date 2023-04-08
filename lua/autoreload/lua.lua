@@ -207,6 +207,7 @@ M.loadFile = function(path, parentPath, opt) -- {{{
         return
     else
         package.loaded[module] = nil
+        Print("unload")
     end
 
     if M.unloadOnlyChk then

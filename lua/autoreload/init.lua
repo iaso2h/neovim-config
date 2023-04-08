@@ -1,8 +1,8 @@
 -- File: reloadConfig
 -- Author: iaso2h
 -- Description: reload lua package or vim file at Neovim configuration directory
--- Version: 0.0.23
--- Last Modified: 2023-3-13
+-- Version: 0.0.24
+-- Last Modified: 2023-4-8
 local api   = vim.api
 local util  = require("autoreload.util")
 local ok, p = pcall(require, "plenary.path")
@@ -24,6 +24,10 @@ M.opt.lua.blacklist        = {
     M.configPath:joinpath("lua", "core", "plugins.lua").filename,
     M.configPath:joinpath("lua", "core", "init.lua").filename,
     -- M.configPath:joinpath("lua", "global").filename,
+}
+M.opt.lua.overrideFileModulePath = {
+    M.configPath:joinpath("lua", "core"),
+    M.configPath:joinpath("lua", "config"),
 }
 M.opt.lua.setup  = {}
 M.opt.lua.config = { -- {{{
@@ -94,18 +98,14 @@ M.reload = function() -- {{{
             end
         end
 
-        local overrideFileModulePath = {
-            M.configPath:joinpath("lua", "core"),
-            M.configPath:joinpath("lua", "config"),
-        }
-        local overrideFileModuleStr = vim.tbl_map(function(i) return i.filename end, overrideFileModulePath)
-
         -- Only reloading lua module from: <nvimConfigPath>/lua/
         if not string.match(path.filename, M.opt.lua.moduleSearchPath.filename) then return end
 
         local l = require("autoreload.lua")
         local parentPath = path:parent()
         local parentStr = parentPath.filename
+        local overrideFileModuleStr = vim.tbl_map(function(i)
+            return i.filename end, M.lua.overrideFileModulePath)
         if parentStr ~= M.opt.lua.moduleSearchPath.filename and
             not vim.tbl_contains(overrideFileModuleStr, parentStr) then
             -- The lua module is a directory

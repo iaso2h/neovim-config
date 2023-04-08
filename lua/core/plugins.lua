@@ -909,6 +909,11 @@ local opts = {
     root = _G._plugin_root,
     ui   = {border = "rounded"},
     concurrency = 5
+    performance = {
+        cache = {
+            enabled = false
+        },
+    }
 }
 
 vim.api.nvim_create_user_command("CDLazyPlugin", function()
