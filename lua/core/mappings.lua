@@ -389,9 +389,9 @@ map("n", [[g}]], [[<CMD>lua require("trailingChar").main("n", "}")<CR>]], {"sile
 map("x", [[g}]], [[:lua require("trailingChar").main("v", "}")<CR>]],     {"silent"}, "Add fold marker end")
 
 map("", [[<leader>z]], [[<CMD>call EnhanceFoldHL("No fold marker found", 500, "")<CR>]], {"silent"}, "Highlight current fold marker")
-map("", [[zm]], [[zMzz]], {"noremap"}, "Close all folds recursively")
+map("", [[zm]], [[zM]],   {"noremap"}, "Close all folds recursively")
 map("", [[zr]], [[zRzz]], {"noremap"}, "Open all folds recursively")
-map("", [[zM]], [[zmzz]], {"noremap"}, "Close folds recursively")
+map("", [[zM]], [[zm]],   {"noremap"}, "Close folds recursively")
 map("", [[zR]], [[zrzz]], {"noremap"}, "Open folds recursively")
 map("", [[zA]], [[za]],   {"noremap"}, "Toggle current fold")
 map("", [[za]],
@@ -527,6 +527,7 @@ map("i", [[<C-[>]], [[<C-[>l]], {"noremap"}, "which_key_ignore")
 if _G._os_uname.machine == "aarch64" then
     map("i", [[jj]], [[<C-[>]], "Exit insert mode")
 end
+-- Insert
 map("i", [[<S-Tab>]], [[<C-d>]], {"noremap"}, "Delete indent")
 map("i", [[<A-[>]],   [[<C-d>]], {"noremap"}, "Delete indent")
 map("i", [[<A-]>]],   [[<C-t>]], {"noremap"}, "Add indent")
@@ -534,7 +535,7 @@ map("i", [[<C-k>]], [[pumvisible() ? "\<C-e>\<Up>" : "\<Up>"]],     {"noremap", 
 map("i", [[<C-j>]], [[pumvisible() ? "\<C-e>\<Down>" : "\<Down>"]], {"noremap", "expr"}, "Move cursor down")
 map("i", [[<C-CR>]], [[pumvisible() ? "\<C-e>\<CR>" : "\<CR>"]],     {"noremap", "expr"}, "Add new line below")
 map("i", [[<S-CR>]], [[<ESC>O]], "Add new line above")
-map("i", [[<C-.>]],  [[<C-a>]], "Insert previous insert character")
+map("i", [[<C-.>]],  [[<C-a>]], {"noremap"}, "Insert previous insert character")
 map("i", [[<C-BS>]], [[<C-w>]], {"noremap"}, "Delete word before")
 map("i", [[<C-y>]],  [[pumvisible() ? "\<C-e>\<C-y>" : "\<C-y>"]], {"noremap", "expr"}, "Insert character from above")
 map("i", [[<A-y>]],  [[<C-x><C-l>]], {"noremap"}, "Insert from sentence")
@@ -542,10 +543,9 @@ map("i", [[,]], [[,<C-g>u]], {"noremap"}, "which_key_ignore")
 map("i", [[.]], [[.<C-g>u]], {"noremap"}, "which_key_ignore")
 map("i", [[!]], [[!<C-g>u]], {"noremap"}, "which_key_ignore")
 map("i", [[*]], [[*<C-g>u]], {"noremap"}, "which_key_ignore")
--- Navigation {{{
+-- Navigation
 map("c", [[<C-a>]],  [[<Home>]],              "Move cursor to the start")
-map("i", [[<C-a>]],  [[<C-o>I]],              "Move cursor to the start")
-map("i", [[<C-a>]],  [[<Home>]],              "Move cursor to the start")
+map("i", [[<C-a>]],  [[<C-o>I]], {"noremap"}, "Move cursor to the start")
 map("!", [[<C-e>]],  [[<End>]],               "Move cursor to the end")
 map("!", [[<C-h>]],  [[<Left>]],              "Move cursor to one character left")
 map("!", [[<C-l>]],  [[<Right>]],             "Move cursor to one character right")
@@ -555,7 +555,7 @@ map("!", [[<C-d>]],  [[<Del>]],               "Delete character to the right")
 map("!", [[<C-w>]],  [[<C-Right>]],           "Move cursor to one word forward")
 map("i", [[<C-w>W]], [[<C-Right>]],           "Move cursor to one WORD forward")
 map("i", [[<C-w>w]], [[<C-o>w]], {"noremap"}, "Move cursor to one word forward")
--- }}} Navigation
+-- Commandline
 map("c", [[<C-BS>]],  [[<C-\>e(RemoveLastPathComponent())<CR>]], "Delete word before")
 map("c", [[<C-j>]], [[<Down>]], "Move cursor down")
 map("c", [[<C-k>]], [[<Up>]], "Move cursor up")

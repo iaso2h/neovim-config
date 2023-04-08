@@ -866,7 +866,8 @@ local pluginArgs = { -- {{{
     },
     {
         "sindrets/diffview.nvim",
-        -- cmd    = "DiffviewOpen",
+        cmd    = {"DiffviewOpen", "DiffviewFileHistory"},
+        dependencies = {"plenary.nvim"},
         config = require("config.nvim-diffview"),
     },
     {
