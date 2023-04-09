@@ -71,3 +71,5 @@ numhl
 linehl
 texthl
 unstage
+chdir
+autocmds

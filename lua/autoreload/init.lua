@@ -105,7 +105,7 @@ M.reload = function() -- {{{
         local parentPath = path:parent()
         local parentStr = parentPath.filename
         local overrideFileModuleStr = vim.tbl_map(function(i)
-            return i.filename end, M.lua.overrideFileModulePath)
+            return i.filename end, M.opt.lua.overrideFileModulePath)
         if parentStr ~= M.opt.lua.moduleSearchPath.filename and
             not vim.tbl_contains(overrideFileModuleStr, parentStr) then
             -- The lua module is a directory

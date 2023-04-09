@@ -3,6 +3,7 @@
 -- Description: exchange operator
 -- Version: 0.0.4
 -- Last Modified: 2023-4-4-8
+-- TODO: add exchange clear
 local fn       = vim.fn
 local api      = vim.api
 require("operator")

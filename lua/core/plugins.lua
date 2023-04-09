@@ -629,6 +629,7 @@ local pluginArgs = { -- {{{
             vim.g["conjure#mapping#eval_comment_current_form"] = "ecc"
             vim.g["conjure#mapping#eval_replace_form"]         = "eR"
             vim.g["conjure#mapping#eval_motion"]               = "ge"
+            vim.g["conjure#mapping#doc_word"]                  = "lK"
 
             vim.g["conjure#log#wrap"]                     = true
             vim.g["conjure#log#fold#enabled"]             = true
@@ -907,12 +908,16 @@ local pluginArgs = { -- {{{
 }
 local opts = {
     root = _G._plugin_root,
+    git  = { log = {"-30"} },
+    install = {colorscheme = {"onenord"}},
     ui   = {border = "rounded"},
-    concurrency = 5
+    concurrency = 5,
     performance = {
         cache = {
             enabled = false
         },
+        reset_packpath = true,
+        rtp = {reset = true}
     }
 }
 

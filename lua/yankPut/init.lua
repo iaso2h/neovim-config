@@ -111,7 +111,7 @@ end -- }}}
 ---        motionType string Motion type by which how the operator perform.
 ---                    Can be "line", "char" or "block"
 ---        vimMode    string Vim mode. See: `:help mode()`
----        plugMap    string eg: <Plug>myplug
+---        plugMap    string eg: <Plug>myPlug
 ---        vimMode    string Vim mode. See: `:help mode()`
 function M.inplaceYank(args) -- {{{
     -- opts = opts or {hlGroup="Search", timeout=500}
@@ -169,7 +169,7 @@ function M.inplaceYank(args) -- {{{
             opts.hlGroup,
             opts.timeout)
     else
-        -- Conver into (0, 0) index
+        -- Convert into (0, 0) index
         posStart = {posStart[1] - 1, posStart[2]}
         posEnd   = {posEnd[1] - 1, posEnd[2]}
         newContentExmark = api.nvim_buf_set_extmark(
@@ -323,7 +323,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
             opts.timeout,
             M.inplacePutNewContentNS)
     else
-        -- Conver into (0, 0) index
+        -- Convert into (0, 0) index
         posStart = {posStart[1] - 1, posStart[2]}
         posEnd   = {posEnd[1] - 1, posEnd[2]}
         newContentExmark = api.nvim_buf_set_extmark(
@@ -370,12 +370,12 @@ function M.lastYankPut(hlType) -- {{{
     local linewise
     if hlType == "yank" then
         if not M.lastYankNS then return end
-        extmark  = api.nvim_buf_get_extmark_by_id(curBufNr, M.lastYankNS,
+        extmark = api.nvim_buf_get_extmark_by_id(curBufNr, M.lastYankNS,
         M.lastYankExtmark, {details=true})
         linewise = M.lastYankLinewise
     elseif hlType == "put" then
         if not M.inplacePutNewContentNS then return end
-        extmark  = api.nvim_buf_get_extmark_by_id(curBufNr, M.inplacePutNewContentNS,
+        extmark = api.nvim_buf_get_extmark_by_id(curBufNr, M.inplacePutNewContentNS,
         M.inplacePutNewContentExtmark, {details=true})
         linewise = M.lastPutLinewise
     end
@@ -387,7 +387,7 @@ function M.lastYankPut(hlType) -- {{{
     local selectStart = {extmark[1] + 1, extmark[2]}
     local selectEnd   = {extmark[3]["end_row"] + 1, extmark[3]["end_col"]}
 
-    -- Determine select directioin
+    -- Determine select direction
     local startDist = util.posDist(cursor, selectStart)
     local endDist   = util.posDist(cursor, selectEnd)
     if startDist < endDist then

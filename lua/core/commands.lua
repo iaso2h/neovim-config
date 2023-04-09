@@ -140,7 +140,7 @@ au("BufWinEnter", {
     end
 })
 
--- BUG: https://github.com/neovim/neovim/issues/2127
+-- HACK: https://github.com/neovim/neovim/issues/2127
 au("FocusGained,BufEnter", {
     desc    = "Check and file changes after regaining focus",
     command = "checktime"

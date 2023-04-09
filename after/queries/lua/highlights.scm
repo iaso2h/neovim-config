@@ -4,7 +4,7 @@
 (break_statement) @keyword.break
 
 ((identifier) @variable.builtin
-  (#any-of? @variable.builtin "self" "string" "table" "vim")
+  (#any-of? @variable.builtin "self" "string" "table" "vim" "debug" "math")
   (#set! "priority" 130))
 
 (function_call

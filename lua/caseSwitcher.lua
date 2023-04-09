@@ -26,7 +26,7 @@ function M.cycleCase() -- {{{
         M.CMDList = vim.deepcopy(M.defaultCMDList)
     end
 
-    -- Stop the previous defered function if this func is quick enough to be
+    -- Stop the previous deferred function if this func is quick enough to be
     -- called again
     if M.timer then M.timer:stop() end
 
@@ -50,7 +50,7 @@ function M.cycleCase() -- {{{
     -- Always set cursor position to the first character of the text changed area
     api.nvim_win_set_cursor(0, M.lastSwitchPos)
 
-    -- Set the defered func.
+    -- Set the deferred func.
     M.timer = vim.defer_fn(function ()
         M.CMDList = vim.deepcopy(M.defaultCMDList)
         M.timer = nil
