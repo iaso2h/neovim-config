@@ -294,15 +294,19 @@ end
 --- after being created
 --- @param presNS     number|nil Optional ID of the preserved namespace, in which the
 --- preserved extmark will be stored to keep track of highlight content
+--- @param zeroBasedChk? boolean Set to true if the posStart and posEnd is (0, 0) based
 --- @return number|boolean Return integer or true when successful, which is the
 --- ID of the preserved namespace of the content defined by. Return false when
 --- failed posStart and posEnd
-M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, presNS)
+M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, presNS, zeroBasedChk)
+    if zeroBasedChk == nil then zeroBasedChk = false end
     local presExtmark
 
     -- Change to 0-based for extmark creation
-    posStart = {posStart[1] - 1, posStart[2]}
-    posEnd = {posEnd[1] - 1, posEnd[2]}
+    if not zeroBasedChk then
+        posStart = {posStart[1] - 1, posStart[2]}
+        posEnd = {posEnd[1] - 1, posEnd[2]}
+    end
 
     -- Create extmark to track the position of the highlight content if preserved
     -- namespace is provided
@@ -352,6 +356,22 @@ end
 ---@return string Corresponding line indent
 M.indentCopy = function(lineNr)
     return string.rep(" ", fn.indent(lineNr))
+end
+
+
+-- Credit: https://github.com/LunarVim/LunarVim/blob/2d373036493b3a61ef24d98efdeecbe8e74467be/lua/lvim/utils/modules.lua#L68
+M.requireSafe = function(mod)
+    local ok, module = pcall(require, mod)
+    if not ok then
+        local trace = debug.getinfo(2, "SL")
+        local shorterSrc = trace.short_src
+        local lineInfo = shorterSrc .. ":" .. (trace.currentline or trace.linedefined)
+        local msg = string.format("%s : skipped loading [%s]", lineInfo, mod)
+        vim.notify(msg, vim.log.levels.WARN)
+        return false
+    else
+        return module
+    end
 end
 
 

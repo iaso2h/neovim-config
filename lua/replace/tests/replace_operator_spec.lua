@@ -1139,32 +1139,19 @@ api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols
                          ^
         local api  = vim.api
             ]]
-            expectedDotLines = [[
-find
-        local api  = vim.api
-            ]]
             initLines        = vim.split(initLines, "\n")
             expectedLines    = vim.split(expectedLines, "\n")
-            expectedDotLines = vim.split(expectedDotLines, "\n")
 
             -- Setup buffer lines
             initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
             -- replace
             ---@diagnostic disable-next-line: param-type-mismatch
-            vim.cmd("norm! mm")
+            vim.cmd("norm! mi")
             vim.fn.setreg("a", "lsp.", "c")
-            outputLines, outputCursorPos     = feedkeysOutput([[gg"agr`m]])
+            outputLines, outputCursorPos     = feedkeysOutput([[gg"agr`i]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
             assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
-
-            -- replace, via dot
-            ---@diagnostic disable-next-line: param-type-mismatch
-            vim.cmd("norm! 0")
-            vim.fn.setreg("a", "fin", "c")
-            outputLines, outputCursorPos     = feedkeysOutput([[.]])
-            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
             assert.are.same(outputLines, expectedLines)
         end) -- }}}
     end) -- }}}
@@ -2344,13 +2331,8 @@ M.replaceSave = function()
                      ^
     local api  = vim.api
             ]]
-            expectedDotLines = [[
-find
-    local api  = vim.api
-            ]]
             initLines        = vim.split(initLines, "\n")
             expectedLines    = vim.split(expectedLines, "\n")
-            expectedDotLines = vim.split(expectedDotLines, "\n")
 
             -- Setup buffer lines
             initLinesCursor(initLines, "lua", cursorIndicatorChar)
@@ -2362,14 +2344,6 @@ find
             outputLines, outputCursorPos     = feedkeysOutput([[gg"agr`m]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
             assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
-
-            -- replace, via dot
-            ---@diagnostic disable-next-line: param-type-mismatch
-                vim.fn.setreg("a", "fin", "V")
-            vim.cmd("norm! 0")
-            outputLines, outputCursorPos     = feedkeysOutput([[.]])
-            expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
             assert.are.same(outputLines, expectedLines)
         end) -- }}}
     end) -- }}}
