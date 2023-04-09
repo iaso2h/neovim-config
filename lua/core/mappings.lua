@@ -255,10 +255,10 @@ map("n", [[<A-i>]], [[<CMD>lua require("searchHop").centerHop("g,", false, false
 map("n", [[<C-o>]], [[<CMD>lua require("searchHop").centerHop("<C-o>", true, false)<CR>]], {"silent"}, "Older jump")
 map("n", [[<C-i>]], [[<CMD>lua require("searchHop").centerHop("<C-i>", true, false)<CR>]], {"silent"}, "Newer jump")
 -- Swap default mapping
-map("n", [[*]],  [[*``<CMD>lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> forward")
-map("n", [[#]],  [[#``<CMD>lua require("searchHop").echoSearch()<CR>]], {"noremap", "silent"}, "Search <cword> back")
-map("n", [[g#]], [[g#``<CMD>lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
-map("n", [[g*]], [[g*``<CMD>lua require("searchHop").echoSearch()<CR>]],  {"noremap", "silent"}, "Search <cWORD> forward")
+map("n", [[*]],  [[<CMD>lua require("searchHop").searchCword("*")<CR>]],  {"noremap", "silent"}, "Search <cword> forward")
+map("n", [[#]],  [[<CMD>lua require("searchHop").searchCword("#")<CR>]],  {"noremap", "silent"}, "Search <cword> back")
+map("n", [[g*]], [[<CMD>lua require("searchHop").searchCword("g*")<CR>]], {"noremap", "silent"}, "Search <cWORD> forward")
+map("n", [[g#]], [[<CMD>lua require("searchHop").searchCword("g#")<CR>]], {"noremap", "silent"}, "Search <cWORD> backward")
 -- Search visual selected
 map("x", [[/]], [[:lua require("searchHop").searchSelected("/")<CR>]], {"silent"}, "Search selected forward")
 map("x", [[?]], [[:lua require("searchHop").searchSelected("?")<CR>]], {"silent"}, "Search selected backward")
@@ -270,7 +270,7 @@ map("n", [[N]], [[<CMD>lua require("searchHop").cycleSearch("N")<CR>]], {"silent
 -- Disable highlight search & Exit visual mode
 map("",  [[<C-l>]], [[<Nop>]], "which_key_ignore")
 map("",  [[<leader>H]], [[<C-l>]],                           {"noremap", "silent"}, "Refresh screen")
-map("n", [[<leader>h]], [[<CMD>noh<CR>]],                    {"silent"}, "Clear highlight")
+map("n", [[<leader>h]], [[<CMD>noh | echo<CR>]],             {"silent"}, "Clear highlight")
 map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"}, "Disable highlight")
 -- Matchit
 map("", [[<C-m>]], [[%]], {"silent"}, "Go to match parenthesis")

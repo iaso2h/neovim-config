@@ -355,4 +355,38 @@ M.indentCopy = function(lineNr)
 end
 
 
+M.saveViewCursor = function(printFormula)
+    local cursorPos = vim.api.nvim_win_get_cursor(0)
+    cursorPos = {cursorPos[1], cursorPos[2] + 1} -- (1, 1) indexed
+    local curWinID = vim.api.nvim_get_current_win()
+    local winInfo  = vim.fn.getwininfo(curWinID)[1]
+    if printFormula then
+        Print(string.format("%d - ((%d * winheight(0) + %d) / %d)", cursorPos[1], cursorPos[1] - winInfo.topline, math.floor(winInfo.height / 2), winInfo.height))
+        Print(cursorPos[1] - ((cursorPos[1] - winInfo.topline) * vim.fn.winheight(0) + math.floor(winInfo.height / 2)) / winInfo.height)
+        Print(vim.fn.winheight(0))
+        return
+    end
+    M.restoreViewCursor = function()
+        -- https://github.com/notomo/neovim/blob/da134270d3e9f8a4824b0e0540bf017f7e59b06e/src/nvim/ex_session.c#L436
+        -- https://www.cs.cmu.edu/afs/club/contrib/build/debian8/vim/src/session.c
+        local soSave   = vim.o.so
+        local sisoSave = vim.o.siso
+        vim.o.so    = 0
+        vim.o.siso  = 0
+
+        local lineNr = cursorPos[1] - ((cursorPos[1] - winInfo.topline) * vim.fn.winheight(0) + math.floor(winInfo.height / 2)) / winInfo.height
+        lineNr = math.ceil(lineNr)
+        if lineNr < 1 then lineNr = 1 end
+        vim.cmd([[keepjumps ]] .. lineNr)
+        vim.cmd [[norm! zt]]
+        vim.cmd([[keepjumps]] .. cursorPos[1])
+        vim.cmd([[norm! 0]] .. cursorPos[2] .. [[|]])
+
+        vim.o.so   = soSave
+        vim.o.siso = sisoSave
+        M.restoreViewCursor = nil
+    end
+end
+
+
 return M

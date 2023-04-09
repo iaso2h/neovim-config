@@ -3,7 +3,7 @@ local api = vim.api
 local M   = {}
 
 --- Echo search pattern and result index at the commandline
-M.echoSearch = function()
+local echoSearch = function()
     local searchDict = fn.searchcount()
     local result = string.format("[%s/%s]", searchDict.current, searchDict.total)
     local searchPat = fn.histget("search")
@@ -34,7 +34,7 @@ M.cycleSearch = function(exCMD)
     end
 
     vim.cmd("norm! " .. "zv")
-    M.echoSearch()
+    echoSearch()
 end
 
 
@@ -87,5 +87,18 @@ M.centerHop = function(exCMD, feedkeyChk, suppressMsgChk)
         vim.cmd [[norm! zz]]
     end
 end
+
+
+M.searchCword = function(exCMD)
+    local util = require("util")
+    util.saveViewCursor()
+    vim.cmd("norm! " .. exCMD .. "``")
+    if vim.is_callable(util.restoreViewCursor) then
+        util.restoreViewCursor(vim.fn.winheight(0))
+    end
+    echoSearch()
+end
+
+
 return M
 
