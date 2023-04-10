@@ -146,11 +146,11 @@ return function()
         ["write-good"]    = function() null_ls.register(null_ls.builtins.formatting.emacs_scheme_mode) end,
     }
     mason_null_is.setup {
-        ensure_installed = vim.tbl_keys(handlerArgs),
+        ensure_installed       = vim.tbl_keys(handlerArgs),
         automatic_installation = true,
-        automatic_setup = true,
+        automatic_setup        = true,
+        handlers               = handlerArgs
     }
-    require("mason-null-ls").setup_handlers(handlerArgs)
 
     null_ls.setup {
         -- diagnostics_format = "[#{c}] #{m} (#{s})",
