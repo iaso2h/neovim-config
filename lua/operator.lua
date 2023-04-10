@@ -62,7 +62,7 @@ function M.vMotion(saveCursorChk)
             vim.cmd([[noa norm! ]] .. t"<Esc>")
         end
     elseif visualMode == "\22" then
-        motionType = "block"
+        motionType = "block" -- HACK: any usage?
         if saveCursorChk then M.cursorPos = api.nvim_win_get_cursor(0) end
     else
         vim.notify(string.format([[Uncaptrued visual mode: %s]], visualMode), vim.log.levels.ERROR)

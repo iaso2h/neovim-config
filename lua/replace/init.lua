@@ -1,8 +1,8 @@
 -- File: replace
 -- Author: iaso2h
 -- Description: Heavily inspired Ingo Karkat's work. Replace text with register
--- Version: 0.1.7
--- Last Modified: 2023-4-8
+-- Version: 0.1.8
+-- Last Modified: 2023-4-11
 -- TODO: tests for softtab convert
 -- TODO: disable motionRegion repeat
 -- NOTE: break change: Dot-repeat no longer support jump to mark motion now
@@ -111,13 +111,10 @@ local reindent = function(regContent, motionRegion, motionDirection, vimMode) --
     else
         if motionDirection == -1 then
             bufferIndent = fn.indent(motionRegion.End[1])
-        -- elseif motionDirection == 1 then
-            -- bufferIndent = fn.indent(motionRegion.Start[1])
         else
             -- It's hard to detect the motionRegion direction for i[, a{, i<. etc in normal mode
             -- nil and 1 using the value of motionRegion.Start
             bufferIndent = fn.indent(motionRegion.Start[1])
-            -- return false
         end
     end
 
@@ -142,120 +139,109 @@ end -- }}}
 --- @param reg table Contain name, type, content of v:register
 --- Can be "line", "char" or "block"
 --- forward, -1 indicates motionRegion is moving backward
---- @return boolean Return true when mataching successfully,
+--- @return table reg The new reg table(might or might not have been modified)
 --- otherwise return false
 local matchRegType = function(motionType, motionRegion, motionDirection, vimMode, reg) -- {{{
     -- NOTE:"\<C-v>" for vimMode in vimscript is evaluated as "\22" in lua, which represents blockwise motionRegion
     -- NOTE:"\0261" in vimscript is evaluated as "\0221" in lua, which represents blockwise-visual register
     -- Vim mode
-    --  ├── block mode
-    --  │    └── ...
-    --  ├── normal mode
-    --  │    ├── "v" register type --> different types of register have match the motionRegion types in the end
-    --  │    │     ├── "char" motionRegion type(charwise)
-    --  │    │     ├── "line" motionRegion type(linewise)
-    --  │    │     └── "block" motionRegion type(blockwise-visual)
-    --  │    ├── "V" register type
-    --  │    │     └── ...
-    --  │    └── "<C-v>" register type
-    --  │          └── ...
-    --  └── visual mode
-    --       └── ...
-    if vimMode == "\22" and motionType == "block" then
-        -- Adapt register for blockwise replace.
-        -- TODO: tests required
+    --  ├── Normal mode
+    --  │    ├── "char" motionRegion type(charwise)
+    --  │    │     ├── "v"     register type
+    --  │    │     ├── "V"     register type
+    --  │    │     └── "<C-v>" register type
+    --  │    └── "line" motionRegion type(linewise)
+    --  └── 3 Visual modes
+    --       └── Motion type is the same as the visual mode type("visual", "char", "block").
+    --           Defined in operator.lua. Kinda meaningless TBH.
+    --            ├── "v"     register type
+    --            ├── "V"     register type
+    --            └── "<C-v>" register type
+    local regContentNew
 
-        local lines    = vim.split(reg.content, "\n", {trimempty = true})
-        local linesCnt = #lines
-
-        if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
-            -- If the register contains just a single line, temporarily duplicate
-            -- the line to match the height of the blockwise selection.
-            local height = motionRegion.Start[1] - motionRegion.End[1] + 1
-            if height > 1 then
-                local linesConcat = {}
-                for _ = 1, height, 1 do
-                    linesConcat = vim.list_extend(linesConcat, lines)
-                end
-
-                local regContentNew = table.concat(linesConcat, "\n")
-                ---@diagnostic disable-next-line: param-type-mismatch
-                fn.setreg(reg.name, regContentNew, "b")
-                reg.content = regContentNew
+    if vimMode == "n" then
+        if motionType == "char" then
+            if reg.type == "V" then
+                regContentNew = vim.trim(reg.content)
+            elseif reg.type == "\0221" then
+                -- TODO:
             end
-        elseif reg.type == "V" and linesCnt > 1 then
-            -- If the register contains multiple lines, paste as blockwise. then
-            -- TODO:
-            ---@diagnostic disable-next-line: param-type-mismatch
-            fn.setreg(reg.name, "", "b")
-        else
-            -- No need to changed register when the register type is already blockwise
-        end
-    elseif vimMode == "n" then
-        if reg.type == "v" then
-            if motionType == "line" then
-                local regContentNew = reindent(reg.content, motionRegion, motionDirection, vimMode)
-                -- Reindent register content when it's available
-                if regContentNew ~= "" then
-                    ---@diagnostic disable-next-line: param-type-mismatch
-                    fn.setreg(reg.name, regContentNew, "v")
-                    reg.content = regContentNew
-                end
-            else
-                -- No need to modify register
-            end
-        elseif reg.type == "V" then
-            -- Our custom operator is characterwise, even in the
-            -- ReplaceWithRegisterLine variant, in order to be able to replace less
-            -- than entire lines (i.e. characterwise yanks).
-            -- So there"s a mismatch when the replacement text is a linewise yank,
-            -- and the replacement would put an additional newline to the end.
-            -- To fix that, we temporarily remove the trailing newline character from
-            -- the register contents and set the register type to characterwise yank.
-            if motionType == "line" then
-                local regContentNew = reindent(reg.content, motionRegion, motionDirection, vimMode)
-                -- Reindent register content when it's available
+        elseif motionType == "line" then
+            if reg.type == "v" then
+                regContentNew = reindent(reg.content, motionRegion, motionDirection, vimMode)
+            elseif reg.type == "V" then
+                -- Our custom operator is characterwise, even in the
+                -- ReplaceWithRegisterLine variant, in order to be able to replace less
+                -- than entire lines (i.e. characterwise yanks).
+                -- So there"s a mismatch when the replacement text is a linewise yank,
+                -- and the replacement would put an additional newline to the end.
+                -- To fix that, we temporarily remove the trailing newline character from
+                -- the register contents and set the register type to characterwise yank.
+                regContentNew = reindent(reg.content, motionRegion, motionDirection, vimMode)
+                -- Reindent register content whenever possible
                 if regContentNew ~= "" then
                     if vim.endswith(regContentNew, "\n") then
                         regContentNew = string.sub(regContentNew, 1, -2)
                     end
-                    ---@diagnostic disable-next-line: param-type-mismatch
-                    fn.setreg(reg.name, regContentNew, "v")
                 else
                     if vim.endswith(reg.content, "\n") then
                         regContentNew = string.sub(reg.content, 1, -2)
                     end
-                    ---@diagnostic disable-next-line: param-type-mismatch
-                    fn.setreg(reg.name, regContentNew, "v")
                 end
-
-                reg.content = regContentNew
-            elseif motionType == "char" then
-                local regContentNew = vim.trim(reg.content)
-                ---@diagnostic disable-next-line: param-type-mismatch
-                fn.setreg(reg.name, regContentNew, "v")
-                reg.content = regContentNew
-            else
-                -- TODO: blockwise-visual motionType parsing?
+            elseif reg.type == "\0221" then
+                -- TODO:
             end
-        else
-            -- TODO: block type register parsing?
+        end
+
+        if regContentNew and regContentNew ~= "" then
+            ---@diagnostic disable-next-line: param-type-mismatch
+            fn.setreg(reg.name, regContentNew, "v")
+            reg.content = regContentNew
+            reg.type    = "c"
         end
     elseif vimMode == "v" then
         -- No need to modify register
     elseif vimMode == "V" then
-        local regContentNew = reindent(reg.content, motionRegion, motionDirection, vimMode)
+        regContentNew = reindent(reg.content, motionRegion, motionDirection, vimMode)
         -- Reindent register content when it's available
         if regContentNew ~= "" then
             fn.setreg(reg.name, regContentNew, reg.type)
             reg.content = regContentNew
         end
+    elseif vimMode == "\22" then
+            -- Adapt register for blockwise replace.
+            -- TODO: tests required
 
-    else
-        -- TODO: more vimMode and tests
+            local lines    = vim.split(reg.content, "\n", {trimempty = true})
+            local linesCnt = #lines
+
+            if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
+                -- If the register contains just a single line, temporarily duplicate
+                -- the line to match the height of the blockwise selection.
+                local height = motionRegion.Start[1] - motionRegion.End[1] + 1
+                if height > 1 then
+                    local linesConcat = {}
+                    for _ = 1, height, 1 do
+                        linesConcat = vim.list_extend(linesConcat, lines)
+                    end
+
+                    regContentNew = table.concat(linesConcat, "\n")
+                    ---@diagnostic disable-next-line: param-type-mismatch
+                    fn.setreg(reg.name, regContentNew, "b")
+                    reg.content = regContentNew
+                    reg.type    = "b"
+                end
+            elseif reg.type == "V" and linesCnt > 1 then
+                -- If the register contains multiple lines, paste as blockwise. then
+                -- TODO:
+                ---@diagnostic disable-next-line: param-type-mismatch
+                fn.setreg(reg.name, "", "b")
+            else
+                -- No need to changed register when the register type is already blockwise
+            end
     end
 
-    return true
+    return reg
 end -- }}}
 
 
@@ -281,7 +267,7 @@ local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
         repStart = api.nvim_buf_get_mark(0, "[")
         repEnd   = api.nvim_buf_get_mark(0, "]")
         return {Start = repStart, End = repEnd}
-    else
+    elseif vimMode == "n" then
         if util.compareDist(motionRegion.Start, motionRegion.End) > 0 then
             -- This's a rare scenario where Start is fall behind End
 
@@ -292,8 +278,6 @@ local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
             repEnd   = api.nvim_buf_get_mark(0, "]")
             return {Start = repStart, End = repEnd}
         else
-            local visualCMD = motionType == "line" and "V" or "v"
-
             if M.useApiSetline and motionType == "char" then
                 local Start = {motionRegion.Start[1] - 1, motionRegion.Start[2]}
                 local End   = {motionRegion.End[1] - 1, motionRegion.End[2]}
@@ -305,15 +289,6 @@ local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
                 api.nvim_buf_set_lines(bufNr, Start[1], End[1] + 1, false,
                     vim.split(reg.content, "\n", {plain = true, trimempty = true}) )
                 return {}
-            else
-                api.nvim_win_set_cursor(0, motionRegion.End)
-                vim.cmd("noa norm! " .. visualCMD)
-                api.nvim_win_set_cursor(0, motionRegion.Start)
-                vim.cmd("noa norm!" .. regCMD .. "p")
-
-                repStart = api.nvim_buf_get_mark(0, "[")
-                repEnd   = api.nvim_buf_get_mark(0, "]")
-                return {Start = repStart, End = repEnd}
             end
         end
     end
@@ -464,8 +439,12 @@ function M.operator(args) -- {{{
     -- Match the motionType type with register type
     ---@diagnostic disable-next-line: cast-local-type
     ok, msgOrVal = pcall(matchRegType, motionType, motionRegion, motionDirection, vimMode, reg)
-    ---@diagnostic disable-next-line: param-type-mismatch
-    if not ok then return vim.notify(msgOrVal, vim.log.levels.ERROR) end
+    if not ok then
+        ---@diagnostic disable-next-line: param-type-mismatch
+        return vim.notify(msgOrVal, vim.log.levels.ERROR)
+    else
+        reg = msgOrVal
+    end
 
     -- Replace with new content
     local rep
@@ -556,7 +535,8 @@ function M.operator(args) -- {{{
             -- TODO: Supported cursor recall in dot-repeat mode
         else
             if util.compareDist(M.cursorPos, rep.End) <= 0 then
-                -- Avoid cursor out of scope
+                -- Replace content is bigger than the source, and cursor is
+                -- still in range of the replacement
                 local cursorLine = api.nvim_buf_get_lines(bufNr,
                     M.cursorPos[1] - 1, M.cursorPos[1], false)[1]
                 cursorLine = #cursorLine == 0 and " " or cursorLine
