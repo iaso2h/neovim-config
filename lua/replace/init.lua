@@ -397,6 +397,8 @@ function M.operator(args) -- {{{
 
     -- Use extmark to track the motionRegion
     local repExtmark
+    -- Always clear namespace before hand
+    api.nvim_buf_clear_namespace(bufNr, M.ns, 0, -1)
     local ok, msgOrVal = pcall(api.nvim_buf_set_extmark, bufNr, M.ns,
         motionRegion.Start[1] - 1, motionRegion.Start[2],
         {end_line = motionRegion.End[1] - 1, end_col = motionRegion.End[2]})
