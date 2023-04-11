@@ -93,32 +93,26 @@ end
 M.reindent = function(indentOffset, srcContent) -- {{{
     if indentOffset == 0 then return srcContent end
 
-    local targetContent
-    local srcLineCnt   = stringCount(srcContent, "\n")
+    local newContent
+    local srcLineCnt = stringCount(srcContent, "\n")
+    if vim.endswith(srcContent, "\n") then srcLineCnt = srcLineCnt - 1 end
     local indentCntAbs = string.rep(" ", math.abs(indentOffset))
 
     if indentOffset < 0 then
-        targetContent = string.gsub(srcContent, "^" .. indentCntAbs, "")
-        if srcLineCnt > 1 then
-            targetContent = string.gsub(targetContent, "\n" .. indentCntAbs, "\n")
+        newContent = string.gsub(srcContent, "^" .. indentCntAbs, "")
+        if srcLineCnt > 0 then
+            newContent = string.gsub(newContent, "\n" .. indentCntAbs, "\n")
         end
     elseif indentOffset > 0 then
-        targetContent = indentCntAbs .. srcContent
-        if srcLineCnt > 1 then
-            targetContent = string.gsub(targetContent, "\n", "\n" .. indentCntAbs)
-            local endLnStart, endLnEnd = string.find(srcContent, "\n%s*$")
-            -- Minus the extra spaces in the end of regConetent, like: ".....\n    "
-            if endLnStart then
-                if endLnEnd ~= endLnStart then
-                    targetContent = string.sub(targetContent, 1, #targetContent - indentOffset * 2 - 1)
-                else
-                    targetContent = string.sub(targetContent, 1, #targetContent - indentOffset - 1)
-                end
-            end
+        newContent = indentCntAbs .. srcContent
+        if srcLineCnt > 0 then
+            newContent = string.gsub(newContent, "\n", "\n" .. indentCntAbs)
+            -- Minus the extra spaces in the end of regConetent. e.g ".....\n    "
+            newContent = string.gsub(newContent, "\n%s*$", "")
         end
     end
 
-    return targetContent
+    return newContent
 end -- }}}
 
 

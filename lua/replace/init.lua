@@ -1,10 +1,9 @@
 -- File: replace
 -- Author: iaso2h
 -- Description: Heavily inspired Ingo Karkat's work. Replace text with register
--- Version: 0.1.8
--- Last Modified: 2023-4-11
+-- Version: 0.1.9
+-- Last Modified: 2023-4-12
 -- TODO: tests for softtab convert
--- TODO: disable motionRegion repeat
 -- NOTE: break change: Dot-repeat no longer support jump to mark motion now
 -- because the new method of setting new line(or replace line) via
 -- api.nvim_buf_set_lines and api.nvim_buf_set_text has been adopted, which
@@ -20,14 +19,13 @@ local M    = {
     cursorPos            = nil, -- (1, 0) indexed
     count                = nil,
     motionDirection      = nil,
-    restoreNondefaultReg = nil,
     restoreOption        = nil,
     ns = api.nvim_create_namespace("inplacePutNewContent"),
 
     -- Options
     highlightChangeChk = false,
+    placeCursor = true,
     suppressMessage = false,
-    useApiSetline = true,
     hlGroup = "Search",
     timeout = 550
 }
@@ -97,7 +95,7 @@ end -- }}}
 --- @param motionDirection number 1 indicate motionRegion like "j, w, f" is moving
 --- forward -1 indicates motionRegion is moving backward
 --- @param vimMode string Vim mode
---- @return string Value of changed register content or false if no
+--- @return string|nil Value of changed register content or nil if no
 --- content changed
 --- when reindentation is successful
 local reindent = function(regContent, motionRegion, motionDirection, vimMode) -- {{{
@@ -125,7 +123,7 @@ local reindent = function(regContent, motionRegion, motionDirection, vimMode) --
     if count ~= 0 then
         return register.reindent(count, regContent)
     else
-        return ""
+        return nil
     end
 end -- }}}
 
@@ -161,25 +159,22 @@ local matchRegType = function(motionType, motionRegion, motionDirection, vimMode
 
     if vimMode == "n" then
         if motionType == "char" then
-            if reg.type == "V" then
+            if reg.type == "v" or reg.type == "c" then
+            elseif reg.type == "V" or reg.type == "l" then
                 regContentNew = vim.trim(reg.content)
-            elseif reg.type == "\0221" then
-                -- TODO:
+            else
+                -- Blockwise register type
+                regContentNew = string.gsub(reg.content, "\n", " ")
             end
         elseif motionType == "line" then
-            if reg.type == "v" then
+            if reg.type == "v" or reg.type == "c" then
                 regContentNew = reindent(reg.content, motionRegion, motionDirection, vimMode)
-            elseif reg.type == "V" then
-                -- Our custom operator is characterwise, even in the
-                -- ReplaceWithRegisterLine variant, in order to be able to replace less
-                -- than entire lines (i.e. characterwise yanks).
-                -- So there"s a mismatch when the replacement text is a linewise yank,
-                -- and the replacement would put an additional newline to the end.
-                -- To fix that, we temporarily remove the trailing newline character from
-                -- the register contents and set the register type to characterwise yank.
+            else
+                -- Blockwise register type and linewise register type
+
                 regContentNew = reindent(reg.content, motionRegion, motionDirection, vimMode)
-                -- Reindent register content whenever possible
-                if regContentNew ~= "" then
+                -- Remove the additional newline in the end
+                if regContentNew then
                     if vim.endswith(regContentNew, "\n") then
                         regContentNew = string.sub(regContentNew, 1, -2)
                     end
@@ -188,12 +183,10 @@ local matchRegType = function(motionType, motionRegion, motionDirection, vimMode
                         regContentNew = string.sub(reg.content, 1, -2)
                     end
                 end
-            elseif reg.type == "\0221" then
-                -- TODO:
             end
         end
 
-        if regContentNew and regContentNew ~= "" then
+        if regContentNew then
             ---@diagnostic disable-next-line: param-type-mismatch
             fn.setreg(reg.name, regContentNew, "v")
             reg.content = regContentNew
@@ -204,41 +197,45 @@ local matchRegType = function(motionType, motionRegion, motionDirection, vimMode
     elseif vimMode == "V" then
         regContentNew = reindent(reg.content, motionRegion, motionDirection, vimMode)
         -- Reindent register content when it's available
-        if regContentNew ~= "" then
+        if regContentNew then
             fn.setreg(reg.name, regContentNew, reg.type)
             reg.content = regContentNew
         end
-    elseif vimMode == "\22" then
-            -- Adapt register for blockwise replace.
-            -- TODO: tests required
+    else
+        -- Block visual mode
+        -- TODO: tests required
 
-            local lines    = vim.split(reg.content, "\n", {trimempty = true})
-            local linesCnt = #lines
+        local lines    = vim.split(reg.content, "\n", {trimempty = true})
+        local linesCnt = #lines
 
-            if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
-                -- If the register contains just a single line, temporarily duplicate
-                -- the line to match the height of the blockwise selection.
-                local height = motionRegion.Start[1] - motionRegion.End[1] + 1
-                if height > 1 then
-                    local linesConcat = {}
-                    for _ = 1, height, 1 do
-                        linesConcat = vim.list_extend(linesConcat, lines)
-                    end
-
-                    regContentNew = table.concat(linesConcat, "\n")
-                    ---@diagnostic disable-next-line: param-type-mismatch
-                    fn.setreg(reg.name, regContentNew, "b")
-                    reg.content = regContentNew
-                    reg.type    = "b"
+        if reg.type == "v" or
+                reg.type == "c" or
+                (reg.type == "V" and linesCnt == 1) or
+                (reg.type == "l" and linesCnt == 1) then
+            -- If the register contains just a single line, temporarily duplicate
+            -- the line to match the height of the blockwise selection.
+            local height = motionRegion.Start[1] - motionRegion.End[1] + 1
+            if height > 1 then
+                local linesConcat = {}
+                for _ = 1, height, 1 do
+                    linesConcat = vim.list_extend(linesConcat, lines)
                 end
-            elseif reg.type == "V" and linesCnt > 1 then
-                -- If the register contains multiple lines, paste as blockwise. then
-                -- TODO:
+
+                regContentNew = table.concat(linesConcat, "\n")
                 ---@diagnostic disable-next-line: param-type-mismatch
-                fn.setreg(reg.name, "", "b")
-            else
-                -- No need to changed register when the register type is already blockwise
+                fn.setreg(reg.name, regContentNew, "b")
+                reg.content = regContentNew
+                reg.type    = "b"
             end
+        elseif (reg.type == "V" and linesCnt > 1) or
+                (reg.type == "l" and linesCnt > 1) then
+            -- If the register contains multiple lines, paste as blockwise. then
+            -- TODO:
+            ---@diagnostic disable-next-line: param-type-mismatch
+            fn.setreg(reg.name, "", "b")
+        else
+            -- No need to changed register when the register type is already blockwise
+        end
     end
 
     return reg
@@ -267,7 +264,7 @@ local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
         repStart = api.nvim_buf_get_mark(0, "[")
         repEnd   = api.nvim_buf_get_mark(0, "]")
         return {Start = repStart, End = repEnd}
-    elseif vimMode == "n" then
+    else
         if util.compareDist(motionRegion.Start, motionRegion.End) > 0 then
             -- This's a rare scenario where Start is fall behind End
 
@@ -278,12 +275,12 @@ local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
             repEnd   = api.nvim_buf_get_mark(0, "]")
             return {Start = repStart, End = repEnd}
         else
-            if M.useApiSetline and motionType == "char" then
+            if motionType == "char" then
                 local Start = {motionRegion.Start[1] - 1, motionRegion.Start[2]}
                 local End   = {motionRegion.End[1] - 1, motionRegion.End[2]}
                 api.nvim_buf_set_text(bufNr, Start[1], Start[2], End[1], End[2] + 1, {reg.content})
                 return {}
-            elseif M.useApiSetline and motionType == "line" then
+            elseif motionType == "line" then
                 local Start = {motionRegion.Start[1] - 1, motionRegion.Start[2]}
                 local End   = {motionRegion.End[1] - 1, motionRegion.End[2]}
                 api.nvim_buf_set_lines(bufNr, Start[1], End[1] + 1, false,
@@ -519,7 +516,7 @@ function M.operator(args) -- {{{
                 string.format(" with %d line%s", repLineCnt, repLineCnt == 1 and "" or "s")
 
             api.nvim_echo({{srcReport .. repReport, "Normal"}}, false, {})
-            -- TODO: Make new message start at another new line
+            vim.notify(srcReport .. repReport, vim.log.levels.INFO)
         end
     end
 
@@ -530,13 +527,60 @@ function M.operator(args) -- {{{
     if vim.is_callable(M.restoreOption) then M.restoreOption() end
 
     -- Cursor {{{
-    if vimMode == "n" then
-        if not M.cursorPos then
-            -- TODO: Supported cursor recall in dot-repeat mode
-        else
+    if M.placeCursor and M.cursorPos then
+        if vimMode == "n" then
+            if not M.cursorPos then
+                -- TODO: Supported cursor recall in dot-repeat mode
+            else
+                if util.compareDist(M.cursorPos, rep.End) <= 0 then
+                    -- Replace content is bigger than the source, and cursor is
+                    -- still in range of the replacement
+                    local cursorLine = api.nvim_buf_get_lines(bufNr,
+                        M.cursorPos[1] - 1, M.cursorPos[1], false)[1]
+                    cursorLine = #cursorLine == 0 and " " or cursorLine
+
+                    if #cursorLine - 1 > M.cursorPos[2] then
+                        api.nvim_win_set_cursor(0, M.cursorPos)
+                    else
+                        api.nvim_win_set_cursor(0, {M.cursorPos[1], #cursorLine - 1})
+                    end
+                else
+                    if motionType == "char" then
+                        api.nvim_win_set_cursor(0, rep.Start)
+                    elseif motionType == "line" then
+                        vim.cmd [[noa normal! ^]]
+                    end
+                end
+
+                -- Always clear M.cursorPos after restoration
+                M.cursorPos = nil
+            end
+        elseif vimMode == "v" then
+            if reg.type == "V" or reg.type == "l" then
+                if M.cursorPos[1] == motionRegion.Start[1] and M.cursorPos[2] == motionRegion.Start[2] then
+                    local startLine = api.nvim_buf_get_lines(bufNr,
+                        rep.Start[1] - 1, rep.Start[1], false)[1]
+                    startLine = #startLine == 0 and " " or startLine
+                    local _, indentEnd = string.find(startLine, "%s+")
+                    if indentEnd then
+                        api.nvim_win_set_cursor(0, {rep.Start[1], indentEnd})
+                    else
+                        api.nvim_win_set_cursor(0, rep.Start)
+                    end
+                else
+                    api.nvim_win_set_cursor(0, rep.End)
+                end
+            else
+                if M.cursorPos[1] == motionRegion.Start[1] and M.cursorPos[2] == motionRegion.Start[2] then
+                    api.nvim_win_set_cursor(0, rep.Start)
+                else
+                    api.nvim_win_set_cursor(0, rep.End)
+                end
+            end
+
+        elseif vimMode == "V" then
             if util.compareDist(M.cursorPos, rep.End) <= 0 then
-                -- Replace content is bigger than the source, and cursor is
-                -- still in range of the replacement
+                -- Avoid cursor out of scope
                 local cursorLine = api.nvim_buf_get_lines(bufNr,
                     M.cursorPos[1] - 1, M.cursorPos[1], false)[1]
                 cursorLine = #cursorLine == 0 and " " or cursorLine
@@ -547,21 +591,6 @@ function M.operator(args) -- {{{
                     api.nvim_win_set_cursor(0, {M.cursorPos[1], #cursorLine - 1})
                 end
             else
-                if motionType == "char" then
-                    api.nvim_win_set_cursor(0, rep.Start)
-                elseif motionType == "line" then
-                    vim.cmd [[noa normal! ^]]
-                else
-                    -- TODO: blockwise parse
-                end
-            end
-
-            -- Always clear M.cursorPos after restoration
-            M.cursorPos = nil
-        end
-    elseif vimMode == "v" then
-        if reg.type == "V" or reg.type == "l" then
-            if M.cursorPos[1] == motionRegion.Start[1] and M.cursorPos[2] == motionRegion.Start[2] then
                 local startLine = api.nvim_buf_get_lines(bufNr,
                     rep.Start[1] - 1, rep.Start[1], false)[1]
                 startLine = #startLine == 0 and " " or startLine
@@ -571,42 +600,10 @@ function M.operator(args) -- {{{
                 else
                     api.nvim_win_set_cursor(0, rep.Start)
                 end
-            else
-                api.nvim_win_set_cursor(0, rep.End)
             end
         else
-            if M.cursorPos[1] == motionRegion.Start[1] and M.cursorPos[2] == motionRegion.Start[2] then
-                api.nvim_win_set_cursor(0, rep.Start)
-            else
-                api.nvim_win_set_cursor(0, rep.End)
-            end
+            -- TODO: visual-block mode parse
         end
-
-    elseif vimMode == "V" then
-        if util.compareDist(M.cursorPos, rep.End) <= 0 then
-            -- Avoid cursor out of scope
-            local cursorLine = api.nvim_buf_get_lines(bufNr,
-                M.cursorPos[1] - 1, M.cursorPos[1], false)[1]
-            cursorLine = #cursorLine == 0 and " " or cursorLine
-
-            if #cursorLine - 1 > M.cursorPos[2] then
-                api.nvim_win_set_cursor(0, M.cursorPos)
-            else
-                api.nvim_win_set_cursor(0, {M.cursorPos[1], #cursorLine - 1})
-            end
-        else
-            local startLine = api.nvim_buf_get_lines(bufNr,
-                rep.Start[1] - 1, rep.Start[1], false)[1]
-            startLine = #startLine == 0 and " " or startLine
-            local _, indentEnd = string.find(startLine, "%s+")
-            if indentEnd then
-                api.nvim_win_set_cursor(0, {rep.Start[1], indentEnd})
-            else
-                api.nvim_win_set_cursor(0, rep.Start)
-            end
-        end
-    else
-        -- TODO: visual-block mode parse
     end
     -- }}} Cursor
 
@@ -638,7 +635,6 @@ end -- }}}
 --support turning off highlight changes in vim normal mode!
 ---@return string "g@"
 function M.expr(restoreCursorChk, highlightChangeChk) -- {{{
-    -- TODO: Detect virtual edit
     if not warnRead() then return "" end
 
     _G._opfunc = M.operator
