@@ -168,7 +168,7 @@ _G.tbl_replace = function(tbl, repVal, srcVal, repAllChk, cnt, alertOnFail)
 end
 
 
---- Return the index of specific item in a list-liked table. Only support
+--- Return the 1 based index of specific item in a list-liked table. Only support
 --- number and string for now
 --- @param tbl table list-liked table
 --- @param item number or string

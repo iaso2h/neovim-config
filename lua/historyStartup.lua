@@ -2,9 +2,8 @@
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
 -- Dependencies: 0
--- Version: 0.0.11
+-- Version: 0.0.12
 -- Last Modified: 2023-4-12
--- TODO: strike through the files that are already loaded and listed in Neovim
 -- TODO: ? to trigger menupage
 
 local M   = {
@@ -12,10 +11,12 @@ local M   = {
     lastBuf = nil,
     curWin  = nil,
     oldBuf  = nil,
+    ns      = vim.api.nvim_create_namespace("historyStartup"),
     lines = {
         firstline = {"< New Buffer >"},
         absolute = {},
         relative = {},
+        bufNr    = {},
         display  = ""
     }
 }
@@ -41,6 +42,8 @@ local resetLines = function ()
                     table.insert(M.lines.relative, relativePath)
                 end
                 table.insert(M.lines.absolute, absolutePath)
+                local bufNr = vim.fn.bufnr(absolutePath)
+                table.insert(M.lines.bufNr, bufNr)
             end
         else
             -- Upper case the first drive character in Windows
@@ -54,7 +57,24 @@ local resetLines = function ()
                     table.insert(M.lines.relative, relativePath)
                 end
                 table.insert(M.lines.absolute, absolutePath)
+                ---@diagnostic disable-next-line: param-type-mismatch
+                local bufNr = vim.fn.bufnr(absolutePath)
+                table.insert(M.lines.bufNr, bufNr)
             end
+        end
+    end
+end
+
+
+local strikeThroughOpened = function()
+    local bufListed = vim.tbl_filter(function (buf)
+        return vim.api.nvim_buf_get_option(buf, "buflisted")
+    end, vim.api.nvim_list_bufs())
+    for _, buf in ipairs(bufListed) do
+        local bufIdx = tbl_idx(M.lines.bufNr, buf, false) -- 1 indexed
+        if bufIdx then
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.api.nvim_buf_add_highlight(M.curBuf, M.ns, "Comment", bufIdx, 0, -1)
         end
     end
 end
@@ -65,7 +85,7 @@ local deleteBuf = function()
 
     local winIDTbl = vim.tbl_filter(function(i)
         return vim.api.nvim_win_get_config(i).relative == ""
-        end, vim.api.nvim_list_wins())
+    end, vim.api.nvim_list_wins())
     local historyStartupLostTick = true
     for _, win in ipairs(winIDTbl) do
         if vim.api.nvim_win_get_buf(win) == M.curBuf then
@@ -73,7 +93,9 @@ local deleteBuf = function()
         end
     end
     -- Don't destroy historyStartup yet if it's still visible in other windows
-    if not historyStartupLostTick then return end
+    if not historyStartupLostTick then
+        return strikeThroughOpened()
+    end
 
     if vim.api.nvim_buf_is_valid(M.curBuf) then
         vim.api.nvim_buf_delete(M.curBuf, {force = true})
@@ -129,7 +151,6 @@ local autoCMD = function(bufNr)
             callback = deleteBuf
         })
     end
-
 end
 
 
@@ -189,6 +210,9 @@ M.display = function(refreshChk)
         end)
     end, 0)
 
+    -- Strike through openned files
+    vim.defer_fn(strikeThroughOpened, 0)
+
     -- Key mappings
     vim.defer_fn(function()
         for _, key in ipairs {"o", "go", "g<CR>", "<C-s>", "<C-v>", "<CR>", "q"} do
@@ -216,8 +240,24 @@ M.execMap = function(key)
         if #bufNrTbl == 0 then
             vim.cmd("noa q!")
         else
+            -- Switch to last buffer or close the current window
             if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
-                vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
+                local winIDTbl = vim.tbl_filter(function(i)
+                    return vim.api.nvim_win_get_config(i).relative == ""
+                end, vim.api.nvim_list_wins())
+                local lastBufVisibleTick = false
+                for _, win in ipairs(winIDTbl) do
+                    if vim.api.nvim_win_get_buf(win) == M.lastBuf then
+                        lastBufVisibleTick = true
+                    end
+                end
+                if not lastBufVisibleTick then
+                    vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
+                else
+                    vim.cmd("noa q!")
+                end
+            else
+                vim.cmd("noa q!")
             end
         end
     elseif key == "o" or key == "<cr>" then
