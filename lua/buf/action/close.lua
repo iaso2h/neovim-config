@@ -138,7 +138,7 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         local specInstanceCnt = 0
         -- Create a table containing all different window ID as keys and the
         -- corresponding buffer number as values
-        for _, win in ipairs(var.winIDtbl) do
+        for _, win in ipairs(var.winIDTbl) do
             local bufNr = api.nvim_win_get_buf(win)
 
             winIDBufNrTbl[win] = api.nvim_win_get_buf(win)

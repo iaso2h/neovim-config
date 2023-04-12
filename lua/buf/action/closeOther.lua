@@ -20,7 +20,7 @@ function M.init() -- {{{
 
     -- TODO: implement in hook function
     -- Check whether call from Nvim Tree
-    var.winIDtbl = api.nvim_list_wins()
+    var.winIDTbl = api.nvim_list_wins()
     if vim.bo.filetype == "NvimTree" then
         util.switchAlter(var.winID)
         if vim.bo.filetype == "NvimTree" then
@@ -57,7 +57,7 @@ function M.init() -- {{{
     -- Close other window that doesn't contain the current buffers while
     -- Reserving windows that contain special buffer like help, quickfix
     if util.winCnt() > 1 then
-        for _, winID in ipairs(var.winIDtbl) do
+        for _, winID in ipairs(var.winIDTbl) do
             if vim.tbl_contains(var.bufNrTbl, api.nvim_win_get_buf(winID))
                 and api.nvim_buf_get_option(api.nvim_win_get_buf(winID), "buftype") == "" then
 

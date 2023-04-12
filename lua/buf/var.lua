@@ -3,7 +3,7 @@ return {
     bufNr    = nil,
     bufType  = nil,
     winID    = nil,
-    winIDtbl = nil,
+    winIDTbl = nil,
     bufNrTbl = nil,
 
     newSplitLastBufNr = nil,

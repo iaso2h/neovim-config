@@ -12,7 +12,7 @@ M.initBuf = function()
     var.bufNr    = api.nvim_get_current_buf()
     var.bufType  = vim.o.buftype
     var.winID    = api.nvim_get_current_win()
-    var.winIDtbl = vim.tbl_filter(function(i)
+    var.winIDTbl = vim.tbl_filter(function(i)
         return api.nvim_win_get_config(i).relative == ""
         end, api.nvim_list_wins())
     -- NOTE: Do not use results from:
@@ -46,8 +46,8 @@ end -- }}}
 --- @param bufNr boolean Buffer number handler
 M.bufWipe = function(bufNr)
     -- bufNr = bufNr or 0
-    -- pcall(cmd, "bdelete! " .. bufNr)
-    pcall(api.nvim_buf_delete, bufNr and bufNr or 0, {force = true})
+    pcall(cmd, "bdelete! " .. bufNr)
+    -- pcall(api.nvim_buf_delete, bufNr and bufNr or 0, {force = true})
 end
 
 
@@ -71,22 +71,26 @@ M.isSpecBuf = function (bufType)
     return bufType ~= ""
 end
 
+
 M.isScratchBuf = function ()
    return var.bufName == "" or not vim.tbl_contains(var.bufNrTbl, var.bufNr)
 end
+
 
 M.closeWin = function (winID)
     local ok, msg = pcall(api.nvim_win_close, winID, false)
     if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 end
 
+
 M.winCnt = function ()
-    return #var.winIDtbl
+    return #var.winIDTbl
 end
+
 
 M.getBufCntInWins = function ()
     local bufCnt = 0
-    for _, w in ipairs(var.winIDtbl) do
+    for _, w in ipairs(var.winIDTbl) do
         if vim.tbl_contains(var.bufNrTbl, api.nvim_win_get_buf(w)) then
             bufCnt = bufCnt + 1
         end
@@ -94,8 +98,10 @@ M.getBufCntInWins = function ()
     return bufCnt
 end
 
+
 M.bufCnt = function()
     return #var.bufNrTbl
 end
+
 
 return M

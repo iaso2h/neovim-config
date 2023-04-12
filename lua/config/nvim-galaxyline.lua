@@ -1,7 +1,7 @@
 -- File: nvim-galaxyline
 -- Author: iaso2h
 -- Description: Statusline configuration
--- Last Modified: 2023-3-12
+-- Last Modified: 2023-4-12
 local M = {}
 
 -- filetype contained in this list will be consider inactive all the time
@@ -24,9 +24,6 @@ M.shortLineList = {
 }
 
 M.config = function()
-
-local fn  = vim.fn
-local api = vim.api
 
 local gl        = require("galaxyline")
 local gls       = gl.section
@@ -120,21 +117,31 @@ end
 
 
 local fileInfo = function()
-    local cwd  = vim.fn.getcwd(0)
-    local absoPath = nvim_buf_get_name(0)
-    if absoPath == "" then return vim.bo.filetype .. " " end
+    local cwd     = vim.loop.cwd()
+    local absPath = nvim_buf_get_name(0)
 
-    local isRel = string.match(absoPath, cwd) ~= nil
+    if absPath == "" then return vim.bo.filetype .. " " end
+    local fileStr
+    if vim.startswith(absPath, "diffview") then
+        fileStr = vim.fn.expand("%:t")
+        local commit = string.match(absPath, ".git/(%w%w%w%w%w%w%w%w)")
+        if commit then
+            fileStr = fileStr .. " | " .. commit .. " "
+        else
+            return " "
+        end
+        return fileStr
+    end
 
     -- Get file path string
-    local winWidth = api.nvim_win_get_width(0)
-    local fileStr
-    if isRel then
-        fileStr = fn.expand("%")
+    local relPath = string.match(absPath, cwd .. ".(.*)")
+    local winWidth = vim.api.nvim_win_get_width(0)
+    if relPath then
+        fileStr = relPath
         -- 11 is what vimmode text is command plus space of icons
         tightWinChk = #fileStr + 11 > winWidth/2
 
-        fileStr = tightWinChk and fn.pathshorten(fileStr, 1) or fileStr
+        fileStr = tightWinChk and vim.fn.pathshorten(fileStr, 1) or fileStr
     else
         fileStr = string.format("..%s%s", _G._sep, vim.fn.expand("%:t"))
         -- 11 is what vimmode text is command plus space of icons
@@ -149,8 +156,7 @@ local fileInfo = function()
 
         local ext = vim.fn.expand("%:e")
         local fileTypeStr = ext ~= vim.bo.filetype and
-            string.format(" | %s ", vim.bo.filetype) or
-            " "
+        string.format(" | %s ", vim.bo.filetype) or " "
         return fileStr .. isMod .. isRead .. fileTypeStr
     end
 end
@@ -177,8 +183,8 @@ end
 
 
 local lineInfo = function()
-    local cursorPos = api.nvim_win_get_cursor(0)
-    local totalLineNr = fn.line("$")
+    local cursorPos   = vim.api.nvim_win_get_cursor(0)
+    local totalLineNr = vim.fn.line("$")
     local lineColumn = string.format("  %d:%d |", cursorPos[1], cursorPos[2] + 1)
     local percentage
     if cursorPos[1] == 1 then
@@ -259,7 +265,7 @@ gls.left[#gls.left+1] = {
     }
 }
 
--- if fn.has("unix") == 1 then
+-- if vim.fn.has("unix") == 1 then
     gls.left[#gls.left+1] = {
         GitIcon = {
             provider  = function() return " " end,
@@ -425,7 +431,7 @@ gls.short_line_left[1] = { -- {{{
             local fileType = vim.bo.filetype
             local bufIcon = bufTypeIcons[fileType]
             if fileType == "qf" then
-                -- The value of vim.b._is_loc is setuped whenever a qf filetype
+                -- The value of vim.b._is_loc is set up whenever a qf filetype
                 -- is set via after/ftplugin/qf.lua
                 fileType = vim.b._is_loc and "Location list" or "Quickfix"
             else

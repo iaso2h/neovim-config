@@ -47,7 +47,7 @@ return function()
                 layout = "diff2_horizontal",
                 winbar_info = false, -- See ':h diffview-config-view.x.winbar_info'
             },
-        }, -- }}} 
+        }, -- }}}
         file_panel         = { -- {{{
             listing_style = "tree",          -- One of 'list' or 'tree'
             tree_options = {
@@ -61,7 +61,7 @@ return function()
                 width = 35,
                 win_opts = {}
             },
-        }, -- }}} 
+        }, -- }}}
         file_history_panel = { -- {{{
             log_options = {
                         -- See ':h diffview-config-log_options'
@@ -84,7 +84,7 @@ return function()
                 height = 16,
                 win_opts = {}
             },
-        }, -- }}} 
+        }, -- }}}
         commit_log_panel   = {
             win_config = { -- See ':h diffview-config-win_config'
                 win_opts = {},
@@ -97,7 +97,7 @@ return function()
         },
         hooks   = {}, -- See ':h diffview-config-hooks'
         keymaps = { -- {{{
-            disable_defaults = false, -- Disable the default keymaps
+            disable_defaults = true, -- Disable the default keymaps
             view = {
                 -- The `view` bindings are active in the diff buffers, only when the current
                 -- tabpage is a Diffview.
@@ -175,10 +175,10 @@ return function()
                 { "n", "g?",            actions.help("file_panel"),  { desc = "Open the help panel" } },
             },
             file_history_panel = {
-                { "n", "g!",            actions.options,          { desc = "Open the option panel" } },
+                { "n", "<leader>a",     actions.options,          { desc = "Open the option panel" } },
                 { "n", "<C-A-d>",       actions.open_in_diffview, { desc = "Open the entry under the cursor in a diffview" } },
                 { "n", "y",             actions.copy_hash,        { desc = "Copy the commit hash of the entry under the cursor" } },
-                { "n", "L",             actions.open_commit_log,    { desc = "Show commit details" } },
+                { "n", "i",             actions.open_commit_log,    { desc = "Show commit details" } },
                 { "n", "zr",            actions.open_all_folds,     { desc = "Expand all folds" } },
                 { "n", "zm",            actions.close_all_folds,    { desc = "Collapse all folds" } },
                 { "n", "j",             actions.next_entry,         { desc = "Bring the cursor to the next file entry" } },
@@ -190,25 +190,25 @@ return function()
                 { "n", "<2-LeftMouse>", actions.select_entry,       { desc = "Open the diff for the selected entry." } },
                 { "n", "<A-e>",         actions.scroll_view(-0.25), { desc = "Scroll the view up" } },
                 { "n", "<A-d>",         actions.scroll_view(0.25),  { desc = "Scroll the view down" } },
-                { "n", "<tab>",         actions.select_next_entry,  { desc = "Open the diff for the next file" } },
-                { "n", "<s-tab>",       actions.select_prev_entry,  { desc = "Open the diff for the previous file" } },
+                { "n", "<C-n>",         actions.select_next_entry,  { desc = "Open the diff for the next file" } },
+                { "n", "<C-p>",         actions.select_prev_entry,  { desc = "Open the diff for the previous file" } },
                 { "n", "gF",            actions.goto_file_edit,     { desc = "Open the file in the previous tabpage" } },
                 { "n", "<C-s>",         actions.goto_file_split,    { desc = "Open the file in a new split" } },
                 { "n", "<C-t>",         actions.goto_file_tab,      { desc = "Open the file in a new tabpage" } },
                 { "n", "<leader>e",     actions.focus_files,        { desc = "Bring focus to the file panel" } },
                 { "n", "<leader>b",     actions.toggle_files,       { desc = "Toggle the file panel" } },
                 { "n", "g<C-x>",        actions.cycle_layout,       { desc = "Cycle available layouts" } },
-                { "n", "g?",            actions.help("file_history_panel"), { desc = "Open the help panel" } },
+                { "n", "?",             actions.help("file_history_panel"), { desc = "Open the help panel" } },
             },
             option_panel = {
                 { "n", "<tab>", actions.select_entry,         { desc = "Change the current option" } },
                 { "n", "q",     actions.close,                { desc = "Close the panel" } },
-                { "n", "g?",    actions.help("option_panel"), { desc = "Open the help panel" } },
+                { "n", "?",     actions.help("option_panel"), { desc = "Open the help panel" } },
             },
             help_panel = {
                 { "n", "q",     actions.close, { desc = "Close help menu" } },
                 { "n", "<esc>", actions.close, { desc = "Close help menu" } },
             },
-        } -- }}} 
+        } -- }}}
     }
 end

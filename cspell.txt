@@ -73,3 +73,6 @@ texthl
 unstage
 chdir
 autocmds
+guifg
+guibg
+bufhidden

@@ -408,7 +408,7 @@ for i=0, 9 do
     )
 end
 -- }}} Folding
--- MS behavior {{{
+
 -- Paste mode
 map({"i","n"}, [[<F3>]], function ()
     if vim.o.paste then
@@ -419,32 +419,6 @@ map({"i","n"}, [[<F3>]], function ()
         vim.opt.paste = true
     end
 end, "Toggle paste mode")
-
--- <C-z/v/s> {{{
-map("n", [[<C-z>]], [[u]], "Undo") -- test
-map("x", [[<C-z>]], [[<esc>u]], "Undo")
-map("i", [[<C-z>]], [[<C-\><C-o>u]], "Undo")
-
-map("n", [[<C-c>]], [[Y]], "Yank")
-map("x", [[<C-c>]], [[y]], "Yank")
--- map("i", [[<C-c>]], [[<C-\><C-o>Y]], "Yank")
-
-map("n", [[<C-v>]], [[p]], {"noremap"}, "Put")
-map("x", [[<C-v>]], [[<esc>i<C-v><esc>]], "Put")
-map("i", [[<C-v>]], [[<C-r>*]], "Put")
-
--- map("n", [[<C-s>]], [[<CMD>w<CR>]], "Write")
--- map("x", [[<C-s>]], [[<CMD>w<CR>]], "Write")
-map("i", [[<C-s>]], [[<C-\><C-o>:w<CR>]], "Write")
--- }}} <C-z/x/v/s>
--- Save as..
-vim.cmd [[command! -nargs=0 SaveAs echohl Moremsg | echo "CWD: ".getcwd() | execute input("", "save as ") | echohl None<CR> | e!]]
-map("n", [[<C-S-s>]], [[<CMD>SaveAs<CR>]],       {"silent"}, "Save as")
-map("i", [[<C-S-s>]], [[<C-\><C-o>:SaveAs<CR>]], {"silent"}, "Save as")
--- Delete
-map("n", [[<C-S-d>]], [[<CMD>d<CR>]],       {"silent"}, "Delete line")
-map("x", [[<C-S-d>]], [[:d<CR>]],           {"silent"}, "Delete line")
-map("i", [[<C-S-d>]], [[<C-\><C-o>:d<CR>]], {"silent"}, "Delete line")
 -- Highlight New Paste Content
 map("n", [[gy]], [[<CMD>lua require("yankPut").lastYankPut("yank")<CR>]], {"silent"}, "Select last yank")
 map("n", [[gY]], [[gy]], "Select last yank")
@@ -490,8 +464,6 @@ map("n", [[<A-S-k>]], [[<CMD>lua require("yankPut").VSCodeLineYank("n", "up")<CR
 map("x", [[<A-S-j>]], [[:lua require("yankPut").VSCodeLineYank("v", "down")<CR>]],           {"silent"}, "Copy line down")
 map("x", [[<A-S-k>]], [[:lua require("yankPut").VSCodeLineYank("v", "up")<CR>]],             {"silent"}, "Copy line up")
 -- }}} Mimic the VSCode move/copy line up/down behavior
-
--- }}} MS behavior
 
 -- Convert \ into /
 map("n", [[g/]], [[m`:s#\\#\/#e<CR>:noh<CR>g``]],   {"noremap", "silent"}, [[Convert \ to /]])
