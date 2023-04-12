@@ -70,7 +70,8 @@ local strikeThroughOpened = function()
 end
 
 
-local deleteBuf = function()
+-- Destory historyStartup buffer
+local destoryBuf = function()
     if not M.curBuf then return end
 
     local winIDTbl = vim.tbl_filter(function(i)
@@ -138,7 +139,7 @@ local autoCMD = function(bufNr)
             "BufReadPost", {
             buffer   = M.curBuf,
             desc     = "Destory historyStartup",
-            callback = deleteBuf
+            callback = destoryBuf
         })
     end
 end
@@ -205,7 +206,7 @@ M.display = function(refreshChk)
 
     -- Key mappings
     vim.defer_fn(function()
-        for _, key in ipairs {"o", "go", "g<CR>", "<C-s>", "<C-v>", "<CR>", "q"} do
+        for _, key in ipairs {"o", "go", "<C-s>", "<C-v>", "<C-t>", "<CR>", "q"} do
             vim.api.nvim_buf_set_keymap(
                 M.curBuf,
                 "n",
@@ -223,67 +224,88 @@ M.execMap = function(key)
     local lnum = vim.api.nvim_win_get_cursor(0)[1]
     key = string.lower(key)
 
-    if key == "q" then
-        local bufNrTbl = vim.tbl_map(function(buf)
-            return tonumber(string.match(buf, "%d+"))
-            end, require("buf.util").bufLoadedTbl(false))
-        if #bufNrTbl == 0 then
-            vim.cmd("noa q!")
-        else
-            -- Switch to last buffer or close the current window
-            if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
-                local winIDTbl = vim.tbl_filter(function(i)
-                    return vim.api.nvim_win_get_config(i).relative == ""
-                end, vim.api.nvim_list_wins())
-                local lastBufVisibleTick = false
-                for _, win in ipairs(winIDTbl) do
-                    if vim.api.nvim_win_get_buf(win) == M.lastBuf then
-                        lastBufVisibleTick = true
-                    end
-                end
-                if not lastBufVisibleTick then
-                    vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
-                else
-                    vim.cmd("noa q!")
-                end
-            else
-                vim.cmd("noa q!")
-            end
-        end
-    elseif key == "o" or key == "<cr>" then
+    if key == "o" or key == "<cr>" then
         if lnum == 1 then
             vim.cmd("enew")
         else
             vim.cmd("edit " .. M.lines.absolute[lnum - 1])
         end
-    elseif key == "go" or key == "g<cr>" then
+    elseif key == "go" then
         if lnum == 1 then
             vim.cmd("noa enew")
         else
             vim.cmd("noa edit " .. M.lines.absolute[lnum - 1])
         end
-    elseif key == "<c-s>" then
+    elseif key == "<c-t>" then
         if lnum == 1 then
-            vim.cmd("noa split")
-            vim.cmd("enew")
+            vim.cmd("tabnew")
         else
             if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
-                vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
+                vim.cmd("tabnew")
+                vim.cmd("edit " .. M.lines.absolute[lnum - 1])
             end
-            vim.cmd("split " .. M.lines.absolute[lnum - 1])
         end
-    elseif key == "<c-v>" then
-        if lnum == 1 then
-            vim.cmd("vnew")
-        else
-            if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
-                vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
+    else
+        local lastBufVisibleTick = false
+        if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
+            local winIDTbl = vim.tbl_filter(function(i)
+                return vim.api.nvim_win_get_config(i).relative == ""
+            end, vim.api.nvim_list_wins())
+            for _, win in ipairs(winIDTbl) do
+                if vim.api.nvim_win_get_buf(win) == M.lastBuf then
+                    lastBufVisibleTick = true
+                end
             end
-            vim.cmd("vsplit " ..M.lines.absolute[lnum - 1])
+        end
+        if key == "<c-s>" then
+            if lnum == 1 then
+                vim.cmd("noa split")
+                vim.cmd("enew")
+            else
+                if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
+                    if not lastBufVisibleTick then
+                        vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
+                        vim.cmd("split " ..M.lines.absolute[lnum - 1])
+                    else
+                        vim.cmd("noa q!")
+                    end
+                end
+            end
+        elseif key == "<c-v>" then
+            if lnum == 1 then
+                vim.cmd("vnew")
+            else
+                if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
+                    if not lastBufVisibleTick then
+                        vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
+                        vim.cmd("vsplit " ..M.lines.absolute[lnum - 1])
+                    else
+                        vim.cmd("noa q!")
+                    end
+                end
+            end
+        elseif key == "q" then
+            local bufNrTbl = vim.tbl_map(function(buf)
+                return tonumber(string.match(buf, "%d+"))
+                end, require("buf.util").bufLoadedTbl(false))
+            if #bufNrTbl == 0 then
+                vim.cmd("noa q!")
+            else
+                -- Switch to last buffer or close the current window
+                if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
+                    if not lastBufVisibleTick then
+                        vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
+                    else
+                        vim.cmd("noa q!")
+                    end
+                else
+                    vim.cmd("noa q!")
+                end
+            end
         end
     end
 
-    deleteBuf()
+    destoryBuf()
 end
 
 
