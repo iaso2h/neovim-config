@@ -2,48 +2,45 @@
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
 -- Dependencies: 0
--- Version: 0.0.10
--- Last Modified: 2023-3-8
+-- Version: 0.0.11
+-- Last Modified: 2023-4-12
 -- TODO: strike through the files that are already loaded and listed in Neovim
-local api = vim.api
-local fn  = vim.fn
+-- TODO: ? to trigger menupage
+
 local M   = {
-    curBuf = -1,
-    lastBuf = -1,
-    curWin = -1,
-    oldBuf = -1,
+    curBuf  = nil,
+    lastBuf = nil,
+    curWin  = nil,
+    oldBuf  = nil,
+    lines = {
+        firstline = {"< New Buffer >"},
+        absolute = {},
+        relative = {},
+        display  = ""
+    }
 }
 
-local resetLine = function ()
-    -- TODO: ? to trigger menupage
-    M.lines = {
-        firstline = {"< New Buffer >"},
-        absolute = {}
-    }
+
+-- Modified options wrapped around the func
+---@param func function Implementation of modifying the lines
+local modifyLines = function(func)
+    vim.api.nvim_buf_set_option(M.curBuf, "modifiable", true)
+    vim.api.nvim_buf_set_option(M.curBuf, "modified",   true)
+    func()
+    vim.api.nvim_buf_set_option(M.curBuf, "modifiable", false)
+    vim.api.nvim_buf_set_option(M.curBuf, "modified",   false)
 end
 
---- Display history in new buffer
---- @param refreshChk boolean Set it true to refresh the history files everytime
-M.display = function(refreshChk)
-    if not refreshChk and fn.argc() > 0 or #vim.v.oldfiles == 1 then
-        return
-    end
 
-    if not M.lines then resetLine() end
-
-    if vim.bo.filetype == "HistoryStartup" then return end
-    M.curWin = api.nvim_get_current_win()
-
-    local relative = {}
-    local absolute = {}
+local resetLines = function ()
     for _, absolutePath in pairs(vim.v.oldfiles) do
         if _G._os_uname.sysname ~= "Windows_NT" then
             if vim.loop.fs_stat(absolutePath) then
-                if #absolutePath > api.nvim_win_get_width(M.curWin) then
-                    local relativePath = fn.pathshorten(absolutePath)
-                    table.insert(relative, relativePath)
+                if #absolutePath > vim.api.nvim_win_get_width(M.curWin) then
+                    local relativePath = vim.fn.pathshorten(absolutePath)
+                    table.insert(M.lines.relative, relativePath)
                 end
-                table.insert(absolute, absolutePath)
+                table.insert(M.lines.absolute, absolutePath)
             end
         else
             -- Upper case the first drive character in Windows
@@ -51,82 +48,165 @@ M.display = function(refreshChk)
             -- Substitute the / character with the \ one
             absolutePath = string.gsub(absolutePath, "/", "\\")
             -- Filter out duplicates and check validity
-            if not vim.tbl_contains(absolute, absolutePath) and vim.loop.fs_stat(absolutePath) then
-                if #absolutePath > api.nvim_win_get_width(M.curWin) then
-                    local relativePath = fn.pathshorten(absolutePath)
-                    table.insert(relative, relativePath)
+            if not vim.tbl_contains(M.lines.absolute, absolutePath) and vim.loop.fs_stat(absolutePath) then
+                if #absolutePath > vim.api.nvim_win_get_width(M.curWin) then
+                    local relativePath = vim.fn.pathshorten(absolutePath)
+                    table.insert(M.lines.relative, relativePath)
                 end
-                table.insert(absolute, absolutePath)
+                table.insert(M.lines.absolute, absolutePath)
             end
         end
-    end
-
-
-    if refreshChk then
-        resetLine()
-    end
-    M.lines.absolute = absolute
-    M.lines.relative = relative
-
-    -- Save last opened buffer and restore it after open a new buffer
-    if vim.bo.buftype == "" and nvim_buf_get_name(0) ~= "" then
-        M.lastBuf = api.nvim_get_current_buf()
-    else
-        M.lastBuf = nil
-    end
-
-
-    -- The factor that vim will always display a buffer for you in the very beginning
-    if api.nvim_buf_is_valid(1) and api.nvim_buf_get_option(1, "modified") and api.nvim_buf_get_option(1, "filetype") ~= nil then
-        -- Use the first buffer whenever possible
-        M.curBuf = 1
-    else
-        vim.cmd [[noa enew]]
-        M.curBuf = api.nvim_get_current_buf()
-    end
-
-    -- Options
-    api.nvim_buf_set_option(M.curBuf, "bufhidden",  "hide")
-    api.nvim_buf_set_option(M.curBuf, "buflisted",  false)
-    api.nvim_buf_set_option(M.curBuf, "modifiable", true)
-    api.nvim_buf_set_option(M.curBuf, "modified",   true)
-    api.nvim_buf_set_option(M.curBuf, "filetype",   "HistoryStartup")
-
-    api.nvim_win_set_buf(M.curWin, M.curBuf)
-    api.nvim_buf_set_lines(M.curBuf, 0, 1, false, M.lines.firstline)
-    if not next(M.lines.relative) then
-        api.nvim_buf_set_lines(M.curBuf, 1, -1, false, M.lines.absolute)
-    else
-        api.nvim_buf_set_lines(M.curBuf, 1, -1, false, M.lines.relative)
-    end
-    api.nvim_buf_set_option(M.curBuf, "modifiable", false)
-    api.nvim_buf_set_option(M.curBuf, "modified",   false)
-
-    -- Key mappings
-    for _, key in ipairs {"o", "<C-s>", "<C-v>", "<CR>", "q"} do
-        api.nvim_buf_set_keymap(
-            M.curBuf,
-            "n",
-            key,
-            string.format([=[<CMD>lua require("historyStartup").execMap([[%s]])<CR>]=], string.gsub(key, [[<]], [[<lt>]])),
-            {silent = true}
-        )
-    end
-
-    -- Don't create the self-destroy AutoCMD yet for the first time leaving historyStartup
-    if M.curBuf ~= 1 then
-        api.nvim_create_autocmd(
-            "BufReadPost", {
-            buffer = M.curBuf,
-            desc = "Destory historyStartup",
-            callback = require("historyStartup").deleteBuf,
-        })
     end
 end
 
 
+local deleteBuf = function()
+    if not M.curBuf then return end
+
+    local winIDTbl = vim.tbl_filter(function(i)
+        return vim.api.nvim_win_get_config(i).relative == ""
+        end, vim.api.nvim_list_wins())
+    local historyStartupLostTick = true
+    for _, win in ipairs(winIDTbl) do
+        if vim.api.nvim_win_get_buf(win) == M.curBuf then
+            historyStartupLostTick = false
+        end
+    end
+    -- Don't destroy historyStartup yet if it's still visible in other windows
+    if not historyStartupLostTick then return end
+
+    if vim.api.nvim_buf_is_valid(M.curBuf) then
+        vim.api.nvim_buf_delete(M.curBuf, {force = true})
+    end
+    M.curBuf = nil
+end
+
+
+local autoCMD = function(bufNr)
+
+    vim.api.nvim_create_autocmd("WinResized", {
+    buffer   = bufNr,
+    desc     = "Re-adjust filepath length",
+    callback = function()
+        if not next(M.lines.absolute) then return end
+
+        local widthExceedTick = false
+        local width = vim.api.nvim_win_get_width(M.curWin)
+        for _, line in ipairs(M.lines.absolute) do
+            if #line > width then widthExceedTick = true end
+        end
+
+        if widthExceedTick then
+            if M.lines.display == "absolute" then
+                if not next(M.lines.relative) then
+                    M.lines.relative = vim.tbl_map(function(i)
+                        return vim.fn.pathshorten(i)
+                    end, M.lines.absolute)
+                end
+
+                modifyLines(function()
+                    vim.api.nvim_buf_set_lines(M.curBuf, 1, -1, false, M.lines.relative)
+                    M.lines.display = "relative"
+                end)
+            end
+        else
+            if M.lines.display == "relative" then
+                modifyLines(function()
+                    vim.api.nvim_buf_set_lines(M.curBuf, 1, -1, false, M.lines.absolute)
+                    M.lines.display = "absolute"
+                end)
+            end
+        end
+    end
+    })
+
+    -- Don't create the self-destroy AutoCMD yet for the first time leaving historyStartup
+    if M.curBuf ~= 1 then
+        vim.api.nvim_create_autocmd(
+            "BufReadPost", {
+            buffer   = M.curBuf,
+            desc     = "Destory historyStartup",
+            callback = deleteBuf
+        })
+    end
+
+end
+
+
+--- Display history in new buffer
+--- @param refreshChk boolean Set it true to refresh the history files everytime
+M.display = function(refreshChk)
+    if vim.fn.argc() > 0 or #vim.v.oldfiles == 1 then
+        return
+    end
+    if vim.bo.filetype == "HistoryStartup" then return end
+
+    M.curWin = vim.api.nvim_get_current_win()
+
+    -- Reset lines
+    if refreshChk or not next(M.lines.absolute) then
+        resetLines()
+    end
+
+    -- Save last opened buffer and restore it after open a new buffer
+    if vim.bo.buftype == "" and nvim_buf_get_name(0) ~= "" then
+        M.lastBuf = vim.api.nvim_get_current_buf()
+    else
+        M.lastBuf = nil
+    end
+
+    -- The factor that vim will always display a buffer for you in the very beginning
+    if vim.api.nvim_buf_is_valid(1) and vim.api.nvim_buf_get_option(1, "modified") and vim.api.nvim_buf_get_option(1, "filetype") ~= nil then
+        -- Use the first buffer whenever possible
+        M.curBuf = 1
+    elseif not M.curBuf then
+        vim.cmd [[noa enew]]
+        M.curBuf = vim.api.nvim_get_current_buf()
+    else
+        -- Use the existing historyStartup buffer
+    end
+
+    -- Setting up autocmd
+    autoCMD(M.curBuf)
+
+    -- Options
+    vim.api.nvim_buf_set_option(M.curBuf, "bufhidden",  "hide")
+    vim.api.nvim_buf_set_option(M.curBuf, "buflisted",  false)
+    vim.api.nvim_buf_set_option(M.curBuf, "filetype",   "HistoryStartup")
+
+    -- Set lines
+    vim.defer_fn(function()
+        vim.api.nvim_win_set_buf(M.curWin, M.curBuf)
+        modifyLines(function()
+            vim.api.nvim_buf_set_lines(M.curBuf, 0, 1, false, M.lines.firstline)
+            if not next(M.lines.relative) then
+                vim.api.nvim_buf_set_lines(M.curBuf, 1, -1, false, M.lines.absolute)
+                M.lines.display = "absolute"
+            else
+                vim.api.nvim_buf_set_lines(M.curBuf, 1, -1, false, M.lines.relative)
+                M.lines.display = "relative"
+            end
+        end)
+    end, 0)
+
+    -- Key mappings
+    vim.defer_fn(function()
+        for _, key in ipairs {"o", "go", "g<CR>", "<C-s>", "<C-v>", "<CR>", "q"} do
+            vim.api.nvim_buf_set_keymap(
+                M.curBuf,
+                "n",
+                key,
+                string.format([=[<CMD>lua require("historyStartup").execMap([[%s]])<CR>]=], string.gsub(key, [[<]], [[<lt>]])),
+                {silent = true}
+            )
+        end
+    end, 0)
+
+end
+
+
 M.execMap = function(key)
-    local lnum = api.nvim_win_get_cursor(0)[1]
+    local lnum = vim.api.nvim_win_get_cursor(0)[1]
     key = string.lower(key)
 
     if key == "q" then
@@ -136,8 +216,8 @@ M.execMap = function(key)
         if #bufNrTbl == 0 then
             vim.cmd("noa q!")
         else
-            if M.lastBuf and api.nvim_buf_is_valid(M.lastBuf) then
-                api.nvim_win_set_buf(M.curWin, M.lastBuf)
+            if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
+                vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
             end
         end
     elseif key == "o" or key == "<cr>" then
@@ -146,13 +226,19 @@ M.execMap = function(key)
         else
             vim.cmd("edit " .. M.lines.absolute[lnum - 1])
         end
+    elseif key == "go" or key == "g<cr>" then
+        if lnum == 1 then
+            vim.cmd("noa enew")
+        else
+            vim.cmd("noa edit " .. M.lines.absolute[lnum - 1])
+        end
     elseif key == "<c-s>" then
         if lnum == 1 then
             vim.cmd("noa split")
             vim.cmd("enew")
         else
-            if M.lastBuf and api.nvim_buf_is_valid(M.lastBuf) then
-                api.nvim_win_set_buf(M.curWin, M.lastBuf)
+            if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
+                vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
             end
             vim.cmd("split " .. M.lines.absolute[lnum - 1])
         end
@@ -160,25 +246,16 @@ M.execMap = function(key)
         if lnum == 1 then
             vim.cmd("vnew")
         else
-            if M.lastBuf and api.nvim_buf_is_valid(M.lastBuf) then
-                api.nvim_win_set_buf(M.curWin, M.lastBuf)
+            if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
+                vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
             end
             vim.cmd("vsplit " ..M.lines.absolute[lnum - 1])
         end
     end
 
-    M.deleteBuf()
+    deleteBuf()
 end
 
-
-M.deleteBuf = function()
-    if not M.curBuf then return end
-
-    if api.nvim_buf_is_valid(M.curBuf) then
-        api.nvim_buf_delete(M.curBuf, {force = true})
-    end
-    M.curBuf = nil
-end
 
 return M
 
