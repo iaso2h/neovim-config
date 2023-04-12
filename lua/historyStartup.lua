@@ -2,7 +2,7 @@
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
 -- Dependencies: 0
--- Version: 0.0.12
+-- Version: 0.0.13
 -- Last Modified: 2023-4-12
 -- TODO: ? to trigger menupage
 
@@ -33,34 +33,24 @@ local modifyLines = function(func)
 end
 
 
-local resetLines = function ()
+local initLines = function ()
     for _, absolutePath in pairs(vim.v.oldfiles) do
-        if _G._os_uname.sysname ~= "Windows_NT" then
-            if vim.loop.fs_stat(absolutePath) then
-                if #absolutePath > vim.api.nvim_win_get_width(M.curWin) then
-                    local relativePath = vim.fn.pathshorten(absolutePath)
-                    table.insert(M.lines.relative, relativePath)
-                end
-                table.insert(M.lines.absolute, absolutePath)
-                local bufNr = vim.fn.bufnr(absolutePath)
-                table.insert(M.lines.bufNr, bufNr)
-            end
-        else
+        if _G._os_uname.sysname == "Windows_NT" then
             -- Upper case the first drive character in Windows
             absolutePath = string.sub(absolutePath, 1, 1):upper() .. string.sub(absolutePath, 2, -1)
             -- Substitute the / character with the \ one
             absolutePath = string.gsub(absolutePath, "/", "\\")
-            -- Filter out duplicates and check validity
-            if not vim.tbl_contains(M.lines.absolute, absolutePath) and vim.loop.fs_stat(absolutePath) then
-                if #absolutePath > vim.api.nvim_win_get_width(M.curWin) then
-                    local relativePath = vim.fn.pathshorten(absolutePath)
-                    table.insert(M.lines.relative, relativePath)
-                end
-                table.insert(M.lines.absolute, absolutePath)
-                ---@diagnostic disable-next-line: param-type-mismatch
-                local bufNr = vim.fn.bufnr(absolutePath)
-                table.insert(M.lines.bufNr, bufNr)
+        end
+        -- Filter out duplicates and check validity
+        if not vim.tbl_contains(M.lines.absolute, absolutePath) and vim.loop.fs_stat(absolutePath) then
+            if #absolutePath > vim.api.nvim_win_get_width(M.curWin) then
+                local relativePath = vim.fn.pathshorten(absolutePath)
+                table.insert(M.lines.relative, relativePath)
             end
+            table.insert(M.lines.absolute, absolutePath)
+            ---@diagnostic disable-next-line: param-type-mismatch
+            local bufNr = vim.fn.bufnr(absolutePath)
+            table.insert(M.lines.bufNr, bufNr)
         end
     end
 end
@@ -166,7 +156,7 @@ M.display = function(refreshChk)
 
     -- Reset lines
     if refreshChk or not next(M.lines.absolute) then
-        resetLines()
+        initLines()
     end
 
     -- Save last opened buffer and restore it after open a new buffer
