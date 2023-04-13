@@ -2,7 +2,7 @@
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
 -- Dependencies: 0
--- Version: 0.0.14
+-- Version: 0.0.15
 -- Last Modified: 2023-4-13
 -- TODO: ? to trigger menupage
 
@@ -34,6 +34,9 @@ end
 
 
 local initLines = function ()
+    M.lines.absolute = {}
+    M.lines.relative = {}
+    M.lines.bufNr    = {}
     for _, absolutePath in pairs(vim.v.oldfiles) do
         if _G._os_uname.sysname == "Windows_NT" then
             -- Upper case the first drive character in Windows
@@ -152,7 +155,7 @@ end
 --- Display history in new buffer
 --- @param refreshChk boolean Set it true to refresh the history files everytime
 M.display = function(refreshChk)
-    -- For VimEnter autocomd
+    -- For VimEnter autocmd
     if not refreshChk and vim.fn.argc() > 0 or #vim.v.oldfiles == 1 then
         return
     end
@@ -203,11 +206,13 @@ M.display = function(refreshChk)
                 vim.api.nvim_buf_set_lines(M.curBuf, 1, -1, false, M.lines.relative)
                 M.lines.display = "relative"
             end
+
+            -- Strike through openned files
+            if refreshChk then
+                strikeThroughOpened()
+            end
         end)
     end, 0)
-
-    -- Strike through openned files
-    vim.defer_fn(strikeThroughOpened, 0)
 
     -- Key mappings
     vim.defer_fn(function()
