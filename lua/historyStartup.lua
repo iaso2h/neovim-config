@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
 -- Dependencies: 0
--- Version: 0.0.13
--- Last Modified: 2023-4-12
+-- Version: 0.0.14
+-- Last Modified: 2023-4-13
 -- TODO: ? to trigger menupage
 
 local M   = {
@@ -81,6 +81,7 @@ local destoryBuf = function()
     for _, win in ipairs(winIDTbl) do
         if vim.api.nvim_win_get_buf(win) == M.curBuf then
             historyStartupLostTick = false
+            break
         end
     end
     -- Don't destroy historyStartup yet if it's still visible in other windows
@@ -106,7 +107,10 @@ local autoCMD = function(bufNr)
         local widthExceedTick = false
         local width = vim.api.nvim_win_get_width(M.curWin)
         for _, line in ipairs(M.lines.absolute) do
-            if #line > width then widthExceedTick = true end
+            if #line > width then
+                widthExceedTick = true
+                break
+            end
         end
 
         if widthExceedTick then
@@ -148,7 +152,8 @@ end
 --- Display history in new buffer
 --- @param refreshChk boolean Set it true to refresh the history files everytime
 M.display = function(refreshChk)
-    if vim.fn.argc() > 0 or #vim.v.oldfiles == 1 then
+    -- For VimEnter autocomd
+    if not refreshChk and vim.fn.argc() > 0 or #vim.v.oldfiles == 1 then
         return
     end
     if vim.bo.filetype == "HistoryStartup" then return end
@@ -254,6 +259,7 @@ M.execMap = function(key)
             for _, win in ipairs(winIDTbl) do
                 if vim.api.nvim_win_get_buf(win) == M.lastBuf then
                     lastBufVisibleTick = true
+                    break
                 end
             end
         end
