@@ -153,6 +153,7 @@ map("n", [[<Plug>ReplaceOperatorInplace]], function ()
     return vim.fn.luaeval [[require("replace").expr(true, true)]]
 end, {"silent", "expr"}, "Replace operator and restore the cursor position")
 
+-- TODO:
 map("n", [[<Plug>ReplaceOperator]], function ()
     return vim.fn.luaeval [[require("replace").expr(false, false)]]
 end, {"silent", "expr"}, "Replace operator")

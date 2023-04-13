@@ -124,7 +124,7 @@ local fileInfo = function()
     local fileStr
     if vim.startswith(absPath, "diffview") then
         fileStr = vim.fn.expand("%:t")
-        local commit = string.match(absPath, ".git/(%w%w%w%w%w%w%w%w)")
+        local commit = string.match(absPath, ".git" .. _G._sep .. "(%w%w%w%w%w%w%w%w)")
         if commit then
             fileStr = fileStr .. " | " .. commit .. " "
         else

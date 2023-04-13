@@ -81,19 +81,8 @@ return function()
     -- https://github.com/microsoft/pyright
     -- https://github.com/microsoft/pyright/blob/master/docs/configuration.md
     -- https://github.com/microsoft/pyright/blob/96871bec5a427048fead499ab151be87b7baf023/packages/vscode-pyright/package.json
-    local pyRootFiles = {
-        'pyproject.toml',
-        'setup.py',
-        'main.py',
-        'setup.cfg',
-        'requirements.txt',
-        'Pipfile',
-        'pyrightconfig.json',
-        }
-
     servers.pyright = {
         settings  = {
-            root_dir = lspUtil.root_pattern(unpack(pyRootFiles)),
             python = {
                 pythonPath = "python",
                 venvPath = "",
@@ -207,7 +196,7 @@ return function()
     -- Clangd {{{
     -- https://github.com/llvm/llvm-project/tree/main/clang-tools-extra/clangd
     local findClangd = function()
-        local cmdStr = {
+        local args = {
             "--all-scopes-completion",
             "--background-index",
             "--clang-tidy",
@@ -219,23 +208,14 @@ return function()
             "--j=4",
             "--pretty",
             "--suggest-missing-includes",
-            "--fallback-style=google"
+            "--fallback-style=google",
+            "--offset-encoding=utf-16"
         }
-        -- TODO: breaking change in clangd path
-        local binaryExt       = {macOS = "", Linux = "", Windows_NT = ".exe"}
-        local sep             = _G._os_uname.sysname == "Windows_NT" and "\\" or "/"
         local dataPath   = path:new(fn.stdpath("data"))
-        local clangdGenericPath = dataPath:joinpath("lsp_servers/clangd")
-        local clangdPathStr     = fn.glob(clangdGenericPath.filename .. sep .. "clangd_*")
-        if clangdPathStr == "" then
-            return {}
-        else
-            local clangdBinPath = path:new(clangdPathStr):joinpath("bin", "clangd")
-            local clangdBinStr  = clangdBinPath.filename .. binaryExt[_G._os_uname.sysname]
-            table.insert(cmdStr, 1, clangdBinStr)
-            return cmdStr
-        end
-
+        local binPath = dataPath:joinpath("mason", "packages", "clangd", "clangd", "bin", "clangd")
+        if _G._os_uname.sysname == "Windows_NT" then binPath = binPath .. ".exe" end
+        table.insert(args, 1, binPath)
+        return args
     end
 
     local clangdCMD = findClangd()

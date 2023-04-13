@@ -76,3 +76,4 @@ autocmds
 guifg
 guibg
 bufhidden
+nord 

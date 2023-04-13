@@ -170,7 +170,7 @@ theme.editor =  {
     VertSplit    = {fg = p.n3},
 
 
-    TabLine     = {fg = p.n4, bg = p.n1},
+    TabLine     = {fg = p.n4, bg = p.n0},
     TabLineFill = {fg = p.n4, bg = p.n0},
     TabLineSel  = {fg = p.n8, bg = p.n3},
 
@@ -371,6 +371,7 @@ theme.plugins = { -- {{{
     LspTroubleNormal = {fg = p.n4, bg = p.sidebar},
 
     -- https://github.com/sindrets/diffview.nvim
+    DiffviewFilePanelSelected = {link = "Search"},
     diffAdded     = {fg = p.n14},
     diffChanged   = {fg = p.n13},
     diffRemoved   = {fg = p.n11},
