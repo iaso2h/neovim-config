@@ -2,10 +2,8 @@
 -- Author: iaso2h
 -- Description: Delete buffer without change the window layout
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.27
--- Last Modified: 2023-3-8
-local fn    = vim.fn
-local api   = vim.api
+-- Version: 0.0.28
+-- Last Modified: 2023-4-14
 local util  = require("buf.util")
 local var   = require("buf.var")
 local M    = {}
@@ -17,15 +15,15 @@ local M    = {}
 --- @return boolean When cancel is input, false will be return, otherwise,
 ---         true will be return
 local function saveModified(bufNr) -- {{{
-    if not api.nvim_buf_is_valid(bufNr) then return false end
+    if not vim.api.nvim_buf_is_valid(bufNr) then return false end
 
     -- Check whether the file has any unsaved changes
-    if not api.nvim_buf_get_option(bufNr, "modified") then
+    if not vim.api.nvim_buf_get_option(bufNr, "modified") then
         return true
     else
-        if api.nvim_buf_get_option(bufNr, "modified") then
+        if vim.api.nvim_buf_get_option(bufNr, "modified") then
             vim.cmd "noa echohl MoreMsg"
-            local answer = fn.confirm("Save modification?",
+            local answer = vim.fn.confirm("Save modification?",
                 ">>> &Save\n&Discard\n&Cancel", 3, "Question")
             vim.cmd "noa echohl None"
             if answer == 1 then
@@ -70,18 +68,23 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
 
         -- if util.winCnt() ~= 1 then
             -- -- Just close the window. Won't do any damage
-            -- api.nvim_win_close(var.winID, true)
+            -- vim.api.nvim_win_close(var.winID, true)
         -- else
             -- NOTE: more details see ":help buftype"
-            if vim.bo.filetype == "vim" then
-                api.nvim_feedkeys(t"<CMD>q<CR>", "t", false)
+            if var.fileType == "vim" then
+                vim.api.nvim_feedkeys(t"<CMD>q<CR>", "t", false)
                 return true
-            elseif var.bufType == "nofile" then
+            elseif var.fileType == "tsplayground" or var.fileType == "query" then
+                vim.cmd [[TSPlaygroundToggle]]
+                return true
+            end
+
+            if var.bufType == "nofile" then
                 if var.bufName == "[Command Line]" then
                     -- This buffer shows up When you hit CTRL-F on commandline
-                    api.nvim_win_close(var.winID, true)
+                    vim.api.nvim_win_close(var.winID, true)
                 elseif string.match(var.bufName, [[%[nvim%-lua%]$]]) then
-                    -- Check for Luapad
+                    -- Check for Lua pad
                     if util.bufCnt() ~= 1 then
                         util.switchAlter(var.winID)
                     else
@@ -117,7 +120,7 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
 
         -- Standard buffer -- {{{
         -- Store closed file path
-        var.lastClosedFilePath = fn.expand("%:p")
+        var.lastClosedFilePath = vim.fn.expand("%:p")
 
         -- Always prompt for unsaved change, so that buffer is ready to be
         -- deleted safely. Abort the processing when false is evaluated
@@ -139,10 +142,10 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         -- Create a table containing all different window ID as keys and the
         -- corresponding buffer number as values
         for _, win in ipairs(var.winIDTbl) do
-            local bufNr = api.nvim_win_get_buf(win)
+            local bufNr = vim.api.nvim_win_get_buf(win)
 
-            winIDBufNrTbl[win] = api.nvim_win_get_buf(win)
-            if util.isSpecBuf(api.nvim_buf_get_option(bufNr, "buftype")) then
+            winIDBufNrTbl[win] = vim.api.nvim_win_get_buf(win)
+            if util.isSpecBuf(vim.api.nvim_buf_get_option(bufNr, "buftype")) then
                 specInstanceCnt = specInstanceCnt + 1
             else
                 bufInstanceCnt = bufInstanceCnt + 1
@@ -159,13 +162,13 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
 
         -- Always restore window focus, window might be unavailable when the
         -- last buffer is deleted
-        if api.nvim_win_is_valid(var.winID) then
-            api.nvim_set_current_win(var.winID)
+        if vim.api.nvim_win_is_valid(var.winID) then
+            vim.api.nvim_set_current_win(var.winID)
         end
 
         -- Merge when there are two windows sharing the last buffer
-        -- NOTE: If this evaluated to true, then the current length of bufNrtble
-        -- has been reduced to 1, #bufNrTbl is just a value of previous state
+        -- NOTE: If this evaluated to true, then the current length of bufNr
+        -- table has been reduced to 1, #bufNrTbl is just a value of previous state
         if util.winCnt() == 2 and bufInstanceCnt == 2 and util.bufCnt() == 2 then
             vim.cmd "only"
         end
@@ -203,14 +206,16 @@ function M.init(type) -- {{{
             -- NOTE: more details see ":help buftype"
             if var.bufType == "nofile" or var.bufType == "prompt" then
                 -- Commandline expand window which can be accessed by pressing <C-f>
-                if vim.bo.filetype == "vim" then
-                    api.nvim_feedkeys(t"<CMD>q<CR>", "t", false)
+                if var.fileType == "vim" then
+                    vim.api.nvim_feedkeys(t"<CMD>q<CR>", "t", false)
                     return
+                elseif var.fileType == "tsplayground" then
+                    return vim.cmd [[TSPlaygroundToggle]]
                 end
                 -- Override the default behavior, treat it like performing a buffer delete
                 if not bufClose(true, false) then return end
                 -- Make sure no lingering window after buffer being wiped
-                if util.winCnt() > 1 and api.nvim_win_is_valid(var.winID) then
+                if util.winCnt() > 1 and vim.api.nvim_win_is_valid(var.winID) then
                     util.closeWin(var.winID)
                 end
             elseif var.bufType == "terminal" then
@@ -232,7 +237,7 @@ function M.init(type) -- {{{
                 -- Scratch files. Override the default behavior, treat it like performing a buffer delete
                 if not bufClose(false, false) then return end
                 -- Make sure no lingering window after buffer being wiped
-                if util.winCnt() > 1 and api.nvim_win_is_valid(var.winID) then
+                if util.winCnt() > 1 and vim.api.nvim_win_is_valid(var.winID) then
                     return util.closeWin(var.winID)
                 end
             else
@@ -240,7 +245,7 @@ function M.init(type) -- {{{
                 if util.winCnt() == 1 then
                     -- 1 Window
                     -- Override the default behavior, treat it like performing
-                    -- a buffer delete untill there are no more buffers loaded
+                    -- a buffer delete until there are no more buffers loaded
                     bufClose(false, false)
                 else
                     -- 1+ Windows
@@ -254,7 +259,7 @@ function M.init(type) -- {{{
                     else
                         -- 1 buffer instance
                         -- Override the default behavior, treat it like performing
-                        -- a buffer delete untill there are no more buffers loaded
+                        -- a buffer delete until there are no more buffers loaded
                         return bufClose(false, false)
                     end
                 end
