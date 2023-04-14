@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
 -- Dependencies: 0
--- Version: 0.0.15
--- Last Modified: 2023-4-13
+-- Version: 0.0.16
+-- Last Modified: 2023-4-14
 -- TODO: ? to trigger menupage
 
 local M   = {
@@ -37,6 +37,7 @@ local initLines = function ()
     M.lines.absolute = {}
     M.lines.relative = {}
     M.lines.bufNr    = {}
+    local relativeTick = false
     for _, absolutePath in pairs(vim.v.oldfiles) do
         if _G._os_uname.sysname == "Windows_NT" then
             -- Upper case the first drive character in Windows
@@ -46,15 +47,19 @@ local initLines = function ()
         end
         -- Filter out duplicates and check validity
         if not vim.tbl_contains(M.lines.absolute, absolutePath) and vim.loop.fs_stat(absolutePath) then
-            if #absolutePath > vim.api.nvim_win_get_width(M.curWin) then
-                local relativePath = vim.fn.pathshorten(absolutePath)
-                table.insert(M.lines.relative, relativePath)
+            if not relativeTick and #absolutePath > vim.api.nvim_win_get_width(M.curWin) then
+                relativeTick = true
             end
             table.insert(M.lines.absolute, absolutePath)
             ---@diagnostic disable-next-line: param-type-mismatch
             local bufNr = vim.fn.bufnr(absolutePath)
             table.insert(M.lines.bufNr, bufNr)
         end
+    end
+    if relativeTick then
+        M.lines.relative = vim.tbl_map(function(p)
+            return vim.fn.pathshorten(p)
+        end, M.lines.absolute)
     end
 end
 
