@@ -18,7 +18,7 @@ return function()
                 },
             },
             swap = {
-                enable = true,
+                enable = false,
                 swap_next = {
                     ["<A-l>"] = "@parameter.inner",
                 },

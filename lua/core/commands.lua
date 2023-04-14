@@ -263,8 +263,12 @@ excmd("CD", [[execute "lcd " . expand("%:p:h")]], {
     desc = "Change the current working directory to the current buffer locally",
 })
 
+excmd("CDConfig", [[execute "lcd " . stdpath("config")]], {
+    desc = "Change the current working directory to configuration path",
+})
+
 excmd("CDRuntime", [[execute "lcd $VIMRUNTIME"]], {
-    desc = "Change the current working directory to the current buffer locally",
+    desc = "Change the current working directory to Neovim runtime path",
 })
 
 excmd("E", function (opts)

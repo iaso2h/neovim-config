@@ -85,7 +85,6 @@ local pluginArgs = { -- {{{
         event  = "BufAdd",
         config = function() require("treesitter-context").setup() end,
     },
-
     {
         "nvim-treesitter/nvim-treesitter-textobjects",
         dependencies = {
@@ -93,6 +92,17 @@ local pluginArgs = { -- {{{
             "gitsigns.nvim"
         },
         config = require("config.nvim-treesitter-textobjects"),
+    },
+    {
+        "Wansmer/sibling-swap.nvim",
+        keys = {
+            {[[<A-l>]],   mode = "n"},
+            {[[<A-h>]],   mode = "n"},
+            {[[<A-S-l>]], mode = "n"},
+            {[[<A-S-h>]], mode = "n"},
+        },
+        dependencies = { "nvim-treesitter", },
+        config = require("config.nvim-sibling-swap")
     },
     {
         "windwp/nvim-ts-autotag",
@@ -573,7 +583,6 @@ local pluginArgs = { -- {{{
     {
         "ray-x/lsp_signature.nvim",
         dependencies = { "nvim-lspconfig" },
-        -- event  = "InsertEnter",
         config = function()
             require("lsp_signature").setup{
                 bind           = true,
@@ -651,6 +660,28 @@ local pluginArgs = { -- {{{
                 command = [[lua vim.opt_local.relativenumber = true]],
                 once    = true,
             })
+        end
+    },
+    {
+        "andrewferrier/debugprint.nvim",
+        keys = {
+            { "dp", mode = "n" },
+            { "dP", mode = "n" },
+            { "dv", mode = "n" },
+            { "dV", mode = "n" },
+        },
+        config = function()
+            require("debugprint").setup {
+                create_keymaps = false
+            }
+            map("n", [[dp]], function() return require("debugprint").debugprint()
+                end, {"expr"}, "Debug print below")
+            map("n", [[dP]], function() return require("debugprint").debugprint { above = true}
+                end, {"expr"}, "Debug print above")
+            map("n", [[dv]], function() return require("debugprint").debugprint { variable = true }
+                end, {"expr"}, "Debug print value below")
+            map("n", [[dV]], function() return require("debugprint").debugprint { variable = true, above = true}
+                end, {"expr"}, "Debug print value above")
         end
     },
     {

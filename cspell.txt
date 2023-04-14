@@ -77,3 +77,4 @@ guifg
 guibg
 bufhidden
 nord 
+pynput 

@@ -559,7 +559,7 @@ theme.plugins = { -- {{{
     CmpItemKindTypeParameter = {fg = p.orange},
 
     -- https://github.com/ray-x/lsp_signature.nvim
-    LspSignatureActiveParameter = {link = "CmpItemAbbrMatch"},
+    LspSignatureActiveParameter = {bg = p.n1, style = "bold"},
 
     -- https://github.com/michaelb/sniprun
     SniprunVirtualTextOk  = {bg=p.n8, fg=p.w},
