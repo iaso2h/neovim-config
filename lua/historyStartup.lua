@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
 -- Dependencies: 0
--- Version: 0.0.16
--- Last Modified: 2023-4-14
+-- Version: 0.0.17
+-- Last Modified: 2023-4-15
 -- TODO: ? to trigger menupage
 
 local M   = {
@@ -11,11 +11,15 @@ local M   = {
     lastBuf = nil,
     curWin  = nil,
     oldBuf  = nil,
+    floatWinID = nil,
+    floatBufNr = nil,
+    floatTick = false,
     ns      = vim.api.nvim_create_namespace("historyStartup"),
     lines = {
         firstline = {"< New Buffer >"},
         absolute = {},
         relative = {},
+        relativeTick = false,
         bufNr    = {},
         display  = ""
     }
@@ -33,11 +37,11 @@ local modifyLines = function(func)
 end
 
 
-local initLines = function ()
+local initLines = function () -- {{{
     M.lines.absolute = {}
     M.lines.relative = {}
     M.lines.bufNr    = {}
-    local relativeTick = false
+    M.lines.relativeTick = false
     for _, absolutePath in pairs(vim.v.oldfiles) do
         if _G._os_uname.sysname == "Windows_NT" then
             -- Upper case the first drive character in Windows
@@ -47,8 +51,8 @@ local initLines = function ()
         end
         -- Filter out duplicates and check validity
         if not vim.tbl_contains(M.lines.absolute, absolutePath) and vim.loop.fs_stat(absolutePath) then
-            if not relativeTick and #absolutePath > vim.api.nvim_win_get_width(M.curWin) then
-                relativeTick = true
+            if not M.lines.relativeTick and #absolutePath > vim.api.nvim_win_get_width(M.curWin) then
+                M.lines.relativeTick = true
             end
             table.insert(M.lines.absolute, absolutePath)
             ---@diagnostic disable-next-line: param-type-mismatch
@@ -56,15 +60,15 @@ local initLines = function ()
             table.insert(M.lines.bufNr, bufNr)
         end
     end
-    if relativeTick then
+    if M.lines.relativeTick then
         M.lines.relative = vim.tbl_map(function(p)
             return vim.fn.pathshorten(p)
         end, M.lines.absolute)
     end
-end
+end -- }}}
 
 
-local strikeThroughOpened = function()
+local strikeThroughOpened = function() -- {{{
     local bufListed = vim.tbl_filter(function (buf)
         return vim.api.nvim_buf_get_option(buf, "buflisted")
     end, vim.api.nvim_list_bufs())
@@ -75,11 +79,11 @@ local strikeThroughOpened = function()
             vim.api.nvim_buf_add_highlight(M.curBuf, M.ns, "Comment", bufIdx, 0, -1)
         end
     end
-end
+end -- }}}
 
 
 -- Destory historyStartup buffer
-local destoryBuf = function()
+local destoryBuf = function() -- {{{
     if not M.curBuf then return end
 
     local winIDTbl = vim.tbl_filter(function(i)
@@ -101,10 +105,10 @@ local destoryBuf = function()
         vim.api.nvim_buf_delete(M.curBuf, {force = true})
     end
     M.curBuf = nil
-end
+end -- }}}
 
 
-local autoCMD = function(bufNr)
+local autoCMD = function(bufNr) -- {{{
 
     vim.api.nvim_create_autocmd("WinResized", {
     buffer   = bufNr,
@@ -132,6 +136,7 @@ local autoCMD = function(bufNr)
                 modifyLines(function()
                     vim.api.nvim_buf_set_lines(M.curBuf, 1, -1, false, M.lines.relative)
                     M.lines.display = "relative"
+                    M.lines.relativeTick = true
                 end)
             end
         else
@@ -139,6 +144,7 @@ local autoCMD = function(bufNr)
                 modifyLines(function()
                     vim.api.nvim_buf_set_lines(M.curBuf, 1, -1, false, M.lines.absolute)
                     M.lines.display = "absolute"
+                    M.lines.relativeTick = false
                 end)
             end
         end
@@ -154,12 +160,12 @@ local autoCMD = function(bufNr)
             callback = destoryBuf
         })
     end
-end
+end -- }}}
 
 
 --- Display history in new buffer
 --- @param refreshChk boolean Set it true to refresh the history files everytime
-M.display = function(refreshChk)
+M.display = function(refreshChk) -- {{{
     -- For VimEnter autocmd
     if not refreshChk and vim.fn.argc() > 0 or #vim.v.oldfiles == 1 then
         return
@@ -221,7 +227,7 @@ M.display = function(refreshChk)
 
     -- Key mappings
     vim.defer_fn(function()
-        for _, key in ipairs {"o", "go", "<C-s>", "<C-v>", "<C-t>", "<CR>", "q"} do
+        for _, key in ipairs {"o", "go", "<C-s>", "<C-v>", "<C-t>", "<CR>", "q", "K"} do
             vim.api.nvim_buf_set_keymap(
                 M.curBuf,
                 "n",
@@ -231,11 +237,75 @@ M.display = function(refreshChk)
             )
         end
     end, 0)
+end -- }}}
 
-end
+
+local hover = function() -- {{{
+    if not M.lines.relativeTick then return end
+    local lineIdx = vim.api.nvim_win_get_cursor(M.curWin)[1] - 1
+    if lineIdx < 1 then return end
+    local line    = " " .. M.lines.absolute[lineIdx]
+    local cursorPos = vim.api.nvim_win_get_cursor(M.curWin)
+    local winInfo = vim.fn.getwininfo(M.curWin)[1]
+    local hoverWidth  = math.ceil(winInfo.width / 3)
+    local hoverHeight = math.ceil(#line / hoverWidth)
+    local anchorVer = winInfo.botline - cursorPos[1] < hoverHeight+ 1 and "S" or "N"
+    local anchorHor = hoverWidth - cursorPos[2] - 8 < hoverWidth and "E" or "W"
+    M.floatWinID = vim.api.nvim_open_win(0, false, {
+        relative = "cursor",
+        width = hoverWidth,
+        height = hoverHeight,
+        anchor = anchorVer .. anchorHor,
+        row = 1,
+        col = 1,
+        style = "minimal",
+        border = "rounded"
+    })
+    vim.api.nvim_win_set_option(M.floatWinID, "signcolumn", "no")
+
+    -- Create buf
+    if not M.floatBufNr then
+        M.floatBufNr = vim.api.nvim_create_buf(false, true)
+    end
+    vim.api.nvim_buf_set_lines(M.floatBufNr, 0, -1, false, {line})
+    vim.api.nvim_buf_set_option(M.floatBufNr, "modified", false)
+    vim.api.nvim_win_set_buf(M.floatWinID, M.floatBufNr)
+
+    vim.api.nvim_create_autocmd({
+        "CursorMoved",
+        -- Neovim will enter relative buffer temporarily, so "BufLeave" will allways
+        -- trigger then destroy the brand new float window and buffer within
+        "BufLeave",
+        "WinLeave",
+        "TabLeave",
+        "ModeChanged",
+    }, {
+        buffer = M.curBuf,
+        desc = "Close floating win inside historyStartup when cursor moves",
+        callback = function()
+            if not M.floatWinID then return end
+            if not M.floatTick then return end
+            if not vim.api.nvim_win_is_valid(M.floatWinID) then return end
+
+            vim.api.nvim_win_close(M.floatWinID, false)
+            M.floatWinID = nil
+
+            -- Delete buffer as well
+            if M.floatBufNr and vim.api.nvim_buf_is_valid(M.floatBufNr) then
+                vim.api.nvim_buf_delete(M.floatBufNr, {force = true})
+                M.floatBufNr = nil
+            end
+            M.floatTick = false
+        end
+    })
+
+    -- Set floatTick to true at the end of the function in case the float will
+    -- be terminated too early by autocmd
+    M.floatTick = true
+end -- }}}
 
 
-M.execMap = function(key)
+M.execMap = function(key) -- {{{
     local lnum = vim.api.nvim_win_get_cursor(0)[1]
     key = string.lower(key)
 
@@ -260,6 +330,8 @@ M.execMap = function(key)
                 vim.cmd("edit " .. M.lines.absolute[lnum - 1])
             end
         end
+    elseif key == "k" then
+        hover()
     else
         local lastBufVisibleTick = false
         if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
@@ -322,7 +394,7 @@ M.execMap = function(key)
     end
 
     destoryBuf()
-end
+end -- }}}
 
 
 return M
