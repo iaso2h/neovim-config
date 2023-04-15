@@ -1,10 +1,10 @@
 local api = vim.api
 
 
---- Checking validity of arguement
+--- Checking validity of argument
 ---@param lhs  string|table    Left hand side of mapping
 ---@param rhs  string|function Right hand side of mapping
----@param arg  table           Arguemnt table
+---@param arg  table           Argument table
 ---@return table|nil, string|nil
 local argCheck = function (lhs, rhs, arg)
     local opts
@@ -69,7 +69,7 @@ local argConvert = function(mode, lhs, rhs, opts, doc)
     -- it as table anyway
     if type(mode) == "string" then
         -- Convert "" into {"n", "x", "o"}. Do not use "" to map visual mode
-        -- inexplicitly, and possibly apply mapping to select mode as well
+        -- Inexplicitly, and possibly apply mapping to select mode as well
         if mode == "" then
             modeTbl = {"n", "x", "o"}
         else
@@ -79,7 +79,7 @@ local argConvert = function(mode, lhs, rhs, opts, doc)
         modeTbl = mode
     end
 
-    -- Do not use "v" to map select mode inexplicitly
+    -- Do not use "v" to map select mode Inexplicitly
     for _, modeStr in ipairs(modeTbl) do
         if modeStr == "v" then
             vim.notify(
@@ -218,11 +218,11 @@ _G.luaRHS = function(str)
 
     local strTbl = vim.split(str, "\n", false)
     strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
-        local concnStr = string.gsub(table.concat(strTbl, " "), "%s+", " ")
+        local concatStr = string.gsub(table.concat(strTbl, " "), "%s+", " ")
 
     return tostring(
-        concnStr:sub(1, 1) == " " and
-        concnStr:sub(2, -1) or concnStr:sub(1, -1))
+        concatStr:sub(1, 1) == " " and
+        concatStr:sub(2, -1) or concatStr:sub(1, -1))
 end
 
 
@@ -231,9 +231,9 @@ _G.vimRHS = function(str)
 
     local strTbl = vim.split(str, "\n", false)
     strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
-        local concnStr = string.gsub(table.concat(strTbl, "<Bar> "), "%s+", " ")
+        local concatStr = string.gsub(table.concat(strTbl, "<Bar> "), "%s+", " ")
 
     return tostring(
-        concnStr:sub(1, 1) == " " and
-        concnStr:sub(2, -1) or concnStr:sub(1, -1))
+        concatStr:sub(1, 1) == " " and
+        concatStr:sub(2, -1) or concatStr:sub(1, -1))
 end

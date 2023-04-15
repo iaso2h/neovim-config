@@ -405,7 +405,8 @@ function M.operator(args) -- {{{
     -- End function calling if extmark is out of scope
     if not ok then
         ---@diagnostic disable-next-line: param-type-mismatch
-        return vim.notify(msgOrVal, vim.log.levels.WARN)
+        vim.notify(msgOrVal, vim.log.levels.WARN)
+        return vim.notify(debug.traceback(), vim.log.levels.ERROR)
     else
         repExtmark = msgOrVal
     end

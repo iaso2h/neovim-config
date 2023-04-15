@@ -3,10 +3,29 @@ return function()
         -- Possible highlighter exception for vim ejection:
         -- https://github.com/nvim-treesitter/nvim-treesitter/issues/3317
         ensure_installed = {
-            "c", "cpp", "cmake", "lua", "json", "toml",
-            "python", "bash", "fish", "ruby", "regex", "css", "html",
-            "go", "javascript", "rust", "vue", "c_sharp", "typescript",
-            "comment", "query", "yaml"
+            "bash",
+            "c",
+            "c_sharp",
+            "cmake",
+            "comment",
+            "cpp",
+            "css",
+            "fish",
+            "go",
+            "html",
+            "javascript",
+            "json",
+            "lua",
+            "markdown",
+            "python",
+            "query",
+            "regex",
+            "ruby",
+            "rust",
+            "toml",
+            "typescript",
+            "vue",
+            "yaml"
         },
         auto_install = true,
         sync_install = true,

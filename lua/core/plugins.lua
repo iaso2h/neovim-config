@@ -475,8 +475,8 @@ local pluginArgs = { -- {{{
     },
     {
         "jay-babu/mason-null-ls.nvim",
-        cond = true,
-        event  = {"BufAdd", "BufNewFile"},
+        cond  = true,
+        event = {"BufAdd", "BufNewFile"},
         dependencies = {
             "jose-elias-alvarez/null-ls.nvim",
             "mason.nvim"
