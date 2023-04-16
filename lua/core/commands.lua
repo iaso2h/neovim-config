@@ -221,7 +221,7 @@ end, {
     nargs    = 0,
 })
 
-excmd("RunSelection", function(opts)
+excmd("RunSelection", function()
     if vim.bo.filetype ~= "lua" then
        return vim.notify("Only support in Lua file", vim.log.levels.WARN)
     end

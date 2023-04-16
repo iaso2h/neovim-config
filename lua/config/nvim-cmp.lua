@@ -44,8 +44,6 @@ return function()
                 winhighlight = 'Normal:Normal,FloatBorder:FloatBorder',
             }
         },
-        -- BUG: when loading seesion at historyStartup <C-i>?, <Tab>, <S-Tab>
-        -- can't be set up properly
         mapping = {
             ["<CR>"] = cmp.mapping.confirm {
                 select   = true,

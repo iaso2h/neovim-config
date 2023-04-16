@@ -66,45 +66,38 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         -- Closing Special buffer
         var.lastClosedFilePath = nil
 
-        -- if util.winCnt() ~= 1 then
-            -- -- Just close the window. Won't do any damage
-            -- vim.api.nvim_win_close(var.winID, true)
-        -- else
-            -- NOTE: more details see ":help buftype"
-            if var.fileType == "vim" then
-                vim.api.nvim_feedkeys(t"<CMD>q<CR>", "t", false)
-                return true
-            elseif var.fileType == "tsplayground" or var.fileType == "query" then
-                vim.cmd [[TSPlaygroundToggle]]
-                return true
-            end
+        -- NOTE: more details see ":help buftype"
+        if var.fileType == "vim" then
+            vim.api.nvim_feedkeys(t"<CMD>q<CR>", "t", false)
+        elseif var.fileType == "tsplayground" or var.fileType == "query" then
+            vim.cmd [[TSPlaygroundToggle]]
+        end
 
-            if var.bufType == "nofile" then
-                if var.bufName == "[Command Line]" then
-                    -- This buffer shows up When you hit CTRL-F on commandline
-                    vim.api.nvim_win_close(var.winID, true)
-                elseif string.match(var.bufName, [[%[nvim%-lua%]$]]) then
-                    -- Check for Lua pad
-                    if util.bufCnt() ~= 1 then
-                        util.switchAlter(var.winID)
-                    else
-                        util.bufWipe(var.bufNr)
-                    end
+        if var.bufType == "nofile" then
+            if var.bufName == "[Command Line]" then
+                -- This buffer shows up When you hit CTRL-F on commandline
+                vim.api.nvim_win_close(var.winID, true)
+            elseif string.match(var.bufName, [[%[nvim%-lua%]$]]) then
+                -- Check for Lua pad
+                if util.bufCnt() ~= 1 then
+                    util.switchAlter(var.winID)
                 else
                     util.bufWipe(var.bufNr)
                 end
-            elseif var.bufType == "prompt" then
-                util.bufWipe(var.bufNr)
             else
-                -- Always wipe the special buffer if window count is 1
-                if not saveModified(var.bufNr) then return false end
                 util.bufWipe(var.bufNr)
             end
-        -- end
+        elseif var.bufType == "prompt" then
+            util.bufWipe(var.bufNr)
+        else
+            -- Always wipe the special buffer if window count is 1
+            if not saveModified(var.bufNr) then return false end
+            util.bufWipe(var.bufNr)
+        end
 
         return true
     else
-        -- Scratch files {{{
+        -- Scratch files
         if util.isScratchBuf() then
             -- Abort the processing when cancel is evaluated
             if not saveModified(var.bufNr) then return false end
@@ -114,9 +107,9 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
             else
                 vim.cmd("q!")
             end
+
             return true
         end
-        -- }}} Scratch files
 
         -- Standard buffer -- {{{
         -- Store closed file path

@@ -333,6 +333,9 @@ local pluginArgs = { -- {{{
         "szw/vim-maximizer",
         cmd  = "MaximizerToggle",
         init = function()
+            vim.g.maximizer_set_default_mapping   = 0
+            vim.g.maximizer_set_mapping_with_bang = 1
+            vim.g.maximizer_restore_on_winleave   = 1
             map("n", [[<C-w>m]], [[<CMD>MaximizerToggle<CR>]],      {"silent"}, "Maximize window")
             map("t", [[<C-w>m]], [[<C-\><C-o><CMD>MaximizerToggle<CR>]], {"silent"}, "Maximize window")
             map("i", [[<C-w>m]], [[<C-o><CMD>MaximizerToggle<CR>]], {"noremap", "silent"}, "Maximize window")

@@ -115,35 +115,6 @@ end
 GuiFontSizeDefault = GuiFontSize
 opt.guifont = string.format("%s%s:h%s", GuiFont, GuiFallbackFont, GuiFontSize)
 -- }}} Basic settings
--- OS varied settings {{{
-if _G._os_uname.sysname == "Windows_NT" then
-    -- o.shell="powershell"
-    -- o.shellquote="shellpipe= shellxquote="
-    -- o.shellcmdflag="-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command"
-    -- o.shellredir=" Out-File -Encoding UTF8"
-    -- Python executable
-    local winPython = fn.expand("$HOME/AppData/Local/Programs/Python/Python38/python.exe")
-    api.nvim_set_var("python3_host_prog", winPython)
-    if ex(winPython) == 0 then
-        local pythonPath = (string.gsub(
-            fn.system {"python", "-c", "'import sys; print(sys.executable)'"},"(\n+$)", ""))
-        api.nvim_set_var("python3_host_prog", pythonPath)
-        if not ex(api.nvim_get_var("python3_host_prog")) then
-            api.nvim_err_write("Python path not found\n")
-        end
-    end
-elseif _G._os_uname.sysname == "Linux" then
-    local linuxPython = "/usr/bin/python3"
-    api.nvim_set_var("python3_host_prog", linuxPython)
-    if ex(linuxPython) == 0 then
-        linuxPython = (fn.system {"which", "python3"}):gsub("\n+$", "")
-        api.nvim_set_var("python3_host_prog", linuxPython)
-        if not ex(api.nvim_get_var("python3_host_prog")) then
-            api.nvim_err_write("Python path not found\n")
-        end
-    end
-end
--- }}} OS varied settings
 
 -- Neovide settings {{{
 if vim.g.neovide then
@@ -162,4 +133,3 @@ if vim.g.neovide then
     vim.g.neovide_window_floating_blur        = false
 end
 -- }}} Neovide settings
-
