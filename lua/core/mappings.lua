@@ -5,12 +5,6 @@ local M    = {}
 -- First thing first
 vim.g.mapleader = " "
 
--- Change font size (GUI client only)
-if not _G._is_term then
-    map({"n", "x"}, [[<C-->]], [[<CMD>lua GuiFontSize = GuiFontSize - 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Increase GUI client font size")
-    map({"n", "x"}, [[<C-=>]], [[<CMD>lua GuiFontSize = GuiFontSize + 1; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]],    {"silent"}, "Decrease GUI client font size")
-    map({"n", "x"}, [[<C-0>]], [[<CMD>lua GuiFontSize = GuiFontSizeDefault; vim.o.guifont = GuiFont ..":h" .. GuiFontSize<CR>]], {"silent"}, "Restore GUI client font size")
-end
 -- Diagnostic mapping
 map("n", [[<C-q>e]],    [[<CMD>lua vim.diagnostic.setqflist()<CR>]],  {"silent"}, "LSP add workspace folder")
 map("n", [[<leader>E]], [[<CMD>lua vim.diagnostic.open_float()<CR>]], {"silent"}, "LSP diagnostics")
@@ -30,8 +24,6 @@ map("n", [[<C-q>n]], [[<CMD>cnext<CR>zzzv]],     {"silent"}, "Go to next item in
 map("n", [[<C-q>N]], [[<CMD>cprevious<CR>zzzv]], {"silent"}, "Go to previous item in quickfix")
 map("n", [[<C-q>l]], [[<CMD>lua require("quickfix.convertToLoc")()<CR>]], {"silent"}, "Convert quickfix into location list")
 map("n", [[<C-q>m]], [[<CMD>lua require("quickfix.message").main()<CR>]], {"silent"}, "Show messages in quickfix")
--- Spell corretion
-map("n", [[\\]], [[z=1<CR><CR>]], {"silent"}, "Quick spell fix")
 -- Expand region
 map("n", [[<A-a>]], [[<CMD>lua require("expandRegion").expandShrink("n", 1)<CR>]],  {"silent"}, "Expand selection")
 map("n", [[<A-s>]], [[<Nop>]], "which_key_ignore")
@@ -285,9 +277,6 @@ map("n", [[gl]], [[<CMD>lua require("getLink").main()<CR>]], {"silent"}, "Open l
 map("x", [[gl]], [[:lua require("getLink").main(require("selection").getSelect("string", false))<CR>]], {"silent"}, "Open selected as link")
 -- Interrupt
 map("n", [[<C-A-c>]], [[<CMD>call interrupt()<CR>]], {"noremap", "silent"}, "Interrupt")
--- Paragraph & Block navigation
--- map("", [[{]], [[:lua require("inclusiveParagraph").main("up")<CR>]],   {"noremap", "silent"})
--- map("", [[}]], [[:lua require("inclusiveParagraph").main("down")<CR>]], {"noremap", "silent"})
 -- Line end/start
 map("", [[H]], [[^]], "Start of line(non-blank)")
 map("", [[L]], [[$]], "End of line")

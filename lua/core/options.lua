@@ -1,5 +1,3 @@
-local fn  = vim.fn
-local api = vim.api
 local opt = vim.opt
 local ex  = require("util").ex
 
@@ -9,7 +7,6 @@ if ex("rg") then
     -- o.grepformat = "%f:%l:%c:%m"
 end
 
--- Basic settings {{{
 opt.cindent    = true
 opt.copyindent = true
 
@@ -27,8 +24,8 @@ elseif _G._os_uname.machine ~= "aarch64" then
     opt.keywordprg = ":Man"
 end
 
-opt.cmdheight  = 2
-opt.shortmess  = "cxTIFSs"
+opt.cmdheight = 2
+opt.shortmess = "cxTIFSs"
 
 opt.complete    = ".,w,b,u,t,kspell,i,d,t"
 opt.completeopt = "menuone,noinsert,noselect"
@@ -40,8 +37,7 @@ opt.cpoptions:append"q;"
 opt.cursorline = true
 opt.guicursor  = "n-v-sm:block,i-c-ci-ve:ver25,r-cr:hor20,o:hor50"
 
--- o.diffopt        = "context:10000,filler,closeoff,vertical,algorithm:patience"
-opt.diffopt = "context:100,algorithm:histogram,internal,indent-heuristic,filler,closeoff,iwhite,vertical"
+opt.diffopt = "context:100,linematch:60,algorithm:histogram,filler,closeoff,hiddenoff,iwhite,vertical"
 
 if _G._os_uname.machine == "aarch64" then
     vim.cmd [[language en_US]]
@@ -90,33 +86,49 @@ opt.swapfile       = false
 opt.wildignore     = vim.o.wildignore .. "*/tmp/*,*.so,*.swp,*.zip,*.db,*.sqlite,*.bak"
 opt.wildignorecase = true
 
-opt.winminwidth    = 3
-opt.winheight      = 3
-opt.winhighlight   = "NormalNC:WinNormalNC"
-opt.splitbelow     = true
-opt.splitright     = true
-opt.switchbuf      = "uselast"
+opt.winminwidth  = 3
+opt.winheight    = 3
+opt.winhighlight = "NormalNC:WinNormalNC"
+opt.splitbelow   = true
+opt.splitright   = true
+opt.switchbuf    = "uselast"
 
 -- GUI
 vim.cmd [[colorscheme onenord]]
--- GuiFont = "VictorMono NFM"
-GuiFont = "Cascadia Code"
--- GuiFallbackFont = ""
--- GuiFallbackFont = ",codicon"
-GuiFallbackFont = ",nonicons"
--- GuiFont = "UbuntuMono Nerd Font"
--- GuiFont = "Sarasa Mono SC Nerd"
--- GuiFont = "FiraCode Nerd Font"
+local guiFont
+local guiFallbackFont
+local guiFontSize
+local guiFontSizeDefault
+-- guiFont = "VictorMono NFM"
+guiFont = "Cascadia Code"
+-- guiFallbackFont = ""
+-- guiFallbackFont = ",codicon"
+guiFallbackFont = ",nonicons"
+-- guiFont = "UbuntuMono Nerd Font"
+-- guiFont = "Sarasa Mono SC Nerd"
+-- guiFont = "FiraCode Nerd Font"
 if vim.g.neovide then
-    GuiFontSize = 14
+    guiFontSize = 14
 else
-    GuiFontSize = 12
+    guiFontSize = 12
 end
-GuiFontSizeDefault = GuiFontSize
-opt.guifont = string.format("%s%s:h%s", GuiFont, GuiFallbackFont, GuiFontSize)
--- }}} Basic settings
+guiFontSizeDefault = guiFontSize
+opt.guifont = string.format("%s%s:h%s", guiFont, guiFallbackFont, guiFontSize)
+-- Change font size (GUI client only)
+if not _G._is_term then
+    map({"n", "x"}, [[<C-->]], function()
+        guiFontSize = guiFontSize - 1
+        vim.o.guifont = guiFont ..":h" .. guiFontSize
+    end, {"silent"}, "Increase GUI client font size")
+    map({"n", "x"}, [[<C-=>]], function()
+        guiFontSize = guiFontSize + 1
+        vim.o.guifont = guiFont ..":h" .. guiFontSize
+    end, {"silent"}, "Decrease GUI client font size")
+    map({"n", "x"}, [[<C-0>]], function()
+        vim.o.guifont = guiFont ..":h" .. guiFontSizeDefault
+    end, {"silent"}, "Restore GUI client font size")
+end
 
--- Neovide settings {{{
 if vim.g.neovide then
     vim.g.neovide_confirm_quit                = false
     vim.g.neovide_cursor_animate_command_line = true
@@ -132,4 +144,3 @@ if vim.g.neovide then
     vim.g.neovide_transparency                = 1.0
     vim.g.neovide_window_floating_blur        = false
 end
--- }}} Neovide settings

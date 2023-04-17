@@ -244,10 +244,11 @@ local hover = function() -- {{{
     if not M.lines.relativeTick then return end
     local lineIdx = vim.api.nvim_win_get_cursor(M.curWin)[1] - 1
     if lineIdx < 1 then return end
-    local line    = " " .. M.lines.absolute[lineIdx]
+    local line = " " .. M.lines.absolute[lineIdx] .. " "
     local cursorPos = vim.api.nvim_win_get_cursor(M.curWin)
     local winInfo = vim.fn.getwininfo(M.curWin)[1]
-    local hoverWidth  = math.ceil(winInfo.width / 3)
+    local hoverWidth = math.ceil(winInfo.width / 2)
+    if #line < hoverWidth then hoverWidth = #line end
     local hoverHeight = math.ceil(#line / hoverWidth)
     local anchorVer = winInfo.botline - cursorPos[1] < hoverHeight+ 1 and "S" or "N"
     local anchorHor = hoverWidth - cursorPos[2] - 8 < hoverWidth and "E" or "W"
