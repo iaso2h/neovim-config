@@ -55,22 +55,18 @@ end
 
 --- Execute ex command then center the screen situationally
 ---@param exCMD string Ex command
----@param feedkeyChk boolean Use the ex command to feed keys
 ---@param suppressMsgChk boolean
-M.centerHop = function(exCMD, feedkeyChk, suppressMsgChk)
-    local winID     = api.nvim_get_current_win()
-    local prevBufNr = api.nvim_get_current_buf()
+M.centerHop = function(exCMD, suppressMsgChk)
+    local winID      = api.nvim_get_current_win()
+    local prevBufNr  = api.nvim_get_current_buf()
+    local preWinInfo = vim.fn.getwininfo(winID)[1]
 
     -- Execute the command first
-    if feedkeyChk then
-        api.nvim_feedkeys(exCMD, "n", true)
-    else
-        local ok, msg = pcall(vim.cmd, "norm! " .. exCMD)
-        if not ok and not suppressMsgChk then
-            local idx = select(2,string.find(msg, "E%d+: "))
-            msg = string.sub(msg, idx + 1, -1)
-            vim.notify(msg, vim.log.levels.INFO)
-        end
+    local ok, msg = pcall(vim.cmd, "norm! " .. t(exCMD))
+    if not ok and not suppressMsgChk then
+        local idx = select(2,string.find(msg, "E%d+: "))
+        msg = string.sub(msg, idx + 1, -1)
+        vim.notify(msg, vim.log.levels.INFO)
     end
 
     local curBufNr = api.nvim_get_current_buf()
@@ -82,8 +78,7 @@ M.centerHop = function(exCMD, feedkeyChk, suppressMsgChk)
     vim.cmd[[norm! zv]]
 
     local postCursorPos = api.nvim_win_get_cursor(winID)
-    local winInfo = vim.fn.getwininfo(winID)[1]
-    if postCursorPos[1] < winInfo.topline or postCursorPos[1] > winInfo.botline then
+    if postCursorPos[1] < preWinInfo.topline or postCursorPos[1] > preWinInfo.botline then
         vim.cmd [[norm! zz]]
     end
 end

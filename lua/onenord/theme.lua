@@ -549,7 +549,7 @@ theme.plugins = { -- {{{
     CmpItemKindVariable      = {fg = p.n8},
     CmpItemKindFile          = {fg = p.n4},
     CmpItemKindUnit          = {fg = "#D4A959"},
-    CmpItemKindSnippet       = {fg = p.purple},
+    CmpItemKindSnippet       = {fg = p.n12},
     CmpItemKindFolder        = {link = "CmpItemKindFile"},
     CmpItemKindMethod        = {fg = p.blue},
     CmpItemKindValue         = {fg = p.n9},

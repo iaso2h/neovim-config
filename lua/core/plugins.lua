@@ -52,6 +52,7 @@ local pluginArgs = { -- {{{
     },
     {
         "nvim-treesitter/playground",
+        commit = "934cb4c",
         dependencies = {"nvim-treesitter"},
         cmd    = "TSPlaygroundToggle",
         keys   = {{"gH", mode = "n"}},
@@ -205,7 +206,8 @@ local pluginArgs = { -- {{{
     {
         "danymat/neogen",
         dependencies = { "nvim-treesitter" },
-        keys   = {{"gcd", mode = "n"}},
+        keys = {{"gcd", mode = "n"}},
+        cmd  = {"Neogen"},
         config = function()
             require("neogen").setup {
                 enabled             = true,
@@ -944,7 +946,8 @@ local pluginArgs = { -- {{{
         "DanilaMihailov/vim-tips-wiki",
     }
     -- }}} Knowledge
-}
+} -- }}}
+
 local opts = {
     root = _G._plugin_root,
     git  = { log = {"-30"} },

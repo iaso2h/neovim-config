@@ -56,6 +56,7 @@ map("n", [[<Plug>InterestingWordVisual]], function ()
     require("interestingWord").operator(vMotion)
 end, {"silent"}, "Visual-repeat for interesting words")
 
+-- TODO: ignore word boundary
 map("n", [[gw]],        [[<Plug>InterestingWordOperator]], "Highlight interesting word...")
 map("x", [[gw]],        [[<Plug>InterestingWordVisual]],   "Highlight selected as interesting words")
 map("n", [[gww]],       [[<CMD>lua require("interestingWord").reapplyColor()<CR>]], {"silent"}, "Recolor last interesting word")
@@ -240,12 +241,12 @@ map("n", [[gx]],  [[<Plug>exchangeOperatorInplace]], "exchange operator and rest
 map("n", [[<leader>i]], [=[[I]=], "Inquiry word under cursor")
 map("x", [[<leader>i]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selection").getSelect("string", false), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquiry selected words")
 -- Fast mark restore
-map("n", [[M]], [[<CMD>lua require("searchHop").centerHop("`m", false)<CR>]], "Restore mark M")
+map("n", [[M]], [[<CMD>lua require("searchHop").centerHop("`m", true)<CR>]], "Restore mark M")
 -- Changelist/Jumplist jumping
-map("n", [[<A-o>]], [[<CMD>lua require("searchHop").centerHop("g;", false, false)<CR>]], {"silent"}, "Older change")
-map("n", [[<A-i>]], [[<CMD>lua require("searchHop").centerHop("g,", false, false)<CR>]], {"silent"}, "Newer change")
-map("n", [[<C-o>]], [[<CMD>lua require("searchHop").centerHop("<C-o>", true, false)<CR>]], {"silent"}, "Older jump")
-map("n", [[<C-i>]], [[<CMD>lua require("searchHop").centerHop("<C-i>", true, false)<CR>]], {"silent"}, "Newer jump")
+map("n", [[<A-o>]], [[<CMD>lua require("searchHop").centerHop("g;", true)<CR>]],    {"silent"}, "Older change")
+map("n", [[<A-i>]], [[<CMD>lua require("searchHop").centerHop("g,", true)<CR>]],    {"silent"}, "Newer change")
+map("n", [[<C-o>]], [[<CMD>lua require("searchHop").centerHop("<C-o>", true)<CR>]], {"silent"}, "Older jump")
+map("n", [[<C-i>]], [[<CMD>lua require("searchHop").centerHop("<C-i>", true)<CR>]], {"silent"}, "Newer jump")
 -- Swap default mapping
 map("n", [[*]],  [[<CMD>lua require("searchHop").searchCword("*")<CR>]],  {"noremap", "silent"}, "Search <cword> forward")
 map("n", [[#]],  [[<CMD>lua require("searchHop").searchCword("#")<CR>]],  {"noremap", "silent"}, "Search <cword> back")
@@ -269,6 +270,7 @@ map("", [[<C-m>]], [[%]], {"silent"}, "Go to match parenthesis")
 -- Visual selection
 map("n", [[go]], [[<CMD>lua require("selection").cornerSelection(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
 map({"n", "x"}, [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
+map({"n", "x"}, [[<C-q>]], [[<Nop>]], "which_key_ignore")
 -- }}} Search & Jumping
 -- Scratch file
 map("n", [[<C-n>]], [[<CMD>new<CR>]], {"silent"}, "New buffer")

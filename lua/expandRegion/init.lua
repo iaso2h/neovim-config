@@ -40,7 +40,7 @@ local saveOption = function()
     selection = vim.o.selection
     vim.o.selection = "inclusive"
 
-    M.restoreoion = function()
+    M.restoreOption = function()
         vim.o.wrapscan  = wrapscan
         vim.o.selection = selection
     end
