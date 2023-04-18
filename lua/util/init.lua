@@ -409,4 +409,61 @@ M.saveViewCursor = function(printFormula)
 end
 
 
+--- Get node text at given range
+---@param bufNr number
+---@param range table Captured indices return by calling tsnode:range() . All
+---values are 0 index
+---@param xOffset? number Negative number to expand the same unit from column
+---start and column end, and positive number to shrink. Default 0
+---@param yOffset? number Negative number to expand the same unit from row
+---start and column end, and positive number to shrink. Default 0
+---@param concatChar? string What character will be used as the separator to
+---concatenate table elements. Default ""
+M.getNodeText = function(bufNr, range, xOffset, yOffset, concatChar)
+    xOffset = xOffset or 0
+    yOffset = yOffset or 0
+    concatChar = concatChar or ""
+    local text = vim.api.nvim_buf_get_text(
+        bufNr,
+        range[1] + yOffset,
+        range[2] + xOffset,
+        range[3] - yOffset,
+        range[4] - xOffset,
+        {})
+    return table.concat(text, concatChar)
+end
+
+
+--- Get nodes from Treesitter query
+---@param bufNr number
+---@param query string
+---@param captureId? number Specific id to be capture when calling query.iter_captures()
+---@return table
+M.getQueryNodes = function(bufNr, query, captureId)
+    local lastLine = vim.api.nvim_buf_call(bufNr, function()
+        ---@diagnostic disable-next-line: redundant-return-value
+        return vim.fn.line("$")
+    end)
+    local lang = vim.treesitter.language.get_lang(vim.api.nvim_buf_get_option(bufNr, "filetype"))
+    local tsParser = vim.treesitter.get_parser(bufNr, lang)
+    local tsTree = tsParser:parse()[1]
+    local root = tsTree:root()
+    local argsQuery = vim.treesitter.query.parse(lang, query)
+
+    local nodeTbl = {}
+    local index = 0
+    for id, node, _ in argsQuery:iter_captures(root, bufNr, 1, lastLine) do
+        index = index + 1
+        if captureId then
+            if id == captureId then
+                nodeTbl[#nodeTbl+1] = node
+            end
+        else
+            nodeTbl[#nodeTbl+1] = node
+        end
+    end
+
+    return nodeTbl
+end
+
 return M

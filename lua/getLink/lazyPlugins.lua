@@ -11,54 +11,6 @@
 -- end
 
 
---- Get node text at given range
----@param bufNr number
----@param range table Captured indices return by calling tsnode:range() . All
----values are 0 index
----@param xOffset? number Negative number to expand the same unit from column
----start and column end, and positive number to shrink. Default 0
----@param yOffset? number Negative number to expand the same unit from row
----start and column end, and positive number to shrink. Default 0
----@param concatChar? string What character will be used as the separator to
----concatenate table elements. Default ""
-local getNodeText = function(bufNr, range, xOffset, yOffset, concatChar)
-    xOffset = xOffset or 0
-    yOffset = yOffset or 0
-    concatChar = concatChar or ""
-    local text = vim.api.nvim_buf_get_text(
-        bufNr,
-        range[1] + yOffset,
-        range[2] + xOffset,
-        range[3] - yOffset,
-        range[4] - xOffset,
-        {})
-    return table.concat(text, concatChar)
-end
-
-
-local getRepoNodes = function(bufNr, query, captureId)
-    local tsParser = vim.treesitter.get_parser(bufNr, "lua")
-    local tsTree = tsParser:parse()[1]
-    local root = tsTree:root()
-    local argsQuery = vim.treesitter.query.parse("lua", query)
-    local lastLine = vim.api.nvim_buf_call(bufNr, function()
-        ---@diagnostic disable-next-line: redundant-return-value
-        return vim.fn.line("$")
-    end)
-
-    local nodeTbl = {}
-    local index = 0
-    for id, node, _ in argsQuery:iter_captures(root, bufNr, 1, lastLine) do
-        index = index + 1
-        if id == captureId then
-            nodeTbl[#nodeTbl+1] = node
-        end
-    end
-
-    return nodeTbl
-end
-
-
 local function getPluginInfo(bufNr, nodes)
     local tbl = {
         names = {},
@@ -80,7 +32,7 @@ local function getPluginInfo(bufNr, nodes)
             range = {stringNode:range()}
         end
 
-        table.insert(tbl.names,      getNodeText(bufNr, range, 1, 0))
+        table.insert(tbl.names,      require("util").getNodeText(bufNr, range, 1, 0))
         table.insert(tbl.tableCheck, tableCheck)
         table.insert(tbl.nodes,      node)
     end
@@ -128,14 +80,14 @@ return function(bufNr, cursorPos, fallback)
     ]]
 
     -- Get primary plugin node that contains the Github repository string
-    local pluginRepoNodes = getRepoNodes(bufNr, pluginRepo, 2)
+    local pluginRepoNodes = require("util").getRepoNodes(bufNr, pluginRepo, 2)
     if not next(pluginRepoNodes) then
         -- Use fallback when no tsNodes found
         return fallback(bufNr, cursorPos, vim.api.nvim_get_current_line())
     end
 
     -- Get the dependencies node that contains the Github repository string
-    local dependencyRepoNodes = getRepoNodes(bufNr, dependencyRepo, 3)
+    local dependencyRepoNodes = require("util").getRepoNodes(bufNr, dependencyRepo, 3)
 
     local pluginInfo = getPluginInfo(bufNr, pluginRepoNodes)
 
@@ -189,7 +141,7 @@ return function(bufNr, cursorPos, fallback)
                 if d:type() == "string" then
                     local dLineIdx = d:range()
                     if lineIdx == dLineIdx then
-                        local dependencyRepoName = getNodeText(bufNr, {d:range()}, 1)
+                        local dependencyRepoName = require("util").getNodeText(bufNr, {d:range()}, 1)
                         if string.find(dependencyRepoName, "/") then
                             return "https://github.com/" .. dependencyRepoName
                         end
