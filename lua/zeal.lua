@@ -5,7 +5,7 @@ local M   = {}
 local zealGlobalChk
 
 --- Look up motionwise selected text with Zeal, Goldendict, Cheat or TL;DR
---- @param args Argument table {motionType, vimMode, plugMap}
+--- @param args table {motionType, vimMode, plugMap}
 ---        motionType: String. Motion type by which how the operator perform.
 ---                    Can be "line", "char" or "block"
 ---        vimMode:    String. Vim mode. See: `:help mode()`

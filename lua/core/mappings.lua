@@ -30,36 +30,61 @@ map("n", [[<A-s>]], [[<Nop>]], "which_key_ignore")
 map("x", [[<A-a>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), 1)<CR>]],  {"silent"}, "Expand selection")
 map("x", [[<A-s>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), -1)<CR>]], {"silent"}, "Shrink selection")
 -- Interesting word {{{
-map("n", [[<Plug>InterestingWordOperator]], function ()
+map("n", [[<Plug>InterestingWordOperatorWordBoundary]], function ()
         return vim.fn.luaeval[[
-        require("operator").expr(require("interestingWord").operator,
+        require("operator").expr(require("interestingWord").operatorWordBoundary,
         false,
-        "<Plug>InterestingWordOperator")
+        "<Plug>InterestingWordOperatorWordBoundary")
+        ]]
+end, {"expr", "silent"}, "Interesting word operator")
+map("n", [[<Plug>InterestingWordOperatorNoWordBoundary]], function ()
+        return vim.fn.luaeval[[
+        require("operator").expr(require("interestingWord").operatorNoWordBoundary,
+        false,
+        "<Plug>InterestingWordOperatorNoWordBoundary")
         ]]
 end, {"expr", "silent"}, "Interesting word operator")
 
-map("x", [[<Plug>InterestingWordVisual]],
+map("x", [[<Plug>InterestingWordVisualWordBoundary]],
 luaRHS[[:lua
-    vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisual", vim.v.register);
+    vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisualWordBoundary", vim.v.register);
 
     local vMotion = require("operator").vMotion(true);
-    table.insert(vMotion, "<Plug>InterestingWordVisual");
-    require("interestingWord").operator(vMotion)<CR>]],
+    table.insert(vMotion, "<Plug>InterestingWordVisualWordBoundary");
+    require("interestingWord").operatorWordBoundary(vMotion)<CR>]],
 {"silent"}, "Mark selected as interesting words")
-
-map("n", [[<Plug>InterestingWordVisual]], function ()
-    vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisual", vim.v.register)
+map("n", [[<Plug>InterestingWordVisualWordBoundary]], function ()
+    vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisualWordBoundary", vim.v.register)
     vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
 
     local vMotion = require("operator").vMotion(true)
-    table.insert(vMotion, "<Plug>InterestingWordVisual")
-    require("interestingWord").operator(vMotion)
+    table.insert(vMotion, "<Plug>InterestingWordVisualWordBoundary")
+    require("interestingWord").operatorWordBoundary(vMotion)
 end, {"silent"}, "Visual-repeat for interesting words")
 
--- TODO: ignore word boundary
-map("n", [[gw]],        [[<Plug>InterestingWordOperator]], "Highlight interesting word...")
-map("x", [[gw]],        [[<Plug>InterestingWordVisual]],   "Highlight selected as interesting words")
-map("n", [[gww]],       [[<CMD>lua require("interestingWord").reapplyColor()<CR>]], {"silent"}, "Recolor last interesting word")
+map("x", [[<Plug>InterestingWordVisualNoWordBoundary]],
+luaRHS[[:lua
+    vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisualNoWordBoundary", vim.v.register);
+
+    local vMotion = require("operator").vMotion(true);
+    table.insert(vMotion, "<Plug>InterestingWordVisualNoWordBoundary");
+    require("interestingWord").operatorNoWordBoundary(vMotion)<CR>]],
+{"silent"}, "Mark selected as interesting words")
+map("n", [[<Plug>InterestingWordVisualNoWordBoundary]], function ()
+    vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisualNoWordBoundary", vim.v.register)
+    vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
+
+    local vMotion = require("operator").vMotion(true)
+    table.insert(vMotion, "<Plug>InterestingWordVisualNoWordBoundary")
+    require("interestingWord").operatorNoWordBoundary(vMotion)
+end, {"silent"}, "Visual-repeat for interesting words")
+
+map("n", [[gw]], [[<Plug>InterestingWordOperatorWordBoundary]],   "Highlight interesting word operator")
+map("n", [[gW]], [[<Plug>InterestingWordOperatorNoWordBoundary]], "Highlight interesting word operator(ignore word boundary)")
+map("x", [[gw]], [[<Plug>InterestingWordVisualWordBoundary]],     "Highlight selected as interesting words")
+map("x", [[gW]], [[<Plug>InterestingWordVisualNoWordBoundary]],   "Highlight selected as interesting words(ignore word boundary)")
+
+map("n", [[gww]], [[<CMD>lua require("interestingWord").reapplyColor()<CR>]], {"silent"}, "Recolor last interesting word")
 map("n", [[<leader>w]], [[<CMD>lua require("interestingWord").clearColor()<CR>]],   {"silent"}, "Clear interesting word")
 map("n", [[<leader>W]], [[<CMD>lua require("interestingWord").restoreColor()<CR>]], {"silent"}, "Restore interesting word")
 -- }}} Interesting word
