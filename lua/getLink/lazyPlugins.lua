@@ -80,14 +80,14 @@ return function(bufNr, cursorPos, fallback)
     ]]
 
     -- Get primary plugin node that contains the Github repository string
-    local pluginRepoNodes = require("util").getRepoNodes(bufNr, pluginRepo, 2)
+    local pluginRepoNodes = require("util").getQueryNodes(bufNr, pluginRepo, 2)
     if not next(pluginRepoNodes) then
         -- Use fallback when no tsNodes found
         return fallback(bufNr, cursorPos, vim.api.nvim_get_current_line())
     end
 
     -- Get the dependencies node that contains the Github repository string
-    local dependencyRepoNodes = require("util").getRepoNodes(bufNr, dependencyRepo, 3)
+    local dependencyRepoNodes = require("util").getQueryNodes(bufNr, dependencyRepo, 3)
 
     local pluginInfo = getPluginInfo(bufNr, pluginRepoNodes)
 
