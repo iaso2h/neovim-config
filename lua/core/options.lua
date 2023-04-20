@@ -79,7 +79,6 @@ opt.termguicolors = true
 opt.shada          = "!,'100,/100,:100,<100,s100,h"
 opt.fileignorecase = true
 opt.sessionoptions = "buffers,curdir,folds,help,resize,slash,tabpages,winpos,winsize"
-opt.undofile       = true
 opt.backup         = false
 opt.swapfile       = false
 

@@ -11,6 +11,7 @@ M.shortLineList = {
     "NvimTree",
     "Trouble",
     "HistoryStartup",
+    "startuptime",
     "dap-repl",
     "dapui_watches",
     "dapui_console",

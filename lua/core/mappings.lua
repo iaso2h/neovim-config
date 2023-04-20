@@ -508,7 +508,6 @@ map("t", [[<C-w>H]],     [[<A-n><C-w>H:startinsert<CR>]], {"silent"}, "Move the 
 map("t", [[<C-w>L]],     [[<A-n><C-w>L:startinsert<CR>]], {"silent"}, "Move the current window to the far right")
 map("t", [[<C-w>J]],     [[<A-n><C-w>J:startinsert<CR>]], {"silent"}, "Move the current window to the bottommost left")
 map("t", [[<C-w>K]],     [[<A-n><C-w>K:startinsert<CR>]], {"silent"}, "Move the current window to the topmost left")
--- TODO: Split terminal in new instance
 -- }}} Mode: Terminal
 -- Mode: Commandline & Insert {{{
 map("i", [[<C-[>]], [[<C-[>l]], {"noremap"}, "which_key_ignore")

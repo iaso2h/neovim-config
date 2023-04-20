@@ -7,6 +7,7 @@ if vim.fn.has("nvim-0.9.0") ~= 1 then
     return
 end
 
+vim.opt.undofile = true
 local ok, msg = pcall(require, "global")
 if not ok then
     return vim.notify(msg, vim.log.levels.ERROR)

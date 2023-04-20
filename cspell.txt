@@ -79,3 +79,5 @@ bufhidden
 nord 
 pynput 
 inexplicitly 
+codeium 
+operatorfunc 

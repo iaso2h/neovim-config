@@ -18,6 +18,8 @@ M.servers = {
 
 if _G._os_uname.sysname ~= "Windows_NT" then
     M.servers.fennel_language_server = {}
+else
+    M.servers.powershell_es = {}
 end
 
 M.config = function()

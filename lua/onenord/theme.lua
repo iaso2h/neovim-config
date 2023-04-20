@@ -509,12 +509,8 @@ theme.plugins = { -- {{{
     HopNextKey2  = {link = "Search"},
     HopUnmatched = {fg   = p.n3},
 
-    -- https://github.com/machakann/vim-sandwich
-    OperatorSandwichAdd    = {link = "Search"},
-    OperatorSandwichAddrcc = {link = "Search"},
-    OperatorSandwichBuns   = {link = "Search"},
-    OperatorSandwichChange = {link = "Search"},
-    OperatorSandwichDelete = {link = "IncSearch"},
+    -- https://github.com/kylechui/nvim-surround
+    NvimSurroundHighlight = {link = "Search"},
 
     -- HistoryStartup
     HistoryStartupCreate   = {fg = p.n10, style = "bold"},

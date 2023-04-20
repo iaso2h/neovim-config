@@ -172,15 +172,15 @@ local pluginArgs = { -- {{{
         config = require("config.vim-switch")
     },
     {
-        "machakann/vim-sandwich",
+        "kylechui/nvim-surround",
         keys = {
-            {"S",  mode = "x"},
-            {"gs", mode = "n"},
-            {"cs", mode = "n"},
-            {"ds", mode = "n"},
+            {"gs",  mode = "n"},
+            {"gss", mode = "n"},
+            {"S",   mode = "x"},
+            {"cs",  mode = "n"},
+            {"ds",  mode = "n"},
         },
-        init   = require("config.vim-sandwich").setup,
-        config = require("config.vim-sandwich").config
+        config = require("config.nvim-surround")
     },
     {
         "junegunn/vim-easy-align",
@@ -267,31 +267,23 @@ local pluginArgs = { -- {{{
         end
     },
     {
-        "ahmedkhalf/project.nvim",
+        "airblade/vim-rooter",
         event = "BufAdd",
         init  = function()
             vim.g.rooter_cd_cmd        = "lcd"
             vim.g.rooter_silent_chdir  = 1
             vim.g.rooter_resolve_links = 1
-        end,
-        config = function()
-            require("project_nvim").setup {
-                detection_methods = { "lsp", "pattern" },
-                ignore_lsp = {},
-                exclude_dirs = {},
-                show_hidden = false,
-                silent_chdir = true,
-                scope_chdir = "win",
-                patterns = {
-                    ".git",
-                    ".hg",
-                    ".svn",
-                    "package.json",
-                    "makefile",
-                    ".vscode",
-                }
+            vim.g.rooter_change_directory_for_non_project_files = "current"
+            vim.g.rooter_patterns = {
+                ".git",
+                ".hg",
+                "*.lsn",
+                ".svn",
+                "package.json",
+                "makefile",
+                ".vscode",
             }
-        end
+        end,
     },
     {
         "numToStr/Comment.nvim",
@@ -355,13 +347,13 @@ local pluginArgs = { -- {{{
         lazy = true,
         cmd  = "Telescope",
         keys = {
-            {[[<C-f>a]], mode = "n"},  {[[<C-f>e]], mode = "n"},  {[[<C-f>E]], mode = "n"}, {[[<C-f>f]], mode = "n"},
-            {[[<C-f>F]], mode = "n"},  {[[<C-f>w]], mode = "n"},  {[[<C-f>W]], mode = "n"}, {[[<C-f>/]], mode = "n"},
-            {[[<C-f>?]], mode = "n"},  {[[<C-f>v]], mode = "n"},  {[[<C-f>j]], mode = "n"}, {[[<C-f>']], mode = "n"},
-            {[[<C-f>m]], mode = "n"},  {[[<C-f>k]], mode = "n"},  {[[<C-f>c]], mode = "n"}, {[[<C-f>C]], mode = "n"},
-            {[[<C-f>h]], mode = "n"},  {[[<C-f>H]], mode = "n"},  {[[<C-f>r]], mode = "n"}, {[[<C-f>gc]], mode = "n"},
-            {[[<C-f>gC]], mode = "n"}, {[[<C-f>gs]], mode = "n"}, {[[<C-f>b]], mode = "n"}, {[[<C-f>d]], mode = "n"},
-            {[[<C-f>D]], mode = "n"},
+            {[[<C-f>a]],  mode = "n"}, {[[<C-f>e]],  mode = "n"}, {[[<C-f>E]], mode = "n"}, {[[<C-f>f]],  mode = "n"},
+            {[[<C-f>F]],  mode = "n"}, {[[<C-f>w]],  mode = "n"}, {[[<C-f>W]], mode = "n"}, {[[<C-f>/]],  mode = "n"},
+            {[[<C-f>?]],  mode = "n"}, {[[<C-f>v]],  mode = "n"}, {[[<C-f>j]], mode = "n"}, {[[<C-f>']],  mode = "n"},
+            {[[<C-f>m]],  mode = "n"}, {[[<C-f>k]],  mode = "n"}, {[[<C-f>c]], mode = "n"}, {[[<C-f>C]],  mode = "n"},
+            {[[<C-f>h]],  mode = "n"}, {[[<C-f>H]],  mode = "n"}, {[[<C-f>r]], mode = "n"}, {[[<C-f>gc]], mode = "n"},
+            {[[<C-f>gC]], mode = "n"}, {[[<C-f>gs]], mode = "n"}, {[[<C-f>b]], mode = "n"}, {[[<C-f>d]],  mode = "n"},
+            {[[<C-f>D]],  mode = "n"},
         },
         config = require("config.nvim-telescope")
     },
@@ -584,6 +576,17 @@ local pluginArgs = { -- {{{
             },
         },
         config = require("config.nvim-cmp"),
+    },
+    {
+        "Exafunction/codeium.vim",
+        cond = true,
+        init = function() vim.g.codeium_disable_bindings = 1 end,
+        config = function()
+            map("i", "<C-f>", function() return vim.fn["codeium#Accept"]() end,             { expr = true }, "Codeium accept")
+            map("i", "<C-,>", function() return vim.fn["codeium#CycleCompletions"](-1) end, { expr = true }, "Codeium previous")
+            map("i", "<C-.>", function() return vim.fn["codeium#CycleCompletions"](1) end,  { expr = true }, "Codeium next")
+            map("i", "<A-f>", function() return vim.fn["codeium#Clear"]() end,              { expr = true }, "Codeium clear")
+        end
     },
     {
         "ray-x/lsp_signature.nvim",

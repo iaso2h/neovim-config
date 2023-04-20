@@ -47,7 +47,11 @@ return function()
 
         vim.keymap.set("n", "<C-n>", api.fs.create, opts("Create"))
         vim.keymap.set("n", "dF",    api.fs.remove, opts("Remove"))
-        vim.keymap.set("n", "df",    api.fs.trash,  opts("Trash"))
+        if _G._os_uname.sysname == "Linux" then
+            vim.keymap.set("n", "df", api.fs.trash,  opts("Trash"))
+        else
+            vim.keymap.set("n", "df", api.fs.remove, opts("Remove"))
+        end
 
         vim.keymap.set("n", "gr", api.fs.rename_basename, opts("Full rename"))
         vim.keymap.set("n", "r",  api.fs.rename,          opts("Rename"))

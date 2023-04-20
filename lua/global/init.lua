@@ -28,6 +28,7 @@ _G._autoreload       = init(true, "Autoreload")
 _G._enable_plugin    = init(true)
 _G._lisp_language    = init {"clojure", "scheme", "lisp", "racket", "hy", "fennel", "janet", "carp", "wast", "yuck"}
 
+vim.g.editorconfig = false
 -- Disable built-in plugins
 vim.g.loaded_2html_plugin      = 1
 vim.g.loaded_getscript         = 1
