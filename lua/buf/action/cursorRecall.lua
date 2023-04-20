@@ -62,7 +62,7 @@ function M.main(args)
     else
         -- Jump to recent last change instead
         if vim.api.nvim_win_get_cursor(0)[1] == 1 then
-            require("searchHop").centerHop("g,", true)
+            require("searchHop").centerHop("g,", true, false)
         end
     end
 

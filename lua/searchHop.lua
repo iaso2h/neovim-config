@@ -1,8 +1,8 @@
 -- File: searchHop
 -- Author: iaso2h
 -- Description: Jump & Search utilities
--- Version: 0.0.5
--- Last Modified: 2023-4-20
+-- Version: 0.0.6
+-- Last Modified: 2023-4-21
 
 
 local fn  = vim.fn
@@ -63,17 +63,25 @@ end
 --- Execute ex command then center the screen situationally
 ---@param exCMD string Ex command
 ---@param suppressMsgChk boolean
-M.centerHop = function(exCMD, suppressMsgChk)
+---@param remapChk boolean
+M.centerHop = function(exCMD, suppressMsgChk, remapChk)
     local winID      = api.nvim_get_current_win()
     local prevBufNr  = api.nvim_get_current_buf()
     local preWinInfo = vim.fn.getwininfo(winID)[1]
 
     -- Execute the command first
-    local ok, valOrMsg = pcall(vim.cmd, "norm! " .. vim.v.count1 .. t(exCMD))
-    if not ok and not suppressMsgChk then
-        local idx = select(2,string.find(valOrMsg, "E%d+: "))
-        valOrMsg = string.sub(valOrMsg, idx + 1, -1)
-        vim.notify(valOrMsg, vim.log.levels.INFO)
+    if type(exCMD) == "string" then
+        local remapStr = remapChk and "normal " or "normal! "
+        local ok, valOrMsg = pcall(vim.cmd, remapStr .. vim.v.count1 .. t(exCMD))
+        if not ok and not suppressMsgChk then
+            local idx = select(2,string.find(valOrMsg, "E%d+: "))
+            valOrMsg = string.sub(valOrMsg, idx + 1, -1)
+            vim.notify(valOrMsg, vim.log.levels.INFO)
+        end
+    elseif type(exCMD) == "function" then
+        exCMD()
+    else
+        return
     end
 
     local curBufNr = api.nvim_get_current_buf()

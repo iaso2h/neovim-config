@@ -343,11 +343,8 @@ local pluginArgs = { -- {{{
     {
         "inkarkat/vim-EnhancedJumps",
         dependencies = {"inkarkat/vim-ingo-library"},
-        init   = function() vim.g.EnhancedJumps_no_mappings = 1 end,
-        config = function()
-            map("n", [[<leader>o]], [[<Plug>EnhancedJumpsLocalOlder]], "Jump to older locally")
-            map("n", [[<leader>i]], [[<Plug>EnhancedJumpsLocalNewer]], "Jump to newer locally")
-        end
+        cond = true,
+        init = function() vim.g.EnhancedJumps_no_mappings = 1 end,
     },
     -- }}} Vim enhancement
     -- Telescope {{{
