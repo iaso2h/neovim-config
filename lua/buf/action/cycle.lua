@@ -1,8 +1,8 @@
 -- File: cycle.lua
 -- Author: iaso2h
 -- Description: Improved bp and bn
--- Version: 0.0.7
--- Last Modified: 2023-4-9
+-- Version: 0.0.8
+-- Last Modified: 2023-4-20
 
 
 local api = vim.api
@@ -14,6 +14,14 @@ local M   = {
     --Options
     registerInJumplist = false
 }
+
+
+local checkTsLoaded = function()
+    local ok, _ = pcall(vim.treesitter.get_parser, nil, nil, nil)
+    if not ok then
+        vim.cmd "e! | norm zv"
+    end
+end
 
 
 local bufferCycle = function(currentBufNr, direction)
@@ -37,9 +45,11 @@ local bufferCycle = function(currentBufNr, direction)
         local bufNr = api.nvim_get_current_buf()
         local bufType = api.nvim_buf_get_option(bufNr, "buftype")
         if bufType == "" or bufType == "nofile" then
-            return
+            break
         end
     until bufNr == currentBufNr
+
+    checkTsLoaded()
 end
 
 
@@ -105,8 +115,9 @@ M.init = function(direction)
 
     -- Use the Ex command to enter a buffer without writing jumplist
     vim.cmd([[noa keepjump buffer ]] .. bufTbl[candidateIdx])
+    checkTsLoaded()
     if M.registerInJumplist then
-        api.nvim_exec_autocmds("BufWinEnter", {modeline = false, buffer = bufTbl[candidateIdx]})
+        api.nvim_exec_autocmds("BufEnter", {modeline = false, buffer = bufTbl[candidateIdx]})
     end
 end
 
