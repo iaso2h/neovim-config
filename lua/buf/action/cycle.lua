@@ -1,7 +1,7 @@
 -- File: cycle.lua
 -- Author: iaso2h
 -- Description: Improved bp and bn
--- Version: 0.0.8
+-- Version: 0.0.9
 -- Last Modified: 2023-4-20
 
 
@@ -17,9 +17,13 @@ local M   = {
 
 
 local checkTsLoaded = function()
-    local ok, _ = pcall(vim.treesitter.get_parser, nil, nil, nil)
-    if not ok then
-        vim.cmd "e! | norm zv"
+    local bufPath = vim.api.nvim_buf_get_name(0)
+    if bufPath ~= "" then
+        -- Reload buffer if it's valid
+        local ok, _ = pcall(vim.treesitter.get_parser, nil, nil, nil)
+        if not ok then
+            vim.cmd "e! | norm zv"
+        end
     end
 end
 
