@@ -268,10 +268,10 @@ map("x", [[<leader>i]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selec
 -- Fast mark restore
 map("n", [[M]], [[<CMD>lua require("searchHop").centerHop("`m", true)<CR>]], "Restore mark M")
 -- Changelist/Jumplist jumping
-map("n", [[<A-o>]], [[<CMD>lua require("searchHop").centerHop("g;", true)<CR>]],    {"silent"}, "Older change")
-map("n", [[<A-i>]], [[<CMD>lua require("searchHop").centerHop("g,", true)<CR>]],    {"silent"}, "Newer change")
-map("n", [[<C-o>]], [[<CMD>lua require("searchHop").centerHop("<C-o>", true)<CR>]], {"silent"}, "Older jump")
-map("n", [[<C-i>]], [[<CMD>lua require("searchHop").centerHop("<C-i>", true)<CR>]], {"silent"}, "Newer jump")
+map("n", [[<A-o>]],  [[<CMD>lua require("searchHop").centerHop("g;", true)<CR>]],    {"silent"}, "Older change")
+map("n", [[<A-i>]],  [[<CMD>lua require("searchHop").centerHop("g,", true)<CR>]],    {"silent"}, "Newer change")
+map("n", [[<C-o>]],  [[<CMD>lua require("searchHop").centerHop("<C-o>", true)<CR>]], {"silent"}, "Older jump")
+map("n", [[<C-i>]],  [[<CMD>lua require("searchHop").centerHop("<C-i>", true)<CR>]], {"silent"}, "Newer jump")
 -- Swap default mapping
 map("n", [[*]],  [[<CMD>lua require("searchHop").searchCword("*")<CR>]],  {"noremap", "silent"}, "Search <cword> forward")
 map("n", [[#]],  [[<CMD>lua require("searchHop").searchCword("#")<CR>]],  {"noremap", "silent"}, "Search <cword> back")

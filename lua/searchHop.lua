@@ -1,3 +1,10 @@
+-- File: searchHop
+-- Author: iaso2h
+-- Description: Jump & Search utilities
+-- Version: 0.0.5
+-- Last Modified: 2023-4-20
+
+
 local fn  = vim.fn
 local api = vim.api
 local M   = {}
@@ -62,11 +69,11 @@ M.centerHop = function(exCMD, suppressMsgChk)
     local preWinInfo = vim.fn.getwininfo(winID)[1]
 
     -- Execute the command first
-    local ok, msg = pcall(vim.cmd, "norm! " .. t(exCMD))
+    local ok, valOrMsg = pcall(vim.cmd, "norm! " .. vim.v.count1 .. t(exCMD))
     if not ok and not suppressMsgChk then
-        local idx = select(2,string.find(msg, "E%d+: "))
-        msg = string.sub(msg, idx + 1, -1)
-        vim.notify(msg, vim.log.levels.INFO)
+        local idx = select(2,string.find(valOrMsg, "E%d+: "))
+        valOrMsg = string.sub(valOrMsg, idx + 1, -1)
+        vim.notify(valOrMsg, vim.log.levels.INFO)
     end
 
     local curBufNr = api.nvim_get_current_buf()
