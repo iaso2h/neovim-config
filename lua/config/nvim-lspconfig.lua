@@ -67,7 +67,8 @@ return function()
         -- bmap(bufNr, "n", [=[<leader>wl]=], Print(vim.lsp.buf.list_workspace_folders, "LSP list workspace folder")
 
         -- Bring back the gqq for formatting comments and stuff, use <A-f> to
-        vim.opt.formatexpr = ""
+        -- format instead
+        vim.o.formatexpr = ""
     end -- }}}
 
     -- LSP config override {{{

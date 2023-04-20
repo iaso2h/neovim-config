@@ -124,6 +124,20 @@ local pluginArgs = { -- {{{
         config = require("config.vim-asyncrun")
     },
     {
+        "inkarkat/vim-EnhancedJumps",
+        dependencies = {"inkarkat/vim-ingo-library"},
+        cond = true,
+        init = function() vim.g.EnhancedJumps_no_mappings = 1 end,
+    },
+    {
+        "inkarkat/vim-AdvancedSorters",
+        dependencies = {"inkarkat/vim-ingo-library"},
+    },
+    {
+        "inkarkat/vim-Concealer",
+        dependencies = {"inkarkat/vim-ingo-library"},
+    },
+    {
         "bkad/camelcasemotion",
         event = "BufAdd",
         init  = function() vim.g.camelcasemotion_key = "," end
@@ -339,12 +353,6 @@ local pluginArgs = { -- {{{
         "folke/which-key.nvim",
         cmd    = "WhichKey",
         config = require("config.nvim-which-key")
-    },
-    {
-        "inkarkat/vim-EnhancedJumps",
-        dependencies = {"inkarkat/vim-ingo-library"},
-        cond = true,
-        init = function() vim.g.EnhancedJumps_no_mappings = 1 end,
     },
     -- }}} Vim enhancement
     -- Telescope {{{
@@ -842,6 +850,14 @@ local pluginArgs = { -- {{{
     },
     -- "CRAG666/code_runner.nvim"
     -- }}} Debug
+    -- Language {{{
+    -- Lua {{{
+    -- TODO: support dirname/init.lua jump and variable jump
+    {
+        "mrjones2014/lua-gf.nvim",
+        ft = "lua",
+    },
+    -- }}} Lua
     -- Fennel {{{
     {
         "rktjmp/hotpot.nvim",
@@ -900,6 +916,7 @@ local pluginArgs = { -- {{{
         end
     },
     -- }}} Fennel
+    -- }}} Language
     -- Source control {{{
     {
         "lewis6991/gitsigns.nvim",

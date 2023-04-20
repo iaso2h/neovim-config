@@ -67,6 +67,6 @@ return  function()
             }
         },
     }
-    map("n", [[<leader><A-,>]], [[<Plug>(cokeline-switch-prev)]], "Cokeline switch previous")
-    map("n", [[<leader><A-.>]], [[<Plug>(cokeline-switch-next)]], "Cokeline switch next")
+    map("n", [[g<A-,>]], [[<Plug>(cokeline-switch-prev)]], "Cokeline switch previous")
+    map("n", [[g<A-.>]], [[<Plug>(cokeline-switch-next)]], "Cokeline switch next")
 end

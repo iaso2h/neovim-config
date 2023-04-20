@@ -30,6 +30,7 @@ map("n", [[<A-s>]], [[<Nop>]], "which_key_ignore")
 map("x", [[<A-a>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), 1)<CR>]],  {"silent"}, "Expand selection")
 map("x", [[<A-s>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), -1)<CR>]], {"silent"}, "Shrink selection")
 -- Interesting word {{{
+-- TODO:Conceal word: https://github.com/inkarkat/vim-Concealer
 map("n", [[<Plug>InterestingWordOperatorWordBoundary]], function ()
         return vim.fn.luaeval[[
         require("operator").expr(require("interestingWord").operatorWordBoundary,
@@ -268,8 +269,8 @@ map("x", [[<leader>i]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selec
 -- Fast mark restore
 map("n", [[M]], [[<CMD>lua require("searchHop").centerHop("`m", true, false)<CR>]], "Restore mark M")
 -- Changelist/Jumplist jumping
-map("n", [[<A-o>]], [[<CMD>lua require("searchHop").centerHop("g;", true, false)<CR>]], {"silent"}, "Older change")
-map("n", [[<A-i>]], [[<CMD>lua require("searchHop").centerHop("g,", true, false)<CR>]], {"silent"}, "Newer change")
+map("n", [[<A-o>]], [[<CMD>lua require("searchHop").centerHop("g;", false, false)<CR>]], {"silent"}, "Older change")
+map("n", [[<A-i>]], [[<CMD>lua require("searchHop").centerHop("g,", false, false)<CR>]], {"silent"}, "Newer change")
 map("n", [[<C-o>]], function()
     require("searchHop").centerHop(function()
         require("jumplist")(false, "local")
@@ -391,7 +392,11 @@ map("i", [[<C-w>j]], [[<C-o><C-w>j<CMD>stopinsert<CR>]], {"noremap"}, "Window be
 map("i", [[<C-w>h]], [[<C-o><C-w>h<CMD>stopinsert<CR>]], {"noremap"}, "Window left")
 map("i", [[<C-w>l]], [[<C-o><C-w>l<CMD>stopinsert<CR>]], {"noremap"}, "Window right")
 
-map("n",        [[<C-w>t]], [[<CMD>tabnew<CR>]],         {"silent"}, "New tab")
+map("n", [[<C-w>t]], [[<C-w>T]], {"noremap"}, "Move current window to new tab")
+map("n", [[<C-w>T]], [[<C-w>t]], {"noremap"}, "Move current window to top left")
+map("n", [[<C-w>b]], [[<Nop>]],  {"noremap"}, "which_key_ignore")
+map("n", [[<C-w>B]], [[<C-w>b]], {"noremap"}, "Move current window to bottom right")
+
 map({"n", "x"}, [[<A-=>]],  [[<CMD>wincmd +<CR>]],       {"silent"}, "Increase window size")
 map("i",        [[<A-=>]],  [[<C-\><C-O>:wincmd +<CR>]], {"silent"}, "Increase window size")
 map({"n", "x"}, [[<A-->]],  [[<CMD>wincmd -<CR>]],       {"silent"}, "Decrease window size")
@@ -404,11 +409,9 @@ map("n", [[<C-S-Tab>]], [[<CMD>lua require("buf.action.cycle").init(-1)<CR>]], {
 map("n", [[<A-,>]],     [[<CMD>lua require("buf.action.cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
 map("n", [[<A-.>]],     [[<CMD>lua require("buf.action.cycle").init(1)<CR>]],  {"silent"}, "Next buffer")
 -- Tab
-map({"n", "x"}, [[<C-t>%]], [[<CMD>tabnew %<CR>]], {"silent"}, "New tab showing current buffer")
-map({"n", "x"}, [[<C-t>n]], [[<CMD>tabnew<CR>]],   {"silent"}, "New tab")
-map({"n", "x"}, [[<C-t>h]], [[<CMD>tabp<CR>]],     {"silent"}, "Previous tab")
-map({"n", "x"}, [[<C-t>l]], [[<CMD>tabn<CR>]],     {"silent"}, "Next tab")
-map({"n", "x"}, [[<C-t>o]], [[<CMD>tabonly<CR>]],  {"silent"}, "Tab only")
+map("n", [[<C-t>,]], [[<CMD>tabp | echo "tabpage " . tabpagenr()<CR>]], {"silent"}, "Previous tab")
+map("n", [[<C-t>.]], [[<CMD>tabn | echo "tabpage " . tabpagenr()<CR>]], {"silent"}, "Next tab")
+map("n", [[<C-t>o]], [[<CMD>tabonly<CR>]],  {"silent"}, "Tab only")
 -- }}} Buffer & Window & Tab
 -- Folding {{{
 map("",  [[zj]], [[<Nop>]], "which_key_ignore")
@@ -461,7 +464,7 @@ map("n", [[gP]], [[gp]], "Select last put")
 -- Inplace join
 map("n", [[J]], function ()
     vim.cmd("norm! m`" .. vim.v.count1 .. "J``")
-end, {"noremap"}, "Join line")
+end, {"noremap"}, "Join line in place")
 -- Inplace yank
 map("", [[<Plug>InplaceYank]], function ()
    return vim.fn.luaeval[[require("operator").expr(require("yankPut").inplaceYank, false, "<Plug>InplaceYank")]]

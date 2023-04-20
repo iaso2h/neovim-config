@@ -216,7 +216,7 @@ theme.treesitter         = {
 
     TSError              = {fg   = p.n6, style = "bold"},        -- For syntax/parser errors.
     TSException          = {link = "Exception"},                 -- For exception related keywords.
-    TSFuncMacro          = {link = "Marcro"},                    -- For macro defined fuctions (calls and definitions): each `macro_rules` in Rust.
+    TSFuncMacro          = {link = "Macro"},                    -- For macro defined fuctions (calls and definitions): each `macro_rules` in Rust.
     TSInclude            = {link = "Include"},                   -- For includes: `#include` in C, `use` or `extern crate` in Rust, or `require` in Lua.
     TSLabel              = {link = "Label"},                     -- For labels: `label:` in C and `:label:` in Lua.
     TSOperator           = {link = "Operator"},                  -- For any operator: `+`, but also `->` and `*` in C.
@@ -244,7 +244,7 @@ theme.treesitter         = {
     ["@attribute"]             = {fg   = p.n15 },
     ["@error"]                 = {fg   = p.n6, style = "bold"},
     ["@exception"]             = {link = "Exception"},
-    ["@funtion.macro"]         = {link = "Marcro"},
+    ["@funtion.macro"]         = {link = "Macro"},
     ["@include"]               = {link = "Include"},
     ["@label"]                 = {link = "Label"},
     ["@operator"]              = {link = "Operator"},
