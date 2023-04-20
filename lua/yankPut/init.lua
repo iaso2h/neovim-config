@@ -1,8 +1,8 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.17
--- Last Modified: 2023-3-12
+-- Version: 0.1.18
+-- Last Modified: 2023-4-20
 
 local fn       = vim.fn
 local cmd      = vim.cmd
@@ -27,18 +27,18 @@ function M.VSCodeLineMove(vimMode, direction) -- {{{
 
     if vimMode == "n" then
         if direction == "down" then
-            pcall(cmd, [[noautocmd m .+1]])
+            pcall(cmd, [[noautocmd keepjump m .+1]])
         elseif direction == "up" then
-            pcall(cmd, [[noautocmd m .-2]])
+            pcall(cmd, [[noautocmd keepjump m .-2]])
         end
     elseif vimMode == "v" then
         if direction == "down" then
-            pcall(cmd, [[noautocmd '<,'>m '>+1]])
+            pcall(cmd, [[noautocmd keepjump '<,'>m '>+1]])
         elseif direction == "up" then
-            pcall(cmd, [[noautocmd '<,'>m '<-2]])
+            pcall(cmd, [[noautocmd keepjump '<,'>m '<-2]])
         end
 
-        cmd [[noautocmd normal! gv]]
+        cmd [[noautocmd keepjump normal! gv]]
     end
 end -- }}}
 
@@ -49,9 +49,9 @@ function M.VSCodeLineYank(vimMode, direction) -- {{{
     end
 
     if vimMode == "v" then
-        vim.cmd([[noa norm! gv]])
+        vim.cmd([[noa keepjump norm! gv]])
         local cursorPos = api.nvim_win_get_cursor(0)
-        vim.cmd([[noa norm! ]] .. t"<Esc>")
+        vim.cmd([[noa keepjump norm! ]] .. t"<Esc>")
 
         local visualStart = api.nvim_buf_get_mark(0, "<")
         local visualEnd   = api.nvim_buf_get_mark(0, ">")
@@ -63,12 +63,12 @@ function M.VSCodeLineYank(vimMode, direction) -- {{{
                 api.nvim_win_set_cursor(0, {
                     visualEnd[1], cursorPos[2]
                 })
-                vim.cmd("noa norm! V")
+                vim.cmd("noa keepjump norm! V")
                 api.nvim_win_set_cursor(0, cursorPos)
             elseif cursorPos[1] == visualEnd[1] then
                 api.nvim_put(lines, "l", true, false)
                 api.nvim_win_set_cursor(0, visualStart)
-                vim.cmd("noa norm! V")
+                vim.cmd("noa keepjump norm! V")
                 api.nvim_win_set_cursor(0, {visualEnd[1], cursorPos[2]})
             end
         elseif direction == "down" then
@@ -77,7 +77,7 @@ function M.VSCodeLineYank(vimMode, direction) -- {{{
                 api.nvim_win_set_cursor(0, {
                     visualEnd[1] + lineDiff, cursorPos[2]
                 })
-                vim.cmd("noa norm! V")
+                vim.cmd("noa keepjump norm! V")
                 api.nvim_win_set_cursor(0, {
                     visualEnd[1] + 1, cursorPos[2]
                 })
@@ -86,7 +86,7 @@ function M.VSCodeLineYank(vimMode, direction) -- {{{
                 api.nvim_win_set_cursor(0, {
                     visualEnd[1] + 1, cursorPos[2]
                 })
-                vim.cmd("noa norm! V")
+                vim.cmd("noa keepjump norm! V")
                 api.nvim_win_set_cursor(0, {
                     visualEnd[1] + lineDiff, cursorPos[2]
                 })

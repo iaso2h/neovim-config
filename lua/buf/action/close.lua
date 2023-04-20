@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Delete buffer without change the window layout
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.28
--- Last Modified: 2023-4-14
+-- Version: 0.0.29
+-- Last Modified: 2023-4-20
 local util  = require("buf.util")
 local var   = require("buf.var")
 local M    = {}
@@ -174,7 +174,7 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
             for _ = 1, util.bufCnt() - 1 + specInstanceCnt do
                 if vim.tbl_contains(unwantedBufType, vim.bo.buftype) then
                     -- HACK: can still switch to a special buffer
-                    vim.cmd "bp"
+                    vim.cmd "keepjump bp"
                 else
                     break
                 end

@@ -30,13 +30,13 @@ local bufferCycle = function(currentBufNr, direction)
         -- the help file or other non-standard buffer via <C-o>
         if direction == 1 then
             if M.registerInJumplist then
-                vim.cmd[[bn]]
+                vim.cmd[[keepjump bn]]
             else
                 vim.cmd[[noa keepjump bn]]
             end
         else
             if M.registerInJumplist then
-                vim.cmd[[bp]]
+                vim.cmd[[keepjump bp]]
             else
                 vim.cmd[[noa keepjump bp]]
             end
