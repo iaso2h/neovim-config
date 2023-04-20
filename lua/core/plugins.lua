@@ -340,6 +340,15 @@ local pluginArgs = { -- {{{
         cmd    = "WhichKey",
         config = require("config.nvim-which-key")
     },
+    {
+        "inkarkat/vim-EnhancedJumps",
+        dependencies = {"inkarkat/vim-ingo-library"},
+        init   = function() vim.g.EnhancedJumps_no_mappings = 1 end,
+        config = function()
+            map("n", [[<leader>o]], [[<Plug>EnhancedJumpsLocalOlder]], "Jump to older locally")
+            map("n", [[<leader>i]], [[<Plug>EnhancedJumpsLocalNewer]], "Jump to newer locally")
+        end
+    },
     -- }}} Vim enhancement
     -- Telescope {{{
     {
@@ -579,8 +588,8 @@ local pluginArgs = { -- {{{
     },
     {
         "Exafunction/codeium.vim",
-        cond = true,
-        init = function() vim.g.codeium_disable_bindings = 1 end,
+        event  = "BufModifiedSet",
+        init   = function() vim.g.codeium_disable_bindings = 1 end,
         config = function()
             map("i", "<C-f>", function() return vim.fn["codeium#Accept"]() end,             { expr = true }, "Codeium accept")
             map("i", "<C-,>", function() return vim.fn["codeium#CycleCompletions"](-1) end, { expr = true }, "Codeium previous")
@@ -938,8 +947,9 @@ local pluginArgs = { -- {{{
     -- Knowledge {{{
     {
         "RishabhRD/nvim-cheat.sh",
+        cond = _G._os_uname.sysname ~= "Windows_NT",
+        cmd  = {"Cheat", "CheatList", "CheatListWithoutComments", "CheatWithoutComments"},
         dependencies = {"RishabhRD/popfix"},
-        cmd = {"Cheat", "CheatList", "CheatListWithoutComments", "CheatWithoutComments"},
     },
     {
         "dahu/VimRegexTutor",
