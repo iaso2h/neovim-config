@@ -46,7 +46,7 @@ function M.openTerminal(newBufNr) -- {{{
     -- if no terminal found, run a new instance. If one or multiple terminal is
     -- found, the smallest buffer number, which is determined by bufnr(), will be
     -- invoke
-    local termBufOutput = vim.api.nvim_exec("ls! R", true)
+    local termBufOutput = vim.api.nvim_exec2("ls! R", {output = true}).output
     if termBufOutput ~= "" then  -- Buffer instance exist
         local termBufInfo = vim.split(termBufOutput, "\n", true)[1]
         cmd("noa b " .. string.match(termBufInfo, "%d+"))

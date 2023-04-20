@@ -147,7 +147,7 @@ map("n", [[gf]], [[<Plug>Extract]], "Extract operator")
 map("n", [[gF]], [[gf]], {"noremap"}, "Go to file")
 -- }}} Extraction
 map("n", [[<C-g>]],
-[[:lua print(" " .. vim.api.nvim_exec("file!", true) .. " 🖵  CWD: " .. vim.fn.getcwd())<CR>]],
+[[:lua print(vim.api.nvim_exec2("file!", {output = true}).output .. " 🖵  CWD: " .. vim.fn.getcwd())<CR>]],
 {"silent"}, "Display file info")
 map("n", [[<S-Tab>]], [[<CMD>lua require("tabSwitcher").main()<CR>]], "Change tab size")
 -- Delete & Change & Replace & Exchange {{{

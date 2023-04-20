@@ -113,7 +113,7 @@ function M.trimSpaces(strTbl, silent, prefix) -- {{{
             vim.cmd [[noa keeppatterns %s#\s\+$##e]]
         else
             vim.cmd [[noa keeppatterns %s#\s\+$##e]]
-            local result = api.nvim_exec([[g#\s\+$#p]], true)
+            local result = api.nvim_exec2([[g#\s\+$#p]], {output = true}).output
             local count = #M.matchAll(result, [[\n]])
             vim.cmd [[noa keeppatterns %s#\s\+$##e]]
             api.nvim_echo({{count .. " line[s] trimmed", "Moremsg"}}, false, {})

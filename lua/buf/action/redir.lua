@@ -21,7 +21,7 @@ end
 --- Redir Vim Ex-command output into a new created scratch buffer
 --- @param CMD string Value of Vim Ex-command
 function M.catch(CMD)
-    local output = api.nvim_exec(string.format([[%s]], CMD), true)
+    local output = api.nvim_exec2(CMD, {output = true}).output
     require("buf").newSplit(dump, {output}, "", false, true)
 end
 

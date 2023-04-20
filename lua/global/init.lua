@@ -13,7 +13,7 @@ local init = function(initValue, optName) -- {{{
 end -- }}}
 
 -- e.g. "NVIM v0.9.0-dev-1248+g204a8b17c"
-local nvimVersion = vim.split(vim.api.nvim_exec("version", true), "\n", {trimempty = true})[1]
+local nvimVersion = vim.split(vim.api.nvim_exec2("version", {output = true}).output, "\n", {trimempty = true})[1]
 _G._nvim_version, _G._is_nightly = select(3, string.find(nvimVersion, [[v(%d%.%d%.%d)%-(dev?)]]))
 
 _G._os_uname         = init(vim.loop.os_uname())
