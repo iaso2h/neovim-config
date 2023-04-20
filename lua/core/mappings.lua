@@ -256,9 +256,9 @@ map("n", [[grN]], [[<Plug>ReplaceUnderBackward]], "Replace the whole word under 
 -- Exchange
 map("n", [[<Plug>exchangeOperatorInplace]], function ()
     return vim.fn.luaeval [[require("exchange").expr(true, true)]]
-end, {"silent", "expr"}, "exchange operator and restore the cursor position")
-
-map("n", [[gx]],  [[<Plug>exchangeOperatorInplace]], "exchange operator and restore the cursor position")
+end, {"silent", "expr"}, "Exchange operator and restore the cursor position")
+map("n", [[gx]],  [[<Plug>exchangeOperatorInplace]], "Exchange operator and restore the cursor position")
+map("n", [[gxc]], [[<CMD>lua require("exchange").clear()<CR>]], "Exchange clear")
 -- }}} Delete & Change & Replace & Exchange
 -- Search & Jumping {{{
 -- In case of mistouching

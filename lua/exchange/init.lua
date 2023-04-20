@@ -1,8 +1,8 @@
 -- File: exchange
 -- Author: iaso2h
 -- Description: exchange operator
--- Version: 0.0.4
--- Last Modified: 2023-4-4-8
+-- Version: 0.0.5
+-- Last Modified: 2023-4-20
 -- TODO: add exchange clear
 local fn       = vim.fn
 local api      = vim.api
@@ -254,6 +254,13 @@ function M.expr(func, plugMap)
     M.cursorPos  = api.nvim_win_get_cursor(0)
     vim.o.opfunc = "v:lua._exchangeOperator"
     return "g@"
+end
+
+
+function M.clear()
+    local bufNr = vim.api.nvim_get_current_buf()
+    pcall(api.nvim_buf_clear_namespace, bufNr, M.ns, 0, -1)
+    M.srcExtmark = {}
 end
 
 
