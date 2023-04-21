@@ -68,7 +68,22 @@ return function()
 
         -- Bring back the gqq for formatting comments and stuff, use <A-f> to
         -- format instead
-        vim.o.formatexpr = ""
+        -- HACK: vim.lsp.formatexpr() is always set in:
+        -- https://github.com/neovim/neovim/blob/f1b415b3abbcccb8b0d2aa1a41a45dd52de1a5ff/runtime/lua/vim/lsp.lua#L1130
+        -- vim.bo.formatexpr = ""
+        -- vim.opt.formatexpr = ""
+        bmap(bufNr, "n", [[gqq]], function()
+            if vim.bo.formatexpr ~= "" then
+                vim.bo.formatexpr = ""
+            end
+            vim.cmd [[norm! gqq]]
+        end, "which_key_ignore")
+        bmap(bufNr, "n", [[gq]], function()
+            if vim.bo.formatexpr ~= "" then
+                vim.bo.formatexpr = ""
+            end
+            vim.cmd [[norm! gq]]
+        end, "which_key_ignore")
     end -- }}}
 
     -- LSP config override {{{
