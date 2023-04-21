@@ -3,57 +3,58 @@
 -- Description: Enhance <C-i>/<C-o>
 -- Version: 0.0.2
 -- Last Modified: 2023-4-21
-local jumpsDummy = { -- {{{
-    "   1    55   15 Print(jumps)", '   2    54   36 local jumps = getJumps(isNewer, "local")',
-    "   3     6   11 -- local filterJumps = function(jumps)", "   4    45    0 ",
-    "   5    14   19 local getJumps = function(isNewer, filter)", "   6    56   15 if no t next(jumps) then",
-    "   7    11   25 --perform a local jump or buffer jump",
-    "   8    10    2 --- Get the filtered out jumplist so that is ready to filter out and decide to",
-    '   9    54   23 local jumps = getJumps(isNewer, "local")', "  10    25   16 bre ak",
-    "  12    39    0 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\plugin\\EnhancedJumps.vim",
-    "  18   274   64 lua/core/mappings.lua", "  19   271   82 lua/core/mappings.lua",
-    "  20   274    9 lua/core/mappings.lua", "  21    14    7 local getJu mps = function(isNewer, filter)",
-    "  22    10   22 --- Get the filtered out jumplist so that is ready to filter out and decide to",
-    "  23    14    2 local getJumps = function(isNewer, filter)",
-    "  24    35    0 for i = currentIdx + 1, #jumpsTbl, 1 do", " 25   274    0 lua/core/mappings.lua",
-    "  26    58    0 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autoload\\EnhancedJumps\\Common.vim",
-    "  27    23    0 lua/buf/action/redir.lua",
-    "  28    39    0 ~\\AppData\\Local\\nvim-data\\lazy\\vim-Enhance dJumps\\plugin\\EnhancedJumps.vim",
-    "  29     5   26 lua/yankPut/init.lua", "  30     1    0 ", "  32   273   63 lua/core/mappings.lua",
-    "  33   274   57 lua/core/mappings.lua", "  36    35   14 for i = currentIdx + 1, #jumpsTbl, 1 do",
-    "  37    61    0 ", "  38     1    2 local M = {", "  39    49    2 end",
-    "  40    14    7 local getJumps = function(isNewer, filter)", "  41    34    7 if isNewer then",
-    "  42    14    7 local getJumps = function(isNewer, filter)", "  43    43    2 end",
-    "  44     1    2 lo cal M = {", "  45    49    2 end",
-    "  46    14    7 local getJumps = function(isNewer, filter)", "  47    34   16 if isNewer then",
-    "  48   408   11 lua/yankPut/init.lua", "  49    34   16 if isNewer then", "  50   116   78 lua\\util\\init.lua",
-    "  51    3 4   16 if isNewer then",
-    "  52    47   10 -- let l:jumps = s:FilterJumps(EnhancedJumps#Common#SliceJumpsInDirection(EnhancedJumps#Common#GetJumps('jumps'), a:isNewer), a:filter, a:isNewer)",
-    "  53    14    7 local getJumps = function(isNewer, filter)", " 54    40    9 for i = currentIdx - 1, 2, -1 do",
-    "  55    34    9 if isNewer then", "  56    14    0 local getJumps = function(isNewer, filter)",
-    "  57    43    0 end", "  58   408   11 lua/yankPut/init.lua", "  59    18   18 lua/yankPut/init.lua",
-    "  60 39    0 -- Exclude the header, which is i == 1", "  61     5    0 lua\\config\\nvim-telescope.lua",
-    "  62    43    6 end", "  63     1    7 local M = {", "  64    62    7 return M", "  65     1    7 local M = {",
-    "  66    39    7 -- Exclude the header, w hich is i == 1", "  67    28    0 if currentIdx == 0 then",
-    "  68     1    6 local M = {", "  69    62    6 return M", "  70     1    6 local M = {",
-    "  71    30    6 return jumpsSliced",
-    "  72    72    0 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJum ps\\autoload\\EnhancedJumps\\Common.vim",
-    "  73    26    8 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autoload\\EnhancedJumps\\Common.vim",
-    "  74    54   27 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autoload\\EnhancedJumps\\Common. vim",
-    "  75    21   12 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autoload\\EnhancedJumps\\Common.vim",
-    "  76    54   31 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autoload\\EnhancedJumps\\Common.vim",
-    "  77    20   10 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autoload\\EnhancedJumps\\Common.vim",
-    "  78    27    0 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autoload\\EnhancedJumps.vim",
-    "  79     1    0 AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autol oad\\EnhancedJumps.vim",
-    "  80   275   95 lua/core/mappings.lua", "  81   274   20 lua/core/mappings.lua",
-    "  82   273   11 lua/core/mappings.lua", "  83     1   14 lua/core/mappings.lua",
-    "  84   477   29 lua/core/mappings.lua", "  85   471   27 lua/core/ mappings.lua",
-    "  86   470   27 lua/core/mappings.lua", "  87   375   23 lua/core/mappings.lua",
-    "  88   374   23 lua/core/mappings.lua", "  89   373   23 lua/core/mappings.lua",
-    "  90   372   23 lua/core/mappings.lua", "  91   362   32 lua/core/mappings.l ua",
-    "  92   306    0 lua/core/mappings.lua", "  94   455    0 lua/core/plugins.lua",
-    "  95    37    2 lua/exchange/init.lua"
-} -- }}}
+
+-- local jumpsDummy = { -- {{{
+--     "   1    55   15 Print(jumps)", '   2    54   36 local jumps = getJumps(isNewer, "local")',
+--     "   3     6   11 -- local filterJumps = function(jumps)", "   4    45    0 ",
+--     "   5    14   19 local getJumps = function(isNewer, filter)", "   6    56   15 if no t next(jumps) then",
+--     "   7    11   25 --perform a local jump or buffer jump",
+--     "   8    10    2 --- Get the filtered out jumplist so that is ready to filter out and decide to",
+--     '   9    54   23 local jumps = getJumps(isNewer, "local")', "  10    25   16 bre ak",
+--     "  12    39    0 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\plugin\\EnhancedJumps.vim",
+--     "  18   274   64 lua/core/mappings.lua", "  19   271   82 lua/core/mappings.lua",
+--     "  20   274    9 lua/core/mappings.lua", "  21    14    7 local getJu mps = function(isNewer, filter)",
+--     "  22    10   22 --- Get the filtered out jumplist so that is ready to filter out and decide to",
+--     "  23    14    2 local getJumps = function(isNewer, filter)",
+--     "  24    35    0 for i = currentIdx + 1, #jumpsTbl, 1 do", " 25   274    0 lua/core/mappings.lua",
+--     "  26    58    0 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autoload\\EnhancedJumps\\Common.vim",
+--     "  27    23    0 lua/buf/action/redir.lua",
+--     "  28    39    0 ~\\AppData\\Local\\nvim-data\\lazy\\vim-Enhance dJumps\\plugin\\EnhancedJumps.vim",
+--     "  29     5   26 lua/yankPut/init.lua", "  30     1    0 ", "  32   273   63 lua/core/mappings.lua",
+--     "  33   274   57 lua/core/mappings.lua", "  36    35   14 for i = currentIdx + 1, #jumpsTbl, 1 do",
+--     "  37    61    0 ", "  38     1    2 local M = {", "  39    49    2 end",
+--     "  40    14    7 local getJumps = function(isNewer, filter)", "  41    34    7 if isNewer then",
+--     "  42    14    7 local getJumps = function(isNewer, filter)", "  43    43    2 end",
+--     "  44     1    2 lo cal M = {", "  45    49    2 end",
+--     "  46    14    7 local getJumps = function(isNewer, filter)", "  47    34   16 if isNewer then",
+--     "  48   408   11 lua/yankPut/init.lua", "  49    34   16 if isNewer then", "  50   116   78 lua\\util\\init.lua",
+--     "  51    3 4   16 if isNewer then",
+--     "  52    47   10 -- let l:jumps = s:FilterJumps(EnhancedJumps#Common#SliceJumpsInDirection(EnhancedJumps#Common#GetJumps('jumps'), a:isNewer), a:filter, a:isNewer)",
+--     "  53    14    7 local getJumps = function(isNewer, filter)", " 54    40    9 for i = currentIdx - 1, 2, -1 do",
+--     "  55    34    9 if isNewer then", "  56    14    0 local getJumps = function(isNewer, filter)",
+--     "  57    43    0 end", "  58   408   11 lua/yankPut/init.lua", "  59    18   18 lua/yankPut/init.lua",
+--     "  60 39    0 -- Exclude the header, which is i == 1", "  61     5    0 lua\\config\\nvim-telescope.lua",
+--     "  62    43    6 end", "  63     1    7 local M = {", "  64    62    7 return M", "  65     1    7 local M = {",
+--     "  66    39    7 -- Exclude the header, w hich is i == 1", "  67    28    0 if currentIdx == 0 then",
+--     "  68     1    6 local M = {", "  69    62    6 return M", "  70     1    6 local M = {",
+--     "  71    30    6 return jumpsSliced",
+--     "  72    72    0 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJum ps\\autoload\\EnhancedJumps\\Common.vim",
+--     "  73    26    8 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autoload\\EnhancedJumps\\Common.vim",
+--     "  74    54   27 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autoload\\EnhancedJumps\\Common. vim",
+--     "  75    21   12 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autoload\\EnhancedJumps\\Common.vim",
+--     "  76    54   31 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autoload\\EnhancedJumps\\Common.vim",
+--     "  77    20   10 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autoload\\EnhancedJumps\\Common.vim",
+--     "  78    27    0 ~\\AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autoload\\EnhancedJumps.vim",
+--     "  79     1    0 AppData\\Local\\nvim-data\\lazy\\vim-EnhancedJumps\\autol oad\\EnhancedJumps.vim",
+--     "  80   275   95 lua/core/mappings.lua", "  81   274   20 lua/core/mappings.lua",
+--     "  82   273   11 lua/core/mappings.lua", "  83     1   14 lua/core/mappings.lua",
+--     "  84   477   29 lua/core/mappings.lua", "  85   471   27 lua/core/ mappings.lua",
+--     "  86   470   27 lua/core/mappings.lua", "  87   375   23 lua/core/mappings.lua",
+--     "  88   374   23 lua/core/mappings.lua", "  89   373   23 lua/core/mappings.lua",
+--     "  90   372   23 lua/core/mappings.lua", "  91   362   32 lua/core/mappings.l ua",
+--     "  92   306    0 lua/core/mappings.lua", "  94   455    0 lua/core/plugins.lua",
+--     "  95    37    2 lua/exchange/init.lua"
+-- } -- }}}
 
 
 local exceedJump = function(isNewer, filter)
@@ -206,7 +207,19 @@ return function(isNewer, filter)
                 return
             end
         end
+
+        local bufNr = vim.api.nvim_get_current_buf()
+        vim.cmd("normal! " .. targetJump.count .. exCMD)
+        local posBufNr = vim.api.nvim_get_current_buf()
+        if posBufNr ~= bufNr then
+            vim.notify("Failed to parse to a correct local jump", vim.log.levels.ERROR)
+            Print(vim.targetJump)
+        end
+        -- TODO: Since local jump is expected to happen in the same buffer,
+        -- it's possible to turn it into a proper motion
+    else
+        vim.cmd("normal! " .. targetJump.count .. exCMD)
     end
-    vim.cmd("normal! " .. targetJump.count .. exCMD)
+
     -- TODO:echo the next jump
 end

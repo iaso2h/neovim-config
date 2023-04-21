@@ -16,7 +16,7 @@ M.servers = {
     yamlls = {},
 }
 
-if _G._os_uname.sysname ~= "Windows_NT" then
+if _G._os_uname.sysname == "Linux" then
     M.servers.fennel_language_server = {}
 else
     M.servers.powershell_es = {}

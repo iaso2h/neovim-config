@@ -39,9 +39,6 @@ opt.guicursor  = "n-v-sm:block,i-c-ci-ve:ver25,r-cr:hor20,o:hor50"
 
 opt.diffopt = "context:100,linematch:60,algorithm:histogram,filler,closeoff,hiddenoff,iwhite,vertical"
 
-if _G._os_uname.machine == "aarch64" then
-    vim.cmd [[language en_US]]
-end
 opt.langmenu      = "en"
 opt.fileencodings = "utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1"
 opt.modelineexpr  = true

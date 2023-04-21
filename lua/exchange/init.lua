@@ -19,7 +19,7 @@ local M    = {
     -- Options
     highlightChangeChk   = true,
     ns = api.nvim_create_namespace("exchange"),
-    option = {RegionHighlightGroup = "IncSearch", timeout = 250}
+    option = {RegionHighlightGroup = "IncSearch", timeout = 200}
 }
 
 
