@@ -111,6 +111,7 @@ au("BufWritePre", {
         require("util").trimSpaces()
     end
 })
+-- HACK: not working properly
 au("BufWritePost", {
     group   = augroupWrite,
     desc    = "Avoiding folding after making modification on a buffer for the first time",

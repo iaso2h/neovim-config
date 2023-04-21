@@ -55,16 +55,14 @@ return function()
                 flatten_dirs = true,         -- Flatten dirs that only contain one single dir
                 folder_statuses = "only_folded", -- One of 'never', 'only_folded' or 'always'.
             },
-            win_config = {
-                                             -- See ':h diffview-config-win_config'
+            win_config = { -- See ':h diffview-config-win_config'
                 position = "left",
                 width = 35,
                 win_opts = {}
             },
         }, -- }}}
         file_history_panel = { -- {{{
-            log_options = {
-                        -- See ':h diffview-config-log_options'
+            log_options = { -- See ':h diffview-config-log_options'
                 git = {
                     single_file = {
                         diff_merges = "combined",
@@ -78,8 +76,7 @@ return function()
                     multi_file = {},
                 },
             },
-            win_config = {
-                       -- See ':h diffview-config-win_config'
+            win_config = { -- See ':h diffview-config-win_config'
                 position = "bottom",
                 height = 16,
                 win_opts = {}
@@ -90,8 +87,7 @@ return function()
                 win_opts = {},
             }
         },
-        default_args = {
-                     -- Default args prepended to the arg-list for the listed commands
+        default_args = { -- Default args prepended to the arg-list for the listed commands
             DiffviewOpen = {},
             DiffviewFileHistory = {},
         },

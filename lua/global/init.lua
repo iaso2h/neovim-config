@@ -67,7 +67,18 @@ vim.g.msql_sql_query = 1
 -- Global function {{{
 require("global.keymap")
 _G.Print = function(...)
-    return vim.print(...)
+    local objects = {}
+    for i = 1, select('#', ...) do
+        local v = select(i, ...)
+        table.insert(objects, vim.inspect(v))
+    end
+    if #objects == 1 and type(objects[1]) == "table" then
+        require("pprint").pprint(objects[1])
+    else
+        print(table.concat(objects, '\n'))
+    end
+
+    return ...
 end
 
 

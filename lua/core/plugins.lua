@@ -264,7 +264,7 @@ local pluginArgs = { -- {{{
                     },
                 }
             }
-            map("n", [[gcd]], [[<CMD>lua require("neogen").generate()<CR>]], {"silent"}, "Document generation")
+            map("n", [[gcd]], [[<CMD>lua vim.api.nvim_feedkeys(":Neogen <Tab>", "nt", true)<CR>]], "Document generation")
         end,
     },
     {

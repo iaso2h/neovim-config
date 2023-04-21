@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Delete buffer without change the window layout
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.29
--- Last Modified: 2023-4-20
+-- Version: 0.0.30
+-- Last Modified: 2023-4-22
 local util  = require("buf.util")
 local var   = require("buf.var")
 local M    = {}
@@ -71,6 +71,8 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
             vim.api.nvim_feedkeys(t"<CMD>q<CR>", "t", false)
         elseif var.fileType == "tsplayground" or var.fileType == "query" then
             vim.cmd [[TSPlaygroundToggle]]
+        elseif var.fileType == "DiffviewFileHistory" then
+            vim.cmd [[DiffviewClose]]
         end
 
         if var.bufType == "nofile" then
@@ -204,6 +206,8 @@ function M.init(type) -- {{{
                     return
                 elseif var.fileType == "tsplayground" then
                     return vim.cmd [[TSPlaygroundToggle]]
+                elseif var.fileType == "DiffviewFileHistory" then
+                    return vim.cmd [[DiffviewClose]]
                 end
                 -- Override the default behavior, treat it like performing a buffer delete
                 if not bufClose(true, false) then return end

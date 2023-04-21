@@ -1,4 +1,5 @@
 local M    = {}
+-- BUG: dT" motion
 
 -- NOTE: Mapping is always recursive unless noremap is specified
 
