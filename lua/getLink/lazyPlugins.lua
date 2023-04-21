@@ -22,16 +22,21 @@ local function getPluginInfo(bufNr, nodes)
         local nodeType = node:type()
         local tableCheck = false
         local range = {node:range()}
-        table.insert(tbl.ranges, range)
 
         if nodeType == "table_constructor" then
             tableCheck = true
             local stringNode = node:named_child(0):named_child(0)
-            -- Override the range value with the real string field for plug-in
-            -- spec table by calling the named_child(0)method twice
-            range = {stringNode:range()}
+            if not stringNode then
+                vim.notify("Plugin specs doesn't follow the correct structure: https://github.com/folke/lazy.nvim#-plugin-spec", vim.log.levels.ERROR)
+                vim.notify(string.format("Error node index: (%d, %d)", range[1], range[2]))
+                return {}
+            end
+            -- Override the range value with the real github string field for
+            -- plug-in spec table by calling the named_child(0)method twice
+            range = { stringNode:range() }
         end
 
+        table.insert(tbl.ranges, range)
         table.insert(tbl.names,      require("util").getNodeText(bufNr, range, 1, 0))
         table.insert(tbl.tableCheck, tableCheck)
         table.insert(tbl.nodes,      node)
@@ -90,6 +95,7 @@ return function(bufNr, cursorPos, fallback)
     local dependencyRepoNodes = require("util").getQueryNodes(bufNr, dependencyRepo, 3)
 
     local pluginInfo = getPluginInfo(bufNr, pluginRepoNodes)
+    if not next(pluginInfo) then return end
 
     -- Convert cursorPos into (0, 0) index
     local cursorIdx = {cursorPos[1] - 1 ,cursorPos[2]}
