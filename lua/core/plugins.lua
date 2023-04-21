@@ -659,7 +659,7 @@ local pluginArgs = { -- {{{
             vim.g["conjure#filetypes"] = {"clojure", "fennel", "janet", "hy", "julia", "racket",
              "scheme", "lua", "lisp", "rust"}
             if _G._os_uname.sysname ~= "Windows_NT" then
-                table.insert(vim.g["g:conjure#filetypes"] , "python")
+                table.insert(vim.g["conjure#filetypes"] , "python")
             end
             vim.g["conjure#mapping#prefix"] = " "
             vim.g["conjure#mapping#eval_comment_current_form"] = "ecc"
@@ -851,13 +851,15 @@ local pluginArgs = { -- {{{
     -- "CRAG666/code_runner.nvim"
     -- }}} Debug
     -- Language {{{
-    -- Lua {{{
     -- TODO: support dirname/init.lua jump and variable jump
     {
         "mrjones2014/lua-gf.nvim",
         ft = "lua",
     },
-    -- }}} Lua
+    {
+        "dzeban/vim-log-syntax",
+        ft = "log",
+    },
     -- Fennel {{{
     {
         "rktjmp/hotpot.nvim",
