@@ -47,7 +47,10 @@ end -- }}}
 --- @param bufNr boolean Buffer number handler
 M.bufWipe = function(bufNr)
     -- bufNr = bufNr or 0
-    pcall(cmd, "keepjump bwipe! " .. bufNr)
+    -- :bdelete will register in both the jumplist and the changelist
+    pcall(cmd, "bdelete! " .. bufNr)
+    -- These two don't register in both the changelist and the changelist
+    -- pcall(cmd, "keepjump bwipe! " .. bufNr)
     -- pcall(api.nvim_buf_delete, bufNr and bufNr or 0, {force = true})
 end
 
