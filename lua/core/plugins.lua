@@ -43,11 +43,7 @@ local pluginArgs = { -- {{{
     -- Treesitter {{{
     {
         "nvim-treesitter/nvim-treesitter",
-        build = function()
-            require("nvim-treesitter.install").update({with_sync = true})
-            ---@diagnostic disable-next-line: undefined-global
-            ts_update()
-        end,
+        build = function() vim.cmd [[TSUpdate]] end,
         config = require("config.nvim-treesitter"),
     },
     {

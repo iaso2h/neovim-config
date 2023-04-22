@@ -279,14 +279,13 @@ local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
                 local Start = {motionRegion.Start[1] - 1, motionRegion.Start[2]}
                 local End   = {motionRegion.End[1] - 1, motionRegion.End[2]}
                 api.nvim_buf_set_text(bufNr, Start[1], Start[2], End[1], End[2] + 1, {reg.content})
-                return {}
             elseif motionType == "line" then
                 local Start = {motionRegion.Start[1] - 1, motionRegion.Start[2]}
                 local End   = {motionRegion.End[1] - 1, motionRegion.End[2]}
                 api.nvim_buf_set_lines(bufNr, Start[1], End[1] + 1, false,
                     vim.split(reg.content, "\n", {plain = true, trimempty = true}) )
-                return {}
             end
+            return {}
         end
     end
 end -- }}}

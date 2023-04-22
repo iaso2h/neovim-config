@@ -47,10 +47,24 @@ return function()
     vim.g._cspellEnable = true -- {{{
     vim.api.nvim_create_user_command("CSpellToggle", function()
         vim.g._cspellEnable = not vim.g._cspellEnable
-        local state = vim.g._cspellEnable and "Enabled" or "Disabled"
-        vim.api.nvim_echo({ { string.format("CSpell has been %s", state), "Moremsg" } }, false, {})
+        local stateStr = vim.g._cspellEnable and "enabled" or "disabled"
+        vim.api.nvim_echo({ { string.format("CSpell has been %s", stateStr), "Moremsg" } }, false, {})
     end, {
         desc  = "Toggle CSpell checking",
+    })
+    -- TODO: refresh virtual diagnostic text
+    vim.api.nvim_create_user_command("CSpellBufToggle", function()
+        vim.b._cspellDisable = not vim.b._cspellDisable
+        local state = vim.g._cspellEnable and not vim.b._cspellDisable
+        vim.diagnostic.reset(nil, vim.api.nvim_get_current_buf())
+        vim.diagnostic.show(nil, vim.api.nvim_get_current_buf(), nil, nil)
+        if vim.o.modifiable then
+            vim.api.nvim_set_current_line(vim.api.nvim_get_current_line())
+        end
+        local stateStr = state and "enabled" or "disabled"
+        vim.api.nvim_echo({ { string.format("CSpell has been %s buffer locally", stateStr), "Moremsg" } }, false, {})
+    end, {
+        desc  = "Toggle CSpell checking buffer locally",
     })
     local cspell = null_ls.builtins.diagnostics.cspell.with {
         disabled_filetypes = require("config.nvim-galaxyline").shortLineList,
@@ -59,7 +73,7 @@ return function()
             "--config",
             string.format([[%s%scspell.json]], _G._config_path, _G._sep),
         },
-        runtime_condition = function() return vim.g._cspellEnable end,
+        runtime_condition = function() return vim.g._cspellEnable and not vim.b._cspellDisable end,
         diagnostics_postprocess = function(diagnostic)
             if type(diagnostic) ~= "table" then return end
             diagnostic.severity = vim.diagnostic.severity.WARN
