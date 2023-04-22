@@ -1,12 +1,11 @@
 -- NOTE: Dependency: https://github.com/charlesmallah/lua-profiler
 
 require("jump.jumplist").setup {
-    filterMethod = "lua_match",
-    checkCursorRedundancy = true
+    returnFilterJumps = true
 }
 
 local function jumplist()
-    Print(require("jumplist")("n", false, "local"))
+    Print(require("jump.jumplist").go("n", false, "local"))
 end
 Print("-------------------")
 local function EnhancedJumps()
@@ -26,11 +25,11 @@ profiler.attachPrintFunction(EnhancedJumps, true)
 profiler.start()
 jumplist()
 profiler.stop()
-profiler.report(reportPath .. "jumplist2.log")
+profiler.report(reportPath .. "jumplist1.log")
 
 profiler.attachPrintFunction(jumplist, true)
 profiler.attachPrintFunction(EnhancedJumps, true)
 profiler.start()
 EnhancedJumps()
 profiler.stop()
-profiler.report(reportPath .. "EnhancedJumps2.log")
+profiler.report(reportPath .. "EnhancedJumps1.log")

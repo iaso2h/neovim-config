@@ -1,15 +1,17 @@
 -- File: jumplist
 -- Author: iaso2h
 -- Description: Enhance <C-i>/<C-o>
--- Version: 0.0.5
--- Last Modified: 2023-4-22
+-- Version: 0.0.6
+-- Last Modified: 2023-4-23
 
 local defaultOpts  = {
     filterMethod = "lua_match",
-    checkCursorRedundancy = true
+    checkCursorRedundancy = true,
+    returnFilterJumps = false
 }
 
 local M = {
+    visualMode = "",
     opts = defaultOpts
 }
 
@@ -68,11 +70,209 @@ local M = {
 
 
 local exceedJump = function(isNewer, filter)
-    local filterStr = filter .. "jumplist"
-    if isNewer then
-        vim.notify("At the newest of " .. filterStr, vim.log.levels.INFO)
+    local directionStr = isNewer and "newer" or "older"
+    vim.notify(
+        string.format("Cannot jump to any %s place in the %s jumplist",
+            directionStr, filter), vim.log.levels.INFO)
+end
+
+local bufNameListed = {}
+
+---@param line string
+---@return string
+local trimLeadingWhitespaces = function(line)
+    local trimmedLine = string.gsub(line, "^%s+", "")
+    return trimmedLine
+end
+
+---@param bufNr number
+---@param jump table
+---@param idxTbl table Indexes of all skeptical non-printable characters
+---@return table All sub-strings. Captured via the position info provide by jump table and spitted by the non-printable
+--characters
+local getSubString = function(bufNr, jump, idxTbl)
+    local subStrings = {}
+    -- {        idx1,     idx2,     idx3,     idx4      }
+    --      ↑          ↑         ↑         ↑         ↑
+    -- {<headStr1>,<subStr2>,<subStr3>,<subStr4>,<tailStr5>}
+    for i, idx in ipairs(idxTbl) do
+        if i == 1 then
+            if idx[1] ~= 1 then
+                -- Skip adjacent empty text
+                local headStr = vim.api.nvim_buf_get_text(bufNr, jump.lnum - 1, 0, jump.lnum - 1, idx[1] - 1,
+                    {})[1]
+                if #subStrings == 0 then
+                    headStr = trimLeadingWhitespaces(headStr)
+                end
+                subStrings[#subStrings + 1] = headStr
+            end
+        end
+        if i == #idxTbl then
+            if idx[2] ~= #jump.text then
+                -- Skip adjacent empty text
+                local tailStr = vim.api.nvim_buf_get_text(bufNr, jump.lnum - 1, idx[2], jump.lnum - 1, -1,
+                {})[1]
+                if #subStrings == 0 then
+                    tailStr = trimLeadingWhitespaces(tailStr)
+                end
+                subStrings[#subStrings + 1] = tailStr
+            end
+        end
+        if i < #idxTbl then
+            local nextIdx = idxTbl[i + 1]
+            if idx[2] + 1 ~= nextIdx[1] then
+                -- Skip adjacent empty text
+                local midStr = vim.api.nvim_buf_get_text(bufNr, jump.lnum - 1, idx[2], jump.lnum - 1,
+                    nextIdx[1] - 1, {})[1]
+                if #subStrings == 0 then
+                    midStr = trimLeadingWhitespaces(midStr)
+                end
+                subStrings[#subStrings + 1] = midStr
+            end
+        end
+    end
+
+    return subStrings
+end
+
+
+---@param bufNr number
+---@param jump table
+---@param filter string "local"|"buffer"
+---@param cursorPos table (1, 0) based. If target and cursor are on the same line in local filter, that target jump will be discard. Set it to empty table to turn off this behavior
+---@return boolean
+local isLocal = function(bufNr, jump, filter, cursorPos)
+    local line
+    -- Special jump text
+    if jump.text == "-invalid-" then
+        return true
+    elseif jump.text == "" then
+        line = vim.api.nvim_buf_get_lines(bufNr, jump.lnum - 1, jump.lnum, false)[1]
+        if line and line == "" then
+            return true
+        else
+            return false
+        end
+    end
+
+    -- Special position
+    if filter == "local" and not next(cursorPos) and cursorPos[1] == jump.lnum then
+        return false
+    end
+
+    -- Generic check
+    if M.opts.filterMethod == "fs_stat" then
+        -- NOTE: This is slow and will be deprecated
+        if not next(bufNameListed) then
+            local bufListed = vim.tbl_filter(function(b)
+                return vim.api.nvim_buf_get_option(b, "buflisted")
+            end, vim.api.nvim_list_bufs())
+            bufNameListed = vim.tbl_map(function(b)
+                return vim.fn.bufname(b)
+            end, bufListed)
+        end
+
+        if string.sub(jump.text, 1, 1) == "~" then
+            -- Expand the filename when the first character is ~
+            if vim.loop.fs_stat(vim.fn.expand(jump.text)) then
+                return false
+            else
+                return true
+            end
+        else
+            -- Check whether jump text is contained in the :ls output
+            if vim.tbl_contains(bufNameListed, jump.text) then
+                return false
+            end
+
+            -- Concatenate the working directory string with the jump text and
+            -- check if that file exist since the most files are under the
+            -- same working directory
+            local cwd = vim.loop.cwd()
+            if vim.loop.fs_stat(string.format("%s/%s", cwd, jump.text)) then
+                return false
+            else
+                if vim.loop.fs_stat(jump.text) then
+                    return false
+                else
+                    return true
+                end
+            end
+        end
+    elseif M.opts.filterMethod == "lua_match" then
+        line = vim.api.nvim_buf_get_lines(bufNr, jump.lnum - 1, jump.lnum, false)[1]
+        if not line then
+            return false
+        else
+            -- Non-empty line
+
+            -- Always trim out the leading whitespaces as the jumplist
+            -- text always do
+            if jump.text == trimLeadingWhitespaces(line) then
+                return true
+            else
+                -- local bufNr = 0 -- Tests {{{
+
+                --                        local foo = [[
+                -- Lorem ^Xipsum dolor sit a^Xmet, qui minim labor^Xe adipisic^Xing minim ^Xsint cillum sin^Xt consec^Xtetur cu^Xpidatat.]]
+                --                        local foo = [[
+                -- Lorem ^Xipsum]]
+                --                        local foo = [[
+                -- Lorem ^Xipsu^Xm do^X^Xlor]]
+                --                         local foo = [[
+                -- local j = {}
+                -- j.lnum = 172
+                -- j.text = foo -- }}} Tests
+                -- Find all indexes of the skeptical non-printable words
+                local cnt = 0
+                local lastIdx = { 0 }
+                local idxTbl = {}
+                repeat
+                    cnt = cnt + 1
+                    lastIdx = { string.find(jump.text, "%^.", lastIdx[1] + 1, false) }
+                    if next(lastIdx) then
+                        idxTbl[#idxTbl + 1] = vim.deepcopy(lastIdx)
+                    end
+                    if cnt > 15 then break end
+                until not next(lastIdx)
+
+                if not next(idxTbl) then
+                    -- No special character appears in the jump.text, and yet
+                    -- it's not equal to line, so this's not a valid local jump
+                    return false
+                else
+                    -- Get all the sub-strings slitted and separated by the
+                    -- skeptical non-printable words, then loop through the
+                    -- sub-strings table. Use the plain sub-string to match
+                    -- against the jump text
+                    for _, t in ipairs(getSubString(bufNr, jump, idxTbl)) do
+                        if not string.find(jump.text, t, 1, true) then
+                            return false
+                        end
+                    end
+                    return true
+                end
+            end
+        end
+    elseif M.opts.filterMethod == "regex_match" then
+        local regex
+        jump.text = vim.fn.escape(jump.text, [[\]])
+        regex = vim.regex([[\V]] .. vim.fn.substitute(jump.text, [[\^\%(\\\\\|\p\)]], [[\\%(\0\\|\\.\\)]], "g"))
+
+        if not regex then
+            vim.notify(string.format("Unable to parse regex for item[%d]", jump.count), vim.log.levels.ERROR)
+            vim.print(jump)
+            return true
+        end
+
+        line = vim.api.nvim_buf_get_lines(bufNr, jump.lnum - 1, jump.lnum, false)[1]
+        if line and regex:match_str(line) then
+            return true
+        else
+            return false
+        end
     else
-        vim.notify("At the oldest of " .. filterStr, vim.log.levels.INFO)
+        return true
     end
 end
 
@@ -81,208 +281,40 @@ end
 ---@param jumps table
 ---@param filter string "local"|"buffer"
 ---@param cursorPos table (1, 0) based. If target and cursor are on the same line in local filter, that target jump will be discard. Set it to empty table to turn off this behavior
+---@return table
 local filterJumps = function(bufNr, jumps, filter, cursorPos)
     -- jumps = M.jumpsDummy
+    local filterFunc
+    if filter == "local" then
+        filterFunc = isLocal
+    else
+        filterFunc = function(...)
+            return not isLocal(...)
+        end
+    end
 
-    local jumpsParsed = vim.tbl_map(function(j)
-        local parseResult = {string.match(j, "^>?%s*(%d+)%s+(%d+)%s+(%d+)%s+(.*)$")}
-        return {
+    local jumpsFiltered = {}
+    for _, jumpLine in ipairs(jumps) do
+        local parseResult = { string.match(jumpLine, "^>?%s*(%d+)%s+(%d+)%s+(%d+)%s+(.*)$") }
+        local jumpParsed = {
             count = parseResult[1],
             lnum  = tonumber(parseResult[2]),
             col   = tonumber(parseResult[3]),
             text  = parseResult[4],
         }
-    end, jumps)
+        if filterFunc(bufNr, jumpParsed, filter, cursorPos) then
+            jumpsFiltered[#jumpsFiltered+1] = jumpParsed
+        end
 
-    local isLocal
+        if #jumpsFiltered == vim.v.count1 + 1 then
+            break
+        end
+    end
     if M.opts.filterMethod == "fs_stat" then
-        -- NOTE: This is slow and will be deprecated
-        local bufListed = vim.tbl_filter(function(b)
-            return vim.api.nvim_buf_get_option(b, "buflisted")
-        end, vim.api.nvim_list_bufs())
-        local bufNameListed = vim.tbl_map(function(b)
-            return vim.fn.bufname(b)
-        end, bufListed)
-
-        isLocal = function(j)
-            if j.text == "" then
-                -- Check wether the current buffer text is empty
-                local ok, valOrMsg = pcall(vim.api.nvim_buf_get_text, 0, j.lnum - 1, j.col- 1, j.lnum - 1, j.col, {})
-                if not ok then
-                    return false -- empty buffer
-                else
-                    if valOrMsg == "" then
-                        return true -- empty line
-                    else
-                        return false -- empty buffer
-                    end
-                end
-            elseif j.text == "-invalid-" then
-                return true
-            elseif string.sub(j.text, 1, 1) == "~" then
-                -- Expand the filename when the first character is ~
-                if vim.loop.fs_stat(vim.fn.expand(j.text)) then
-                    return false
-                else
-                    return true
-                end
-            else
-                -- Check whether jump text is contained in the :ls output
-                if vim.tbl_contains(bufNameListed, j.text) then
-                    return false
-                end
-
-                -- Concatenate the working directory string with the jump text and
-                -- check if that file exist since the most files are under the
-                -- same working directory
-                local cwd = vim.loop.cwd()
-                if vim.loop.fs_stat(string.format("%s/%s", cwd, j.text)) then
-                    return false
-                else
-                    if vim.loop.fs_stat(j.text) then
-                        return false
-                    else
-                        return true
-                    end
-                end
-            end
-        end
-    elseif M.opts.filterMethod == "lua_match" then
-        isLocal = function(j)
-            local line
-            if j.text == "" then
-                line = vim.api.nvim_buf_get_lines(bufNr, j.lnum - 1, j.lnum, false)[1]
-                if line and line == "" then
-                    return true
-                else
-                    return false
-                end
-            elseif j.text == "-invalid-" then
-                return true
-            else
-                line = vim.api.nvim_buf_get_lines(bufNr, j.lnum - 1, j.lnum, false)[1]
-                if not line then
-                    -- Non-empty line
-                    return false
-                else
-                    -- Meaning full line content
-
-                    -- Trim the leading whitespaces
-                    line = string.gsub(line, "^%s+", "")
-                    -- Check redundant jumps
-                    if filter == "local" and not next(cursorPos) and cursorPos[1] == j.lnum then
-                        return false
-                    end
-
-                    if j.text == line then
-                        return true
-                    else
-                        -- local bufNr = 0 -- Tests {{{
-
- --                        local foo = [[
- -- Lorem ^Xipsum dolor sit a^Xmet, qui minim labor^Xe adipisic^Xing minim ^Xsint cillum sin^Xt consec^Xtetur cu^Xpidatat.]]
- --                        local foo = [[
- -- Lorem ^Xipsum]]
- --                        local foo = [[
- -- Lorem ^Xipsu^Xm do^X^Xlor]]
---                         local foo = [[
--- ^X^X Lorem ^Xipsum dolor^X^X]]
-                        -- local j = {}
-                        -- j.lnum = 172
-                        -- j.text = foo -- }}} Tests
-                        -- Find all indexes of the skeptical non-printable words
-                        local cnt = 0
-                        local lastIdx = {0}
-                        local idxTbl = {}
-                        repeat
-                            cnt = cnt + 1
-                            lastIdx = {string.find(j.text, "%^.", lastIdx[1] + 1, false)}
-                            if next(lastIdx) then
-                                idxTbl[#idxTbl+1] = vim.deepcopy(lastIdx)
-                            end
-                            if cnt > 15 then break end
-                        until not next(lastIdx)
-
-                        if not next(idxTbl) then
-                            -- Not special character
-                            return false
-                        else
-                            -- Get all substrings
-                            local substrings = {}
-                            for i, idx in ipairs(idxTbl) do
-                                if i == 1 and idx[1] ~= 1 then
-                                    local headStr = vim.api.nvim_buf_get_text(bufNr, j.lnum - 1, 0, j.lnum - 1, idx[1] - 1, {})[1]
-                                    if #substrings == 0 then
-                                        headStr = string.gsub(headStr, "^%s+", "")
-                                    end
-                                    substrings[#substrings+1] = headStr
-                                end
-                                if i == #idxTbl and idx[2] ~= #j.text then
-                                    local tailText = vim.api.nvim_buf_get_text(bufNr, j.lnum - 1, idx[2], j.lnum - 1, -1, {})[1]
-                                    if #substrings == 0 then
-                                        tailText = string.gsub(tailText, "^%s+", "")
-                                    end
-                                    substrings[#substrings+1] = tailText
-                                end
-                                if i < #idxTbl then
-                                    local nextIdx = idxTbl[i + 1]
-                                    if idx[2] + 1 ~= nextIdx[1] then
-                                        -- Skip adjacent empty text
-                                        local midStr = vim.api.nvim_buf_get_text(bufNr, j.lnum - 1, idx[2], j.lnum - 1, nextIdx[1] - 1, {})[1]
-                                        if #substrings == 0 then
-                                            midStr = string.gsub(midStr, "^%s+", "")
-                                        end
-                                        substrings[#substrings+1] = midStr
-                                    end
-                                end
-                            end
-                            -- Use the plain string to match against the jump text
-                            for _, t in ipairs(substrings) do
-                                if not string.find(j.text, t, 1, true) then
-                                    return false
-                                end
-                            end
-                            return true
-                        end
-                    end
-                end
-            end
-        end
-    elseif M.opts.filterMethod == "regex_match" then
-        isLocal = function(j)
-            local regex
-            if j.text == "-invalid-" then
-                return true
-            elseif j.text ~= "" then
-                j.text = vim.fn.escape(j.text, [[\]])
-                regex = vim.regex([[\V]] .. vim.fn.substitute(j.text, [[\^\%(\\\\\|\p\)]], [[\\%(\0\\|\\.\\)]], "g"))
-            else
-                regex = vim.regex("^$")
-            end
-
-            if not regex then
-                vim.notify(string.format("Unable to parse regex for item[%d]", j.count), vim.log.levels.ERROR)
-                vim.print(j)
-                return false
-            end
-
-            local line = vim.api.nvim_buf_get_lines(bufNr, j.lnum - 1, j.lnum, false)[1]
-            if line and regex:match_str(line) then
-                return true
-            else
-                return false
-            end
-        end
-    else
-        return {}
+        bufNameListed = {}
     end
 
-    -- Filter out the parsed jumps
-    if filter == "local" then
-        return vim.tbl_filter(isLocal, jumpsParsed)
-    elseif filter == "buffer" then
-        return vim.tbl_filter(function(j) return not isLocal(j) end,jumpsParsed)
-    end
+    return jumpsFiltered
 end
 
 
@@ -324,29 +356,30 @@ end
 
 
 M.go = function(vimMode, isNewer, filter)
-
     local bufNr       = vim.api.nvim_get_current_buf()
     local winId       = vim.api.nvim_get_current_win()
     local cursorPos   = M.opts.checkCursorRedundancy and vim.api.nvim_win_get_cursor(winId) or {}
 
     -- Get the jumps table and reordered them
-    -- OPTIM:
     local jumpsSliced = getJumps(isNewer)
     if not next(jumpsSliced) then
         return exceedJump(isNewer, filter)
     end
 
     -- Get the parsed and filtered jumps table
-    local jumpsFilter = filterJumps(bufNr, jumpsSliced, filter, cursorPos)
-    if not next(jumpsFilter) then
+    local jumpsFiltered = filterJumps(bufNr, jumpsSliced, filter, cursorPos)
+    if not next(jumpsFiltered) then
         return exceedJump(isNewer, filter)
     end
-    do return jumpsFilter end
+
+    -- For tests
+    if M.opts.returnFilterJumps then
+        M.opts.returnFilterJumps = false
+        return jumpsFiltered
+    end
 
     -- Get the target jump, then execute the built-in command
-    local count = vim.v.count1
-    count = count > #jumpsFilter and #jumpsFilter or count
-    local targetJump = jumpsFilter[count]
+    local targetJump = jumpsFiltered[vim.v.count1]
     local exCMD = isNewer and t"<C-i>" or t"<C-o>"
     -- TODO: Since local jump is expected to happen in the same buffer,
     -- it's possible to turn it into a proper motion?
