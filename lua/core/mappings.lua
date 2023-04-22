@@ -282,16 +282,18 @@ map("n", [[<C-i>]], function()
         require("jump.jumplist").go("n", true, "local")
     end, true, true)
 end, {"silent"}, "Newer jump")
-map("x", [[<C-o>]], function()
+map("x", [[<C-o>]], luaRHS[[:lua
+    require("jump.jumplist").visualMode = vim.fn.visualmode();
     require("searchHop").centerHop(function()
         require("jump.jumplist").go(vim.fn.visualmode(), false, "local")
-    end, true, true)
-end, {"silent"}, "Older jump")
-map("x", [[<C-i>]], function()
+    end, true, true)<CR>
+]], {"silent"}, "Older jump")
+map("x", [[<C-i>]], luaRHS[[:lua
+    require("jump.jumplist").visualMode = vim.fn.visualmode();
     require("searchHop").centerHop(function()
         require("jump.jumplist").go(vim.fn.visualmode(), true, "local")
-    end, true, true)
-end, {"silent"}, "Newer jump")
+    end, true, true)<CR>
+]], {"silent"}, "Newer jump")
 map("n", [[g<C-o>]], function()
     require("searchHop").centerHop(function()
         require("jump.jumplist").go("n", false, "buffer")

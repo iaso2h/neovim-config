@@ -1,7 +1,7 @@
 -- File: jumplist
 -- Author: iaso2h
 -- Description: Enhance <C-i>/<C-o>
--- Version: 0.0.6
+-- Version: 0.0.7
 -- Last Modified: 2023-4-23
 
 local defaultOpts  = {
@@ -381,11 +381,13 @@ M.go = function(vimMode, isNewer, filter)
     -- Get the target jump, then execute the built-in command
     local targetJump = jumpsFiltered[vim.v.count1]
     local exCMD = isNewer and t"<C-i>" or t"<C-o>"
-    -- TODO: Since local jump is expected to happen in the same buffer,
-    -- it's possible to turn it into a proper motion?
     if vimMode ~= "n" then
         local visualCMD = "v" ~= string.lower(vimMode) and t"<C-q>" or vimMode
-        vim.cmd(string.format("norm! %s%s%s", visualCMD, targetJump.count, exCMD))
+        vim.cmd(string.format("norm! %s%s%s", t"<Esc>", targetJump.count, exCMD))
+        local posCursor = vim.api.nvim_win_get_cursor(winId)
+        vim.api.nvim_win_set_cursor(winId, cursorPos)
+        vim.cmd("noa norm! " .. visualCMD)
+        vim.api.nvim_win_set_cursor(winId, posCursor)
     else
         vim.cmd(string.format("norm! %s%s", targetJump.count, exCMD))
     end

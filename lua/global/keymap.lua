@@ -218,11 +218,12 @@ _G.luaRHS = function(str)
 
     local strTbl = vim.split(str, "\n", false)
     strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
-        local concatStr = string.gsub(table.concat(strTbl, " "), "%s+", " ")
+
+    local concatStr = string.gsub(table.concat(strTbl, " "), "%s+", " ")
 
     return tostring(
         concatStr:sub(1, 1) == " " and
-        concatStr:sub(2, -1) or concatStr:sub(1, -1))
+        concatStr:sub(2, -1) or concatStr)
 end
 
 
