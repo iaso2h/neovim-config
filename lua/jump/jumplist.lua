@@ -1,7 +1,7 @@
 -- File: jumplist
 -- Author: iaso2h
 -- Description: Enhance <C-i>/<C-o>
--- Version: 0.0.7
+-- Version: 0.0.8
 -- Last Modified: 2023-4-23
 
 local defaultOpts  = {
@@ -379,7 +379,8 @@ M.go = function(vimMode, isNewer, filter)
     end
 
     -- Get the target jump, then execute the built-in command
-    local targetJump = jumpsFiltered[vim.v.count1]
+    local count = vim.v.count1 > #jumpsFiltered and #jumpsFiltered or vim.v.count1
+    local targetJump = jumpsFiltered[count]
     local exCMD = isNewer and t"<C-i>" or t"<C-o>"
     if vimMode ~= "n" then
         local visualCMD = "v" ~= string.lower(vimMode) and t"<C-q>" or vimMode
