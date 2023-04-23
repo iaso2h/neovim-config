@@ -1,8 +1,8 @@
 -- File: replace
 -- Author: iaso2h
 -- Description: Heavily inspired Ingo Karkat's work. Replace text with register
--- Version: 0.1.9
--- Last Modified: 2023-4-12
+-- Version: 0.1.10
+-- Last Modified: 2023-4-23
 -- TODO: tests for softtab convert
 -- NOTE: break change: Dot-repeat no longer support jump to mark motion now
 -- because the new method of setting new line(or replace line) via
@@ -161,7 +161,12 @@ local matchRegType = function(motionType, motionRegion, motionDirection, vimMode
         if motionType == "char" then
             if reg.type == "v" or reg.type == "c" then
             elseif reg.type == "V" or reg.type == "l" then
-                regContentNew = vim.trim(reg.content)
+                if not string.find(reg.content, "\n", 1, true) then
+                    regContentNew = vim.trim(reg.content)
+                else
+                    -- TODO: reindent the new Content when there's newline
+                    -- character in reg.content
+                end
             else
                 -- Blockwise register type
                 regContentNew = string.gsub(reg.content, "\n", " ")
@@ -266,28 +271,34 @@ local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
         return {Start = repStart, End = repEnd}
     else
         if util.compareDist(motionRegion.Start, motionRegion.End) > 0 then
-            -- This's a rare scenario where Start is fall behind End
+        -- This's a rare scenario where Start is fall behind End
 
-            -- HACK: occurred when execute [[gr"agr$]]
-            -- vim.notify("Start fall behind End", vim.log.levels.ERROR)
-            vim.cmd(string.format("noa norm! %sP", regCMD))
-            repStart = api.nvim_buf_get_mark(0, "[")
-            repEnd   = api.nvim_buf_get_mark(0, "]")
-            return {Start = repStart, End = repEnd}
-        else
-            if motionType == "char" then
-                local Start = {motionRegion.Start[1] - 1, motionRegion.Start[2]}
-                local End   = {motionRegion.End[1] - 1, motionRegion.End[2]}
+        -- HACK: occurred when execute [[gr"agr$]]
+        -- vim.notify("Start fall behind End", vim.log.levels.ERROR)
+        vim.cmd(string.format("noa norm! %sP", regCMD))
+        repStart = api.nvim_buf_get_mark(0, "[")
+        repEnd   = api.nvim_buf_get_mark(0, "]")
+        return {Start = repStart, End = repEnd}
+    else
+        if motionType == "char" then
+            local Start = {motionRegion.Start[1] - 1, motionRegion.Start[2]}
+            local End   = {motionRegion.End[1] - 1, motionRegion.End[2]}
+            if string.find(reg.content, "\n") then
+                api.nvim_buf_set_text(
+                    bufNr, Start[1], Start[2], End[1], End[2] + 1,
+                    vim.split(reg.content, "\n", {plain = true}) )
+            else
                 api.nvim_buf_set_text(bufNr, Start[1], Start[2], End[1], End[2] + 1, {reg.content})
-            elseif motionType == "line" then
-                local Start = {motionRegion.Start[1] - 1, motionRegion.Start[2]}
-                local End   = {motionRegion.End[1] - 1, motionRegion.End[2]}
-                api.nvim_buf_set_lines(bufNr, Start[1], End[1] + 1, false,
-                    vim.split(reg.content, "\n", {plain = true, trimempty = true}) )
             end
-            return {}
+        elseif motionType == "line" then
+            local Start = {motionRegion.Start[1] - 1, motionRegion.Start[2]}
+            local End   = {motionRegion.End[1] - 1, motionRegion.End[2]}
+            api.nvim_buf_set_lines(bufNr, Start[1], End[1] + 1, false,
+            vim.split(reg.content, "\n", {plain = true, trimempty = true}) )
         end
+        return {}
     end
+end
 end -- }}}
 
 
@@ -517,7 +528,6 @@ function M.operator(args) -- {{{
             local repReport = srcLinesCnt == repLineCnt and '' or
                 string.format(" with %d line%s", repLineCnt, repLineCnt == 1 and "" or "s")
 
-            api.nvim_echo({{srcReport .. repReport, "Normal"}}, false, {})
             vim.notify(srcReport .. repReport, vim.log.levels.INFO)
         end
     end
