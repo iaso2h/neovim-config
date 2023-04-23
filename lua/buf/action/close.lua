@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Delete buffer without change the window layout
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.30
--- Last Modified: 2023-4-22
+-- Version: 0.0.31
+-- Last Modified: 2023-4-23
 local util  = require("buf.util")
 local var   = require("buf.var")
 local M    = {}
@@ -91,6 +91,10 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
             end
         elseif var.bufType == "prompt" then
             util.bufWipe(var.bufNr)
+        elseif var.bufType == "nowrite" then
+            if vim.startswith(var.bufName, "diffview") then
+                vim.cmd [[DiffviewClose]]
+            end
         else
             -- Always wipe the special buffer if window count is 1
             if not saveModified(var.bufNr) then return false end
@@ -214,6 +218,10 @@ function M.init(type) -- {{{
                 -- Make sure no lingering window after buffer being wiped
                 if util.winCnt() > 1 and vim.api.nvim_win_is_valid(var.winID) then
                     util.closeWin(var.winID)
+                end
+            elseif var.bufType == "nowrite" then
+                if vim.startswith(var.bufName, "diffview") then
+                    return vim.cmd [[DiffviewClose]]
                 end
             elseif var.bufType == "terminal" then
                 util.closeWin(var.winID)

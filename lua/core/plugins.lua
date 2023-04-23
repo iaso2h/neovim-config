@@ -79,7 +79,7 @@ local pluginArgs = { -- {{{
     {
         "romgrk/nvim-treesitter-context",
         dependencies = {"nvim-treesitter"},
-        event  = {"BufAdd", "BufModifiedSet"},
+        event  = {"BufAdd"},
         config = function() require("treesitter-context").setup() end,
     },
     {
@@ -135,7 +135,7 @@ local pluginArgs = { -- {{{
     },
     {
         "bkad/camelcasemotion",
-        event = {"BufAdd", "BufModifiedSet"},
+        event = {"BufAdd"},
         init  = function() vim.g.camelcasemotion_key = "," end
     },
     {
@@ -278,7 +278,7 @@ local pluginArgs = { -- {{{
     },
     {
         "airblade/vim-rooter",
-        event = {"BufAdd", "BufModifiedSet"},
+        event = {"BufAdd"},
         init  = function()
             vim.g.rooter_cd_cmd        = "lcd"
             vim.g.rooter_silent_chdir  = 1
@@ -317,7 +317,7 @@ local pluginArgs = { -- {{{
     {
         "lukas-reineke/indent-blankline.nvim",
         dependencies = { "nvim-treesitter" },
-        event  = {"BufAdd", "BufModifiedSet"},
+        event  = {"BufAdd"},
         config = function()
             require("indent_blankline").setup{
                 use_treesitter = true,
@@ -397,7 +397,7 @@ local pluginArgs = { -- {{{
     {
         "glepnir/galaxyline.nvim",
         dependencies = { "nvim-web-devicons" },
-        event  = {"BufAdd", "BufModifiedSet"},
+        event  = {"BufAdd"},
         config = require("config.nvim-galaxyline").config,
     },
     {
@@ -407,7 +407,7 @@ local pluginArgs = { -- {{{
     },
     {
         "NvChad/nvim-colorizer.lua",
-        event  = {"BufAdd", "BufModifiedSet"},
+        event  = {"BufAdd"},
         config = function()
             require("colorizer").setup {
                 filetypes = { "*" },
@@ -438,7 +438,7 @@ local pluginArgs = { -- {{{
     {
         "folke/todo-comments.nvim",
         dependencies = { "nvim-web-devicons" },
-        event  = {"BufAdd", "BufModifiedSet"},
+        event  = {"BufAdd"},
         config = require("config.nvim-todo-comments"),
     },
     {
@@ -449,7 +449,7 @@ local pluginArgs = { -- {{{
     },
     {
         "stevearc/dressing.nvim",
-        event  = {"BufAdd", "BufModifiedSet"},
+        event  = {"BufAdd"},
         config = require("config.nvim-dressing")
     },
     -- }}} UI
@@ -483,7 +483,7 @@ local pluginArgs = { -- {{{
     {
         "jay-babu/mason-null-ls.nvim",
         cond  = true,
-        event = {"BufAdd", "BufModifiedSet", "BufNewFile"},
+        event = {"BufAdd", "BufNewFile"},
         dependencies = {
             "jose-elias-alvarez/null-ls.nvim",
             "mason.nvim"
@@ -519,7 +519,7 @@ local pluginArgs = { -- {{{
         "L3MON4D3/LuaSnip",
         dependencies = { "rafamadriz/friendly-snippets", },
         build  = "make install_jsregexp",
-        event  = {"BufAdd", "BufModifiedSet"},
+        event  = {"BufAdd"},
         config = function ()
             local mySnippets = _G._config_path .. _G._sep .. "snippets"
             require("luasnip.loaders.from_vscode").lazy_load()
@@ -529,7 +529,7 @@ local pluginArgs = { -- {{{
     {
         "windwp/nvim-autopairs",
         dependencies = { "nvim-treesitter" },
-        event  = {"BufAdd", "BufModifiedSet"},
+        event  = {"BufAdd"},
         config = function()
             require("nvim-autopairs").setup {
                 disable_filetype        = vim.list_extend(
@@ -601,20 +601,11 @@ local pluginArgs = { -- {{{
     {
         "ray-x/lsp_signature.nvim",
         dependencies = { "nvim-lspconfig" },
-        config = function()
-            require("lsp_signature").setup{
-                bind           = true,
-                hint_enable    = false,
-                always_trigger = true,
-                doc_lines      = 12
-            }
-            map("i", "<A-o>", [[<C-o><CMD>lua require("lsp_signature").toggle_float_win()<CR>]],
-                { "silent", "noremap" }, "Toggle signature")
-        end,
+        config = require("config.nvim-lsp-signature")
     },
     {
         "RRethy/vim-illuminate",
-        event = {"BufAdd", "BufModifiedSet"},
+        event = {"BufAdd"},
         config = function()
             require("illuminate").configure{
                 providers = {
@@ -919,7 +910,7 @@ local pluginArgs = { -- {{{
     -- Source control {{{
     {
         "lewis6991/gitsigns.nvim",
-        event  = {"BufAdd", "BufModifiedSet"},
+        event  = {"BufAdd"},
         config = require("config.nvim-gitsigns")
     },
     {
