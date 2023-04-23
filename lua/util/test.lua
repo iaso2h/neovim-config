@@ -5,11 +5,12 @@ local api = vim.api
 ---@param lines table
 ---@param cursorIndicatorChar string
 ---@param visualRegionChk? boolean
+---@return table, table
 _G.lineFilterCursor = function(lines, cursorIndicatorChar, visualRegionChk)
     -- Init cursor startup position if cursor indicator exist
     local filterLines  = {}
     local visualRegion = {}
-    -- Defalut location
+    -- Default location
     local cursorPos = {1, 0}
 
     -- Find cursor position
@@ -57,7 +58,6 @@ _G.lineFilterCursor = function(lines, cursorIndicatorChar, visualRegionChk)
         assert.are.same(2, #visualRegion)
         return filterLines, visualRegion
     end
-
 end
 
 
@@ -84,7 +84,7 @@ _G.initLinesCursor = function(lines, filetype, cursorIndicatorChar, visualCMD, v
     if not visualRegionChk then
         api.nvim_win_set_cursor(0, cursorPos)
     else
-        if cursorAtEnd then
+        if visualRegionChk and cursorAtEnd then
             api.nvim_win_set_cursor(0, cursorPos[1])
             vim.cmd([[noa norm! ]] .. visualCMD)
             api.nvim_win_set_cursor(0, cursorPos[2])

@@ -12,7 +12,7 @@ local M   = {
     },
 
     --Options
-    registerInJumplist = false
+    registerInJumplist = true
 }
 
 

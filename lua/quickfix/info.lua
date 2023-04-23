@@ -80,6 +80,8 @@ M.hover = function(printChk) -- {{{
 
     api.nvim_buf_set_lines(M.bufNr, 0, -1, false, lines)
     api.nvim_buf_set_option(M.bufNr, "modified", false)
+    api.nvim_buf_set_option(M.bufNr, "modifiable", false)
+    api.nvim_buf_set_option(M.bufNr, "bufhidden", "wipe")
     api.nvim_win_set_buf(M.floatWinID, M.bufNr)
 
 end -- }}}

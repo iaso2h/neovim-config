@@ -81,6 +81,25 @@ function M.matchAll(expr, pat)
     end
 end
 
+
+--- Find all the pat in a string aggressively, based on string.find()
+---@param srcStr string
+---@param pat string
+---@return table
+function M.findAll(srcStr, pat)
+    local lastIdx = { 0 }
+    local idxTbl = {}
+    repeat
+        lastIdx = { string.find(srcStr, pat, lastIdx[1] + 1, false) }
+        if next(lastIdx) then
+            idxTbl[#idxTbl + 1] = vim.deepcopy(lastIdx)
+        end
+    until not next(lastIdx)
+
+    return idxTbl
+end
+
+
 function M.matchAllStrPos(expr, pat)
     -- Based on VimL matchstrpos(), Always return a list
     local t = {}

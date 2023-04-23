@@ -3,7 +3,7 @@ return  function()
     local space  = {text = " "}
     require("cokeline").setup{
         buffers = {
-            new_buffers_position = "last"
+            new_buffers_position = "bufnr"
         },
         default_hl = {
             fg = function(buffer)
@@ -25,7 +25,33 @@ return  function()
             },
             {
                 text = function(buffer)
-                    return buffer.filename
+                    local filename = buffer.filename
+                    -- TODO: test in windows
+                    if filename == "init.lua" then
+                        local lastIdx = 0
+                        local idxTbl = {}
+                        repeat
+                            lastIdx = string.find(buffer.path, _G._sep, lastIdx + 1, false)
+                            if lastIdx then
+                                idxTbl[#idxTbl + 1] = lastIdx
+                            end
+                        until not lastIdx
+
+                        if not next(idxTbl) then
+                            return filename
+                        end
+
+                        if #idxTbl == 1 then
+                            return buffer.path
+                        end
+
+                        local secondToLastSep = idxTbl[#idxTbl - 1]
+                        if secondToLastSep then
+                            return string.sub(buffer.path, secondToLastSep + 1, -1)
+                        end
+                    end
+
+                    return filename
                 end,
                 style = function(buffer)
                     if buffer.is_focused then

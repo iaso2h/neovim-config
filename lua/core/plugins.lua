@@ -79,7 +79,7 @@ local pluginArgs = { -- {{{
     {
         "romgrk/nvim-treesitter-context",
         dependencies = {"nvim-treesitter"},
-        event  = "BufAdd",
+        event  = {"BufAdd", "BufModifiedSet"},
         config = function() require("treesitter-context").setup() end,
     },
     {
@@ -135,7 +135,7 @@ local pluginArgs = { -- {{{
     },
     {
         "bkad/camelcasemotion",
-        event = "BufAdd",
+        event = {"BufAdd", "BufModifiedSet"},
         init  = function() vim.g.camelcasemotion_key = "," end
     },
     {
@@ -278,7 +278,7 @@ local pluginArgs = { -- {{{
     },
     {
         "airblade/vim-rooter",
-        event = "BufAdd",
+        event = {"BufAdd", "BufModifiedSet"},
         init  = function()
             vim.g.rooter_cd_cmd        = "lcd"
             vim.g.rooter_silent_chdir  = 1
@@ -317,7 +317,7 @@ local pluginArgs = { -- {{{
     {
         "lukas-reineke/indent-blankline.nvim",
         dependencies = { "nvim-treesitter" },
-        event  = "BufAdd",
+        event  = {"BufAdd", "BufModifiedSet"},
         config = function()
             require("indent_blankline").setup{
                 use_treesitter = true,
@@ -397,7 +397,7 @@ local pluginArgs = { -- {{{
     {
         "glepnir/galaxyline.nvim",
         dependencies = { "nvim-web-devicons" },
-        event  = "BufAdd",
+        event  = {"BufAdd", "BufModifiedSet"},
         config = require("config.nvim-galaxyline").config,
     },
     {
@@ -407,7 +407,7 @@ local pluginArgs = { -- {{{
     },
     {
         "NvChad/nvim-colorizer.lua",
-        event  = "BufAdd",
+        event  = {"BufAdd", "BufModifiedSet"},
         config = function()
             require("colorizer").setup {
                 filetypes = { "*" },
@@ -438,7 +438,7 @@ local pluginArgs = { -- {{{
     {
         "folke/todo-comments.nvim",
         dependencies = { "nvim-web-devicons" },
-        event  = "BufAdd",
+        event  = {"BufAdd", "BufModifiedSet"},
         config = require("config.nvim-todo-comments"),
     },
     {
@@ -449,7 +449,7 @@ local pluginArgs = { -- {{{
     },
     {
         "stevearc/dressing.nvim",
-        event  = "BufAdd",
+        event  = {"BufAdd", "BufModifiedSet"},
         config = require("config.nvim-dressing")
     },
     -- }}} UI
@@ -483,7 +483,7 @@ local pluginArgs = { -- {{{
     {
         "jay-babu/mason-null-ls.nvim",
         cond  = true,
-        event = {"BufAdd", "BufNewFile"},
+        event = {"BufAdd", "BufModifiedSet", "BufNewFile"},
         dependencies = {
             "jose-elias-alvarez/null-ls.nvim",
             "mason.nvim"
@@ -519,7 +519,7 @@ local pluginArgs = { -- {{{
         "L3MON4D3/LuaSnip",
         dependencies = { "rafamadriz/friendly-snippets", },
         build  = "make install_jsregexp",
-        event  = "BufAdd",
+        event  = {"BufAdd", "BufModifiedSet"},
         config = function ()
             local mySnippets = _G._config_path .. _G._sep .. "snippets"
             require("luasnip.loaders.from_vscode").lazy_load()
@@ -529,7 +529,7 @@ local pluginArgs = { -- {{{
     {
         "windwp/nvim-autopairs",
         dependencies = { "nvim-treesitter" },
-        event  = "BufAdd",
+        event  = {"BufAdd", "BufModifiedSet"},
         config = function()
             require("nvim-autopairs").setup {
                 disable_filetype        = vim.list_extend(
@@ -614,7 +614,7 @@ local pluginArgs = { -- {{{
     },
     {
         "RRethy/vim-illuminate",
-        event = "BufAdd",
+        event = {"BufAdd", "BufModifiedSet"},
         config = function()
             require("illuminate").configure{
                 providers = {
@@ -688,6 +688,7 @@ local pluginArgs = { -- {{{
             { "dv", mode = "n" },
             { "dV", mode = "n" },
         },
+        cmd = {"DeleteDebugPrints"},
         config = function()
             require("debugprint").setup {
                 create_keymaps = false
@@ -918,7 +919,7 @@ local pluginArgs = { -- {{{
     -- Source control {{{
     {
         "lewis6991/gitsigns.nvim",
-        event  = "BufAdd",
+        event  = {"BufAdd", "BufModifiedSet"},
         config = require("config.nvim-gitsigns")
     },
     {

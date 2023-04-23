@@ -364,6 +364,8 @@ theme.lsp = { -- {{{
 } -- }}}
 
 theme.plugins = { -- {{{
+    -- https://github.com/folke/lazy.nvim
+    LazyDimmed = {fg = p.n3b},
 
     -- https://github.com/folke/trouble.nvim
     LspTroubleText   = {fg = p.n4},
