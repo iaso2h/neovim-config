@@ -1,9 +1,7 @@
-local api = vim.api
-local fn  = vim.fn
 -- TODO: bundle the quifix into a plugins?
 
 -- Location list detection
-if next(fn.getloclist(0, {items = 0}).items) then
+if next(vim.fn.getloclist(0, {items = 0}).items) then
     vim.b._is_loc = true
 end
 if vim.b._is_loc then
@@ -34,7 +32,7 @@ bmap(0, "x", [[d]],  [[:lua require("quickfix.undo").delete("v")<CR>]],     {"si
 bmap(0, "n", [[dd]], [[<CMD>lua require("quickfix.undo").delete("n")<CR>]], {"silent"}, "Delete quickfix item under cursor")
 bmap(0, "n", [[u]],  [[<CMD>lua require("quickfix.undo").recovery()<CR>]],  {"silent"}, "Recovery quickfix items")
 bmap(0, "n", [[r]],  [[<CMD>lua require("quickfix.refresh").main()<CR>]],   {"silent"}, "Refresh quickfix items")
-api.nvim_create_autocmd({
+vim.api.nvim_create_autocmd({
     "CursorMoved",
     -- Neovim will enter relative buffer temporarily, so "BufLeave" will allways
     -- trigger then destroy the brand new float window and buffer within
@@ -47,11 +45,16 @@ api.nvim_create_autocmd({
     callback = require("quickfix.info").closeFloatWin,
 })
 
-api.nvim_win_set_option(0, "number", true)
-api.nvim_win_set_option(0, "relativenumber", false)
-api.nvim_win_set_option(0, "signcolumn", "no")
-api.nvim_win_set_option(0, "foldcolumn", "0")
-api.nvim_buf_set_option(0, "buflisted", false)
+vim.api.nvim_win_set_option(0, "number", true)
+vim.api.nvim_win_set_option(0, "relativenumber", false)
+vim.api.nvim_win_set_option(0, "signcolumn", "no")
+vim.api.nvim_win_set_option(0, "foldcolumn", "0")
+vim.api.nvim_buf_set_option(0, "buflisted", false)
 
 vim.cmd [[setlocal winhighlight=Normal:PanelBackground,SignColumn:PanelBackground]]
 vim.cmd [[resize 21]]
+-- In case of cmdheight being changed
+if vim.o.cmdheight ~= 2 then
+    vim.o.cmdheight = 2
+end
+
