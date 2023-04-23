@@ -1,20 +1,16 @@
 -- NOTE: Dependency: https://github.com/charlesmallah/lua-profiler
 
 require("jump.jumplist").setup {
-    returnFilterJumps = true
+    returnAllJumps = true
 }
 
 local function jumplist()
-    Print(require("jump.jumplist").go("n", false, "local"))
+    return require("jump.jumplist").go("n", false, "local")
 end
 Print("-------------------")
 local function EnhancedJumps()
-    Print(vim.fn["EnhancedJumps#FilterOutput"](false, "local"))
+    return vim.fn["EnhancedJumps#FilterOutput"](false, "local")
 end
--- jumplist()
--- EnhancedJumps()
--- do return end
-
 
 local profiler = require("profiler.src.profiler")
 local reportPath = _G._config_path .. "/lua/jump/report/"
