@@ -1,19 +1,20 @@
 -- File: jumplist
 -- Author: iaso2h
 -- Description: Enhance <C-i>/<C-o>
--- Version: 0.0.9
--- Last Modified: 2023-4-24
+-- Version: 0.0.10
+-- Last Modified: 2023-4-25
 
 local defaultOpts  = {
     checkCursorRedundancy = true,
-    returnAllJumps = false -- DEBUG: tests only
+    returnAllJumps = false, -- DEBUG: tests only
+    jumpBetweenLoadedBuffersOnly = false
 }
 
 local jumpUtil = require("jump.util")
 
 local M = {
-    _CUR_IDX_OFFSET = 2,
     _ITEM_IDX_OFFSET = 1,
+    _CMD_THRESHOLD = 50,
     visualMode = "",
     opts = defaultOpts
 }
@@ -28,75 +29,149 @@ local overJumpInfo = function(isNewer, filter) -- {{{
             directionStr, filter), vim.log.levels.INFO)
 end -- }}}
 
+
+--- 1-based index of the ">" character in the ex-command `:jumps` output
+---@param jumpsCmdRaw table Captured output of `:jumps`
+---@return number
+local getJumpCmdIdx = function(jumpsCmdRaw)
+    local CmdRawIdx = 0
+    -- Loop backward because the index character ">" is more likely closer to
+    -- the end of the `:jumps` list
+    for i = #jumpsCmdRaw, 2, -1 do
+        local jumpCmdRaw = jumpsCmdRaw[i]
+        if string.sub(jumpCmdRaw, 1, 1) == ">" then
+            CmdRawIdx = i
+            break
+        end
+    end
+
+    return CmdRawIdx
+end
+
+
+---@param isNewer boolean
+---@param filter string "local"|"buffer"
+---@param CmdIdx number
+---@param jumpsCmdRaw table
+---@param jumpIdx? number
+---@param jumps? table
+---@return table
+local getJumpsSliced = function(isNewer, filter, CmdIdx, jumpsCmdRaw, jumpIdx, jumps)
+    local jumpsSliced = {}
+    local cmdStart
+    local cmdEnd
+    local jumpStart
+    local jumpEnd
+    local step
+    local offset = 0
+    if jumpIdx and jumps then
+        offset = CmdIdx - jumpIdx
+    end
+
+    if isNewer then
+        if CmdIdx == #jumpsCmdRaw then
+            overJumpInfo(isNewer, filter)
+            return jumpsSliced
+        end
+        cmdStart = CmdIdx + 1
+        -- Check the last element in jumpsCmd is properly parsed in previous
+        -- stage
+        cmdEnd  = jumpsCmdRaw[#jumpsCmdRaw] == "" and #jumpsCmdRaw - 1 or #jumpsCmdRaw
+        jumpEnd = #jumps
+        step    = 1
+    else
+        if CmdIdx == 2 then
+            overJumpInfo(isNewer, filter)
+            return jumpsSliced
+        end
+        cmdStart = CmdIdx - 1
+        cmdEnd   = 2
+        jumpEnd  = 1
+        step     = -1
+    end
+
+    -- Loop through the `jumpsCmd` and align the element with `jumps`, then
+    -- reorder and slice the jumps
+
+    -- The starting index, ending index and step varies depending on the `filter`
+    -- value, hence looping in different direction to reorder the jumpsCmd
+    for i = cmdStart, cmdEnd, step do
+        local jumpCmd = jumpUtil.jumpCmdParse(jumpsCmdRaw[i])
+
+        if jumpIdx and jumps then
+            -- Loop the jumps in the the same direction to match the the same
+            -- value of lnum and col, hence aligning the data
+            jumpStart = i - offset + 1
+            for x = jumpStart, jumpEnd, step do
+                local jump    = jumps[x]
+                -- UGLY: Sometime `vim.fn.getjumplist()[1]` will contain some
+                -- items come with invalid bufnr and insert them for no reason
+                -- Probably because the prompt window when invoking the `:jumps`
+                -- command?
+                if vim.api.nvim_buf_is_valid(jump.bufnr) and
+                        jump.col == jumpCmd.col and
+                        jump.lnum == jumpCmd.lnum then
+
+                    jump.count = jumpCmd.count
+                    jumpsSliced[#jumpsSliced+1] = jump
+                end
+            end
+        else
+            local jump = {}
+            jump.lnum  = jumpCmd.lnum
+            jump.col   = jumpCmd.col
+            jumpsSliced[#jumpsSliced+1] = jump
+        end
+    end
+
+    if not next(jumpsSliced) then
+        vim.notify("Failed to get the sliced jumps", vim.log.levels.ERROR)
+    end
+
+    return jumpsSliced
+end
+
+
 --- Get the filtered out jumplist so that is ready to filter out and decide to perform a local jump or buffer jump
 ---@param isNewer boolean
 ---@param winId number
 ---@param filter string "local"|"buffer"
 ---@return table
-M.getJumps = function(isNewer, winId, filter) -- {{{
-    -- Get jumps from ex-command :jumps
-    local jumpsCmdRaw = jumpUtil.getJumpsTbl()
-    local jumpsCmd = vim.tbl_map(function(jumpCmdRaw)
-        return jumpUtil.jumplistParse(jumpCmdRaw, M.opts.returnAllJumps)
-    end, jumpsCmdRaw)
-
+local getJumps = function(isNewer, winId, filter) -- {{{
     -- Get jumps from built-in function
     local jumpsList   = vim.fn.getjumplist(winId)
-    local jumpsIdx    = jumpsList[2]
+    local jumpIdx     = jumpsList[2]
     local jumps       = jumpsList[1]
     local jumpsSliced = {}
-    if jumpsIdx == 0 then
+    if jumpIdx == 0 then
         vim.notify("Jumplist is empty", vim.log.levels.INFO)
         return jumpsSliced
     end
 
-    -- Use offset addition to get `CmdIdx` to improve performance even though
-    -- it's more intuitive to capture it by looping through `jumpsCmdRaw`
-    -- local CmdRawIdx = jumpUtil.getJumpCmdIdx(jumpsCmdRaw)
-    local CmdIdx = jumpsIdx + M._CUR_IDX_OFFSET -- Concluded by test results
+    -- Get jumps from ex-command :jumps
+    local jumpsCmdRaw = jumpUtil.getJumpsCmd()
 
+    local CmdIdx = getJumpCmdIdx(jumpsCmdRaw)
+    if CmdIdx == 0 then
+        vim.notify("Can't find current index", vim.log.levels.ERROR)
+        return jumpsSliced
+    end
+
+    -- local jumpCmd = jumpsCmd[CmdIdx] -- Test {{{
+    -- local jump    = jumps[jumpIdx]
+    -- logBuf('DEBUGPRINT[1]: jumplist.lua:129: jumpsIdx=' .. vim.inspect(jumpIdx))
+    -- logBuf('DEBUGPRINT[2]: jumplist.lua:130: CmdIdx=' .. vim.inspect(CmdIdx))
+    -- logBuf('DEBUGPRINT[3]: jumplist.lua:128: jump=' .. vim.inspect(jump))
+    -- logBuf('DEBUGPRINT[4]: jumplist.lua:127: jumpCmd=' .. vim.inspect(jumpCmd))
+    -- logBuf('DEBUGPRINT[5]: jumplist.lua:128: #jumps=' .. vim.inspect(#jumps))
+    -- logBuf('DEBUGPRINT[6]: jumplist.lua:127: #jumpsCmd=' .. vim.inspect(#jumpsCmd))
+    -- logBuf('DEBUGPRINT[5]: jumplist.lua:128: jumps=' .. vim.inspect(jumps))
+    -- logBuf('DEBUGPRINT[6]: jumplist.lua:127: jumpsCmd=' .. vim.inspect(jumpsCmd))
+    -- do return jumpsSliced end -- }}} Test
 
     -- Get the sliced jumps
     -- Loop through `jumpsCmd` instead of `jumps` because it's more intuitive
-    if isNewer then
-        if CmdIdx ~= #jumpsCmd then
-            for i = CmdIdx + 1, #jumpsCmd - 1, 1 do
-                jumps[i - M._ITEM_IDX_OFFSET].count = jumpsCmd[i].count
-                jumpsSliced[#jumpsSliced+1] = jumps[i - M._ITEM_IDX_OFFSET]
-            end
-        else
-            overJumpInfo(isNewer, filter)
-        end
-    else
-        if CmdIdx ~= 2 then
-            -- Reverse the table so that it's ready to get target jump
-            for i = CmdIdx - 1, 2, -1 do
-                -- Print("-------------")
-                -- print('DEBUGPRINT[1]: jumplist.lua:75: i=' .. vim.inspect(i))
-                -- -- HACK: there're some senarios where `i` can be out of scope
-                -- if not jumps[i - M._ITEM_IDX_OFFSET] or jumpsCmd[i] then
-                --     logBuf('DEBUGPRINT[4]: jumplist.lua:79: i=' .. vim.inspect(i))
-                --     logBuf('DEBUGPRINT[1]: jumplist.lua:73: CmdIdx=' .. vim.inspect(CmdIdx))
-                --     logBuf('DEBUGPRINT[1]: jumplist.lua:79: jumps[i - M._ITEM_IDX_OFFSET]=' .. vim.inspect(jumps[i - M._ITEM_IDX_OFFSET]))
-                --     logBuf('DEBUGPRINT[1]: jumplist.lua:79: jumpsCmd[i]=' .. vim.inspect(jumpsCmd[i]))
-                --     logBuf('DEBUGPRINT[1]: jumplist.lua:76: #jumps=' .. vim.inspect(#jumps))
-                --     logBuf('DEBUGPRINT[2]: jumplist.lua:77: #jumpsCmd=' .. vim.inspect(#jumpsCmd))
-                --     logBuf('DEBUGPRINT[2]: jumplist.lua:79: jumpsCmd=' .. vim.inspect(jumpsCmd))
-                --     logBuf('DEBUGPRINT[1]: jumplist.lua:79: jumps=' .. vim.inspect(jumps))
-                --     break
-                -- end
-                if next(jumpsCmd[i]) then
-                    jumps[i - M._ITEM_IDX_OFFSET].count = jumpsCmd[i].count
-                    if M.opts.returnAllJumps then
-                        jumps[i - M._ITEM_IDX_OFFSET].text = jumpsCmd[i].text
-                    end
-                    jumpsSliced[#jumpsSliced + 1] = jumps[i - M._ITEM_IDX_OFFSET]
-                end
-            end
-        else
-            overJumpInfo(isNewer, filter)
-        end
-    end
+    jumpsSliced = getJumpsSliced(isNewer, filter, CmdIdx, jumpsCmdRaw, jumpIdx, jumps)
 
     return jumpsSliced
 end -- }}}
@@ -113,6 +188,11 @@ local filterJumps = function(bufNr, jumps, filter, cursorPos)
         -- Remove redandunt `jumps` that have the same line number as
         -- `cursorPos` does
         if filter == "local" and cursorPos and jump.lnum == cursorPos[1] then
+            return false
+        end
+
+        if filter == "buffer" and M.opts.jumpBetweenLoadedBuffersOnly and
+            not (vim.api.nvim_buf_is_loaded(jump.bufnr)) then
             return false
         end
 
@@ -165,6 +245,9 @@ M.go = function(vimMode, isNewer, filter)
 
     -- Get the jumps table and reordered them
     local jumpsSliced = M.getJumps(isNewer, winId, filter)
+    if not next(jumpsSliced) then
+        return
+    end
 
     -- Get the parsed and filtered jumps table
     local jumpsDiscarded, jumpsFiltered = filterJumps(bufNr, jumpsSliced, filter, cursorPos)
@@ -210,5 +293,12 @@ M.setup = function(opts)
     opts = opts or defaultOpts
     M.opts = vim.tbl_deep_extend("keep", opts, defaultOpts)
 end
+
+
+-- Exposed API
+M.getJumpCmdIdx = getJumpCmdIdx
+M.getJumpsSliced = getJumpsSliced
+M.getJumps = getJumps
+
 
 return M

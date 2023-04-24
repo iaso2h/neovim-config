@@ -11,26 +11,6 @@ M.tblReverse = function(t)
 end
 
 
-M.getJumpsTbl = function()
-    local jumps = vim.api.nvim_exec2("jumps", { output = true }).output
-    local jumpsTbl = vim.split(jumps, "\n", { trimempty = false })
-    -- jumpsTbl[1] = nil
-    return jumpsTbl
-end
-
-M.getJumpCmdIdx = function(jumpsCmdRaw)
-    local CmdRawIdx = 0
-    -- jumpsCmdRaw[1] = nil -- Remove header
-    for i = #jumpsCmdRaw, 2, -1 do
-        local jumpCmdRaw = jumpsCmdRaw[i]
-        if string.sub(jumpCmdRaw, 1, 1) == ">" then
-            CmdRawIdx = i
-            break
-        end
-    end
-    return CmdRawIdx
-end
-
 M.jumplistRegisterLines = function(startLineNr, lastLineNr)
     startLineNr = startLineNr or 1
     vim.cmd([[norm! ]] .. startLineNr .. [[G0]])
@@ -47,21 +27,24 @@ M.jumplistRegisterLines = function(startLineNr, lastLineNr)
 end
 
 
-M.jumplistParse = function(jumpCmdRaw, verbose)
-    if verbose then
-        local parseResult = { string.match(jumpCmdRaw, "^>?%s*(%d+)%s+(%d+)%s+(%d+)%s+(.*)$") }
-        if not next(parseResult) then
-            return parseResult
-        else
-            return {
-                count = tonumber(parseResult[1]),
-                lnum  = tonumber(parseResult[2]),
-                col   = tonumber(parseResult[3]),
-                text  = parseResult[4]
-            }
-        end
+M.getJumpsCmd = function()
+    local jumps = vim.api.nvim_exec2("jumps", { output = true }).output
+    local jumpsTbl = vim.split(jumps, "\n", { plain = true, trimempty = false })
+    return jumpsTbl
+end
+
+
+M.jumpCmdParse = function(jumpCmdRaw)
+    local parseResult = { string.match(jumpCmdRaw, "^>?%s*(%d+)%s+(%d+)%s+(%d+)%s+(.*)$") }
+    if not next(parseResult) then
+        return parseResult
     else
-        return {count = string.match(jumpCmdRaw, "^>?%s*(%d+)%s.*$")}
+        return {
+            count = parseResult[1],
+            lnum  = tonumber(parseResult[2]),
+            col   = tonumber(parseResult[3]),
+            text  = parseResult[4]
+        }
     end
 end
 
@@ -74,7 +57,7 @@ M.jumplistRegisterLinesToTbl = function(returnJumpsChk, startLineNr, lastLineNr,
     local currentBuf = vim.api.nvim_get_current_buf()
     local jumpsTbl = {}
     local extendJump = function()
-        local jumps = M.getJumpsTbl()
+        local jumps = M.getJumpsCmd()
         vim.cmd [[noa clearjumps]]
         for _, jump in ipairs(jumps) do
             if jump ~= " jump line  col file/text" and string.sub(jump, 1, 1) ~= ">" then

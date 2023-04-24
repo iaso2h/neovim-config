@@ -1,5 +1,5 @@
 # Dependencies
-* `/lua/global/keymap.lua`
+* `/lua/global/`
 * `/lua/util/test.lua`
 * [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) to run tests
 

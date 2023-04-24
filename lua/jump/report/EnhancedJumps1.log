@@ -1,14 +1,9 @@
-> Total time: 0.008835 s
+> Total time: 0.003492 s
 --------------------------------------------------------------------------------------
 | FILE                : FUNCTION                    : LINE   : TIME   : %     : #    |
 --------------------------------------------------------------------------------------
-| lua/jump/jumplistCom: EnhancedJumps               :    11  : 0.0088 : 99.6  :    1 |
-| /home/iaso2h/.config: Print                       :    69  : 0.0041 : 46.0  :    1 |
-| vim/inspect         :                             :     0  : 0.0027 : 30.7  :   65 |
-| vim/_editor         : Anon                        :     0  : 0.0001 : 0.9   :    1 |
 --------------------------------------------------------------------------------------
-| vim/F               : pack_len                    :     0  : ~      : ~     :    1 |
 | /home/iaso2h/.config: stop                        :   225  : ~      : ~     :    1 |
-| vim/inspect         : inspect                     :     0  : ~      : ~     :    2 |
-| vim/_editor         : EnhancedJumps#FilterOutput  :     0  : ~      : ~     :    1 |
+| lua/jump/jumplistCom: EnhancedJumps               :    11  : ~      : ~     :    1 |
+| vim/_editor         : EnhancedJumps               :     0  : ~      : ~     :    1 |
 --------------------------------------------------------------------------------------

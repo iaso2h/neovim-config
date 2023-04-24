@@ -1,25 +1,23 @@
-> Total time: 0.004401 s
+> Total time: 0.009244 s
 --------------------------------------------------------------------------------------
 | FILE                : FUNCTION                    : LINE   : TIME   : %     : #    |
 --------------------------------------------------------------------------------------
-| lua/jump/jumplistCom: jumplist                    :     7  : 0.0043 : 97.5  :    1 |
-| /home/iaso2h/.config: Print                       :    69  : 0.0028 : 63.7  :    1 |
-| /home/iaso2h/.config: go                          :   358  : 0.0015 : 33.2  :    1 |
-| vim/inspect         :                             :     0  : 0.0012 : 28.2  :  104 |
-| /home/iaso2h/.config: getJumps                    :   323  : 0.0011 : 24.1  :    1 |
-| vim/inspect         : putValue                    :     0  : 0.0006 : 14.6  :   11 |
-| vim/shared          : split                       :     0  : 0.0006 : 13.3  :    1 |
-| vim/shared          : Anon                        :     0  : 0.0003 : 7.3   :    1 |
-| vim/shared          : gsplit                      :     0  : 0.0003 : 7.3   :    1 |
-| /home/iaso2h/.config: filterJumps                 :   285  : 0.0003 : 7.3   :    1 |
-| vim/shared          : validate                    :     0  : 0.0003 : 6.7   :    1 |
-| vim/inspect         : Anon                        :     0  : 0.0002 : 4.2   :   14 |
-| /home/iaso2h/.config: filterFunc                  :   144  : 0.0001 : 2.4   :    2 |
-| vim/shared          :                             :     0  : 0.0001 : 1.6   :    5 |
-| /home/iaso2h/.config: trimLeadingWhitespaces      :    83  : 0.0001 : 1.2   :    2 |
+| /home/iaso2h/.config: jumplist                    :   241  : 0.0092 : 99.4  :    1 |
+| /home/iaso2h/.config: getJumps                    :   140  : 0.0081 : 87.6  :    1 |
+| /home/iaso2h/.config: getJumpsSliced              :    59  : 0.0074 : 80.1  :    1 |
+| /home/iaso2h/.config: filterJumps                 :   185  : 0.0011 : 11.4  :    1 |
+| /home/iaso2h/.config: jumpCmdParse                :    37  : 0.0010 : 11.1  :   68 |
+| /home/iaso2h/.config: getJumpsCmd                 :    30  : 0.0005 : 5.1   :    1 |
+| /home/iaso2h/.config: filterFunc                  :   187  : 0.0004 : 3.9   :  137 |
+| vim/shared          : split                       :     0  : 0.0002 : 2.1   :    1 |
+| vim/shared          : gsplit                      :     0  : 0.0001 : 1.5   :    1 |
+| vim/shared          : validate                    :     0  : 0.0001 : 1.4   :    1 |
 --------------------------------------------------------------------------------------
+| vim/shared          :                             :     0  : ~      : ~     :    4 |
 | vim/shared          : is_callable                 :     0  : ~      : ~     :    3 |
-| vim/inspect         : inspect                     :     0  : ~      : ~     :    2 |
-| vim/_editor         : __index                     :     0  : ~      : ~     :    2 |
+| /home/iaso2h/.config: getJumpCmdIdx               :    36  : ~      : ~     :    1 |
+| vim/shared          : Anon                        :     0  : ~      : ~     :    2 |
 | /home/iaso2h/.config: stop                        :   225  : ~      : ~     :    1 |
+| lua/jump/jumplistCom: jumplist                    :     7  : ~      : ~     :    1 |
+| vim/_editor         : getjumplist                 :     0  : ~      : ~     :    1 |
 --------------------------------------------------------------------------------------

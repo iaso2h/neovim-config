@@ -1,5 +1,6 @@
 local M    = {}
 -- BUG: dT" motion
+-- BUG: daw motion will delete the proceeding space of word ` Msa`
 
 -- NOTE: Mapping is always recursive unless noremap is specified
 
@@ -276,34 +277,34 @@ map("n", [[<C-o>]], function()
     require("searchHop").centerHop(function()
         require("jump.jumplist").go("n", false, "local")
     end, true, true)
-end, {"silent"}, "Older jump")
+end, {"silent"}, "Older local jump")
 map("n", [[<C-i>]], function()
     require("searchHop").centerHop(function()
         require("jump.jumplist").go("n", true, "local")
     end, true, true)
-end, {"silent"}, "Newer jump")
+end, {"silent"}, "Newer local jump")
 map("x", [[<C-o>]], luaRHS[[:lua
     require("jump.jumplist").visualMode = vim.fn.visualmode();
     require("searchHop").centerHop(function()
         require("jump.jumplist").go(vim.fn.visualmode(), false, "local")
     end, true, true)<CR>
-]], {"silent"}, "Older jump")
+]], {"silent"}, "Older local jump")
 map("x", [[<C-i>]], luaRHS[[:lua
     require("jump.jumplist").visualMode = vim.fn.visualmode();
     require("searchHop").centerHop(function()
         require("jump.jumplist").go(vim.fn.visualmode(), true, "local")
     end, true, true)<CR>
-]], {"silent"}, "Newer jump")
+]], {"silent"}, "Newer local jump")
 map("n", [[g<C-o>]], function()
     require("searchHop").centerHop(function()
         require("jump.jumplist").go("n", false, "buffer")
     end, true, true)
-end, {"silent"}, "Older jump")
+end, {"silent"}, "Older buffer jump")
 map("n", [[g<C-i>]], function()
     require("searchHop").centerHop(function()
         require("jump.jumplist").go("n", true, "buffer")
     end, true, true)
-end, {"silent"}, "Newer jump")
+end, {"silent"}, "Newer buffer jump")
 -- Swap default mapping
 map("n", [[*]],  [[<CMD>lua require("searchHop").searchCword("*")<CR>]],  {"noremap", "silent"}, "Search <cword> forward")
 map("n", [[#]],  [[<CMD>lua require("searchHop").searchCword("#")<CR>]],  {"noremap", "silent"}, "Search <cword> back")
