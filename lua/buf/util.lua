@@ -1,44 +1,48 @@
 local M = {}
-local api = vim.api
-local fn  = vim.fn
-local cmd = vim.cmd
 local var = require("buf.var")
-
 
 
 --- Gather informatioin about buffers and windows for further processing
 M.initBuf = function()
-    var.bufNr    = api.nvim_get_current_buf()
+    var.bufNr    = vim.api.nvim_get_current_buf()
     var.bufName  = nvim_buf_get_name(var.bufNr)
     var.bufType  = vim.bo.buftype
     var.fileType = vim.bo.filetype
-    var.winID    = api.nvim_get_current_win()
+    var.winID    = vim.api.nvim_get_current_win()
     var.winIDTbl = vim.tbl_filter(function(i)
-        return api.nvim_win_get_config(i).relative == ""
-        end, api.nvim_list_wins())
+        return vim.api.nvim_win_get_config(i).relative == ""
+        end, vim.api.nvim_list_wins())
     -- NOTE: Do not use results from:
     -- vim.tbl_filter(function(i) return api.nvim_buf_is_loaded(i) end, api.nvim_list_bufs())
-    var.bufNrTbl = vim.tbl_map(function(buf)
-        return tonumber(string.match(buf, "%d+"))
-        end, M.bufLoadedTbl(false))
+    var.bufNrTbl = require("buf.util").bufTbl(true, false)
 end
 
 
---- Return all loaded buffer listed in the :ls command in a table
---- @param termInclude boolean Value to determine whether contains terminal or not
+--- Function wrapped around the vim.api.nvim_list_bufs()
+--- @param validLoadedOnly boolean Whether contains loaded buffers only
+--- @param hiddenIncluded boolean Whether include hidden buffer
 --- @return table
-function M.bufLoadedTbl(termInclude) -- {{{
-    local bufTbl
-    if not termInclude then
-        bufTbl = vim.tbl_filter(function(buf) return string.match(buf, "term://") == nil end,
-            vim.split(fn.execute("ls"), '\n', false))
-        table.remove(bufTbl, 1)
-    else
-        -- NOTE: Execute ls! will incur Neovim built-in LSP complain
-        bufTbl = vim.split(fn.execute("ls"), '\n', false)
-        table.remove(bufTbl, 1)
+function M.bufTbl(validLoadedOnly, hiddenIncluded) -- {{{
+    local unLisedBufTbl = vim.api.nvim_list_bufs()
+    local cond = function(buf)
+        if hiddenIncluded then
+            if validLoadedOnly then
+                return vim.api.nvim_buf_is_loaded(buf)
+            else
+                return true
+            end
+        else
+            if validLoadedOnly then
+                return vim.api.nvim_buf_is_loaded(buf) and
+                    vim.api.nvim_buf_get_option(buf, "bufhidden")
+            else
+                return vim.api.nvim_buf_get_option(buf, "bufhidden")
+            end
+
+        end
     end
-    return bufTbl
+
+    return vim.tbl_filter(cond, unLisedBufTbl)
 end -- }}}
 
 
@@ -48,7 +52,7 @@ end -- }}}
 M.bufWipe = function(bufNr)
     -- bufNr = bufNr or 0
     -- :bdelete will register in both the jumplist and the changelist
-    pcall(cmd, "bdelete! " .. bufNr)
+    pcall(vim.cmd, "bdelete! " .. bufNr)
     -- These two don't register in both the changelist and the changelist
     -- pcall(cmd, "keepjump bwipe! " .. bufNr)
     -- pcall(api.nvim_buf_delete, bufNr and bufNr or 0, {force = true})
@@ -58,14 +62,14 @@ end
 --- Switch to alternative buffer or previous buffer before wiping current buffer
 --- @param winID number Window ID in which alternative will be set
 M.switchAlter = function(winID)
-    local altBufNr = fn.bufnr("#")
-    if altBufNr ~= var.bufNr and api.nvim_buf_is_valid(altBufNr) and
+    local altBufNr = vim.fn.bufnr("#")
+    if altBufNr ~= var.bufNr and vim.api.nvim_buf_is_valid(altBufNr) and
             vim.tbl_contains(var.bufNrTbl, altBufNr) then
-        api.nvim_win_set_buf(winID, altBufNr)
+        vim.api.nvim_win_set_buf(winID, altBufNr)
     else
         -- Fallback method
-        cmd(string.format("noautocmd %swincmd w", fn.getwininfo(winID)[1].winnr))
-        cmd "bprevious"
+        vim.cmd(string.format("noautocmd %swincmd w", vim.fn.getwininfo(winID)[1].winnr))
+        vim.cmd "bprevious"
     end
 end
 
@@ -82,7 +86,7 @@ end
 
 
 M.closeWin = function (winID)
-    local ok, msg = pcall(api.nvim_win_close, winID, false)
+    local ok, msg = pcall(vim.api.nvim_win_close, winID, false)
     if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 end
 
@@ -92,19 +96,39 @@ M.winCnt = function ()
 end
 
 
-M.getBufCntInWins = function ()
+M.getAllBufCntsInWins = function()
     local bufCnt = 0
     for _, w in ipairs(var.winIDTbl) do
-        if vim.tbl_contains(var.bufNrTbl, api.nvim_win_get_buf(w)) then
+        if vim.tbl_contains(var.bufNrTbl, vim.api.nvim_win_get_buf(w)) then
             bufCnt = bufCnt + 1
         end
     end
+
     return bufCnt
 end
 
 
-M.bufCnt = function()
-    return #var.bufNrTbl
+M.getCurBufCntsInWins = function(buf)
+    local bufCnt = 0
+    for _, w in ipairs(var.winIDTbl) do
+        if buf == vim.api.nvim_win_get_buf(w) then
+            bufCnt = bufCnt + 1
+        end
+    end
+
+    return bufCnt
+end
+
+
+M.bufValidCnt = function()
+    if M.bufNrTbl then
+        local cnt = #vim.tbl_filter(function(bufNr)
+            return vim.api.nvim_buf_get_name(bufNr) ~= ""
+        end, M.bufNrTbl)
+        return cnt
+    else
+        return 0
+    end
 end
 
 

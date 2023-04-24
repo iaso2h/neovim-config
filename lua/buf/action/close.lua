@@ -2,10 +2,10 @@
 -- Author: iaso2h
 -- Description: Delete buffer without change the window layout
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.31
--- Last Modified: 2023-4-23
-local util  = require("buf.util")
-local var   = require("buf.var")
+-- Version: 0.0.32
+-- Last Modified: 2023-4-24
+local bufUtil = require("buf.util")
+local var     = require("buf.var")
 local M    = {}
 
 
@@ -43,7 +43,7 @@ end -- }}}
 
 
 local function historyStartup()
-    if util.bufCnt() == 1 then
+    if bufUtil.bufValidCnt() == 1 then
         return require("historyStartup").display(true)
     else
         return
@@ -62,7 +62,7 @@ end
 local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
     -- Close buffer depending on buffer type
 
-    if checkSpecBuf or util.isSpecBuf() then
+    if checkSpecBuf or bufUtil.isSpecBuf() then
         -- Closing Special buffer
         var.lastClosedFilePath = nil
 
@@ -81,16 +81,16 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
                 vim.api.nvim_win_close(var.winID, true)
             elseif string.match(var.bufName, [[%[nvim%-lua%]$]]) then
                 -- Check for Lua pad
-                if util.bufCnt() ~= 1 then
-                    util.switchAlter(var.winID)
+                if bufUtil.bufValidCnt() > 1 then
+                    bufUtil.switchAlter(var.winID)
                 else
-                    util.bufWipe(var.bufNr)
+                    bufUtil.bufWipe(var.bufNr)
                 end
             else
-                util.bufWipe(var.bufNr)
+                bufUtil.bufWipe(var.bufNr)
             end
         elseif var.bufType == "prompt" then
-            util.bufWipe(var.bufNr)
+            bufUtil.bufWipe(var.bufNr)
         elseif var.bufType == "nowrite" then
             if vim.startswith(var.bufName, "diffview") then
                 vim.cmd [[DiffviewClose]]
@@ -98,18 +98,18 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         else
             -- Always wipe the special buffer if window count is 1
             if not saveModified(var.bufNr) then return false end
-            util.bufWipe(var.bufNr)
+            bufUtil.bufWipe(var.bufNr)
         end
 
         return true
     else
         -- Scratch files
-        if util.isScratchBuf() then
+        if bufUtil.isScratchBuf() then
             -- Abort the processing when cancel is evaluated
             if not saveModified(var.bufNr) then return false end
 
-            if util.bufCnt() ~= 1 then
-                util.bufWipe(var.bufNr)
+            if bufUtil.bufValidCnt() > 1 then
+                bufUtil.bufWipe(var.bufNr)
             else
                 vim.cmd("q!")
             end
@@ -126,9 +126,9 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         if not saveModified(var.bufNr) then return false end
 
         -- Whether to check other windows that might have the same buffer instance
-        if not checkAllBuf or util.winCnt() == 1 then
+        if not checkAllBuf or bufUtil.winCnt() == 1 then
             historyStartup()
-            util.bufWipe(var.bufNr)
+            bufUtil.bufWipe(var.bufNr)
             return true
         end
 
@@ -144,7 +144,7 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
             local bufNr = vim.api.nvim_win_get_buf(win)
 
             winIDBufNrTbl[win] = vim.api.nvim_win_get_buf(win)
-            if util.isSpecBuf(vim.api.nvim_buf_get_option(bufNr, "buftype")) then
+            if bufUtil.isSpecBuf(vim.api.nvim_buf_get_option(bufNr, "buftype")) then
                 specInstanceCnt = specInstanceCnt + 1
             else
                 bufInstanceCnt = bufInstanceCnt + 1
@@ -155,9 +155,9 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         -- Loop through winIDBufNrTbl to check other windows contain the same
         -- buffer number as the one we are going to wipe
         for winID, bufNr in pairs(winIDBufNrTbl) do
-            if bufNr == var.bufNr then util.switchAlter(winID) end
+            if bufNr == var.bufNr then bufUtil.switchAlter(winID) end
         end
-        util.bufWipe(var.bufNr)
+        bufUtil.bufWipe(var.bufNr)
 
         -- Always restore window focus, window might be unavailable when the
         -- last buffer is deleted
@@ -168,16 +168,16 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         -- Merge when there are two windows sharing the last buffer
         -- NOTE: If this evaluated to true, then the current length of bufNr
         -- table has been reduced to 1, #bufNrTbl is just a value of previous state
-        if util.winCnt() == 2 and bufInstanceCnt == 2 and util.bufCnt() == 2 then
+        if bufUtil.winCnt() == 2 and bufInstanceCnt == 2 and bufUtil.bufValidCnt() == 2 then
             vim.cmd "only"
         end
 
         -- After finishing buffer wiping, prevent Neovim from setting the
         -- current window to display a special window. e.g. quickfix list
         -- or terminal. This means you have to at least have 2 buffers
-        if util.bufCnt() >= 2 then
+        if bufUtil.bufValidCnt() >= 2 then
             local unwantedBufType = {"quickfix", "terminal", "help"}
-            for _ = 1, util.bufCnt() - 1 + specInstanceCnt do
+            for _ = 1, bufUtil.bufValidCnt() - 1 + specInstanceCnt do
                 if vim.tbl_contains(unwantedBufType, vim.bo.buftype) then
                     -- HACK: can still switch to a special buffer
                     vim.cmd "keepjump bp"
@@ -196,10 +196,10 @@ end -- }}}
 --- Close window safely and wipe buffer without modifying the layout
 --- @param type string Expect string value. possible value: "buffer", "window"
 function M.init(type) -- {{{
-    util.initBuf()
+    bufUtil.initBuf()
 
     if type == "window" then
-        if util.isSpecBuf() then
+        if bufUtil.isSpecBuf() then
             -- Close window containing special buffer
 
             -- NOTE: more details see ":help buftype"
@@ -216,38 +216,42 @@ function M.init(type) -- {{{
                 -- Override the default behavior, treat it like performing a buffer delete
                 if not bufClose(true, false) then return end
                 -- Make sure no lingering window after buffer being wiped
-                if util.winCnt() > 1 and vim.api.nvim_win_is_valid(var.winID) then
-                    util.closeWin(var.winID)
+                if bufUtil.winCnt() > 1 and vim.api.nvim_win_is_valid(var.winID) then
+                    bufUtil.closeWin(var.winID)
                 end
             elseif var.bufType == "nowrite" then
                 if vim.startswith(var.bufName, "diffview") then
                     return vim.cmd [[DiffviewClose]]
                 end
             elseif var.bufType == "terminal" then
-                util.closeWin(var.winID)
+                bufUtil.closeWin(var.winID)
             else
                 -- Other special buffer
 
-                if util.winCnt() > 1 then
-                    util.closeWin(var.winID)
+                if bufUtil.winCnt() > 1 then
+                    bufUtil.closeWin(var.winID)
                 else
                     -- Override the default behavior, treat it like performing a buffer delete
-                    util.bufWipe(var.bufNr)
+                    bufUtil.bufWipe(var.bufNr)
                 end
             end
         else
             -- Close window containing buffer
 
-            if util.isScratchBuf() then
+            if bufUtil.isScratchBuf() then
                 -- Scratch files. Override the default behavior, treat it like performing a buffer delete
-                if not bufClose(false, false) then return end
-                -- Make sure no lingering window after buffer being wiped
-                if util.winCnt() > 1 and vim.api.nvim_win_is_valid(var.winID) then
-                    return util.closeWin(var.winID)
+                if bufUtil.getCurBufCntsInWins(var.bufNr) > 1 then
+                    bufUtil.closeWin(var.winID)
+                else
+                    if not bufClose(false, false) then return end
+                    -- Make sure no lingering window after buffer being wiped
+                    if bufUtil.winCnt() > 1 and vim.api.nvim_win_is_valid(var.winID) then
+                        return bufUtil.closeWin(var.winID)
+                    end
                 end
             else
                 -- Standard buffer
-                if util.winCnt() == 1 then
+                if bufUtil.winCnt() == 1 then
                     -- 1 Window
                     -- Override the default behavior, treat it like performing
                     -- a buffer delete until there are no more buffers loaded
@@ -257,10 +261,10 @@ function M.init(type) -- {{{
                     -- In situation where there are multiple buffers loaded
                     -- with only one standard buffer display in one of the
                     -- windows
-                    local bufInstanceCount = util.getBufCntInWins()
+                    local bufInstanceCount = bufUtil.getAllBufCntsInWins()
                     if bufInstanceCount ~= 1 then
                         -- Multiple buffer instances or no instances
-                        util.closeWin(var.winID)
+                        bufUtil.closeWin(var.winID)
                     else
                         -- 1 buffer instance
                         -- Override the default behavior, treat it like performing

@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
 -- Dependencies: 0
--- Version: 0.0.18
--- Last Modified: 2023-4-23
+-- Version: 0.0.19
+-- Last Modified: 2023-4-24
 -- TODO: ? to trigger menupage
 
 local M   = {
@@ -402,9 +402,9 @@ M.execMap = function(key) -- {{{
                 end
             end
         elseif key == "q" then
-            local bufNrTbl = vim.tbl_map(function(buf)
-                return tonumber(string.match(buf, "%d+"))
-                end, require("buf.util").bufLoadedTbl(false))
+            local bufNrTbl = vim.tbl_filter(function(bufNr)
+                return vim.api.nvim_buf_get_name(bufNr) ~= ""
+            end, require("buf.util").bufTbl(true, false))
             if #bufNrTbl == 0 then
                 vim.cmd("noa q!")
             else
