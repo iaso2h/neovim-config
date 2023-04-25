@@ -2,7 +2,7 @@
 -- Author: iaso2h
 -- Description: Delete buffer without change the window layout
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.33
+-- Version: 0.0.34
 -- Last Modified: 2023-4-25
 local bufUtil = require("buf.util")
 local var     = require("buf.var")
@@ -129,13 +129,15 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         -- Create a table containing all different window ID as keys and the
         -- corresponding buffer number as values
         for _, win in ipairs(var.winIDTbl) do
-            local bufNr = vim.api.nvim_win_get_buf(win)
+            if vim.api.nvim_win_is_valid(win) then
+                local bufNr = vim.api.nvim_win_get_buf(win)
 
-            winIDBufNrTbl[win] = vim.api.nvim_win_get_buf(win)
-            if bufUtil.isSpecBuf(vim.api.nvim_buf_get_option(bufNr, "buftype")) then
-                specInstanceCnt = specInstanceCnt + 1
-            else
-                bufInstanceCnt = bufInstanceCnt + 1
+                winIDBufNrTbl[win] = vim.api.nvim_win_get_buf(win)
+                if bufUtil.isSpecBuf(vim.api.nvim_buf_get_option(bufNr, "buftype")) then
+                    specInstanceCnt = specInstanceCnt + 1
+                else
+                    bufInstanceCnt = bufInstanceCnt + 1
+                end
             end
         end
         -- }}} Get count of buffer instance that display at Neovim windows
