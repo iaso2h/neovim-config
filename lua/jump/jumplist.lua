@@ -1,7 +1,7 @@
 -- File: jumplist
 -- Author: iaso2h
 -- Description: Enhance <C-i>/<C-o>
--- Version: 0.0.10
+-- Version: 0.0.11
 -- Last Modified: 2023-4-25
 
 local defaultOpts  = {
@@ -98,6 +98,10 @@ local getJumpsSliced = function(isNewer, filter, CmdIdx, jumpsCmdRaw, jumpIdx, j
     for i = cmdStart, cmdEnd, step do
         local jumpCmd = jumpUtil.jumpCmdParse(jumpsCmdRaw[i])
 
+        if not M.opts.returnAllJumps and vim.v.count1 == #jumpsSliced then
+            break
+        end
+
         if jumpIdx and jumps then
             -- Loop the jumps in the the same direction to match the the same
             -- value of lnum and col, hence aligning the data
@@ -114,6 +118,7 @@ local getJumpsSliced = function(isNewer, filter, CmdIdx, jumpsCmdRaw, jumpIdx, j
 
                     jump.count = jumpCmd.count
                     jumpsSliced[#jumpsSliced+1] = jump
+                    break
                 end
             end
         else

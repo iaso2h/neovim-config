@@ -1,23 +1,34 @@
-> Total time: 0.009244 s
+> Total time: 0.007715 s
 --------------------------------------------------------------------------------------
 | FILE                : FUNCTION                    : LINE   : TIME   : %     : #    |
 --------------------------------------------------------------------------------------
-| /home/iaso2h/.config: jumplist                    :   241  : 0.0092 : 99.4  :    1 |
-| /home/iaso2h/.config: getJumps                    :   140  : 0.0081 : 87.6  :    1 |
-| /home/iaso2h/.config: getJumpsSliced              :    59  : 0.0074 : 80.1  :    1 |
-| /home/iaso2h/.config: filterJumps                 :   185  : 0.0011 : 11.4  :    1 |
-| /home/iaso2h/.config: jumpCmdParse                :    37  : 0.0010 : 11.1  :   68 |
-| /home/iaso2h/.config: getJumpsCmd                 :    30  : 0.0005 : 5.1   :    1 |
-| /home/iaso2h/.config: filterFunc                  :   187  : 0.0004 : 3.9   :  137 |
-| vim/shared          : split                       :     0  : 0.0002 : 2.1   :    1 |
-| vim/shared          : gsplit                      :     0  : 0.0001 : 1.5   :    1 |
-| vim/shared          : validate                    :     0  : 0.0001 : 1.4   :    1 |
+| /home/iaso2h/.config: jumplist                    :   246  : 0.0077 : 99.2  :    1 |
+| /home/iaso2h/.config: getJumps                    :   145  : 0.0068 : 88.0  :    1 |
+| /home/iaso2h/.config: getJumpsSliced              :    59  : 0.0030 : 39.4  :    1 |
+| vim/shared          : getJumpsCmd                 :     0  : 0.0026 : 33.7  :    1 |
+| vim/shared          : Anon                        :     0  : 0.0017 : 22.6  :   99 |
+| /home/iaso2h/.config: jumpCmdParse                :    82  : 0.0015 : 19.6  :   96 |
+| vim/shared          :                             :     0  : 0.0010 : 12.5  :  107 |
+| /home/iaso2h/.config: filterJumps                 :   190  : 0.0008 : 10.7  :    1 |
+| /usr/share/nvim/runt: Anon                        :   247  : 0.0006 : 7.1   :    1 |
+| /usr/share/nvim/runt: handle_body                 :   738  : 0.0004 : 5.4   :    1 |
+| /usr/share/nvim/runt: handle_body                 :   381  : 0.0004 : 5.3   :    1 |
+| vim/shared          : validate                    :     0  : 0.0003 : 4.4   :    3 |
+| /home/iaso2h/.config: filterFunc                  :   192  : 0.0003 : 4.0   :   96 |
+| vim/shared          : gsplit                      :     0  : 0.0003 : 3.3   :    2 |
+| vim/_editor         : notify_reply_callback       :     0  : 0.0001 : 1.4   :    1 |
+| vim/_editor         : Anon                        :     0  : 0.0001 : 1.0   :    1 |
+| vim/F               : pack_len                    :     0  : 0.0001 : 0.8   :    2 |
 --------------------------------------------------------------------------------------
-| vim/shared          :                             :     0  : ~      : ~     :    4 |
-| vim/shared          : is_callable                 :     0  : ~      : ~     :    3 |
+| vim/shared          : (for generator)             :     0  : ~      : ~     :    1 |
+| vim/shared          : is_callable                 :     0  : ~      : ~     :    5 |
 | /home/iaso2h/.config: getJumpCmdIdx               :    36  : ~      : ~     :    1 |
-| vim/shared          : Anon                        :     0  : ~      : ~     :    2 |
+| /usr/share/nvim/runt: debug                       :   104  : ~      : ~     :    1 |
+| /usr/share/nvim/runt: try_call                    :   363  : ~      : ~     :    1 |
+| /usr/share/nvim/runt: try_call                    :   372  : ~      : ~     :    1 |
 | /home/iaso2h/.config: stop                        :   225  : ~      : ~     :    1 |
-| lua/jump/jumplistCom: jumplist                    :     7  : ~      : ~     :    1 |
 | vim/_editor         : getjumplist                 :     0  : ~      : ~     :    1 |
+| /home/iaso2h/.config: getJumpsCmd                 :    30  : ~      : ~     :    1 |
+| lua/jump/jumplistCom: jumplist                    :     7  : ~      : ~     :    1 |
+| /usr/share/nvim/runt: parse_headers               :    62  : ~      : ~     :    1 |
 --------------------------------------------------------------------------------------

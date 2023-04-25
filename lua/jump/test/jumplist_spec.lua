@@ -76,7 +76,7 @@ describe([[vim.fn.getjumplist() and ex-command :jumps. ]], function()
         assert.are.same(jumpsExpectedCmd, jumps)
     end) -- }}}
 
-    it([[Current idxes relationship]], function() -- {{{
+    it([[Current idexes relationship]], function() -- {{{
         vim.cmd [[enew ]]
         vim.cmd("clearjumps")
         for i = 1, jumplist._CMD_THRESHOLD, 1 do
@@ -122,6 +122,19 @@ describe([[vim.fn.getjumplist() and ex-command :jumps. ]], function()
 
         assert.are.same(jumpsExpectedCmdSliced, jumpsSliced)
     end)
+
+    it([[Custom vim.split]], function() -- {{{
+        vim.cmd [[enew ]]
+        vim.cmd("clearjumps")
+        for i = 1, jumplist._CMD_THRESHOLD, 1 do
+            vim.api.nvim_put({"line: " .. i}, "l", true, true)
+        end
+
+        local expectedOutput = jumpUtil.getJumpsCmd()
+        _G._noStdlib = true
+        local myOutput = jumpUtil.getJumpsCmd()
+        assert.are.same(expectedOutput, myOutput)
+    end)
 end) -- }}}
 
 
@@ -153,6 +166,9 @@ describe([[Local jump. ]], function()
             }
             local jumpsSliced, jumpsDiscarded, jumpsFiltered = jumplist.go("n", isNewer, filter)
             -- Get expected parsed jumps
+            jumplist.setup {
+                returnAllJumps = true
+            }
             local jumpsExpectedCmdSliced = getJumpsCmdSliced(isNewer, filter)
 
             -- assert.are.same(#ExpectedCmd, #jumpsSliced)

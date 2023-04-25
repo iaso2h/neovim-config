@@ -27,9 +27,54 @@ M.jumplistRegisterLines = function(startLineNr, lastLineNr)
 end
 
 
-M.getJumpsCmd = function()
-    local jumps = vim.api.nvim_exec2("jumps", { output = true }).output
-    local jumpsTbl = vim.split(jumps, "\n", { plain = true, trimempty = false })
+M.getJumpsCmd = function(noStdlib)
+    local jumpsTbl = {}
+    local jumpsOutput = vim.api.nvim_exec2("jumps", { output = true }).output
+    if not noStdlib then
+        return vim.split(jumpsOutput, "\n", { plain = true, trimempty = false })
+    else
+        local lastIdx = { 0 }
+        local idxTbl = {}
+        repeat
+            lastIdx = { string.find(jumpsOutput, "\n", lastIdx[1] + 1, true) }
+            if next(lastIdx) then
+                idxTbl[#idxTbl + 1] = vim.deepcopy(lastIdx)
+            end
+        until not next(lastIdx)
+
+        if not next(idxTbl) then
+            return {}
+        end
+
+        -- {        idx1,     idx2,     idx3,     idx4      }
+        --      ↑          ↑         ↑         ↑         ↑
+        -- {<headStr1>,<subStr2>,<subStr3>,<subStr4>,<tailStr5>}
+        for i, idx in ipairs(idxTbl) do
+            if i < #idxTbl then
+                local nextIdx = idxTbl[i + 1]
+                if idx[2] + 1 ~= nextIdx[1] then
+                    -- Skip adjacent to next idx
+                    local midStr = string.sub(jumpsOutput, idx[2] + 1, nextIdx[1] - 1)
+                    jumpsTbl[#jumpsTbl + 1] = midStr
+                end
+            end
+            if i == 1 then
+                if idx[1] ~= 1 then
+                    -- Skip adjacent to the beginning
+                    local headStr = string.sub(jumpsOutput, 1, idx[1] - 1)
+                    jumpsTbl[#jumpsTbl + 1] = headStr
+                end
+            end
+            if i == #idxTbl then
+                if idx[2] ~= string.len(jumpsOutput) then
+                    -- Skip adjacent to the end
+                    local tailStr = string.sub(jumpsOutput, idx[2] + 1, -1)
+                    jumpsTbl[#jumpsTbl + 1] = tailStr
+                end
+            end
+        end
+    end
+
     return jumpsTbl
 end
 
