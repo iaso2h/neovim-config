@@ -1,8 +1,8 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.18
--- Last Modified: 2023-4-20
+-- Version: 0.1.19
+-- Last Modified: 2023-4-25
 
 local fn       = vim.fn
 local cmd      = vim.cmd
@@ -13,7 +13,14 @@ local register = require("register")
 local M = {
     hlInterval = 250,
     hlGroup    = "Search",
-    hlEnable   = true
+    hlEnable   = true,
+
+    lastYankNs      = api.nvim_create_namespace("inplaceYank"),
+    lastYankExtmark = -1,
+    lastYankLinewise = false,
+    lastPutNs       = api.nvim_create_namespace("inplacePut"),
+    lastPutExtmark  = -1,
+    lastPutLinewise = false,
 }
 -- TODO: test cases
 
@@ -158,7 +165,6 @@ function M.inplaceYank(args) -- {{{
 
     -- Create highlight {{{
     -- Creates a new namespace or gets an existing one.
-    M.lastYankNS = api.nvim_create_namespace("inplacePutNewContent")
     local newContentExmark
     if M.hlEnable then
         newContentExmark = util.nvimBufAddHl(
@@ -167,14 +173,15 @@ function M.inplaceYank(args) -- {{{
             posEnd,
             fn.getregtype(),
             opts.hlGroup,
-            opts.timeout)
+            opts.timeout,
+            M.lastYankNs)
     else
         -- Convert into (0, 0) index
         posStart = {posStart[1] - 1, posStart[2]}
         posEnd   = {posEnd[1] - 1, posEnd[2]}
         newContentExmark = api.nvim_buf_set_extmark(
             curBufNr,
-            M.lastYankNS,
+            M.lastYankNs,
             posStart[1],
             posStart[2],
             {
@@ -311,7 +318,6 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     local posStart = api.nvim_buf_get_mark(curBufNr, "[")
     local posEnd = api.nvim_buf_get_mark(curBufNr, "]")
     -- Creates a new namespace or gets an existing one.
-    M.inplacePutNewContentNS = api.nvim_create_namespace("inplacePutNewContent")
     local newContentExmark
     if M.hlEnable then
         newContentExmark = util.nvimBufAddHl(
@@ -321,14 +327,14 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
             regTypeNew,
             opts.hlGroup,
             opts.timeout,
-            M.inplacePutNewContentNS)
+            M.lastPutNs)
     else
         -- Convert into (0, 0) index
         posStart = {posStart[1] - 1, posStart[2]}
         posEnd   = {posEnd[1] - 1, posEnd[2]}
         newContentExmark = api.nvim_buf_set_extmark(
             curBufNr,
-            M.inplacePutNewContentNS,
+            M.lastPutNs,
             posStart[1],
             posStart[2],
             {
@@ -336,7 +342,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
                 end_col = posEnd[2]
             })
     end
-    if newContentExmark then M.inplacePutNewContentExtmark = newContentExmark end
+    if newContentExmark then M.lastPutExtmark = newContentExmark end
     -- }}} Create highlight
 
     -- Restoration {{{
@@ -358,62 +364,6 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     M.lastPutLinewise = regTypeNew == "V" or regTypeNew == "l"
 end --  }}}
 
-
-function M.lastYankPut(hlType) -- {{{
-    -- Create jump location in jumplist
-    cmd [[normal! m`]]
-
-    local curBufNr = api.nvim_get_current_buf()
-    local curWinID = api.nvim_get_current_win()
-    local cursor   = api.nvim_win_get_cursor(curWinID)
-    local extmark
-    local linewise
-    if hlType == "yank" then
-        if not M.lastYankNS then return end
-        extmark = api.nvim_buf_get_extmark_by_id(curBufNr, M.lastYankNS,
-        M.lastYankExtmark, {details=true})
-        linewise = M.lastYankLinewise
-    elseif hlType == "put" then
-        if not M.inplacePutNewContentNS then return end
-        extmark = api.nvim_buf_get_extmark_by_id(curBufNr, M.inplacePutNewContentNS,
-        M.inplacePutNewContentExtmark, {details=true})
-        linewise = M.lastPutLinewise
-    end
-    -- Check valid extmark
-    if not next(extmark) then
-        return vim.notify("No record found on current buffer", vim.log.levels.WARN)
-    end
-
-    local selectStart = {extmark[1] + 1, extmark[2]}
-    local selectEnd   = {extmark[3]["end_row"] + 1, extmark[3]["end_col"]}
-
-    -- Determine select direction
-    local startDist = util.posDist(cursor, selectStart)
-    local endDist   = util.posDist(cursor, selectEnd)
-    if startDist < endDist then
-        if linewise then
-            api.nvim_win_set_cursor(curWinID, selectEnd)
-            cmd [[noautocmd normal! V]]
-            api.nvim_win_set_cursor(curWinID, {selectStart[1], cursor[2]})
-        else
-            api.nvim_win_set_cursor(curWinID, selectEnd)
-            cmd [[noautocmd normal! v]]
-            api.nvim_win_set_cursor(curWinID, selectStart)
-        end
-    else
-        if linewise then
-            api.nvim_win_set_cursor(curWinID, selectStart)
-            cmd [[noautocmd normal! V]]
-            api.nvim_win_set_cursor(curWinID, {selectEnd[1], cursor[2]})
-        else
-            api.nvim_win_set_cursor(curWinID, selectStart)
-            cmd [[noautocmd normal! v]]
-            api.nvim_win_set_cursor(curWinID, selectEnd)
-        end
-    end
-
-    return 0
-end -- }}}
 
 return M
 

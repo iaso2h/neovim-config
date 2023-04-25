@@ -1,8 +1,8 @@
 -- File: replace
 -- Author: iaso2h
 -- Description: Heavily inspired Ingo Karkat's work. Replace text with register
--- Version: 0.1.10
--- Last Modified: 2023-4-23
+-- Version: 0.1.11
+-- Last Modified: 2023-4-25
 -- TODO: tests for softtab convert
 -- NOTE: break change: Dot-repeat no longer support jump to mark motion now
 -- because the new method of setting new line(or replace line) via
@@ -20,7 +20,10 @@ local M    = {
     count                = nil,
     motionDirection      = nil,
     restoreOption        = nil,
-    ns = api.nvim_create_namespace("inplacePutNewContent"),
+
+    lastReplaceNs       = api.nvim_create_namespace("inplaceReplace"),
+    lastReplaceExtmark  = -1,
+    lastReplaceLinewise = false,
 
     -- Options
     highlightChangeChk = false,
@@ -408,8 +411,8 @@ function M.operator(args) -- {{{
     -- Use extmark to track the motionRegion
     local repExtmark
     -- Always clear namespace before hand
-    api.nvim_buf_clear_namespace(bufNr, M.ns, 0, -1)
-    local ok, msgOrVal = pcall(api.nvim_buf_set_extmark, bufNr, M.ns,
+    api.nvim_buf_clear_namespace(bufNr, M.lastReplaceNs, 0, -1)
+    local ok, msgOrVal = pcall(api.nvim_buf_set_extmark, bufNr, M.lastReplaceNs,
         motionRegion.Start[1] - 1, motionRegion.Start[2],
         {end_line = motionRegion.End[1] - 1, end_col = motionRegion.End[2]})
     -- End function calling if extmark is out of scope
@@ -473,7 +476,7 @@ function M.operator(args) -- {{{
     -- always reversed?
     local repEndLine
     if not next(rep) then
-        local repPos = api.nvim_buf_get_extmark_by_id(bufNr, M.ns, repExtmark, {details = true})
+        local repPos = api.nvim_buf_get_extmark_by_id(bufNr, M.lastReplaceNs, repExtmark, {details = true})
         if vimMode == "n" and motionType == "line" and repPos[3].end_col == 0 and repPos[2] == 0 then
             if repPos[3].end_row < repPos[1] then
                 -- NOTE: the END ROW has to subtract 1 offset
@@ -511,11 +514,14 @@ function M.operator(args) -- {{{
     -- Creates a new namespace or gets an existing one.
     if not (vimMode == "n" and not M.highlightChangeChk) then
         local newContentExmark = util.nvimBufAddHl(bufNr, rep.Start, rep.End,
-                reg.type, M.hlGroup, M.timeout, M.ns)
+                reg.type, M.hlGroup, M.timeout, M.lastReplaceNs)
         if newContentExmark then
-            if util.requireSafe("yankPut") then
-                util.requireSafe("yankPut").inplacePutNewContentExtmark = newContentExmark
-            end
+            M.lastReplaceExtmark = newContentExmark
+        end
+        if reg.type == "l" or reg.type == "V" then
+            M.lastReplaceLinewise = true
+        else
+            M.lastReplaceLinewise = false
         end
     end
 

@@ -262,6 +262,13 @@ map("n", [[<Plug>exchangeOperatorInplace]], function ()
 end, {"silent", "expr"}, "Exchange operator and restore the cursor position")
 map("n", [[gx]],  [[<Plug>exchangeOperatorInplace]], "Exchange operator and restore the cursor position")
 map("n", [[gxc]], [[<CMD>lua require("exchange").clear()<CR>]], "Exchange clear")
+
+map("n", [[gvr]], function()
+    require("selection").extmarkSelect(
+        require("replace").lastReplaceNs,
+        require("replace").lastReplaceExtmark,
+        require("replace").lastReplaceLinewise)
+end, "Select last yank")
 -- }}} Delete & Change & Replace & Exchange
 -- Search & Jumping {{{
 -- In case of mistouching
@@ -326,7 +333,8 @@ map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"}, "Disabl
 -- Matchit
 map("", [[<C-m>]], [[%]], {"silent"}, "Go to match parenthesis")
 -- Visual selection
-map("n", [[go]], [[<CMD>lua require("selection").cornerSelection(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
+map("n", [[gvv]], [[gv]], {"noremap"}, "Select previous selected region")
+map("n", [[gvo]], [[<CMD>lua require("selection").cornerSelection(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
 map({"n", "x"}, [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
 map({"n", "x"}, [[<C-q>]], [[<Nop>]], "which_key_ignore")
 -- }}} Search & Jumping
@@ -406,6 +414,7 @@ map("i", [[<C-w>j]], [[<C-o><C-w>j<CMD>stopinsert<CR>]], {"noremap"}, "Window be
 map("i", [[<C-w>h]], [[<C-o><C-w>h<CMD>stopinsert<CR>]], {"noremap"}, "Window left")
 map("i", [[<C-w>l]], [[<C-o><C-w>l<CMD>stopinsert<CR>]], {"noremap"}, "Window right")
 
+--TODO: <C-w>.
 map("n", [[<C-w>t]], [[<C-w>T]], {"noremap"}, "Move current window to new tab")
 map("n", [[<C-w>T]], [[<C-w>t]], {"noremap"}, "Move current window to top left")
 map("n", [[<C-w>b]], [[<Nop>]],  {"noremap"}, "which_key_ignore")
@@ -470,11 +479,6 @@ map({"i","n"}, [[<F3>]], function ()
         vim.opt.paste = true
     end
 end, "Toggle paste mode")
--- Highlight New Paste Content
-map("n", [[gy]], [[<CMD>lua require("yankPut").lastYankPut("yank")<CR>]], {"silent"}, "Select last yank")
-map("n", [[gY]], [[gy]], "Select last yank")
-map("n", [[gp]], [[<CMD>lua require("yankPut").lastYankPut("put")<CR>]],  {"silent"}, "Select last put")
-map("n", [[gP]], [[gp]], "Select last put")
 -- Inplace join
 map("n", [[J]], function ()
     vim.cmd("norm! m`" .. vim.v.count1 .. "J``")
@@ -491,6 +495,14 @@ map("n", [[p]], [[:lua require("yankPut").inplacePut("n", "p", false)<CR>]], {"s
 map("x", [[p]], [[:lua require("yankPut").inplacePut("v", "p", false)<CR>]], {"silent"}, "Put after")
 map("n", [[P]], [[:lua require("yankPut").inplacePut("n", "P", false)<CR>]], {"silent"}, "Put before")
 map("x", [[P]], [[:lua require("yankPut").inplacePut("v", "P", false)<CR>]], {"silent"}, "Put before")
+-- Highlight New Paste Content
+local yp = require("yankPut")
+map("n", [[gvy]], function()
+    require("selection").extmarkSelect(yp.lastYankNs, yp.lastYankExtmark, yp.lastYankLinewise)
+end, "Select last yank")
+map("n", [[gvp]], function()
+    require("selection").extmarkSelect(yp.lastPutNs, yp.lastPutExtmark, yp.lastPutLinewise)
+end, "Select last put")
 -- Convert put
 map("n", [[cp]], [[:lua require("yankPut").inplacePut("n", "p", true)<CR>]], {"silent"}, "Convert put after")
 map("n", [[cP]], [[:lua require("yankPut").inplacePut("n", "P", true)<CR>]], {"silent"}, "Convert put before")
