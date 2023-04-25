@@ -2,7 +2,7 @@ local M = {}
 local var = require("buf.var")
 
 
---- Gather informatioin about buffers and windows for further processing
+--- Gather information about buffers and windows for further processing
 M.initBuf = function()
     var.bufNr    = vim.api.nvim_get_current_buf()
     var.bufName  = nvim_buf_get_name(var.bufNr)
@@ -14,7 +14,7 @@ M.initBuf = function()
         end, vim.api.nvim_list_wins())
     -- NOTE: Do not use results from:
     -- vim.tbl_filter(function(i) return api.nvim_buf_is_loaded(i) end, api.nvim_list_bufs())
-    var.bufNrTbl = require("buf.util").bufTbl(true, false)
+    var.bufNrTbl = M.bufTbl(true, false)
 end
 
 
@@ -23,7 +23,7 @@ end
 --- @param hiddenIncluded boolean Whether include hidden buffer
 --- @return table
 function M.bufTbl(validLoadedOnly, hiddenIncluded) -- {{{
-    local unLisedBufTbl = vim.api.nvim_list_bufs()
+    local unListedBufTbl = vim.api.nvim_list_bufs()
     local cond = function(buf)
         if hiddenIncluded then
             if validLoadedOnly then
@@ -34,15 +34,15 @@ function M.bufTbl(validLoadedOnly, hiddenIncluded) -- {{{
         else
             if validLoadedOnly then
                 return vim.api.nvim_buf_is_loaded(buf) and
-                    vim.api.nvim_buf_get_option(buf, "bufhidden")
+                    vim.api.nvim_buf_get_option(buf, "bufhidden") == ""
             else
-                return vim.api.nvim_buf_get_option(buf, "bufhidden")
+                return vim.api.nvim_buf_get_option(buf, "bufhidden") == ""
             end
 
         end
     end
 
-    return vim.tbl_filter(cond, unLisedBufTbl)
+    return vim.tbl_filter(cond, unListedBufTbl)
 end -- }}}
 
 
@@ -120,11 +120,16 @@ M.getCurBufCntsInWins = function(buf)
 end
 
 
-M.bufValidCnt = function()
-    if M.bufNrTbl then
+--- Return valid and loaded buffer count
+---@param bufNrTbl? table Use `var.bufNrTbl` if no bufNrTbl provided
+---@return number
+M.bufValidCnt = function(bufNrTbl)
+    bufNrTbl = bufNrTbl or var.bufNrTbl
+
+    if bufNrTbl then
         local cnt = #vim.tbl_filter(function(bufNr)
             return vim.api.nvim_buf_get_name(bufNr) ~= ""
-        end, M.bufNrTbl)
+        end, bufNrTbl)
         return cnt
     else
         return 0

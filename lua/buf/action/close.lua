@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Delete buffer without change the window layout
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.32
--- Last Modified: 2023-4-24
+-- Version: 0.0.33
+-- Last Modified: 2023-4-25
 local bufUtil = require("buf.util")
 local var     = require("buf.var")
 local M    = {}
@@ -42,15 +42,6 @@ local function saveModified(bufNr) -- {{{
 end -- }}}
 
 
-local function historyStartup()
-    if bufUtil.bufValidCnt() == 1 then
-        return require("historyStartup").display(true)
-    else
-        return
-    end
-end
-
-
 --- Close buffer in a smart way
 --- @param checkSpecBuf boolean Whether to check the current buffer is
 --- a special buffer or a standard buffer. If false is provided, then the
@@ -58,7 +49,6 @@ end
 --- @param checkAllBuf boolean Whether to check other windows that have the
 --- same buffer instance as the one to be close. Only useful when wipe
 --- a standard buffer
---- @return boolean Represent whether it's safe to delete buffer
 local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
     -- Close buffer depending on buffer type
 
@@ -68,11 +58,11 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
 
         -- NOTE: more details see ":help buftype"
         if var.fileType == "vim" then
-            vim.api.nvim_feedkeys(t"<CMD>q<CR>", "t", false)
+            return vim.api.nvim_feedkeys(t"<CMD>q<CR>", "t", false)
         elseif var.fileType == "tsplayground" or var.fileType == "query" then
-            vim.cmd [[TSPlaygroundToggle]]
+            return vim.cmd [[TSPlaygroundToggle]]
         elseif var.fileType == "DiffviewFileHistory" then
-            vim.cmd [[DiffviewClose]]
+            return vim.cmd [[DiffviewClose]]
         end
 
         if var.bufType == "nofile" then
@@ -81,7 +71,7 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
                 vim.api.nvim_win_close(var.winID, true)
             elseif string.match(var.bufName, [[%[nvim%-lua%]$]]) then
                 -- Check for Lua pad
-                if bufUtil.bufValidCnt() > 1 then
+                if bufUtil.bufValidCnt() >= 1 then
                     bufUtil.switchAlter(var.winID)
                 else
                     bufUtil.bufWipe(var.bufNr)
@@ -97,24 +87,20 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
             end
         else
             -- Always wipe the special buffer if window count is 1
-            if not saveModified(var.bufNr) then return false end
+            if not saveModified(var.bufNr) then return end
             bufUtil.bufWipe(var.bufNr)
         end
-
-        return true
     else
         -- Scratch files
         if bufUtil.isScratchBuf() then
             -- Abort the processing when cancel is evaluated
-            if not saveModified(var.bufNr) then return false end
+            if not saveModified(var.bufNr) then return end
 
-            if bufUtil.bufValidCnt() > 1 then
+            if bufUtil.bufValidCnt() >= 1 then
                 bufUtil.bufWipe(var.bufNr)
             else
                 vim.cmd("q!")
             end
-
-            return true
         end
 
         -- Standard buffer -- {{{
@@ -123,13 +109,15 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
 
         -- Always prompt for unsaved change, so that buffer is ready to be
         -- deleted safely. Abort the processing when false is evaluated
-        if not saveModified(var.bufNr) then return false end
+        if not saveModified(var.bufNr) then return end
 
         -- Whether to check other windows that might have the same buffer instance
-        if not checkAllBuf or bufUtil.winCnt() == 1 then
-            historyStartup()
+        if not checkAllBuf or bufUtil.winCnt() == 1 and bufUtil.bufValidCnt() == 1 then
             bufUtil.bufWipe(var.bufNr)
-            return true
+            if vim.api.nvim_buf_get_name(0) == "" then
+                vim.api.nvim_buf_set_option(0, "buflisted", false)
+                require("historyStartup").display(true)
+            end
         end
 
         -- 1+ Windows
@@ -187,8 +175,6 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
             end
         end
          -- }}}Standard buffer
-
-        return true
     end
 end -- }}}
 
@@ -212,12 +198,6 @@ function M.init(type) -- {{{
                     return vim.cmd [[TSPlaygroundToggle]]
                 elseif var.fileType == "DiffviewFileHistory" then
                     return vim.cmd [[DiffviewClose]]
-                end
-                -- Override the default behavior, treat it like performing a buffer delete
-                if not bufClose(true, false) then return end
-                -- Make sure no lingering window after buffer being wiped
-                if bufUtil.winCnt() > 1 and vim.api.nvim_win_is_valid(var.winID) then
-                    bufUtil.closeWin(var.winID)
                 end
             elseif var.bufType == "nowrite" then
                 if vim.startswith(var.bufName, "diffview") then
@@ -243,11 +223,7 @@ function M.init(type) -- {{{
                 if bufUtil.getCurBufCntsInWins(var.bufNr) > 1 then
                     bufUtil.closeWin(var.winID)
                 else
-                    if not bufClose(false, false) then return end
-                    -- Make sure no lingering window after buffer being wiped
-                    if bufUtil.winCnt() > 1 and vim.api.nvim_win_is_valid(var.winID) then
-                        return bufUtil.closeWin(var.winID)
-                    end
+                    bufClose(false, false)
                 end
             else
                 -- Standard buffer
