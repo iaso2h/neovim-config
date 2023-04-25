@@ -142,7 +142,7 @@ au("BufWinEnter", {
 })
 
 -- HACK: https://github.com/neovim/neovim/issues/2127
-au("FocusGained,BufEnter", {
+au({"FocusGained", "WinEnter"}, {
     desc    = "Check and file changes after regaining focus",
     command = "checktime"
 })
@@ -234,6 +234,7 @@ excmd("RunSelection", function()
 
     local lineStr = require("selection").getSelect("string", false)
     -- TODO: support run multiple lines at the same time
+    -- Similar work lua-dev
     if vimMode == "V" then
         lineStr = string.gsub(lineStr, "\n", "")
     end
