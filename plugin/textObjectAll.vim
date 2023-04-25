@@ -2,7 +2,6 @@ function! s:isCurrentLineEmpty()
     return !len(getline('.'))
 endfunction
 " isCurrentLineEmpty
-" TODO: camelcase convert tool
 
 function! s:inside()
     keepjumps normal! gg^

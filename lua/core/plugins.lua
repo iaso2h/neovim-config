@@ -121,8 +121,8 @@ local pluginArgs = { -- {{{
     },
     {
         "inkarkat/vim-EnhancedJumps",
+        lazy = true,
         dependencies = {"inkarkat/vim-ingo-library"},
-        cond = true,
         init = function() vim.g.EnhancedJumps_no_mappings = 1 end,
     },
     {
@@ -338,7 +338,7 @@ local pluginArgs = { -- {{{
         cmd  = "MaximizerToggle",
         init = function()
             vim.g.maximizer_set_default_mapping   = 0
-            vim.g.maximizer_set_mapping_with_bang = 1
+            vim.g.maximizer_set_mapping_with_bang = 0
             vim.g.maximizer_restore_on_winleave   = 1
             map("n", [[<C-w>m]], [[<CMD>MaximizerToggle<CR>]],      {"silent"}, "Maximize window")
             map("t", [[<C-w>m]], [[<C-\><C-o><CMD>MaximizerToggle<CR>]], {"silent"}, "Maximize window")

@@ -52,7 +52,7 @@ return function()
     end, {
         desc  = "Toggle CSpell checking",
     })
-    -- TODO: refresh virtual diagnostic text
+    -- UGLY: refresh virtual diagnostic text
     vim.api.nvim_create_user_command("CSpellBufToggle", function()
         vim.b._cspellDisable = not vim.b._cspellDisable
         local state = vim.g._cspellEnable and not vim.b._cspellDisable

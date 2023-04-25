@@ -1,4 +1,5 @@
-return  function()
+-- https://github.com/iaso2h/nvim-cokeline/tree/master
+return function()
     local getHex = require("cokeline/utils").get_hex
     local space  = {text = " "}
     require("cokeline").setup{
@@ -93,6 +94,7 @@ return  function()
             }
         },
     }
-    map("n", [[g<A-,>]], [[<Plug>(cokeline-switch-prev)]], "Cokeline switch previous")
-    map("n", [[g<A-.>]], [[<Plug>(cokeline-switch-next)]], "Cokeline switch next")
+    map("n", [[g<A-,>]],  [[<Plug>(cokeline-switch-prev)]], "Cokeline switch previous")
+    map("n", [[g<A-.>]],  [[<Plug>(cokeline-switch-next)]], "Cokeline switch next")
+    map("n", "<leader>b", [[<Plug>(cokeline-pick-focus)]],  "Cokeline focus")
 end

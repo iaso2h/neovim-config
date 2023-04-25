@@ -379,7 +379,7 @@ M.execMap = function(key) -- {{{
             local bufValidCnt = require("buf.util").bufValidCnt(
                 require("buf.util").bufTbl(true, false) )
             if bufValidCnt == 0 then
-                vim.cmd("noa q!")
+                vim.cmd("noa qa!")
             else
                 -- Switch to last buffer or close the current window
                 if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then

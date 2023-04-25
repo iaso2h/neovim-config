@@ -14,6 +14,7 @@ end
 
 --- Wipe all the other buffers except for the special buffers without changing the window layout
 function M.init() -- {{{
+    -- TODO: parsing all buffers in buf.close instead
     util.initBuf()
     if util.isSpecBuf() then return end
 

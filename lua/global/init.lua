@@ -66,17 +66,62 @@ vim.g.msql_sql_query = 1
 
 -- Global function {{{
 require("global.keymap")
+
+
 _G.Print = function(...)
     local objects = {}
     for i = 1, select('#', ...) do
         local v = select(i, ...)
         table.insert(objects, vim.inspect(v))
     end
-    if #objects == 1 and type(objects[1]) == "table" then
-        require("pprint").pprint(objects[1])
-    else
-        print(table.concat(objects, '\n'))
+
+    print(table.concat(objects, '\n'))
+
+    return ...
+end
+
+
+_G.logBuf = function(...)
+    local objects = {}
+    for i = 1, select('#', ...) do
+        local v = select(i, ...)
+        table.insert(objects, vim.inspect(v))
     end
+    table.insert(objects, 1, os.date("%Y-%m-%d-%H:%M:%S", os.time()) .. "-------------------------------------------")
+
+    -- Output the result into a new scratch buffer
+    if _G._logBufNr and vim.api.nvim_buf_is_valid(_G._logBufNr) then
+        -- Focus on that log buffer
+        for _, tbl in ipairs(vim.fn.getwininfo()) do
+            if vim.api.nvim_win_get_buf(tbl["winid"]) == _G._logBufNr then
+                vim.cmd(string.format("%dwincmd w", tbl["winnr"]))
+                vim.cmd [[keepjumps norm! G]]
+                vim.api.nvim_put(objects, "l", true, true)
+                return
+            end
+        end
+        vim.api.nvim_set_current_buf(_G._logBufNr)
+        vim.api.nvim_put(objects, "l", true, true)
+        vim.cmd "wincmd p"
+    elseif vim.bo.modifiable and not vim.bo.buflisted and vim.bo.bufhidden ~= "" then
+        -- Use current file as the log buffer
+        _G._logBufNr = vim.api.nvim_get_current_buf()
+        vim.api.nvim_buf_set_option(_G._logBufNr, "bufhidden", "wipe")
+        vim.api.nvim_buf_set_option(_G._logBufNr, "buftype", "nofile")
+        vim.api.nvim_put(objects, "l", true, true)
+        -- vim.api.nvim_buf_set_lines(_G._logBufNr, 0, -1, false, objects)
+    else
+        -- TODO: how to determine performing a vertical split or a horizontal split
+        vim.cmd [[vsplit]]
+        _G._logBufNr = vim.api.nvim_create_buf(false, true)
+        vim.api.nvim_buf_set_option(_G._logBufNr, "bufhidden", "wipe")
+        vim.api.nvim_set_current_buf(_G._logBufNr)
+        vim.api.nvim_put(objects, "l", true, true)
+        -- vim.api.nvim_buf_set_lines(_G._logBufNr, 0, -1, false, objects)
+        vim.cmd "wincmd p"
+    end
+
+    vim.api.nvim_feedkeys(t[[:%s#\\n#\r#e<CR>]], "nt", false)
 
     return ...
 end

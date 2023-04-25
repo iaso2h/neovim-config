@@ -144,7 +144,6 @@ map("n", [[<C-f>a]], [[<CMD>lua require('telescope.builtin').builtin()<CR>]], {"
 
 map("n", [[<C-f>E]], [[<CMD>lua require('telescope.builtin').find_files({no_ignore=true})<CR>]],
         {"silent"}, "Find files(ignore git file)")
--- TODO: keepjump
 map("n", [[<C-f>e]], [[<CMD>lua require('telescope.builtin').find_files({no_ignore=false})<CR>]],
         {"silent"}, "Find all files")
 
