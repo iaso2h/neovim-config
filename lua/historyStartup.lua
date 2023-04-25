@@ -2,17 +2,17 @@
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
 -- Dependencies: 0
--- Version: 0.0.19
--- Last Modified: 2023-4-24
+-- Version: 0.0.20
+-- Last Modified: 2023-4-25
 -- TODO: ? to trigger menupage
 
 local M   = {
-    curBuf  = nil,
-    lastBuf = nil,
-    curWin  = nil,
-    oldBuf  = nil,
-    floatWinID = nil,
-    floatBufNr = nil,
+    curBuf  = -1,
+    lastBuf = -1,
+    curWin  = -1,
+    oldBuf  = -1,
+    floatWinID = -1,
+    floatBufNr = -1,
     floatTick = false,
     ns      = vim.api.nvim_create_namespace("historyStartup"),
     lines = {
@@ -79,33 +79,6 @@ local strikeThroughOpened = function() -- {{{
     end
 end -- }}}
 
-
--- Destory historyStartup buffer
-local destoryBuf = function() -- {{{
-    if not M.curBuf then return end
-
-    -- Get all non-relative window IDs
-    local winIDTbl = vim.tbl_filter(function(i)
-        return vim.api.nvim_win_get_config(i).relative == ""
-    end, vim.api.nvim_list_wins())
-    local historyStartupVisibleTick = true
-    for _, win in ipairs(winIDTbl) do
-        if vim.api.nvim_win_get_buf(win) == M.curBuf then
-            historyStartupVisibleTick = false
-            break
-        end
-    end
-
-    -- Don't destroy historyStartup yet if it's still visible in other windows
-    if not historyStartupVisibleTick then
-        return strikeThroughOpened()
-    end
-
-    if vim.api.nvim_buf_is_valid(M.curBuf) then
-        vim.api.nvim_buf_delete(M.curBuf, {force = true})
-    end
-    M.curBuf = nil
-end -- }}}
 
 
 local autoCMD = function(bufNr) -- {{{
@@ -215,9 +188,10 @@ M.display = function(refreshChk) -- {{{
         M.curBuf = 1
         vim.api.nvim_buf_set_option(M.curBuf, "buftype", "nofile")
         vim.api.nvim_buf_set_option(M.curBuf, "buflisted", false)
-    elseif vim.bo.modifiable and not vim.bo.buflisted and vim.bo.bufhidden ~= "" then
+    elseif vim.bo.modifiable and not vim.bo.buflisted and
+            vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
         -- Use the current buffer if it's a scratch buffer
-        M.curBuf  = M.lastBuf
+        M.curBuf  = vim.api.nvim_get_current_buf()
         M.lastBuf = nil
         vim.api.nvim_buf_set_option(M.curBuf, "buftype", "nofile")
     else
@@ -255,7 +229,7 @@ M.display = function(refreshChk) -- {{{
 
     -- Key mappings
     vim.defer_fn(function()
-        for _, key in ipairs {"o", "go", "<C-s>", "<C-v>", "<C-t>", "<CR>", "q", "K"} do
+        for _, key in ipairs {"o", "go", "<C-s>", "<C-v>", "<C-t>", "<CR>", "q", "Q", "K"} do
             vim.api.nvim_buf_set_keymap(
                 M.curBuf,
                 "n",
@@ -402,10 +376,9 @@ M.execMap = function(key) -- {{{
                 end
             end
         elseif key == "q" then
-            local bufNrTbl = vim.tbl_filter(function(bufNr)
-                return vim.api.nvim_buf_get_name(bufNr) ~= ""
-            end, require("buf.util").bufTbl(true, false))
-            if #bufNrTbl == 0 then
+            local bufValidCnt = require("buf.util").bufValidCnt(
+                require("buf.util").bufTbl(true, false) )
+            if bufValidCnt == 0 then
                 vim.cmd("noa q!")
             else
                 -- Switch to last buffer or close the current window
