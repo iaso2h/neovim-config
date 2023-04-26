@@ -111,12 +111,6 @@ au("BufWritePre", {
         require("util").trimSpaces()
     end
 })
--- HACK: not working properly
-au("BufWritePost", {
-    group   = augroupWrite,
-    desc    = "Avoiding folding after making modification on a buffer for the first time",
-    command = "normal! zv"
-})
 
 if _G._autoreload then
     au("BufWritePost", {
@@ -132,6 +126,15 @@ if _G._autoreload then
     })
 end
 
+-- HACK: not working properly https://github.com/fatih/vim-go/issues/502
+au("BufWritePost", {
+    group   = augroupWrite,
+    desc    = "Avoiding folding after making modification on a buffer for the first time",
+    callback = function()
+        vim.api.nvim_feedkeys("zv", "nt", false)
+        -- vim.cmd[[normal! zxzv]]
+    end
+})
 
 au("BufReadPost", {
     desc     = "Place the cursor on the last position",

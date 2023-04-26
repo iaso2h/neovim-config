@@ -296,6 +296,17 @@ local pluginArgs = { -- {{{
         keys = { { [[<leader>z]],  mode = "n" }, },
         config = require("plugins.nvim-no-neck-pain")
     },
+    {
+        "chrisbra/unicode.vim",
+        cmd = {
+            "UnicodeSearch",
+            "UnicodeName",
+            "UnicodeCache",
+            "UnicodeTable",
+            "Digraphs",
+            "DownloadUnicode",
+        }
+    },
     -- }}} Vim enhancement
     -- Telescope {{{
     {
@@ -328,11 +339,20 @@ local pluginArgs = { -- {{{
         end,
     },
     {
-        'prochri/telescope-all-recent.nvim',
-        dependencies = { "kkharji/sqlite.lua"},
+        "prochri/telescope-all-recent.nvim",
+        dependencies = { "telescope.nvim", "kkharji/sqlite.lua"},
         config = function()
             require 'telescope-all-recent'.setup { }
         end
+    },
+    {
+        "rafi/telescope-thesaurus.nvim",
+        enabled = false,
+        dependencies = { "telescope.nvim"},
+    },
+    {
+        "ron89/thesaurus_query.vim",
+        cmd = {"Thesaurus"}
     },
     -- }}} Telescope
     -- UI {{{

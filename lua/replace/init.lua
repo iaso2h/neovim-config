@@ -62,16 +62,7 @@ end
 -- Function: saveOption:Store vim options before perform any replacement----
 ----
 local saveOption = function() -- {{{
-    local saveClipboard
     local saveSelection
-
-    -- BUG: somehow it will trigger xclipboard warning
-    -- if api.nvim_get_option("clipboard") ~= "" then
-
-        -- saveClipboard = vim.o.clipboard
-        -- -- Avoid clobbering the selection and clipboard registers.
-        -- vim.o.clipboard = ""
-    -- end
 
     if api.nvim_get_option("selection") ~= "inclusive" then
         saveSelection = vim.o.clipboard
@@ -82,7 +73,6 @@ local saveOption = function() -- {{{
     if saveClipboard or saveSelection then
         M.restoreOption = function()
             if saveSelection then vim.opt.selection = saveSelection end
-            if saveClipboard then vim.opt.clipboard = saveClipboard end
         end
     else
         M.restoreOption = nil
@@ -486,6 +476,7 @@ function M.operator(args) -- {{{
                     End   = {repPos[1], #repEndLine - 1}
                 }
             else
+                print('DEBUGPRINT[1]: init.lua:488 (after else)')
                 repEndLine = api.nvim_buf_get_lines(bufNr, repPos[3].end_row - 1, repPos[3].end_row, false)[1]
                 rep = {
                     Start = {repPos[1] + 1, repPos[2]},
@@ -501,6 +492,7 @@ function M.operator(args) -- {{{
                     End   = {repPos[1] + 1, repPos[2] - 1}
                 }
             else
+                print('DEBUGPRINT[2]: init.lua:504 (after else)')
                 repEndLine = api.nvim_buf_get_lines(bufNr, repPos[3].end_row, repPos[3].end_row + 1, false)[1]
                 rep = {
                     Start = {repPos[1] + 1, repPos[2]},

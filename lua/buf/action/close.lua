@@ -100,7 +100,7 @@ local function bufHandler(loneWin) -- {{{
             -- Abort the processing when cancel is evaluated
             if not saveModified(var.bufNr) then return end
 
-            if u.bufValidCnt() >= 1 then
+            if u.bufValidCnt() > 1 then
                 return u.closeBuf(var.bufNr)
             else
                 return vim.cmd("q!")

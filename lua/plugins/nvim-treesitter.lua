@@ -47,5 +47,5 @@ return function()
 
     map("n",        [[<A-S-a>]], [[gnn]], "Expand selection")
     map("x",        [[<A-S-a>]], [[grc]], "Expand selection")
-    map({"n", "x"}, [[<A-S-s>]], [[grm]], "Shirnk selection")
+    map({"n", "x"}, [[<A-S-s>]], [[grm]], "Shrink selection")
 end
