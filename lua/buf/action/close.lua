@@ -92,13 +92,18 @@ local function bufHandler(loneWin) -- {{{
     else
         -- Scratch files
         if u.isScratchBuf() then
+            if string.find(var.bufName, "no-neck-pain") and
+                    package.loaded["no-neck-pain"] then
+                return require("no-neck-pain").toggle()
+            end
+
             -- Abort the processing when cancel is evaluated
             if not saveModified(var.bufNr) then return end
 
             if u.bufValidCnt() >= 1 then
-                u.bufWipe(var.bufNr)
+                return u.closeBuf(var.bufNr)
             else
-                vim.cmd("q!")
+                return vim.cmd("q!")
             end
 
         end
@@ -245,6 +250,10 @@ local winHandler = function() -- {{{
         -- Close window containing buffer
 
         if u.isScratchBuf() then
+            if string.find(var.bufName, "no-neck-pain") and
+                package.loaded["no-neck-pain"] then
+                return require("no-neck-pain").toggle()
+            end
             -- Scratch files. Override the default behavior, treat it like performing a buffer delete
             if u.getCurBufCntsInWins(var.bufNr) > 1 then
                 u.closeWin(var.winID)
