@@ -45,7 +45,7 @@ M.main = function(qfChk, pat, bang)
 
 
     local cond
-    local regex = vim.regex(fn.escape(pat, "\\"))
+    local regex = vim.regex(pat)
     if not regex then return end
 
     if bang then
