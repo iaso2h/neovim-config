@@ -155,7 +155,7 @@ M.jumplistRegisterLinesToTbl = function(returnJumpsChk, startLineNr, lastLineNr,
     if vim.bo.modifiable and not vim.bo.buflisted and vim.bo.bufhidden ~= "" then
         scratchBuf = currentBuf
     else
-        -- TODO: how to decide perform a vertical split or a horizontal split
+        -- TODO: how to determine performing a vertical split or a horizontal split
         vim.cmd [[vsplit]]
         scratchBuf = vim.api.nvim_create_buf(false, true)
         vim.api.nvim_buf_set_option(scratchBuf, "bufhidden", "wipe")

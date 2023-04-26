@@ -1,4 +1,4 @@
--- BUG: doesn't work on config/nvim-null-is.lua
+-- BUG: doesn't work on plugins/nvim-null-is.lua
 local fn   = vim.fn
 local api  = vim.api
 local util = require("autoreload.util")

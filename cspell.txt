@@ -89,3 +89,5 @@ offx
 offy
 guihua
 augroups
+fixit
+optim

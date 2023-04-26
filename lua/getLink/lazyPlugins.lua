@@ -111,7 +111,7 @@ return function(bufNr, cursorPos, fallback)
 
     -- Plugin use a table specification for the configuration
     local pluginSpecRange = pluginInfos.specRanges[pluginIdx]
-    local configRegex = vim.regex [[\(config\|init\).\{-}=.\{-}require[ (]\{-}\('\|"\)config\.\zs.*\ze\('\|"\)]]
+    local configRegex = vim.regex [[\(config\|init\).\{-}=.\{-}require[ (]\{-}\('\|"\)plugins\.\zs.*\ze\('\|"\)]]
     local pluginSpecLines = vim.api.nvim_buf_get_lines(bufNr, pluginSpecRange[1], pluginSpecRange[3] + 1, false)
     -- Loop form the end to check keyword in every line so that cursor can get
     -- snap to the closest available keyword even if it's not on the same line
@@ -120,13 +120,13 @@ return function(bufNr, cursorPos, fallback)
         local lineIdx  = pluginSpecRange[3] - (#pluginSpecLines - i) -- 0 indexed
         -- Only check the fields just above the cursorline
         if lineIdx <= cursorIdx[1] then
-            -- Try to open the file for the config/init field in path:
+            -- Try to open the file for the plugins/init field in path:
             -- <Neovim configuration path>/lua/config/<plugin name>.lua
             ---@diagnostic disable-next-line: need-check-nil
             local idx = {configRegex:match_str(lineText)}
             if next(idx) then
                 local configName = lineText:sub(idx[1] + 1, idx[2])
-                return string.format("e %s%slua%sconfig%s%s.lua",
+                return string.format("e %s%slua%plugins%s%s.lua",
                     _G._config_path, _G._sep, _G._sep, _G._sep, configName)
             end
 

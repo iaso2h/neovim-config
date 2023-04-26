@@ -19,12 +19,3 @@ vim.defer_fn(function()
     if not ok then vim.notify(msg, vim.log.levels.ERROR) end
     _G.CoreMappigsStart = false
 end, 0)
-
-if _G._enable_plugin then
-    vim.defer_fn(function()
-        ok, msg = pcall(require, "core.plugins")
-        if not ok then
-            return vim.notify(msg, vim.log.levels.ERROR)
-        end
-    end, 0)
-end

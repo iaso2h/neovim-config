@@ -21,19 +21,19 @@ M.opt.lua.moduleSearchPath = M.configPath:joinpath("lua")
 M.opt.lua.blacklist        = {
     M.configPath:joinpath("lua", "config", "nvim-galaxyline.lua").filename,
     M.configPath:joinpath("lua", "config", "nvim-null-is.lua").filename,
-    M.configPath:joinpath("lua", "core", "plugins.lua").filename,
+    M.configPath:joinpath("lua", "core", "plugins", "init.lua").filename,
     M.configPath:joinpath("lua", "core", "init.lua").filename,
     -- M.configPath:joinpath("lua", "global").filename,
 }
 M.opt.lua.overrideFileModulePath = {
     M.configPath:joinpath("lua", "core"),
-    M.configPath:joinpath("lua", "config"),
+    M.configPath:joinpath("lua", "plugins"),
 }
 M.opt.lua.setup  = {}
 M.opt.lua.config = { -- {{{
     {
         -- Call the config func from "<NvimConfig>/lua/config/" if it's callable
-        pathPat       = M.opt.lua.moduleSearchPath:joinpath("config").filename,
+        pathPat       = M.opt.lua.moduleSearchPath:joinpath("plugins").filename,
         unloadOnlyChk = false,
         callback      = function(path, callback)
             if not _G._enable_plugin then return end

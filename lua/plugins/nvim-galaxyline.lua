@@ -31,7 +31,7 @@ local gls       = gl.section
 local condition = require("galaxyline.condition")
 
 -- Filetype
-gl.short_line_list = require("config.nvim-galaxyline").shortLineList
+gl.short_line_list = require("plugins.nvim-galaxyline").shortLineList
 
 local colors = {
     fg        = "#5E81AC",

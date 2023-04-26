@@ -52,6 +52,7 @@ local defaultTheme = {
             ["<C-d>"]     = false,
             ["<C-x>"]     = false,
             ["<C-w>"]     = false,
+            ["<C-l>"]     = false,
 
             ["<C-n>"]  = actions.move_selection_next,
             ["<C-p>"]  = actions.move_selection_previous,

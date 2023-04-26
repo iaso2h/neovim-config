@@ -61,7 +61,7 @@ function M.main(selectText)
 
         local filePath = fn.expand("%:p")
 
-        if filePath == string.format("%s%slua%score%splugins.lua", _G._config_path, _G._sep, _G._sep, _G._sep) then
+        if filePath == string.format("%s%slua%splugins%sinit.lua", _G._config_path, _G._sep, _G._sep, _G._sep) then
             url = require("getLink.lazyPlugins")(curBufNr, cursorPos, getUrl)
             if type(url) == "string" and url ~= "" then
                 if string.find(url, "http") then
@@ -83,7 +83,7 @@ function M.main(selectText)
         if _G._os_uname.sysname == "Windows_NT" then
             fn.system{"explorer", selectText}
         elseif _G._os_uname.sysname == "Linux" then
-            if fn.expand("%:p") == fn.stdpath("config") .. "/lua/core/plugins.lua" then
+            if fn.expand("%:p") == fn.stdpath("config") .. "/lua/plugins/init.lua" then
                 selectText = "https://github.com/" .. selectText
             end
                 fn.system{"xdg-open", selectText}

@@ -14,3 +14,12 @@ if not ok then
 end
 
 require "core"
+
+if _G._enable_plugin then
+    vim.defer_fn(function()
+        ok, msg = pcall(require, "plugins")
+        if not ok then
+            return vim.notify(msg, vim.log.levels.ERROR)
+        end
+    end, 0)
+end

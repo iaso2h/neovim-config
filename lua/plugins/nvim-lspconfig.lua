@@ -5,7 +5,7 @@ return function()
     local lspConfig = require("lspconfig")
     local lspUtil   = require("lspconfig.util")
     local path      = require("plenary.path")
-    local servers   = require("config.nvim-mason-lspconfig").servers
+    local servers   = require("plugins.nvim-mason-lspconfig").servers
     ----
     -- Function: onAttach :Mappings or commands need to be loaded when specific LSP is attach
     --
