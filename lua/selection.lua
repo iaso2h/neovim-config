@@ -134,7 +134,6 @@ function M.extmarkSelect(ns, extmark, linewise) -- {{{
     local extmarkPos = vim.api.nvim_buf_get_extmark_by_id(curBufNr, ns, extmark, {details=true})
 
     -- Validate extmark
-    print('print[6]: selection.lua:139 (before if not next(extmarkPos) then)')
     if not next(extmarkPos) then
         return vim.notify("No record found on current buffer", vim.log.levels.WARN)
     end

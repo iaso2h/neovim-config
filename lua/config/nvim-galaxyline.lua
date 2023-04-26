@@ -111,9 +111,16 @@ local vimMode
 local tightWinChk = false
 
 
-local shortLineFileType = function ()
-    local fileType = vim.bo.filetype
-    return vim.tbl_contains(gl.short_line_list, fileType)
+local isSpecialFileType = function ()
+    return vim.tbl_contains(gl.short_line_list, vim.bo.filetype)
+end
+
+local isNoNeckPain = function()
+    if vim.bo.filetype == "no-neck-pain" then
+        return true
+    else
+        return false
+    end
 end
 
 
@@ -165,7 +172,10 @@ end
 
 local changeHLColor = function (hlStr)
     local cmdStr
-    if vimMode == "c" then
+    if vim.o.paste then
+        cmdStr = string.format("hi %s guibg=%s guifg=%s gui=%s",
+            hlStr, colors.red, colors.bg1, "bold")
+    elseif vimMode == "c" then
         cmdStr = string.format("hi %s guibg=%s guifg=%s gui=%s",
             hlStr, modeColors[vimMode], colors.blue, "bold")
     elseif vimMode == "n" then
@@ -231,10 +241,15 @@ gls.left[1] = { -- {{{
 gls.left[#gls.left+1] = {
     VimModeCap = {
         provider = function()
-            local cmdStr = string.format("hi GalaxyVimModeCap guifg=%s", modeColors[vimMode])
-            vim.cmd(cmdStr)
+                local cmdStr
+                if vim.o.paste then
+                    cmdStr = string.format("hi GalaxyVimModeCap guifg=%s", colors.red)
+                else
+                    cmdStr = string.format("hi GalaxyVimModeCap guifg=%s", modeColors[vimMode])
+                end
+                vim.cmd(cmdStr)
 
-            return circleHalfRight .. " "
+                return circleHalfRight .. " "
         end,
         highlight = {colors.fg, colors.bg3},
     }
@@ -288,18 +303,27 @@ gls.left[#gls.left+1] = {
 -- end
 
 gls.left[#gls.left+1] = {
+    DiffLeadingSpace = {
+        provider  = function() return " " end,
+        condition = hideInTight,
+        highlight = {colors.bg2, colors.bg2}
+    }
+}
+
+gls.left[#gls.left+1] = {
     DiffAdd = {
         provider  = "DiffAdd",
         condition = hideInTight,
-        icon      = "  ",
+        icon      = " ",
         highlight = {colors.green, colors.bg2}
     }
 }
+
 gls.left[#gls.left+1] = {
     DiffModified = {
         provider  = "DiffModified",
         condition = hideInTight,
-        icon      = "  ",
+        icon      = " ",
         highlight = {colors.yellow, colors.bg2}
     }
 }
@@ -308,7 +332,7 @@ gls.left[#gls.left+1] = {
     DiffRemove = {
         provider  = "DiffRemove",
         condition = hideInTight,
-        icon      = "  ",
+        icon      = " ",
         highlight = {colors.red, colors.bg2}
     }
 }
@@ -320,11 +344,17 @@ gls.left[#gls.left+1] = {
     }
 }
 
+gls.left[#gls.left+1] = {
+    DiagnosticLeadingSpace = {
+        provider  = function() return " " end,
+        highlight = {colors.bg1, colors.bg1}
+    }
+}
 
 gls.left[#gls.left+1] = {
     DiagnosticHint = {
         provider  = "DiagnosticHint",
-        icon      = "  ",
+        icon      = " ",
         highlight = {colors.blueLight,colors.bg1},
     }
 }
@@ -332,7 +362,7 @@ gls.left[#gls.left+1] = {
 gls.left[#gls.left+1] = {
     DiagnosticInfo = {
         provider  = "DiagnosticInfo",
-        icon      = "  ",
+        icon      = " ",
         highlight = {colors.blue,colors.bg1},
     }
 }
@@ -340,7 +370,7 @@ gls.left[#gls.left+1] = {
 gls.left[#gls.left+1] = {
     DiagnosticWarn = {
         provider  = "DiagnosticWarn",
-        icon      = "  ",
+        icon      = " ",
         highlight = {colors.yellow, colors.bg1}
     }
 }
@@ -348,7 +378,7 @@ gls.left[#gls.left+1] = {
 gls.left[#gls.left+1] = {
     DiagnosticError = {
         provider  = "DiagnosticError",
-        icon      = "  ",
+        icon      = " ",
         highlight = {colors.red, colors.bg1}
     }
 } -- }}}
@@ -424,13 +454,12 @@ gls.right[#gls.right+1] = {
 
 
 gls.short_line_left[1] = { -- {{{
-    ShortFileType = {
+    SpecialFileTypeVimMode = {
         provider = function()
             vimMode = vim.fn.mode()
-            changeHLColor("GalaxyShortFileType")
+            changeHLColor("GalaxySpecialFileTypeVimMode")
 
             local fileType = vim.bo.filetype
-            local bufIcon = bufTypeIcons[fileType]
             if fileType == "qf" then
                 -- The value of vim.b._is_loc is set up whenever a qf filetype
                 -- is set via after/ftplugin/qf.lua
@@ -439,24 +468,25 @@ gls.short_line_left[1] = { -- {{{
                 fileType:upper()
             end
 
+            local bufIcon = bufTypeIcons[fileType]
             if bufIcon then
                 return "  " .. bufIcon .. " " .. fileType .. " "
             else
                 return "  " .. fileType .. " "
             end
         end,
-        condition = shortLineFileType,
+        condition = isSpecialFileType,
         highlight = {colors.fg, colors.bg},
     }
 }
 
 gls.short_line_left[2] = {
-    ShortFileTypeCap = {
+    SpecialFileTypeVimModeCap = {
         provider = function()
-            vim.cmd("hi GalaxyShortFileTypeCap guifg=" .. modeColors[vimMode])
+            vim.cmd("hi GalaxySpecialFileTypeVimModeCap guifg=" .. modeColors[vimMode])
             return circleHalfRight
         end,
-        condition = shortLineFileType,
+        condition = isSpecialFileType,
         highlight = {colors.fg, colors.bg},
     }
 }
@@ -464,8 +494,8 @@ gls.short_line_left[2] = {
 
 gls.short_line_left[3] = {
     ShortFileIconStart = {
-        provider = function() return " " end,
-        highlight = {colors.gray, colors.bg1}
+        provider = function() return "" end,
+        highlight = {colors.gray, colors.bg}
     }
 }
 
@@ -473,7 +503,9 @@ gls.short_line_left[4] = {
     ShortFileIcon = {
         provider  = "FileIcon",
         condition = function ()
-            return condition.buffer_not_empty() and not shortLineFileType()
+            return not isNoNeckPain() and
+            condition.buffer_not_empty() and
+            not isSpecialFileType()
         end,
         highlight = {colors.gray, colors.bg1}
     }
@@ -483,7 +515,9 @@ gls.short_line_left[5] = {
     ShortFileInfo = {
         provider  = fileInfo,
         condition = function ()
-            return condition.buffer_not_empty() and not shortLineFileType()
+            return not isNoNeckPain() and
+            condition.buffer_not_empty() and
+            not isSpecialFileType()
         end,
         highlight = {colors.gray, colors.bg1}
     }
@@ -494,8 +528,13 @@ gls.short_line_right[1] = {
     ShortRightLineInfo = {
         provider  = lineInfo,
         condition = function ()
-            return vim.tbl_contains(whiteList, vim.bo.filetype) or
-                (condition.buffer_not_empty() and not shortLineFileType())
+            if isNoNeckPain() then
+                return false
+            elseif vim.tbl_contains(whiteList, vim.bo.filetype) then
+                return true
+            else
+                return condition.buffer_not_empty() and not isSpecialFileType()
+            end
         end,
         highlight = {colors.gray, colors.bg1}
     }

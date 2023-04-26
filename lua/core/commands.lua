@@ -133,7 +133,7 @@ if _G._autoreload then
 end
 
 
-au("BufWinEnter", {
+au("BufReadPost", {
     desc     = "Place the cursor on the last position",
     callback = function(arg)
         -- Credit: https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim

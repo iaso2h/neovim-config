@@ -102,6 +102,13 @@ local pluginArgs = { -- {{{
         config = require("config.nvim-sibling-swap")
     },
     {
+        "ckolkey/ts-node-action",
+        dependencies = { "nvim-treesitter" },
+        init = function()
+            map("n", [[<leader>s]], require("ts-node-action").node_action, "Trigger node action" )
+        end
+    },
+    {
         "windwp/nvim-ts-autotag",
         dependencies = { "nvim-treesitter", },
         event  = "InsertEnter",
@@ -132,28 +139,27 @@ local pluginArgs = { -- {{{
     {
         "inkarkat/vim-Concealer",
         dependencies = {"inkarkat/vim-ingo-library"},
+        keys = {
+            {[[<leader>xx]], mode = "n"},
+            {[[<leader>xx]], mode = "x"},
+            {[[<leader>xa]], mode = "n"},
+            {[[<leader>xa]], mode = "x"},
+            {[[<leader>xd]], mode = "n"},
+            {[[<leader>xd]], mode = "x"},
+        },
+        config = function()
+            map("n", [[<leader>xx]], [[<Plug>(ConcealerToggleLocal)]], "Conceal current word locally")
+            map("x", [[<leader>xx]], [[<Plug>(ConcealerToggleLocal)]], "Reveal selected word locally")
+            map("n", [[<leader>xa]], [[<Plug>(ConcealerAddGlobal)]],   "Conceal current word globally")
+            map("x", [[<leader>xa]], [[<Plug>(ConcealerAddGlobal)]],   "Conceal selected words globally")
+            map("n", [[<leader>xd]], [[<Plug>(ConcealerRemGlobal)]],   "Reveal current word globally")
+            map("x", [[<leader>xd]], [[<Plug>(ConcealerRemGlobal)]],   "Reveal selected words globally")
+        end
     },
     {
         "bkad/camelcasemotion",
         event = {"BufAdd"},
         init  = function() vim.g.camelcasemotion_key = "," end
-    },
-    {
-        "zatchheems/vim-camelsnek",
-        keys = {
-            {[[<A-c>]], mode = "x"},
-            {[[<A-c>]], mode = "n"},
-            {[[<A-S-c>]], mode = "n"},
-        },
-        init = function()
-            vim.g.camelsnek_alternative_camel_commands = 1
-            vim.g.camelsnek_no_fun_allowed             = 1
-            vim.g.camelsnek_iskeyword_override         = 0
-        end,
-        config = function()
-            map("n", [[<A-c>]],   [[<CMD>lua require("caseSwitcher").cycleCase()<CR>]],           "Cycle cases")
-            map("n", [[<A-S-c>]], [[<CMD>lua require("caseSwitcher").cycleDefaultCMDList()<CR>]], "Cycle cases reset")
-        end,
     },
     {
         "phaazon/hop.nvim",
@@ -171,15 +177,6 @@ local pluginArgs = { -- {{{
                 case_insensitive = false
             }
         end
-    },
-    {
-        "AndrewRadev/switch.vim",
-        cmd  = {"Switch"},
-        init = function()
-            map("n", [[<leader>s]], [[<CMD>Switch<CR>]], {"silent"}, "Switch word under cursor")
-            vim.g.switch_mapping = ""
-        end,
-        config = require("config.vim-switch")
     },
     {
         "kylechui/nvim-surround",
@@ -218,63 +215,7 @@ local pluginArgs = { -- {{{
         dependencies = { "nvim-treesitter" },
         keys = {{"gcd", mode = "n"}},
         cmd  = {"Neogen"},
-        config = function()
-            require("neogen").setup {
-                enabled             = true,
-                input_after_comment = true,
-                languages = {
-                    lua = {
-                        template = {
-                            annotation_convention = "emmylua"
-                        }
-                    },
-                    python = {
-                        template = {
-                            annotation_convention = "google_docstrings"
-                        }
-                    },
-                    c = {
-                        template = {
-                            annotation_convention = "doxygen"
-                        }
-                    },
-                    csharp = {
-                        template = {
-                            annotation_convention = "xmldoc"
-                        }
-                    },
-                    rust = {
-                        template = {
-                            annotation_convention = "rustdoc"
-                        }
-                    },
-                    typescript = {
-                        template = {
-                            annotation_convention = "jsdoc"
-                        }
-                    },
-                    typescriptreact = {
-                        template = {
-                            annotation_convention = "jsdoc"
-                        }
-                    },
-                }
-            }
-            map("n", [[gcd]], [[<CMD>lua vim.api.nvim_feedkeys(":Neogen <Tab>", "nt", true)<CR>]], "Document generation")
-        end,
-    },
-    {
-        "AndrewRadev/splitjoin.vim",
-        keys = { {"gS", mode = "n"}, {"gJ", mode = "n"} },
-        init = function()
-            vim.g.splitjoin_align = 1
-            vim.g.splitjoin_curly_brace_padding = 0
-        end,
-        -- TODO: split on lua ; syntax
-        config = function()
-            map("n", [["gS"]], [[<CMD>SplitjoinSplit<CR>]], {"silent"}, "Smart split")
-            map("n", [["gJ"]], [[<CMD>SplitjoinJoin<CR>]],  {"silent"}, "Smart join")
-        end
+        config = require("config.nvim-neogen")
     },
     {
         "airblade/vim-rooter",
@@ -350,6 +291,11 @@ local pluginArgs = { -- {{{
         cmd    = "WhichKey",
         config = require("config.nvim-which-key")
     },
+    {
+        "shortcuts/no-neck-pain.nvim",
+        keys = { { [[<leader>z]],  mode = "n" }, },
+        config = require("config.nvim-no-neck-pain")
+    },
     -- }}} Vim enhancement
     -- Telescope {{{
     {
@@ -380,6 +326,13 @@ local pluginArgs = { -- {{{
             require("telescope").load_extension("undo")
             map("n", [[<C-f>u]], [[<CMD>lua require("telescope").extensions.undo.undo()<CR>]], {"silent"}, "Undo")
         end,
+    },
+    {
+        'prochri/telescope-all-recent.nvim',
+        dependencies = { "kkharji/sqlite.lua"},
+        config = function()
+            require 'telescope-all-recent'.setup { }
+        end
     },
     -- }}} Telescope
     -- UI {{{
@@ -684,6 +637,7 @@ local pluginArgs = { -- {{{
             require("debugprint").setup {
                 create_keymaps = false
             }
+            -- TODO: prehook buffer-wise
             map("n", [[dp]], function() return require("debugprint").debugprint()
                 end, {"expr"}, "Debug print below")
             map("n", [[dP]], function() return require("debugprint").debugprint { above = true}

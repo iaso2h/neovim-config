@@ -69,12 +69,12 @@ M.config = function()
             {
                 elements = {
                     {
-                        id = "scopes",
-                        size = 0.40
-                    },
-                    {
                         id = "watches",
                         size = 0.35
+                    },
+                    {
+                        id = "scopes",
+                        size = 0.40
                     },
                     {
                         id = "stacks",
@@ -139,6 +139,7 @@ M.config = function()
 
     local windowFocus = function(filetype) -- {{{
         if not next(M.winID) then return end
+        vim.cmd(t[[norm! <C-\><C-n>]])
         if filetype == "dapui_scopes" or filetype ==  "dapui_scopes" or filetype ==  "dapui_scopes" or filetype ==  "dapui_scopes" then
             if require("dapui.windows").layouts[1]:is_open() then
                 local winid = M.winID[filetype]
@@ -168,12 +169,12 @@ M.config = function()
     end, {desc = "Dap UI Toggle"} )
 
     map("n", [[<C-w>dd]], [[<CMD>lua require("dapui").toggle {layout=nil,reset=true}<CR>]], {"silent"}, "Dap UI toggle")
-    map("n", [[<C-w>ds]], function() windowFocus("dapui_scopes") end,      "Go ot Dap scopes window")
-    map("n", [[<C-w>dw]], function() windowFocus("dapui_watches") end,     "Go ot Dap watches window")
-    map("n", [[<C-w>dS]], function() windowFocus("dapui_stacks") end,      "Go ot Dap stacks window")
-    map("n", [[<C-w>db]], function() windowFocus("dapui_breakpoints") end, "Go ot Dap breakpoints window")
-    map("n", [[<C-w>dr]], function() windowFocus("dap-repl") end,          "Go ot Dap repl window")
-    map("n", [[<C-w>dc]], function() windowFocus("dapui_console") end,     "Go ot Dap console window")
+    map({"i", "n"}, [[<C-w>ds]], function() windowFocus("dapui_scopes") end,      "Go ot Dap scopes window")
+    map({"i", "n"}, [[<C-w>dw]], function() windowFocus("dapui_watches") end,     "Go ot Dap watches window")
+    map({"i", "n"}, [[<C-w>dS]], function() windowFocus("dapui_stacks") end,      "Go ot Dap stacks window")
+    map({"i", "n"}, [[<C-w>db]], function() windowFocus("dapui_breakpoints") end, "Go ot Dap breakpoints window")
+    map({"i", "n"}, [[<C-w>dr]], function() windowFocus("dap-repl") end,          "Go ot Dap repl window")
+    map({"i", "n"}, [[<C-w>dc]], function() windowFocus("dapui_console") end,     "Go ot Dap console window")
     -- }}} key mappings
 end
 

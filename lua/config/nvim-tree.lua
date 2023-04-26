@@ -239,7 +239,7 @@ return function()
                     col      = 1,
                     row      = 1,
                     relative = "cursor",
-                    border   = "shadow",
+                    border   = "rounded",
                     style    = "minimal",
                 },
             },
@@ -268,7 +268,7 @@ return function()
             always_show_folders = true,
             prefix              = "[FILTER]: ",
         },
-        tab                     = {
+        tab = {
             sync = {
                 open   = false,
                 close  = false,
