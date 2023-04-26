@@ -377,7 +377,7 @@ M.execMap = function(key) -- {{{
             end
         elseif key == "q" then
             local bufValidCnt = require("buf.util").bufValidCnt(
-                require("buf.util").bufTbl(true, false) )
+                require("buf.util").getBufNrTbl(true) )
             if bufValidCnt == 0 then
                 vim.cmd("noa qa!")
             else

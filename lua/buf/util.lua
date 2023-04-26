@@ -14,36 +14,8 @@ M.initBuf = function()
         end, vim.api.nvim_list_wins())
     -- NOTE: Do not use results from:
     -- vim.tbl_filter(function(i) return api.nvim_buf_is_loaded(i) end, api.nvim_list_bufs())
-    var.bufNrTbl = M.bufTbl(true, false)
+    var.bufNrTbl = M.getBufNrTbl(true)
 end
-
-
---- Function wrapped around the vim.api.nvim_list_bufs()
---- @param validLoadedOnly boolean Whether contains loaded buffers only
---- @param hiddenIncluded boolean Whether include hidden buffer
---- @return table
-function M.bufTbl(validLoadedOnly, hiddenIncluded) -- {{{
-    local unListedBufTbl = vim.api.nvim_list_bufs()
-    local cond = function(buf)
-        if hiddenIncluded then
-            if validLoadedOnly then
-                return vim.api.nvim_buf_is_loaded(buf)
-            else
-                return true
-            end
-        else
-            if validLoadedOnly then
-                return vim.api.nvim_buf_is_loaded(buf) and
-                    vim.api.nvim_buf_get_option(buf, "bufhidden") == ""
-            else
-                return vim.api.nvim_buf_get_option(buf, "bufhidden") == ""
-            end
-
-        end
-    end
-
-    return vim.tbl_filter(cond, unListedBufTbl)
-end -- }}}
 
 
 --- Force wipe the given buffer, if no bufNr is provided, then current buffer
@@ -89,6 +61,23 @@ M.bufSwitchAlter = function(winID)
 end
 
 
+--- Return valid and loaded buffer count
+---@param bufNrTbl? table Use `var.bufNrTbl` if no bufNrTbl provided
+---@return number
+M.bufValidCnt = function(bufNrTbl)
+    bufNrTbl = bufNrTbl or var.bufNrTbl
+
+    if bufNrTbl then
+        local cnt = #vim.tbl_filter(function(bufNr)
+            return vim.api.nvim_buf_get_name(bufNr) ~= ""
+        end, bufNrTbl)
+        return cnt
+    else
+        return 0
+    end
+end
+
+
 M.isSpecBuf = function(bufType)
     bufType = bufType or var.bufType
     return bufType ~= ""
@@ -122,6 +111,24 @@ M.winCnt = function()
 end
 
 
+--- Function wrapped around the vim.api.nvim_list_bufs()
+--- @param validLoadedOnly boolean Whether contains loaded buffers only
+--- @return table
+function M.getBufNrTbl(validLoadedOnly) -- {{{
+    local unListedBufTbl = vim.api.nvim_list_bufs()
+    local cond = function(buf)
+        if validLoadedOnly then
+            return vim.api.nvim_buf_is_loaded(buf) and
+                vim.api.nvim_buf_get_option(buf, "buflisted")
+        else
+            return vim.api.nvim_buf_get_option(buf, "buflisted")
+        end
+    end
+
+    return vim.tbl_filter(cond, unListedBufTbl)
+end -- }}}
+
+
 M.getAllBufCntsInWins = function()
     local bufCnt = 0
     for _, w in ipairs(var.winIDTbl) do
@@ -143,23 +150,6 @@ M.getCurBufCntsInWins = function(buf)
     end
 
     return bufCnt
-end
-
-
---- Return valid and loaded buffer count
----@param bufNrTbl? table Use `var.bufNrTbl` if no bufNrTbl provided
----@return number
-M.bufValidCnt = function(bufNrTbl)
-    bufNrTbl = bufNrTbl or var.bufNrTbl
-
-    if bufNrTbl then
-        local cnt = #vim.tbl_filter(function(bufNr)
-            return vim.api.nvim_buf_get_name(bufNr) ~= ""
-        end, bufNrTbl)
-        return cnt
-    else
-        return 0
-    end
 end
 
 
