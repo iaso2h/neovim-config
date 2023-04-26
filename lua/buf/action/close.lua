@@ -2,9 +2,9 @@
 -- Author: iaso2h
 -- Description: Delete buffer without change the window layout
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.35
--- Last Modified: 2023-4-25
-local bufUtil = require("buf.util")
+-- Version: 0.0.36
+-- Last Modified: 2023-4-26
+local u = require("buf.util")
 local var     = require("buf.var")
 local M    = {}
 
@@ -52,7 +52,7 @@ end -- }}}
 local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
     -- Close buffer depending on buffer type
 
-    if checkSpecBuf or bufUtil.isSpecBuf() then
+    if checkSpecBuf or u.isSpecBuf() then
         -- Closing Special buffer
         var.lastClosedFilePath = nil
 
@@ -71,16 +71,18 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
                 vim.api.nvim_win_close(var.winID, true)
             elseif string.match(var.bufName, [[%[nvim%-lua%]$]]) then
                 -- Check for Lua pad
-                if bufUtil.bufValidCnt() >= 1 then
-                    bufUtil.switchAlter(var.winID)
+                if u.bufValidCnt() >= 1 then
+                    if not u.bufSwitchAlter(var.winID) then
+                        return
+                    end
                 else
-                    bufUtil.bufWipe(var.bufNr)
+                    u.bufWipe(var.bufNr)
                 end
             else
-                bufUtil.bufWipe(var.bufNr)
+                u.bufWipe(var.bujfNr)
             end
         elseif var.bufType == "prompt" then
-            bufUtil.bufWipe(var.bufNr)
+            u.bufWipe(var.bufNr)
         elseif var.bufType == "nowrite" then
             if vim.startswith(var.bufName, "diffview") then
                 vim.cmd [[DiffviewClose]]
@@ -88,19 +90,22 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         else
             -- Always wipe the special buffer if window count is 1
             if not saveModified(var.bufNr) then return end
-            bufUtil.bufWipe(var.bufNr)
+            u.bufWipe(var.bufNr)
         end
     else
         -- Scratch files
-        if bufUtil.isScratchBuf() then
+        if u.isScratchBuf() then
             -- Abort the processing when cancel is evaluated
             if not saveModified(var.bufNr) then return end
 
-            if bufUtil.bufValidCnt() >= 1 then
-                bufUtil.bufWipe(var.bufNr)
+            if u.bufValidCnt() >= 1 then
+                u.bufWipe(var.bufNr)
             else
                 vim.cmd("q!")
             end
+        end
+        if string.find(var.bufName, "no-neck-pain") then
+            return
         end
 
         -- Standard buffer -- {{{
@@ -112,13 +117,31 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         if not saveModified(var.bufNr) then return end
 
         -- Whether to check other windows that might have the same buffer instance
-        if not checkAllBuf or bufUtil.winCnt() == 1 and bufUtil.bufValidCnt() == 1 then
-            bufUtil.bufWipe(var.bufNr)
-            if vim.api.nvim_buf_get_name(0) == "" then
-                vim.api.nvim_buf_set_option(0, "buflisted", false)
-                require("historyStartup").display(true)
+        if not checkAllBuf or u.winCnt() == 1 then
+            if u.bufValidCnt() == 1 then
+                u.bufWipe(var.bufNr)
+                if vim.api.nvim_buf_get_name(0) == "" then
+                    vim.api.nvim_buf_set_option(0, "buflisted", false)
+                    return require("historyStartup").display(true)
+                else
+                    return vim.notify(
+                        "Unable to enter the historyStartup correctly for the last scratch file",
+                        vim.log.levels.ERROR
+                    )
+                end
+            else
+                -- Switch to alternative buffer in advance if NNP is loaded,
+                -- otherwise a scratch buffer will be the active buffer after
+                -- calling `bufWipe`
+                if package.loaded["no-neck-pain"] then
+                    if not u.bufSwitchAlter(var.winID) then
+                        return
+                    end
+                end
+                u.bufWipe(var.bufNr)
             end
         end
+
 
         -- 1+ Windows
 
@@ -133,7 +156,7 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
                 local bufNr = vim.api.nvim_win_get_buf(win)
 
                 winIDBufNrTbl[win] = vim.api.nvim_win_get_buf(win)
-                if bufUtil.isSpecBuf(vim.api.nvim_buf_get_option(bufNr, "buftype")) then
+                if u.isSpecBuf(vim.api.nvim_buf_get_option(bufNr, "buftype")) then
                     specInstanceCnt = specInstanceCnt + 1
                 else
                     bufInstanceCnt = bufInstanceCnt + 1
@@ -145,9 +168,13 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         -- Loop through winIDBufNrTbl to check other windows contain the same
         -- buffer number as the one we are going to wipe
         for winID, bufNr in pairs(winIDBufNrTbl) do
-            if bufNr == var.bufNr then bufUtil.switchAlter(winID) end
+            if bufNr == var.bufNr then
+                if not u.bufSwitchAlter(winID) then
+                    return
+                end
+            end
         end
-        bufUtil.bufWipe(var.bufNr)
+        u.bufWipe(var.bufNr)
 
         -- Always restore window focus, window might be unavailable when the
         -- last buffer is deleted
@@ -158,16 +185,16 @@ local function bufClose(checkSpecBuf, checkAllBuf) -- {{{
         -- Merge when there are two windows sharing the last buffer
         -- NOTE: If this evaluated to true, then the current length of bufNr
         -- table has been reduced to 1, #bufNrTbl is just a value of previous state
-        if bufUtil.winCnt() == 2 and bufInstanceCnt == 2 and bufUtil.bufValidCnt() == 2 then
+        if u.winCnt() == 2 and bufInstanceCnt == 2 and u.bufValidCnt() == 2 then
             vim.cmd "only"
         end
 
         -- After finishing buffer wiping, prevent Neovim from setting the
         -- current window to display a special window. e.g. quickfix list
         -- or terminal. This means you have to at least have 2 buffers
-        if bufUtil.bufValidCnt() >= 2 then
+        if u.bufValidCnt() >= 2 then
             local unwantedBufType = {"quickfix", "terminal", "help"}
-            for _ = 1, bufUtil.bufValidCnt() - 1 + specInstanceCnt do
+            for _ = 1, u.bufValidCnt() - 1 + specInstanceCnt do
                 if vim.tbl_contains(unwantedBufType, vim.bo.buftype) then
                     -- HACK: can still switch to a special buffer
                     vim.cmd "keepjump bp"
@@ -184,10 +211,10 @@ end -- }}}
 --- Close window safely and wipe buffer without modifying the layout
 --- @param type string Expect string value. possible value: "buffer", "window"
 function M.init(type) -- {{{
-    bufUtil.initBuf()
+    u.initBuf()
 
     if type == "window" then
-        if bufUtil.isSpecBuf() then
+        if u.isSpecBuf() then
             -- Close window containing special buffer
 
             -- NOTE: more details see ":help buftype"
@@ -202,11 +229,11 @@ function M.init(type) -- {{{
                     return vim.cmd [[DiffviewClose]]
                 else
                     -- Other special buffer
-                    if bufUtil.winCnt() > 1 then
-                        bufUtil.closeWin(var.winID)
+                    if u.winCnt() > 1 then
+                        u.closeWin(var.winID)
                     else
                         -- Override the default behavior, treat it like performing a buffer delete
-                        bufUtil.bufWipe(var.bufNr)
+                        u.bufWipe(var.bufNr)
                     end
                 end
             elseif var.bufType == "nowrite" then
@@ -214,29 +241,29 @@ function M.init(type) -- {{{
                     return vim.cmd [[DiffviewClose]]
                 end
             elseif var.bufType == "terminal" then
-                bufUtil.closeWin(var.winID)
+                u.closeWin(var.winID)
             else
                 -- Other special buffer
-                if bufUtil.winCnt() > 1 then
-                    bufUtil.closeWin(var.winID)
+                if u.winCnt() > 1 then
+                    u.closeWin(var.winID)
                 else
                     -- Override the default behavior, treat it like performing a buffer delete
-                    bufUtil.bufWipe(var.bufNr)
+                    u.bufWipe(var.bufNr)
                 end
             end
         else
             -- Close window containing buffer
 
-            if bufUtil.isScratchBuf() then
+            if u.isScratchBuf() then
                 -- Scratch files. Override the default behavior, treat it like performing a buffer delete
-                if bufUtil.getCurBufCntsInWins(var.bufNr) > 1 then
-                    bufUtil.closeWin(var.winID)
+                if u.getCurBufCntsInWins(var.bufNr) > 1 then
+                    u.closeWin(var.winID)
                 else
                     bufClose(false, false)
                 end
             else
                 -- Standard buffer
-                if bufUtil.winCnt() == 1 then
+                if u.winCnt() == 1 then
                     -- 1 Window
                     -- Override the default behavior, treat it like performing
                     -- a buffer delete until there are no more buffers loaded
@@ -246,10 +273,10 @@ function M.init(type) -- {{{
                     -- In situation where there are multiple buffers loaded
                     -- with only one standard buffer display in one of the
                     -- windows
-                    local bufInstanceCount = bufUtil.getAllBufCntsInWins()
+                    local bufInstanceCount = u.getAllBufCntsInWins()
                     if bufInstanceCount ~= 1 then
                         -- Multiple buffer instances or no instances
-                        bufUtil.closeWin(var.winID)
+                        u.closeWin(var.winID)
                     else
                         -- 1 buffer instance
                         -- Override the default behavior, treat it like performing

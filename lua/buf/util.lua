@@ -61,16 +61,25 @@ end
 
 --- Switch to alternative buffer or previous buffer before wiping current buffer
 --- @param winID number Window ID in which alternative will be set
-M.switchAlter = function(winID)
+M.bufSwitchAlter = function(winID)
     local altBufNr = vim.fn.bufnr("#")
     if altBufNr ~= var.bufNr and vim.api.nvim_buf_is_valid(altBufNr) and
             vim.tbl_contains(var.bufNrTbl, altBufNr) then
         vim.api.nvim_win_set_buf(winID, altBufNr)
+        return true
     else
         -- Fallback method
-        vim.cmd(string.format("noautocmd %swincmd w", vim.fn.getwininfo(winID)[1].winnr))
-        vim.cmd "bprevious"
+        for _, b in ipairs(var.bufNrTbl) do
+            if b ~= var.bufNr then
+                vim.api.nvim_win_set_buf(var.winID, b)
+                return true
+            end
+        end
     end
+
+    vim.notify("Failed to switch alternative buffer in Windows: " .. winID)
+
+    return false
 end
 
 
@@ -91,8 +100,25 @@ M.closeWin = function (winID)
 end
 
 
-M.winCnt = function ()
-    return #var.winIDTbl
+M.winCnt = function()
+    -- Take two NNP windows into account
+    if package.loaded["no-neck-pain"] then
+        local totalWinCnts = #var.winIDTbl
+        for _, winId in ipairs(var.winIDTbl) do
+            if vim.api.nvim_win_is_valid(winId) then
+                local bufNr    = vim.api.nvim_win_get_buf(winId)
+                local filetype = vim.api.nvim_buf_get_option(bufNr, "filetype")
+                if filetype == "no-neck-pain" then
+                    totalWinCnts = totalWinCnts - 1
+                end
+            else
+                totalWinCnts = totalWinCnts - 1
+            end
+        end
+        return totalWinCnts
+    else
+        return #var.winIDTbl
+    end
 end
 
 
