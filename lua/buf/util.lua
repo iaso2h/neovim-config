@@ -91,7 +91,9 @@ end
 
 M.winCnt = function()
     -- Take two NNP windows into account
-    if package.loaded["no-neck-pain"] then
+    if package.loaded["no-neck-pain"] and
+        require("no-neck-pain").state.enabled then
+
         local totalWinCnts = #var.winIDTbl
         for _, winId in ipairs(var.winIDTbl) do
             if vim.api.nvim_win_is_valid(winId) then

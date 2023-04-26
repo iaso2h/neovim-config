@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Delete buffer without change the window layout
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.37
--- Last Modified: 2023-4-26
+-- Version: 0.0.38
+-- Last Modified: 2023-4-27
 local u   = require("buf.util")
 local var = require("buf.var")
 local M   = {}
@@ -92,8 +92,11 @@ local function bufHandler(loneWin) -- {{{
     else
         -- Scratch files
         if u.isScratchBuf() then
-            if string.find(var.bufName, "no-neck-pain") and
-                    package.loaded["no-neck-pain"] then
+            -- Close NNP
+            if package.loaded["no-neck-pain"] and
+                require("no-neck-pain").state.enabled and
+                var.fileType == "no-neck-pain" then
+
                 return require("no-neck-pain").toggle()
             end
 
@@ -133,7 +136,9 @@ local function bufHandler(loneWin) -- {{{
                 -- Switch to alternative buffer in advance if NNP is loaded,
                 -- otherwise a scratch buffer will be the active buffer after
                 -- calling `bufWipe`
-                if package.loaded["no-neck-pain"] then
+                if package.loaded["no-neck-pain"] and
+                    require("no-neck-pain").state.enabled then
+
                     if not u.bufSwitchAlter(var.winID) then
                         return
                     end
@@ -250,8 +255,11 @@ local winHandler = function() -- {{{
         -- Close window containing buffer
 
         if u.isScratchBuf() then
-            if string.find(var.bufName, "no-neck-pain") and
-                package.loaded["no-neck-pain"] then
+            -- Close NNP
+            if package.loaded["no-neck-pain"] and
+                require("no-neck-pain").state.enabled and
+                var.fileType == "no-neck-pain" then
+
                 return require("no-neck-pain").toggle()
             end
             -- Scratch files. Override the default behavior, treat it like performing a buffer delete
