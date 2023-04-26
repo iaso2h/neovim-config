@@ -448,7 +448,7 @@ map("x", [[g{]], [[:lua require("trailingChar").main("v", "{")<CR>]],     {"sile
 map("n", [[g}]], [[<CMD>lua require("trailingChar").main("n", "}")<CR>]], {"silent"}, "Add fold marker end")
 map("x", [[g}]], [[:lua require("trailingChar").main("v", "}")<CR>]],     {"silent"}, "Add fold marker end")
 
-map("n", [[<leader>z]], [[<CMD>lua require("foldmarker").highlightCurrentMarkerRegion()<CR>]], {"silent"}, "Highlight current fold marker")
+-- map("n", [[<leader>z]], [[<CMD>lua require("foldmarker").highlightCurrentMarkerRegion()<CR>]], {"silent"}, "Highlight current fold marker")
 map("", [[zm]], [[zM]],   {"noremap"}, "Close all folds recursively")
 map("", [[zr]], [[zRzz]], {"noremap"}, "Open all folds recursively")
 map("", [[zM]], [[zm]],   {"noremap"}, "Close folds recursively")
@@ -460,13 +460,6 @@ map("", [[za]],
 map("",  [[<leader><Space>]],
     [[:lua require("snapToFold").main("norm! za", true, 0.5)<CR>]],
     {"silent"}, "Snap to closest fold then toggle it")
-for i=0, 9 do
-    map({"n", "x"},
-        string.format("z%d", i),
-        string.format([[:set foldlevel=%d<Bar>echohl Moremsg<Bar>echo 'Foldlevel set to: %d'<Bar>echohl None<CR>]], i, i),
-        string.format("Set fold level to %d", i)
-    )
-end
 -- }}} Folding
 
 -- Paste mode

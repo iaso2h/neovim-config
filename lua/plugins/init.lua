@@ -221,7 +221,7 @@ local pluginArgs = { -- {{{
         "airblade/vim-rooter",
         event = {"BufAdd"},
         init  = function()
-            vim.g.rooter_cd_cmd        = "lcd"
+            vim.g.rooter_cd_cmd        = "cd"
             vim.g.rooter_silent_chdir  = 1
             vim.g.rooter_resolve_links = 1
             vim.g.rooter_change_directory_for_non_project_files = "current"
@@ -260,13 +260,15 @@ local pluginArgs = { -- {{{
         dependencies = { "nvim-treesitter" },
         event  = {"BufAdd"},
         config = function()
+            local ftExclude = vim.deepcopy(require("plugins.nvim-galaxyline").shortLineList)
+            ftExclude[#ftExclude+1] = "help"
             require("indent_blankline").setup{
                 use_treesitter = true,
                 char             = "▏",
                 char_blankline   = "▏",
                 context_char     = "▏",
                 buftype_exclude  = {"terminal", "nofile"},
-                filetype_exclude = require("plugins.nvim-galaxyline").shortLineList,
+                filetype_exclude = ftExclude,
                 bufname_exclude  = {"*.md"},
                 char_highlight_list = {"SignColumn"},
                 show_current_context           = true,
@@ -281,9 +283,9 @@ local pluginArgs = { -- {{{
             vim.g.maximizer_set_default_mapping   = 0
             vim.g.maximizer_set_mapping_with_bang = 0
             vim.g.maximizer_restore_on_winleave   = 1
-            map("n", [[<C-w>m]], [[<CMD>MaximizerToggle<CR>]],      {"silent"}, "Maximize window")
-            map("t", [[<C-w>m]], [[<C-\><C-o><CMD>MaximizerToggle<CR>]], {"silent"}, "Maximize window")
-            map("i", [[<C-w>m]], [[<C-o><CMD>MaximizerToggle<CR>]], {"noremap", "silent"}, "Maximize window")
+            map("n", [[<C-w>m]], [[<CMD>MaximizerToggle<CR>]],           {"silent"},            "Maximize window")
+            map("t", [[<C-w>m]], [[<C-\><C-o><CMD>MaximizerToggle<CR>]], {"noremap", "silent"}, "Maximize window")
+            map("i", [[<C-w>m]], [[<C-\><C-o><CMD>MaximizerToggle<CR>]], {"noremap", "silent"}, "Maximize window")
         end
     },
     {
@@ -340,6 +342,7 @@ local pluginArgs = { -- {{{
     },
     {
         "prochri/telescope-all-recent.nvim",
+        enabled = not (_G._os_uname.sysname == "Windows_NT"),
         dependencies = { "telescope.nvim", "kkharji/sqlite.lua"},
         config = function()
             require 'telescope-all-recent'.setup { }

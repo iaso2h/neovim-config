@@ -3,16 +3,15 @@
 -- Description: reload lua package or vim file at Neovim configuration directory
 -- Version: 0.0.24
 -- Last Modified: 2023-4-8
-local api   = vim.api
 local util  = require("autoreload.util")
-local ok, p = pcall(require, "plenary.path")
+local ok, valOrMsg = pcall(require, "plenary.path")
 if not ok then
-    p = nil
+    valOrMsg = nil
     return
 end
 
-local M                    = {
-    configPath = p:new(_G._config_path),
+local M = {
+    configPath = valOrMsg:new(_G._config_path),
     opt = {
         lua = {}
     }
@@ -71,20 +70,16 @@ M.opt.lua.config = { -- {{{
 
 
 
-----
--- Function: Reload: Reload lua module path. Called in autocmd
---
--- @param module: String value of module path
-----
+---Reload lua module path. Called in autocmd
 M.reload = function() -- {{{
-    if not p then return end
-    local bufNr = api.nvim_get_current_buf()
+    if not valOrMsg then return end
+    local bufNr   = vim.api.nvim_get_current_buf()
     local pathStr = nvim_buf_get_name(bufNr)
     -- Uppercase the first character in Windows
     if _G._os_uname.sysname == "Windows_NT" then
         pathStr = util.upperCaseWindowsDrive(pathStr)
     end
-    local path = p:new(pathStr)
+    local path = valOrMsg:new(pathStr)
 
     -- Config path only
     if not string.match(path.filename, M.configPath.filename) then return end
@@ -103,7 +98,7 @@ M.reload = function() -- {{{
 
         local l = require("autoreload.lua")
         local parentPath = path:parent()
-        local parentStr = parentPath.filename
+        local parentStr  = parentPath.filename
         local overrideFileModuleStr = vim.tbl_map(function(i)
             return i.filename end, M.opt.lua.overrideFileModulePath)
         if parentStr ~= M.opt.lua.moduleSearchPath.filename and

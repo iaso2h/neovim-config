@@ -41,12 +41,6 @@ opt.listchars = "tab:>_,precedes:«,extends:»,nbsp:␣"
 -- o.listchars = "tab:>-,precedes:«,extends:»,nbsp:␣,eol:↵,trail:•"
 opt.showbreak = "⤷ "
 
-opt.foldcolumn = "auto:4"
-opt.signcolumn = "yes:1"
-opt.foldmethod = "expr"
-opt.foldexpr   = "EnhanceFoldExpr()"
-opt.formatoptions = _G._format_option -- NOTE: Might change on loading different types of ftplugins
-
 opt.inccommand = "nosplit"
 opt.gdefault   = true
 opt.ignorecase = true
@@ -81,6 +75,86 @@ opt.splitbelow   = true
 opt.splitright   = true
 opt.switchbuf    = "uselast"
 
+vim.g.FiletypeCommentDelimiter = {
+    vim    = "\"",
+    python = "#",
+    sh     = "#",
+    zsh    = "#",
+    fish   = "#",
+    c      = "\\/\\/",
+    cpp    = "\\/\\/",
+    json   = "\\/\\/",
+    conf   = "\\/\\/",
+    lua    = "--",
+}
+
+if not vim.g.vscode then
+    vim.g.enhanceFoldStartPat = {
+        vim    = [=[\s*".*{{{.*$]=],
+        python = [=[\s*#.*{{{.*$]=],
+        c      = [=[\s*//.*{{{.*$]=],
+        cpp    = [=[\s*//.*{{{.*$]=],
+        json   = [=[\s*//.*{{{.*$]=],
+        conf   = [=[\s*//.*{{{.*$]=],
+        lua    = [=[\s*--.*{{{.*$]=],
+        sh     = [=[\s*#.*{{{.*$]=],
+        zsh    = [=[\s*#.*{{{.*$]=],
+        fish   = [=[\s*#.*{{{.*$]=],
+    }
+    vim.g.enhanceFoldEndPat = {
+        vim    = [=[\s*".*}}}.*$]=],
+        python = [=[\s*#.*}}}.*$]=],
+        c      = [=[\s*//.*}}}.*$]=],
+        cpp    = [=[\s*//.*}}}.*$]=],
+        json   = [=[\s*//.*}}}.*$]=],
+        conf   = [=[\s*//.*}}}.*$]=],
+        lua    = [=[\s*--.*}}}.*$]=],
+        sh     = [=[\s*#.*}}}.*$]=],
+        zsh    = [=[\s*#.*}}}.*$]=],
+        fish   = [=[\s*#.*}}}.*$]=],
+    }
+
+    vim.cmd [[
+    function! EnhanceFoldExpr()
+        " BUG: let line = nvim_get_current_line()
+        let line = getline(v:lnum)
+        if match(line, g:enhanceFoldStartPat[&filetype]) > -1
+            return "a1"
+        elseif match(line, g:enhanceFoldEndPat[&filetype]) > -1
+            return "s1"
+        else
+            return "="
+        endif
+    endfunction
+    ]]
+end
+
+opt.foldcolumn = "auto:4"
+opt.signcolumn = "yes:1"
+-- opt.foldmethod = "expr"
+-- opt.foldexpr   = "EnhanceFoldExpr()"
+opt.foldmethod = "marker"
+-- opt.foldexpr   = "EnhanceFoldExpr()"
+opt.formatoptions = _G._format_option -- NOTE: Might change on loading different types of ftplugins
+
+
+if _G._os_uname.sysname == "Windows_NT" then
+    vim.defer_fn(function()
+        -- Python executable
+        local pythonBin = vim.fn.expand([[D:\anaconda3\python.exe]])
+        if vim.fn.executable(pythonBin) == 0 then
+            pythonBin = vim.split(vim.fn.system("where.exe python"), "\n", {plain=true})[1]
+            if vim.fn.executable(pythonBin) == 0 then
+                return vim.notify("Python binary path not found", vim.log.levels.WARN)
+            end
+        end
+        vim.g.python3_host_prog = pythonBin
+        vim.cmd[[let $NVIM_PYTHON_LOG_FILE = stdpath("config") . "\\log\\nvim_python"]]
+        -- if not string.find(vim.fn.system("python -m pip show pynvim"), "Location") then
+        --     vim.notify("Package pynvim isn't installed", vim.log.levels.WARN)
+        -- end
+    end, 0)
+end
 -- GUI
 vim.cmd [[colorscheme onenord]]
 local guiFont

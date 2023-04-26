@@ -93,3 +93,4 @@ fixit
 optim
 goldentdict
 pynvim 
+foldexpr 

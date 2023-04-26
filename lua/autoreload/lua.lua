@@ -1,22 +1,8 @@
--- BUG: doesn't work on plugins/nvim-null-is.lua
-local fn   = vim.fn
-local api  = vim.api
 local util = require("autoreload.util")
 local p    = require("plenary.path")
 local M    = {
     unloadOnlyChk = false
 }
-
-
--- local packerCompileQuery = function(...)
-    -- local answer = fn.confirm("Update packages?", "&Sync\ncom&Pile\n&No", 3)
-
-    -- if answer == 1 then
-        -- vim.cmd [[PackerSync]]
-    -- elseif answer == 2 then
-        -- vim.cmd [[PackerCompile]]
-    -- end
--- end
 
 
 local getAllRelStr
@@ -99,25 +85,25 @@ local checkOtherOpenMod = function (allAbsStr, topParentTailStr)
             -- Handle folder path by appending ".lua" or "<foldername>.lua"
 
             ---@diagnostic disable-next-line: param-type-mismatch
-            bufnr = fn.bufnr(string.format(
+            bufnr = vim.fn.bufnr(string.format(
                 "%s%sinit.lua", absStr, util.sep, "init.lua"))
 
             if bufnr == -1 then
                 -- fn.bufnr() will return -1 if buffer doesn't exist
                 ---@diagnostic disable-next-line: param-type-mismatch
-                bufnr = fn.bufnr(string.format(
+                bufnr = vim.fn.bufnr(string.format(
                     "%s%s%s.lua", absStr, util.sep, topParentTailStr, ".lua"))
             end
         else
-            bufnr = fn.bufnr(absStr)
+            bufnr = vim.fn.bufnr(absStr)
         end
 
         return bufnr
     end, allAbsStr)
 
-    local currentBufNr = api.nvim_get_current_buf()
+    local currentBufNr = vim.api.nvim_get_current_buf()
     local allValidBufNr = vim.tbl_filter(function(bufNr)
-        if bufNr ~= -1 and bufNr ~= currentBufNr and api.nvim_buf_get_option(bufNr, "modified") then
+        if bufNr ~= -1 and bufNr ~= currentBufNr and vim.api.nvim_buf_get_option(bufNr, "modified") then
             return true
         else
             return false
@@ -129,7 +115,7 @@ local checkOtherOpenMod = function (allAbsStr, topParentTailStr)
     -- Prompt saving buffers
     local pluralStr = #allValidBufNr > 1 and "s" or ""
     vim.cmd "noa echohl MoreMsg"
-    local answer = fn.confirm(
+    local answer = vim.fn.confirm(
         string.format("Save the modification%s for file%s under the same [%s] directory?",
             pluralStr, pluralStr, topParentTailStr),
         ">>> &Yes\n&No", 1, "Question")
@@ -330,9 +316,9 @@ M.loadDir = function(path, opt) -- {{{
                 vim.notify(" ", vim.log.levels.INFO)
                 vim.notify(msg, vim.log.levels.ERROR)
                 vim.notify(" ", vim.log.levels.INFO)
-                for i = idx, #allLoadedModule, 1 do
+                for j = idx, #allLoadedModule, 1 do
                     vim.notify(
-                        string.format("Lua module[%s] has been unloaded", allLoadedModule[i]),
+                        string.format("Lua module[%s] has been unloaded", allLoadedModule[j]),
                         vim.log.levels.INFO)
                 end
             else

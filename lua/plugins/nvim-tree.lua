@@ -79,7 +79,7 @@ return function()
         sort_by = "name",  -- name, case_sensitive, modification_time, extension or a
         root_dirs = {},    -- Only relevant when update_focused_file.update_root is true
         prefer_startup_root = false,  -- Only relevant when update_focused_file.update_root is true
-        sync_root_with_cwd  = false,
+        sync_root_with_cwd  = true,
         reload_on_bufenter  = false,
         respect_buf_cwd     = true,
         remove_keymaps      = false,  -- Remove the default mappings in the tree.

@@ -18,7 +18,6 @@ M.shortLineList = {
     "dapui_stacks",
     "dapui_breakpoints",
     "dapui_scopes",
-    "help",
     "tsplayground",
     "DiffviewFiles",
     "DiffviewFileHistory"
@@ -33,23 +32,24 @@ local condition = require("galaxyline.condition")
 -- Filetype
 gl.short_line_list = require("plugins.nvim-galaxyline").shortLineList
 
+local pallette = require("onenord.pallette")
 local colors = {
-    fg        = "#5E81AC",
-    bg1       = "#3B4252",
+    fg        = pallette.n10,
+    bg1       = pallette.n1,
     bg2       = "#4C566A",
     bg3       = "#616e88",
-    yellow    = "#EBCB8B",
-    cyan      = "#88C0D0",
+    yellow    = pallette.n13,
+    cyan      = pallette.n8,
     darkblue  = "#081633",
-    green     = "#A3BE8C",
-    orange    = "#D08770",
-    purple    = "#B48EAD",
-    magenta   = "#C678DD",
-    blue      = "#5E81AC",
-    blueLight = "#81A1C1",
-    red       = "#BF616A",
+    green     = pallette.n14,
+    orange    = pallette.orange,
+    purple    = pallette.n15,
+    magenta   = pallette.purple,
+    blue      = pallette.n10,
+    blueLight = pallette.n9,
+    red       = pallette.n11,
     gray      = "#66738e",
-    white     = "#D8DEE9",
+    white     = pallette.n4,
 }
 
 local alias = {
@@ -181,9 +181,6 @@ local changeHLColor = function (hlStr)
     elseif vimMode == "n" then
         cmdStr = string.format("hi %s guibg=%s guifg=%s gui=%s",
             hlStr, modeColors[vimMode], colors.bg1, "bold")
-    elseif vimMode == "t" or vimMode == "!" then
-        cmdStr = string.format("hi %s guibg=%s guifg=%s gui=%s",
-            hlStr, modeColors[vimMode], colors.white, "bold")
     else
         cmdStr = string.format("hi %s guibg=%s guifg=%s gui=%s",
             hlStr, modeColors[vimMode], colors.white, "bold")
@@ -206,8 +203,7 @@ local lineInfo = function()
         percentage = string.format(" %s%% ", math.modf((cursorPos[1]/totalLineNr)*100))
     end
 
-    local lineInfo = lineColumn .. percentage
-    return lineInfo
+    return lineColumn .. percentage
 end
 
 
@@ -480,7 +476,7 @@ gls.short_line_left[1] = { -- {{{
     }
 }
 
-gls.short_line_left[2] = {
+gls.short_line_left[#gls.short_line_left+1] = {
     SpecialFileTypeVimModeCap = {
         provider = function()
             vim.cmd("hi GalaxySpecialFileTypeVimModeCap guifg=" .. modeColors[vimMode])
@@ -492,14 +488,14 @@ gls.short_line_left[2] = {
 }
 
 
-gls.short_line_left[3] = {
-    ShortFileIconStart = {
-        provider = function() return "" end,
-        highlight = {colors.gray, colors.bg}
+gls.short_line_left[#gls.short_line_left+1] = {
+    ShortFileLeadingSpace = {
+        provider = function() return " " end,
+        highlight = {colors.gray, colors.bg1}
     }
 }
 
-gls.short_line_left[4] = {
+gls.short_line_left[#gls.short_line_left+1] = {
     ShortFileIcon = {
         provider  = "FileIcon",
         condition = function ()
@@ -511,7 +507,7 @@ gls.short_line_left[4] = {
     }
 }
 
-gls.short_line_left[5] = {
+gls.short_line_left[#gls.short_line_left+1] = {
     ShortFileInfo = {
         provider  = fileInfo,
         condition = function ()
@@ -523,15 +519,15 @@ gls.short_line_left[5] = {
     }
 }
 
-local whiteList = {"help"}
+-- local whiteList = {"help"}
 gls.short_line_right[1] = {
     ShortRightLineInfo = {
         provider  = lineInfo,
         condition = function ()
             if isNoNeckPain() then
                 return false
-            elseif vim.tbl_contains(whiteList, vim.bo.filetype) then
-                return true
+            -- elseif vim.tbl_contains(whiteList, vim.bo.filetype) then
+            --     return true
             else
                 return condition.buffer_not_empty() and not isSpecialFileType()
             end

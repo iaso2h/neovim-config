@@ -25,9 +25,10 @@ local foldmarkerEndQuery = [[
 
 
 local chkMarkerOption = function()
-    if not (vim.wo.foldmethod == "expr" and
-        vim.wo.foldexpr == "EnhanceFoldExpr()" and
-    vim.wo.foldmarker == vim.opt.foldmarker._info.default) then
+    if not vim.wo.foldmethod == "marker" then
+    -- if not (vim.wo.foldmethod == "expr" and
+    --     vim.wo.foldexpr == "EnhanceFoldExpr()" and
+    -- vim.wo.foldmarker == vim.opt.foldmarker._info.default) then
         return false
     else
         return true
