@@ -49,13 +49,19 @@ end -- }}}
 --- Force wipe the given buffer, if no bufNr is provided, then current buffer
 --- will be wiped
 --- @param bufNr boolean Buffer number handler
-M.bufWipe = function(bufNr)
+M.closeBuf = function(bufNr)
     -- bufNr = bufNr or 0
     -- :bdelete will register in both the jumplist and the changelist
     pcall(vim.cmd, "bdelete! " .. bufNr)
     -- These two don't register in both the changelist and the changelist
     -- pcall(cmd, "keepjump bwipe! " .. bufNr)
     -- pcall(api.nvim_buf_delete, bufNr and bufNr or 0, {force = true})
+end
+
+
+M.closeWin = function (winID)
+    local ok, msg = pcall(vim.api.nvim_win_close, winID, false)
+    if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 end
 
 
@@ -83,20 +89,14 @@ M.bufSwitchAlter = function(winID)
 end
 
 
-M.isSpecBuf = function (bufType)
+M.isSpecBuf = function(bufType)
     bufType = bufType or var.bufType
     return bufType ~= ""
 end
 
 
-M.isScratchBuf = function ()
-   return var.bufName == "" or not vim.tbl_contains(var.bufNrTbl, var.bufNr)
-end
-
-
-M.closeWin = function (winID)
-    local ok, msg = pcall(vim.api.nvim_win_close, winID, false)
-    if not ok then vim.notify(msg, vim.log.levels.ERROR) end
+M.isScratchBuf = function()
+    return var.bufName == "" or not vim.tbl_contains(var.bufNrTbl, var.bufNr)
 end
 
 
