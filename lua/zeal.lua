@@ -67,7 +67,7 @@ local function lookUp(args)
     elseif answer == 3 then
         vim.cmd(string.format("noa Cheat %s %s", vim.bo.filetype, content))
     elseif answer == 4 then
-        vim.cmd("Thesaurus " .. content)
+        return require("thesaurus").lookUp(content)
     else
         return
     end

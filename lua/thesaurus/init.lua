@@ -1,5 +1,5 @@
 local M = {
-
+    scratchBuf = -1
 }
 
 -- Python environment setup
@@ -8,7 +8,7 @@ if vim.fn.has("python3") == 0 then
         vim.log.levels.ERROR)
     return
 end
-vim.g.thesaurusRoot = vim.fn.expand("%:p:h")
+vim.g.thesaurusRoot = _G._config_path .. _G._sep .. "lua" .. _G._sep .. "thesaurus" .. _G._sep .. "python"
 
 local pyExecLine = function(codeStr)
     vim.cmd(string.format([[
@@ -30,14 +30,9 @@ thesaurusRoot = vim.eval("g:thesaurusRoot")
 if thesaurusRoot not in sys.path:
     sys.path.append(thesaurusRoot)
 
-import thesaurus_query.thesaurus_query as tq_interface
-from thesaurus_query.tq_common_lib import decode_utf_8
+import extract
 ]]
 
-
-local init = function()
-    pyExec "tq_framework = tq_interface.Thesaurus_Query_Handler()"
-end
 
 local trim = function(input)
     input = vim.fn.substitute(input, "[ \\t]*[\\r\\n:][ \\t]*", " ", "g")
@@ -45,46 +40,60 @@ local trim = function(input)
 end
 
 
----Look up word
----@param word string
----@param replaceChk boolean Whether to replace the word under the cursor
-M.lookUp = function(word, replaceChk)
-    word = word or "dummy"
-    vim.g.thesaurusReplaceChk = replaceChk
-    vim.g.thesaurusWordTrimmed = trim(word)
-    vim.g.thesaurusWord = string.lower(vim.g.thesaurusWordTrimmed)
-    vim.g.thesaurusWord = string.gsub(vim.g.thesaurusWord, [=[["']]=], [[]])
-    pyExecLine[[
-tq_framework.session_terminate()
-tq_framework.session_init()
+local query = function()
 
-tq_continue_query = 1
+    pyExecLine -- {{{
+[[
+definition_family_list = extract.online_thesaurus(vim.eval("g:thesaurusWord"))
+if definition_family_list:
+    vim.command("let g:thesaurusTestFamily=v:true")
+else:
+    vim.command("let g:thesaurusTestFamily=v:false")
+]] -- }}}
 
-while tq_continue_query>0:
-    vim.command("redraw")
-    tq_next_query_direction = True if tq_continue_query==1 else False
-    tq_synonym_result = tq_framework.query(decode_utf_8(vim.eval("g:thesaurusWord")), tq_next_query_direction)
-# Use Python environment for handling candidate displaying {{{
-# mark for exit function if no candidate is found
-    if not tq_synonym_result:
-        vim.command("echom \"No synonym found for \\\"{0}\\\".\"".format(vim.eval("g:thesaurusWordTrimmed").replace('\\','\\\\').replace('"','\\"')))
-        vim.command("g:thesaurusSynoFound=v:false")
-        tq_framework.session_terminate()
-        tq_continue_query = 0
-# if replace flag is on, prompt user to choose after populating candidate list
-    elif vim.eval("g:thesaurusReplaceChk") != "0":
-        tq_continue_query = tq_interface.tq_replace_cursor_word_from_candidates(tq_synonym_result, tq_framework.good_backends[-1])
-    else:
-        tq_continue_query = 0
-        tq_framework.session_terminate()
+    if vim.g.thesaurusTestFamily then
+        if vim.bo.modifiable and not vim.bo.buflisted and
+                vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
+            M.scratchBuf = vim.api.nvim_get_current_buf()
+        else
+            if not M.scratchBuf or (not vim.api.nvim_buf_is_valid(M.scratchBuf)) then
+                M.scratchBuf = vim.api.nvim_create_buf(false, true)
+            end
+            vim.cmd [[split]]
+            M.scratchBuf = vim.api.nvim_create_buf(false, true)
+            vim.api.nvim_buf_set_option(M.scratchBuf, "bufhidden", "wipe")
+            vim.api.nvim_set_current_buf(M.scratchBuf)
+        end
 
-del tq_continue_query
-del tq_next_query_direction
-# }}}
-    ]]
-
+        pyExecLine -- {{{
+[[
+cb = vim.current.buffer
+for each_family in definition_family_list:
+    cb.append("DEFINITION: " + each_family._definition)
+    cb.append("PART OF SPEECH: " + each_family._syntax)
+    cb.append('SYNONYMS: '  + ', '.join(each_family._synonyms))
+    cb.append('ANTONYMS: ' + ', '.join(each_family._antonyms))
+cb[0] = None # delete the first empty line
+]] -- }}}
+        vim.cmd([[noa resize]] .. vim.fn.line("$"))
+        if vim.o.cmdheight ~= 2 then
+            vim.o.cmdheight = 2
+        end
+        vim.bo.modifiable = false
+        vim.bo.filetype = "thesaurus"
+    else
+        vim.notify([[No result for "]] .. vim.g.thesaurusWord .. [["]])
+    end
 end
 
-init()
+
+---Look up word
+---@param word string
+M.lookUp = function(word)
+    vim.g.thesaurusWord = string.lower(trim(word))
+    vim.g.thesaurusWord = string.gsub(vim.g.thesaurusWord, [=[["']]=], [[]])
+    vim.loop.new_async(vim.schedule_wrap(query)):send()
+end
+
 
 return M

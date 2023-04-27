@@ -354,8 +354,20 @@ local pluginArgs = { -- {{{
         dependencies = { "telescope.nvim"},
     },
     {
-        "ron89/thesaurus_query.vim",
-        cmd = {"Thesaurus"}
+        "benshuailyu/online-thesaurus-vim",
+        cmd = {
+            "ThesaurusCurrent", "Thesaurus"
+        },
+        init = function()
+            vim.g.use_default_key_map = 0
+        end,
+        config = function()
+            vim.api.nvim_create_user_command("ThesaurusCurrent",
+                [[:call thesaurusPy2Vim#Thesaurus_LookCurrentWord()]], {})
+            vim.api.nvim_create_user_command("Thesaurus",
+                [[:call thesaurusPy2Vim#Thesaurus_LookWord(<q-args>)]],
+                {nargs = 1})
+        end
     },
     -- }}} Telescope
     -- UI {{{
