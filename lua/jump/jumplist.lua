@@ -1,13 +1,16 @@
 -- File: jumplist
 -- Author: iaso2h
 -- Description: Enhance <C-i>/<C-o>
--- Version: 0.0.11
--- Last Modified: 2023-4-25
+-- Version: 0.0.12
+-- Last Modified: 2023-4-27
 
 local defaultOpts  = {
     checkCursorRedundancy = true,
     returnAllJumps = false, -- DEBUG: tests only
-    jumpBetweenLoadedBuffersOnly = false
+    jumpBetweenLoadedBuffersOnly = false,
+    fileTypeUseBuiltIn = {
+        "help"
+    }
 }
 
 local jumpUtil = require("jump.util")
@@ -242,11 +245,50 @@ local filterJumps = function(bufNr, jumps, filter, cursorPos)
 end
 
 
+--- Execute the ex-command and start jumping
+---@param vimMode string
+---@param isNewer boolean
+---@param winId number
+---@param cursorPos table
+---@param jumpsFiltered? table
+---@return number The count number of target jump
+local execute = function(vimMode, isNewer, winId, cursorPos, jumpsFiltered)
+    -- Get the target jump, then execute the built-in command
+    local count
+    if type(jumpsFiltered) == "table" then
+        count = vim.v.count1 > #jumpsFiltered and #jumpsFiltered or vim.v.count1
+        local targetJump = jumpsFiltered[count]
+        count = tonumber(targetJump.count)
+    else
+        count = vim.v.count1
+    end
+    local exCMD = isNewer and t"<C-i>" or t"<C-o>"
+    if type(jumpsFiltered) == "table" and vimMode ~= "n" then
+        local visualCMD = "v" ~= string.lower(vimMode) and t"<C-q>" or vimMode
+        vim.cmd(string.format("norm! %s%s%s", t"<Esc>", count, exCMD))
+        local posCursor = vim.api.nvim_win_get_cursor(winId)
+        vim.api.nvim_win_set_cursor(winId, cursorPos)
+        vim.cmd("noa norm! " .. visualCMD)
+        vim.api.nvim_win_set_cursor(winId, posCursor)
+    else
+        vim.cmd(string.format("norm! %s%s", count, exCMD))
+    end
+
+    return count
+end
+
+
+--- Handler of vimMode, direction and filter
+---@param vimMode string
+---@param isNewer boolean
 ---@param filter string "local"|"buffer"
 M.go = function(vimMode, isNewer, filter)
     local bufNr     = vim.api.nvim_get_current_buf()
     local winId     = vim.api.nvim_get_current_win()
     local cursorPos = M.opts.checkCursorRedundancy and vim.api.nvim_win_get_cursor(winId) or {}
+    if vim.tbl_contains(M.opts, vim.bo.filetype) then
+        return execute(vimMode, isNewer, winId, cursorPos)
+    end
 
     -- Get the jumps table and reordered them
     local jumpsSliced = M.getJumps(isNewer, winId, filter)
@@ -266,27 +308,14 @@ M.go = function(vimMode, isNewer, filter)
         return jumpsSliced, jumpsDiscarded, jumpsFiltered
     end
 
-    -- Get the target jump, then execute the built-in command
-    local count = vim.v.count1 > #jumpsFiltered and #jumpsFiltered or vim.v.count1
-    local targetJump = jumpsFiltered[count]
-    local exCMD = isNewer and t"<C-i>" or t"<C-o>"
-    if vimMode ~= "n" then
-        local visualCMD = "v" ~= string.lower(vimMode) and t"<C-q>" or vimMode
-        vim.cmd(string.format("norm! %s%s%s", t"<Esc>", targetJump.count, exCMD))
-        local posCursor = vim.api.nvim_win_get_cursor(winId)
-        vim.api.nvim_win_set_cursor(winId, cursorPos)
-        vim.cmd("noa norm! " .. visualCMD)
-        vim.api.nvim_win_set_cursor(winId, posCursor)
-    else
-        vim.cmd(string.format("norm! %s%s", targetJump.count, exCMD))
-    end
+    local targetCount = execute(vimMode, isNewer, winId, cursorPos, jumpsFiltered)
 
     -- Post processing
     if filter == "local" then
         local posBufNr = vim.api.nvim_get_current_buf()
         if posBufNr ~= bufNr then
             vim.notify("Failed to perform a correct local jump", vim.log.levels.ERROR)
-            vim.print(targetJump)
+            vim.print(jumpsSliced[targetCount])
         end
     end
 
