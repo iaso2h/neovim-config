@@ -70,15 +70,15 @@ M.config = function()
                 elements = {
                     {
                         id = "watches",
-                        size = 0.35
+                        size = 0.20
                     },
                     {
                         id = "scopes",
-                        size = 0.40
+                        size = 0.60
                     },
                     {
                         id = "stacks",
-                        size = 0.15
+                        size = 0.10
                     },
                     {
                         id = "breakpoints",

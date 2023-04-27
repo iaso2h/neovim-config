@@ -299,6 +299,18 @@ return function()
             },
         },
     }
+    local toggleAndFocus = function()
+        local api = require("nvim-tree.api")
+        if vim.bo.filetype == "NvimTree" then
+            api.tree.close()
+        else
+            if api.tree.is_visible() then
+                api.tree.focus()
+            else
+                api.tree.toggle()
+            end
+        end
+    end
 
-    map("n", [[<C-w>e]], [[<CMD>NvimTreeToggle<CR>]], { "silent" }, "Toggle Nvim tree")
+    map("n", [[<C-w>e]], toggleAndFocus, "Toggle Nvim tree")
 end

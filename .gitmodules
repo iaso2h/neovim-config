@@ -1,6 +1,3 @@
-[submodule "lua/pprint"]
-	path = lua/pprint
-	url = https://github.com/jagt/pprint.lua.git
 [submodule "lua/lua/profiler"]
 	path = lua/profiler
 	url = https://github.com/charlesmallah/lua-profiler.git

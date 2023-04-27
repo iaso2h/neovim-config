@@ -1,8 +1,8 @@
 -- File: searchHop
 -- Author: iaso2h
 -- Description: Jump & Search utilities
--- Version: 0.0.6
--- Last Modified: 2023-4-21
+-- Version: 0.0.7
+-- Last Modified: 2023-4-27
 
 
 local fn  = vim.fn
@@ -99,10 +99,12 @@ M.centerHop = function(exCMD, suppressMsgChk, remapChk)
 end
 
 
-M.searchCword = function(exCMD)
+M.searchCurrentWord = function(exCmd, WORDChk)
+    exCmd = WORDChk and "g" .. exCmd or exCmd
     local util = require("util")
+
     util.saveViewCursor()
-    vim.cmd("norm! " .. exCMD .. "``")
+    vim.cmd("norm! " .. exCmd .. "``")
     if vim.is_callable(util.restoreViewCursor) then
         util.restoreViewCursor(vim.fn.winheight(0))
     end
