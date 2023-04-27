@@ -1,7 +1,5 @@
-local M    = {}
 -- BUG: dT" motion
 -- BUG: daw motion will delete the proceeding space of word ` Msa`
-
 -- NOTE: Mapping is always recursive unless noremap is specified
 
 -- First thing first
@@ -152,7 +150,11 @@ map("n", [[gF]], [[gf]], {"noremap"}, "Go to file")
 map("n", [[<C-g>]],
 [[:lua print(vim.api.nvim_exec2("file!", {output = true}).output .. " 🖵  CWD: " .. vim.fn.getcwd())<CR>]],
 {"silent"}, "Display file info")
-map("n", [[<S-Tab>]], [[<CMD>lua require("tabSwitcher").main()<CR>]], "Change tab size")
+map("n", [[<S-Tab>]], function()
+    local newWidth = vim.bo.shiftwidth == 4 and 2 or 4
+    vim.bo.shiftwidth = newWidth; vim.bo.tabstop = newWidth; vim.bo.softtabstop = newWidth
+    vim.api.nvim_echo({ { string.format("Shiftwidth has been changed to %d", newWidth), "Moremsg" } }, true, {})
+end, "Change tab size")
 -- Delete & Change & Replace & Exchange {{{
 -- Delete
 map("n", [[dj]], [[<Nop>]], "which_key_ignore")
@@ -274,57 +276,57 @@ end, "Select last yank")
 -- In case of mistouching
 -- Inquiry word
 map("n", [[<leader>i]], [=[[I]=], "Inquiry word under cursor")
-map("x", [[<leader>i]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selection").getSelect("string", false), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquiry selected words")
+map("x", [[<leader>i]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selection").get("string", false), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquiry selected words")
 -- Fast mark restore
-map("n", [[M]], [[<CMD>lua require("searchHop").centerHop("`m", true, false)<CR>]], "Restore mark M")
+map("n", [[M]], [[<CMD>lua require("jump.search").centerHop("`m", true, false)<CR>]], "Restore mark M")
 -- Changelist/Jumplist jumping
-map("n", [[<A-o>]], [[<CMD>lua require("searchHop").centerHop("g;", false, false)<CR>]], {"silent"}, "Older change")
-map("n", [[<A-i>]], [[<CMD>lua require("searchHop").centerHop("g,", false, false)<CR>]], {"silent"}, "Newer change")
+map("n", [[<A-o>]], [[<CMD>lua require("jump.search").centerHop("g;", false, false)<CR>]], {"silent"}, "Older change")
+map("n", [[<A-i>]], [[<CMD>lua require("jump.search").centerHop("g,", false, false)<CR>]], {"silent"}, "Newer change")
 map("n", [[<C-o>]], function()
-    require("searchHop").centerHop(function()
+    require("jump.search").centerHop(function()
         require("jump.jumplist").go("n", false, "local")
     end, true, true)
 end, {"silent"}, "Older local jump")
 map("n", [[<C-i>]], function()
-    require("searchHop").centerHop(function()
+    require("jump.search").centerHop(function()
         require("jump.jumplist").go("n", true, "local")
     end, true, true)
 end, {"silent"}, "Newer local jump")
 map("x", [[<C-o>]], luaRHS[[:lua
     require("jump.jumplist").visualMode = vim.fn.visualmode();
-    require("searchHop").centerHop(function()
+    require("jump.search").centerHop(function()
         require("jump.jumplist").go(vim.fn.visualmode(), false, "local")
     end, true, true)<CR>
 ]], {"silent"}, "Older local jump")
 map("x", [[<C-i>]], luaRHS[[:lua
     require("jump.jumplist").visualMode = vim.fn.visualmode();
-    require("searchHop").centerHop(function()
+    require("jump.search").centerHop(function()
         require("jump.jumplist").go(vim.fn.visualmode(), true, "local")
     end, true, true)<CR>
 ]], {"silent"}, "Newer local jump")
 map("n", [[g<C-o>]], function()
-    require("searchHop").centerHop(function()
+    require("jump.search").centerHop(function()
         require("jump.jumplist").go("n", false, "buffer")
     end, true, true)
 end, {"silent"}, "Older buffer jump")
 map("n", [[g<C-i>]], function()
-    require("searchHop").centerHop(function()
+    require("jump.search").centerHop(function()
         require("jump.jumplist").go("n", true, "buffer")
     end, true, true)
 end, {"silent"}, "Newer buffer jump")
 -- Swap default mapping
-map("n", [[*]],  [[<CMD>lua require("searchHop").searchCurrentWord("*", false)<CR>]],  {"noremap", "silent"}, "Search <cword> forward")
-map("n", [[#]],  [[<CMD>lua require("searchHop").searchCurrentWord("#", false)<CR>]],  {"noremap", "silent"}, "Search <cword> back")
-map("n", [[g*]], [[<CMD>lua require("searchHop").searchCurrentWord("*", true)<CR>]], {"noremap", "silent"}, "Search <cWORD> forward")
-map("n", [[g#]], [[<CMD>lua require("searchHop").searchCurrentWord("#", true)<CR>]], {"noremap", "silent"}, "Search <cWORD> backward")
+map("n", [[*]],  [[<CMD>lua require("jump.search").cword("*", false)<CR>]],  {"noremap", "silent"}, "Search <cword> forward")
+map("n", [[#]],  [[<CMD>lua require("jump.search").cword("#", false)<CR>]],  {"noremap", "silent"}, "Search <cword> back")
+map("n", [[g*]], [[<CMD>lua require("jump.search").cword("*", true)<CR>]], {"noremap", "silent"}, "Search <cWORD> forward")
+map("n", [[g#]], [[<CMD>lua require("jump.search").cword("#", true)<CR>]], {"noremap", "silent"}, "Search <cWORD> backward")
 -- Search visual selected
-map("x", [[/]], [[:lua require("searchHop").searchSelected("/")<CR>]], {"silent"}, "Search selected forward")
-map("x", [[?]], [[:lua require("searchHop").searchSelected("?")<CR>]], {"silent"}, "Search selected backward")
+map("x", [[/]], [[:lua require("jump.search").searchSelected("/")<CR>]], {"silent"}, "Search selected forward")
+map("x", [[?]], [[:lua require("jump.search").searchSelected("?")<CR>]], {"silent"}, "Search selected backward")
 map("x", [[*]], [[/]], "Search selected forward")
 map("x", [[#]], [[?]], "Search selected backward")
 -- Regex very magic
-map("n", [[n]], [[<CMD>lua require("searchHop").cycleSearch("n")<CR>]], {"silent"}, "Cycle through search result forward")
-map("n", [[N]], [[<CMD>lua require("searchHop").cycleSearch("N")<CR>]], {"silent"}, "Cycle through search result backward")
+map("n", [[n]], [[<CMD>lua require("jump.search").cycle("n")<CR>]], {"silent"}, "Cycle through search result forward")
+map("n", [[N]], [[<CMD>lua require("jump.search").cycle("N")<CR>]], {"silent"}, "Cycle through search result backward")
 -- Disable highlight search & Exit visual mode
 map("",  [[<C-l>]], [[<Nop>]], "which_key_ignore")
 map("",  [[<leader>H]], [[<C-l>]],                           {"noremap", "silent"}, "Refresh screen")
@@ -334,7 +336,7 @@ map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"}, "Disabl
 map("", [[<C-m>]], [[%]], {"silent"}, "Go to match parenthesis")
 -- Visual selection
 map("n", [[gvv]], [[gv]], {"noremap"}, "Select previous selected region")
-map("n", [[gvo]], [[<CMD>lua require("selection").cornerSelection(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
+map("n", [[gvo]], [[<CMD>lua require("selection").corner(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
 map({"n", "x"}, [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
 map({"n", "x"}, [[<C-q>]], [[<Nop>]], "which_key_ignore")
 -- }}} Search & Jumping
@@ -342,7 +344,7 @@ map({"n", "x"}, [[<C-q>]], [[<Nop>]], "which_key_ignore")
 map("n", [[<C-n>]], [[<CMD>new<CR>]], {"silent"}, "New buffer")
 -- Open/Search in browser
 map("n", [[gl]], [[<CMD>lua require("getLink").main()<CR>]], {"silent"}, "Open link")
-map("x", [[gl]], [[:lua require("getLink").main(require("selection").getSelect("string", false))<CR>]], {"silent"}, "Open selected as link")
+map("x", [[gl]], [[:lua require("getLink").main(require("selection").get("string", false))<CR>]], {"silent"}, "Open selected as link")
 -- Interrupt
 map("n", [[<C-A-c>]], [[<CMD>call interrupt()<CR>]], {"noremap", "silent"}, "Interrupt")
 -- Line end/start
@@ -454,11 +456,9 @@ map("", [[zr]], [[zRzz]], {"noremap"}, "Open all folds recursively")
 map("", [[zM]], [[zm]],   {"noremap"}, "Close folds recursively")
 map("", [[zR]], [[zrzz]], {"noremap"}, "Open folds recursively")
 map("", [[zA]], [[za]],   {"noremap"}, "Toggle current fold")
-map("", [[za]],
-    [[:lua require("snapToFold").main("norm! zA", true, 0.5)<CR>]],
+map("", [[za]], [[:lua require("foldmarker").snap("norm! zA", true, 0.5)<CR>]],
     {"silent"}, "Snap to closest fold then toggle it recursively")
-map("",  [[<leader><Space>]],
-    [[:lua require("snapToFold").main("norm! za", true, 0.5)<CR>]],
+map("",  [[<leader><Space>]], [[:lua require("foldmarker").snap("norm! za", true, 0.5)<CR>]],
     {"silent"}, "Snap to closest fold then toggle it")
 -- }}} Folding
 
@@ -589,6 +589,3 @@ map("c", [[<C-k>]], [[<Up>]], "Move cursor up")
 map("c", [[<A-l>]], [[<C-d>]],  {"noremap"}, "List more commands")
 map("c", [[<A-e>]], [[<C-\>e]], {"noremap"}, "Evaluate in Vimscript")
 -- }}} Mode: Commandline & Insert
-
-return M
-

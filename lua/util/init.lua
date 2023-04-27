@@ -1,9 +1,7 @@
-local fn  = vim.fn
-local api = vim.api
 local M   = {}
 
 
-M.ex = function(exec) return fn.executable(exec) == 1 end
+M.ex = function(exec) return vim.fn.executable(exec) == 1 end
 
 
 function M.convertMap(mode, lhs, rhs, optsTbl)
@@ -56,7 +54,7 @@ function M.readInitLua()
                 break
             end
             if vim.startswith(text, "map(") then
-                local convertMap = fn.luaeval([[require("util").convertMap]] .. text:sub(4))
+                local convertMap = vim.fn.luaeval([[require("util").convertMap]] .. text:sub(4))
                 targetF:write(convertMap)
                 break
             end
@@ -66,19 +64,6 @@ function M.readInitLua()
     end
     targetF:close()
     srcF:close()
-end
-
-
--- Match enhance {{{
-function M.matchAll(expr, pat)
-    -- Based on VimL match(), Always return a list
-    local t = {}
-    local idx = -1
-    while 1 do
-        idx = fn.match(expr, pat, idx + 1)
-        if idx == -1 then return t end
-        table.insert(t, idx)
-    end
 end
 
 
@@ -99,20 +84,6 @@ function M.findAll(srcStr, pat)
     return idxTbl
 end
 
-
-function M.matchAllStrPos(expr, pat)
-    -- Based on VimL matchstrpos(), Always return a list
-    local t = {}
-    local posList = {0, 0, 0}
-    while 1 do
-        posList = fn.matchstrpos(expr, pat, posList[3])
-        if posList[1] == "" then return t end
-        table.insert(t, posList)
-    end
-end
--- }}} Match enhance
-
-
 --- Function: M.trimSpaces :Trim all trailing white spaces in current buffer
 ---
 --- @param strTbl table of source string need to be trimmed. If no table
@@ -126,18 +97,18 @@ function M.trimSpaces(strTbl, silent, prefix) -- {{{
     if vim.bo.modified == false then return end
 
     if not strTbl then
-        local saveView = fn.winsaveview()
+        local saveView = vim.fn.winsaveview()
         silent = silent or true
         if silent then
             vim.cmd [[noa keeppatterns %s#\s\+$##e]]
         else
             vim.cmd [[noa keeppatterns %s#\s\+$##e]]
-            local result = api.nvim_exec2([[g#\s\+$#p]], {output = true}).output
-            local count = #M.matchAll(result, [[\n]])
+            local result = vim.api.nvim_exec2([[g#\s\+$#p]], {output = true}).output
+            local count = #M.findAll(result, [[\n]])
             vim.cmd [[noa keeppatterns %s#\s\+$##e]]
-            api.nvim_echo({{count .. " line[s] trimmed", "Moremsg"}}, false, {})
+            vim.api.nvim_echo({{count .. " line[s] trimmed", "Moremsg"}}, false, {})
         end
-        fn.winrestview(saveView)
+        vim.fn.winrestview(saveView)
     elseif next(strTbl) then
         if prefix then
             strTbl = vim.tbl_map(function(str)
@@ -149,71 +120,6 @@ function M.trimSpaces(strTbl, silent, prefix) -- {{{
             local result = string.gsub(str, "^%s+", "")
             return result
         end, strTbl)
-    end
-end -- }}}
-
-
---- Save the star registers, plus and unnamed registers - independently,
---- restoreReg can be accessed after saveReg is called
-function M.saveReg() -- {{{
-    local unnamedContent = fn.getreg('"', 1)
-    local unnamedType    = fn.getregtype('"')
-    local starContent    = fn.getreg('*', 1)
-    local starType       = fn.getregtype('*')
-    local plusContent    = fn.getreg('+', 1)
-    local plusType       = fn.getregtype('+')
-    local nonDefaultName = vim.v.register
-    local nonDefaultContent
-    local nonDefaultType
-    if not vim.tbl_contains({'"', "*", "+"}, nonDefaultName) then
-        nonDefaultContent = fn.getreg(nonDefaultName, 1)
-        nonDefaultType    = fn.getregtype(nonDefaultName)
-    end
-    M.restoreReg = function()
-        if nonDefaultContent and nonDefaultContent ~= "" then
-            fn.setreg(nonDefaultName, nonDefaultContent, nonDefaultType)
-        end
-
-        if starContent ~= "" then
-            fn.setreg('*', starContent,    starType)
-        end
-        if plusContent ~= "" then
-            fn.setreg('+', plusContent,    plusType)
-        end
-        if unnamedContent ~= "" then
-            fn.setreg('"', unnamedContent, unnamedType)
-        end
-
-        vim.defer_fn(function() M.restoreReg = nil end, 1000)
-    end
-end -- }}}
-
-
-function M.visualSelection(returnType, returnNormal) -- {{{
-    -- Not support blockwise visual mode
-    local mode = fn.visualmode()
-    if mode == "\22" then return end
-    -- Return (1,0)-indexed line,col info
-    local selectStart = api.nvim_buf_get_mark(0, "<")
-    local selectEnd = api.nvim_buf_get_mark(0, ">")
-    local lines = api.nvim_buf_get_lines(0, selectStart[1] - 1, selectEnd[1],
-                                         false)
-
-    if #lines == 0 then
-        return {""}
-    end
-    -- Needed to remove the last character to make it match the visual selection
-    if vim.o.selection == "exclusive" then selectEnd[2] = selectEnd[2] - 1 end
-    if mode == "v" then
-        lines[#lines] = lines[#lines]:sub(1, selectEnd[2] + 1)
-        lines[1]      = lines[1]:sub(selectStart[2] + 1)
-    end
-
-    if returnNormal then vim.cmd("norm! " .. t"<Esc>") end
-    if returnType == "list" then
-        return lines
-    elseif returnType == "string" then
-        return table.concat(lines, "\n")
     end
 end -- }}}
 
@@ -266,36 +172,13 @@ function M.withinRegion(pos, regionStart, regionEnd)
 end
 
 
--- Convert UTF-8 hex code to character
-function M.u2char(code)
-    if type(code) == 'string' then code = tonumber('0x' .. code) end
-    local c = string.char
-    if code <= 0x7f then return c(code) end
-    local t = {}
-    if code <= 0x07ff then
-        t[1] = c(bit.bor(0xc0, bit.rshift(code, 6)))
-        t[2] = c(bit.bor(0x80, bit.band(code, 0x3f)))
-    elseif code <= 0xffff then
-        t[1] = c(bit.bor(0xe0, bit.rshift(code, 12)))
-        t[2] = c(bit.bor(0x80, bit.band(bit.rshift(code, 6), 0x3f)))
-        t[3] = c(bit.bor(0x80, bit.band(code, 0x3f)))
-    else
-        t[1] = c(bit.bor(0xf0, bit.rshift(code, 18)))
-        t[2] = c(bit.bor(0x80, bit.band(bit.rshift(code, 12), 0x3f)))
-        t[3] = c(bit.bor(0x80, bit.band(bit.rshift(code, 6), 0x3f)))
-        t[4] = c(bit.bor(0x80, bit.band(code, 0x3f)))
-    end
-    return table.concat(t)
-end
-
-
 function M.splitExist()
-    local winCount  = fn.winnr("$")
-    local ui        = api.nvim_list_uis()[1]
+    local winCount  = vim.fn.winnr("$")
+    local ui        = vim.api.nvim_list_uis()[1]
     -- Based on vim.o.guifont = "更纱黑体 Mono SC Nerd:h13"
-    if fn.has("win32") == 1 then
+    if vim.fn.has("win32") == 1 then
         if winCount == 2 and 232/2 < ui["width"] then vim.cmd [[noautocmd wincmd L]] end
-    elseif fn.has("unix") == 1 then
+    elseif vim.fn.has("unix") == 1 then
         if winCount == 2 and 284/2 < ui["width"] then vim.cmd [[noautocmd wincmd L]] end
     end
 end
@@ -330,7 +213,7 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, 
     -- Create extmark to track the position of the highlight content if preserved
     -- namespace is provided
     if presNS then
-        local ok, msg = pcall(api.nvim_buf_set_extmark, bufNr, presNS,
+        local ok, msg = pcall(vim.api.nvim_buf_set_extmark, bufNr, presNS,
             posStart[1], posStart[2], {end_line = posEnd[1], end_col = posEnd[2]})
         -- End function calling if extmark is out of scope
         if not ok then
@@ -342,23 +225,23 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, 
     end
 
     -- Creates a new namespace or gets an existing one.
-    local hlNS = api.nvim_create_namespace('myHighlight')
+    local hlNS = vim.api.nvim_create_namespace('myHighlight')
     -- Always clear all namespaced objects
-    api.nvim_buf_clear_namespace(bufNr, hlNS, 0, -1)
+    vim.api.nvim_buf_clear_namespace(bufNr, hlNS, 0, -1)
 
     -- Add highlight
     local region = vim.region(bufNr, posStart, posEnd, regType,
                     vim.o.selection == "inclusive" and true or false)
     for lineNr, cols in pairs(region) do
-        api.nvim_buf_add_highlight(bufNr, hlNS, hlGroup,
+        vim.api.nvim_buf_add_highlight(bufNr, hlNS, hlGroup,
                                     lineNr, cols[1], cols[2])
     end
 
     -- Clear highlight after certain timeout
     vim.defer_fn(function()
         -- In case of buffer being deleted
-        if api.nvim_buf_is_valid(bufNr) then
-            pcall(api.nvim_buf_clear_namespace, bufNr, hlNS, 0, -1)
+        if vim.api.nvim_buf_is_valid(bufNr) then
+            pcall(vim.api.nvim_buf_clear_namespace, bufNr, hlNS, 0, -1)
         end
     end, hlTimeout)
 
@@ -367,14 +250,6 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, 
     else
         return true
     end
-end
-
-
---- Copy indent of specific line number in current buffer
----@param lineNr number (1, 0) indexed
----@return string Corresponding line indent
-M.indentCopy = function(lineNr)
-    return string.rep(" ", fn.indent(lineNr))
 end
 
 
@@ -484,5 +359,6 @@ M.getQueryNodes = function(bufNr, query, captureId)
 
     return nodeTbl
 end
+
 
 return M

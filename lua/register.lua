@@ -143,46 +143,48 @@ M.getIndent = function(regContent) -- {{{
 end -- }}}
 
 
-----
--- Function: M.saveReg will save the star registers, plus and unnamed registers
--- independently, restoreReg can be accessed after saveReg is called
-----
-M.saveReg = function() -- {{{
-    local unnamedContent = fn.getreg('"', 1)
-    local unnamedType    = fn.getregtype('"')
-    local starContent    = fn.getreg('*', 1)
-    local starType       = fn.getregtype('*')
-    local plusContent    = fn.getreg('+', 1)
-    local plusType       = fn.getregtype('+')
+--- Save the star registers, plus and unnamed registers - independently,
+--- restoreReg can be accessed after saveReg is called
+function M.saveReg() -- {{{
+    local unnamedContent = vim.fn.getreg('"', 1)
+    local unnamedType    = vim.fn.getregtype('"')
+    local starContent    = vim.fn.getreg('*', 1)
+    local starType       = vim.fn.getregtype('*')
+    local plusContent    = vim.fn.getreg('+', 1)
+    local plusType       = vim.fn.getregtype('+')
     local nonDefaultName = vim.v.register
     local nonDefaultContent
     local nonDefaultType
     if not vim.tbl_contains({'"', "*", "+"}, nonDefaultName) then
-        nonDefaultContent = fn.getreg(nonDefaultName, 1)
-        nonDefaultType    = fn.getregtype(nonDefaultName)
+        nonDefaultContent = vim.fn.getreg(nonDefaultName, 1)
+        nonDefaultType    = vim.fn.getregtype(nonDefaultName)
     end
     M.restoreReg = function()
-        if nonDefaultContent and nonDefaultContent then
-            ---@diagnostic disable-next-line: param-type-mismatch
-            fn.setreg(nonDefaultName, nonDefaultContent, nonDefaultType)
+        if nonDefaultContent and nonDefaultContent ~= "" then
+            vim.fn.setreg(nonDefaultName, nonDefaultContent, nonDefaultType)
         end
 
         if starContent ~= "" then
-            ---@diagnostic disable-next-line: param-type-mismatch
-            fn.setreg('*', starContent,    starType)
+            vim.fn.setreg('*', starContent,    starType)
         end
         if plusContent ~= "" then
-            ---@diagnostic disable-next-line: param-type-mismatch
-            fn.setreg('+', plusContent,    plusType)
+            vim.fn.setreg('+', plusContent,    plusType)
         end
         if unnamedContent ~= "" then
-            ---@diagnostic disable-next-line: param-type-mismatch
-            fn.setreg('"', unnamedContent, unnamedType)
+            vim.fn.setreg('"', unnamedContent, unnamedType)
         end
 
         vim.defer_fn(function() M.restoreReg = nil end, 1000)
     end
 end -- }}}
+
+
+--- Copy indent of specific line number in current buffer
+---@param lineNr number (1, 0) indexed
+---@return string Corresponding line indent
+M.indentCopy = function(lineNr)
+    return string.rep(" ", vim.fn.indent(lineNr))
+end
 
 
 return M

@@ -157,7 +157,7 @@ local operator = function(args)
         posStart = vim.api.nvim_buf_get_mark(0, "<")
         posEnd   = vim.api.nvim_buf_get_mark(0, ">")
     end
-    word = vim.fn.escape(require("util").visualSelection("string"), [=[\/.-][]=])
+    word = vim.fn.escape(require("selection").get("string"), [=[\/.-][]=])
 
     -- }}} Store word info
 

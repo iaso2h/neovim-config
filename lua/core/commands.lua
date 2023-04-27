@@ -149,7 +149,7 @@ vim.api.nvim_create_user_command("RunSelection", function()
         return vim.notify("Blockwise visual mode is not supported", vim.log.levels.WARN)
     end
 
-    local lineStr = require("selection").getSelect("string", false)
+    local lineStr = require("selection").get("string", false)
     -- TODO: support run multiple lines at the same time
     -- Similar work lua-dev
     if vimMode == "V" then

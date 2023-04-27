@@ -3,20 +3,18 @@
 -- Description: Add character at the end of line
 -- Version: 0.0.6
 -- Last Modified: 2023-3-21
-local api = vim.api
-local fn  = vim.fn
 local ts  = vim.treesitter
 local M   = {}
 
 --- Find if a comment node exist in a line
----@param commentStr string The trimed version of vim.bo.commentstring
+---@param commentStr string The trimmed version of vim.bo.commentstring
 ---@param char string The character to be added
 ---@param line string The value of current line
 local trailingMarkerFallback = function(commentStr, char, line)
     if char == "{" then
-        api.nvim_set_current_line(line .. " " .. commentStr .. " {{{")
+        vim.api.nvim_set_current_line(line .. " " .. commentStr .. " {{{")
     elseif char == "}" then
-        api.nvim_set_current_line(line .. " " .. commentStr .. " }}}")
+        vim.api.nvim_set_current_line(line .. " " .. commentStr .. " }}}")
     end
 end
 
@@ -24,7 +22,7 @@ end
 --- Find if a comment node exist in a line, start at col 2
 ---@param cursorPos table (0, 0) indexing. Row(Line) and column.
 ---@param lastNode object The treesitter object retrieved by calling
----ts.get_node_at_post(0, <linenum>, 0)
+---ts.get_node_at_post(0, <lineNum>, 0)
 ---@param lineLen number The length of current cursor
 ---@return boolean Whether comment node is found
 local function findCommentNode(cursorPos, lastNode, lineLen)
@@ -56,7 +54,7 @@ local function findCommentNode(cursorPos, lastNode, lineLen)
         -- Break condition 3
         cnt = cnt + 1
         if cnt > 20 then
-            vim.notify("Reoccured too many times", vim.log.levels.WARN)
+            vim.notify("Reoccurred too many times", vim.log.levels.WARN)
             break
         end
     until i > lineLen  -- Break condition 1
@@ -132,28 +130,23 @@ local function findEmptyLine(line)
 end
 
 
-local function indentCopy(lineNr)
-    return string.rep(" ", fn.indent(lineNr))
-end
-
-
 --- Add trailing character
 ---@param char string
 function M.main(vimMode, char) -- {{{
-    local cursorPos = api.nvim_win_get_cursor(0)
+    local cursorPos = vim.api.nvim_win_get_cursor(0)
     local lines
     if vimMode == "n" then
-        lines = api.nvim_buf_get_lines(0, cursorPos[1] - 1, cursorPos[1], false)[1]
+        lines = vim.api.nvim_buf_get_lines(0, cursorPos[1] - 1, cursorPos[1], false)[1]
 
         if char == "{" or char == "}" then
             trailingMarker(cursorPos, lines, char)
         else
-            api.nvim_set_current_line(lines .. char)
+            vim.api.nvim_set_current_line(lines .. char)
         end
     else
-        local startPos = api.nvim_buf_get_mark(0, "<")
-        local endPos   = api.nvim_buf_get_mark(0, ">")
-        lines = api.nvim_buf_get_lines(0, startPos[1] - 1, endPos[1], false)
+        local startPos = vim.api.nvim_buf_get_mark(0, "<")
+        local endPos   = vim.api.nvim_buf_get_mark(0, ">")
+        lines = vim.api.nvim_buf_get_lines(0, startPos[1] - 1, endPos[1], false)
 
         if char == "{" or char == "}" then
             local commentStr
@@ -168,7 +161,7 @@ function M.main(vimMode, char) -- {{{
             -- Get user note
             local note
             vim.cmd [[noa echohl Moremsg]]
-            ok, msg = pcall(fn.input, "Comment for fold marker: ")
+            ok, msg = pcall(vim.fn.input, "Comment for fold marker: ")
             vim.cmd [[noa echohl None]]
             if not ok then
                 if string.find(msg, "Keyboard interrupt") then
@@ -186,20 +179,20 @@ function M.main(vimMode, char) -- {{{
             local newLine
             -- Whole line fold marker
             if topEmpty or botEmpty then
-                -- Always put empty line at the very end of visual seletion
+                -- Always put empty line at the very end of visual selection
                 if topEmpty then
-                    newLine = indentCopy(startPos[1] + 1) .. commentStr .. " " .. note .. " {{{"
+                    newLine = require("register").indentCopy(startPos[1] + 1) .. commentStr .. " " .. note .. " {{{"
                     table.insert(lines, 2, newLine)
                 else
-                    newLine = indentCopy(startPos[1]) .. commentStr .. " " .. note .. " {{{"
+                    newLine = require("register").indentCopy(startPos[1]) .. commentStr .. " " .. note .. " {{{"
                     table.insert(lines, 1, newLine)
                 end
 
                 if botEmpty then
-                    newLine = indentCopy(endPos[1] - 1) .. commentStr .. " }}}" .. note
+                    newLine = require("register").indentCopy(endPos[1] - 1) .. commentStr .. " }}}" .. note
                     table.insert(lines, #lines, newLine)
                 else
-                    newLine = indentCopy(endPos[1]) .. commentStr .. " }}}" .. note
+                    newLine = require("register").indentCopy(endPos[1]) .. commentStr .. " }}}" .. note
                     lines[#lines + 1] = newLine
                 end
             else
@@ -224,7 +217,7 @@ function M.main(vimMode, char) -- {{{
         end
 
         -- Replace lines
-        api.nvim_buf_set_lines(0, startPos[1] - 1, endPos[1], false, lines)
+        vim.api.nvim_buf_set_lines(0, startPos[1] - 1, endPos[1], false, lines)
     end
 end -- }}}
 

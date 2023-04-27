@@ -43,10 +43,10 @@ return function(word)
     else
         -- TODO: This should be exact match only. Not sure how to do that with `:help`
         -- TODO: Let users determine how magical they want the help finding to be
-        local ok = pcall(vim.cmd, string.format('help %s', word))
+        local ok = pcall(vim.api.nvim_command, string.format('help %s', word))
         if not ok then
             local split_word = vim.split(word, '.', true)
-            ok = pcall(vim.cmd, string.format('help %s', split_word[#split_word]))
+            ok = pcall(vim.api.nvim_command, string.format('help %s', split_word[#split_word]))
         end
         if not ok then
             vim.lsp.buf.hover()

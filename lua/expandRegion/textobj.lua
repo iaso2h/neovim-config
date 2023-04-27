@@ -52,7 +52,7 @@ M.getTextObjSelection = function(textObjTbl, curBufNr, tsNode)
             selection.content = ""
             selection.length  = 0
         else
-            selection.content = require("selection").getSelect("string", true)
+            selection.content = require("selection").get("string", true)
             selection.length  = #selection.content
         end
 

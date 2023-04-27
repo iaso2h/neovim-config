@@ -45,7 +45,7 @@ local function lookUp(args)
         posStart = vim.api.nvim_buf_get_mark(0, "<")
         posEnd   = vim.api.nvim_buf_get_mark(0, ">")
     end
-    content = require("util").visualSelection("string")
+    content = require("selection").get("string")
     -- }}} Get content
 
     vim.cmd "noa echohl MoreMsg"

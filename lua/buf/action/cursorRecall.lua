@@ -81,11 +81,11 @@ function M.main(args)
         -- Jump to recent last change instead
         if vim.api.nvim_win_get_cursor(0)[1] == 1 then
             -- Go newest first then the older one
-            local ok, msgOrVal = pcall(vim.cmd, "normal! g,")
-            log("DEBUGPRINT[9]: cursorRecall.lua:85 (after local ok, _ = pcall(vim.cmd, normal! g,))")
+            local ok, msgOrVal = pcall(vim.api.nvim_command, "normal! g,")
+            log("DEBUGPRINT[9]: cursorRecall.lua:85 (after local ok, _ = pcall(vim.api.nvim_command, normal! g,))")
             if not ok then
                 log("DEBUGPRINT[10]: cursorRecall.lua:87 (after if not ok then)")
-                pcall(vim.cmd, "normal! g;")
+                pcall(vim.api.nvim_command, "normal! g;")
             end
         end
     end

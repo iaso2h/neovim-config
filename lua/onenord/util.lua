@@ -1,11 +1,10 @@
-local cmd = vim.cmd
 local M   = {}
 local ok, msg
 
 -- Go trough the table and highlight the group with the color values
 M.hi = function (group, color)
     if color.link then
-        ok, msg = pcall(cmd, string.format([[highlight! link %s %s]], group, color.link))
+        ok, msg = pcall(vim.api.nvim_command, string.format([[highlight! link %s %s]], group, color.link))
     else
         local style = color.style and "gui="   .. color.style or "gui=NONE"
         local fg    = color.fg    and "guifg=" .. color.fg    or "guifg=NONE"
@@ -14,7 +13,7 @@ M.hi = function (group, color)
 
         local hl = string.format("highlight %s %s %s %s %s", group, style, fg, bg, sp)
 
-        ok, msg = pcall(cmd, hl)
+        ok, msg = pcall(vim.api.nvim_command, hl)
     end
 
     if not ok then

@@ -24,9 +24,9 @@ end
 M.closeBuf = function(bufNr)
     -- bufNr = bufNr or 0
     -- :bdelete will register in both the jumplist and the changelist
-    pcall(vim.cmd, "bdelete! " .. bufNr)
+    pcall(vim.api.nvim_command, "bdelete! " .. bufNr)
     -- These two don't register in both the changelist and the changelist
-    -- pcall(cmd, "keepjump bwipe! " .. bufNr)
+    -- pcall(vim.api.nvim_command, "keepjump bwipe! " .. bufNr)
     -- pcall(api.nvim_buf_delete, bufNr and bufNr or 0, {force = true})
 end
 

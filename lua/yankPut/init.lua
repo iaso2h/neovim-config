@@ -4,9 +4,6 @@
 -- Version: 0.1.19
 -- Last Modified: 2023-4-25
 
-local fn       = vim.fn
-local cmd      = vim.cmd
-local api      = vim.api
 local util     = require("util")
 local operator = require("operator")
 local register = require("register")
@@ -15,10 +12,10 @@ local M = {
     hlGroup    = "Search",
     hlEnable   = true,
 
-    lastYankNs      = api.nvim_create_namespace("inplaceYank"),
+    lastYankNs      = vim.api.nvim_create_namespace("inplaceYank"),
     lastYankExtmark = -1,
     lastYankLinewise = false,
-    lastPutNs       = api.nvim_create_namespace("inplacePut"),
+    lastPutNs       = vim.api.nvim_create_namespace("inplacePut"),
     lastPutExtmark  = -1,
     lastPutLinewise = false,
 }
@@ -30,22 +27,22 @@ function M.VSCodeLineMove(vimMode, direction) -- {{{
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
     end
     ---@diagnostic disable-next-line: param-type-mismatch
-    if fn.foldclosed('.') ~= -1 then return end
+    if vim.fn.foldclosed('.') ~= -1 then return end
 
     if vimMode == "n" then
         if direction == "down" then
-            pcall(cmd, [[noautocmd keepjump m .+1]])
+            pcall(vim.api.nvim_command, [[noautocmd keepjump m .+1]])
         elseif direction == "up" then
-            pcall(cmd, [[noautocmd keepjump m .-2]])
+            pcall(vim.api.nvim_command, [[noautocmd keepjump m .-2]])
         end
     elseif vimMode == "v" then
         if direction == "down" then
-            pcall(cmd, [[noautocmd keepjump '<,'>m '>+1]])
+            pcall(vim.api.nvim_command, [[noautocmd keepjump '<,'>m '>+1]])
         elseif direction == "up" then
-            pcall(cmd, [[noautocmd keepjump '<,'>m '<-2]])
+            pcall(vim.api.nvim_command, [[noautocmd keepjump '<,'>m '<-2]])
         end
 
-        cmd [[noautocmd keepjump normal! gv]]
+        vim.cmd [[noautocmd keepjump normal! gv]]
     end
 end -- }}}
 
@@ -57,57 +54,57 @@ function M.VSCodeLineYank(vimMode, direction) -- {{{
 
     if vimMode == "v" then
         vim.cmd([[noa keepjump norm! gv]])
-        local cursorPos = api.nvim_win_get_cursor(0)
+        local cursorPos = vim.api.nvim_win_get_cursor(0)
         vim.cmd([[noa keepjump norm! ]] .. t"<Esc>")
 
-        local visualStart = api.nvim_buf_get_mark(0, "<")
-        local visualEnd   = api.nvim_buf_get_mark(0, ">")
+        local visualStart = vim.api.nvim_buf_get_mark(0, "<")
+        local visualEnd   = vim.api.nvim_buf_get_mark(0, ">")
         local lineDiff    = visualEnd[1] - visualStart[1] + 1
-        local lines = api.nvim_buf_get_lines(0, visualStart[1] - 1, visualEnd[1], false)
+        local lines = vim.api.nvim_buf_get_lines(0, visualStart[1] - 1, visualEnd[1], false)
         if direction == "up" then
             if cursorPos[1] == visualStart[1] then
-                api.nvim_put(lines, "l", false, false)
-                api.nvim_win_set_cursor(0, {
+                vim.api.nvim_put(lines, "l", false, false)
+                vim.api.nvim_win_set_cursor(0, {
                     visualEnd[1], cursorPos[2]
                 })
                 vim.cmd("noa keepjump norm! V")
-                api.nvim_win_set_cursor(0, cursorPos)
+                vim.api.nvim_win_set_cursor(0, cursorPos)
             elseif cursorPos[1] == visualEnd[1] then
-                api.nvim_put(lines, "l", true, false)
-                api.nvim_win_set_cursor(0, visualStart)
+                vim.api.nvim_put(lines, "l", true, false)
+                vim.api.nvim_win_set_cursor(0, visualStart)
                 vim.cmd("noa keepjump norm! V")
-                api.nvim_win_set_cursor(0, {visualEnd[1], cursorPos[2]})
+                vim.api.nvim_win_set_cursor(0, {visualEnd[1], cursorPos[2]})
             end
         elseif direction == "down" then
             if cursorPos[1] == visualStart[1] then
-                api.nvim_put(lines, "l", false, false)
-                api.nvim_win_set_cursor(0, {
+                vim.api.nvim_put(lines, "l", false, false)
+                vim.api.nvim_win_set_cursor(0, {
                     visualEnd[1] + lineDiff, cursorPos[2]
                 })
                 vim.cmd("noa keepjump norm! V")
-                api.nvim_win_set_cursor(0, {
+                vim.api.nvim_win_set_cursor(0, {
                     visualEnd[1] + 1, cursorPos[2]
                 })
             elseif cursorPos[1] == visualEnd[1] then
-                api.nvim_put(lines, "l", true, false)
-                api.nvim_win_set_cursor(0, {
+                vim.api.nvim_put(lines, "l", true, false)
+                vim.api.nvim_win_set_cursor(0, {
                     visualEnd[1] + 1, cursorPos[2]
                 })
                 vim.cmd("noa keepjump norm! V")
-                api.nvim_win_set_cursor(0, {
+                vim.api.nvim_win_set_cursor(0, {
                     visualEnd[1] + lineDiff, cursorPos[2]
                 })
             end
         end
     else
-        local cursorPos = api.nvim_win_get_cursor(0)
-        local currentLine = api.nvim_get_current_line()
+        local cursorPos = vim.api.nvim_win_get_cursor(0)
+        local currentLine = vim.api.nvim_get_current_line()
         if direction == "up" then
-            api.nvim_put({currentLine}, "l", false, false)
-            api.nvim_win_set_cursor(0, { cursorPos[1], cursorPos[2] })
+            vim.api.nvim_put({currentLine}, "l", false, false)
+            vim.api.nvim_win_set_cursor(0, { cursorPos[1], cursorPos[2] })
         elseif direction == "down" then
-            api.nvim_put({ currentLine }, "l", true, false)
-            api.nvim_win_set_cursor(0, { cursorPos[1] + 1, cursorPos[2] })
+            vim.api.nvim_put({ currentLine }, "l", true, false)
+            vim.api.nvim_win_set_cursor(0, { cursorPos[1] + 1, cursorPos[2] })
         end
     end
 end -- }}}
@@ -126,10 +123,10 @@ function M.inplaceYank(args) -- {{{
     local motionType = args[1]
     local vimMode    = args[2]
     local plugMap    = operator.plugMap
-    local curWinID   = api.nvim_get_current_win()
-    local curBufNr   = api.nvim_get_current_buf()
-    local posStart   = api.nvim_buf_get_mark(0, "[")
-    local posEnd     = api.nvim_buf_get_mark(0, "]")
+    local curWinID   = vim.api.nvim_get_current_win()
+    local curBufNr   = vim.api.nvim_get_current_buf()
+    local posStart   = vim.api.nvim_buf_get_mark(0, "[")
+    local posEnd     = vim.api.nvim_buf_get_mark(0, "]")
 
     local regName
     if vim.o.clipboard == "unnamed" then
@@ -143,7 +140,7 @@ function M.inplaceYank(args) -- {{{
     -- Change the col info to the end of line if motionType is line-wise
     if motionType == "line" then
         -- Get the exact end position to avoid surprising posEnd value like {88, 2147483647}
-        local lines = #api.nvim_buf_get_lines(0, posEnd[1] - 1, posEnd[1], false)[1]
+        local lines = #vim.api.nvim_buf_get_lines(0, posEnd[1] - 1, posEnd[1], false)[1]
         if lines ~= 0 then
             posEnd = {posEnd[1], lines - 1}
         else
@@ -153,13 +150,13 @@ function M.inplaceYank(args) -- {{{
     end
 
     if motionType == "char" then
-        cmd(string.format([[noautocmd normal! g`[vg`]%sy]], regName))
+        vim.cmd(string.format([[noautocmd normal! g`[vg`]%sy]], regName))
         M.lastYankLinewise = false
     elseif motionType == "line" then
-        cmd(string.format([[noautocmd normal! g`[Vg`]%sy]], regName))
+        vim.cmd(string.format([[noautocmd normal! g`[Vg`]%sy]], regName))
         M.lastYankLinewise = true
     else
-        cmd(string.format([[noautocmd normal! gv%sy]], regName))
+        vim.cmd(string.format([[noautocmd normal! gv%sy]], regName))
         M.lastYankLinewise = false
     end
 
@@ -171,7 +168,7 @@ function M.inplaceYank(args) -- {{{
             curBufNr,
             posStart,
             posEnd,
-            fn.getregtype(),
+            vim.fn.getregtype(),
             opts.hlGroup,
             opts.timeout,
             M.lastYankNs)
@@ -179,7 +176,7 @@ function M.inplaceYank(args) -- {{{
         -- Convert into (0, 0) index
         posStart = {posStart[1] - 1, posStart[2]}
         posEnd   = {posEnd[1] - 1, posEnd[2]}
-        newContentExmark = api.nvim_buf_set_extmark(
+        newContentExmark = vim.api.nvim_buf_set_extmark(
             curBufNr,
             M.lastYankNs,
             posStart[1],
@@ -194,14 +191,14 @@ function M.inplaceYank(args) -- {{{
 
     -- Restor cursor position
     if operator.cursorPos then
-        api.nvim_win_set_cursor(curWinID, operator.cursorPos)
+        vim.api.nvim_win_set_cursor(curWinID, operator.cursorPos)
         -- Always clear M.cursorPos after restoration to avoid restoring
         -- cursor in after repeat command is performed
         operator.cursorPos = nil
     end
 
     if vimMode ~= "n" then
-        fn["visualrepeat#set"](t(plugMap))
+        vim.fn["visualrepeat#set"](t(plugMap))
     end
 end -- }}}
 
@@ -214,13 +211,13 @@ local function inplacePutExCmd(pasteCMD, vimMode)
     if vimMode == "n" then
         if vim.v.count ~= 0 then
             for _=0, vim.v.count do
-                cmd("noautocmd normal! \"" .. vim.v.register .. pasteCMD)
+                vim.cmd("noautocmd normal! \"" .. vim.v.register .. pasteCMD)
             end
         else
-            cmd("noautocmd normal! \"" .. vim.v.register .. pasteCMD)
+            vim.cmd("noautocmd normal! \"" .. vim.v.register .. pasteCMD)
         end
     else
-        cmd("noautocmd normal! gv\"" .. vim.v.register .. pasteCMD)
+        vim.cmd("noautocmd normal! gv\"" .. vim.v.register .. pasteCMD)
     end
 end
 
@@ -235,12 +232,12 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     if not vim.bo.modifiable then
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
     end
-    if fn.foldclosed('.') ~= -1 then return end
+    if vim.fn.foldclosed('.') ~= -1 then return end
 
     -- Highlight Configuration
     opts = opts or {hlGroup=M.hlGroup, timeout=M.hlInterval}
 
-    local regTypeSave = fn.getregtype()
+    local regTypeSave = vim.fn.getregtype()
     local regTypeNew
     -- "Block-wise type register"
     if regTypeSave == "\0221" then
@@ -252,14 +249,14 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     end
 
     -- Initiation
-    local regContentSave = fn.getreg(vim.v.register, 1)
+    local regContentSave = vim.fn.getreg(vim.v.register, 1)
     local regContentNew
 
-    local curBufNr      = api.nvim_get_current_buf()
-    local curWinID      = api.nvim_get_current_win()
-    local cursorPos     = api.nvim_win_get_cursor(curWinID)
-    local cursorNS      = api.nvim_create_namespace("inplacePutCursor")
-    local cursorExtmark = api.nvim_buf_set_extmark(curBufNr, cursorNS, cursorPos[1] - 1, cursorPos[2], {})
+    local curBufNr      = vim.api.nvim_get_current_buf()
+    local curWinID      = vim.api.nvim_get_current_win()
+    local cursorPos     = vim.api.nvim_win_get_cursor(curWinID)
+    local cursorNS      = vim.api.nvim_create_namespace("inplacePutCursor")
+    local cursorExtmark = vim.api.nvim_buf_set_extmark(curBufNr, cursorNS, cursorPos[1] - 1, cursorPos[2], {})
 
 
     -- Format the register content {{{
@@ -273,7 +270,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
         if regTypeSave == "v" or regTypeSave == "c" then
             regTypeNew = "V"
 
-            local bufferIndent = fn.indent(cursorPos[1])
+            local bufferIndent = vim.fn.indent(cursorPos[1])
             -- Get reindent count
             local reindent  = bufferIndent - register.getIndent(regContentSave)
 
@@ -291,13 +288,13 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
             regContentNew = string.gsub(regContentNew, "^%s+", "")
         end
 
-        fn.setreg(vim.v.register, regContentNew, regTypeNew)
+        vim.fn.setreg(vim.v.register, regContentNew, regTypeNew)
     else
         regTypeNew = regTypeSave
 
         -- Reindent the multiple line register before putting it into the editing buffer
         if regTypeSave == "V" or regTypeSave == "l" then
-            local bufferIndent = fn.indent(cursorPos[1])
+            local bufferIndent = vim.fn.indent(cursorPos[1])
             -- Get reindent count
             local reindent  = bufferIndent - register.getIndent(regContentSave)
             if reindent ~= 0 then
@@ -306,7 +303,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
                 regContentNew = regContentSave
             end
 
-            fn.setreg(vim.v.register, regContentNew, regTypeSave)
+            vim.fn.setreg(vim.v.register, regContentNew, regTypeSave)
         end
     end
     -- }}} Format the register content
@@ -315,8 +312,8 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
 
     -- Create highlight {{{
     -- Position of new created content
-    local posStart = api.nvim_buf_get_mark(curBufNr, "[")
-    local posEnd = api.nvim_buf_get_mark(curBufNr, "]")
+    local posStart = vim.api.nvim_buf_get_mark(curBufNr, "[")
+    local posEnd = vim.api.nvim_buf_get_mark(curBufNr, "]")
     -- Creates a new namespace or gets an existing one.
     local newContentExmark
     if M.hlEnable then
@@ -332,7 +329,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
         -- Convert into (0, 0) index
         posStart = {posStart[1] - 1, posStart[2]}
         posEnd   = {posEnd[1] - 1, posEnd[2]}
-        newContentExmark = api.nvim_buf_set_extmark(
+        newContentExmark = vim.api.nvim_buf_set_extmark(
             curBufNr,
             M.lastPutNs,
             posStart[1],
@@ -348,11 +345,11 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     -- Restoration {{{
     -- Restore cursor position
     if vimMode == "n" then
-        local cursorResExtmark = api.nvim_buf_get_extmark_by_id(curBufNr, cursorNS, cursorExtmark, {})
-        api.nvim_win_set_cursor(curWinID, {cursorResExtmark[1] + 1, cursorResExtmark[2]})
-        api.nvim_buf_clear_namespace(curBufNr, cursorNS, 0, -1)
+        local cursorResExtmark = vim.api.nvim_buf_get_extmark_by_id(curBufNr, cursorNS, cursorExtmark, {})
+        vim.api.nvim_win_set_cursor(curWinID, {cursorResExtmark[1] + 1, cursorResExtmark[2]})
+        vim.api.nvim_buf_clear_namespace(curBufNr, cursorNS, 0, -1)
     else
-        api.nvim_win_set_cursor(curWinID, cursorPos)
+        vim.api.nvim_win_set_cursor(curWinID, cursorPos)
     end
     -- Restore register
     if convertPut then

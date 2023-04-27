@@ -128,9 +128,8 @@ local function bufHandler(loneWin) -- {{{
                     return require("historyStartup").display(true)
                 else
                     return vim.notify(
-                        "Unable to enter the historyStartup correctly for the last scratch file",
-                        vim.log.levels.ERROR
-                    )
+                        "Unabled to enter the historyStartup correctly for the last scratch file",
+                        vim.log.levels.ERROR)
                 end
             else
                 if not u.bufSwitchAlter(var.winID) then
