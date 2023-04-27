@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Delete buffer without change the window layout
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.0.38
--- Last Modified: 2023-4-27
+-- Version: 0.0.39
+-- Last Modified: 2023-4-28
 local u   = require("buf.util")
 local var = require("buf.var")
 local M   = {}
@@ -133,17 +133,10 @@ local function bufHandler(loneWin) -- {{{
                     )
                 end
             else
-                -- Switch to alternative buffer in advance if NNP is loaded,
-                -- otherwise a scratch buffer will be the active buffer after
-                -- calling `bufWipe`
-                if package.loaded["no-neck-pain"] and
-                    require("no-neck-pain").state.enabled then
-
-                    if not u.bufSwitchAlter(var.winID) then
-                        return
-                    end
+                if not u.bufSwitchAlter(var.winID) then
+                    return
                 end
-                u.closeBuf(var.bufNr)
+                return u.closeBuf(var.bufNr)
             end
         end
 
