@@ -286,7 +286,7 @@ M.go = function(vimMode, isNewer, filter)
     local bufNr     = vim.api.nvim_get_current_buf()
     local winId     = vim.api.nvim_get_current_win()
     local cursorPos = M.opts.checkCursorRedundancy and vim.api.nvim_win_get_cursor(winId) or {}
-    if vim.tbl_contains(M.opts, vim.bo.filetype) then
+    if vim.tbl_contains(M.opts.fileTypeUseBuiltIn, vim.bo.filetype) then
         return execute(vimMode, isNewer, winId, cursorPos)
     end
 
