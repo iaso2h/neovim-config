@@ -9,12 +9,12 @@ packer.nvim/
 lsp/
 bk/
 log/
+__pycache__/
 
 packer_compiled*.lua
 lua/test**
 *.bk
 *~
-*.py
 *temp*
 *.snippets
 *session*
