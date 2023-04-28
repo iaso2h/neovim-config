@@ -1,23 +1,21 @@
 -- File: trailingChar
 -- Author: iaso2h
 -- Description: Add character at the end of line
--- Version: 0.0.5
--- Last Modified: 2023-3-16
-local fn  = vim.fn
-local api = vim.api
+-- Version: 0.0.6
+-- Last Modified: 2023-4-28
 local M = {
-    writable = [=[[-a-zA-Z0-9"*+_/]]=],
-         all = [=[[-a-zA-Z0-9":.%#=*+~/]]=]
+    regAllWritable = [=[[-a-zA-Z0-9"*+_/]]=],
+    regAll         = [=[[-a-zA-Z0-9":.%#=*+~/]]=]
 }
 
 --- Clear register
 M.clear = function() -- {{{
-    local regexWritable = vim.regex(M.writable)
+    local regexWritable = vim.regex(M.regAllWritable)
     local char
     for i=34, 122 do
         char = string.char(i)
         if regexWritable:match_str(char) then
-            fn.setreg(char, "")
+            vim.fn.setreg(char, "")
         end
     end
     vim.api.nvim_echo({{"Register cleared", "MoreMsg"}}, true, {})
@@ -26,52 +24,88 @@ end -- }}}
 
 --- Prompt for inserting register
 M.insertPrompt = function(vimMode) -- {{{
-    local regexAll = vim.regex(M.all)
-    local reg
+    local regexAll = vim.regex(M.regAll)
+    local regName
+    local regType
+    local input
+
+    -- Show the register hi and enter prompt
     vim.cmd [[noa reg]]
-    vim.cmd [[noa echohl Moremsg]]
     repeat
-        local ok, msg = pcall(fn.input, "Register: ")
+        vim.cmd [[noa echohl Moremsg]]
+        local ok, msg = pcall(vim.fn.input, "Register: ")
+        vim.cmd [[noa echohl None]]
         if not ok then
             if string.find(msg, "Keyboard interrupt") then
                 return
             else
-                return vim.notify(msg, vim.log.levels.ERROR)
+                return vim.notify("\n" .. msg, vim.log.levels.ERROR)
             end
         else
-            reg = msg
+            input = msg
         end
 
         -- Allow quick cancel by pressing return key only
-        if reg == "" then return end
+        if input == "" then return end
 
         -- Allow more specific put command in normal mode
-        if vimMode == "n" and #reg == 2 then
-            local exCMD = reg:sub(2, 2)
-            if exCMD:lower() == "p" and regexAll:match_str(reg:sub(1, 1)) then
-                -- Use remap keybinding
-                return api.nvim_feedkeys('"' .. reg, "m", false)
+        if vimMode == "n" and #input == 2 then
+            regName = input:sub(1, 1)
+            local exCMD = input:sub(2, 2)
+            ---@diagnostic disable-next-line: need-check-nil
+            if regexAll:match_str(input:sub(1, 1)) then
+                if exCMD:lower() == "p" then
+                    -- Use remap keybinding
+                    return vim.api.nvim_feedkeys('"' .. input, "m", false)
+                elseif exCMD:lower() == "e" then
+                    regType = vim.fn.getregtype(regName)
+                    if regType == "v" then
+                        vim.api.nvim_feedkeys('"' .. regName .. "cpj", "m", false)
+                        -- OPTIM: more options when invoking inplace putting
+                        return vim.defer_fn(function()
+                            vim.cmd([[s#^\s*##e]])
+                            vim.cmd("noh")
+                        end ,0)
+                    else
+                        vim.notify("\nRegister" .. regName .. " isn't a characterwise register for editing macro", vim.log.levels.WARN)
+                    end
+                elseif exCMD:lower() == "r" then
+                    local regexWritable = vim.regex(M.regAllWritable)
+                    ---@diagnostic disable-next-line: need-check-nil
+                    if regexWritable:match_str(regName) then
+                        local curLine = vim.api.nvim_get_current_line()
+                        if string.find(curLine, "^%s*$") then
+                            vim.notify("\nCurrent line isn't a invalid register content", vim.log.levels.WARN)
+                        else
+                            ---@diagnostic disable-next-line: param-type-mismatch
+                            vim.fn.setreg(regName, curLine, "c")
+                            return vim.cmd([[norm! "_dd]])
+                        end
+                    else
+                        vim.notify("\nRegister" .. regName .. " isn't a writable register", vim.log.levels.WARN)
+                    end
+                end
+            end
+        else
+            if #input == 1 and regexAll:match_str(input) then
+                regName = input
+                regType = vim.fn.getregtype(regName)
+                local regContent = vim.fn.getreg(regName, 0)
+
+                if regType == "" then
+                    return
+                elseif regType == "V" or regType == "line" then
+                    local lines = vim.split(regContent:sub(1, -2), "\n")
+                    return vim.api.nvim_put(lines, "l", true, false)
+                else
+                    return vim.api.nvim_put({regContent}, "c", true, false)
+                end
+            else
+                vim.notify("\nInvalid register name", vim.log.levels.WARN)
             end
         end
-    until (#reg == 1 and regexAll:match_str(reg)) or vim.notify("    Invalid register name", vim.log.levels.WARN)
-    vim.cmd [[noa echohl None]]
-
-    -- local regContent = reg == "=" and fn.getreg(reg, 1) or fn.getreg(reg, 0)
-    local regType    = fn.getregtype(reg)
-    local regContent = fn.getreg(reg, 0)
-
-
-    if regType == "" then
-        return
-    elseif regType == "V" or regType == "line" then
-        local lines = vim.split(regContent:sub(1, -2), "\n")
-        api.nvim_put(lines, "l", true, false)
-    else
-        api.nvim_put({regContent}, "c", true, false)
-    end
+    until false -- Inifinite loop with multiple break points nested
 end -- }}}
-
-
 
 
 local stringCount = function(str, pattern)
@@ -137,7 +171,7 @@ M.getIndent = function(regContent) -- {{{
         if tabIdx then tabCnt = tabCnt + 1 end
     until not tabIdx or tabIdx > regIndent
 
-    if tabIdx then regIndent = regIndent + tabCnt * api.nvim_buf_get_option(0, "tabstop") end
+    if tabIdx then regIndent = regIndent + tabCnt * vim.api.nvim_buf_get_option(0, "tabstop") end
 
     return regIndent
 end -- }}}

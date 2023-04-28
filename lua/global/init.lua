@@ -121,7 +121,10 @@ _G.logBuf = function(...)
         vim.cmd "wincmd p"
     end
 
-    vim.api.nvim_feedkeys(t[[:%s#\\n#\r#e<CR>]], "nt", false)
+    vim.defer_fn(function()
+        vim.cmd([[%s#\\n#\r#e]])
+        vim.cmd("noh")
+    end ,0)
 
     return ...
 end
