@@ -126,7 +126,7 @@ return function(bufNr, cursorPos, fallback)
             local idx = {configRegex:match_str(lineText)}
             if next(idx) then
                 local configName = lineText:sub(idx[1] + 1, idx[2])
-                return string.format("e %s%slua%plugins%s%s.lua",
+                return string.format("e %s%slua%splugins%s%s.lua",
                     _G._config_path, _G._sep, _G._sep, _G._sep, configName)
             end
 

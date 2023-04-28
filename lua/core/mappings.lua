@@ -1,5 +1,3 @@
--- BUG: dT" motion
--- BUG: daw motion will delete the proceeding space of word ` Msa`
 -- NOTE: Mapping is always recursive unless noremap is specified
 
 -- First thing first
