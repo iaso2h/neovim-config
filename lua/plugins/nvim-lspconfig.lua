@@ -165,19 +165,20 @@ return function()
     -- Fennel {{{
     if _G._os_uname.sysname ~= "Windows_NT" then
         -- HACK:
-        local fennelRuntimePath = {vim.api.nvim_eval("$VIMRUNTIME")}
-        table.insert(fennelRuntimePath, _G._config_path)
-        table.insert(fennelRuntimePath, string.format("%s%sfnl%sruntimestub%s%s",
-                                            _G._config_path,
-                                            _G._sep,
-                                            _G._sep,
-                                            _G._sep,
-                                            _G._sep and "nightly" or "stable"))
+        -- https://github.com/rydesun/fennel-language-server
+        -- local fennelRuntimePath = {vim.api.nvim_eval("$VIMRUNTIME")}
+        -- table.insert(fennelRuntimePath, _G._config_path)
+        -- table.insert(fennelRuntimePath, string.format("%s%sfnl%sruntimestub%s%s",
+        --                                     _G._config_path,
+        --                                     _G._sep,
+        --                                     _G._sep,
+        --                                     _G._sep,
+        --                                     _G._sep and "nightly" or "stable"))
         servers.fennel_language_server = {
             settings = {
                 fennel = {
                     workspace = {
-                        library = fennelRuntimePath,
+                        library = vim.api.nvim_list_runtime_paths(),
                     },
                     diagnostics = {
                         globals = {"vim"}
