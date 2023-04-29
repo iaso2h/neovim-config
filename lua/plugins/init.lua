@@ -134,6 +134,30 @@ local pluginArgs = { -- {{{
     },
     {
         "inkarkat/vim-AdvancedSorters",
+        cmd = {
+            "ReorderByHeader",
+            "ReorderByMatchAndLines",
+            "ReorderByMatchAndNonMatches",
+            "ReorderByRangeAndLines",
+            "ReorderByRangeAndNonMatches",
+            "ReorderFolded",
+            "ReorderOnlyByMatch",
+            "ReorderOnlyByRange",
+            "ReorderUnfolded",
+            "ReorderVisible",
+            "SortByCharLength",
+            "SortByExpr",
+            "SortByExprUnique",
+            "SortByWidth",
+            "SortEach",
+            "SortRangesByHeader",
+            "SortRangesByMatch",
+            "SortRangesByRange",
+            "SortVisible",
+            "SortWORDs",
+            "UniqAny",
+            "UniqSubsequent",
+        },
         dependencies = {"inkarkat/vim-ingo-library"},
     },
     {
@@ -500,6 +524,7 @@ local pluginArgs = { -- {{{
     },
     {
         "folke/trouble.nvim",
+        cmd = {"Trouble"},
         dependencies = { "nvim-lspconfig", },
         config = require("plugins.nvim-trouble"),
     },
@@ -549,7 +574,6 @@ local pluginArgs = { -- {{{
             "hrsh7th/cmp-nvim-lsp",
             "hrsh7th/cmp-buffer",
             "hrsh7th/cmp-path",
-            "PaterJason/cmp-conjure",
             {
                 "tzachar/cmp-tabnine",
                 cond  = _G._os_uname.machine ~= "aarch64",
@@ -577,7 +601,7 @@ local pluginArgs = { -- {{{
     },
     {
         "Exafunction/codeium.vim",
-        enabled = _G._os_uname.sysname == "Windows_NT",
+        enabled = _G._os_uname.sysname ~= "Windows_NT",
         event  = "BufModifiedSet",
         init   = function() vim.g.codeium_disable_bindings = 1 end,
         config = function()
@@ -630,7 +654,19 @@ local pluginArgs = { -- {{{
     -- Debug {{{
     {
         "Olical/conjure",
-        dependencies = { "cmp-conjure" },
+        dependencies = {
+            {
+                "PaterJason/cmp-conjure",
+                dependencies = {"nvim-cmp"}
+            }
+        },
+        keys = {
+            { "<leader>lg",  mode = "n" },
+            { "<leader>le",  mode = "n" },
+            { "<leader>ls",  mode = "n" },
+            { "<leader>lv",  mode = "n" },
+            { "<leader>lt",  mode = "n" },
+        },
         init = function()
             vim.g["conjure#filetypes"] = {"clojure", "fennel", "janet", "hy", "julia", "racket",
              "scheme", "lua", "lisp", "rust"}

@@ -1,4 +1,5 @@
 local opt = vim.opt
+local o   = vim.go
 local ex  = require("util").ex
 
 -- let &path.="src/include,/usr/include/AL,"
@@ -19,25 +20,25 @@ opt.tabstop     = 4
 opt.cmdheight = 2
 opt.shortmess = "cxTIFSs"
 
-opt.complete    = ".,w,b,u,t,kspell,i,d,t"
-opt.completeopt = "menuone,noinsert,noselect"
+o.complete    = ".,w,b,u,t,kspell,i,d,t"
+o.completeopt = "menuone,noinsert,noselect"
 
 opt.conceallevel  = 0
 opt.concealcursor = "nc"
 
 opt.cpoptions:append"q;"
 opt.cursorline = true
-opt.guicursor  = "n-v-sm:block,i-c-ci-ve:ver25,r-cr:hor20,o:hor50"
+o.guicursor    = "n-v-sm:block,i-c-ci-ve:ver25,r-cr:hor20,o:hor50"
 
-opt.diffopt = "context:100,linematch:60,algorithm:histogram,filler,closeoff,hiddenoff,iwhite,vertical"
+o.diffopt = "context:100,linematch:60,algorithm:histogram,filler,closeoff,hiddenoff,iwhite,vertical"
 
-opt.langmenu      = "en"
-opt.fileencodings = "utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1"
-opt.modelineexpr  = true
+opt.langmenu     = "en"
+o.fileencodings  = "utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1"
+opt.modelineexpr = true
 
-opt.fillchars = "msgsep:─,fold:-,eob: ,diff:╱,foldopen:,foldclose:"
-opt.list      = true
-opt.listchars = "tab:>_,precedes:«,extends:»,nbsp:␣"
+o.fillchars = "msgsep:─,fold:-,eob: ,diff:╱,foldopen:,foldclose:"
+opt.list    = true
+o.listchars = "tab:>_,precedes:«,extends:»,nbsp:␣"
 -- o.listchars = "tab:>-,precedes:«,extends:»,nbsp:␣,eol:↵,trail:•"
 opt.showbreak = "⤷ "
 
@@ -47,7 +48,7 @@ opt.ignorecase = true
 opt.smartcase  = true
 opt.lazyredraw = true
 
-opt.matchpairs = "[:],{:},(:),《:》,（:）,【:】,“:”,‘:’"
+o.matchpairs = "[:],{:},(:),《:》,（:）,【:】,“:”,‘:’"
 
 opt.jumpoptions = "stack"
 opt.scrolloff   = 10
@@ -59,21 +60,21 @@ opt.showcmd       = false
 opt.showmode      = false
 opt.termguicolors = true
 
-opt.shada          = "!,'100,/100,:100,<100,s100,h"
+o.shada            = "!,'100,/100,:100,<100,s100,h"
 opt.fileignorecase = true
-opt.sessionoptions = "buffers,curdir,folds,help,resize,slash,tabpages,winpos,winsize"
+o.sessionoptions   = "buffers,curdir,folds,help,resize,slash,tabpages,winpos,winsize"
 opt.backup         = false
 opt.swapfile       = false
 
-opt.wildignore     = vim.o.wildignore .. "*/tmp/*,*.so,*.swp,*.zip,*.db,*.sqlite,*.bak"
+o.wildignore       = o.wildignore .. "*/tmp/*,*.so,*.swp,*.zip,*.db,*.sqlite,*.bak"
 opt.wildignorecase = true
 
-opt.winminwidth  = 3
-opt.winheight    = 3
-opt.winhighlight = "NormalNC:WinNormalNC"
-opt.splitbelow   = true
-opt.splitright   = true
-opt.switchbuf    = "uselast"
+opt.winminwidth = 3
+opt.winheight   = 3
+o.winhighlight  = "NormalNC:WinNormalNC"
+opt.splitbelow  = true
+opt.splitright  = true
+opt.switchbuf   = "uselast"
 
 vim.g.FiletypeCommentDelimiter = {
     vim    = "\"",
@@ -114,19 +115,19 @@ if not vim.g.vscode then
         fish   = [=[\s*#.*}}}.*$]=],
     }
 
-    vim.cmd [[
-    function! EnhanceFoldExpr()
-        " BUG: let line = nvim_get_current_line()
-        let line = getline(v:lnum)
-        if match(line, g:enhanceFoldStartPat[&filetype]) > -1
-            return "a1"
-        elseif match(line, g:enhanceFoldEndPat[&filetype]) > -1
-            return "s1"
-        else
-            return "="
-        endif
-    endfunction
-    ]]
+--     vim.cmd [[
+--     function! EnhanceFoldExpr()
+--         " BUG: let line = nvim_get_current_line()
+--         let line = getline(v:lnum)
+--         if match(line, g:enhanceFoldStartPat[&filetype]) > -1
+--             return "a1"
+--         elseif match(line, g:enhanceFoldEndPat[&filetype]) > -1
+--             return "s1"
+--         else
+--             return "="
+--         endif
+--     endfunction
+--     ]]
 end
 
 opt.foldcolumn = "auto:4"
@@ -134,7 +135,6 @@ opt.signcolumn = "yes:1"
 -- opt.foldmethod = "expr"
 -- opt.foldexpr   = "EnhanceFoldExpr()"
 opt.foldmethod = "marker"
--- opt.foldexpr   = "EnhanceFoldExpr()"
 opt.formatoptions = _G._format_option -- NOTE: Might change on loading different types of ftplugins
 
 

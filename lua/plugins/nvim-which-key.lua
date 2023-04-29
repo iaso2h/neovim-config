@@ -81,6 +81,7 @@ return function ()
             "<C-f>",
             "<C-h>",
             "<leader>",
+            "<leader>d",
             "<leader>e",
             "<leader>l"
         },
