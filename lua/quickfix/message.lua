@@ -90,7 +90,7 @@ M.main = function()
     vim.cmd [[clast]]
 
     vim.defer_fn(function()
-        require("quickfix.highlight").add(
+        require("quickfix.highlight").addLines(
             errorLineTbl,
             "ErrorMsg",
             require("quickfix").ns

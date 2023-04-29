@@ -1,3 +1,9 @@
+-- File: cFilter
+-- Author: iaso2h
+-- Description: Lua migration of cfilter.vim
+-- Version: 0.0.5
+-- Last Modified: 04/29/2023 Sat
+
 -- Commands to filter the quickfix list:
 --   :Cfilter[!] /{pat}/
 --       Create a new quickfix list from entries matching {pat} in the current
@@ -11,7 +17,6 @@
 --   :Lfilter[!] /{pat}/
 --       Same as :Cfilter but operates on the current location list.
 --
-local fn  = vim.fn
 local M   = { }
 
 local lastFilterPat = ""
@@ -22,6 +27,7 @@ local lastFilterPat = ""
 ---        pattern will be preserved
 M.main = function(qfChk, pat, bang)
     local items = require("quickfix.util").getlist()
+    local title = require("quickfix.util").getlist{title = 0}.title
     if not next(items) then return end
 
     -- Parsing the pat
@@ -50,11 +56,11 @@ M.main = function(qfChk, pat, bang)
 
     if bang then
         cond = function(i)
-            return (not regex:match_str(i.text)) and (not regex:match_str(fn.bufname(i.bufnr)))
+            return (not regex:match_str(i.text)) and (not regex:match_str(vim.fn.bufname(i.bufnr)))
         end
     else
         cond = function(i)
-            return regex:match_str(i.text) or regex:match_str(fn.bufname(i.bufnr))
+            return regex:match_str(i.text) or regex:match_str(vim.fn.bufname(i.bufnr))
         end
     end
 
@@ -62,7 +68,7 @@ M.main = function(qfChk, pat, bang)
     -- Check whether item list is emptry and prompt for continuation
     if not next(newItems) then
         vim.cmd "noa echohl MoreMsg"
-        local answer = fn.confirm("No satisified items, proceed?  ",
+        local answer = vim.fn.confirm("No satisified items, proceed?  ",
             ">>> &Yes\n&No\n&Cancel", 3, "Question")
         vim.cmd "noa echohl None"
 
@@ -76,13 +82,13 @@ M.main = function(qfChk, pat, bang)
 
     -- Populate new items
     if qfChk then
-        fn.setqflist({}, "r", {items = newItems})
+        vim.fn.setqflist({}, "r", {items = newItems, title = title})
     else
-        fn.setloclist(0, {}, "r", {items = newItems})
+        vim.fn.setloclist(0, {}, "r", {items = newItems, title = title})
     end
 
     -- Optional step need to do for todo-comment
-    vim.defer_fn(require("quickfix.highlight").clear, 0, 0)
+    vim.defer_fn(require("quickfix.highlight").clear, 0)
 end
 
 return M

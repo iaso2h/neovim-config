@@ -74,7 +74,7 @@ M.main = function(fallbackChk, closeQfChk, offset)
     -- Comment out invalid item
     if item.valid == 0 or item.bufnr == 0 or
             not api.nvim_buf_is_valid(item.bufnr) then
-        require("quickfix.highlight").add(
+        require("quickfix.highlight").addLines(
             {qfCursorPos[1]},
             "Comment",
             api.nvim_create_namespace("myQuickfix")
