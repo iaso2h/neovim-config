@@ -2,7 +2,7 @@
 -- Author: iaso2h
 -- Description: Open diagnostics in quickfix window
 -- Credit: https://github.com/onsails/diaglist.nvim
--- Version: 0.0.2
+-- Version: 0.0.3
 -- Last Modified: 04/29/2023 Sat
 -- TODO: Preview mode implementation
 -- TODO: Auto highlight selection
@@ -105,7 +105,12 @@ M.open = function(forceChk, localChk)
     end
 
     -- Make up the highlights for character string "warning", "note"
-    hl.moreDiagnosticsHighlight(qfItems)
+    local asyncHandler = vim.loop.new_async(
+        vim.schedule_wrap(function()
+            hl.moreDiagnosticsHighlight(qfItems)
+        end)
+    )
+    asyncHandler:send()
 
     if not curBufQuickfixTick and not forceChk then
         vim.cmd [[noa wincmd w]]
