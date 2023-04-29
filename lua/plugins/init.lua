@@ -264,9 +264,9 @@ local pluginArgs = { -- {{{
             ftExclude[#ftExclude+1] = "help"
             require("indent_blankline").setup{
                 use_treesitter = true,
-                char             = "▏",
-                char_blankline   = "▏",
-                context_char     = "▏",
+                char             = require("util.icon").ui.LineLeft,
+                char_blankline   = require("util.icon").ui.LineLeft,
+                context_char     = require("util.icon").ui.LineLeft,
                 buftype_exclude  = {"terminal", "nofile"},
                 filetype_exclude = ftExclude,
                 bufname_exclude  = {"*.md"},

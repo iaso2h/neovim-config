@@ -24,7 +24,7 @@ return function()
     -- }}} General mappings
 
     fn.sign_define("DapBreakpoint", {
-        text   = icon.debug.breakpoint,
+        text   = icon.debug.Breakpoint,
         texthl = "DiagnosticError",
         linehl = "",
         numhl  = "DiagnosticError",
@@ -36,7 +36,7 @@ return function()
         numhl  = "DiagnosticWarn",
     })
     fn.sign_define("DapLogPoint",   {
-        text   = icon.debug.logpoint,
+        text   = icon.debug.Logpoint,
         texthl = "MoreMsg",
         linehl = "DapLogPointLine",
         numhl  = "MoreMsg",

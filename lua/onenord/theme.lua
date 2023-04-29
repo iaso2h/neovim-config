@@ -46,7 +46,7 @@ theme.syntax = {
     Underlined     = {fg = p.n10, style = "underline", sp = p.n10}, -- text that stands out, HTML links
     Ignore         = {fg = p.n1}, -- left blank, hidden
 
-    Error          = {fg = p.n11, style = "bold,underline", sp = p.n11}, -- any erroneous construct
+    Error          = {fg = p.n11, style = "bold", sp = p.n11}, -- any erroneous construct
     Todo           = {fg = p.n13, style = "bold,italic"}, -- anything that needs extra attention; mostly the keywords TODO FIXME and XXX
 
     htmlLink            = {fg = p.n14,  style = "underline", sp = p.n14},
@@ -140,10 +140,6 @@ theme.editor =  {
     WildMenu   = {link = "PmenuSel"},
 
 
-    QuickFixLine = {link = "Search"},
-    qfLineNr     = {link = "LineNr"},
-
-
     SpellBad   = {fg = p.n11, style = "italic,undercurl"},
     SpellCap   = {fg = p.n7,  style = "italic,undercurl"},
     SpellLocal = {fg = p.n8,  style = "italic,undercurl"},
@@ -178,6 +174,12 @@ theme.editor =  {
     Title      = {fg = p.n8, style = "bold"},
     SpecialKey = {fg = p.n12},
     Directory  = {fg = p.n7},
+
+
+    QuickFixLine = {bg = "NONE", style = "bold,italic"},
+    qfLineNr     = {link = "LineNr"},
+    qfFileName   = {link = "Directory"},
+    qfError      = {fg = p.n11, style = "bold"},
 
 
     Visual    = {bg = p.n2, style = "bold"},
@@ -335,14 +337,14 @@ theme.treesitter         = {
 -- }}}
 
 theme.lsp = { -- {{{
-    DiagnosticError                = {fg = p.n11},
-    DiagnosticUnderlineError       = {style = "undercurl", sp = p.n11},
-    DiagnosticWarn                 = {fg = p.n13},
-    DiagnosticUnderlineWarn        = {style = "undercurl", sp = p.n13},
-    DiagnosticInfo                 = {fg = p.n10},
-    DiagnosticUnderlineInfo        = {style = "undercurl", sp = p.n10},
-    DiagnosticHint                 = {fg = p.n9 },
-    DiagnosticUnderlineHint        = {style = "undercurl", sp = p.n9},
+    DiagnosticError          = {fg = p.n11, style = "bold"},
+    DiagnosticWarn           = {fg = p.n13, style = "bold"},
+    DiagnosticInfo           = {fg = p.n10, style = "bold"},
+    DiagnosticHint           = {fg = p.n9,  style = "bold"},
+    DiagnosticUnderlineError = {sp = p.n11, style = "undercurl"},
+    DiagnosticUnderlineWarn  = {sp = p.n13, style = "undercurl"},
+    DiagnosticUnderlineInfo  = {sp = p.n10, style = "undercurl"},
+    DiagnosticUnderlineHint  = {sp = p.n9,  style = "undercurl"},
 
     LspDiagnosticsError                = {link = "DiagnosticError"},
     LspDiagnosticsWarning              = {link = "DiagnosticWarn"},
@@ -524,8 +526,8 @@ theme.plugins = { -- {{{
 
     -- https://github.com/hrsh7th/nvim-cmp
     CmpItemAbbr           = {fg = p.white},
-    CmpItemAbbrDeprecated = {fg = p.white,  bg = "NONE", style = "strikethrough" },
-    CmpItemAbbrMatch      = {fg = p.w, bg = "NONE", style = "bold"},
+    CmpItemAbbrDeprecated = {fg = p.white, bg = "NONE", style = "strikethrough" },
+    CmpItemAbbrMatch      = {fg = p.w,     bg = "NONE", style = "bold"},
     CmpItemAbbrMatchFuzzy = {link = "CmpItemAbbrMatch"},
     CmpItemKind           = {fg = p.n15},
     CmpItemMenu           = {fg = p.n3b,  bg = "NONE", style = "italic" },

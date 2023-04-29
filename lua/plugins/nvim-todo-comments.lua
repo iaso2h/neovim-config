@@ -1,4 +1,5 @@
 return function()
+    local icon = require("util.icon")
     require("todo-comments").setup {
         signs = false, -- show icons in the signs column
         sign_priority = 8, -- sign priority
@@ -9,13 +10,38 @@ return function()
                 alt   = { "FIXME", "BUG", "FIXIT", "FIX", "ISSUE" }, -- a set of other keywords that all map to this FIX keywords
                 -- signs = false, -- configure signs for some keywords individually
             },
-            TODO   = { icon = " ", color = "warning" },
-            HACK   = { icon = " ", color = "error", alt = { "UGLY" } },
-            WARN   = { icon = " ", color = "warning", alt = { "WARNING", "XXX" } },
-            NOTE   = { icon = " ", color = "hint", alt = { "INFO", "DEBUG" } },
-            TEST   = { icon = "⏲ ", color = "test", alt = { "TESTING", "PASSED", "FAILED" } },
-            PERF   = { icon = " ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
-            LUARUN = { icon = " ", color = "hint" }
+            TODO   = {
+                icon = icon.ui.Comment .. " ",
+                color = "warning"
+            },
+            HACK   = {
+                icon = icon.ui.Fire .. " ",
+                color = "error",
+                alt = { "UGLY" }
+            },
+            WARN   = {
+                icon = icon.diagnostics.WarningBold .. " ",
+                color = "warning",
+                alt = { "WARNING", "XXX" }
+            },
+            NOTE   = {
+                icon = icon.ui.Note .. " ",
+                color = "hint",
+                alt = { "INFO", "DEBUG" }
+            },
+            TEST   = {
+                icon = icon.ui.Test .. " ",
+                color = "test",
+                alt = { "TESTING", "PASSED", "FAILED" }
+            },
+            PERF   = {
+                icon = icon.ui.Dashboard .. " ",
+                alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" }
+            },
+            LUARUN = {
+                icon = icon.ui.Lua .. " ",
+                color = "hint"
+            }
         },
         gui_style = {
             fg = "NONE",   -- The gui style to use for the fg highlight group.

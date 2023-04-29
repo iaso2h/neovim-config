@@ -1,4 +1,6 @@
+-- https://github.com/folke/trouble.nvim
 return function()
+    local icon = require("util.icon")
     require("trouble").setup {
         position    = "bottom",  -- position of the list can be: bottom, top, left, right
         height      = 15,        -- height of the trouble list when position is top or bottom
@@ -16,22 +18,25 @@ return function()
             close          = "q",                 -- close the list
             cancel         = {"<esc>", "<C-o>"},  -- cancel the preview and get back to your last window / buffer / cursor
             refresh        = "r",                 -- manually refresh
-            jump           = {"<CR>", "o"},       -- jump to the diagnostic or open / close folds
-            open_split     = "<C-s>",             -- open buffer in new split
-            open_vsplit    = "<C-v>",             -- open buffer in new vsplit
-            open_tab       = "<C-t>",             -- open buffer in new tab
-            jump_close     = "O",                 -- jump to the diagnostic and close the list
-            toggle_mode    = "<Tab>",             -- toggle between "workspace" and "document" diagnostics mode
-            toggle_preview = "P",                 -- toggle auto_preview
-            hover          = "K",                 -- opens a small popup with the full multiline message
-            preview        = "p",                 -- preview the diagnostic location
 
-            close_folds    = {"zM", "zm"},        -- close all folds
-            open_folds     = {"zR", "zr"},        -- open all folds
-            toggle_fold    = "<Leader><Space>",   -- toggle fold of current file
+            jump           = "<CR>",   -- jump to the diagnostic or open / close folds
+            jump_close     = "o",      -- jump to the diagnostic and close the list
+            open_split     = "<C-s>",  -- open buffer in new split
+            open_vsplit    = "<C-v>",  -- open buffer in new vsplit
+            open_tab       = "<C-t>",  -- open buffer in new tab
 
-            previous       = "k",                 -- preview item
-            next           = "j"                  -- next item
+            toggle_mode    = "<Tab>",  -- toggle between "workspace" and "document" diagnostics mode
+            toggle_preview = "P",      -- toggle auto_preview
+
+            hover          = "K",  -- opens a small popup with the full multiline message
+            preview        = "p",  -- preview the diagnostic location
+
+            close_folds    = "zm",  -- close all folds
+            open_folds     = "zr",  -- open all folds
+            toggle_fold    = "u",   -- toggle fold of current file
+
+            previous       = "k",  -- preview item
+            next           = "j"   -- next item
         },
 
         indent_lines = true, -- add an indent guide below the fold icons
@@ -41,11 +46,11 @@ return function()
         auto_fold    = true,  -- automatically fold a file trouble list at creation
         signs        = {
         -- icons / text used for a diagnostic
-            error       = "",
-            warning     = "",
-            hint        = "",
-            information = "",
-            other       = "﫠"
+            error       = icon.diagnostics.Error,
+            warning     = icon.diagnostics.Warning,
+            hint        = icon.diagnostics.Hint,
+            information = icon.diagnostics.Information,
+            other       = icon.diagnostics.BoxChecked
         },
         use_diagnostic_signs = true -- enabling this will use the signs defined in your lsp client
     }
