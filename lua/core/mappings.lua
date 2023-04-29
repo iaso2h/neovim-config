@@ -4,8 +4,8 @@
 vim.g.mapleader = " "
 
 -- Diagnostic mapping
-map("n", [[<C-q>e]],    [[<CMD>lua vim.diagnostic.setqflist()<CR>]],  {"silent"}, "LSP add workspace folder")
-map("n", [[<leader>E]], [[<CMD>lua vim.diagnostic.open_float()<CR>]], {"silent"}, "LSP diagnostics")
+-- map("n", [[<leader>E]], [[<CMD>lua vim.diagnostic.open_float()<CR>]], {"silent"}, "LSP diagnostics")
+map("n", [[<C-q>d]],    [[<CMD>lua vim.diagnostic.setqflist()<CR>]],  {"silent"}, "LSP add workspace folder")
 map("n", [[[e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to previous diagnostic symbol")
 map("n", [[]e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to next diagnostic symbol")
 map("n", [[[E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to previous error")
@@ -322,6 +322,7 @@ map("x", [[/]], [[:lua require("jump.search").searchSelected("/")<CR>]], {"silen
 map("x", [[?]], [[:lua require("jump.search").searchSelected("?")<CR>]], {"silent"}, "Search selected backward")
 map("x", [[*]], [[/]], "Search selected forward")
 map("x", [[#]], [[?]], "Search selected backward")
+map("n", [[<leader>/]], [[q/]], {"noremap"}, "Open search in commandline window")
 -- Regex very magic
 map("n", [[n]], [[<CMD>lua require("jump.search").cycle("n")<CR>]], {"silent"}, "Cycle through search result forward")
 map("n", [[N]], [[<CMD>lua require("jump.search").cycle("N")<CR>]], {"silent"}, "Cycle through search result backward")
