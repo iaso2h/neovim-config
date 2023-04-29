@@ -76,64 +76,8 @@ opt.splitbelow  = true
 opt.splitright  = true
 opt.switchbuf   = "uselast"
 
-vim.g.FiletypeCommentDelimiter = {
-    vim    = "\"",
-    python = "#",
-    sh     = "#",
-    zsh    = "#",
-    fish   = "#",
-    c      = "\\/\\/",
-    cpp    = "\\/\\/",
-    json   = "\\/\\/",
-    conf   = "\\/\\/",
-    lua    = "--",
-}
-
-if not vim.g.vscode then
-    vim.g.enhanceFoldStartPat = {
-        vim    = [=[\s*".*{{{.*$]=],
-        python = [=[\s*#.*{{{.*$]=],
-        c      = [=[\s*//.*{{{.*$]=],
-        cpp    = [=[\s*//.*{{{.*$]=],
-        json   = [=[\s*//.*{{{.*$]=],
-        conf   = [=[\s*//.*{{{.*$]=],
-        lua    = [=[\s*--.*{{{.*$]=],
-        sh     = [=[\s*#.*{{{.*$]=],
-        zsh    = [=[\s*#.*{{{.*$]=],
-        fish   = [=[\s*#.*{{{.*$]=],
-    }
-    vim.g.enhanceFoldEndPat = {
-        vim    = [=[\s*".*}}}.*$]=],
-        python = [=[\s*#.*}}}.*$]=],
-        c      = [=[\s*//.*}}}.*$]=],
-        cpp    = [=[\s*//.*}}}.*$]=],
-        json   = [=[\s*//.*}}}.*$]=],
-        conf   = [=[\s*//.*}}}.*$]=],
-        lua    = [=[\s*--.*}}}.*$]=],
-        sh     = [=[\s*#.*}}}.*$]=],
-        zsh    = [=[\s*#.*}}}.*$]=],
-        fish   = [=[\s*#.*}}}.*$]=],
-    }
-
---     vim.cmd [[
---     function! EnhanceFoldExpr()
---         " BUG: let line = nvim_get_current_line()
---         let line = getline(v:lnum)
---         if match(line, g:enhanceFoldStartPat[&filetype]) > -1
---             return "a1"
---         elseif match(line, g:enhanceFoldEndPat[&filetype]) > -1
---             return "s1"
---         else
---             return "="
---         endif
---     endfunction
---     ]]
-end
-
 opt.foldcolumn = "auto:4"
 opt.signcolumn = "yes:1"
--- opt.foldmethod = "expr"
--- opt.foldexpr   = "EnhanceFoldExpr()"
 opt.foldmethod = "marker"
 opt.formatoptions = _G._format_option -- NOTE: Might change on loading different types of ftplugins
 

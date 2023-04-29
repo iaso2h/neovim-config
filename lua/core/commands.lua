@@ -41,14 +41,6 @@ if _G._autoreload then
     })
 end
 
--- NOTE: only enable this autocmd when foldexpr = <CustomFunc>
--- vim.api.nvim_create_autocmd("BufModifiedSet", {
---     desc     = "Avoiding folding after making modification on a buffer for the first time",
---     callback = function()
---         vim.cmd[[normal! zv]]
---     end
---     once = true
--- })
 
 vim.api.nvim_create_autocmd("BufReadPost", {
     desc     = "Place the cursor on the last position",
