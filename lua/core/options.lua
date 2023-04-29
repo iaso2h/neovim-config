@@ -81,24 +81,48 @@ opt.signcolumn = "yes:1"
 opt.foldmethod = "marker"
 opt.formatoptions = _G._format_option -- NOTE: Might change on loading different types of ftplugins
 
+if _G._os_uname.sysname == "Windows_NT" then -- {{{ Setting up python backen env for Windows
+    local pythonBin = vim.fn.expand([[D:\anaconda3\python.exe]])
+    if not ex(pythonBin) then
+        local findPythonBin = function(jobId, data, event)
+            if event == "stdout" then
+                if not vim.g.python3_host_prog and ex(data[1]) then
+                    vim.g.python3_host_prog = data[1]
+                end
+            elseif event == "exit" then
+                if ex(vim.g.python3_host_prog) then
+                    return vim.notify("Python binary path not found", vim.log.levels.WARN)
+                end
 
-if _G._os_uname.sysname == "Windows_NT" then
-    vim.defer_fn(function()
-        -- Python executable
-        local pythonBin = vim.fn.expand([[D:\anaconda3\python.exe]])
-        if vim.fn.executable(pythonBin) == 0 then
-            pythonBin = vim.split(vim.fn.system("where.exe python"), "\n", {plain=true})[1]
-            if vim.fn.executable(pythonBin) == 0 then
-                return vim.notify("Python binary path not found", vim.log.levels.WARN)
+                vim.fn.jobstop(jobId)
             end
         end
-        vim.g.python3_host_prog = pythonBin
-        vim.cmd[[let $NVIM_PYTHON_LOG_FILE = stdpath("config") . "\\log\\nvim_python"]]
-        -- if not string.find(vim.fn.system("python -m pip show pynvim"), "Location") then
-        --     vim.notify("Package pynvim isn't installed", vim.log.levels.WARN)
-        -- end
-    end, 0)
-end
+        vim.fn.jobstart( {"where", "python"}, {on_stdout = findPythonBin, on_exit = findPythonBin} )
+    end
+
+    vim.defer_fn(function()
+        if ex(pythonBin) then
+            local pynvimFoundTick = false
+            local findPynvim = function(jobId, data, event)
+                if event == "stdout" then
+                    if string.find(data[1], "Location") then pynvimFoundTick = true end
+                elseif event == "exit" then
+                    if not pynvimFoundTick then
+                        vim.notify("Package pynvim isn't found", vim.log.levels.WARN)
+                    end
+
+                    vim.fn.jobstop(jobId)
+                end
+            end
+            vim.fn.jobstart({"python", "-m", "pip", "show", "pynvim"},
+            {
+                on_stdout = findPynvim,
+                on_exit = findPynvim
+            })
+        end
+    end, 10000)
+end -- }}}
+
 -- GUI
 vim.cmd [[colorscheme onenord]]
 local guiFont
