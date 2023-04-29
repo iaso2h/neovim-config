@@ -32,19 +32,6 @@ bmap(0, "x", [[d]],  [[:lua require("quickfix.undo").delete("v")<CR>]],     {"si
 bmap(0, "n", [[dd]], [[<CMD>lua require("quickfix.undo").delete("n")<CR>]], {"silent"}, "Delete quickfix item under cursor")
 bmap(0, "n", [[u]],  [[<CMD>lua require("quickfix.undo").recovery()<CR>]],  {"silent"}, "Recovery quickfix items")
 bmap(0, "n", [[r]],  [[<CMD>lua require("quickfix.refresh").main()<CR>]],   {"silent"}, "Refresh quickfix items")
-vim.api.nvim_create_autocmd({
-    "CursorMoved",
-    -- Neovim will enter relative buffer temporarily, so "BufLeave" will allways
-    -- trigger then destroy the brand new float window and buffer within
-    "WinLeave",
-    "TabLeave",
-    "ModeChanged",
-}, {
-    buffer = 0,
-    desc = "Close floating win inside quickfix when cursor moves",
-    callback = require("quickfix.info").closeFloatWin,
-})
-
 vim.api.nvim_win_set_option(0, "number", true)
 vim.api.nvim_win_set_option(0, "relativenumber", false)
 vim.api.nvim_win_set_option(0, "signcolumn", "no")
