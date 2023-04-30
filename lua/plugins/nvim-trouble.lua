@@ -1,6 +1,6 @@
 -- https://github.com/folke/trouble.nvim
 return function()
-    local icon = require("util.icon")
+    local icon = require("icon")
     require("trouble").setup {
         position    = "bottom",  -- position of the list can be: bottom, top, left, right
         height      = 15,        -- height of the trouble list when position is top or bottom

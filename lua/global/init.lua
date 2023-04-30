@@ -1,5 +1,4 @@
-local fn  = vim.fn
-local api = vim.api
+local icon = require("icon")
 
 local init = function(initValue, optName) -- {{{
     if optName then
@@ -20,7 +19,7 @@ end -- }}}
 _G._os_uname         = init(vim.loop.os_uname())
 _G._is_term          = init(vim.fn.has("gui_running") == 0)
 _G._sep              = init(_G._os_uname.sysname == "Windows_NT" and "\\" or "/")
-_G._config_path      = init(fn.stdpath("config"))
+_G._config_path      = init(vim.fn.stdpath("config"))
 _G._plugin_root      = init(vim.fn.stdpath("data") .. _G._sep .. "lazy")
 _G._format_option    = init("cr/qn2mM1jpl")
 _G._qf_fallback_open = init(true, "QuickFixFallbackOpen")
@@ -28,6 +27,77 @@ _G._trim_space       = init(true, "QuickTrimSpace")
 _G._autoreload       = init(true, "Autoreload")
 _G._enable_plugin    = init(true)
 _G._lisp_language    = init {"clojure", "scheme", "lisp", "racket", "hy", "fennel", "janet", "carp", "wast", "yuck"}
+_G._short_line_infos = { -- {{{
+    qf = {
+        name = "Quickfix",
+        icon = icon.ui.Quickfix
+    },
+    Trouble = {
+        name = "Trouble",
+        icon = icon.ui.Quickfix
+    },
+    term = {
+        name = "Terminal",
+        icon = icon.ui.Terminal
+    },
+    ["dap-repl"] = {
+        name = "Repl",
+        icon = icon.ui.Terminal
+    },
+    dapui_watches = {
+        name = "Watchs",
+        icon = icon.ui.Watches
+    },
+    dapui_console = {
+        name = "Console",
+        icon = icon.ui.DebugConsole
+    },
+    dapui_stacks = {
+        name = "Stacks",
+        icon = icon.ui.Stacks
+    },
+    dapui_breakpoints = {
+        name = "Breakpoints",
+        icon = icon.ui.Breakpoint
+    },
+    dapui_scopes = {
+        name = "Scopes",
+        icon = icon.ui.Scopes
+    },
+    tsplayground = {
+        name = "Tree-sitter Playground",
+        icon = icon.kind.Keyword
+    },
+    Outline = {
+        name = "Outline",
+        icon = icon.ui.Outline
+    },
+    startuptime = {
+        name = "Startup Time",
+        icon = icon.ui.Dashboard
+    },
+    help = {
+        name = "Help",
+        icon = icon.ui.Documentation
+    },
+    NvimTree = {
+        name = "Nvim Tree",
+        icon = icon.ui.Flag
+    },
+    DiffviewFiles = {
+        name = "Diffview Files",
+        icon = icon.ui.Flag
+    },
+    DiffviewFileHistory = {
+    name = "Diffview History",
+        icon = icon.ui.History
+    },
+    HistoryStartup = {
+        name = "History Startup",
+        icon = icon.ui.History
+    }
+} -- }}}
+_G._short_line_list = vim.tbl_keys(_G._short_line_infos)
 
 vim.g.editorconfig = false
 -- Disable built-in plugins
@@ -250,11 +320,12 @@ end
 ---@vararg any Same as vim.api.nvim_buf_get_name()
 _G.nvim_buf_get_name = function(bufNr)
     if _G._os_uname.sysname == "Windows_NT" then
-        local name = api.nvim_buf_get_name(bufNr)
+        local name = vim.api.nvim_buf_get_name(bufNr)
         local retName = name:gsub("/", _G._sep)
         return retName
     else
-        return api.nvim_buf_get_name(bufNr)
+        return vim.api.nvim_buf_get_name(bufNr)
     end
 end
+
 -- }}} Global function

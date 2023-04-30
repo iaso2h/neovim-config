@@ -1,5 +1,5 @@
 return function()
-    local icon = require("util.icon")
+    local icon = require("icon")
     local args = {
         highlight_hovered_item = true,
         show_guides = true,

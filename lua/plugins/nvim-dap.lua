@@ -1,7 +1,7 @@
 return function()
     local fn   = vim.fn
     local dap  = require("dap")
-    local icon = require("util.icon")
+    local icon = require("icon")
 
     -- General mappings {{{
     map("n", [[<leader>dc]], [[<CMD>lua require("dap").set_breakpoint(vim.fn.input("Breakpoint Condition: "), nil, nil, true)<CR>]], {"silent"}, "Dap set conditional break point")

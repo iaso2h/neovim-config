@@ -65,10 +65,10 @@ return function()
             format = function(entry, vimItem)
                 local maxWidth = 40
                 if #vimItem.abbr > maxWidth then
-                    vimItem.abbr = string.sub(vimItem.abbr, 1, maxWidth - 1) .. require("util.icon").ui.Ellipsis
+                    vimItem.abbr = string.sub(vimItem.abbr, 1, maxWidth - 1) .. require("icon").ui.Ellipsis
                 end
                 vimItem.menu = vimItem.kind
-                vimItem.kind = require("util.icon").kind[vimItem.kind]
+                vimItem.kind = require("icon").kind[vimItem.kind]
                 -- vimItem.menu = ({
                     -- nvim_lsp    = "[LSP]",
                     -- buffer      = "[Buffer]",

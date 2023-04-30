@@ -33,7 +33,7 @@ end
 -- }}} Bootstrap lazy.nvim
 
 -- Plug-ins configuration
-local icon = require("util.icon")
+local icon = require("icon")
 local trailingSpaces = " "
 local pluginArgs = { -- {{{
     -- https://github.com/folke/lazy.nvim#-plugin-spec
@@ -288,13 +288,13 @@ local pluginArgs = { -- {{{
         dependencies = { "nvim-treesitter" },
         event  = {"BufAdd"},
         config = function()
-            local ftExclude = vim.deepcopy(require("plugins.nvim-galaxyline").shortLineList)
+            local ftExclude = vim.deepcopy(_G._short_line_list)
             ftExclude[#ftExclude+1] = "help"
             require("indent_blankline").setup{
                 use_treesitter = true,
-                char             = require("util.icon").ui.LineLeft,
-                char_blankline   = require("util.icon").ui.LineLeft,
-                context_char     = require("util.icon").ui.LineLeft,
+                char             = require("icon").ui.LineLeft,
+                char_blankline   = require("icon").ui.LineLeft,
+                context_char     = require("icon").ui.LineLeft,
                 buftype_exclude  = {"terminal", "nofile"},
                 filetype_exclude = ftExclude,
                 bufname_exclude  = {"*.md"},
@@ -414,7 +414,7 @@ local pluginArgs = { -- {{{
         "glepnir/galaxyline.nvim",
         dependencies = { "nvim-web-devicons" },
         event  = {"BufAdd"},
-        config = require("plugins.nvim-galaxyline").config,
+        config = require("plugins.nvim-galaxyline")
     },
     {
         "iaso2h/nvim-cokeline",
@@ -645,7 +645,7 @@ local pluginArgs = { -- {{{
                     "lsp",
                     "treesitter",
                 },
-                filetypes_denylist = require("plugins.nvim-galaxyline").shortLineList,
+                filetypes_denylist = _G._short_line_list,
                 min_count_to_highlight = 2
             }
         end

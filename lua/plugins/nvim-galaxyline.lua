@@ -2,92 +2,17 @@
 -- Author: iaso2h
 -- Description: Statusline configuration
 -- Last Modified: 2023-4-30
-local M = {}
-local icon = require("util.icon")
-
-local shortLineInfos = { -- {{{
-    qf = {
-        name = "Quickfix",
-        icon = icon.ui.Quickfix
-    },
-    Trouble = {
-        name = "Trouble",
-        icon = icon.ui.Quickfix
-    },
-    term = {
-        name = "Terminal",
-        icon = icon.ui.Terminal
-    },
-    ["dap-repl"] = {
-        name = "Repl",
-        icon = icon.ui.Terminal
-    },
-    dapui_watches = {
-        name = "Watchs",
-        icon = icon.ui.Watches
-    },
-    dapui_console = {
-        name = "Console",
-        icon = icon.ui.DebugConsole
-    },
-    dapui_stacks = {
-        name = "Stacks",
-        icon = icon.ui.Stacks
-    },
-    dapui_breakpoints = {
-        name = "Breakpoints",
-        icon = icon.ui.Breakpoint
-    },
-    dapui_scopes = {
-        name = "Scopes",
-        icon = icon.ui.Scopes
-    },
-    tsplayground = {
-        name = "Tree-sitter Playground",
-        icon = icon.kind.Keyword
-    },
-    Outline = {
-        name = "Outline",
-        icon = icon.ui.Outline
-    },
-    startuptime = {
-        name = "Startup Time",
-        icon = icon.ui.Dashboard
-    },
-    help = {
-        name = "Help",
-        icon = icon.ui.Documentation
-    },
-    NvimTree = {
-        name = "Nvim Tree",
-        icon = icon.ui.Flag
-    },
-    DiffviewFiles = {
-        name = "Diffview Files",
-        icon = icon.ui.Flag
-    },
-    DiffviewFileHistory = {
-    name = "Diffview History",
-        icon = icon.ui.History
-    },
-    HistoryStartup = {
-        name = "History Startup",
-        icon = icon.ui.History
-    }
-} -- }}}
--- Filetypes contained in this list will be consider inactive all the time
-M.shortLineList = vim.tbl_keys(shortLineInfos)
-
-M.config = function() -- {{{
-    local gl           = require("galaxyline")
-    local gls          = gl.section
-    local condition    = require("galaxyline.condition")
-    local pallette     = require("onenord.pallette")
+return function() -- {{{
+    local icon = require("icon")
+    local gl        = require("galaxyline")
+    local gls       = gl.section
+    local condition = require("galaxyline.condition")
+    local pallette  = require("onenord.pallette")
 
     -- Filetypes contained in this list will be consider inactive all the time
-    gl.short_line_list = M.shortLineList
+    gl.short_line_list = _G._short_line_list
 
-    local colors       = { -- {{{
+    local colors = { -- {{{
         fg        = pallette.n10,
         bg1       = pallette.n1,
         bg2       = "#4C566A",
@@ -143,11 +68,11 @@ M.config = function() -- {{{
     } -- }}}
 
     local vimMode
-    local tightWinChk  = false
-    local padding = " "
+    local tightWinChk = false
+    local padding     = " "
 
     local isSpecialFileType = function() -- {{{
-        return vim.tbl_contains(gl.short_line_list, vim.bo.filetype)
+        return vim.tbl_contains(_G._short_line_list, vim.bo.filetype)
     end -- }}}
     local isNoNeckPain = function() -- {{{
         if vim.bo.filetype == "no-neck-pain" then
@@ -487,6 +412,8 @@ M.config = function() -- {{{
     gls.short_line_left[1] = { -- {{{
         SpecialFileTypeVimMode = {
             provider = function()
+                -- UGLY: somehow non-special filetypes will sneak in
+                if not isSpecialFileType() then return "" end
                 vimMode = vim.fn.mode()
                 changeHLColor("GalaxySpecialFileTypeVimMode")
 
@@ -498,8 +425,8 @@ M.config = function() -- {{{
                     fileType = vim.b._is_loc and "Location list" or "Quickfix"
                     return leadingSpaces .. icon.ui.Quickfix .. padding .. fileType .. padding
                 else
-                    local bufIcon = shortLineInfos[fileType].icon
-                    local fileName = shortLineInfos[fileType].name
+                    local bufIcon  = _G._short_line_infos[fileType].icon
+                    local fileName = _G._short_line_infos[fileType].name
                     if bufIcon then
                         return leadingSpaces .. bufIcon .. padding .. fileName .. padding
                     else
@@ -572,5 +499,3 @@ M.config = function() -- {{{
     } --- }}}
 
 end -- }}}
-
-return M

@@ -1,5 +1,5 @@
 return function()
-    local icon = require("util.icon")
+    local icon = require("icon")
     require("todo-comments").setup {
         signs = false, -- show icons in the signs column
         sign_priority = 8, -- sign priority

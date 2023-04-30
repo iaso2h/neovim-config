@@ -32,7 +32,7 @@ end
 
 M.config = function()
     local M     = require("plugins.nvim-dap-ui")
-    local icon  = require("util.icon")
+    local icon  = require("icon")
     local dapui = require("dapui")
     local dap   = require("dap")
     dapui.setup { -- {{{

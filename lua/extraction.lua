@@ -5,7 +5,7 @@
 -- Last Modified: 2023-3-4
 -- NOTE: Deprecated: Please use refactor.nvim instead for visual line mode
 require("operator")
-local util = require("util")
+local util     = require("util")
 local register = require("register")
 local M = {}
 local reset = function ()
@@ -84,7 +84,7 @@ local getSrcContent = function() -- {{{
     end
 
     -- Save register
-    util.saveReg()
+    register.saveReg()
 
     -- Cut content into register and retrieve it as RHS content
     local linebreakChk = false

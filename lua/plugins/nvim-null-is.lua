@@ -67,7 +67,7 @@ return function()
         desc  = "Toggle CSpell checking buffer locally",
     })
     local cspell = null_ls.builtins.diagnostics.cspell.with {
-        disabled_filetypes = require("plugins.nvim-galaxyline").shortLineList,
+        disabled_filetypes = vim.tbl_keys(_G._short_line_infos),
         extra_args = {
             "--gitignore",
             "--config",

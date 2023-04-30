@@ -1,8 +1,8 @@
 -- https://github.com/iaso2h/nvim-cokeline/tree/master
 return function()
     local getHex = require("cokeline/utils").get_hex
+    local icon   = require("icon")
     local space  = {text = " "}
-    local icon   = require("util.icon")
     require("cokeline").setup{
         buffers = {
             new_buffers_position = "bufnr"
