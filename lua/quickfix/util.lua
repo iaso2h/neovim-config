@@ -13,10 +13,7 @@ end
 
 
 M.isVisible = function()
-    local winIDTbl = vim.tbl_filter(function(i)
-        return vim.api.nvim_win_get_config(i).relative == ""
-    end, vim.api.nvim_list_wins())
-
+    local winIDTbl = require("buf.util").getAllWins(false)
     local bufInWin
     for _, win in ipairs(winIDTbl) do
         bufInWin = vim.api.nvim_win_get_buf(win)

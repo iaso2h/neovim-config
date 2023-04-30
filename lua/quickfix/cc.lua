@@ -1,27 +1,26 @@
-local fn  = vim.fn
-local api = vim.api
+-- BUG: <CR> on quickfix
 local M   = {}
 
 local regainFocus = function(closeQfChk, qfWinID, qfCursorPos, savedLastWinID)
     if not closeQfChk then
-        local ok, msg = pcall(api.nvim_set_current_win, qfWinID)
+        local ok, msg = pcall(vim.api.nvim_set_current_win, qfWinID)
         if not ok then
             vim.notify(msg, vim.log.levels.WARN)
             vim.cmd[[wincmd p]]
         end
-        ok, msg = pcall(api.nvim_win_set_cursor, qfWinID, qfCursorPos)
+        ok, msg = pcall(vim.api.nvim_win_set_cursor, qfWinID, qfCursorPos)
         if not ok then
             vim.notify(msg, vim.log.levels.WARN)
         end
     else
         if savedLastWinID then
-            if savedLastWinID ~= qfWinID and api.nvim_win_is_valid(qfWinID) then
-                api.nvim_win_close(qfWinID, false)
+            if savedLastWinID ~= qfWinID and vim.api.nvim_win_is_valid(qfWinID) then
+                vim.api.nvim_win_close(qfWinID, false)
             else
                 -- Cursor is at quickfix window
             end
         else
-            api.nvim_win_close(qfWinID, false)
+            vim.api.nvim_win_close(qfWinID, false)
         end
     end
 end
@@ -46,11 +45,11 @@ end
 ---@param offset number Open the item based on the given offset to the
 --cursor. Set it to -1 to open the previous item, 1 to open the next item
 M.main = function(fallbackChk, closeQfChk, offset)
-    local qfWinID     = api.nvim_get_current_win()
-    local qfCursorPos = api.nvim_win_get_cursor(qfWinID)
+    local qfWinID     = vim.api.nvim_get_current_win()
+    local qfCursorPos = vim.api.nvim_win_get_cursor(qfWinID)
     local lineNr
     if offset ~= 0 then
-        local lastLine = fn.line("$")
+        local lastLine = vim.fn.line("$")
         lineNr = require("quickfix.util").getlist({idx = 0}).idx + offset
         if lineNr > lastLine then
             qfCursorPos = {lastLine, qfCursorPos[2]}
@@ -73,11 +72,11 @@ M.main = function(fallbackChk, closeQfChk, offset)
 
     -- Comment out invalid item
     if item.valid == 0 or item.bufnr == 0 or
-            not api.nvim_buf_is_valid(item.bufnr) then
+            not vim.api.nvim_buf_is_valid(item.bufnr) then
         require("quickfix.highlight").addLines(
             {qfCursorPos[1]},
             "Comment",
-            api.nvim_create_namespace("myQuickfix")
+            vim.api.nvim_create_namespace("myQuickfix")
         )
         return vim.notify("This item is no longer valid", vim.log.levels.INFO)
     end
@@ -93,20 +92,20 @@ M.main = function(fallbackChk, closeQfChk, offset)
 
     -- Validating that savedLastWinID is the window to be switched, and making
     -- sure it is focused
-    if fallbackTick or not api.nvim_win_is_valid(savedLastWinID) then
+    if fallbackTick or not vim.api.nvim_win_is_valid(savedLastWinID) then
         -- Fallback method by utilizing wincmd to find out
 
         -- Make the previous winID as the last presevered winID
         vim.cmd[[noa wincmd p]]
-        savedLastWinID = api.nvim_get_current_win()
+        savedLastWinID = vim.api.nvim_get_current_win()
         -- Prevent quickfix from looping back to itself
         if savedLastWinID == qfWinID then
             vim.notify("Quickfix looped back to itself", vim.log.levels.WARN)
             vim.cmd[[noa wincmd w]]
-            savedLastWinID = api.nvim_get_current_win()
+            savedLastWinID = vim.api.nvim_get_current_win()
         end
     else
-        api.nvim_win_set_buf(savedLastWinID, item.bufnr)
+        vim.api.nvim_win_set_buf(savedLastWinID, item.bufnr)
     end
 
     -- Switch buf in the window
