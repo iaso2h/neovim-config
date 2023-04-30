@@ -67,13 +67,21 @@ return function()
         desc  = "Toggle CSpell checking buffer locally",
     })
     local cspell = null_ls.builtins.diagnostics.cspell.with {
-        disabled_filetypes = vim.tbl_keys(_G._short_line_infos),
+        disabled_filetypes = vim.deepcopy(_G._short_line_infos),
         extra_args = {
             "--gitignore",
             "--config",
             string.format([[%s%scspell.json]], _G._config_path, _G._sep),
         },
-        runtime_condition = function() return vim.g._cspellEnable and not vim.b._cspellDisable end,
+        runtime_condition = function(params)
+            if params.bufname == "" then
+                return false
+            end
+            if vim.g._cspellEnable and not vim.b._cspellDisable then
+                return true
+            end
+            return false
+            end,
         diagnostics_postprocess = function(diagnostic)
             if type(diagnostic) ~= "table" then return end
             diagnostic.severity = vim.diagnostic.severity.WARN
