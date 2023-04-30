@@ -5,7 +5,7 @@ return function()
         sign_priority = 8, -- sign priority
         keywords = {
             FIX    = {
-                icon  = " ",                                -- icon used for the sign, and in search results
+                icon  = icon.diagnostics.DebugBold .. " ",            -- icon used for the sign, and in search results
                 color = "error",                                      -- can be a hex color, or a named color (see below)
                 alt   = { "FIXME", "BUG", "FIXIT", "FIX", "ISSUE" },  -- a set of other keywords that all map to this FIX keywords
             },

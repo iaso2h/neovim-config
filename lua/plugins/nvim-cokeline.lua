@@ -2,6 +2,7 @@
 return function()
     local getHex = require("cokeline/utils").get_hex
     local space  = {text = " "}
+    local icon   = require("util.icon")
     require("cokeline").setup{
         buffers = {
             new_buffers_position = "bufnr"
@@ -64,9 +65,9 @@ return function()
             {
                 text = function(buffer)
                     if buffer.is_readonly then
-                        return " "
+                        return " " .. icon.ui.Lock
                     elseif buffer.is_modified then
-                        return " ●"
+                        return " " .. icon.ui.Dot
                     else
                         return ""
                     end

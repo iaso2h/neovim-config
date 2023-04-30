@@ -30,10 +30,11 @@ local shortLineIcons = {
     dapui_watches     = icon.ui.Watches,
     dapui_console     = icon.ui.DebugConsole,
     dapui_stacks      = icon.ui.Stacks,
-    dapui_breakpoints = icon.ui.Bug,
+    dapui_breakpoints = icon.ui.Breakpoint,
     dapui_scopes      = icon.ui.Scopes,
 
-    tsplayground      = icon.kind.Keyword,
+    tsplayground = icon.kind.Keyword,
+
 
     startuptime = icon.ui.Dashboard,
 

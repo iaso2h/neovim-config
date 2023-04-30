@@ -133,8 +133,8 @@ return function()
                 webdev_colors      = true,
                 git_placement      = "before",
                 modified_placement = "after",
-                padding = " ",
-                symlink_arrow = " ➛ ",
+                padding            = " ",
+                symlink_arrow = " " .. icon.ui.SymlinkArrow .. " ",
                 show = {
                     file         = true,
                     folder       = true,

@@ -67,6 +67,7 @@ return {
         BookMark           = "",
         BoxChecked         = "",
         Bug                = "",
+        Breakpoint         = "⦿",
         Stacks             = "",
         Scopes             = "",
         Watches            = "",
@@ -85,6 +86,7 @@ return {
         CloudDownload      = "",
         Code               = "",
         Comment            = "",
+        Dot                = "",
         Dashboard          = "",
         DividerLeft        = "",
         DividerRight       = "",
@@ -114,6 +116,9 @@ return {
         Lua                = "",
         NewFile            = "",
         Note               = "",
+        Maximize           = "ﬕ",
+        Minimize           = "ﬔ",
+        Outline            = "פּ",
         Package            = "",
         Pencil             = "",
         Plus               = "",
@@ -122,6 +127,7 @@ return {
         Search             = "",
         SignIn             = "",
         SignOut            = "",
+        SymlinkArrow       = "➛",
         Tab                = "",
         Table              = "",
         Target             = "󰀘",
@@ -129,16 +135,19 @@ return {
         Terminal           = "",
         Test               = "",
         Text               = "",
+        Translate          = "韛",
         Tree               = "",
         Triangle           = "契",
         TriangleShortArrowDown  = "",
         TriangleShortArrowLeft  = "",
         TriangleShortArrowRight = "",
         TriangleShortArrowUp    = "",
-        Vim = ""
+        Tweak = "שּׂ",
+        Vim   = ""
     }, -- }}}
     diagnostics = { -- {{{
         Debug           = "",
+        DebugBold       = "",
         Error           = "",
         ErrorBold       = "",
         Hint            = "",
@@ -172,5 +181,8 @@ return {
         StepOut    = "",
         StepOver   = "",
         Terminate  = "",
-    } -- }}}
+    }, -- }}}
+    tree = {
+
+    }
 }
