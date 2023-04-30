@@ -19,10 +19,10 @@ bmap(0, "n", [[Q]], [[<CMD>lua require("quickfix.highlight").clear();vim.cmd"q"<
 bmap(0, "n", [[<leader>H]], [[<CMD>lua require("quickfix.highlight").clear()<CR>]], {"silent"}, "Clear known quickfix highlight")
 
 -- _G._qf_fallback_open is setup at '<stdpath("config")>/init.lua'
-bmap(0, "n", [[<CR>]], [[:lua require("quickfix.cc").main(_G._qf_fallback_open, false, 0)<CR>]], {"silent"}, "Preview current item in quickfix")
-bmap(0, "n", [[o]],    [[:lua require("quickfix.cc").main(_G._qf_fallback_open, true, 0)<CR>]],  {"silent"}, "Open current item in quickfix")
-bmap(0, "n", [[<C-n>]], [[<CMD>lua require("quickfix.cc").main(_G._qf_fallback_open, false, 1)<CR>]], {"noremap", "silent"}, "Next item on quickfix")
-bmap(0, "n", [[<C-p>]], [[<CMD>lua require("quickfix.cc").main(_G._qf_fallback_open, false, -1)<CR>]], {"noremap", "silent"}, "Previous item on quickfix")
+bmap(0, "n", [[<CR>]], [[:lua require("quickfix.cc")(false, 0)<CR>]], {"silent"}, "Preview current item in quickfix")
+bmap(0, "n", [[o]],    [[:lua require("quickfix.cc")(true, 0)<CR>]],  {"silent"}, "Open current item in quickfix")
+bmap(0, "n", [[<C-n>]], [[<CMD>lua require("quickfix.cc")(false, 1)<CR>]], {"noremap", "silent"}, "Next item on quickfix")
+bmap(0, "n", [[<C-p>]], [[<CMD>lua require("quickfix.cc")(false, -1)<CR>]], {"noremap", "silent"}, "Previous item on quickfix")
 -- Showing floating info
 bmap(0, "n", [[gK]], [[<CMD>lua require("quickfix.info").hover(true)<CR>]],  {"silent"}, "Show quickfix item info")
 bmap(0, "n", [[K]],  [[<CMD>lua require("quickfix.info").hover(false)<CR>]], {"silent"}, "Show quickfix item info")

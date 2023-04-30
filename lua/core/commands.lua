@@ -55,24 +55,6 @@ vim.api.nvim_create_autocmd({"FocusGained", "WinEnter"}, {
     desc    = "Check and file changes after regaining focus",
     command = "checktime"
 })
-
-if not _G._qf_fallback_open then
-    vim.api.nvim_create_autocmd("BufLeave", {
-        desc    = "Record the current window id before leaving the current buffer",
-        callback = function ()
-            -- if not vim.bo.buflisted then return end
-            local bufNr     = vim.api.nvim_get_current_buf()
-            local bufName   = nvim_buf_get_name(bufNr)
-            local bufType   = vim.bo.buftype
-            local winID     = vim.api.nvim_get_current_win()
-            local winConfig = vim.api.nvim_win_get_config(winID)
-            -- Non-float window and non-special buffer type and non-scratch buffer file
-            if winConfig.relative == "" and bufType == "" and bufName ~= "" then
-                _G._last_win_id = winID
-            end
-        end
-    })
-end
 -- }}} Auto commands
 
 -- Commands {{{

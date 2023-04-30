@@ -22,7 +22,6 @@ _G._sep              = init(_G._os_uname.sysname == "Windows_NT" and "\\" or "/"
 _G._config_path      = init(vim.fn.stdpath("config"))
 _G._plugin_root      = init(vim.fn.stdpath("data") .. _G._sep .. "lazy")
 _G._format_option    = init("cr/qn2mM1jpl")
-_G._qf_fallback_open = init(true, "QuickFixFallbackOpen")
 _G._trim_space       = init(true, "QuickTrimSpace")
 _G._autoreload       = init(true, "Autoreload")
 _G._enable_plugin    = init(true)
