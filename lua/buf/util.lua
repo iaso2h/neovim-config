@@ -9,11 +9,7 @@ M.initBuf = function()
     var.bufType  = vim.bo.buftype
     var.fileType = vim.bo.filetype
     var.winID    = vim.api.nvim_get_current_win()
-    var.winIDTbl = vim.tbl_filter(function(i)
-        return vim.api.nvim_win_get_config(i).relative == ""
-        end, vim.api.nvim_list_wins())
-    -- NOTE: Do not use results from:
-    -- vim.tbl_filter(function(i) return api.nvim_buf_is_loaded(i) end, api.nvim_list_bufs())
+    var.winIDTbl = M.getAllWins(false)
     var.bufNrTbl = M.getBufNrTbl(true)
 end
 
@@ -21,7 +17,7 @@ end
 --- Force wipe the given buffer, if no bufNr is provided, then current buffer
 --- will be wiped
 --- @param bufNr boolean Buffer number handler
-M.closeBuf = function(bufNr)
+M.bufClose = function(bufNr)
     -- bufNr = bufNr or 0
     -- :bdelete will register in both the jumplist and the changelist
     pcall(vim.api.nvim_command, "bdelete! " .. bufNr)
@@ -31,7 +27,7 @@ M.closeBuf = function(bufNr)
 end
 
 
-M.closeWin = function (winID)
+M.winClose = function (winID)
     local ok, msg = pcall(vim.api.nvim_win_close, winID, false)
     if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 end
@@ -140,6 +136,17 @@ M.getAllBufCntsInWins = function()
     end
 
     return bufCnt
+end
+
+
+M.getAllWins = function(relativeIncludeChk)
+    if not relativeIncludeChk then
+        return vim.tbl_filter(function(i)
+            return vim.api.nvim_win_get_config(i).relative == ""
+        end, vim.api.nvim_list_wins())
+    else
+        return vim.api.nvim_list_wins()
+    end
 end
 
 

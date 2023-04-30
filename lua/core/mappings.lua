@@ -334,7 +334,8 @@ map("n", [[<leader>h]], function()
         local util = require("util")
 
         util.saveViewCursor()
-        local ok, _ = vim.cmd [[noa keepjumps norm! * |]]
+        local ok, _ = pcall(vim.api.nvim_command, [[noa keepjumps norm! *]])
+        vim.cmd [[noa echo]]
         if not ok then return end
         vim.defer_fn(function () vim.cmd [[nohlsearch]] end, 500)
         if vim.is_callable(util.restoreViewCursor) then

@@ -59,14 +59,14 @@ function M.init() -- {{{
             if vim.tbl_contains(var.bufNrTbl, vim.api.nvim_win_get_buf(winID))
                 and vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(winID), "buftype") == "" then
 
-                u.closeWin(winID)
+                u.winClose(winID)
             end
         end
     end
 
     -- Wipe buffers
     for _, bufNr in ipairs(var.bufNrTbl) do
-        if vim.api.nvim_buf_is_valid(bufNr) then u.closeBuf(bufNr) end
+        if vim.api.nvim_buf_is_valid(bufNr) then u.bufClose(bufNr) end
     end
     if package.loaded["cokeline"] then
         require('cokeline/augroups').toggle()

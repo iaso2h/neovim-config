@@ -4,6 +4,7 @@
 -- Similar Work: https://github.com/ojroques/nvim-bufdel
 -- Version: 0.0.39
 -- Last Modified: 2023-4-28
+-- DEBUG: 3 wins, 2 wins with same buffers, exe Q on either of the 2 wins
 local u   = require("buf.util")
 local var = require("buf.var")
 local M   = {}
@@ -73,13 +74,13 @@ local function bufHandler(loneWin) -- {{{
                         return
                     end
                 else
-                    u.closeBuf(var.bufNr)
+                    u.bufClose(var.bufNr)
                 end
             else
-                u.closeBuf(var.bufNr)
+                u.bufClose(var.bufNr)
             end
         elseif var.bufType == "prompt" then
-            u.closeBuf(var.bufNr)
+            u.bufClose(var.bufNr)
         elseif var.bufType == "nowrite" then
             if vim.startswith(var.bufName, "diffview") then
                 vim.cmd [[DiffviewClose]]
@@ -87,7 +88,7 @@ local function bufHandler(loneWin) -- {{{
         else
             -- Always wipe the special buffer if window count is 1
             if not saveModified(var.bufNr) then return end
-            u.closeBuf(var.bufNr)
+            u.bufClose(var.bufNr)
         end
     else
         -- Scratch files
@@ -104,7 +105,7 @@ local function bufHandler(loneWin) -- {{{
             if not saveModified(var.bufNr) then return end
 
             if u.bufValidCnt() > 1 then
-                return u.closeBuf(var.bufNr)
+                return u.bufClose(var.bufNr)
             else
                 return vim.cmd("q!")
             end
@@ -122,7 +123,7 @@ local function bufHandler(loneWin) -- {{{
         -- Whether to check other windows that might have the same buffer instance
         if not loneWin or u.winCnt() == 1 then
             if u.bufValidCnt() == 1 then
-                u.closeBuf(var.bufNr)
+                u.bufClose(var.bufNr)
                 if vim.api.nvim_buf_get_name(0) == "" then
                     vim.api.nvim_buf_set_option(0, "buflisted", false)
                     return require("historyStartup").display(true)
@@ -135,7 +136,7 @@ local function bufHandler(loneWin) -- {{{
                 if not u.bufSwitchAlter(var.winID) then
                     return
                 end
-                return u.closeBuf(var.bufNr)
+                return u.bufClose(var.bufNr)
             end
         end
 
@@ -171,7 +172,7 @@ local function bufHandler(loneWin) -- {{{
                 end
             end
         end
-        u.closeBuf(var.bufNr)
+        u.bufClose(var.bufNr)
 
         -- Always restore window focus, window might be unavailable when the
         -- last buffer is deleted
@@ -222,10 +223,10 @@ local winHandler = function() -- {{{
             else
                 -- Other special buffer
                 if u.winCnt() > 1 then
-                    u.closeWin(var.winID)
+                    u.winClose(var.winID)
                 else
                     -- Override the default behavior, treat it like performing a buffer delete
-                    u.closeBuf(var.bufNr)
+                    u.bufClose(var.bufNr)
                 end
             end
         elseif var.bufType == "nowrite" then
@@ -233,14 +234,14 @@ local winHandler = function() -- {{{
                 return vim.cmd [[DiffviewClose]]
             end
         elseif var.bufType == "terminal" then
-            u.closeWin(var.winID)
+            u.winClose(var.winID)
         else
             -- Other special buffer
             if u.winCnt() > 1 then
-                u.closeWin(var.winID)
+                u.winClose(var.winID)
             else
                 -- Override the default behavior, treat it like performing a buffer delete
-                u.closeBuf(var.bufNr)
+                u.bufClose(var.bufNr)
             end
         end
     else
@@ -256,7 +257,7 @@ local winHandler = function() -- {{{
             end
             -- Scratch files. Override the default behavior, treat it like performing a buffer delete
             if u.getCurBufCntsInWins(var.bufNr) > 1 then
-                u.closeWin(var.winID)
+                u.winClose(var.winID)
             else
                 bufHandler(false)
             end
@@ -275,7 +276,7 @@ local winHandler = function() -- {{{
                 local bufInstanceCount = u.getAllBufCntsInWins()
                 if bufInstanceCount ~= 1 then
                     -- Multiple buffer instances or no instances
-                    u.closeWin(var.winID)
+                    u.winClose(var.winID)
                 else
                     -- 1 buffer instance
                     -- Override the default behavior, treat it like performing

@@ -35,6 +35,7 @@ bmap(0, "n", [[r]],  [[<CMD>lua require("quickfix.refresh").main()<CR>]],   {"si
 vim.api.nvim_win_set_option(0, "number", true)
 vim.api.nvim_win_set_option(0, "relativenumber", false)
 vim.api.nvim_win_set_option(0, "signcolumn", "no")
+vim.api.nvim_win_set_option(0, "wrap", true)
 vim.api.nvim_win_set_option(0, "foldcolumn", "0")
 vim.api.nvim_buf_set_option(0, "buflisted", false)
 

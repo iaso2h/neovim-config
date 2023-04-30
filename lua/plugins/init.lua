@@ -481,7 +481,7 @@ local pluginArgs = { -- {{{
                         update_all_packages     = "U",
                         check_package_version   = "c",
                         check_outdated_packages = "C",
-                        uninstall_package       = "d",
+                        uninstall_package       = "x",
                         cancel_installation     = "<C-c>",
                         apply_language_filter   = "f",
                     }
@@ -632,7 +632,6 @@ local pluginArgs = { -- {{{
     },
     {
         "RRethy/vim-illuminate",
-        event = {"BufAdd"},
         config = function()
             require("illuminate").configure{
                 providers = {
@@ -1061,7 +1060,7 @@ local opts = {
 }
 
 vim.api.nvim_create_user_command("CDLazyPlugin", function()
-    vim.cmd( "cd " .. vim.fn.stdpath("data") .. "/lazy")
+    vim.cmd("cd " .. vim.fn.stdpath("data") .. "/lazy")
     vim.notify("Change directory to Lazy plug-ins path", vim.log.levels.INFO)
 end, { desc  = "Change directory to lazy plug-ins path", })
 

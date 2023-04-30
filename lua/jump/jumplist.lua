@@ -9,7 +9,8 @@ local defaultOpts  = {
     returnAllJumps = false, -- DEBUG: tests only
     jumpBetweenLoadedBuffersOnly = false,
     fileTypeUseBuiltIn = {
-        "help"
+        "help",
+        "HistoryStartup"
     }
 }
 
