@@ -4,6 +4,7 @@
 -- Version: 0.1.11
 -- Last Modified: 2023-4-25
 -- TODO: tests for softtab convert
+-- BUG: can't replace with nerd font character
 -- NOTE: break change: Dot-repeat no longer support jump to mark motion now
 -- because the new method of setting new line(or replace line) via
 -- api.nvim_buf_set_lines and api.nvim_buf_set_text has been adopted, which

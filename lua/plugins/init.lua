@@ -203,6 +203,7 @@ local pluginArgs = { -- {{{
             }
         end
     },
+    -- TODO: skip asking for input when performing a dot-repeat
     {
         "kylechui/nvim-surround",
         keys = {
@@ -617,6 +618,18 @@ local pluginArgs = { -- {{{
         dependencies = { "nvim-lspconfig" },
         config = require("plugins.nvim-lsp-signature")
     },
+    -- TODO: higlight group
+    {
+        "weilbith/nvim-code-action-menu",
+        cmd  = "CodeActionMenu",
+        init = function()
+            vim.g.code_action_menu_window_border    = "rounded"
+            vim.g.code_action_menu_show_details     = true
+            vim.g.code_action_menu_show_diff        = true
+            vim.g.code_action_menu_show_action_kind = true
+            map("n", "<leader>a", "<CMD>CodeActionMenu<CR>", "Lsp code action menu")
+        end,
+    },
     {
         "RRethy/vim-illuminate",
         event = {"BufAdd"},
@@ -661,6 +674,15 @@ local pluginArgs = { -- {{{
                 },
             }
         end
+    },
+    {
+        "simrat39/symbols-outline.nvim",
+        cmd = {
+            "SymbolsOutline",
+            "SymbolsOutlineOpen",
+            "SymbolsOutlineClose",
+        },
+        config = require("plugins.nvim-symbols-outline")
     },
     {
         "ThePrimeagen/refactoring.nvim",

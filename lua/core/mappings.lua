@@ -328,8 +328,22 @@ map("n", [[n]], [[<CMD>lua require("jump.search").cycle("n")<CR>]], {"silent"}, 
 map("n", [[N]], [[<CMD>lua require("jump.search").cycle("N")<CR>]], {"silent"}, "Cycle through search result backward")
 -- Disable highlight search & Exit visual mode
 map("",  [[<C-l>]], [[<Nop>]], "which_key_ignore")
-map("",  [[<leader>H]], [[<C-l>]],                           {"noremap", "silent"}, "Refresh screen")
-map("n", [[<leader>h]], [[<CMD>noh | echo<CR>]],             {"silent"}, "Clear highlight")
+map("",  [[<leader>H]], [[<C-l>]], {"noremap", "silent"}, "Refresh screen")
+map("n", [[<leader>h]], function()
+    if vim.v.hlsearch == 0 then
+        local util = require("util")
+
+        util.saveViewCursor()
+        local ok, _ = vim.cmd [[noa keepjumps norm! * |]]
+        if not ok then return end
+        vim.defer_fn(function () vim.cmd [[nohlsearch]] end, 500)
+        if vim.is_callable(util.restoreViewCursor) then
+            util.restoreViewCursor(vim.fn.winheight(0))
+        end
+    else
+        vim.cmd [[noh | echo]]
+    end
+end, {"silent"}, "Clear highlight")
 map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"}, "Disable highlight")
 -- Matchit
 map("", [[<C-m>]], [[%]], {"silent"}, "Go to match parenthesis")

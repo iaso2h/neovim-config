@@ -55,7 +55,7 @@ return function()
             vim.lsp.buf.implementation { on_list = conciseQuifix }
         end, "LSP implementation")
 
-        bmap(bufNr, {"x", "n"}, [[<leader>a]],  vim.lsp.buf.code_action,    "LSP code action")
+        -- bmap(bufNr, {"x", "n"}, [[<leader>a]],  vim.lsp.buf.code_action,    "LSP code action")
         bmap(bufNr, "n",        [[<leader>rn]], vim.lsp.buf.rename,         "LSP rename")
         bmap(bufNr, "n",        [[K]],          vim.lsp.buf.hover,          "LSP hover")
         bmap(bufNr, "n",        [[<C-p>]],      vim.lsp.buf.signature_help, "LSP signature help")

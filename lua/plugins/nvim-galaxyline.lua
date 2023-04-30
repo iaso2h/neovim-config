@@ -11,6 +11,7 @@ M.shortLineList = {
     "qf",
     "NvimTree",
     "Trouble",
+    "Outline",
     "HistoryStartup",
     "startuptime",
 
@@ -35,6 +36,7 @@ local shortLineIcons = {
 
     tsplayground = icon.kind.Keyword,
 
+    Outline = icon.ui.Outline,
 
     startuptime = icon.ui.Dashboard,
 

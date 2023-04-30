@@ -571,6 +571,10 @@ theme.plugins = { -- {{{
     TreesitterContext           = {style = "bold"},
     TreesitterContextLineNumber = {fg = p.n3b, style = "bold"},
     TreesitterContextBottom     = {link  = "TreesitterContextLineNumber"},
+
+    -- https://github.com/simrat39/symbols-outline.nvim
+    FocusedSymbol           = {fg = p.n10, style = "bold,italic"},
+    SymbolsOutlineConnector = {fg = p.n2},
 } -- }}}
 
 theme.loadTerminal = function()

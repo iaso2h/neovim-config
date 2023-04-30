@@ -88,12 +88,12 @@ if _G._os_uname.sysname == "Windows_NT" then -- {{{ Setting up python backen env
             if event == "stdout" then
                 if not vim.g.python3_host_prog and ex(data[1]) then
                     vim.g.python3_host_prog = data[1]
+                    vim.fn.chansend(jobId, "exit")
                 end
             elseif event == "exit" then
                 if ex(vim.g.python3_host_prog) then
                     return vim.notify("Python binary path not found", vim.log.levels.WARN)
                 end
-
                 vim.fn.jobstop(jobId)
             end
         end
@@ -105,12 +105,14 @@ if _G._os_uname.sysname == "Windows_NT" then -- {{{ Setting up python backen env
             local pynvimFoundTick = false
             local findPynvim = function(jobId, data, event)
                 if event == "stdout" then
-                    if string.find(data[1], "Location") then pynvimFoundTick = true end
+                    if string.find(data[1], "Location") then
+                        pynvimFoundTick = true
+                        vim.fn.chansend(jobId, "exit")
+                    end
                 elseif event == "exit" then
                     if not pynvimFoundTick then
                         vim.notify("Package pynvim isn't found", vim.log.levels.WARN)
                     end
-
                     vim.fn.jobstop(jobId)
                 end
             end
