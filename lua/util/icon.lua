@@ -25,7 +25,7 @@ return {
         Operator      = "",
         Package       = "",
         Property      = "",
-        Reference     = "",
+        Reference     = "",
         Snippet       = "",
         String        = "",
         Struct        = "",
@@ -67,7 +67,7 @@ return {
         BookMark           = "",
         BoxChecked         = "",
         Bug                = "",
-        Breakpoint         = "⦿",
+        Breakpoint         = "",
         Stacks             = "",
         Scopes             = "",
         Watches            = "",
@@ -80,6 +80,7 @@ return {
         ChevronShortRight  = "",
         ChevronShortUp     = "",
         Circle             = "",
+        CircleDotted       = "◌",
         CircleHalfRight    = "",
         CircleHalfLeft     = "",
         Close              = "",
@@ -170,7 +171,7 @@ return {
         Watch        = "",
     }, -- }}}
     debug = { -- {{{
-        Breakpoint = "●",
+        Breakpoint = "",
         Disconnect = "",
         Logpoint   = "",
         Pause      = "",
@@ -182,7 +183,4 @@ return {
         StepOver   = "",
         Terminate  = "",
     }, -- }}}
-    tree = {
-
-    }
 }

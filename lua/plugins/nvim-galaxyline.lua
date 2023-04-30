@@ -1,66 +1,93 @@
 -- File: nvim-galaxyline
 -- Author: iaso2h
 -- Description: Statusline configuration
--- Last Modified: 2023-4-12
+-- Last Modified: 2023-4-30
 local M = {}
 local icon = require("util.icon")
 
--- filetype contained in this list will be consider inactive all the time
-M.shortLineList = {
-    "term",
-    "qf",
-    "NvimTree",
-    "Trouble",
-    "Outline",
-    "HistoryStartup",
-    "startuptime",
-
-    "dap-repl",
-    "dapui_watches",
-    "dapui_console",
-    "dapui_stacks",
-    "dapui_breakpoints",
-    "dapui_scopes",
-
-    "tsplayground",
-    "DiffviewFiles",
-    "DiffviewFileHistory"
-}
-local shortLineIcons = {
-    ["dap-repl"]      = icon.ui.Terminal,
-    dapui_watches     = icon.ui.Watches,
-    dapui_console     = icon.ui.DebugConsole,
-    dapui_stacks      = icon.ui.Stacks,
-    dapui_breakpoints = icon.ui.Breakpoint,
-    dapui_scopes      = icon.ui.Scopes,
-
-    tsplayground = icon.kind.Keyword,
-
-    Outline = icon.ui.Outline,
-
-    startuptime = icon.ui.Dashboard,
-
-    help     = icon.ui.Documentation,
-    NvimTree = icon.ui.Flag,
-    qf       = icon.ui.Quickfix,
-
-    DiffviewFiles       = icon.ui.Flag,
-    DiffviewFileHistory = icon.ui.History,
-
-    HistoryStartup = icon.ui.History
-}
-
+local shortLineInfos = { -- {{{
+    qf = {
+        name = "Quickfix",
+        icon = icon.ui.Quickfix
+    },
+    Trouble = {
+        name = "Trouble",
+        icon = icon.ui.Quickfix
+    },
+    term = {
+        name = "Terminal",
+        icon = icon.ui.Terminal
+    },
+    ["dap-repl"] = {
+        name = "Repl",
+        icon = icon.ui.Terminal
+    },
+    dapui_watches = {
+        name = "Watchs",
+        icon = icon.ui.Watches
+    },
+    dapui_console = {
+        name = "Console",
+        icon = icon.ui.DebugConsole
+    },
+    dapui_stacks = {
+        name = "Stacks",
+        icon = icon.ui.Stacks
+    },
+    dapui_breakpoints = {
+        name = "Breakpoints",
+        icon = icon.ui.Breakpoint
+    },
+    dapui_scopes = {
+        name = "Scopes",
+        icon = icon.ui.Scopes
+    },
+    tsplayground = {
+        name = "Tree-sitter Playground",
+        icon = icon.kind.Keyword
+    },
+    Outline = {
+        name = "Outline",
+        icon = icon.ui.Outline
+    },
+    startuptime = {
+        name = "Startup Time",
+        icon = icon.ui.Dashboard
+    },
+    help = {
+        name = "Help",
+        icon = icon.ui.Documentation
+    },
+    NvimTree = {
+        name = "Nvim Tree",
+        icon = icon.ui.Flag
+    },
+    DiffviewFiles = {
+        name = "Diffview Files",
+        icon = icon.ui.Flag
+    },
+    DiffviewFileHistory = {
+    name = "Diffview History",
+        icon = icon.ui.History
+    },
+    HistoryStartup = {
+        name = "History Startup",
+        icon = icon.ui.History
+    }
+} -- }}}
+-- Filetypes contained in this list will be consider inactive all the time
+M.shortLineList = vim.tbl_keys(shortLineInfos)
 
 M.config = function() -- {{{
     local gl           = require("galaxyline")
     local gls          = gl.section
     local condition    = require("galaxyline.condition")
+    local pallette     = require("onenord.pallette")
 
-    -- Filetype
+    -- Filetypes contained in this list will be consider inactive all the time
     gl.short_line_list = M.shortLineList
 
-    local pallette     = require("onenord.pallette")
-    local colors       = {
+    local colors       = { -- {{{
         fg        = pallette.n10,
         bg1       = pallette.n1,
         bg2       = "#4C566A",
@@ -77,9 +104,8 @@ M.config = function() -- {{{
         red       = pallette.n11,
         gray      = "#66738e",
         white     = pallette.n4,
-    }
-
-    local alias        = {
+    } -- }}}
+    local alias        = { -- {{{
         n      = "NORMAL",
         i      = "INSERT",
         c      = "COMMAND",
@@ -96,9 +122,8 @@ M.config = function() -- {{{
         ["r"]  = "HIT-ENTER",
         t      = "TERMINAL",
         ["!"]  = "SHELL"
-    }
-
-    local modeColors   = {
+    } -- }}}
+    local modeColors   = { -- {{{
         n      = colors.cyan,
         i      = colors.green,
         c      = colors.yellow,
@@ -115,41 +140,50 @@ M.config = function() -- {{{
         ["r"]  = colors.purple,
         t      = colors.blue,
         ["!"]  = colors.blue
-    }
+    } -- }}}
 
     local vimMode
     local tightWinChk  = false
+    local padding = " "
 
-
-    local isSpecialFileType = function()
+    local isSpecialFileType = function() -- {{{
         return vim.tbl_contains(gl.short_line_list, vim.bo.filetype)
-    end
-
-    local isNoNeckPain = function()
+    end -- }}}
+    local isNoNeckPain = function() -- {{{
         if vim.bo.filetype == "no-neck-pain" then
             return true
         else
             return false
         end
-    end
+    end -- }}}
+    local fileInfo = function() -- {{{
+        if vim.bo.filetype == "qf" then -- {{{
+            local title
+            if vim.b._is_loc then
+                title = vim.fn.getloclist(0, {title = 0}).title
+            else
+                title = vim.fn.getqflist({title = 0}).title
+            end
+            return title and padding .. title or padding
+        end -- }}}
 
-
-    local fileInfo = function()
         local cwd     = vim.loop.cwd()
         local absPath = nvim_buf_get_name(0)
 
-        if absPath == "" then return vim.bo.filetype .. " " end
+        -- Scratch buffer
+        if absPath == "" then return vim.bo.filetype .. padding end
         local fileStr
-        if vim.startswith(absPath, "diffview") then
+
+        if vim.startswith(absPath, "diffview") then -- {{{
             fileStr = vim.fn.expand("%:t")
             local commit = string.match(absPath, ".git" .. _G._sep .. "(%w%w%w%w%w%w%w%w)")
             if commit then
-                fileStr = fileStr .. " | " .. commit .. " "
+                fileStr = fileStr .. " | " .. commit .. padding
             else
-                return " "
+                return padding
             end
-            return fileStr
-        end
+            return fileStr .. padding
+        end -- }}}
 
         -- Get file path string
         local relPath = string.match(absPath, cwd .. ".(.*)")
@@ -167,20 +201,18 @@ M.config = function() -- {{{
         end
 
         if tightWinChk then
-            return fileStr .. " "
+            return fileStr .. padding
         else
-            local isMod  = vim.bo.readonly and " " .. icon.ui.Plus or ""
-            local isRead = vim.bo.readonly and " " .. icon.ui.Lock or ""
+            local isMod  = vim.bo.readonly and padding .. icon.ui.Plus or ""
+            local isRead = vim.bo.readonly and padding .. icon.ui.Lock or ""
 
             local ext = vim.fn.expand("%:e")
             local fileTypeStr = ext ~= vim.bo.filetype and
-                string.format(" | %s ", vim.bo.filetype) or " "
+                string.format(" | %s ", vim.bo.filetype) or padding
             return fileStr .. isMod .. isRead .. fileTypeStr
         end
-    end
-
-
-    local changeHLColor = function(hlStr)
+    end -- }}}
+    local changeHLColor = function(hlStr) -- {{{
         local cmdStr
         if vim.o.paste then
             cmdStr = string.format("hi %s guibg=%s guifg=%s gui=%s",
@@ -197,10 +229,8 @@ M.config = function() -- {{{
         end
 
         vim.cmd(cmdStr)
-    end
-
-
-    local lineInfo = function()
+    end -- }}}
+    local lineInfo = function() -- {{{
         local cursorPos   = vim.api.nvim_win_get_cursor(0)
         local totalLineNr = vim.fn.line("$")
         local lineColumn  = string.format("  %d:%d |", cursorPos[1], cursorPos[2] + 1)
@@ -214,12 +244,11 @@ M.config = function() -- {{{
         end
 
         return lineColumn .. percentage
-    end
-
-
-    local hideInTight = function()
+    end -- }}}
+    local hideInTight = function() -- {{{
         return not tightWinChk
-    end
+    end -- }}}
+
 
     gls.left[1] = { -- {{{
         VimMode = {
@@ -461,20 +490,21 @@ M.config = function() -- {{{
                 vimMode = vim.fn.mode()
                 changeHLColor("GalaxySpecialFileTypeVimMode")
 
+                local leadingSpaces = "  "
                 local fileType = vim.bo.filetype
                 if fileType == "qf" then
                     -- The value of vim.b._is_loc is set up whenever a qf filetype
-                    -- is set via after/ftplugin/qf.lua
+                    -- is set via `after/ftplugin/qf.lua`
                     fileType = vim.b._is_loc and "Location list" or "Quickfix"
+                    return leadingSpaces .. icon.ui.Quickfix .. padding .. fileType .. padding
                 else
-                    fileType:upper()
-                end
-
-                local bufIcon = shortLineIcons[fileType]
-                if bufIcon then
-                    return "  " .. bufIcon .. " " .. fileType .. " "
-                else
-                    return "  " .. fileType .. " "
+                    local bufIcon = shortLineInfos[fileType].icon
+                    local fileName = shortLineInfos[fileType].name
+                    if bufIcon then
+                        return leadingSpaces .. bufIcon .. padding .. fileName .. padding
+                    else
+                        return leadingSpaces .. fileName .. padding
+                    end
                 end
             end,
             condition = isSpecialFileType,
@@ -493,17 +523,11 @@ M.config = function() -- {{{
         }
     }
 
-
-    gls.short_line_left[#gls.short_line_left + 1] = {
-        ShortFileLeadingSpace = {
-            provider = function() return " " end,
-            highlight = { colors.gray, colors.bg1 }
-        }
-    }
-
     gls.short_line_left[#gls.short_line_left + 1] = {
         ShortFileIcon = {
-            provider  = "FileIcon",
+            provider  = function()
+                return " " .. require("galaxyline.provider_fileinfo").get_file_icon()
+            end,
             condition = function()
                 return not isNoNeckPain() and
                     condition.buffer_not_empty() and
@@ -513,26 +537,31 @@ M.config = function() -- {{{
         }
     }
 
+    local fileInfoWhitelist = {"qf"}
     gls.short_line_left[#gls.short_line_left + 1] = {
         ShortFileInfo = {
             provider  = fileInfo,
             condition = function()
-                return not isNoNeckPain() and
-                    condition.buffer_not_empty() and
-                    not isSpecialFileType()
+                if vim.tbl_contains(fileInfoWhitelist, vim.bo.filetype) then
+                    return true
+                elseif isNoNeckPain() then
+                    return false
+                else
+                    return condition.buffer_not_empty() and not isSpecialFileType()
+                end
             end,
             highlight = { colors.gray, colors.bg1 }
         }
     }
 
-    -- local whiteList = {"help"}
+    -- local ShortRightLineInfoWhitelist = {"help"}
     gls.short_line_right[1] = {
         ShortRightLineInfo = {
             provider  = lineInfo,
             condition = function()
                 if isNoNeckPain() then
                     return false
-                    -- elseif vim.tbl_contains(whiteList, vim.bo.filetype) then
+                    -- elseif vim.tbl_contains(ShortRightLineInfoWhitelist, vim.bo.filetype) then
                     --     return true
                 else
                     return condition.buffer_not_empty() and not isSpecialFileType()

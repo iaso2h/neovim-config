@@ -33,6 +33,8 @@ end
 -- }}} Bootstrap lazy.nvim
 
 -- Plug-ins configuration
+local icon = require("util.icon")
+local trailingSpaces = " "
 local pluginArgs = { -- {{{
     -- https://github.com/folke/lazy.nvim#-plugin-spec
     -- Dependencies {{{
@@ -472,6 +474,11 @@ local pluginArgs = { -- {{{
         "williamboman/mason.nvim",
         config = function()
             require("mason").setup {
+                icons = {
+                    package_installed = icon.ui.Circle,
+                    package_pending = icon.ui.Target,
+                    package_uninstalled = icon.kind.Event
+                },
                 ui = {
                     border = "rounded",
                     keymaps = {
@@ -1048,7 +1055,32 @@ local opts = {
     root = _G._plugin_root,
     git  = { log = {"-30"} },
     install = {colorscheme = {"onenord"}},
-    ui   = {border = "rounded"},
+    ui   = {
+        border = "rounded",
+        icons = {
+            cmd        = icon.ui.Terminal .. trailingSpaces,
+            config     = icon.ui.Tweak .. trailingSpaces,
+            event      = icon.kind.Event .. trailingSpaces,
+            ft         = icon.ui.FindFile .. trailingSpaces,
+            init       = icon.ui.Tweak .. trailingSpaces,
+            import     = icon.kind.Reference .. trailingSpaces,
+            keys       = " ",
+            lazy       = icon.kind.Event .. trailingSpaces,
+            loaded     = icon.ui.Circle .. trailingSpaces,
+            not_loaded = icon.ui.CircleDotted .. trailingSpaces,
+            plugin     = icon.ui.Package .. trailingSpaces,
+            runtime    = icon.ui.Vim .. trailingSpaces,
+            source     = icon.debug.RunLast .. trailingSpaces,
+            start      = icon.debug.Play .. trailingSpaces,
+            task       = icon.ui.BoxChecked .. trailingSpaces,
+            list       = {
+                icon.ui.Circle,
+                icon.ui.BoldArrowRight,
+                icon.ui.Dot,
+                "‒",
+            },
+        },
+    },
     concurrency = 5,
     performance = {
         cache = {
