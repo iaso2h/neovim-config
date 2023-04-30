@@ -44,6 +44,3 @@
 ((identifier) @constant
   (#lua-match? @constant "^[A-Z][A-Z_0-9]*$")
   (#set! "priority" 130))
-
-((parameters (identifier) @parameter)
-  (#set! "priority" 130))

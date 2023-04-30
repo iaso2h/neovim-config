@@ -631,6 +631,37 @@ local pluginArgs = { -- {{{
         end
     },
     {
+        "m-demare/hlargs.nvim",
+        dependencies = {
+            "nvim-lspconfig",
+            "nvim-treesitter"
+        },
+        config = function()
+            require("hlargs").setup {
+                color = require("onenord.pallette").orange,
+                highlight = {},
+                excluded_filetypes = {},
+                paint_arg_declarations = true,
+                paint_arg_usages = true,
+                paint_catch_blocks = {
+                    declarations = false,
+                    usages = false
+                },
+                extras = {
+                    named_parameters = false,
+                },
+                hl_priority = 10000,
+                excluded_argnames = {
+                    declarations = {},
+                    usages = {
+                        python = { 'self', 'cls' },
+                        lua = { 'self' }
+                    }
+                },
+            }
+        end
+    },
+    {
         "ThePrimeagen/refactoring.nvim",
         dependencies = {
             "plenary.nvim",
