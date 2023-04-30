@@ -1,7 +1,7 @@
 -- File: search
 -- Author: iaso2h
 -- Description: Jump & Search utilities
--- Version: 0.0.7
+-- Version: 0.0.8
 -- Last Modified: 2023-4-27
 local M   = {}
 
@@ -43,11 +43,12 @@ end
 
 --- Search func wraps around the native //? exCMD in Visual mode
 ---@param exCMD string "/" or "?"
+-- Similar project: https://github.com/bronson/vim-visual-star-search
 M.searchSelected = function(exCMD)
     local cursorPos = vim.api.nvim_win_get_cursor(0)
     local selectedStr = vim.fn.escape(
         require("selection").get("string", true),
-        [=[\/.-][]=]
+        [=[\$^.*~[]=]  -- Escape special character in magic mode(Neovim default)
     )
     selectedStr = exCMD .. selectedStr
     vim.cmd(selectedStr)
