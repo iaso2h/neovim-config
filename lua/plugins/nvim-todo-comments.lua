@@ -6,9 +6,8 @@ return function()
         keywords = {
             FIX    = {
                 icon  = " ",                                -- icon used for the sign, and in search results
-                color = "error",                               -- can be a hex color, or a named color (see below)
-                alt   = { "FIXME", "BUG", "FIXIT", "FIX", "ISSUE" }, -- a set of other keywords that all map to this FIX keywords
-                -- signs = false, -- configure signs for some keywords individually
+                color = "error",                                      -- can be a hex color, or a named color (see below)
+                alt   = { "FIXME", "BUG", "FIXIT", "FIX", "ISSUE" },  -- a set of other keywords that all map to this FIX keywords
             },
             TODO   = {
                 icon = icon.ui.Comment .. " ",
@@ -44,8 +43,8 @@ return function()
             }
         },
         gui_style = {
-            fg = "NONE",   -- The gui style to use for the fg highlight group.
-            bg = "BOLD",   -- The gui style to use for the bg highlight group.
+            fg = "NONE",  -- The gui style to use for the fg highlight group.
+            bg = "BOLD",  -- The gui style to use for the bg highlight group.
         },
         merge_keywords = true, -- when true, custom keywords will be merged with the defaults
         -- highlighting of the line containing the todo comment

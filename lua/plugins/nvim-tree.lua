@@ -130,8 +130,8 @@ return function()
                 },
             },
             icons = {
-                webdev_colors = true,
-                git_placement = "before",
+                webdev_colors      = true,
+                git_placement      = "before",
                 modified_placement = "after",
                 padding = " ",
                 symlink_arrow = " ➛ ",

@@ -3,7 +3,6 @@ return function()
     local lsp       = vim.lsp
     local fn        = vim.fn
     local lspConfig = require("lspconfig")
-    local lspUtil   = require("lspconfig.util")
     local path      = require("plenary.path")
     local servers   = require("plugins.nvim-mason-lspconfig").servers
     ----
@@ -45,16 +44,16 @@ return function()
 
         bmap(bufNr, "n", [[gd]], function()
             vim.lsp.buf.definition { on_list = conciseQuifix }
-        end, { "silent" }, "LSP definition")
+        end, "LSP definition")
         bmap(bufNr, "n", [[gD]], function()
             vim.lsp.buf.declaration { on_list = conciseQuifix }
-        end, { "silent" }, "LSP declaration")
+        end, "LSP declaration")
         bmap(bufNr, "n", [[gt]], function()
             vim.lsp.buf.type_definition { on_list = conciseQuifix }
-        end, { "silent" }, "LSP type definition")
+        end, "LSP type definition")
         bmap(bufNr, "n", [[gi]], function()
             vim.lsp.buf.implementation { on_list = conciseQuifix }
-        end, { "silent" }, "LSP implementation")
+        end, "LSP implementation")
 
         bmap(bufNr, {"x", "n"}, [[<leader>a]],  vim.lsp.buf.code_action,    "LSP code action")
         bmap(bufNr, "n",        [[<leader>rn]], vim.lsp.buf.rename,         "LSP rename")

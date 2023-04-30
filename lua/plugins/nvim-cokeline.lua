@@ -27,7 +27,6 @@ return function()
             {
                 text = function(buffer)
                     local filename = buffer.filename
-                    -- TODO: test in windows
                     if filename == "init.lua" then
                         local lastIdx = 0
                         local idxTbl = {}

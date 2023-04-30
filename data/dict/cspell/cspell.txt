@@ -94,3 +94,7 @@ optim
 goldentdict
 pynvim 
 foldexpr 
+unstaged 
+hlsearch 
+nohlsearch 
+octoface 

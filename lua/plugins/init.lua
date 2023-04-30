@@ -103,8 +103,9 @@ local pluginArgs = { -- {{{
     },
     {
         "ckolkey/ts-node-action",
+        keys = { {[[<leader>s]], mode = "n"} },
         dependencies = { "nvim-treesitter" },
-        init = function()
+        config = function()
             map("n", [[<leader>s]], require("ts-node-action").node_action, "Trigger node action" )
         end
     },

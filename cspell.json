@@ -11,7 +11,7 @@
     "dictionaryDefinitions": [
         {
             "name": "programming",
-            "path": ".\/cspell.txt"
+            "path": "./data/dict/cspell/cspell.txt"
         }
     ]
 }

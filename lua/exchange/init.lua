@@ -158,7 +158,7 @@ function _G._exchangeOperator(args) -- {{{
         -- For exchange operator exclusively
 
         motionType = args
-        -- TODO: necessity of implement line motion???
+        -- TODO: necessity of implementing line motion???
         if motionType == "line" then return end
         vimMode = "n"
         -- Saving cursor part is done inside expr()

@@ -4,8 +4,9 @@ local api = vim.api
 local init = function(initValue, optName) -- {{{
     if optName then
         vim.api.nvim_create_user_command("Toggle" .. optName, function()
-            vim.g._cspellEnable = not vim.g._cspellEnable
-            local state = vim.g._cspellEnable and "Enabled" or "Disabled"
+            local key = string.format("_%sEnable", optName)
+            vim.g[key] = not vim.g[key]
+            local state = vim.g[key] and "Enabled" or "Disabled"
             vim.api.nvim_echo({ { string.format("%s has been %s", optName, state), "Moremsg" } }, false, {})
         end, {})
     end

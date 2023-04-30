@@ -70,7 +70,7 @@ local saveOption = function() -- {{{
         vim.opt.selection = "inclusive"
     end
 
-    if saveClipboard or saveSelection then
+    if saveSelection then
         M.restoreOption = function()
             if saveSelection then vim.opt.selection = saveSelection end
         end
