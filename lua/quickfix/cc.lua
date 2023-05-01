@@ -1,8 +1,8 @@
 -- File: cc.lua
 -- Author: iaso2h
 -- Description: Enhance version of the :cc
--- Version: 0.0.5
--- Last Modified: Sun 30 Apr 2023
+-- Version: 0.0.6
+-- Last Modified: Mon 01 May 2023
 
 --- Set current window focus
 ---@param closeQfChk boolean Whether to close the quickfix window
@@ -44,7 +44,7 @@ end
 --cursor. Set it to -1 to open the previous item, 1 to open the next item
 return function(closeQfChk, offset)
     local u = require("quickfix.util")
-    local qfItems     = u.getlist()
+    local qfItems = u.getlist()
     if not next(qfItems) then
         return vim.notify("No quickfix items available")
     end
@@ -82,10 +82,12 @@ return function(closeQfChk, offset)
     if targetItem.valid == 1 and (targetItem.bufnr == 0 or
             not vim.api.nvim_buf_is_valid(targetItem.bufnr)) then
 
+        local ns = vim.api.nvim_create_namespace("myQuickfix")
+        vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
         require("quickfix.highlight").addLines(
             {targetLineNr},
             "Comment",
-            vim.api.nvim_create_namespace("myQuickfix")
+            ns
         )
         return vim.notify("This item is no longer valid")
     elseif targetItem.valid == 0 then
