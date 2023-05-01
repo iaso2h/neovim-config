@@ -10,7 +10,9 @@ return function() -- {{{
     local pallette  = require("onenord.pallette")
 
     -- Filetypes contained in this list will be consider inactive all the time
-    gl.short_line_list = _G._short_line_list
+    gl.short_line_list = vim.deepcopy(_G._short_line_list)
+    local idx = tbl_idx(gl.short_line_list, "help")
+    table.remove(gl.short_line_list, idx)
 
     local colors = { -- {{{
         fg        = pallette.n10,

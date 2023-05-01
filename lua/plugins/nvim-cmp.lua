@@ -13,6 +13,9 @@ return function()
                     return false
                 end
             end
+            if vim.startswith(vim.bo.filetype, "neoai") then
+                return false
+            end
 
             -- Disable completion in comments
             local context = require("cmp.config.context")
