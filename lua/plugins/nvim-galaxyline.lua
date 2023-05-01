@@ -88,7 +88,7 @@ return function() -- {{{
             else
                 title = vim.fn.getqflist({title = 0}).title
             end
-            return title and padding .. title or padding
+            return title and "  " .. title or ""
         end -- }}}
 
         local cwd     = vim.loop.cwd()

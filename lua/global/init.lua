@@ -160,32 +160,33 @@ _G.logBuf = function(...)
     table.insert(objects, 1, os.date("%Y-%m-%d-%H:%M:%S", os.time()) .. "-------------------------------------------")
 
     -- Output the result into a new scratch buffer
-    if _G._logBufNr and vim.api.nvim_buf_is_valid(_G._logBufNr) then
-        -- Focus on that log buffer
-        for _, tbl in ipairs(vim.fn.getwininfo()) do
-            if vim.api.nvim_win_get_buf(tbl["winid"]) == _G._logBufNr then
+    if _G._log_buf_nr and vim.api.nvim_buf_is_valid(_G._log_buf_nr) then
+        -- if scratch buffer is visible, populate the date into it
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+            if vim.api.nvim_win_get_buf(win) == _G._log_buf_nr then
                 vim.api.nvim_set_current_win(win)
                 vim.cmd [[keepjumps norm! G]]
                 vim.api.nvim_put(objects, "l", true, true)
                 return
             end
         end
-        vim.api.nvim_set_current_buf(_G._logBufNr)
+        vim.api.nvim_set_current_buf(_G._log_buf_nr)
         vim.api.nvim_put(objects, "l", true, true)
         vim.cmd "wincmd p"
-    elseif vim.bo.modifiable and vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
+    elseif vim.api.nvim_buf_get_name(0) == "" and vim.bo.modifiable and
+            vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
         -- Use current file as the log buffer
-        _G._logBufNr = vim.api.nvim_get_current_buf()
-        vim.api.nvim_buf_set_option(_G._logBufNr, "bufhidden", "wipe")
-        vim.api.nvim_buf_set_option(_G._logBufNr, "buftype", "nofile")
+        _G._log_buf_nr = vim.api.nvim_get_current_buf()
+        vim.api.nvim_buf_set_option(_G._log_buf_nr, "bufhidden", "wipe")
+        vim.api.nvim_buf_set_option(_G._log_buf_nr, "buftype", "nofile")
         vim.api.nvim_put(objects, "l", true, true)
         -- vim.api.nvim_buf_set_lines(_G._logBufNr, 0, -1, false, objects)
     else
         -- TODO: how to determine performing a vertical split or a horizontal split
         vim.cmd [[vsplit]]
-        _G._logBufNr = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(_G._logBufNr, "bufhidden", "wipe")
-        vim.api.nvim_set_current_buf(_G._logBufNr)
+        _G._log_buf_nr = vim.api.nvim_create_buf(false, true)
+        vim.api.nvim_buf_set_option(_G._log_buf_nr, "bufhidden", "wipe")
+        vim.api.nvim_set_current_buf(_G._log_buf_nr)
         vim.api.nvim_put(objects, "l", true, true)
         -- vim.api.nvim_buf_set_lines(_G._logBufNr, 0, -1, false, objects)
         vim.cmd "wincmd p"

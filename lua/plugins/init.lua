@@ -625,7 +625,7 @@ local pluginArgs = { -- {{{
         dependencies = { "nvim-lspconfig" },
         config = require("plugins.nvim-lsp-signature")
     },
-    -- TODO: higlight group
+    -- TODO: highlight group
     {
         "weilbith/nvim-code-action-menu",
         cmd  = "CodeActionMenu",

@@ -186,7 +186,8 @@ M.display = function(refreshChk) -- {{{
         M.curBuf = 1
         vim.api.nvim_buf_set_option(M.curBuf, "buftype", "nofile")
         vim.api.nvim_buf_set_option(M.curBuf, "buflisted", false)
-    elseif vim.bo.modifiable and vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
+    elseif vim.api.nvim_buf_get_name(0) == "" and vim.bo.modifiable and
+            vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
         -- Use the current buffer if it's a scratch buffer
         M.curBuf  = vim.api.nvim_get_current_buf()
         M.lastBuf = nil

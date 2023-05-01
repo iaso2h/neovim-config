@@ -128,6 +128,7 @@ local function bufHandler(loneWin) -- {{{
                 if vim.api.nvim_buf_get_name(postBufNr) == "" then
                     return require("historyStartup").display(true)
                 else
+                    Print(var.bufNrTbl)
                     return vim.notify(
                         "Unabled to enter the historyStartup correctly for the last scratch file",
                         vim.log.levels.ERROR)

@@ -67,7 +67,7 @@ return function()
         desc  = "Toggle CSpell checking buffer locally",
     })
     local cspell = null_ls.builtins.diagnostics.cspell.with {
-        disabled_filetypes = vim.deepcopy(_G._short_line_infos),
+        disabled_filetypes = _G._short_line_list,
         extra_args = {
             "--gitignore",
             "--config",

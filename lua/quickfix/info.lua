@@ -8,9 +8,9 @@ local M   = {
     hoverBufNr = nil,
     ns = vim.api.nvim_create_namespace("quickfixHover")
 }
-local pallete = require("onenord.pallette")
+local pallette = require("onenord.pallette")
 
-vim.cmd(string.format([[hi! quickfixHoverKey guifg=%s ]], pallete.n9))
+vim.cmd(string.format([[hi! quickfixHoverKey guifg=%s ]], pallette.n9))
 
 --- Destroy floating window and the buffer within created by M.info() before
 --- leaving quickfix. This func is mainly used as a autocmd callback
