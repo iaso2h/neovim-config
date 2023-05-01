@@ -21,7 +21,7 @@ map("n", [[<C-q>G]], [[<CMD>clast<CR>zzzv]],     {"silent"}, "Go to last item in
 map("n", [[<C-q>n]], [[<CMD>cnext<CR>zzzv]],     {"silent"}, "Go to next item in quickfix")
 map("n", [[<C-q>N]], [[<CMD>cprevious<CR>zzzv]], {"silent"}, "Go to previous item in quickfix")
 map("n", [[<C-q>l]], [[<CMD>lua require("quickfix.convertToLoc")()<CR>]], {"silent"}, "Convert quickfix into location list")
-map("n", [[<C-q>m]], [[<CMD>lua require("quickfix.message").main()<CR>]], {"silent"}, "Show messages in quickfix")
+map("n", [[<C-q>m]], [[<CMD>lua require("quickfix.message")("scratch")<CR>]], {"silent"}, "Show messages in quickfix")
 -- Expand region
 map("n", [[<A-a>]], [[<CMD>lua require("expandRegion").expandShrink("n", 1)<CR>]],  {"silent"}, "Expand selection")
 map("n", [[<A-s>]], [[<Nop>]], "which_key_ignore")
