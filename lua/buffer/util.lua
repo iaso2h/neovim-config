@@ -219,31 +219,6 @@ M.getCurWinLayoutTest = function() -- {{{
     end
 
 end -- }}}
---- Return ex command for spliting Neovim windows
----@param splitPrefixChk boolean If the function resolve to vertical split solution. Whether to return `vertical` form ex command prefix or `vsplit` to split a window first
----@return string Neovim ex command string
-M.winSplitCmd = function(splitPrefixChk)
-    local layout = require("buffer.util").winLayout()
-    if layout ~= "" then
-        if layout == "col" then
-            if splitPrefixChk then
-                return "vertical"
-            else
-                return "vsplit"
-            end
-        elseif layout == "row" then
-            if splitPrefixChk then
-                return "horizontal"
-            else
-                return "split"
-            end
-        elseif layout == "leaf" then
-            -- TODO: detection in one window screen
-        end
-    else
-        return ""
-    end
-end
 
 
 return M

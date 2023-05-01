@@ -20,7 +20,7 @@ return function(word)
     local helpPath = topic and (topic.prefix .. word:sub(#topic + 1) .. topic.suffix) or word
 
     -- Get the current window layout
-    local layoutCmd = require("buffer.util").winSplitCmd(true)
+    local layoutCmd = require("buffer.smartSplit").handler(true)
 
     ok = pcall(vim.api.nvim_command, string.format("%s help %s", layoutCmd, helpPath))
 

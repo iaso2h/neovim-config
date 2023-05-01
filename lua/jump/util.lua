@@ -156,12 +156,8 @@ M.jumplistRegisterLinesToTbl = function(returnJumpsChk, startLineNr, lastLineNr,
             vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
         scratchBuf = currentBuf
     else
-        local layoutCmd = require("buffer.util").winSplitCmd(false)
-        if layoutCmd == "" then
-            vim.cmd "vsplit"
-        else
-            vim.cmd(layoutCmd)
-        end
+        local layoutCmd = require("buffer.smartSplit").handler(false)
+        vim.cmd(layoutCmd)
         scratchBuf = vim.api.nvim_create_buf(false, true)
         vim.api.nvim_buf_set_option(scratchBuf, "bufhidden", "wipe")
         vim.api.nvim_set_current_buf(scratchBuf)
