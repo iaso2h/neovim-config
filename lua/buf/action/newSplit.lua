@@ -66,7 +66,7 @@ function M.init(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
         for _, tbl in ipairs(winInfo) do
             matchResult = string.match(nvim_buf_get_name(api.nvim_win_get_buf(tbl["winid"])), bufnamePat)
             if matchResult then
-                cmd(string.format("%dwincmd w", tbl["winnr"]))
+                vim.api.nvim_set_current_win(tbl["winid"])
                 return
             end
         end

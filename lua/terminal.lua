@@ -31,7 +31,7 @@ function M.terminalToggle() -- {{{
             if not require("buf.var").newSplitLastBufNr then
                 for _, tbl in winInfo do
                     if api.nvim_win_get_buf(tbl["winid"]) == vim.g.smartSplitLastBufNr then
-                        cmd(string.format("%dwincmd w", tbl["winnr"]))
+                        vim.api.nvim_set_current_win(tbl["winnr"])
                     end
                 end
             end

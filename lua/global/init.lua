@@ -164,7 +164,7 @@ _G.logBuf = function(...)
         -- Focus on that log buffer
         for _, tbl in ipairs(vim.fn.getwininfo()) do
             if vim.api.nvim_win_get_buf(tbl["winid"]) == _G._logBufNr then
-                vim.cmd(string.format("%dwincmd w", tbl["winnr"]))
+                vim.api.nvim_set_current_win(win)
                 vim.cmd [[keepjumps norm! G]]
                 vim.api.nvim_put(objects, "l", true, true)
                 return
