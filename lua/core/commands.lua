@@ -46,7 +46,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     desc     = "Place the cursor on the last position",
     callback = function(arg)
         -- Credit: https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
-        require("buf.action.cursorRecall").main(arg)
+        require("buffer.action.cursorRecall").main(arg)
     end
 })
 
@@ -78,7 +78,7 @@ vim.api.nvim_create_user_command([[PP strftime('%c') . ": " . <args>]], "Echo", 
 })
 
 vim.api.nvim_create_user_command("Redir", function(opts)
-    require("buf.action.redir").catch(opts.args)
+    require("buffer.action.redir").catch(opts.args)
 end, {
     desc     = "Echo from Scriptease plug-ins",
     nargs    = "+",

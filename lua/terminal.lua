@@ -18,7 +18,7 @@ function M.terminalToggle() -- {{{
     local winInfo           = fn.getwininfo()
 
     if vim.bo.buftype ~= "terminal" then
-        require("buf").newSplit(require("terminal").openTerminal, {}, "^term.*", false, true)
+        require("buffer").newSplit(require("terminal").openTerminal, {}, "^term.*", false, true)
     else
         if winCount == 1 then
             cmd [[bp]]
@@ -28,7 +28,7 @@ function M.terminalToggle() -- {{{
         else
             cmd [[q]]
             -- Switch back last window if exists
-            if not require("buf.var").newSplitLastBufNr then
+            if not require("buffer.var").newSplitLastBufNr then
                 for _, tbl in winInfo do
                     if api.nvim_win_get_buf(tbl["winid"]) == vim.g.smartSplitLastBufNr then
                         vim.api.nvim_set_current_win(tbl["winnr"])

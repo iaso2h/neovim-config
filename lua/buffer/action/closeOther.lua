@@ -1,5 +1,5 @@
-local u   = require("buf.util")
-local var = require("buf.var")
+local u   = require("buffer.util")
+local var = require("buffer.var")
 local M   = {}
 
 -- Filter out terminal and special buffer, because I don't want to close them yet
@@ -18,20 +18,20 @@ function M.init() -- {{{
 
     -- TODO: implement in hook function
     -- Check whether call from Nvim Tree
-    var.winIDTbl = vim.api.nvim_list_wins()
+    var.winIds = vim.api.nvim_list_wins()
     if vim.bo.filetype == "NvimTree" then
-        u.switchAlter(var.winID)
+        u.switchAlter(var.winId)
         if vim.bo.filetype == "NvimTree" then
             return
         end
     end
 
-    var.bufNrTbl = vim.tbl_filter(filterBuf, var.bufNrTbl)
+    var.bufNrs = vim.tbl_filter(filterBuf, var.bufNrs)
     local unsavedChange = false
     local answer = -1
 
     -- Check unsaved change
-    for _, bufNr in ipairs(var.bufNrTbl) do
+    for _, bufNr in ipairs(var.bufNrs) do
         if bufNr ~= var.bufNr then
             local modified = vim.api.nvim_buf_get_option(bufNr, "modified")
             if modified then unsavedChange = true; break end
@@ -54,9 +54,9 @@ function M.init() -- {{{
 
     -- Close other window that doesn't contain the current buffers while
     -- Reserving windows that contain special buffer like help, quickfix
-    if u.winCnt() > 1 then
-        for _, winID in ipairs(var.winIDTbl) do
-            if vim.tbl_contains(var.bufNrTbl, vim.api.nvim_win_get_buf(winID))
+    if u.winsOccur() > 1 then
+        for _, winID in ipairs(var.winIds) do
+            if vim.tbl_contains(var.bufNrs, vim.api.nvim_win_get_buf(winID))
                 and vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(winID), "buftype") == "" then
 
                 u.winClose(winID)
@@ -65,7 +65,7 @@ function M.init() -- {{{
     end
 
     -- Wipe buffers
-    for _, bufNr in ipairs(var.bufNrTbl) do
+    for _, bufNr in ipairs(var.bufNrs) do
         if vim.api.nvim_buf_is_valid(bufNr) then u.bufClose(bufNr) end
     end
     if package.loaded["cokeline"] then

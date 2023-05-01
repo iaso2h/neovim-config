@@ -5,8 +5,8 @@
 -- Version: 0.0.39
 -- Last Modified: 2023-4-28
 -- DEBUG: 3 wins, 2 wins with same buffers, exe Q on either of the 2 wins
-local u   = require("buf.util")
-local var = require("buf.var")
+local u   = require("buffer.util")
+local var = require("buffer.var")
 local M   = {}
 
 
@@ -25,7 +25,7 @@ local function saveModified(bufNr) -- {{{
         if vim.api.nvim_buf_get_option(bufNr, "modified") then
             vim.cmd "noa echohl MoreMsg"
             local answer = vim.fn.confirm("Save modification?",
-                ">>> &Save\n&Discard\n&Cancel", 3, "Question")
+                ">>> &Save\n&Unload save\n&Discard\n&Cancel", 3, "Question")
             vim.cmd "noa echohl None"
             if answer == 1 then
                 vim.cmd "noa update!"
@@ -66,11 +66,11 @@ local function bufHandler(loneWin) -- {{{
         if var.bufType == "nofile" then
             if var.bufName == "[Command Line]" then
                 -- This buffer shows up When you hit CTRL-F on commandline
-                vim.api.nvim_win_close(var.winID, true)
+                vim.api.nvim_win_close(var.winId, true)
             elseif string.match(var.bufName, [[%[nvim%-lua%]$]]) then
                 -- Check for Lua pad
-                if u.bufValidCnt() >= 1 then
-                    if not u.bufSwitchAlter(var.winID) then
+                if u.bufsVisibleOccur() >= 1 then
+                    if not u.bufSwitchAlter(var.winId) then
                         return
                     end
                 else
@@ -104,7 +104,7 @@ local function bufHandler(loneWin) -- {{{
             -- Abort the processing when cancel is evaluated
             if not saveModified(var.bufNr) then return end
 
-            if u.bufValidCnt() > 1 then
+            if u.bufsVisibleOccur() > 1 then
                 return u.bufClose(var.bufNr)
             else
                 return vim.cmd("q!")
@@ -121,20 +121,20 @@ local function bufHandler(loneWin) -- {{{
         if not saveModified(var.bufNr) then return end
 
         -- Whether to check other windows that might have the same buffer instance
-        if not loneWin or u.winCnt() == 1 then
-            if u.bufValidCnt() == 1 then
+        if not loneWin or u.winsOccur() == 1 then
+            if u.bufsVisibleOccur() == 1 then
                 u.bufClose(var.bufNr)
                 local postBufNr = vim.api.nvim_get_current_buf()
                 if vim.api.nvim_buf_get_name(postBufNr) == "" then
                     return require("historyStartup").display(true)
                 else
-                    Print(var.bufNrTbl)
+                    Print(var.bufNrs)
                     return vim.notify(
                         "Unabled to enter the historyStartup correctly for the last scratch file",
                         vim.log.levels.ERROR)
                 end
             else
-                if not u.bufSwitchAlter(var.winID) then
+                if not u.bufSwitchAlter(var.winId) then
                     return
                 end
                 return u.bufClose(var.bufNr)
@@ -150,7 +150,7 @@ local function bufHandler(loneWin) -- {{{
         local specInstanceCnt = 0
         -- Create a table containing all different window ID as keys and the
         -- corresponding buffer number as values
-        for _, win in ipairs(var.winIDTbl) do
+        for _, win in ipairs(var.winIds) do
             if vim.api.nvim_win_is_valid(win) then
                 local bufNr = vim.api.nvim_win_get_buf(win)
 
@@ -177,23 +177,23 @@ local function bufHandler(loneWin) -- {{{
 
         -- Always restore window focus, window might be unavailable when the
         -- last buffer is deleted
-        if vim.api.nvim_win_is_valid(var.winID) then
-            vim.api.nvim_set_current_win(var.winID)
+        if vim.api.nvim_win_is_valid(var.winId) then
+            vim.api.nvim_set_current_win(var.winId)
         end
 
         -- Merge when there are two windows sharing the last buffer
         -- NOTE: If this evaluated to true, then the current length of bufNr
         -- table has been reduced to 1, #bufNrTbl is just a value of previous state
-        if u.winCnt() == 2 and bufInstanceCnt == 2 and u.bufValidCnt() == 2 then
+        if u.winsOccur() == 2 and bufInstanceCnt == 2 and u.bufsVisibleOccur() == 2 then
             vim.cmd "only"
         end
 
         -- After finishing buffer wiping, prevent Neovim from setting the
         -- current window to display a special window. e.g. quickfix list
         -- or terminal. This means you have to at least have 2 buffers
-        if u.bufValidCnt() >= 2 then
+        if u.bufsVisibleOccur() >= 2 then
             local unwantedBufType = {"quickfix", "terminal", "help"}
-            for _ = 1, u.bufValidCnt() - 1 + specInstanceCnt do
+            for _ = 1, u.bufsVisibleOccur() - 1 + specInstanceCnt do
                 if vim.tbl_contains(unwantedBufType, vim.bo.buftype) then
                     -- HACK: can still switch to a special buffer
                     vim.cmd "keepjump bp"
@@ -223,8 +223,8 @@ local winHandler = function() -- {{{
                 return vim.cmd [[DiffviewClose]]
             else
                 -- Other special buffer
-                if u.winCnt() > 1 then
-                    u.winClose(var.winID)
+                if u.winsOccur() > 1 then
+                    u.winClose(var.winId)
                 else
                     -- Override the default behavior, treat it like performing a buffer delete
                     u.bufClose(var.bufNr)
@@ -235,11 +235,11 @@ local winHandler = function() -- {{{
                 return vim.cmd [[DiffviewClose]]
             end
         elseif var.bufType == "terminal" then
-            u.winClose(var.winID)
+            u.winClose(var.winId)
         else
             -- Other special buffer
-            if u.winCnt() > 1 then
-                u.winClose(var.winID)
+            if u.winsOccur() > 1 then
+                u.winClose(var.winId)
             else
                 -- Override the default behavior, treat it like performing a buffer delete
                 u.bufClose(var.bufNr)
@@ -257,14 +257,14 @@ local winHandler = function() -- {{{
                 return require("no-neck-pain").toggle()
             end
             -- Scratch files. Override the default behavior, treat it like performing a buffer delete
-            if u.getCurBufCntsInWins(var.bufNr) > 1 then
-                u.winClose(var.winID)
+            if u.bufOccurInWins(var.bufNr) > 1 then
+                u.winClose(var.winId)
             else
                 bufHandler(false)
             end
         else
             -- Standard buffer
-            if u.winCnt() == 1 then
+            if u.winsOccur() == 1 then
                 -- 1 Window
                 -- Override the default behavior, treat it like performing
                 -- a buffer delete until there are no more buffers loaded
@@ -274,10 +274,10 @@ local winHandler = function() -- {{{
                 -- In situation where there are multiple buffers loaded
                 -- with only one standard buffer display in one of the
                 -- windows
-                local bufInstanceCount = u.getAllBufCntsInWins()
+                local bufInstanceCount = u.bufsOccurInWins()
                 if bufInstanceCount ~= 1 then
                     -- Multiple buffer instances or no instances
-                    u.winClose(var.winID)
+                    u.winClose(var.winId)
                 else
                     -- 1 buffer instance
                     -- Override the default behavior, treat it like performing

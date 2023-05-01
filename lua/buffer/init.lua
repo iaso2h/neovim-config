@@ -1,14 +1,14 @@
-local var = require("buf.var")
+local var = require("buffer.var")
 local M   = {}
 
 
 M.close = function(type)
-    require("buf.action.close").init(type)
+    require("buffer.action.close").init(type)
 end
 
 
 M.closeOther = function ()
-    require("buf.action.closeOther").init()
+    require("buffer.action.closeOther").init()
 end
 
 
@@ -20,7 +20,7 @@ end
 
 
 M.newSplit = function(...)
-    require("buf.action.newSplit").init(...)
+    require("buffer.action.newSplit").init(...)
 end
 
 return M

@@ -57,7 +57,7 @@ function M.init(func, funcArgList, bufnamePat, bufListed, scratchBuf) -- {{{
     local screenHeight   = ui.height
 
     -- Store windows ID for position restoration
-    require("buf.var").newSplitLastBufNr = curWinID
+    require("buffer.var").newSplitLastBufNr = curWinID
 
     -- If bufnamePat is provided and vim find the buffer that match the
     -- pattern, Shift focus to that buffer in current window instead

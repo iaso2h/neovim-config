@@ -22,7 +22,7 @@ end
 --- @param CMD string Value of Vim Ex-command
 function M.catch(CMD)
     local output = api.nvim_exec2(CMD, {output = true}).output
-    require("buf").newSplit(dump, {output}, "", false, true)
+    require("buffer").newSplit(dump, {output}, "", false, true)
 end
 
 

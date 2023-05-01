@@ -350,6 +350,7 @@ map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"}, "Disabl
 map("", [[<C-m>]], [[%]], {"silent"}, "Go to match parenthesis")
 -- Visual selection
 map("n", [[gvv]], [[gv]], {"noremap"}, "Select previous selected region")
+-- TODO: remove unnecessary screent center move
 map("n", [[gvo]], [[<CMD>lua require("selection").corner(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
 map({"n", "x"}, [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
 map({"n", "x"}, [[<C-q>]], [[<Nop>]], "which_key_ignore")
@@ -419,9 +420,9 @@ map("i", [[<C-r><C-r>]], [[<C-\><C-o><CMD>lua require("register").insertPrompt("
 
 -- Buffer & Window & Tab{{{
 -- Smart quit
-map("n", [[q]],     [[<CMD>lua require("buf").close("window")<CR>]],    {"silent"}, "Close window")
-map("n", [[Q]],     [[<CMD>lua require("buf").close("buffer")<CR>]],    {"silent"}, "Close buffer")
-map("n", [[<C-u>]], [[<CMD>lua require("buf").restoreClosedBuf()<CR>]], {"silent"}, "Restore last closed buffer")
+map("n", [[q]],     [[<CMD>lua require("buffer").close("window")<CR>]],    {"silent"}, "Close window")
+map("n", [[Q]],     [[<CMD>lua require("buffer").close("buffer")<CR>]],    {"silent"}, "Close buffer")
+map("n", [[<C-u>]], [[<CMD>lua require("buffer").restoreClosedBuf()<CR>]], {"silent"}, "Restore last closed buffer")
 -- Window
 map("n", [[<C-w>V]], [[<CMD>wincmd o | wincmd v<CR>]], {"silent"}, "Split only current window vertically")
 map("n", [[<C-w>S]], [[<CMD>wincmd o | wincmd s<CR>]], {"silent"}, "Split only current window vertically")
@@ -442,11 +443,11 @@ map({"n", "x"}, [[<A-->]],  [[<CMD>wincmd -<CR>]],       {"silent"}, "Decrease w
 map("i",        [[<A-->]],  [[<C-\><C-O>:wincmd -<CR>]], {"silent"}, "Decrease window size")
 
 -- Buffers
-map("n", [[<C-w>O]], [[<CMD>lua require("buf").closeOther()<CR>]], {"silent"}, "Wipe other buffer")
-map("n", [[<C-Tab>]],   [[<CMD>lua require("buf.action.cycle").init(1)<CR>]],  {"silent"}, "Next buffer")
-map("n", [[<C-S-Tab>]], [[<CMD>lua require("buf.action.cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
-map("n", [[<A-,>]],     [[<CMD>lua require("buf.action.cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
-map("n", [[<A-.>]],     [[<CMD>lua require("buf.action.cycle").init(1)<CR>]],  {"silent"}, "Next buffer")
+map("n", [[<C-w>O]],    [[<CMD>lua require("buffer").closeOther()<CR>]],          {"silent"}, "Wipe other buffer")
+map("n", [[<C-Tab>]],   [[<CMD>lua require("buffer.action.cycle").init(1)<CR>]],  {"silent"}, "Next buffer")
+map("n", [[<C-S-Tab>]], [[<CMD>lua require("buffer.action.cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
+map("n", [[<A-,>]],     [[<CMD>lua require("buffer.action.cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
+map("n", [[<A-.>]],     [[<CMD>lua require("buffer.action.cycle").init(1)<CR>]],  {"silent"}, "Next buffer")
 -- Tab
 map("n", [[<C-t>,]], [[<CMD>tabp | echo "tabpage " . tabpagenr()<CR>]], {"silent"}, "Previous tab")
 map("n", [[<C-t>.]], [[<CMD>tabn | echo "tabpage " . tabpagenr()<CR>]], {"silent"}, "Next tab")
