@@ -98,3 +98,5 @@ unstaged
 hlsearch 
 nohlsearch 
 octoface 
+openai
+neoai

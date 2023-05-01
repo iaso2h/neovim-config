@@ -291,7 +291,7 @@ end
 --- Return the 1 based index of specific item in a list-liked table. Only support
 --- number and string for now
 --- @param tbl table list-liked table
---- @param item number or string
+--- @param item number|string
 --- @param returnIdxTbl? boolean whether to return all the indexes as a table
 --- @return number|table return table when returnIdxTbl is true
 _G.tbl_idx = function(tbl, item, returnIdxTbl)
