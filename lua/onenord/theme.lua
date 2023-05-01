@@ -302,8 +302,8 @@ theme.treesitter         = {
     theme.treesitter.TSMethod      = {link = "Function"}      -- For method calls and definitions.
     theme.treesitter.TSFuncBuiltin = {link = "TSVariableBuiltin"}
     -- Namespaces and property accessors
-    theme.treesitter.TSNamespace = {fg   = "#00ffe5"}  -- For identifiers referring to modules and namespaces.
-    theme.treesitter.TSField     = {fg   = p.n4 }      -- For fields.
+    theme.treesitter.TSNamespace = {fg = "#00ffe5"}  -- For identifiers referring to modules and namespaces.
+    theme.treesitter.TSField     = {fg = p.n4 }      -- For fields.
     theme.treesitter.TSProperty  = {link = "TSField"}  -- Same as `TSField`, but when accessing, not declaring.
     -- Language keywords
     theme.treesitter.TSKeyword         = {link = "Keyword"} -- For keywords that don't fall in other categories.
@@ -315,25 +315,26 @@ theme.treesitter         = {
     theme.treesitter.TSString             = {link = "String"}                  -- For strings.
     theme.treesitter.TSStringRegex        = {fg   = p.n7, style  = "italic" }  -- For regexes.
     theme.treesitter.TSStringEscape       = {fg   = p.n15, style = "italic" }  -- For escape characters within a string.
-    theme.treesitter.TSCharacter          = {link = "String"}                  -- For characters.
-    theme.treesitter["@comment"]          = {link = "Comment"}
-    theme.treesitter["@conditional"]      = {link = "Conditional"}
-    theme.treesitter["@function"]         = {link = "Function"}
-    theme.treesitter["@method"]           = {link = "Function"}
-    theme.treesitter["@function.builtin"] = {link = "TSVariableBuiltin"}
-    theme.treesitter["@namespace"]        = {link = "TSNamespace"}
-    theme.treesitter["@field"]            = {link = "TSField"}
-    theme.treesitter["@property"]         = {link = "TSField"}
-    theme.treesitter["@keyword"]          = {link = "Keyword"}
-    theme.treesitter["@keyword.function"] = {link = "Keyword"}
-    theme.treesitter["@keyword.return"]   = {link = "TSKeywordReturn"}
-    theme.treesitter["@keyword.operator"] = {link = "Keyword"}
-    theme.treesitter["@keyword.break"]    = {link = "TSKeywordReturn"}
-    theme.treesitter["@repeat"]           = {link = "Repeat"}
-    theme.treesitter["@string"]           = {link = "String"}
-    theme.treesitter["@string.regex"]     = {link = "TSStringRegex"}
-    theme.treesitter["@string.escape"]    = {link = "TSStringEscape"}
-    theme.treesitter["@character"]        = {link = "String"}
+    theme.treesitter.TSCharacter           = {link = "String"}                  -- For characters.
+    theme.treesitter["@comment"]           = {link = "Comment"}
+    theme.treesitter["@conditional"]       = {link = "Conditional"}
+    theme.treesitter["@function"]          = {link = "Function"}
+    theme.treesitter["@function.builtin"]  = {fg = p.blue , style = "bold"}
+    theme.treesitter["@method"]            = {link = "Function"}
+    theme.treesitter["@namespace"]         = {link = "TSNamespace"}
+    theme.treesitter["@namespace.builtin"] = {fg = "#00ffe5", style = "bold"}
+    theme.treesitter["@field"]             = {link = "TSField"}
+    theme.treesitter["@property"]          = {link = "TSField"}
+    theme.treesitter["@keyword"]           = {link = "Keyword"}
+    theme.treesitter["@keyword.function"]  = {link = "Keyword"}
+    theme.treesitter["@keyword.return"]    = {link = "TSKeywordReturn"}
+    theme.treesitter["@keyword.operator"]  = {link = "Keyword"}
+    theme.treesitter["@keyword.break"]     = {link = "TSKeywordReturn"}
+    theme.treesitter["@repeat"]            = {link = "Repeat"}
+    theme.treesitter["@string"]            = {link = "String"}
+    theme.treesitter["@string.regex"]      = {link = "TSStringRegex"}
+    theme.treesitter["@string.escape"]     = {link = "TSStringEscape"}
+    theme.treesitter["@character"]         = {link = "String"}
 -- }}}
 
 theme.lsp = { -- {{{
@@ -465,7 +466,7 @@ theme.plugins = { -- {{{
     DapUIScope                   = {fg   = p.n14, style = "bold"},
     DapUIType                    = {fg   = p.orange},
     DapUIValue                   = {link = "Identifier"},
-    DapUIModifiedValue           = {fg   = p.orange, style = "bold"},
+    DapUIModifiedValue           = {fg   = p.n13, style = "bold"},
     DapUIDecoration              = {fg   = p.n8},
     DapUIThread                  = {fg   = p.n14},
     DapUIStoppedThread           = {fg   = p.n14, style = "bold"},
