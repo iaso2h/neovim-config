@@ -173,7 +173,7 @@ _G.logBuf = function(...)
         vim.api.nvim_set_current_buf(_G._logBufNr)
         vim.api.nvim_put(objects, "l", true, true)
         vim.cmd "wincmd p"
-    elseif vim.bo.modifiable and not vim.bo.buflisted and vim.bo.bufhidden ~= "" then
+    elseif vim.bo.modifiable and vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
         -- Use current file as the log buffer
         _G._logBufNr = vim.api.nvim_get_current_buf()
         vim.api.nvim_buf_set_option(_G._logBufNr, "bufhidden", "wipe")

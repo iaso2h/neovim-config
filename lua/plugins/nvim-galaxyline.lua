@@ -69,8 +69,7 @@ return function() -- {{{
 
     local vimMode
     local tightWinChk = false
-    local padding     = " "
-
+    local padding = _G._os_uname.machine ~= "aarch64" and " " or ""
     local isSpecialFileType = function() -- {{{
         return vim.tbl_contains(_G._short_line_list, vim.bo.filetype)
     end -- }}}
@@ -182,7 +181,9 @@ return function() -- {{{
 
                 changeHLColor("GalaxyVimMode")
 
-                if not _G._is_term then
+                if _G._os_uname.machine == "aarch64" then
+                    return string.format(" %s ", alias[vimMode])
+                elseif not _G._is_term then
                     return string.format("  %s %s ", require("nvim-nonicons").get("vim"), alias[vimMode])
                 else
                     if vimMode == "t" or vimMode == "!" then
@@ -273,7 +274,7 @@ return function() -- {{{
         DiffAdd = {
             provider  = "DiffAdd",
             condition = hideInTight,
-            icon      = icon.git.LineAdded .. " ",
+            icon      = _G._os_uname.machine == "aarch64" and " " or icon.git.LineAdded .. " ",
             highlight = { colors.green, colors.bg2 }
         }
     }
@@ -282,7 +283,7 @@ return function() -- {{{
         DiffModified = {
             provider  = "DiffModified",
             condition = hideInTight,
-            icon      = icon.git.LineModified .. " ",
+            icon      = _G._os_uname.machine == "aarch64" and " " or icon.git.LineModified .. " ",
             highlight = { colors.yellow, colors.bg2 }
         }
     }
@@ -291,7 +292,7 @@ return function() -- {{{
         DiffRemove = {
             provider  = "DiffRemove",
             condition = hideInTight,
-            icon      = icon.git.LineRemoved .. " ",
+            icon      = _G._os_uname.machine == "aarch64" and " " or icon.git.LineRemoved .. " ",
             highlight = { colors.red, colors.bg2 }
         }
     }

@@ -152,8 +152,7 @@ M.jumplistRegisterLinesToTbl = function(returnJumpsChk, startLineNr, lastLineNr,
 
     -- Output the result into a new scratch buffer
     local scratchBuf
-    if vim.bo.modifiable and not vim.bo.buflisted and
-            vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
+    if vim.bo.modifiable and vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
         scratchBuf = currentBuf
     else
         -- TODO: how to determine performing a vertical split or a horizontal split

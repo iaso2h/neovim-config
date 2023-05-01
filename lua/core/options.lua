@@ -76,8 +76,13 @@ opt.splitbelow  = true
 opt.splitright  = true
 opt.switchbuf   = "uselast"
 
-opt.foldcolumn = "auto:4"
-opt.signcolumn = "yes:1"
+if _G._os_uname.machine ~= "aarch64" then
+    opt.foldcolumn = "auto:4"
+    opt.signcolumn = "yes:1"
+else
+    opt.foldcolumn = "0"
+    opt.signcolumn = "no"
+end
 opt.foldmethod = "marker"
 opt.formatoptions = _G._format_option -- NOTE: Might change on loading different types of ftplugins
 

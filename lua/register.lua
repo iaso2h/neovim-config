@@ -4,9 +4,14 @@
 -- Version: 0.0.6
 -- Last Modified: 2023-4-28
 local M = {
-    regAllWritable = [=[[-a-zA-Z0-9"*+_/]]=],
+    regAllWritable = [=[[-a-zA-Z0-9"_/]]=],
     regAll         = [=[[-a-zA-Z0-9":.%#=*+~/]]=]
 }
+
+-- TODO: Better register support detection
+if _G._os_uname.machine ~= "aarch64" then
+    M.regAllWritable = M.regAllWritable .. "+*"
+end
 
 --- Clear register
 M.clear = function() -- {{{
@@ -180,22 +185,35 @@ end -- }}}
 --- Save the star registers, plus and unnamed registers - independently,
 --- restoreReg can be accessed after saveReg is called
 function M.saveReg() -- {{{
-    local unnamedContent = vim.fn.getreg('"', 1)
-    local unnamedType    = vim.fn.getregtype('"')
-    local starContent    = vim.fn.getreg('*', 1)
-    local starType       = vim.fn.getregtype('*')
-    local plusContent    = vim.fn.getreg('+', 1)
-    local plusType       = vim.fn.getregtype('+')
-    local nonDefaultName = vim.v.register
+    local unnamedContent
+    local unnamedType
+    local starContent
+    local starType
+    local plusContent
+    local plusType
+    unnamedContent = vim.fn.getreg('"', 1)
+    unnamedType    = vim.fn.getregtype('"')
+    if _G._os_uname.machine == "aarch64" then
+        starContent = ""
+        plusContent = ""
+    else
+        starContent    = vim.fn.getreg('*', 1)
+        starType       = vim.fn.getregtype('*')
+        plusContent    = vim.fn.getreg('+', 1)
+        plusType       = vim.fn.getregtype('+')
+    end
+
     local nonDefaultContent
     local nonDefaultType
-    if not vim.tbl_contains({'"', "*", "+"}, nonDefaultName) then
-        nonDefaultContent = vim.fn.getreg(nonDefaultName, 1)
-        nonDefaultType    = vim.fn.getregtype(nonDefaultName)
+    if not vim.tbl_contains({'"', "*", "+"}, vim.v.register) then
+        nonDefaultContent = vim.fn.getreg(vim.v.register, 1)
+        nonDefaultType    = vim.fn.getregtype(vim.v.register)
     end
+
+
     M.restoreReg = function()
         if nonDefaultContent and nonDefaultContent ~= "" then
-            vim.fn.setreg(nonDefaultName, nonDefaultContent, nonDefaultType)
+            vim.fn.setreg(vim.v.register, nonDefaultContent, nonDefaultType)
         end
 
         if starContent ~= "" then

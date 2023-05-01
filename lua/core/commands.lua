@@ -181,7 +181,7 @@ end, {
 vim.api.nvim_create_user_command("O", [[browse oldfiles]], { desc = "Browse the oldfiles then prompt", })
 
 vim.api.nvim_create_user_command("Q", function (opts)
-    local saveCMD = opts.bang and "noa " or "noa bufdo update | "
+    local saveCMD = opts.bang and "noa silent " or "noa silent bufdo update | "
     local sessionName = opts.args == "" and "01" or opts.args
     local sessionDir  = vim.fn.stdpath("state") .. _G._sep .. "my_session" .. _G._sep
     if not vim.loop.fs_stat(sessionDir) then

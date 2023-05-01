@@ -40,7 +40,9 @@ vim.api.nvim_win_set_option(0, "foldcolumn", "0")
 vim.api.nvim_buf_set_option(0, "buflisted", false)
 
 vim.cmd [[setlocal winhighlight=Normal:PanelBackground,SignColumn:PanelBackground]]
-vim.cmd [[resize 21]]
+if vim.api.nvim_list_uis()[1].height < 42 and _G._os_uname.machine ~= "aarch64" then
+    vim.cmd [[resize 21]]
+end
 -- In case of cmdheight being changed
 if vim.o.cmdheight ~= 2 then
     vim.o.cmdheight = 2

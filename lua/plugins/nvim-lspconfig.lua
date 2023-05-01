@@ -1,7 +1,5 @@
 -- https://github.com/neovim/nvim-lspconfig
 return function()
-    local lsp       = vim.lsp
-    local fn        = vim.fn
     local lspConfig = require("lspconfig")
     local path      = require("plenary.path")
     local servers   = require("plugins.nvim-mason-lspconfig").servers
@@ -20,7 +18,7 @@ return function()
                                     i.lnum == tbl.items[2].lnum) then
                 local currentBufNr = api.nvim_get_current_buf()
                 -- item.bufnr can be nil!
-                local itemBufNr = fn.bufnr(i.filename)
+                local itemBufNr = vim.fn.bufnr(i.filename)
                 if currentBufNr ~= itemBufNr then
                     -- local openExcmd = api.nvim_buf_get_option(i.bufnr, "buflisted") and "buffer" or "edit"
                     local openExcmd = "edit"
@@ -30,7 +28,7 @@ return function()
                 api.nvim_win_set_cursor(0, {i.lnum, i.col - 1})
                 vim.cmd [[norm! zv]]
             else
-                fn.setqflist({}, "r", {items = tbl.items, title = tbl.title})
+                vim.fn.setqflist({}, "r", {items = tbl.items, title = tbl.title})
                 require("quickfix.toggle")(false)
             end
         end
@@ -162,7 +160,7 @@ return function()
     }
     -- }}} Lua
     -- Fennel {{{
-    if _G._os_uname.sysname ~= "Windows_NT" then
+    if _G._os_uname.sysname ~= "Linux" and _G._os_uname.machine ~= "aarch64" then
         -- HACK:
         -- https://github.com/rydesun/fennel-language-server
         -- local fennelRuntimePath = {vim.api.nvim_eval("$VIMRUNTIME")}
@@ -206,49 +204,51 @@ return function()
     }
     -- }}} Vimscript
     -- Clangd {{{
-    -- https://github.com/llvm/llvm-project/tree/main/clang-tools-extra/clangd
-    local findClangd = function()
-        local args = {
-            "--all-scopes-completion",
-            "--background-index",
-            "--clang-tidy",
-            "--clang-tidy-checks=google-*,llvm-*,clang-analyzer-*, cert-*,performance-*,misc-,modernize-*,-modernize-use-trailing-return-type,concurrency-*,bugprone-*,readability-*,-readability-magic-numbers",
-            "--completion-parse=auto",
-            "--completion-style=detailed",
-            "--cross-file-rename",
-            "--header-insertion=iwyu",
-            "--j=4",
-            "--pretty",
-            "--suggest-missing-includes",
-            "--fallback-style=google",
-            "--offset-encoding=utf-16"
-        }
-        local dataPath   = path:new(fn.stdpath("data"))
-        local binPath = dataPath:joinpath("mason", "packages", "clangd", "clangd", "bin", "clangd")
-        if _G._os_uname.sysname == "Windows_NT" then binPath = binPath .. ".exe" end
-        table.insert(args, 1, binPath)
-        return args
-    end
+    if _G._os_uname.machine ~= "aarch64" then
+        -- https://github.com/llvm/llvm-project/tree/main/clang-tools-extra/clangd
+        local findClangd = function()
+            local args = {
+                "--all-scopes-completion",
+                "--background-index",
+                "--clang-tidy",
+                "--clang-tidy-checks=google-*,llvm-*,clang-analyzer-*, cert-*,performance-*,misc-,modernize-*,-modernize-use-trailing-return-type,concurrency-*,bugprone-*,readability-*,-readability-magic-numbers",
+                "--completion-parse=auto",
+                "--completion-style=detailed",
+                "--cross-file-rename",
+                "--header-insertion=iwyu",
+                "--j=4",
+                "--pretty",
+                "--suggest-missing-includes",
+                "--fallback-style=google",
+                "--offset-encoding=utf-16"
+            }
+            local dataPath   = path:new(vim.fn.stdpath("data"))
+            local binPath = dataPath:joinpath("mason", "packages", "clangd", "clangd", "bin", "clangd")
+            if _G._os_uname.sysname == "Windows_NT" then binPath = binPath .. ".exe" end
+            table.insert(args, 1, binPath)
+            return args
+        end
 
-    local clangdCMD = findClangd()
-    if clangdCMD ~= "" then
-        servers.clangd = {
-            cmd = clangdCMD,
-            init_options = {
-                -- capabilities         = {},
-                clangdFileStatus     = true,
-                usePlaceholders      = true,
-                completeUnimported   = true,
-                semanticHighlighting = true,
-                fallbackFlags = {
-                "-std=c99",
-                "-Wall",
-                "-Wextra",
-                "-Wno-deprecated-declarations"
-                }
-            },
-            root_dir = lspConfig.util.root_pattern(".git", "compile_commands.json", "compile_flags.txt", "build", "README.md", "makefile"),
-        }
+        local clangdCMD = findClangd()
+        if clangdCMD ~= "" then
+            servers.clangd = {
+                cmd = clangdCMD,
+                init_options = {
+                    -- capabilities         = {},
+                    clangdFileStatus     = true,
+                    usePlaceholders      = true,
+                    completeUnimported   = true,
+                    semanticHighlighting = true,
+                    fallbackFlags = {
+                    "-std=c99",
+                    "-Wall",
+                    "-Wextra",
+                    "-Wno-deprecated-declarations"
+                    }
+                },
+                root_dir = lspConfig.util.root_pattern(".git", "compile_commands.json", "compile_flags.txt", "build", "README.md", "makefile"),
+            }
+        end
     end
     -- }}} Clangd
 
@@ -278,8 +278,8 @@ return function()
     sign define DiagnosticSignInfo  text= texthl=DiagnosticInfo  linehl= numhl=DiagnosticInfo
     sign define DiagnosticSignHint  text= texthl=DiagnosticHint  linehl= numhl=DiagnosticHint
     ]]
-    lsp.handlers["textDocument/hover"]         = lsp.with(lsp.handlers.hover,          {border = "rounded"})
-    lsp.handlers["textDocument/signatureHelp"] = lsp.with(lsp.handlers.signature_help, {border = "rounded"})
+    vim.lsp.handlers["textDocument/hover"]         = vim.lsp.with(vim.lsp.handlers.hover,          {border = "rounded"})
+    vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {border = "rounded"})
     -- }}} vim.lsp and vim.diagnostic setups
 
     -- Setup servers {{{

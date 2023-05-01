@@ -124,8 +124,8 @@ local function bufHandler(loneWin) -- {{{
         if not loneWin or u.winCnt() == 1 then
             if u.bufValidCnt() == 1 then
                 u.bufClose(var.bufNr)
-                if vim.api.nvim_buf_get_name(0) == "" then
-                    vim.api.nvim_buf_set_option(0, "buflisted", false)
+                local postBufNr = vim.api.nvim_get_current_buf()
+                if vim.api.nvim_buf_get_name(postBufNr) == "" then
                     return require("historyStartup").display(true)
                 else
                     return vim.notify(

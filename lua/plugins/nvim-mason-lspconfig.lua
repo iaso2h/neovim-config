@@ -1,26 +1,33 @@
 local M = {}
 
 M.servers = {
-    bashls = {},
-    clangd = {},
     cmake = {},
     cssls = {},
-    grammarly = {},
     html = {},
     jsonls = {},
     lua_ls = {},
     pyright = {},
-    marksman = {},
     tsserver = {},
     vimls = {},
-    yamlls = {},
 }
 
-if _G._os_uname.sysname == "Linux" then
+if _G._os_uname.sysname == "Linux" and _G._os_uname.machine ~= "aarch64" then
     M.servers.fennel_language_server = {}
-else
+elseif _G._os_uname.sysname == "Windows_NT" then
     M.servers.powershell_es = {}
 end
+
+if _G._os_uname.machine ~= "aarch64" then
+    M.servers = vim.tbl_extend("keep", M.servers, {
+        grammarly = {},
+        marksman = {},
+        yamlls = {},
+        bashls = {},
+        clangd = {},
+    })
+end
+
+
 
 M.config = function()
     require("mason-lspconfig").setup {

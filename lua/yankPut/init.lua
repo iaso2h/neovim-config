@@ -240,7 +240,8 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     local regTypeSave = vim.fn.getregtype()
     local regTypeNew
     -- "Block-wise type register"
-    if regTypeSave == "\0221" then
+    if regTypeSave:lower() ~= "v" then
+    -- if regTypeSave == "\0221" then
         if convertPut then
             return
         else

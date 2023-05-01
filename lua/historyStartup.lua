@@ -80,7 +80,6 @@ local strikeThroughOpened = function() -- {{{
 end -- }}}
 
 
-
 local autoCMD = function(bufNr) -- {{{
     if not vim.api.nvim_buf_is_valid(bufNr) then return end
 
@@ -167,9 +166,8 @@ M.display = function(refreshChk) -- {{{
     end
     if vim.bo.filetype == "HistoryStartup" then return end
 
-    M.curWin = vim.api.nvim_get_current_win()
-
     -- Reset lines
+    M.curWin = vim.api.nvim_get_current_win()
     if refreshChk or not next(M.lines.absolute) then
         initLines()
     end
@@ -188,11 +186,11 @@ M.display = function(refreshChk) -- {{{
         M.curBuf = 1
         vim.api.nvim_buf_set_option(M.curBuf, "buftype", "nofile")
         vim.api.nvim_buf_set_option(M.curBuf, "buflisted", false)
-    elseif vim.bo.modifiable and not vim.bo.buflisted and
-            vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
+    elseif vim.bo.modifiable and vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
         -- Use the current buffer if it's a scratch buffer
         M.curBuf  = vim.api.nvim_get_current_buf()
         M.lastBuf = nil
+        vim.api.nvim_buf_set_option(M.curBuf, "buflisted", false)
         vim.api.nvim_buf_set_option(M.curBuf, "buftype", "nofile")
     else
         if not M.curBuf or (not vim.api.nvim_buf_is_valid(M.curBuf)) then

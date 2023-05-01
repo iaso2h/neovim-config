@@ -610,7 +610,7 @@ local pluginArgs = { -- {{{
     },
     {
         "Exafunction/codeium.vim",
-        enabled = _G._os_uname.sysname ~= "Windows_NT",
+        enabled = _G._os_uname.sysname ~= "Windows_NT" and _G._os_uname.machine ~= "aarch64",
         event  = "BufModifiedSet",
         init   = function() vim.g.codeium_disable_bindings = 1 end,
         config = function()
