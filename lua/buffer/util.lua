@@ -141,6 +141,109 @@ M.winClose = function (winID) -- {{{
     local ok, msg = pcall(vim.api.nvim_win_close, winID, false)
     if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 end -- }}}
+--- Get the layout in which the target window nested in
+---@param matchPattern? number|function Specify how to match a target window. Default is current window ID. You can pass in a specific window ID or a function that take window ID as its parameter, they will check against each window ID by calling this function recursively until it finds a match, which means the window IDs are equal or `matchPattern(<window ID>)` is evaluated to be `true`
+---@param layout? table Return value of `vim.fn.winlayout()`, contains the layout data of target window. It's used for internal loop only, and should be not passed in any value in the first calling stack. This layout is heavily nested when it's initialized in the first place, so we need to iterating through it over and over again
+---@param superiorLayout? string The parent layout the target nested in. It's used for internal loop only as the `layout` argument does
+---@return string,table The parent layout string and the table contain sibling data
+M.winLayout = function(matchPattern, layout, superiorLayout) -- {{{
+    -- Initiation for in the first calling stack
+    matchPattern = matchPattern or vim.api.nvim_get_current_win()
+    layout = layout or vim.fn.winlayout()
+
+    -- Store siblings in every calling stack
+    for i, element in ipairs(layout) do
+        if type(element) == "string" then
+            if type(layout[i + 1]) == "table" then
+                superiorLayout = element
+            end
+        elseif type(element) == "table" then
+            -- Iterating through the table element
+            local nextSuperiorLayout, nextLayout = M.winLayout(matchPattern, element, superiorLayout)
+            if nextSuperiorLayout ~= "" then
+                if not next(nextLayout) then
+                    -- When values are returned from topmost calling stack at
+                    -- the first time, don't use the `layout` from the nested
+                    -- calling stack, use then one in current calling stack,
+                    -- which contains the whole siblings.
+                    -- e.g: layout == {{"leaf", 1003}, {"leaf", 1003}, {"leaf", 1003}}
+                    return nextSuperiorLayout, layout
+                else
+                    -- When `nextLayout` isn't empty, return it as well
+                    -- because it's properly returned from nested calling
+                    -- stack
+                    return nextSuperiorLayout, nextLayout
+                end
+            end
+        elseif type(element) == "number" then
+            if type(matchPattern) == "function" then
+                if matchPattern(element) then
+                    -- Matched data will be returned from highest calling stack
+                    ---@diagnostic disable-next-line: return-type-mismatch
+                    return superiorLayout, {}
+                end
+            else
+                if element == matchPattern then
+                    -- Matched data will be returned from highest calling stack
+                    ---@diagnostic disable-next-line: return-type-mismatch
+                    return superiorLayout, {}
+                end
+            end
+        end
+    end
+
+    -- Fallback return if no window id match against the `matchPattern`
+    return "", {}
+end -- }}}
+M.getCurWinLayoutTest = function() -- {{{
+    local curWinId = vim.api.nvim_get_current_win()
+    local superiorLayout, siblings = M.winLayout(curWinId)
+    print('DEBUGPRINT[1]: util.lua:195: vim.fn.winlayout()=' .. vim.inspect(vim.fn.winlayout()))
+    print('DEBUGPRINT[2]: util.lua:195: siblings=' .. vim.inspect(siblings))
+    local layoutDesc = superiorLayout == "row" and "Vertical" or "Horizontally"
+    local siblingWinIds = {}
+    for _, s in ipairs(siblings) do
+        if not(type(s[2]) == "number" and s[2] == curWinId) then
+            siblingWinIds[#siblingWinIds+1] = s[2]
+        end
+    end
+    Print(string.format("Current window is %d and it's in a %s split layout.", curWinId, layoutDesc))
+    Print("")
+    Print("The sibling windows are: ")
+    for _, s in ipairs(siblingWinIds) do
+        if type(s) == "number" then
+            Print("   Window " .. s)
+        else
+            Print("A compound window contain " .. #s .. " windows")
+        end
+    end
+
+end -- }}}
+--- Return ex command for spliting Neovim windows
+---@param splitPrefixChk boolean If the function resolve to vertical split solution. Whether to return `vertical` form ex command prefix or `vsplit` to split a window first
+---@return string Neovim ex command string
+M.winSplitCmd = function(splitPrefixChk)
+    local layout = require("buffer.util").winLayout()
+    if layout ~= "" then
+        if layout == "col" then
+            if splitPrefixChk then
+                return "vertical"
+            else
+                return "vsplit"
+            end
+        elseif layout == "row" then
+            if splitPrefixChk then
+                return "horizontal"
+            else
+                return "split"
+            end
+        elseif layout == "leaf" then
+            -- TODO: detection in one window screen
+        end
+    else
+        return ""
+    end
+end
 
 
 return M

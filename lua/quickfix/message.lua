@@ -1,8 +1,8 @@
 -- File: cc.lua
 -- Author: iaso2h
 -- Description: Enhance version of the :cc
--- Version: 0.0.7
--- Last Modified: Mon 01 May 2023
+-- Version: 0.0.8
+-- Last Modified: Tue 02 May 2023
 -- TODO: live update
 
 local filterChk = false
@@ -12,16 +12,7 @@ local filterChk = false
 ---@return table, table
 local getMsg = function()
     local msg = vim.api.nvim_cmd({cmd = "messages"}, {output = true})
-    local function split(str, sep)
-        local result = {}
-        local regex = ("([^%s]+)"):format(sep)
-        for each in str:gmatch(regex) do
-            table.insert(result, each)
-        end
-        return result
-    end
-
-    local msgTbl = split(msg, "\n")
+    local msgTbl = vim.split(msg, "\n", {plain = true})
 
     -- Filter messages
     if filterChk then
@@ -125,7 +116,12 @@ return function(des) -- {{{
                 end
             end
             if not visibleTick then
-                vim.cmd [[vsplit]]
+                local layoutCmd = require("buffer.util").winSplitCmd(false)
+                if layoutCmd == "" then
+                    vim.cmd "vsplit"
+                else
+                    vim.cmd(layoutCmd)
+                end
                 vim.api.nvim_set_current_buf(_G._message_scratch_buf)
                 vim.api.nvim_buf_set_lines(_G._message_scratch_buf, 0, -1, false, msg)
                 vim.api.nvim_win_set_cursor(0, {#msg, 0})
@@ -141,8 +137,12 @@ return function(des) -- {{{
             vim.api.nvim_buf_set_lines(_G._message_scratch_buf, 0, -1, false, msg)
             vim.cmd "noa keepjumps G"
         else
-            -- TODO: how to determine performing a vertical split or a horizontal split
-            vim.cmd [[vsplit]]
+            local layoutCmd = require("buffer.util").winSplitCmd(false)
+            if layoutCmd == "" then
+                vim.cmd "vsplit"
+            else
+                vim.cmd(layoutCmd)
+            end
             _G._message_scratch_buf = vim.api.nvim_create_buf(false, true)
             vim.api.nvim_buf_set_option(_G._message_scratch_buf, "bufhidden", "wipe")
             vim.api.nvim_set_current_buf(_G._message_scratch_buf)

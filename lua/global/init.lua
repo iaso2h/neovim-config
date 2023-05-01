@@ -162,17 +162,27 @@ _G.logBuf = function(...)
     -- Output the result into a new scratch buffer
     if _G._log_buf_nr and vim.api.nvim_buf_is_valid(_G._log_buf_nr) then
         -- if scratch buffer is visible, populate the date into it
+        local visibleTick = false
         for _, win in ipairs(vim.api.nvim_list_wins()) do
             if vim.api.nvim_win_get_buf(win) == _G._log_buf_nr then
                 vim.api.nvim_set_current_win(win)
                 vim.cmd [[keepjumps norm! G]]
                 vim.api.nvim_put(objects, "l", true, true)
-                return
+                visibleTick = true
+                break
             end
         end
-        vim.api.nvim_set_current_buf(_G._log_buf_nr)
-        vim.api.nvim_put(objects, "l", true, true)
-        vim.cmd "wincmd p"
+        if not visibleTick then
+            local layoutCmd = require("buffer.util").winSplitCmd(false)
+            if layoutCmd == "" then
+                vim.cmd "vsplit"
+            else
+                vim.cmd(layoutCmd)
+            end
+            vim.api.nvim_set_current_buf(_G._log_buf_nr)
+            vim.api.nvim_put(objects, "l", true, true)
+            vim.cmd "wincmd p"
+        end
     elseif vim.api.nvim_buf_get_name(0) == "" and vim.bo.modifiable and
             vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
         -- Use current file as the log buffer
@@ -182,8 +192,12 @@ _G.logBuf = function(...)
         vim.api.nvim_put(objects, "l", true, true)
         -- vim.api.nvim_buf_set_lines(_G._logBufNr, 0, -1, false, objects)
     else
-        -- TODO: how to determine performing a vertical split or a horizontal split
-        vim.cmd [[vsplit]]
+        local layoutCmd = require("buffer.util").winSplitCmd(false)
+        if layoutCmd == "" then
+            vim.cmd "vsplit"
+        else
+            vim.cmd(layoutCmd)
+        end
         _G._log_buf_nr = vim.api.nvim_create_buf(false, true)
         vim.api.nvim_buf_set_option(_G._log_buf_nr, "bufhidden", "wipe")
         vim.api.nvim_set_current_buf(_G._log_buf_nr)
