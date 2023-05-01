@@ -1,8 +1,8 @@
 -- File: cc.lua
 -- Author: iaso2h
 -- Description: Enhance version of the :cc
--- Version: 0.0.6
--- Last Modified: Sun 30 Apr 2023
+-- Version: 0.0.7
+-- Last Modified: Mon 01 May 2023
 -- TODO: live update
 
 local filterChk = false
@@ -119,6 +119,7 @@ return function(des) -- {{{
             for _, win in ipairs(vim.api.nvim_list_wins()) do
                 if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == _G._message_scratch_buf then
                     vim.api.nvim_buf_set_lines(_G._message_scratch_buf, 0, -1, false, msg)
+                    vim.api.nvim_win_set_cursor(win, {#msg, 0})
                     visibleTick = true
                     break
                 end
@@ -127,6 +128,7 @@ return function(des) -- {{{
                 vim.cmd [[vsplit]]
                 vim.api.nvim_set_current_buf(_G._message_scratch_buf)
                 vim.api.nvim_buf_set_lines(_G._message_scratch_buf, 0, -1, false, msg)
+                vim.api.nvim_win_set_cursor(0, {#msg, 0})
                 vim.cmd "wincmd p"
             end
         elseif vim.api.nvim_buf_get_name(0) == "" and vim.bo.modifiable and
@@ -137,6 +139,7 @@ return function(des) -- {{{
             vim.api.nvim_buf_set_option(_G._message_scratch_buf, "bufhidden", "wipe")
             vim.api.nvim_buf_set_option(_G._message_scratch_buf, "buftype", "nofile")
             vim.api.nvim_buf_set_lines(_G._message_scratch_buf, 0, -1, false, msg)
+            vim.cmd "noa keepjumps G"
         else
             -- TODO: how to determine performing a vertical split or a horizontal split
             vim.cmd [[vsplit]]
@@ -145,6 +148,7 @@ return function(des) -- {{{
             vim.api.nvim_set_current_buf(_G._message_scratch_buf)
             vim.api.nvim_put(msg, "l", true, true)
             vim.api.nvim_buf_set_lines(_G._message_scratch_buf, 0, -1, false, msg)
+            vim.api.nvim_win_set_cursor(0, {#msg, 0})
             vim.cmd "wincmd p"
         end
 
