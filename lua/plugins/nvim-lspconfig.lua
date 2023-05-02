@@ -160,7 +160,7 @@ return function()
     }
     -- }}} Lua
     -- Fennel {{{
-    if _G._os_uname.sysname ~= "Linux" and _G._os_uname.machine ~= "aarch64" then
+    if _G._os_uname.sysname == "Linux" and _G._os_uname.machine ~= "aarch64" then
         -- HACK:
         -- https://github.com/rydesun/fennel-language-server
         -- local fennelRuntimePath = {vim.api.nvim_eval("$VIMRUNTIME")}
