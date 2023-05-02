@@ -14,12 +14,18 @@ M.initBuf = function()
 end
 
 
-M.isSpecBuf = function(bufType) -- {{{
-    bufType = bufType or var.bufType
-    return bufType ~= ""
+M.isSpecialBuf = function(bufNr) -- {{{
+    bufNr = bufNr or var.bufNr
+    local bufType = vim.api.nvim_buf_get_option(bufNr, "buftype")
+    local modifiable = vim.api.nvim_buf_get_option(bufNr, "modifiable")
+    return bufType ~= "" and not modifiable
 end -- }}}
-M.isScratchBuf = function() -- {{{
-    return var.bufName == "" or not vim.tbl_contains(var.bufNrs, var.bufNr)
+M.isScratchBuf = function(bufNr) -- {{{
+    if not bufNr then
+        return var.bufName == ""
+    else
+        return nvim_buf_get_name(bufNr) == ""
+    end
 end -- }}}
 --- Force wipe the given buffer, if no bufNr is provided, then current buffer
 --- will be wiped
@@ -49,52 +55,35 @@ M.bufNrs = function(validLoadedOnly) -- {{{
     return vim.tbl_filter(cond, unListedBufTbl)
 end -- }}}
 --- Switch to alternative buffer or previous buffer before wiping current buffer
---- @param winID number Window ID in which alternative will be set
-M.bufSwitchAlter = function(winID) -- {{{
+--- @param winId number Window ID in which alternative will be set
+M.bufSwitchAlter = function(winId) -- {{{
     ---@diagnostic disable-next-line: param-type-mismatch
     local altBufNr = vim.fn.bufnr("#")
-    if altBufNr ~= var.bufNr and vim.api.nvim_buf_is_valid(altBufNr) and
-            vim.tbl_contains(var.bufNrs, altBufNr) then
-        vim.api.nvim_win_set_buf(winID, altBufNr)
-        return true
+    if altBufNr ~= var.bufNr and vim.api.nvim_buf_get_option(altBufNr, "buflisted") then
+        vim.api.nvim_win_set_buf(winId, altBufNr)
     else
         -- Fallback method
-        for _, b in ipairs(var.bufNrs) do
-            if b ~= var.bufNr then
-                vim.api.nvim_win_set_buf(var.winId, b)
-                return true
+        for _, bufNr in ipairs(var.bufNrs) do
+            if bufNr ~= var.bufNr and M.isSpecialBuf(bufNr) then
+                vim.api.nvim_win_set_buf(winId, bufNr)
             end
         end
     end
 
-    vim.notify("Failed to switch alternative buffer in Windows: " .. winID)
-
-    return false
-end -- }}}
---- Return valid and loaded buffer count
----@param bufNrTbl? table Use `var.bufNrs` if no bufNrTbl provided
----@return number
-M.bufsVisibleOccur = function(bufNrTbl) -- {{{
-    bufNrTbl = bufNrTbl or var.bufNrs
-
-    if bufNrTbl then
-        local cnt = #vim.tbl_filter(function(bufNr)
-            return vim.api.nvim_buf_get_name(bufNr) ~= ""
-        end, bufNrTbl)
-        return cnt
-    else
-        return 0
-    end
+    vim.notify("Failed to switch alternative buffer in Windows: " .. winId)
 end -- }}}
 M.bufOccurInWins = function(buf) -- {{{
+    -- TODO: validate
     local bufCnt = 0
-    for _, w in ipairs(var.winIds) do
-        if buf == vim.api.nvim_win_get_buf(w) then
+    local winIds = {}
+    for _, winId in ipairs(var.winIds) do
+        if buf == vim.api.nvim_win_get_buf(winId) then
             bufCnt = bufCnt + 1
+            winIds[#winIds+1] = winId
         end
     end
 
-    return bufCnt
+    return bufCnt, winIds
 end -- }}}
 M.bufsOccurInWins = function() -- {{{
     local bufCnt = 0
@@ -105,6 +94,21 @@ M.bufsOccurInWins = function() -- {{{
     end
 
     return bufCnt
+end -- }}}
+--- Return valid and loaded buffer count
+---@param bufNrTbl? table Use `var.bufNrs` if no bufNrTbl provided
+---@return number
+M.bufsNonScratchOccurInWins = function(bufNrTbl) -- {{{
+    bufNrTbl = bufNrTbl or var.bufNrs
+
+    if bufNrTbl then
+        local cnt = #vim.tbl_filter(function(bufNr)
+            return not M.isScratchBuf(bufNr)
+        end, bufNrTbl)
+        return cnt
+    else
+        return 0
+    end
 end -- }}}
 M.winIds = function(relativeIncludeChk) -- {{{
     if not relativeIncludeChk then

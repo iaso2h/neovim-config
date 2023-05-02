@@ -13,7 +13,7 @@ end
 function M.init() -- {{{
     -- TODO: parsing all buffers in buf.close instead
     u.initBuf()
-    if u.isSpecBuf() then return end
+    if u.isSpecialBuf(var.bufNr) then return end
 
 
     -- TODO: implement in hook function

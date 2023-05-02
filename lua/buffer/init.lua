@@ -3,12 +3,12 @@ local M   = {}
 
 
 M.close = function(type)
-    require("buffer.action.close").init(type)
+    require("buffer..close").init(type)
 end
 
 
 M.closeOther = function ()
-    require("buffer.action.closeOther").init()
+    require("buffer..closeOther").init()
 end
 
 
@@ -20,7 +20,7 @@ end
 
 
 M.newSplit = function(...)
-    require("buffer.action.newSplit").init(...)
+    require("buffer..newSplit").init(...)
 end
 
 return M

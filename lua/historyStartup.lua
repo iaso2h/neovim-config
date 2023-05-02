@@ -375,9 +375,9 @@ M.execMap = function(key) -- {{{
                 end
             end
         elseif key == "q" then
-            local bufsVisibleOccur = require("buffer.util").bufsVisibleOccur(
+            local bufsNonScratchOccurInWins = require("buffer.util").bufsNonScratchOccurInWins(
                 require("buffer.util").bufNrs(true) )
-            if bufsVisibleOccur == 0 then
+            if bufsNonScratchOccurInWins == 0 then
                 vim.cmd("noa qa!")
             else
                 -- Switch to last buffer or close the current window

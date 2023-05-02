@@ -173,7 +173,7 @@ _G.logBuf = function(...)
             end
         end
         if not visibleTick then
-            local layoutCmd = require("buffer.smartSplit").handler(false)
+            local layoutCmd = require("buffer.split").handler(false)
             vim.cmd(layoutCmd)
             vim.api.nvim_set_current_buf(_G._log_buf_nr)
             vim.api.nvim_put(objects, "l", true, true)
@@ -188,7 +188,7 @@ _G.logBuf = function(...)
         vim.api.nvim_put(objects, "l", true, true)
         -- vim.api.nvim_buf_set_lines(_G._logBufNr, 0, -1, false, objects)
     else
-        local layoutCmd = require("buffer.smartSplit").handler(false)
+        local layoutCmd = require("buffer.split").handler(false)
         vim.cmd(layoutCmd)
         _G._log_buf_nr = vim.api.nvim_create_buf(false, true)
         vim.api.nvim_buf_set_option(_G._log_buf_nr, "bufhidden", "wipe")

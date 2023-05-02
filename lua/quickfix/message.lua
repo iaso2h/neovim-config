@@ -116,7 +116,7 @@ return function(des) -- {{{
                 end
             end
             if not visibleTick then
-                local layoutCmd = require("buffer.smartSplit").handler(false)
+                local layoutCmd = require("buffer.split").handler(false)
                 vim.cmd(layoutCmd)
                 vim.api.nvim_set_current_buf(_G._message_scratch_buf)
                 vim.api.nvim_buf_set_lines(_G._message_scratch_buf, 0, -1, false, msg)
@@ -133,7 +133,7 @@ return function(des) -- {{{
             vim.api.nvim_buf_set_lines(_G._message_scratch_buf, 0, -1, false, msg)
             vim.cmd "noa keepjumps G"
         else
-            local layoutCmd = require("buffer.smartSplit").handler(false)
+            local layoutCmd = require("buffer.split").handler(false)
             vim.cmd(layoutCmd)
             _G._message_scratch_buf = vim.api.nvim_create_buf(false, true)
             vim.api.nvim_buf_set_option(_G._message_scratch_buf, "bufhidden", "wipe")
