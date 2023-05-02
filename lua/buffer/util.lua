@@ -54,9 +54,9 @@ M.bufClose = function(bufNr, switchBeforeClose) -- {{{
         end
     end
     local ok, msg = pcall(vim.api.nvim_command, "bdelete! " .. bufNr)
-    if not ok then
-        vim.notify(msg, vim.log.levels.ERROR)
-    end
+    -- if not ok then
+    --     vim.notify(msg, vim.log.levels.ERROR)
+    -- end
     -- `:bdelete` will register in both the jumplist and the changelist
     -- These two don't register in both the changelist and the changelist
     -- pcall(vim.api.nvim_command, "keepjump bwipe! " .. bufNr)
@@ -93,7 +93,7 @@ M.bufSwitchAlter = function(winId) -- {{{
     winId = winId or var.winId
     ---@diagnostic disable-next-line: param-type-mismatch
     local altBufNr = vim.fn.bufnr("#")
-    if altBufNr ~= var.bufNr and
+    if altBufNr ~= var.bufNr and vim.api.nvim_buf_is_valid(altBufNr) and
         vim.api.nvim_buf_get_option(altBufNr, "buflisted") and
         M.isSpecialBuf(altBufNr) then
 
@@ -204,8 +204,8 @@ M.winsOccur = function() -- {{{
 end -- }}}
 --- Function wrap around `vim.api.nvim_win_close`
 ---@param winId? number Use `var.winId` if no window ID provided
-M.winClose = function(winID) -- {{{
-    local ok, msg = pcall(vim.api.nvim_win_close, winID, false)
+M.winClose = function(winId) -- {{{
+    local ok, msg = pcall(vim.api.nvim_win_close, winId, false)
     if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 end -- }}}
 --- Get the layout in which the target window nested in
@@ -217,6 +217,9 @@ M.winLayout = function(matchPattern, layout, superiorLayout) -- {{{
     -- Initiation for in the first calling stack
     matchPattern = matchPattern or vim.api.nvim_get_current_win()
     layout = layout or vim.fn.winlayout()
+
+    -- Return data directly if there's only on window
+    if #layout == 2 then return layout[1], layout end
 
     -- Store siblings in every calling stack
     for i, element in ipairs(layout) do

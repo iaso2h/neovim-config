@@ -9,7 +9,7 @@ if _G._os_uname.machine == "aarch64" then
     width  = 60
     height = 30
 else
-    width  = 115
+    width  = 117
     height = 52
 end
 
@@ -40,7 +40,7 @@ M.handler = function(prefixCmdChk)
         local ui = vim.api.nvim_list_uis()[1]
         local uiWidth  = ui.width
         local uiHeight = ui.height
-        if uiWidth / uiHeight <= width / height then
+        if uiWidth / uiHeight > width / height then
             return vertCmd
         else
             return horiCmd
