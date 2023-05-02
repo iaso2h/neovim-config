@@ -441,13 +441,10 @@ map({"n", "x"}, [[<A-=>]],  [[<CMD>wincmd +<CR>]],       {"silent"}, "Increase w
 map("i",        [[<A-=>]],  [[<C-\><C-O>:wincmd +<CR>]], {"silent"}, "Increase window size")
 map({"n", "x"}, [[<A-->]],  [[<CMD>wincmd -<CR>]],       {"silent"}, "Decrease window size")
 map("i",        [[<A-->]],  [[<C-\><C-O>:wincmd -<CR>]], {"silent"}, "Decrease window size")
-
 -- Buffers
 map("n", [[<C-w>O]],    [[<CMD>lua require("buffer").closeOther()<CR>]],          {"silent"}, "Wipe other buffer")
-map("n", [[<C-Tab>]],   [[<CMD>lua require("buffer..cycle").init(1)<CR>]],  {"silent"}, "Next buffer")
-map("n", [[<C-S-Tab>]], [[<CMD>lua require("buffer..cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
-map("n", [[<A-,>]],     [[<CMD>lua require("buffer..cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
-map("n", [[<A-.>]],     [[<CMD>lua require("buffer..cycle").init(1)<CR>]],  {"silent"}, "Next buffer")
+map("n", [[<A-,>]],     [[<CMD>lua require("buffer.cycle").init(-1)<CR>]],       {"silent"}, "Previous buffer")
+map("n", [[<A-.>]],     [[<CMD>lua require("buffer.cycle").init(1)<CR>]],        {"silent"}, "Next buffer")
 -- Tab
 map("n", [[<C-t>,]], [[<CMD>tabp | echo "tabpage " . tabpagenr()<CR>]], {"silent"}, "Previous tab")
 map("n", [[<C-t>.]], [[<CMD>tabn | echo "tabpage " . tabpagenr()<CR>]], {"silent"}, "Next tab")

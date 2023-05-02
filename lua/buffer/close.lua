@@ -1,10 +1,8 @@
 -- File: /buf/close.lua
 -- Author: iaso2h
--- Description: Delete buffer without change the window layout
--- Similar Work: https://github.com/ojroques/nvim-bufdel
--- Version: 0.1.0
+-- Description: Deleting buffer without changing the window layout
+-- Version: 0.1.1
 -- Last Modified: 05/02/2023 Tue
--- DEBUG: 3 wins, 2 wins with same buffers, exe Q on either of the 2 wins
 local u   = require("buffer.util")
 local var = require("buffer.var")
 local M   = {}
@@ -12,8 +10,8 @@ local M   = {}
 
 --- Prompt save query for unsaved changes, make sure the buffer is ready to be
 --- deleted
---- @param bufNr number Buffer number handler
---- @return boolean When cancel is input, false will be return, otherwise,
+---@param bufNr number Buffer number handler
+---@return boolean When cancel is input, false will be return, otherwise,
 ---         true will be return
 local function saveModified(bufNr) -- {{{
     if not vim.api.nvim_buf_is_valid(bufNr) then return false end
@@ -46,7 +44,7 @@ local function saveModified(bufNr) -- {{{
 end -- }}}
 
 
-local specialBufHandler = function()
+local specialBufHandler = function() -- {{{
     if var.bufType == "nofile" then
         -- Commandline expand window which can be accessed by pressing <C-f>
         if var.fileType == "tsplayground" then
@@ -81,12 +79,14 @@ local specialBufHandler = function()
 
     -- Fail to resolve this special buffer
     return false
-end
+end -- }}}
 
 
-
---- Close buffer in a smart way
-local function bufHandler() -- {{{
+--- Handler function for closing special buffers, scratch buffers and standard
+--buffers in smart way. The buffer is in good hand.
+---@param postRearrange boolean Whether to rearrange the layout after the
+--deleting the buffer
+M.bufHandler = function(postRearrange) -- {{{
     -- Close buffer depending on whether it's a scratch buffer
     if u.isSpecialBuf(var.bufNr) then
         -- Call `specialBufHandler` in the condition check to deal with
@@ -99,7 +99,7 @@ local function bufHandler() -- {{{
         var.lastClosedFilePath = nil
     else
         -- Scratch files
-        if u.isScratchBuf() then
+        if u.isScratchBuf() then -- {{{
             -- Close NNP
             if package.loaded["no-neck-pain"] and
                 require("no-neck-pain").state.enabled and
@@ -117,7 +117,7 @@ local function bufHandler() -- {{{
                 -- This's the last resort of Neovim
                 return vim.cmd("q!")
             end
-        end
+        end -- }}}
 
         -- Standard buffer: buffer that has a non-empty buffer name and listed in buffer list-- {{{
         -- Store closed file path
@@ -143,28 +143,20 @@ local function bufHandler() -- {{{
                     "Unabled to enter the historyStartup correctly for the last scratch file",
                     vim.log.levels.ERROR)
             end
-        else
-            return u.bufClose(nil, true)
         end
 
+        u.bufClose(nil, true)
 
-        -- 1+ Windows
-
-        -- Loop through `var.winIds` to check other windows contain the same
-        -- buffer number as the one we are going to wipe
-        u.bufClose(nil, false)
-
-
-        -- Always restore window focus, window might be unavailable when the
-        -- last buffer is deleted
-        if vim.api.nvim_win_is_valid(var.winId) then
-            vim.api.nvim_set_current_win(var.winId)
-        end
+        -- -- Always restore window focus, window might be unavailable when the
+        -- -- last buffer is deleted
+        -- if vim.api.nvim_win_is_valid(var.winId) then
+        --     vim.api.nvim_set_current_win(var.winId)
+        -- end
 
         -- Merge when there are two windows sharing the last buffer
         -- The updated value of `#bufNrTbl` should be 1, but I don't bother
         -- re-calculating it
-        if u.winsOccur() == 2 and u.bufOccurInWins() == 2 and #var.bufNrs == 2 then
+        if postRearrange and u.winsOccur() == 2 and u.bufOccurInWins() == 2 and #var.bufNrs == 2 then
             vim.cmd "only"
         end
          -- }}}
@@ -172,15 +164,21 @@ local function bufHandler() -- {{{
 end -- }}}
 
 
-local winHandler = function() -- {{{
+--- Handler function for closing window
+---@param resortToBufClose boolean Set it to true to call `bufHandler` to
+--close the window like close a buffer when necessary
+M.winHandler = function(resortToBufClose) -- {{{
     local fallback = function()
-        if u.winsOccur() > 1 and u.bufsOccurInWins() > 1 then
-            u.winClose(var.winId)
+        if resortToBufClose then
+            if u.winsOccur() > 1 and u.bufsOccurInWins() > 1 then
+                u.winClose()
+            else
+                M.bufHandler(true)
+            end
         else
-            bufHandler()
+            u.winClose()
         end
     end
-
 
     if u.isSpecialBuf(var.bufNr) then
         -- Call `specialBufHandler` in the condition check to deal with
@@ -205,14 +203,14 @@ end -- }}}
 
 
 --- Close window safely and wipe buffer without modifying the layout
---- @param type string Expect string value. possible value: "buffer", "window"
-function M.init(type) -- {{{
+---@param type string Expect string value. possible value: "buffer", "window"
+ M.init = function(type) -- {{{
     u.initBuf()
 
     if type == "window" then
-        winHandler()
+        M.winHandler(true)
     elseif type == "buffer" then
-        bufHandler()
+        M.bufHandler(true)
     end
 end -- }}}
 
