@@ -196,13 +196,11 @@ local pluginArgs = { -- {{{
             {[[<leader>F]], mode = "n"},
             {[[<leader>F]], mode = "x"},
         },
-        init = function()
-            map("", [[<leader>f]], [[:lua require("hop").hint_char1()<CR>]], "Hop char")
-        end,
         config = function()
             require("hop").setup{
                 case_insensitive = false
             }
+            map("", [[<leader>f]], [[:lua require("hop").hint_char1()<CR>]], "Hop char")
         end
     },
     -- TODO: skip asking for input when performing a dot-repeat
@@ -344,13 +342,30 @@ local pluginArgs = { -- {{{
         lazy = true,
         cmd  = "Telescope",
         keys = {
-            {[[<C-f>a]],  mode = "n"}, {[[<C-f>e]],  mode = "n"}, {[[<C-f>E]], mode = "n"}, {[[<C-f>f]],  mode = "n"},
-            {[[<C-f>F]],  mode = "n"}, {[[<C-f>w]],  mode = "n"}, {[[<C-f>W]], mode = "n"}, {[[<C-f>/]],  mode = "n"},
-            {[[<C-f>?]],  mode = "n"}, {[[<C-f>v]],  mode = "n"}, {[[<C-f>j]], mode = "n"}, {[[<C-f>']],  mode = "n"},
-            {[[<C-f>m]],  mode = "n"}, {[[<C-f>k]],  mode = "n"}, {[[<C-f>c]], mode = "n"}, {[[<C-f>C]],  mode = "n"},
-            {[[<C-f>h]],  mode = "n"}, {[[<C-f>H]],  mode = "n"}, {[[<C-f>r]], mode = "n"}, {[[<C-f>gc]], mode = "n"},
-            {[[<C-f>gC]], mode = "n"}, {[[<C-f>gs]], mode = "n"}, {[[<C-f>b]], mode = "n"}, {[[<C-f>d]],  mode = "n"},
-            {[[<C-f>D]],  mode = "n"},
+            { [[<C-f>a]],  mode = "n" },
+            { [[<C-f>e]],  mode = "n" },
+            { [[<C-f>E]],  mode = "n" },
+            { [[<C-f>f]],  mode = "n" },
+            { [[<C-f>F]],  mode = "n" },
+            { [[<C-f>w]],  mode = "n" },
+            { [[<C-f>W]],  mode = "n" },
+            { [[<C-f>/]],  mode = "n" },
+            { [[<C-f>?]],  mode = "n" },
+            { [[<C-f>c]],  mode = "n" },
+            { [[<C-f>:]],  mode = "n" },
+            { [[<C-f>v]],  mode = "n" },
+            { [[<C-f>j]],  mode = "n" },
+            { [[<C-f>m]],  mode = "n" },
+            { [[<C-f>k]],  mode = "n" },
+            { [[<C-f>h]],  mode = "n" },
+            { [[<C-f>H]],  mode = "n" },
+            { [[<C-f>r]],  mode = "n" },
+            { [[<C-f>gc]], mode = "n" },
+            { [[<C-f>gC]], mode = "n" },
+            { [[<C-f>gs]], mode = "n" },
+            { [[<C-f>b]],  mode = "n" },
+            { [[<C-f>d]],  mode = "n" },
+            { [[<C-f>D]],  mode = "n" },
         },
         config = require("plugins.nvim-telescope")
     },
@@ -720,18 +735,23 @@ local pluginArgs = { -- {{{
                 dependencies = {"nvim-cmp"}
             }
         },
-        keys = {
-            { "<leader>lg",  mode = "n" },
-            { "<leader>le",  mode = "n" },
-            { "<leader>ls",  mode = "n" },
-            { "<leader>lv",  mode = "n" },
-            { "<leader>lt",  mode = "n" },
-        },
+        -- keys = {
+        --     { "<leader>lg",  mode = "n" },
+        --     { "<leader>le",  mode = "n" },
+        --     { "<leader>ls",  mode = "n" },
+        --     { "<leader>lv",  mode = "n" },
+        --     { "<leader>lt",  mode = "n" },
+        -- },
         init = function()
             vim.g["conjure#filetypes"] = {"clojure", "fennel", "janet", "hy", "julia", "racket",
              "scheme", "lua", "lisp", "rust"}
-            if _G._os_uname.sysname ~= "Windows_NT" then
+            -- if _G._os_uname.sysname ~= "Windows_NT" then
                 table.insert(vim.g["conjure#filetypes"] , "python")
+            -- end
+            vim.g["conjure#client#python#stdio#mapping#start"] = "lp"
+            vim.g["conjure#client#python#stdio#mapping#stop"]  = "lP"
+            if _G._os_uname.sysname == "Windows_NT" then
+                vim.g["g:conjure#client#python#stdio#command"]  = "python -iq"
             end
             vim.g["conjure#mapping#prefix"] = " "
             vim.g["conjure#mapping#eval_comment_current_form"] = "ecc"

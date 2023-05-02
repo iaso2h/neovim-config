@@ -69,7 +69,6 @@ M.opt.lua.config = { -- {{{
 } -- }}}
 
 
-
 ---Reload lua module path. Called in autocmd
 M.reload = function() -- {{{
     if not valOrMsg then return end
@@ -113,5 +112,6 @@ M.reload = function() -- {{{
         require("autoreload.vim")(path, M.configPath)
     end
 end -- }}}
+
 
 return M
