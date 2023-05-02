@@ -1,10 +1,11 @@
 return {
-    bufName = nil,
-    bufNr   = nil,
-    bufNrs  = nil,
-    bufType = nil,
-    winId   = nil,
-    winIds  = nil,
+    bufNr    = nil,
+    bufNrs   = nil,
+    bufName  = nil,
+    bufType  = nil,
+    fileType = nil,
+    winId    = nil,
+    winIds   = nil,
 
     newSplitLastBufNr = nil,
     lastClosedFilePath = nil

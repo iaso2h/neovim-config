@@ -100,3 +100,5 @@ nohlsearch
 octoface 
 openai
 neoai
+bwipe 
+bdelete 
