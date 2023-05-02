@@ -45,7 +45,7 @@ return function()
             not vim.tbl_contains(buftypeWhitelist, vim.api.nvim_buf_get_option(bufNr, "buftype")) then
 
             u.initBuf()
-            close.bufHandler(false)
+            close.bufHandler(false, false)
         end
     end
     -- TODO: whether to close windows don't contain the current buffer as

@@ -1,52 +1,46 @@
 -- File: /buf/close.lua
 -- Author: iaso2h
 -- Description: Deleting buffer without changing the window layout
--- Version: 0.1.1
--- Last Modified: 05/02/2023 Tue
+-- Version: 0.1.2
+-- Last Modified: 05/03/2023 Wed
 local u   = require("buffer.util")
 local var = require("buffer.var")
 local M   = {}
 
 
---- Prompt save query for unsaved changes, make sure the buffer is ready to be
---- deleted
+--- Prompt for saving changes
 ---@param bufNr number Buffer number handler
----@return boolean When cancel is input, false will be return, otherwise,
----         true will be return
+---@return boolean false will be retunef if input is cancle, otherwise true
+--will be return
 local function saveModified(bufNr) -- {{{
     if not vim.api.nvim_buf_is_valid(bufNr) then return false end
 
-    -- Check whether the file has any unsaved changes
     if not vim.api.nvim_buf_get_option(bufNr, "modified") then
         return true
     else
-        if vim.api.nvim_buf_get_option(bufNr, "modified") then
-            vim.cmd "noa echohl MoreMsg"
-            local answer = vim.fn.confirm("Save modification?",
-                ">>> &Save\n&Unload save\n&Discard\n&Cancel", 3, "Question")
-            vim.cmd "noa echohl None"
-            if answer == 1 then
-                vim.cmd "update!"
-                return true
-            elseif answer == 2 then
-                vim.cmd "noa update!"
-                return true
-            elseif answer == 3 then
-                return true
-            else
-                return false
-            end
-        else
+        vim.cmd "noa echohl MoreMsg"
+        local answer = vim.fn.confirm("Save modification?",
+            ">>> &Save\n&Unload save\n&Discard\n&Cancel", 3, "Question")
+        vim.cmd "noa echohl None"
+        if answer == 1 then
+            vim.cmd "update!"
             return true
+        elseif answer == 2 then
+            vim.cmd "noa update!"
+            return true
+        elseif answer == 3 then
+            return true
+        else
+            return false
         end
     end
-
 end -- }}}
 
 
+--- Go through different special buffers to delete them properly
+---@return boolean false will be return if failed to resolve the special buffer
 local specialBufHandler = function() -- {{{
     if var.bufType == "nofile" then
-        -- Commandline expand window which can be accessed by pressing <C-f>
         if var.fileType == "tsplayground" then
             vim.cmd [[TSPlaygroundToggle]]
             return true
@@ -71,13 +65,12 @@ local specialBufHandler = function() -- {{{
         end
     elseif var.bufType == "prompt" then
         if var.fileType == "vim" then
-            -- This buffer shows up When you hit CTRL-F on commandline
-            vim.api.nvim_feedkeys(t "<CMD>q<CR>", "t", false)
+            -- Commandline expand window which can be accessed by pressing <C-f>
+            vim.api.nvim_feedkeys(t "<CMD>q<CR>", "tn", false)
             return true
         end
     end
 
-    -- Fail to resolve this special buffer
     return false
 end -- }}}
 
@@ -86,19 +79,16 @@ end -- }}}
 --buffers in smart way. The buffer is in good hand.
 ---@param postRearrange boolean Whether to rearrange the layout after the
 --deleting the buffer
-M.bufHandler = function(postRearrange) -- {{{
-    -- Close buffer depending on whether it's a scratch buffer
-    if u.isSpecialBuf(var.bufNr) then
-        -- Call `specialBufHandler` in the condition check to deal with
-        -- special buffers first, if it's evaluated to false then execute the
-        -- nested code block
+---@param skipSpecialChk boolean Whether to go through the special
+--file checking for the current buffer
+M.bufHandler = function(postRearrange, skipSpecialChk) -- {{{
+    if not skipSpecialChk and u.isSpecialBuf() then
         if not specialBufHandler() then
             if not saveModified(var.bufNr) then return end
             u.bufClose(nil, true)
         end
         var.lastClosedFilePath = nil
     else
-        -- Scratch files
         if u.isScratchBuf() then -- {{{
             -- Close NNP
             if package.loaded["no-neck-pain"] and
@@ -108,7 +98,6 @@ M.bufHandler = function(postRearrange) -- {{{
                 return require("no-neck-pain").toggle()
             end
 
-            -- Abort the processing when cancel is input
             if not saveModified(var.bufNr) then return end
 
             if #var.bufNrs > 1 then
@@ -120,11 +109,9 @@ M.bufHandler = function(postRearrange) -- {{{
         end -- }}}
 
         -- Standard buffer: buffer that has a non-empty buffer name and listed in buffer list-- {{{
-        -- Store closed file path
+        -- For future retrieviation
         var.lastClosedFilePath = vim.fn.expand("%:p")
 
-        -- Always prompt for unsaved change, so that buffer is ready to be
-        -- deleted safely. Abort the processing when false is evaluated
         if not saveModified(var.bufNr) then return end
 
         -- When it comes down to only 1 buffer in 1 window, Neovim
@@ -147,12 +134,6 @@ M.bufHandler = function(postRearrange) -- {{{
 
         u.bufClose(nil, true)
 
-        -- -- Always restore window focus, window might be unavailable when the
-        -- -- last buffer is deleted
-        -- if vim.api.nvim_win_is_valid(var.winId) then
-        --     vim.api.nvim_set_current_win(var.winId)
-        -- end
-
         -- Merge when there are two windows sharing the last buffer
         -- The updated value of `#bufNrTbl` should be 1, but I don't bother
         -- re-calculating it
@@ -166,51 +147,59 @@ end -- }}}
 
 --- Handler function for closing window
 ---@param resortToBufClose boolean Set it to true to call `bufHandler` to
---close the window like close a buffer when necessary
+--close the window like closing a buffer when necessary
 M.winHandler = function(resortToBufClose) -- {{{
-    local fallback = function()
+    local fallback = function(skipSpecialChk) -- {{{
         if resortToBufClose then
-            if u.winsOccur() > 1 and u.bufsOccurInWins() > 1 then
-                u.winClose()
+            if u.winsOccur() > 1 then
+                if u.bufsOccurInWins() == 0 then
+                    M.bufHandler(true, skipSpecialChk)
+                elseif u.bufsOccurInWins() == 1 then
+                    if u.isSpecialBuf() then
+                        u.winClose()
+                    else
+                        M.bufHandler(true, skipSpecialChk)
+                    end
+                else
+                    u.winClose()
+                end
             else
-                M.bufHandler(true)
+                M.bufHandler(true, skipSpecialChk)
             end
         else
             u.winClose()
         end
-    end
+    end -- }}}
 
-    if u.isSpecialBuf(var.bufNr) then
-        -- Call `specialBufHandler` in the condition check to deal with
-        -- special buffers first, if it's evaluated to false then use the
-        -- fallback method
+    if u.isSpecialBuf() then
         if not specialBufHandler() then
-            fallback()
+            fallback(true)
         end
     else
-        -- Close window containing buffer
         if u.isScratchBuf() and package.loaded["no-neck-pain"] and
-                require("no-neck-pain").state.enabled and
-                var.fileType == "no-neck-pain" then
-
+            require("no-neck-pain").state.enabled and
+            var.fileType == "no-neck-pain" then
             return require("no-neck-pain").toggle()
         else
             -- Standard buffer
-            fallback()
+            fallback(false)
         end
     end
 end -- }}}
 
 
---- Close window safely and wipe buffer without modifying the layout
----@param type string Expect string value. possible value: "buffer", "window"
- M.init = function(type) -- {{{
+--- Close window safely and wipe buffer without modifying the layout. The
+--window handler function and the buffer handler function both follow the
+--pattern that deal with special buffer first, then scratch buffer, then the
+--standard buffers
+---@param type string Expect string value. Possible value: "buffer", "window"
+ M.deleteBufferOrWindow = function(type) -- {{{
     u.initBuf()
 
     if type == "window" then
         M.winHandler(true)
     elseif type == "buffer" then
-        M.bufHandler(true)
+        M.bufHandler(true, false)
     end
 end -- }}}
 

@@ -3,7 +3,7 @@ local M   = {}
 
 
 M.close = function(type)
-    require("buffer.close").init(type)
+    require("buffer.close").deleteBufferOrWindow(type)
 end
 
 
