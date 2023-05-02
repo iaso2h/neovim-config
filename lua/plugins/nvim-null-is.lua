@@ -74,7 +74,7 @@ return function()
             string.format([[%s%scspell.json]], _G._config_path, _G._sep),
         },
         runtime_condition = function(params)
-            if params.bufname == "" then
+            if params.bufname == "" or not vim.api.nvim_buf_get_option(params.bufnr, "buflisted") then
                 return false
             end
             if vim.g._cspellEnable and not vim.b._cspellDisable then

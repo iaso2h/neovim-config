@@ -74,6 +74,7 @@ opt.winheight   = 3
 o.winhighlight  = "NormalNC:WinNormalNC"
 opt.splitbelow  = true
 opt.splitright  = true
+opt.splitkeep   = "screen"
 opt.switchbuf   = "uselast"
 
 if _G._os_uname.machine ~= "aarch64" then
