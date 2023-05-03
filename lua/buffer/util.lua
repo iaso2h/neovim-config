@@ -234,7 +234,7 @@ M.winLayout = function(matchPattern, layout, superiorLayout) -- {{{
     layout = layout or vim.fn.winlayout()
 
     -- Return data directly if there's only on window
-    if layout[1] == "leaf" then return layout[1], layout end
+    if not superiorLayout and layout[1] == "leaf" then return layout[1], layout end
 
     -- Store siblings in every calling stack
     for i, element in ipairs(layout) do
