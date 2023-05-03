@@ -299,7 +299,7 @@ end
 --- @param tbl table list-liked table
 --- @param item number|string
 --- @param returnIdxTbl? boolean whether to return all the indexes as a table
---- @return number|table return table when returnIdxTbl is true
+--- @return number|table|nil return table when returnIdxTbl is true
 _G.tbl_idx = function(tbl, item, returnIdxTbl)
     assert(vim.tbl_islist(tbl), "Expect list-liked table")
     assert(type(item) == "string" or type(item) == "number", "Only support indexing string or number")

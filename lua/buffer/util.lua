@@ -20,7 +20,8 @@ M.isSpecialBuf = function(bufNr) -- {{{
     bufNr = bufNr or var.bufNr
     local bufType    = vim.api.nvim_buf_get_option(bufNr, "buftype")
     local modifiable = vim.api.nvim_buf_get_option(bufNr, "modifiable")
-    return bufType ~= "" and not modifiable
+    local bufListed  = vim.api.nvim_buf_get_option(bufNr, "buflisted")
+    return bufType ~= "" and (not modifiable or not bufListed)
 end -- }}}
 --- Check if the provided buffer is a scratch buffer
 ---@param bufNr? number If it isn't provided, the `var.bufName` will be used instead
@@ -45,7 +46,7 @@ M.bufClose = function(bufNr, switchBeforeClose) -- {{{
         if var.winIds then
             for _, winId in ipairs(var.winIds) do
                 if vim.api.nvim_win_get_buf(winId) == bufNr then
-                    M.bufSwitchAlter(winId)
+                    M.bufSwitchAlter(winId, bufNr)
                 end
             end
         else
@@ -87,22 +88,36 @@ M.bufNrs = function(listedOnly, loadedOnly) -- {{{
 end -- }}}
 --- Switch to alternative buffer or previous buffer before wiping current buffer
 ---@param winId? number Window ID in which the buffer nest will be switch to
---an alternative buffer. Default is var.winId if no window ID provided
-M.bufSwitchAlter = function(winId) -- {{{
+--an alternative buffer. Default is `var.winId` if no window ID provided
+---@param bufNr? number What bufNr will be switch away in the specific
+--window. Default is `var.bufNr` if no buffer number provided
+M.bufSwitchAlter = function(winId, bufNr) -- {{{
     winId = winId or var.winId
+    bufNr = bufNr or var.bufNr
     ---@diagnostic disable-next-line: param-type-mismatch
     local altBufNr = vim.fn.bufnr("#")
-    if altBufNr ~= var.bufNr and vim.api.nvim_buf_is_valid(altBufNr) and
+    if altBufNr ~= bufNr and vim.api.nvim_buf_is_loaded(altBufNr) and
         vim.api.nvim_buf_get_option(altBufNr, "buflisted") and
-        M.isSpecialBuf(altBufNr) then
+        not M.isSpecialBuf(altBufNr) then
 
         return vim.api.nvim_win_set_buf(winId, altBufNr)
     else
         -- Fallback method
-        local bufNrs = var.bufNrs and var.bufNrs or M.bufNrs(true, false)
-        for _, bufNr in ipairs(bufNrs) do
-            if bufNr ~= var.bufNr and not M.isSpecialBuf(bufNr) then
-                return vim.api.nvim_win_set_buf(winId, bufNr)
+        local curBufNrIdx = tbl_idx(var.bufNrs, bufNr)
+        if curBufNrIdx then
+            for offset = 1, curBufNrIdx do
+                local idx = curBufNrIdx - offset
+                idx = idx > 0 and idx or idx + #var.bufNrs
+                local b = var.bufNrs[idx]
+                if not M.isSpecialBuf(b) then
+                    return vim.api.nvim_win_set_buf(winId, b)
+                end
+            end
+        else
+            for _, b in ipairs(var.bufNrs) do
+                if b ~= bufNr and not M.isSpecialBuf(b) then
+                    return vim.api.nvim_win_set_buf(winId, b)
+                end
             end
         end
     end
@@ -112,7 +127,7 @@ end -- }}}
 --- Check how many times the specified buffer occurs in all windows
 ---@param bufNr? number If it isn't provided, the `var.bufNr` will be used
 --instead
----@param winIds? table If it isn't provided, the `var.bufNr` will be used
+---@param winIds? table If it isn't provided, the `var.winIds` will be used
 --instead
 ---@return number,table How many same provided buffer instances display in
 --other windows and the window IDs that contain the provided buffer Note that
@@ -135,7 +150,7 @@ end -- }}}
 --specified window table
 ---@param bufNrs? table If it isn't provided, the `var.bufNrs` will be used
 --instead
----@param winIds? table If it isn't provided, the `var.bufNr` will be used
+---@param winIds? table If it isn't provided, the `var.winIds` will be used
 --instead
 ---@return number The occurrence number
 M.bufsOccurInWins = function(bufNrs, winIds) -- {{{
