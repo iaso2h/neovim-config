@@ -2,7 +2,7 @@
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
 -- Dependencies: 0
--- Version: 0.0.21
+-- Version: 0.0.22
 -- Last Modified: 05/03/2023 Wed
 -- TODO: ? to trigger menupage
 
@@ -164,6 +164,175 @@ local autoCMD = function(bufNr) -- {{{
 end -- }}}
 
 
+local hover = function() -- {{{
+    if not M.lines.relativeTick then return end
+    local cursorPos = vim.api.nvim_win_get_cursor(M.curWin)
+    local lineIdx = cursorPos[1] - 1
+    if lineIdx < 1 then return end
+    M.floatLine = M.lines.absolute[lineIdx]
+
+    -- Construct float window
+    local line = " " .. M.floatLine .. " "
+    local winInfo = vim.fn.getwininfo(M.curWin)[1]
+    local hoverWidth = math.ceil(winInfo.width / 2)
+    if #line < hoverWidth then hoverWidth = #line end
+    local hoverHeight = math.ceil(#line / hoverWidth)
+    local anchorVer = winInfo.botline - cursorPos[1] < hoverHeight+ 1 and "S" or "N"
+    local anchorHor = hoverWidth - cursorPos[2] - 8 < hoverWidth and "E" or "W"
+    M.floatWinID = vim.api.nvim_open_win(0, false, {
+        relative = "cursor",
+        width = hoverWidth,
+        height = hoverHeight,
+        anchor = anchorVer .. anchorHor,
+        row = 1,
+        col = 1,
+        style = "minimal",
+        border = "rounded"
+    })
+    vim.api.nvim_win_set_option(M.floatWinID, "signcolumn", "no")
+
+    -- Create buf
+    if not M.floatBufNr or not vim.api.nvim_buf_is_valid(M.floatBufNr) then
+        M.floatBufNr = vim.api.nvim_create_buf(false, true)
+    end
+    vim.api.nvim_buf_set_lines(M.floatBufNr, 0, -1, false, {line})
+    vim.api.nvim_buf_set_option(M.floatBufNr, "modifiable", false)
+    vim.api.nvim_win_set_buf(M.floatWinID, M.floatBufNr)
+
+    vim.api.nvim_create_autocmd({
+        "CursorMoved",
+        -- Neovim will enter relative buffer temporarily, so "BufLeave" will allways
+        -- trigger then destroy the brand new float window and buffer within
+        "BufLeave",
+        "WinLeave",
+        "TabLeave",
+        "ModeChanged",
+    }, {
+        buffer = M.curBuf,
+        desc = "Close floating win inside historyStartup when cursor moves",
+        callback = function()
+            if not M.floatWinID then return end
+            if not M.floatTick then return end
+            if not vim.api.nvim_win_is_valid(M.floatWinID) then return end
+
+            vim.api.nvim_win_close(M.floatWinID, false)
+            M.floatWinID = nil
+
+            -- Delete buffer as well
+            if M.floatBufNr and vim.api.nvim_buf_is_valid(M.floatBufNr) then
+                vim.api.nvim_buf_delete(M.floatBufNr, {force = true})
+                M.floatBufNr = nil
+            end
+            M.floatTick = false
+            M.floatLine = ""
+        end
+    })
+
+    -- Set floatTick to true at the end of the function in case the float will
+    -- be terminated too early by autocmd
+    M.floatTick = true
+end -- }}}
+
+
+local execMap = function(key) -- {{{
+    local lnum = vim.api.nvim_win_get_cursor(0)[1]
+    if key == "o" or key == "<CR>" then -- {{{
+        if lnum == 1 then
+            vim.cmd("enew")
+        else
+            vim.cmd("edit " .. M.lines.absolute[lnum - 1])
+        end -- }}}
+    elseif key == "go" then -- {{{
+        if lnum == 1 then
+            vim.cmd("noa enew")
+        else
+            vim.cmd("noa edit " .. M.lines.absolute[lnum - 1])
+        end -- }}}
+    elseif key == "<C-t>" then -- {{{
+        if lnum == 1 then
+            vim.cmd("tabnew")
+        else
+            if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
+                vim.cmd("tabnew")
+                vim.cmd("edit " .. M.lines.absolute[lnum - 1])
+            end
+        end -- }}}
+    elseif key == "yp" then -- {{{
+        local cursorPos = vim.api.nvim_win_get_cursor(M.curWin)
+        local lineIdx = cursorPos[1] - 1
+        local line
+        if not M.floatBufNr or not vim.api.nvim_buf_is_valid(M.floatBufNr) then
+            line = M.lines.absolute[lineIdx]
+        else
+            line = M.floatLine
+        end
+        vim.fn.setreg(vim.v.register, line, "v")
+        vim.notify("File path copied") -- }}}
+    elseif key == "K" then
+        hover()
+    else
+        -- Related to spliting window or rearranging the window layout
+        local lastBufVisibleTick = false
+        if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
+            local winIDTbl = vim.tbl_filter(function(i)
+                return vim.api.nvim_win_get_config(i).relative == ""
+            end, vim.api.nvim_list_wins())
+            for _, win in ipairs(winIDTbl) do
+                if vim.api.nvim_win_get_buf(win) == M.lastBuf then
+                    lastBufVisibleTick = true
+                    break
+                end
+            end
+        end
+        if key == "<C-s>" then -- {{{
+            if lnum == 1 then
+                vim.cmd("noa split")
+                vim.cmd("enew")
+            else
+                if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
+                    if not lastBufVisibleTick then
+                        vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
+                        vim.cmd("split " ..M.lines.absolute[lnum - 1])
+                    else
+                        vim.cmd("noa q!")
+                    end
+                end
+            end -- }}}
+        elseif key == "<C-v>" then -- {{{
+            if lnum == 1 then
+                vim.cmd("vnew")
+            else
+                if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
+                    if not lastBufVisibleTick then
+                        vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
+                        vim.cmd("vsplit " ..M.lines.absolute[lnum - 1])
+                    else
+                        vim.cmd("noa q!")
+                    end
+                end
+            end -- }}}
+        elseif key == "q" and key == "Q" then -- {{{
+            local bufsNonScratchOccurInWins = require("buffer.util").bufsNonScratchOccurInWins(
+                require("buffer.util").bufNrs(true) )
+            if bufsNonScratchOccurInWins == 0 then
+                vim.cmd("noa qa!")
+            else
+                -- Switch to last buffer or close the current window
+                if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
+                    if not lastBufVisibleTick then
+                        vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
+                    else
+                        vim.cmd("noa q!")
+                    end
+                else
+                    vim.cmd("noa q!")
+                end
+            end
+        end -- }}}
+    end
+end -- }}}
+
+
 --- Display history in new buffer
 --- @param refreshChk boolean Set it true to refresh the history files everytime
 M.display = function(refreshChk) -- {{{
@@ -236,188 +405,11 @@ M.display = function(refreshChk) -- {{{
     -- Key mappings
     vim.defer_fn(function()
         for _, key in ipairs {"o", "go", "<C-s>", "<C-v>", "<C-t>", "<CR>", "q", "Q", "K","yp"} do
-            vim.api.nvim_buf_set_keymap(
-                M.curBuf,
-                "n",
-                key,
-                string.format([=[<CMD>lua require("historyStartup").execMap([[%s]])<CR>]=], string.gsub(key, [[<]], [[<lt>]])),
-                {silent = true}
-            )
+            vim.api.nvim_buf_set_keymap(M.curBuf, "n", key, "",
+                {callback = function() execMap(key) end} )
         end
     end, 0)
 end -- }}}
-
-
-local hover = function() -- {{{
-    if not M.lines.relativeTick then return end
-    local cursorPos = vim.api.nvim_win_get_cursor(M.curWin)
-    local lineIdx = cursorPos[1] - 1
-    if lineIdx < 1 then return end
-    M.floatLine = M.lines.absolute[lineIdx]
-
-    -- Construct float window
-    local line = " " .. M.floatLine .. " "
-    local winInfo = vim.fn.getwininfo(M.curWin)[1]
-    local hoverWidth = math.ceil(winInfo.width / 2)
-    if #line < hoverWidth then hoverWidth = #line end
-    local hoverHeight = math.ceil(#line / hoverWidth)
-    local anchorVer = winInfo.botline - cursorPos[1] < hoverHeight+ 1 and "S" or "N"
-    local anchorHor = hoverWidth - cursorPos[2] - 8 < hoverWidth and "E" or "W"
-    M.floatWinID = vim.api.nvim_open_win(0, false, {
-        relative = "cursor",
-        width = hoverWidth,
-        height = hoverHeight,
-        anchor = anchorVer .. anchorHor,
-        row = 1,
-        col = 1,
-        style = "minimal",
-        border = "rounded"
-    })
-    vim.api.nvim_win_set_option(M.floatWinID, "signcolumn", "no")
-
-    -- Create buf
-    if not M.floatBufNr or not vim.api.nvim_buf_is_valid(M.floatBufNr) then
-        M.floatBufNr = vim.api.nvim_create_buf(false, true)
-    end
-    vim.api.nvim_buf_set_lines(M.floatBufNr, 0, -1, false, {line})
-    vim.api.nvim_buf_set_option(M.floatBufNr, "modifiable", false)
-    vim.api.nvim_win_set_buf(M.floatWinID, M.floatBufNr)
-
-    vim.api.nvim_create_autocmd({
-        "CursorMoved",
-        -- Neovim will enter relative buffer temporarily, so "BufLeave" will allways
-        -- trigger then destroy the brand new float window and buffer within
-        "BufLeave",
-        "WinLeave",
-        "TabLeave",
-        "ModeChanged",
-    }, {
-        buffer = M.curBuf,
-        desc = "Close floating win inside historyStartup when cursor moves",
-        callback = function()
-            if not M.floatWinID then return end
-            if not M.floatTick then return end
-            if not vim.api.nvim_win_is_valid(M.floatWinID) then return end
-
-            vim.api.nvim_win_close(M.floatWinID, false)
-            M.floatWinID = nil
-
-            -- Delete buffer as well
-            if M.floatBufNr and vim.api.nvim_buf_is_valid(M.floatBufNr) then
-                vim.api.nvim_buf_delete(M.floatBufNr, {force = true})
-                M.floatBufNr = nil
-            end
-            M.floatTick = false
-            M.floatLine = ""
-        end
-    })
-
-    -- Set floatTick to true at the end of the function in case the float will
-    -- be terminated too early by autocmd
-    M.floatTick = true
-end -- }}}
-
-
-M.execMap = function(key) -- {{{
-    local lnum = vim.api.nvim_win_get_cursor(0)[1]
-    key = string.lower(key)
-
-    if key == "o" or key == "<cr>" then -- {{{
-        if lnum == 1 then
-            vim.cmd("enew")
-        else
-            vim.cmd("edit " .. M.lines.absolute[lnum - 1])
-        end -- }}}
-    elseif key == "go" then -- {{{
-        if lnum == 1 then
-            vim.cmd("noa enew")
-        else
-            vim.cmd("noa edit " .. M.lines.absolute[lnum - 1])
-        end -- }}}
-    elseif key == "<c-t>" then -- {{{
-        if lnum == 1 then
-            vim.cmd("tabnew")
-        else
-            if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
-                vim.cmd("tabnew")
-                vim.cmd("edit " .. M.lines.absolute[lnum - 1])
-            end
-        end -- }}}
-    elseif key == "yp" then
-        local cursorPos = vim.api.nvim_win_get_cursor(M.curWin)
-        local lineIdx = cursorPos[1] - 1
-        local line
-        if not M.floatBufNr or not vim.api.nvim_buf_is_valid(M.floatBufNr) then
-            line = M.lines.absolute[lineIdx]
-        else
-            line = M.floatLine
-        end
-        vim.fn.setreg(vim.v.register, line, "v")
-        vim.notify("File path copied")
-    elseif key == "k" then
-        hover()
-    else
-        -- Related to spliting window or rearranging the window layout
-        local lastBufVisibleTick = false
-        if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
-            local winIDTbl = vim.tbl_filter(function(i)
-                return vim.api.nvim_win_get_config(i).relative == ""
-            end, vim.api.nvim_list_wins())
-            for _, win in ipairs(winIDTbl) do
-                if vim.api.nvim_win_get_buf(win) == M.lastBuf then
-                    lastBufVisibleTick = true
-                    break
-                end
-            end
-        end
-        if key == "<c-s>" then -- {{{
-            if lnum == 1 then
-                vim.cmd("noa split")
-                vim.cmd("enew")
-            else
-                if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
-                    if not lastBufVisibleTick then
-                        vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
-                        vim.cmd("split " ..M.lines.absolute[lnum - 1])
-                    else
-                        vim.cmd("noa q!")
-                    end
-                end
-            end -- }}}
-        elseif key == "<c-v>" then -- {{{
-            if lnum == 1 then
-                vim.cmd("vnew")
-            else
-                if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
-                    if not lastBufVisibleTick then
-                        vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
-                        vim.cmd("vsplit " ..M.lines.absolute[lnum - 1])
-                    else
-                        vim.cmd("noa q!")
-                    end
-                end
-            end -- }}}
-        elseif key == "q" then -- {{{
-            local bufsNonScratchOccurInWins = require("buffer.util").bufsNonScratchOccurInWins(
-                require("buffer.util").bufNrs(true) )
-            if bufsNonScratchOccurInWins == 0 then
-                vim.cmd("noa qa!")
-            else
-                -- Switch to last buffer or close the current window
-                if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
-                    if not lastBufVisibleTick then
-                        vim.api.nvim_win_set_buf(M.curWin, M.lastBuf)
-                    else
-                        vim.cmd("noa q!")
-                    end
-                else
-                    vim.cmd("noa q!")
-                end
-            end
-        end -- }}}
-    end
-end -- }}}
-
 
 return M
 
