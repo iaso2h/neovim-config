@@ -1,7 +1,7 @@
 -- File: /buf/close.lua
 -- Author: iaso2h
 -- Description: Deleting buffer without changing the window layout
--- Version: 0.1.3
+-- Version: 0.1.4
 -- Last Modified: 05/03/2023 Wed
 local u   = require("buffer.util")
 local var = require("buffer.var")
@@ -40,8 +40,10 @@ end -- }}}
 --- Go through different special buffers to delete them properly
 ---@param postRearrange boolean Whether to rearrange the layout after the
 --deleting the buffer
+---@param handler string "buffer"|"window" Define the specific way to deal with some special
+--buffers
 ---@return boolean false will be return if failed to resolve the special buffer
-local specialBufHandler = function(postRearrange) -- {{{
+local specialBufHandler = function(postRearrange, handler) -- {{{
     if var.bufType == "nofile" then
         if var.fileType == "tsplayground" then
             vim.cmd [[TSPlaygroundToggle]]
@@ -87,7 +89,7 @@ end -- }}}
 --file checking for the current buffer
 M.bufHandler = function(postRearrange, skipSpecialChk) -- {{{
     if not skipSpecialChk and u.isSpecialBuf() then
-        if not specialBufHandler(postRearrange) then
+        if not specialBufHandler(postRearrange, "buffer") then
             if not saveModified(var.bufNr) then return end
             u.bufClose(nil, true and postRearrange)
         end
@@ -126,21 +128,32 @@ M.bufHandler = function(postRearrange, skipSpecialChk) -- {{{
             return u.bufClose(nil, false)
         end
 
-        -- When it comes down to only 1 buffer in 1 window, Neovim
-        -- will open up a scratch buffer automatically as the last
-        -- resort after wiping out the last standard buffer. We then
-        -- use that scratch buffer to setup a historyStartup buffer
         if u.bufsNonScratchOccurInWins() == 1 then
             u.bufClose(nil, false)
-            local postBufNr = vim.api.nvim_get_current_buf()
-            if u.isScratchBuf(postBufNr) then
-                return require("historyStartup").display(true)
+
+            if not require("historyStartup").historyStartupIsLoad() then
+                -- Neovim will crate a scratch buffer automatically as the
+                -- last resort after wiping out the last standard buffer. We
+                -- then use that scratch buffer to setup a historyStartup
+                -- buffer
+                local postBufNr = vim.api.nvim_get_current_buf()
+                if u.isScratchBuf(postBufNr) then
+                    return require("historyStartup").display(true)
+                else
+                    -- HACK: hmm mm... I wonder when will this happen
+                    Print(var.bufNrs)
+                    return vim.notify(
+                        "Unabled to enter the historyStartup correctly for the last scratch file",
+                        vim.log.levels.ERROR)
+                end
             else
-                -- HACK: hmm mm... I wonder when will this happen
-                Print(var.bufNrs)
-                return vim.notify(
-                    "Unabled to enter the historyStartup correctly for the last scratch file",
-                    vim.log.levels.ERROR)
+                -- Use the existing historyStartup as the only buffer in one window
+                if u.winsOccur() > 1 then
+                    local bufNr = vim.api.nvim_get_current_buf()
+                    vim.api.nvim_win_set_buf(var.winId, require("historyStartup").curBuf)
+                    vim.api.nvim_buf_delete(bufNr, {unload = false})
+                    return vim.cmd [[only]]
+                end
             end
         end
 
@@ -184,7 +197,7 @@ M.winHandler = function(resortToBufClose) -- {{{
     end -- }}}
 
     if u.isSpecialBuf() then
-        if not specialBufHandler(true) then
+        if not specialBufHandler(true, "window") then
             fallback(true)
         end
     else

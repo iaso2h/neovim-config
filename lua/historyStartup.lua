@@ -37,6 +37,10 @@ local modifyLines = function(func)
     vim.api.nvim_buf_set_option(M.curBuf, "modifiable", false)
 end
 
+M.historyStartupIsLoad = function() -- {{{
+    return M.curBuf and vim.api.nvim_buf_is_loaded(M.curBuf)
+end -- }}}
+
 
 local initLines = function () -- {{{
     M.lines.absolute = {}
