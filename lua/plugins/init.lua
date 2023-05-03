@@ -285,6 +285,7 @@ local pluginArgs = { -- {{{
         "lukas-reineke/indent-blankline.nvim",
         dependencies = { "nvim-treesitter" },
         event  = {"BufAdd"},
+        -- TODO: support dapui_watches filetype
         config = function()
             local ftExclude = vim.deepcopy(_G._short_line_list)
             ftExclude[#ftExclude+1] = "help"
@@ -537,11 +538,19 @@ local pluginArgs = { -- {{{
             require("neodev").setup{
                 library = {
                     plugins = {
-                        "nvim-dap-ui",
+                        "nvim-dap",
+                        "nvim-dap",
                         "plenary",
                         "nvim-treesitter",
+                        "buffer",
+                        "jump",
+                        "quickfix",
+                        "util",
+                        "operator",
+                        "selection",
+                        "register"
                     },
-                types = true },
+                },
             }
             require("plugins.nvim-lspconfig")()
         end,

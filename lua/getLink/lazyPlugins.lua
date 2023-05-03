@@ -24,7 +24,7 @@ local function getPluginInfo(bufNr, nodes)
             repoRange = specRange
         end
 
-        table.insert(tbl.specRanges,     specRange)
+        table.insert(tbl.specRanges, specRange)
         table.insert(tbl.names,      require("util").getNodeText(bufNr, repoRange, 1, 0))
         table.insert(tbl.tableCheck, tableCheck)
         table.insert(tbl.nodes,      node)

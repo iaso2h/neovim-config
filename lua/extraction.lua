@@ -1,9 +1,9 @@
 -- File: extraction
 -- Author: iaso2h
 -- Description: Extract selected content into new variable or new file
--- Version: 0.0.8
--- Last Modified: 2023-3-4
--- NOTE: Deprecated: Please use refactor.nvim instead for visual line mode
+-- Version: 0.0.9
+-- Last Modified: 05/03/2023 Wed
+-- TODO: Deprecated: Please use refactor.nvim instead for visual line mode
 require("operator")
 local util     = require("util")
 local register = require("register")
@@ -120,15 +120,13 @@ local getSrcContent = function() -- {{{
         -- Join source content for multiple line visual characterwise selection
         srcContent = joinRHS(srcContent)
 
-        -- util.restoreReg()
         return {srcContent, namespace, extmark, linebreakChk}
     else
         -- Visual line mode
-
         vim.cmd [[noa normal! gvd]]
         srcContent = vim.fn.getreg("\"", 1)
 
-        util.restoreReg()
+        register.restoreReg()
         return {srcContent}
     end
 end -- }}}

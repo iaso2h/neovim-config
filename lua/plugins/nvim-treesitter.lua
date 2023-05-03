@@ -48,4 +48,22 @@ return function()
     map("n",        [[<A-S-a>]], [[gnn]], "Expand selection")
     map("x",        [[<A-S-a>]], [[grc]], "Expand selection")
     map({"n", "x"}, [[<A-S-s>]], [[grm]], "Shrink selection")
+
+    vim.api.nvim_create_user_command("TSGetNodeAtCursor", function()
+        if not package.loaded["nvim-treesitter.parsers"] or
+            not require("nvim-treesitter.parsers").has_parser() then
+            return vim.cmd [[norm! gf]]
+        end
+        local ns = vim.api.nvim_create_namespace("treesitterHighlightUtil")
+        local u    = require "nvim-treesitter.ts_utils"
+        local util = require("util")
+        local node = u.get_node_at_cursor(vim.api.nvim_get_current_win())
+        local bufNr = vim.api.nvim_get_current_buf()
+        vim.api.nvim_buf_clear_namespace(bufNr, ns, 0, -1)
+        u.highlight_node(node, bufNr, ns, "Search")
+        vim.defer_fn(function()
+            vim.api.nvim_buf_clear_namespace(bufNr, ns, 0, -1)
+        end, 500)
+        Print("Node name: " .. node:type(), "Node range: " .. vim.inspect{node:range()}, "Node text: " .. util.getNodeText(bufNr, {node:range()}))
+    end, {})
 end

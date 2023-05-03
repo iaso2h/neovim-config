@@ -21,7 +21,7 @@ end
 
 --- Find if a comment node exist in a line, start at col 2
 ---@param cursorPos table (0, 0) indexing. Row(Line) and column.
----@param lastNode object The treesitter object retrieved by calling
+---@param lastNode object The treesitter object can be retrieved by calling
 ---ts.get_node_at_post(0, <lineNum>, 0)
 ---@param lineLen number The length of current cursor
 ---@return boolean Whether comment node is found

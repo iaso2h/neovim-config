@@ -1,12 +1,9 @@
-local api = vim.api
-
-
 --- Checking validity of argument
 ---@param lhs  string|table    Left hand side of mapping
 ---@param rhs  string|function Right hand side of mapping
 ---@param arg  table           Argument table
 ---@return table|nil, string|nil
-local argCheck = function (lhs, rhs, arg)
+local argCheck = function (lhs, rhs, arg) -- {{{
     local opts
     local doc
 
@@ -52,9 +49,7 @@ local argCheck = function (lhs, rhs, arg)
     end
 
     return opts, doc
-end
-
-
+end -- }}}
 --- Convert arguments to match up the specified ones in vim.api.nvim_set_keymap()
 ---@param mode string|table Same as vim.api.nvim_set_keymap()
 ---@param lhs string Same as vim.api.nvim_set_keymap()
@@ -63,7 +58,7 @@ end
 -- that will be convert into table then passed into vim.api.nvim_set_keymap
 ---@param doc string|nil key mapping description
 ---@return table, table, string
-local argConvert = function(mode, lhs, rhs, opts, doc)
+local argConvert = function(mode, lhs, rhs, opts, doc) -- {{{
     local modeTbl
     -- Parameter "mode" can be either table value or string value, but convert
     -- it as table anyway
@@ -113,9 +108,7 @@ local argConvert = function(mode, lhs, rhs, opts, doc)
     end
 
     return modeTbl, optsKeyValTbl, rhsStr
-end
-
-
+end -- }}}
 --- Handy mapping func that wrap around the vim.api.nvim_set_keymap()
 ---@param mode string|table    Same as vim.api.nvim_set_keymap()
 ---@param lhs  string          Same as vim.api.nvim_set_keymap()
@@ -123,7 +116,7 @@ end
 ---@vararg ... table|string    Optional table value contain `h:map-arguments` strings
 --- that will be convert into table then passed into vim.api.nvim_set_keymap.
 --- Optional key mapping description
-function _G.map(mode, lhs, rhs, ...)
+_G.map = function(mode, lhs, rhs, ...) -- {{{
     -- Behavior difference between vim.keymap.set() and api.nvim_set_keymap()
     -- https://github.com/neovim/neovim/commit/6d41f65aa45f10a93ad476db01413abaac21f27d
     -- New api.nvim_set_keymap(): https://github.com/neovim/neovim/commit/b411f436d3e2e8a902dbf879d00fc5ed0fc436d3
@@ -132,7 +125,7 @@ function _G.map(mode, lhs, rhs, ...)
     local modeTbl, optsKeyValTbl, rhsStr = argConvert(mode, lhs, rhs, opts, doc)
 
     for _, m in ipairs(modeTbl) do
-        local ok, msg = pcall(api.nvim_set_keymap, m, lhs, rhsStr, optsKeyValTbl)
+        local ok, msg = pcall(vim.api.nvim_set_keymap, m, lhs, rhsStr, optsKeyValTbl)
         if not ok then
             vim.notify(
                 string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhsStr),
@@ -145,27 +138,25 @@ function _G.map(mode, lhs, rhs, ...)
     -- Always disable Select mode mapping for key mapping like: R,C,A,S,X
     -- when lhs is "". See: ":help map-table"
     if string.match(lhs, "[A-Z]") and modeTbl == "" then
-        return api.nvim_del_keymap("s", lhs)
+        return vim.api.nvim_del_keymap("s", lhs)
     end
-end
-
-
---- Handy mapping func that wrap around the vim.api.nvim_set_keymap()
----@param bufNr number          Same as vim.api.nvim_set_keymap()
----@param mode  string|table    Same as vim.api.nvim_set_keymap()
----@param lhs   string          Same as vim.api.nvim_set_keymap()
----@param rhs   string|function Same as vim.api.nvim_set_keymap()
+end -- }}}
+--- Handy mapping func that wrap around the vim.api.nvim_buf_set_keymap()
+---@param bufNr number          Same as vim.api.nvim_buf_set_keymap()
+---@param mode  string|table    Same as vim.api.nvim_buf_set_keymap()
+---@param lhs   string          Same as vim.api.nvim_buf_set_keymap()
+---@param rhs   string|function Same as vim.api.nvim_buf_set_keymap()
 ---@vararg ...  table|string     Optional table value contain `h:map-arguments` strings
 --- that will be convert into table then passed into vim.api.nvim_set_keymap.
 --- Optional key mapping description
-function _G.bmap(bufNr, mode, lhs, rhs, ...)
+_G.bmap = function(bufNr, mode, lhs, rhs, ...) -- {{{
     assert(type(bufNr) == "number", "#1 argument is not a valid number")
     local opts, doc = argCheck(lhs, rhs, {...})
 
     local modeTbl, optsKeyValTbl, rhsStr = argConvert(mode, lhs, rhs, opts, doc)
 
     for _, m in ipairs(modeTbl) do
-        local ok, msg = pcall(api.nvim_buf_set_keymap, bufNr, m, lhs, rhsStr, optsKeyValTbl)
+        local ok, msg = pcall(vim.api.nvim_buf_set_keymap, bufNr, m, lhs, rhsStr, optsKeyValTbl)
         if not ok then
             vim.notify(
                 string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhsStr),
@@ -178,16 +169,12 @@ function _G.bmap(bufNr, mode, lhs, rhs, ...)
     -- Always disable Select modemapping for key mapping like: R,C,A,S,X
     -- when lhs is "". See: ":help map-table"
     if string.match(lhs, "[A-Z]") and modeTbl == "" then
-        return api.nvim_buf_del_keymap(bufNr, "s", lhs)
+        return vim.api.nvim_buf_del_keymap(bufNr, "s", lhs)
     end
-end
-
-
-_G.t = function(str)
-    return api.nvim_replace_termcodes(str, true, true, true)
-end
-
-
+end -- }}}
+_G.t = function(str) -- {{{
+    return vim.api.nvim_replace_termcodes(str, true, true, true)
+end -- }}}
 ----
 -- Function: _G.luaRHS: Let you write rhs of mapping in a comafortable way
 
@@ -213,7 +200,7 @@ end
 -- @param str: RHS mapping
 -- @return: nil
 ----
-_G.luaRHS = function(str)
+_G.luaRHS = function(str) -- {{{
     assert(type(str) == "string", "Expected string value")
 
     local strTbl = vim.split(str, "\n", false)
@@ -224,10 +211,8 @@ _G.luaRHS = function(str)
     return tostring(
         concatStr:sub(1, 1) == " " and
         concatStr:sub(2, -1) or concatStr)
-end
-
-
-_G.vimRHS = function(str)
+end -- }}}
+_G.vimRHS = function(str) -- {{{
     assert(type(str) == "string", "Expected string value")
 
     local strTbl = vim.split(str, "\n", false)
@@ -237,4 +222,4 @@ _G.vimRHS = function(str)
     return tostring(
         concatStr:sub(1, 1) == " " and
         concatStr:sub(2, -1) or concatStr:sub(1, -1))
-end
+end -- }}}

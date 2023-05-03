@@ -65,13 +65,11 @@ function M.readInitLua()
     targetF:close()
     srcF:close()
 end
-
-
 --- Find all the pat in a string aggressively, based on string.find()
 ---@param srcStr string
 ---@param pat string
 ---@return table
-function M.findAll(srcStr, pat)
+function M.findAll(srcStr, pat) -- {{{
     local lastIdx = { 0 }
     local idxTbl = {}
     repeat
@@ -82,15 +80,14 @@ function M.findAll(srcStr, pat)
     until not next(lastIdx)
 
     return idxTbl
-end
-
+end -- }}}
 --- Function: M.trimSpaces :Trim all trailing white spaces in current buffer
 ---
---- @param strTbl table of source string need to be trimmed. If no table
+---@param strTbl table of source string need to be trimmed. If no table
 ---        provided, the whole buffer will be trimmed instead.
---- @param silent boolean Default is true. Set this to true to not show trimming result
---- @param prefix boolean Set to true to trim the suffix as well
---- @return  table | nil Return table of trimmed string, otherwise return 0
+---@param silent boolean Default is true. Set this to true to not show trimming result
+---@param prefix boolean Set to true to trim the suffix as well
+---@return  table | nil Return table of trimmed string, otherwise return 0
 function M.trimSpaces(strTbl, silent, prefix) -- {{{
     if not _G._trim_space then return end
 
@@ -122,15 +119,13 @@ function M.trimSpaces(strTbl, silent, prefix) -- {{{
         end, strTbl)
     end
 end -- }}}
-
-
 --- Calculate the distance from pos1 to pos2
 ---@param pos1       table      {1, 0} based number. Can be retrieved by calling vim.api.nvim_buf_get_mark()
 ---@param pos2       table      Same as pos1
 ---@param biasFactor number|nil
 ---@param biasIdx    number|nil To which value the factor is going to apply
 ---@return number value of distance from pos1 to pos2
-function M.posDist(pos1, pos2, biasFactor, biasIdx)
+function M.posDist(pos1, pos2, biasFactor, biasIdx) -- {{{
     biasFactor = biasFactor or 1
     biasIdx    = biasIdx or 1
     local lineDist
@@ -143,64 +138,48 @@ function M.posDist(pos1, pos2, biasFactor, biasIdx)
         colDist  = (pos1[2] - pos2[2])^2 * biasFactor
     end
     return lineDist + colDist
-end
-
-
+end -- }}}
 --- Compare the distance from a to b by subtracting them
---- @param a table list-liked table
---- @param b table list-liked table
---- @return number
-function M.compareDist(a, b)
+---@param a table list-liked table
+---@param b table list-liked table
+---@return number
+function M.compareDist(a, b) -- {{{
     for idx, val in ipairs({a, b}) do
         assert(vim.tbl_islist(val), string.format("Argument %s expects list-liked table", idx))
     end
     return a[1] == b[1] and a[2] - b[2] or a[1] - b[1]
-end
-
-
---- Check if pos is whithin a defined region
---- @param pos table
---- @param regionStart table
---- @param regionEnd table
---- @return boolean
-function M.withinRegion(pos, regionStart, regionEnd)
+end -- }}}
+--- Check if pos is whithin a defined region. Note that all position have to
+--be the same index based. e.g They must be all (0, 0) indexed or all (1, 0)
+--indexed etc
+---@param pos table
+---@param regionStart table
+---@param regionEnd table
+---@return boolean
+function M.withinRegion(pos, regionStart, regionEnd) -- {{{
     if M.compareDist(pos, regionStart) < 0 or M.compareDist(regionEnd, pos) < 0 then
         return false
     else
         return true
     end
-end
-
-
-function M.splitExist()
-    local winCount  = vim.fn.winnr("$")
-    local ui        = vim.api.nvim_list_uis()[1]
-    -- Based on vim.o.guifont = "更纱黑体 Mono SC Nerd:h13"
-    if vim.fn.has("win32") == 1 then
-        if winCount == 2 and 232/2 < ui["width"] then vim.cmd [[noautocmd wincmd L]] end
-    elseif vim.fn.has("unix") == 1 then
-        if winCount == 2 and 284/2 < ui["width"] then vim.cmd [[noautocmd wincmd L]] end
-    end
-end
-
-
+end -- }}}
 --- Create highlights for region in a buffer. The region is defined by two
 --- tables containing position info represent the start and the end
 --- respectively. The region can be multi-lines across in a buffer
---- @param bufNr      number     Buffer number/handler
---- @param posStart   table      (1, 0)-indexed values from vim.api.nvim_buf_get_mark()
---- @param posEnd     table      (1, 0)-indexed values from vim.api.nvim_buf_get_mark()
---- @param regType    string     Register type from vim.fn.getregtype()
---- @param hlGroup    string     Highlight group name
---- @param hlTimeout  number     Determine how long the highlight will be clear
+---@param bufNr      number     Buffer number/handler
+---@param posStart   table      (1, 0)-indexed values from vim.api.nvim_buf_get_mark()
+---@param posEnd     table      (1, 0)-indexed values from vim.api.nvim_buf_get_mark()
+---@param regType    string     Register type from vim.fn.getregtype()
+---@param hlGroup    string     Highlight group name
+---@param hlTimeout  number     Determine how long the highlight will be clear
 --- after being created
---- @param presNS     number|nil Optional ID of the preserved namespace, in which the
+---@param presNS     number|nil Optional ID of the preserved namespace, in which the
 --- preserved extmark will be stored to keep track of highlight content
---- @param zeroBasedChk? boolean Set to true if the posStart and posEnd is (0, 0) based
---- @return number|boolean Return integer or true when successful, which is the
+---@param zeroBasedChk? boolean Set to true if the posStart and posEnd is (0, 0) based
+---@return number|boolean Return integer or true when successful, which is the
 --- ID of the preserved namespace of the content defined by. Return false when
 --- failed posStart and posEnd
-M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, presNS, zeroBasedChk)
+M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, presNS, zeroBasedChk) -- {{{
     if zeroBasedChk == nil then zeroBasedChk = false end
     local presExtmark
 
@@ -250,11 +229,13 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, 
     else
         return true
     end
-end
-
-
+end -- }}}
 -- Credit: https://github.com/LunarVim/LunarVim/blob/2d373036493b3a61ef24d98efdeecbe8e74467be/lua/lvim/utils/modules.lua#L68
-M.requireSafe = function(mod)
+--- A safer require function
+---@param mod string Module name
+---@return any|boolean Data returned by require lua module or false to signify
+--a failure require
+M.requireSafe = function(mod) -- {{{
     local ok, module = pcall(require, mod)
     if not ok then
         local trace = debug.getinfo(2, "SL")
@@ -266,23 +247,24 @@ M.requireSafe = function(mod)
     else
         return module
     end
-end
-
-
-M.saveViewCursor = function(printFormula)
+end -- }}}
+--- Save the cursor position in current window, also respect the topline and
+--the botline of the current window
+---@param printFormulaChk boolean Set it to true to debug print the data
+M.saveViewCursor = function(printFormulaChk) -- {{{
+    -- https://github.com/notomo/neovim/blob/da134270d3e9f8a4824b0e0540bf017f7e59b06e/src/nvim/ex_session.c#L436
+    -- https://www.cs.cmu.edu/afs/club/contrib/build/debian8/vim/src/session.c
     local cursorPos = vim.api.nvim_win_get_cursor(0)
     cursorPos = {cursorPos[1], cursorPos[2] + 1} -- (1, 1) indexed
     local curWinID = vim.api.nvim_get_current_win()
     local winInfo  = vim.fn.getwininfo(curWinID)[1]
-    if printFormula then
+    if printFormulaChk then
         Print(string.format("%d - ((%d * winheight(0) + %d) / %d)", cursorPos[1], cursorPos[1] - winInfo.topline, math.floor(winInfo.height / 2), winInfo.height))
         Print(cursorPos[1] - ((cursorPos[1] - winInfo.topline) * vim.fn.winheight(0) + math.floor(winInfo.height / 2)) / winInfo.height)
         Print(vim.fn.winheight(0))
         return
     end
-    M.restoreViewCursor = function()
-        -- https://github.com/notomo/neovim/blob/da134270d3e9f8a4824b0e0540bf017f7e59b06e/src/nvim/ex_session.c#L436
-        -- https://www.cs.cmu.edu/afs/club/contrib/build/debian8/vim/src/session.c
+    M.restoreViewCursor = function() -- {{{
         local soSave   = vim.o.so
         local sisoSave = vim.o.siso
         vim.o.so    = 0
@@ -299,10 +281,8 @@ M.saveViewCursor = function(printFormula)
         vim.o.so   = soSave
         vim.o.siso = sisoSave
         M.restoreViewCursor = nil
-    end
-end
-
-
+    end -- }}}
+end -- }}}
 --- Get node text at given range
 ---@param bufNr number
 ---@param range table Captured indices return by calling tsnode:range() . All
@@ -313,7 +293,7 @@ end
 ---start and column end, and positive number to shrink. Default 0
 ---@param concatChar? string What character will be used as the separator to
 ---concatenate table elements. Default ""
-M.getNodeText = function(bufNr, range, xOffset, yOffset, concatChar)
+M.getNodeText = function(bufNr, range, xOffset, yOffset, concatChar) -- {{{
     xOffset = xOffset or 0
     yOffset = yOffset or 0
     concatChar = concatChar or ""
@@ -325,15 +305,13 @@ M.getNodeText = function(bufNr, range, xOffset, yOffset, concatChar)
         range[4] - xOffset,
         {})
     return table.concat(text, concatChar)
-end
-
-
+end -- }}}
 --- Get nodes from Treesitter query
 ---@param bufNr number
 ---@param query string
 ---@param captureId? number Specific id to be capture when calling query.iter_captures()
 ---@return table
-M.getQueryNodes = function(bufNr, query, captureId)
+M.getQueryNodes = function(bufNr, query, captureId) -- {{{
     local lastLine = vim.api.nvim_buf_call(bufNr, function()
         ---@diagnostic disable-next-line: redundant-return-value
         return vim.fn.line("$")
@@ -358,7 +336,7 @@ M.getQueryNodes = function(bufNr, query, captureId)
     end
 
     return nodeTbl
-end
+end -- }}}
 
 
 return M

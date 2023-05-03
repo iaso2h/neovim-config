@@ -3,6 +3,7 @@
 -- Description: Enhance <C-i>/<C-o>
 -- Version: 0.0.13
 -- Last Modified: 05/03/2023 Wed
+--BUG: <C-I> at the oldest local position
 
 local defaultOpts  = {
     checkCursorRedundancy = true,

@@ -10,13 +10,12 @@ return function()
     -- @param bufNr: buffer number
     ----
     local conciseQuifix = function(tbl)
-        local api = vim.api
         if tbl then
             local i = tbl.items[1]
             if #tbl.items == 1 or (#tbl.items == 2 and
                                     i.filename == tbl.items[2].filename and
                                     i.lnum == tbl.items[2].lnum) then
-                local currentBufNr = api.nvim_get_current_buf()
+                local currentBufNr = vim.api.nvim_get_current_buf()
                 -- item.bufnr can be nil!
                 local itemBufNr = vim.fn.bufnr(i.filename)
                 if currentBufNr ~= itemBufNr then
@@ -26,7 +25,7 @@ return function()
                 end
                 require("jump.util").posCenter(function()
                     vim.cmd [[normal! m`]] -- Register current position in jumplist
-                    api.nvim_win_set_cursor(0, {i.lnum, i.col - 1})
+                    vim.api.nvim_win_set_cursor(0, {i.lnum, i.col - 1})
                     vim.cmd [[norm! zv]]
                 end, false)
             else
