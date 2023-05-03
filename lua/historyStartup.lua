@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
 -- Dependencies: 0
--- Version: 0.0.20
--- Last Modified: 2023-4-25
+-- Version: 0.0.21
+-- Last Modified: 05/03/2023 Wed
 -- TODO: ? to trigger menupage
 
 local M   = {
@@ -11,9 +11,12 @@ local M   = {
     lastBuf = -1,
     curWin  = -1,
     oldBuf  = -1,
+
     floatWinID = -1,
     floatBufNr = -1,
     floatTick = false,
+    floatLine = "",
+
     ns      = vim.api.nvim_create_namespace("historyStartup"),
     lines = {
         firstline = {"< New Buffer >"},
@@ -228,7 +231,7 @@ M.display = function(refreshChk) -- {{{
 
     -- Key mappings
     vim.defer_fn(function()
-        for _, key in ipairs {"o", "go", "<C-s>", "<C-v>", "<C-t>", "<CR>", "q", "Q", "K"} do
+        for _, key in ipairs {"o", "go", "<C-s>", "<C-v>", "<C-t>", "<CR>", "q", "Q", "K","yp"} do
             vim.api.nvim_buf_set_keymap(
                 M.curBuf,
                 "n",
@@ -243,10 +246,13 @@ end -- }}}
 
 local hover = function() -- {{{
     if not M.lines.relativeTick then return end
-    local lineIdx = vim.api.nvim_win_get_cursor(M.curWin)[1] - 1
-    if lineIdx < 1 then return end
-    local line = " " .. M.lines.absolute[lineIdx] .. " "
     local cursorPos = vim.api.nvim_win_get_cursor(M.curWin)
+    local lineIdx = cursorPos[1] - 1
+    if lineIdx < 1 then return end
+    M.floatLine = M.lines.absolute[lineIdx]
+
+    -- Construct float window
+    local line = " " .. M.floatLine .. " "
     local winInfo = vim.fn.getwininfo(M.curWin)[1]
     local hoverWidth = math.ceil(winInfo.width / 2)
     if #line < hoverWidth then hoverWidth = #line end
@@ -266,7 +272,7 @@ local hover = function() -- {{{
     vim.api.nvim_win_set_option(M.floatWinID, "signcolumn", "no")
 
     -- Create buf
-    if not M.floatBufNr then
+    if not M.floatBufNr or not vim.api.nvim_buf_is_valid(M.floatBufNr) then
         M.floatBufNr = vim.api.nvim_create_buf(false, true)
     end
     vim.api.nvim_buf_set_lines(M.floatBufNr, 0, -1, false, {line})
@@ -298,6 +304,7 @@ local hover = function() -- {{{
                 M.floatBufNr = nil
             end
             M.floatTick = false
+            M.floatLine = ""
         end
     })
 
@@ -311,19 +318,19 @@ M.execMap = function(key) -- {{{
     local lnum = vim.api.nvim_win_get_cursor(0)[1]
     key = string.lower(key)
 
-    if key == "o" or key == "<cr>" then
+    if key == "o" or key == "<cr>" then -- {{{
         if lnum == 1 then
             vim.cmd("enew")
         else
             vim.cmd("edit " .. M.lines.absolute[lnum - 1])
-        end
-    elseif key == "go" then
+        end -- }}}
+    elseif key == "go" then -- {{{
         if lnum == 1 then
             vim.cmd("noa enew")
         else
             vim.cmd("noa edit " .. M.lines.absolute[lnum - 1])
-        end
-    elseif key == "<c-t>" then
+        end -- }}}
+    elseif key == "<c-t>" then -- {{{
         if lnum == 1 then
             vim.cmd("tabnew")
         else
@@ -331,10 +338,22 @@ M.execMap = function(key) -- {{{
                 vim.cmd("tabnew")
                 vim.cmd("edit " .. M.lines.absolute[lnum - 1])
             end
+        end -- }}}
+    elseif key == "yp" then
+        local cursorPos = vim.api.nvim_win_get_cursor(M.curWin)
+        local lineIdx = cursorPos[1] - 1
+        local line
+        if not M.floatBufNr or not vim.api.nvim_buf_is_valid(M.floatBufNr) then
+            line = M.lines.absolute[lineIdx]
+        else
+            line = M.floatLine
         end
+        vim.fn.setreg(vim.v.register, line, "v")
+        vim.notify("File path copied")
     elseif key == "k" then
         hover()
     else
+        -- Related to spliting window or rearranging the window layout
         local lastBufVisibleTick = false
         if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
             local winIDTbl = vim.tbl_filter(function(i)
@@ -347,7 +366,7 @@ M.execMap = function(key) -- {{{
                 end
             end
         end
-        if key == "<c-s>" then
+        if key == "<c-s>" then -- {{{
             if lnum == 1 then
                 vim.cmd("noa split")
                 vim.cmd("enew")
@@ -360,8 +379,8 @@ M.execMap = function(key) -- {{{
                         vim.cmd("noa q!")
                     end
                 end
-            end
-        elseif key == "<c-v>" then
+            end -- }}}
+        elseif key == "<c-v>" then -- {{{
             if lnum == 1 then
                 vim.cmd("vnew")
             else
@@ -373,8 +392,8 @@ M.execMap = function(key) -- {{{
                         vim.cmd("noa q!")
                     end
                 end
-            end
-        elseif key == "q" then
+            end -- }}}
+        elseif key == "q" then -- {{{
             local bufsNonScratchOccurInWins = require("buffer.util").bufsNonScratchOccurInWins(
                 require("buffer.util").bufNrs(true) )
             if bufsNonScratchOccurInWins == 0 then
@@ -391,7 +410,7 @@ M.execMap = function(key) -- {{{
                     vim.cmd("noa q!")
                 end
             end
-        end
+        end -- }}}
     end
 end -- }}}
 
