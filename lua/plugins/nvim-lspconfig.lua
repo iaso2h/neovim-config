@@ -24,9 +24,11 @@ return function()
                     local openExcmd = "edit"
                     vim.cmd(string.format("%s %s", openExcmd, i.filename))
                 end
-                vim.cmd [[normal! m`]] -- Register current position in jumplist
-                api.nvim_win_set_cursor(0, {i.lnum, i.col - 1})
-                vim.cmd [[norm! zv]]
+                require("jump.util").posCenter(function()
+                    vim.cmd [[normal! m`]] -- Register current position in jumplist
+                    api.nvim_win_set_cursor(0, {i.lnum, i.col - 1})
+                    vim.cmd [[norm! zv]]
+                end, false)
             else
                 vim.fn.setqflist({}, "r", {items = tbl.items, title = tbl.title})
                 require("quickfix.toggle")(false)

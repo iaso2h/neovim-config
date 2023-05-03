@@ -166,4 +166,43 @@ M.jumplistRegisterLinesToTbl = function(returnJumpsChk, startLineNr, lastLineNr,
 end
 
 
+--- Execute ex command then center the screen if necessary
+---@param exCMD string|function Ex command or executable function
+---@param suppressMsgChk boolean
+---@param remapChk boolean
+M.posCenter = function(exCMD, suppressMsgChk, remapChk)
+    local winID      = vim.api.nvim_get_current_win()
+    local prevBufNr  = vim.api.nvim_get_current_buf()
+    local preWinInfo = vim.fn.getwininfo(winID)[1]
+    local ok, valOrMsg
+
+    -- Execute the command first
+    if type(exCMD) == "string" then
+        local remapStr = remapChk and "normal " or "normal! "
+        ok, valOrMsg = pcall(vim.api.nvim_command, remapStr .. vim.v.count1 .. t(exCMD))
+    elseif type(exCMD) == "function" then
+        ok, valOrMsg = pcall(exCMD)
+    else
+        return
+    end
+
+    if not ok and not suppressMsgChk then
+        vim.notify(valOrMsg, vim.log.levels.INFO)
+    end
+
+    local postBufNr = vim.api.nvim_get_current_buf()
+
+    -- Jump to a different buffer
+    if prevBufNr ~= postBufNr then return end
+
+    -- Make sure cursor does not sit on a fold line
+    vim.cmd[[norm! zv]]
+
+    local postCursorPos = vim.api.nvim_win_get_cursor(winID)
+    if postCursorPos[1] < preWinInfo.topline or postCursorPos[1] > preWinInfo.botline then
+        vim.cmd [[norm! zz]]
+    end
+end
+
+
 return M

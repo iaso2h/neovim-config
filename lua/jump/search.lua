@@ -3,7 +3,7 @@
 -- Description: Jump & Search utilities
 -- Version: 0.0.8
 -- Last Modified: 2023-4-27
-local M   = {}
+local M = {}
 
 --- Echo search pattern and result index at the commandline
 local echo = function()
@@ -57,45 +57,6 @@ M.searchSelected = function(exCMD)
 end
 
 
---- Execute ex command then center the screen situationally
----@param exCMD string Ex command
----@param suppressMsgChk boolean
----@param remapChk boolean
-M.centerHop = function(exCMD, suppressMsgChk, remapChk)
-    local winID      = vim.api.nvim_get_current_win()
-    local prevBufNr  = vim.api.nvim_get_current_buf()
-    local preWinInfo = vim.fn.getwininfo(winID)[1]
-
-    -- Execute the command first
-    if type(exCMD) == "string" then
-        local remapStr = remapChk and "normal " or "normal! "
-        local ok, valOrMsg = pcall(vim.api.nvim_command, remapStr .. vim.v.count1 .. t(exCMD))
-        if not ok and not suppressMsgChk then
-            local idx = select(2,string.find(valOrMsg, "E%d+: "))
-            valOrMsg = string.sub(valOrMsg, idx + 1, -1)
-            vim.notify(valOrMsg, vim.log.levels.INFO)
-        end
-    elseif type(exCMD) == "function" then
-        exCMD()
-    else
-        return
-    end
-
-    local curBufNr = vim.api.nvim_get_current_buf()
-
-    -- Jump to a different buffer
-    if prevBufNr ~= curBufNr then return end
-
-    -- Make sure cursor does not sit on a fold line
-    vim.cmd[[norm! zv]]
-
-    local postCursorPos = vim.api.nvim_win_get_cursor(winID)
-    if postCursorPos[1] < preWinInfo.topline or postCursorPos[1] > preWinInfo.botline then
-        vim.cmd [[norm! zz]]
-    end
-end
-
-
 M.cword = function(exCmd, WORDChk)
     exCmd = WORDChk and "g" .. exCmd or exCmd
     local util = require("util")
@@ -110,4 +71,3 @@ end
 
 
 return M
-
