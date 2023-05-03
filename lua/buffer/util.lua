@@ -3,17 +3,16 @@ local var = require("buffer.var")
 
 
 --- Gather information about buffers and windows for further processing
-M.initBuf = function()
-    var.bufNr    = vim.api.nvim_get_current_buf()
+---@param bufNr? number
+M.initBuf = function(bufNr) -- {{{
+    var.bufNr    = bufNr or vim.api.nvim_get_current_buf()
     var.bufNrs   = M.bufNrs(true, false)
     var.bufName  = nvim_buf_get_name(var.bufNr)
     var.bufType  = vim.bo.buftype
     var.fileType = vim.bo.filetype
     var.winId    = vim.api.nvim_get_current_win()
     var.winIds   = M.winIds(false)
-end
-
-
+end -- }}}
 --- Check if the provided buffer is a special buffer
 ---@param bufNr? number If it isn't provided, the `var.bufNr` will be used
 ---@return boolean

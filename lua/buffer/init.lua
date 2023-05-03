@@ -8,7 +8,7 @@ end
 
 
 M.restoreClosedBuf = function()
-    if var.lastClosedFilePath then
+    if var.lastClosedFilePath and vim.loop.fs_stat(var.lastClosedFilePath) then
         vim.cmd(string.format("e %s", var.lastClosedFilePath))
     end
 end

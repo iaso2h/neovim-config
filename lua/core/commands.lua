@@ -203,17 +203,14 @@ vim.api.nvim_create_user_command("Se", function (opts)
         sessionDir, _G._sep, _G._sep, sessionName))
 
     -- Delete invalid buffers
-    vim.defer_fn(function()
-        local bufTbl = vim.api.nvim_list_bufs()
-        local cond = function(buf)
-            return vim.api.nvim_buf_get_option(buf, "buflisted") and
-                not vim.loop.fs_stat(vim.api.nvim_buf_get_name(buf))
-        end
-        bufTbl = vim.tbl_filter(cond, bufTbl)
-        for _, buf in ipairs(bufTbl) do
-            vim.api.nvim_buf_delete(buf, {})
-        end
-    end, 0)
+    local invalidBufNrs = vim.tbl_filter(function(buf)
+        return vim.api.nvim_buf_get_option(buf, "buflisted") and
+            not vim.loop.fs_stat(vim.api.nvim_buf_get_name(buf))
+    end, vim.api.nvim_list_bufs())
+
+    for _, bufNr in ipairs(invalidBufNrs) do
+        vim.api.nvim_buf_delete(bufNr, {})
+    end
 end, {
     desc  = "Load session",
     nargs = "?",

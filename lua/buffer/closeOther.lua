@@ -1,8 +1,8 @@
 -- File: closeOther
 -- Author: iaso2h
 -- Description: Close other buffers or windows
--- Version: 0.0.5
--- Last Modified: 05/02/2023 Tue
+-- Version: 0.0.6
+-- Last Modified: 05/03/2023 Wed
 local u     = require("buffer.util")
 local var   = require("buffer.var")
 local close = require("buffer.close")
@@ -10,18 +10,22 @@ local close = require("buffer.close")
 local filetypeWhitelist = {"qf", "help", "terminal"}
 local buftypeWhitelist  = {"terminal"}
 
---- Wipe all the other buffers except for the special buffers without changing the window layout
-return function()
-    local saveWinId = vim.api.nvim_get_current_win()
-    local saveBufNr = vim.api.nvim_get_current_buf()
 
+--- Check modified state of specified buffer numbers and prompt for saving if
+--unsave changes found
+---@param bufNrs table
+---@param saveBufNr number
+---@return boolean Evaluate to false if cancel signal has input
+local saveModified = function(bufNrs, saveBufNr)
     local changeTick = false
     local answer = -1
-    -- Check unsaved change
-    for _, bufNr in ipairs(var.bufNrs) do
-        if bufNr ~= var.bufNr then
+    for _, bufNr in ipairs(bufNrs) do
+        if bufNr ~= saveBufNr then
             local modified = vim.api.nvim_buf_get_option(bufNr, "modified")
-            if modified then changeTick = true; break end
+            if modified then
+                changeTick = true
+                break
+            end
         end
     end
     -- Ask for saving, return when cancel is input
@@ -32,19 +36,32 @@ return function()
         vim.cmd "noa echohl None"
         -- Interrupt
         if answer == 3 or answer == 0 then
-            return
+            return false
         elseif answer == 1 then
             vim.cmd "noa silent bufdo update"
+            return true
         end
     end
 
+    return true
+end
+
+--- Wipe all the other buffers except for the special buffers without changing the window layout
+return function()
+    local saveWinId = vim.api.nvim_get_current_win()
+    local saveBufNr = vim.api.nvim_get_current_buf()
+
+    local bufNrs = u.bufNrs()
+    if not saveModified(bufNrs, saveBufNr) then
+        return
+    end
+
     -- Deleting other buffers
-    for _, bufNr in ipairs(u.bufNrs()) do
+    for _, bufNr in ipairs(bufNrs) do
         if bufNr ~= saveBufNr and
             not vim.tbl_contains(filetypeWhitelist, vim.api.nvim_buf_get_option(bufNr, "filetype")) and
             not vim.tbl_contains(buftypeWhitelist, vim.api.nvim_buf_get_option(bufNr, "buftype")) then
-
-            u.initBuf()
+            u.initBuf(bufNr)
             close.bufHandler(false, false)
         end
     end
