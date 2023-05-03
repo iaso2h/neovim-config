@@ -958,6 +958,9 @@ local pluginArgs = { -- {{{
     {
         "mrjones2014/lua-gf.nvim",
         ft = "lua",
+        config = function()
+            map("n", [[gF]], [[<CMD>lua require("plugins.nvim-lua-gf")()<CR>]], {"silent"}, "Go to file")
+        end
     },
     {
         "dzeban/vim-log-syntax",
