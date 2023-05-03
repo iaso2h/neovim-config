@@ -85,7 +85,7 @@ return function() -- {{{
     local fileInfo = function() -- {{{
         if vim.bo.filetype == "qf" then -- {{{
             local title
-            if vim.b._is_loc then
+            if vim.b._is_local then
                 title = vim.fn.getloclist(0, {title = 0}).title
             else
                 title = vim.fn.getqflist({title = 0}).title
@@ -423,9 +423,9 @@ return function() -- {{{
                 local leadingSpaces = "  "
                 local fileType = vim.bo.filetype
                 if fileType == "qf" then
-                    -- The value of vim.b._is_loc is set up whenever a qf filetype
+                    -- The value of vim.b._is_local is set up whenever a qf filetype
                     -- is set via `after/ftplugin/qf.lua`
-                    fileType = vim.b._is_loc and "Location list" or "Quickfix"
+                    fileType = vim.b._is_local and "Location list" or "Quickfix"
                     return leadingSpaces .. icon.ui.Quickfix .. padding .. fileType .. padding
                 else
                     local bufIcon  = _G._short_line_infos[fileType].icon

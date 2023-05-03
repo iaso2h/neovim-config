@@ -2,9 +2,9 @@
 
 -- Location list detection
 if next(vim.fn.getloclist(0, {items = 0}).items) then
-    vim.b._is_loc = true
+    vim.b._is_local = true
 end
-if vim.b._is_loc then
+if vim.b._is_local then
     bmap(0, "n", [[<C-f>]], [[:Lfilter ]],          {"nowait"}, "Filter in quickfix")
     bmap(0, "n", [[%]],     [[<CMD>Lfilter %<CR>]], {"silent"}, "Filter other buffer in quickfix")
     bmap(0, "n", [[#]],     [[<CMD>Cfilter #<CR>]], {"silent"}, "Filter other buffer in quickfix")

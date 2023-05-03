@@ -4,7 +4,7 @@ local M   = {}
 --- Universally warp around getlocist() and getqflist()
 ---@vararg any
 M.getlist = function(...)
-    if vim.b._is_loc then
+    if vim.b._is_local then
         return vim.fn.getloclist(0, ...)
     else
         return vim.fn.getqflist(...)

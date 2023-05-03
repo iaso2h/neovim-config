@@ -1,26 +1,26 @@
 -- File: cc.lua
 -- Author: iaso2h
 -- Description: Enhance version of the :cc
--- Version: 0.0.6
--- Last Modified: Mon 01 May 2023
+-- Version: 0.0.7
+-- Last Modified: 05/03/2023 Wed
 
 --- Set current window focus
 ---@param closeQfChk boolean Whether to close the quickfix window
----@param qfWinID number Window ID of the quickfix window
+---@param qfWinId number Window ID of the quickfix window
 ---@param targetCursorPos table target cursor position
-local setCurrentWin = function(closeQfChk, qfWinID, targetCursorPos)
+local setCurrentWin = function(closeQfChk, qfWinId, targetCursorPos)
     if not closeQfChk then
-        local ok, msg = pcall(vim.api.nvim_set_current_win, qfWinID)
+        local ok, msg = pcall(vim.api.nvim_set_current_win, qfWinId)
         if not ok then
             vim.notify(msg, vim.log.levels.WARN)
             vim.cmd[[wincmd p]]
         end
-        ok, msg = pcall(vim.api.nvim_win_set_cursor, qfWinID, targetCursorPos)
+        ok, msg = pcall(vim.api.nvim_win_set_cursor, qfWinId, targetCursorPos)
         if not ok then
             vim.notify(msg, vim.log.levels.WARN)
         end
     else
-        vim.api.nvim_win_close(qfWinID, false)
+        vim.api.nvim_win_close(qfWinId, false)
     end
 end
 
@@ -49,8 +49,8 @@ return function(closeQfChk, offset)
         return vim.notify("No quickfix items available")
     end
 
-    local qfWinID     = vim.api.nvim_get_current_win()
-    local qfCursorPos = vim.api.nvim_win_get_cursor(qfWinID)
+    local qfWinId     = vim.api.nvim_get_current_win()
+    local qfCursorPos = vim.api.nvim_win_get_cursor(qfWinId)
     local targetCursorPos = {}
 
     -- Get target line
@@ -73,6 +73,18 @@ return function(closeQfChk, offset)
         targetCursorPos = {targetLineNr, qfCursorPos[2]}
     end
 
+
+    -- Local list. Terminate the function
+    if vim.b._is_local then
+        vim.api.nvim_win_set_cursor(qfWinId, {targetLineNr, 0})
+        vim.cmd(t[[norm! <CR>]])
+        if closeQfChk then
+            vim.api.nvim_win_close(qfWinId, false)
+        end
+        return
+    end
+
+    -- Global quick list
     local targetItem = qfItems[targetLineNr]
     if not targetItem then
         return vim.notify("Invalid quickfix item", vim.log.levels.ERROR)
@@ -95,5 +107,5 @@ return function(closeQfChk, offset)
     end
 
     -- User the built-in :cc command to open quickfix item
-    return fallback(targetLineNr, closeQfChk, qfWinID, targetCursorPos)
+    return fallback(targetLineNr, closeQfChk, qfWinId, targetCursorPos)
 end
