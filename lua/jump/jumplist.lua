@@ -1,8 +1,8 @@
 -- File: jumplist
 -- Author: iaso2h
 -- Description: Enhance <C-i>/<C-o>
--- Version: 0.0.12
--- Last Modified: 2023-4-27
+-- Version: 0.0.13
+-- Last Modified: 05/03/2023 Wed
 
 local defaultOpts  = {
     checkCursorRedundancy = true,
@@ -102,20 +102,17 @@ local getJumpsSliced = function(isNewer, filter, CmdIdx, jumpsCmdRaw, jumpIdx, j
     for i = cmdStart, cmdEnd, step do
         local jumpCmd = jumpUtil.jumpCmdParse(jumpsCmdRaw[i])
 
-        if not M.opts.returnAllJumps and vim.v.count1 == #jumpsSliced then
-            break
-        end
-
         if jumpIdx and jumps then
             -- Loop the jumps in the the same direction to match the the same
             -- value of lnum and col, hence aligning the data
             jumpStart = i - offset + 1
             for x = jumpStart, jumpEnd, step do
-                local jump    = jumps[x]
+                local jump = jumps[x]
                 -- UGLY: Sometime `vim.fn.getjumplist()[1]` will contain some
                 -- items come with invalid bufnr and insert them for no reason
                 -- Probably because the prompt window when invoking the `:jumps`
                 -- command?
+                -- OPTIM: filter jump table on the fly to improve performance
                 if vim.api.nvim_buf_is_valid(jump.bufnr) and
                         jump.col == jumpCmd.col and
                         jump.lnum == jumpCmd.lnum then
@@ -148,9 +145,7 @@ end
 ---@return table
 local getJumps = function(isNewer, winId, filter) -- {{{
     -- Get jumps from built-in function
-    local jumpsList   = vim.fn.getjumplist(winId)
-    local jumpIdx     = jumpsList[2]
-    local jumps       = jumpsList[1]
+    local jumps, jumpIdx = unpack(vim.fn.getjumplist(winId))
     local jumpsSliced = {}
     if jumpIdx == 0 then
         vim.notify("Jumplist is empty", vim.log.levels.INFO)
