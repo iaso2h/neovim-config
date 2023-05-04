@@ -134,6 +134,20 @@ return function()
     local mapArgs = {
         ["<A-e>"] = cmp.mapping.scroll_docs(-4),
         ["<A-d>"] = cmp.mapping.scroll_docs(4),
+        ["<Down>"] = function ()
+            if cmp.visible() then
+                cmp.select_next_item()
+            else
+                vim.cmd(t"norm! <Down>")
+            end
+        end,
+        ["<Up>"] = function ()
+            if cmp.visible() then
+                cmp.select_prev_item()
+            else
+                vim.cmd(t"norm! <Up>")
+            end
+        end,
         ["<C-p>"] = function()
             if cmp.visible() then
                 cmp.select_prev_item()

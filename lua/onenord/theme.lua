@@ -319,7 +319,7 @@ theme.treesitter         = {
     theme.treesitter["@comment"]           = {link = "Comment"}
     theme.treesitter["@conditional"]       = {link = "Conditional"}
     theme.treesitter["@function"]          = {link = "Function"}
-    theme.treesitter["@function.builtin"]  = {fg = p.blue , style = "bold"}
+    theme.treesitter["@function.builtin"]  = {link = "TSFuncBuiltin"}
     theme.treesitter["@method"]            = {link = "Function"}
     theme.treesitter["@namespace"]         = {link = "TSNamespace"}
     theme.treesitter["@namespace.builtin"] = {fg = "#00ffe5", style = "bold"}
