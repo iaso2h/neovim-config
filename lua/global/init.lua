@@ -141,8 +141,8 @@ require("global.keymap")
 _G.Print = function(...)
     local objects = {}
     for i = 1, select('#', ...) do
-        local v = select(i, ...)
-        table.insert(objects, vim.inspect(v))
+        local obj = select(i, ...)
+        table.insert(objects, vim.inspect(obj))
     end
 
     print(table.concat(objects, '\n'))
@@ -154,56 +154,13 @@ end
 _G.logBuf = function(...)
     local objects = {}
     for i = 1, select('#', ...) do
-        local v = select(i, ...)
-        table.insert(objects, vim.inspect(v))
+        local obj = select(i, ...)
+        vim.list_extend(objects, vim.split(vim.inspect(obj), "\n", {plain=true}))
     end
-    table.insert(objects, 1, os.date("%Y-%m-%d-%H:%M:%S", os.time()) .. "-------------------------------------------")
+    table.insert(objects, 1, os.date("-----%Y-%m-%d-%H:%M:%S", os.time()) .. "-----")
 
     -- Output the result into a new scratch buffer
-    if _G._log_buf_nr and vim.api.nvim_buf_is_valid(_G._log_buf_nr) then
-        -- if scratch buffer is visible, populate the date into it
-        local visibleTick = false
-        for _, win in ipairs(vim.api.nvim_list_wins()) do
-            if vim.api.nvim_win_get_buf(win) == _G._log_buf_nr then
-                vim.api.nvim_set_current_win(win)
-                vim.cmd [[keepjumps norm! G]]
-                vim.api.nvim_put(objects, "l", true, true)
-                visibleTick = true
-                break
-            end
-        end
-        if not visibleTick then
-            local layoutCmd = require("buffer.split").handler(false)
-            vim.cmd(layoutCmd)
-            vim.api.nvim_set_current_buf(_G._log_buf_nr)
-            vim.api.nvim_put(objects, "l", true, true)
-            vim.cmd "wincmd p"
-        end
-    elseif vim.api.nvim_buf_get_name(0) == "" and vim.bo.modifiable and
-            vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
-        -- Use current file as the log buffer
-        _G._log_buf_nr = vim.api.nvim_get_current_buf()
-        vim.api.nvim_buf_set_option(_G._log_buf_nr, "bufhidden", "wipe")
-        vim.api.nvim_buf_set_option(_G._log_buf_nr, "buftype", "nofile")
-        vim.api.nvim_put(objects, "l", true, true)
-        -- vim.api.nvim_buf_set_lines(_G._logBufNr, 0, -1, false, objects)
-    else
-        local layoutCmd = require("buffer.split").handler(false)
-        vim.cmd(layoutCmd)
-        _G._log_buf_nr = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(_G._log_buf_nr, "bufhidden", "wipe")
-        vim.api.nvim_set_current_buf(_G._log_buf_nr)
-        vim.api.nvim_put(objects, "l", true, true)
-        -- vim.api.nvim_buf_set_lines(_G._logBufNr, 0, -1, false, objects)
-        vim.cmd "wincmd p"
-    end
-
-    vim.defer_fn(function()
-        vim.cmd([[%s#\\n#\r#e]])
-        vim.cmd("noh")
-    end ,0)
-
-    return ...
+    _G._log_buf_nr = require("buffer.util").redirScratch(objects, _G._log_buf_nr, true)
 end
 
 

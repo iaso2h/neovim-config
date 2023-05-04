@@ -94,12 +94,28 @@ M.jumpCmdParse = function(jumpCmdRaw)
 end
 
 
-M.jumplistRegisterLinesToTbl = function(returnJumpsChk, startLineNr, lastLineNr, onlyOutputSpecialCharChk, bufferThreshold)
+end -- }}}
+--- Register specific line region in the current buffer and generate the `:
+--jumps` output as table or redirect it to a scratch buffer
+---@param returnJumpsChk? boolean Whether to return output as table or
+--redirect the output into a scratch buffer
+---@param startLineNr? number
+---@param lastLineNr? number
+---@param onlyOutputSpecialCharChk boolean Whether to generate output only
+--when non-printable character found in the `:jumps` prompt
+---@param bufferThreshold? number How many lines to capture the `:jumps`
+--output. Default is 50, which is the gerneral line number the `:jumps` will
+--remember
+M.jumplistRegisterLinesToTbl = function(returnJumpsChk, startLineNr, lastLineNr, onlyOutputSpecialCharChk, bufferThreshold) -- {{{
     startLineNr = startLineNr or 1
-    lastLineNr = lastLineNr or vim.fn.line("$")
     bufferThreshold = bufferThreshold or 50
+    if not lastLineNr then
+        lastLineNr = vim.fn.line("$")
+    else
+        local bufferLastLine = vim.fn.line("$")
+        lastLineNr = lastLineNr > bufferLastLine and bufferLastLine or lastLineNr
+    end
 
-    local currentBuf = vim.api.nvim_get_current_buf()
     local jumpsTbl = {}
     local extendJump = function()
         local jumps = M.getJumpsCmd()
@@ -121,12 +137,12 @@ M.jumplistRegisterLinesToTbl = function(returnJumpsChk, startLineNr, lastLineNr,
             -- last line of the buffer
             vim.cmd [[norm! m```j]]
         else
-            if lastLineNr % 50 ~= 0 then
+            if lastLineNr % bufferThreshold ~= 0 then
                 extendJump()
             end
         end
 
-        if i % 50 == 0 then
+        if i % bufferThreshold == 0 then
             extendJump()
         end
     end
@@ -151,26 +167,13 @@ M.jumplistRegisterLinesToTbl = function(returnJumpsChk, startLineNr, lastLineNr,
     end
 
     -- Output the result into a new scratch buffer
-    local scratchBuf
-    if vim.api.nvim_buf_get_name(0) == "" and vim.bo.modifiable and
-            vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
-        scratchBuf = currentBuf
-    else
-        local layoutCmd = require("buffer.split").handler(false)
-        vim.cmd(layoutCmd)
-        scratchBuf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(scratchBuf, "bufhidden", "wipe")
-        vim.api.nvim_set_current_buf(scratchBuf)
-    end
-    vim.api.nvim_buf_set_lines(scratchBuf, 0, -1, false, jumpsTbl)
-end
-
-
+    require("buffer.util").redirScratch(jumpsTbl, nil)
+end -- }}}
 --- Execute ex command then center the screen if necessary
 ---@param exCMD string|function Ex command or executable function
 ---@param suppressMsgChk boolean
 ---@param remapChk boolean
-M.posCenter = function(exCMD, suppressMsgChk, remapChk)
+M.posCenter = function(exCMD, suppressMsgChk, remapChk) -- {{{
     local winID      = vim.api.nvim_get_current_win()
     local prevBufNr  = vim.api.nvim_get_current_buf()
     local preWinInfo = vim.fn.getwininfo(winID)[1]
@@ -202,7 +205,7 @@ M.posCenter = function(exCMD, suppressMsgChk, remapChk)
     if postCursorPos[1] < preWinInfo.topline or postCursorPos[1] > preWinInfo.botline then
         vim.cmd [[norm! zz]]
     end
-end
+end -- }}}
 
 
 return M

@@ -78,7 +78,9 @@ vim.api.nvim_create_user_command([[PP strftime('%c') . ": " . <args>]], "Echo", 
 })
 
 vim.api.nvim_create_user_command("Redir", function(opts)
-    require("buffer.redir").catch(opts.args)
+    local output = vim.api.nvim_exec2(opts.args, {output = true}).output
+    local lines = vim.split(output, "\n", {plain = true, trimempty = true})
+    require("buffer.util").redirScratch(lines, nil)
 end, {
     desc     = "Echo from Scriptease plug-ins",
     nargs    = "+",

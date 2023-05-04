@@ -304,6 +304,72 @@ M.getCurWinLayoutTest = function() -- {{{
     end
 
 end -- }}}
+---Redirect the lines into a scratch buffer
+---@param lines string[] List-like table contains strings that represent
+--different lines respectively
+---@param scratchBufNr number|nil The scratch buffer to which the lines will
+--be redirect to. If nil provided, a new buffer number will be created
+---@param appendChk? boolean Whether to append the new lines at the end if the
+--scracth buffer exist
+---@param preHook? function Optional function to call before the redirection
+---@param postHook? function Optional function to call after the redirection
+---@return number The scratch bufffer
+M.redirScratch = function(lines, scratchBufNr, appendChk, preHook, postHook)
+    if preHook  and vim.is_callable(preHook)  then preHook()  end
+    if postHook and vim.is_callable(postHook) then postHook() end
+    local startLine = appendChk and -1 or 0
+    local scratchWinId
+
+    -- Output the result into a new scratch buffer
+    if scratchBufNr and vim.api.nvim_buf_is_valid(scratchBufNr) then
+        -- if scratch buffer is visible, populate the date into it
+        local visibleTick = false
+        for _, winId in ipairs(vim.api.nvim_list_wins()) do
+            if vim.api.nvim_win_get_buf(winId) == scratchBufNr then
+                scratchWinId = winId
+
+                vim.api.nvim_buf_set_lines(scratchBufNr, startLine, -1, false, lines)
+                visibleTick = true
+                break
+            end
+        end
+        if not visibleTick then
+            local layoutCmd = require("buffer.split").handler(true)
+            vim.cmd(layoutCmd .. " new")
+            scratchWinId = vim.api.nvim_get_current_win()
+
+            vim.api.nvim_buf_set_lines(scratchBufNr, startLine, -1, false, lines)
+            vim.cmd "wincmd p"
+        end
+    elseif vim.api.nvim_buf_get_name(0) == "" and vim.bo.modifiable and
+            vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
+        -- Use current file as the log buffer
+        scratchBufNr = vim.api.nvim_get_current_buf()
+        scratchWinId = vim.api.nvim_get_current_win()
+
+        vim.api.nvim_buf_set_option(scratchBufNr, "buflisted", false)
+        vim.api.nvim_buf_set_option(scratchBufNr, "bufhidden", "wipe")
+        vim.api.nvim_buf_set_option(scratchBufNr, "buftype", "nofile")
+        vim.api.nvim_buf_set_lines(scratchBufNr, 0, -1, false, lines)
+    else
+        local layoutCmd = require("buffer.split").handler(false)
+        vim.cmd(layoutCmd)
+        scratchWinId = vim.api.nvim_get_current_win()
+        scratchBufNr = vim.api.nvim_create_buf(false, true)
+        vim.api.nvim_set_current_buf(scratchBufNr)
+
+        vim.api.nvim_buf_set_option(scratchBufNr, "bufhidden", "wipe")
+        vim.api.nvim_buf_set_lines(scratchBufNr, 0, -1, false, lines)
+        vim.cmd "wincmd p"
+    end
+
+    local lastLine = vim.api.nvim_buf_call(scratchBufNr, function()
+        return vim.fn.line("$")
+    end)
+    vim.api.nvim_win_set_cursor(scratchWinId, {lastLine, 0})
+
+    return scratchBufNr
+end
 
 
 return M
