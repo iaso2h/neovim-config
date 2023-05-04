@@ -259,16 +259,16 @@ local execute = function(vimMode, isNewer, winId, cursorPos, jumpsFiltered)
     else
         count = vim.v.count1
     end
-    local exCMD = isNewer and t"<C-i>" or t"<C-o>"
+    local exCmd = isNewer and t"<C-i>" or t"<C-o>"
     if type(jumpsFiltered) == "table" and vimMode ~= "n" then
         local visualCMD = "v" ~= string.lower(vimMode) and t"<C-q>" or vimMode
-        vim.cmd(string.format("norm! %s%s%s", t"<Esc>", count, exCMD))
+        vim.cmd(string.format("norm! %s%s%s", t"<Esc>", count, exCmd))
         local posCursor = vim.api.nvim_win_get_cursor(winId)
         vim.api.nvim_win_set_cursor(winId, cursorPos)
         vim.cmd("noa norm! " .. visualCMD)
         vim.api.nvim_win_set_cursor(winId, posCursor)
     else
-        vim.cmd(string.format("norm! %s%s", count, exCMD))
+        vim.cmd(string.format("norm! %s%s", count, exCmd))
     end
 
     return count

@@ -372,25 +372,25 @@ end
 
 
 --- Execute an Ex command or a function
----@param exCMD string|function
-local function exeCommand(exCMD)
-    if type(exCMD) == "string" then
-        return vim.cmd(exCMD)
-    elseif type(exCMD) == "function" then
-        exCMD()
+---@param exCmd string|function
+local function exeCommand(exCmd)
+    if type(exCmd) == "string" then
+        return vim.cmd(exCmd)
+    elseif type(exCmd) == "function" then
+        exCmd()
     end
 end
 
 
 --- Snap to the closest fold and execute a Ex command or a function
----@param exCMD string|function An Ex command or a function. Note that it will
+---@param exCmd string|function An Ex command or a function. Note that it will
 ---be executed right away if the cursor is right above a fold start or a fold
 ---end
 ---@param snapEnable boolean Whether to enable the snap. If this set to false,
---- the exCMD will act like a right hand side of a normal mapping
+--- the exCmd will act like a right hand side of a normal mapping
 ---@param threshold number Multiplied by the Neovim window height to get the
 --- minimum number for the snap taking place
-M.snap = function(exCMD, snapEnable, threshold)
+M.snap = function(exCmd, snapEnable, threshold)
     --
     -- {
     -- botline = 12,
@@ -420,7 +420,7 @@ M.snap = function(exCMD, snapEnable, threshold)
     -- }
     -- Execute command right away
     if snapEnable == nil then snapEnable = true end
-    if not snapEnable then return exeCommand(exCMD) end
+    if not snapEnable then return exeCommand(exCmd) end
 
     -- Default value
     threshold = threshold or 1
@@ -431,7 +431,7 @@ M.snap = function(exCMD, snapEnable, threshold)
     -- (1, 0) indexed table
     local cursorPos = vim.api.nvim_win_get_cursor(curWinNr)
     if vim.fn.foldlevel(cursorPos[1]) ~= 0 then
-        return exeCommand(exCMD)
+        return exeCommand(exCmd)
     end
 
     local winInfo = vim.fn.getwininfo(curWinNr)
@@ -524,7 +524,7 @@ M.snap = function(exCMD, snapEnable, threshold)
     end
 
     -- Last but not least
-    exeCommand(exCMD)
+    exeCommand(exCmd)
 end
 
 

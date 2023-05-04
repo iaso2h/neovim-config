@@ -3,15 +3,12 @@ local preWinId
 local preBufNr
 local preCursor
 
-local postWinId
-local postBufNr
-local postCursor
-
 
 local fallback = function()
     vim.api.nvim_win_set_cursor(preWinId, preCursor)
     vim.cmd [[norm! gf]]
 end
+
 
 local handler = function(tbl) -- {{{
     if not tbl then return end

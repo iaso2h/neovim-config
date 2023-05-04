@@ -170,21 +170,22 @@ M.jumplistRegisterLinesToTbl = function(returnJumpsChk, startLineNr, lastLineNr,
     require("buffer.util").redirScratch(jumpsTbl, nil)
 end -- }}}
 --- Execute ex command then center the screen if necessary
----@param exCMD string|function Ex command or executable function
----@param suppressMsgChk boolean
----@param remapChk boolean
-M.posCenter = function(exCMD, suppressMsgChk, remapChk) -- {{{
+---@param exCmd string|function Ex command or executable function
+---@param suppressMsgChk? boolean Whether to suppress the error message when
+--execute the `exCmd` string or call the `exCmd` function
+---@param remapChk? boolean Whether to use remap key when execute a ex command
+M.posCenter = function(exCmd, suppressMsgChk, remapChk) -- {{{
     local winID      = vim.api.nvim_get_current_win()
     local prevBufNr  = vim.api.nvim_get_current_buf()
     local preWinInfo = vim.fn.getwininfo(winID)[1]
     local ok, valOrMsg
 
     -- Execute the command first
-    if type(exCMD) == "string" then
+    if type(exCmd) == "string" then
         local remapStr = remapChk and "normal " or "normal! "
-        ok, valOrMsg = pcall(vim.api.nvim_command, remapStr .. vim.v.count1 .. t(exCMD))
-    elseif type(exCMD) == "function" then
-        ok, valOrMsg = pcall(exCMD)
+        ok, valOrMsg = pcall(vim.api.nvim_command, remapStr .. vim.v.count1 .. t(exCmd))
+    elseif type(exCmd) == "function" then
+        ok, valOrMsg = pcall(exCmd)
     else
         return
     end

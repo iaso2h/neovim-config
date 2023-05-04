@@ -960,7 +960,6 @@ local pluginArgs = { -- {{{
     -- "CRAG666/code_runner.nvim"
     -- }}} Debug
     -- Language {{{
-    -- TODO: support dirname/init.lua jump and variable jump
     {
         "mrjones2014/lua-gf.nvim",
         ft = "lua",

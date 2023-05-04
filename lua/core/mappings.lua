@@ -6,10 +6,26 @@ vim.g.mapleader = " "
 -- Diagnostic mapping
 -- map("n", [[<leader>E]], [[<CMD>lua vim.diagnostic.open_float()<CR>]], {"silent"}, "LSP diagnostics")
 map("n", [[<C-q>d]], [[<CMD>lua require("quickfix.diagnostics").open(true, false)<CR>]], {"silent"}, "LSP add workspace folder")
-map("n", [[[e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to previous diagnostic symbol")
-map("n", [[]e]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to next diagnostic symbol")
-map("n", [[[E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to previous error")
-map("n", [[]E]], [[:lua vim.diagnostic.goto_prev{float = {border = "rounded"}, severity = "Error"};vim.cmd("norm! zz")<CR>]], {"silent"}, "Go to next error")
+map("n", [[[e]], function()
+    require("jump.util").posCenter(function()
+        vim.diagnostic.goto_prev { float = { border = "rounded" } }
+    end, false)
+end, "Go to previous diagnostic")
+map("n", [[]e]], function()
+    require("jump.util").posCenter(function()
+        vim.diagnostic.goto_next { float = { border = "rounded" } }
+    end, false)
+end, "Go to next diagnostic")
+map("n", [[[e]], function()
+    require("jump.util").posCenter(function()
+        vim.diagnostic.goto_prev { float = { border = "rounded" }, severity = "Error" }
+    end, false)
+end, "Go to previous error")
+map("n", [[]e]], function()
+    require("jump.util").posCenter(function()
+        vim.diagnostic.goto_next { float = { border = "rounded" }, severity = "Error" }
+    end, false)
+end, "Go to next error")
 -- Colorcolumn
 map("n", [[]C]], [[:noa windo set cc=80<CR>]], {"silent"}, "Turn on colorcolumn")
 map("n", [[[C]], [[:noa windo set cc&<CR>]],   {"silent"}, "Turn off colorcolumn")
@@ -276,42 +292,42 @@ end, "Select last yank")
 map("n", [[<leader>i]], [=[[I]=], "Inquiry word under cursor")
 map("x", [[<leader>i]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selection").get("string", false), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquiry selected words")
 -- Fast mark restore
-map("n", [[M]], [[<CMD>lua require("jump.util").posCenter("`m", true, false)<CR>]], "Restore mark M")
+map("n", [[M]], [[<CMD>lua require("jump.util").posCenter("`m", false, false)<CR>]], "Restore mark M")
 -- Changelist/Jumplist jumping
 map("n", [[<A-o>]], [[<CMD>lua require("jump.util").posCenter("g;", false, false)<CR>]], {"silent"}, "Older change")
 map("n", [[<A-i>]], [[<CMD>lua require("jump.util").posCenter("g,", false, false)<CR>]], {"silent"}, "Newer change")
 map("n", [[<C-o>]], function()
     require("jump.util").posCenter(function()
         require("jump.jumplist").go("n", false, "local")
-    end, true, true)
-end, {"silent"}, "Older local jump")
+    end, true)
+end, "Older local jump")
 map("n", [[<C-i>]], function()
     require("jump.util").posCenter(function()
         require("jump.jumplist").go("n", true, "local")
-    end, true, true)
-end, {"silent"}, "Newer local jump")
+    end, true)
+end, "Newer local jump")
 map("x", [[<C-o>]], luaRHS[[:lua
     require("jump.jumplist").visualMode = vim.fn.visualmode();
     require("jump.util").posCenter(function()
         require("jump.jumplist").go(vim.fn.visualmode(), false, "local")
-    end, true, true)<CR>
-]], {"silent"}, "Older local jump")
+    end, true)<CR>
+]], "Older local jump")
 map("x", [[<C-i>]], luaRHS[[:lua
     require("jump.jumplist").visualMode = vim.fn.visualmode();
     require("jump.util").posCenter(function()
         require("jump.jumplist").go(vim.fn.visualmode(), true, "local")
-    end, true, true)<CR>
-]], {"silent"}, "Newer local jump")
+    end, true)<CR>
+]], "Newer local jump")
 map("n", [[g<C-o>]], function()
     require("jump.util").posCenter(function()
         require("jump.jumplist").go("n", false, "buffer")
-    end, true, true)
-end, {"silent"}, "Older buffer jump")
+    end, true)
+end, "Older buffer jump")
 map("n", [[g<C-i>]], function()
     require("jump.util").posCenter(function()
         require("jump.jumplist").go("n", true, "buffer")
-    end, true, true)
-end, {"silent"}, "Newer buffer jump")
+    end, true)
+end, "Newer buffer jump")
 -- Swap default mapping
 map("n", [[*]],  [[<CMD>lua require("jump.search").cword("*", false)<CR>]],  {"noremap", "silent"}, "Search <cword> forward")
 map("n", [[#]],  [[<CMD>lua require("jump.search").cword("#", false)<CR>]],  {"noremap", "silent"}, "Search <cword> back")

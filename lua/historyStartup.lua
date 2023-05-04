@@ -235,7 +235,6 @@ end -- }}}
 
 
 local execMap = function(key) -- {{{
-    print(key)
     local lnum = vim.api.nvim_win_get_cursor(0)[1]
     if key == "o" or key == "<CR>" then -- {{{
         if lnum == 1 then

@@ -22,10 +22,10 @@ local echo = function()
 end
 
 
---- Search func wraps around the native n/N exCMD
----@param exCMD string "n" or "N"
-M.cycle = function(exCMD)
-    local ok, msg = pcall(vim.api.nvim_command, "noa norm! " .. exCMD)
+--- Search func wraps around the native n/N exCmd
+---@param exCmd string "n" or "N"
+M.cycle = function(exCmd)
+    local ok, msg = pcall(vim.api.nvim_command, "noa norm! " .. exCmd)
     if not ok then
         ---@diagnostic disable-next-line: param-type-mismatch
         if string.match(msg, "E486") then
@@ -41,16 +41,16 @@ M.cycle = function(exCMD)
 end
 
 
---- Search func wraps around the native //? exCMD in Visual mode
----@param exCMD string "/" or "?"
+--- Search func wraps around the native //? exCmd in Visual mode
+---@param exCmd string "/" or "?"
 -- Similar project: https://github.com/bronson/vim-visual-star-search
-M.searchSelected = function(exCMD)
+M.searchSelected = function(exCmd)
     local cursorPos = vim.api.nvim_win_get_cursor(0)
     local selectedStr = vim.fn.escape(
         require("selection").get("string", true),
         [=[\$^.*~[]=]  -- Escape special character in magic mode(Neovim default)
     )
-    selectedStr = exCMD .. selectedStr
+    selectedStr = exCmd .. selectedStr
     vim.cmd(selectedStr)
     vim.api.nvim_echo({{selectedStr}}, false, {})
     vim.api.nvim_win_set_cursor(0, cursorPos)

@@ -56,13 +56,13 @@ M.insertPrompt = function(vimMode) -- {{{
         -- Allow more specific put command in normal mode
         if vimMode == "n" and #input == 2 then
             regName = input:sub(1, 1)
-            local exCMD = input:sub(2, 2)
+            local exCmd = input:sub(2, 2)
             ---@diagnostic disable-next-line: need-check-nil
             if regexAll:match_str(input:sub(1, 1)) then
-                if exCMD:lower() == "p" then
+                if exCmd:lower() == "p" then
                     -- Use remap keybinding
                     return vim.api.nvim_feedkeys('"' .. input, "m", false)
-                elseif exCMD:lower() == "e" then
+                elseif exCmd:lower() == "e" then
                     regType = vim.fn.getregtype(regName)
                     if regType == "v" then
                         vim.api.nvim_feedkeys('"' .. regName .. "cpj", "m", false)
@@ -74,7 +74,7 @@ M.insertPrompt = function(vimMode) -- {{{
                     else
                         vim.notify("\nRegister" .. regName .. " isn't a characterwise register for editing macro", vim.log.levels.WARN)
                     end
-                elseif exCMD:lower() == "r" then
+                elseif exCmd:lower() == "r" then
                     local regexWritable = vim.regex(M.regAllWritable)
                     ---@diagnostic disable-next-line: need-check-nil
                     if regexWritable:match_str(regName) then
