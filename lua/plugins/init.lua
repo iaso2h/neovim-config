@@ -535,8 +535,11 @@ local pluginArgs = { -- {{{
             "cmp-nvim-lsp"
         },
         config = function()
-            require("neodev").setup{
+            require("neodev").setup {
                 library = {
+                    enabled  = true,
+                    runtimes = true,
+                    types    = true,
                     plugins = {
                         "nvim-dap",
                         "nvim-dap",
@@ -550,6 +553,9 @@ local pluginArgs = { -- {{{
                         "selection",
                         "register"
                     },
+                    setup_jsonls = true,
+                    lspconfig    = true,
+                    pathStrict   = true,
                 },
             }
             require("plugins.nvim-lspconfig")()

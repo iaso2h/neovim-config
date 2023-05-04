@@ -1,4 +1,3 @@
--- BUG: failed to reload `buffer.close`
 local util = require("autoreload.util")
 local p    = require("plenary.path")
 local M    = {

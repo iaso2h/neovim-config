@@ -235,6 +235,7 @@ end -- }}}
 
 
 local execMap = function(key) -- {{{
+    print(key)
     local lnum = vim.api.nvim_win_get_cursor(0)[1]
     if key == "o" or key == "<CR>" then -- {{{
         if lnum == 1 then
@@ -311,7 +312,7 @@ local execMap = function(key) -- {{{
                     end
                 end
             end -- }}}
-        elseif key == "q" and key == "Q" then -- {{{
+        elseif key == "q" or key == "Q" then -- {{{
             local bufsNonScratchOccurInWins = require("buffer.util").bufsNonScratchOccurInWins(
                 require("buffer.util").bufNrs(true) )
             if bufsNonScratchOccurInWins == 0 then

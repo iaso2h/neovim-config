@@ -162,7 +162,7 @@ return function()
     -- }}} Lua
     -- Fennel {{{
     if _G._os_uname.sysname == "Linux" and _G._os_uname.machine ~= "aarch64" then
-        -- HACK:
+        -- HACK: make fennel lsp realize neovim runtime
         -- https://github.com/rydesun/fennel-language-server
         -- local fennelRuntimePath = {vim.api.nvim_eval("$VIMRUNTIME")}
         -- table.insert(fennelRuntimePath, _G._config_path)
