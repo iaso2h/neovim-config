@@ -36,7 +36,7 @@ map("n", [[<C-q>g]], [[<CMD>cfirst<CR>zzzv]],    {"silent"}, "Go to first item i
 map("n", [[<C-q>G]], [[<CMD>clast<CR>zzzv]],     {"silent"}, "Go to last item in quickfix")
 map("n", [[<C-q>n]], [[<CMD>cnext<CR>zzzv]],     {"silent"}, "Go to next item in quickfix")
 map("n", [[<C-q>N]], [[<CMD>cprevious<CR>zzzv]], {"silent"}, "Go to previous item in quickfix")
-map("n", [[<C-q>l]], [[<CMD>lua require("quickfix.convertToLoc")()<CR>]], {"silent"}, "Convert quickfix into location list")
+map("n", [[<C-q>l]], [[<CMD>lua require("quickfix.modification").interConvert()<CR>]], {"silent"}, "Convert a quickfix into a location list, and vice versa")
 map("n", [[<C-q>m]], [[<CMD>lua require("quickfix.message")("scratch")<CR>]], {"silent"}, "Show messages in quickfix")
 -- Expand region
 map("n", [[<A-a>]], [[<CMD>lua require("expandRegion").expandShrink("n", 1)<CR>]],  {"silent"}, "Expand selection")
@@ -447,7 +447,6 @@ map("i", [[<C-w>j]], [[<C-\><C-n><C-w>j]], {"noremap"}, "Window below")
 map("i", [[<C-w>h]], [[<C-\><C-n><C-w>h]], {"noremap"}, "Window left")
 map("i", [[<C-w>l]], [[<C-\><C-n><C-w>l]], {"noremap"}, "Window right")
 
---TODO: <C-w>.
 map("n", [[<C-w>t]], [[<C-w>T]], {"noremap"}, "Move current window to new tab")
 map("n", [[<C-w>T]], [[<C-w>t]], {"noremap"}, "Move current window to top left")
 map("n", [[<C-w>b]], [[<Nop>]],  {"noremap"}, "which_key_ignore")

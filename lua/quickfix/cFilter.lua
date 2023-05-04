@@ -26,8 +26,7 @@ local lastFilterPat = ""
 --- @param bang string if bang value is "!", then items not matching the
 ---        pattern will be preserved
 M.main = function(qfChk, pat, bang)
-    local items = require("quickfix.util").getlist()
-    local title = require("quickfix.util").getlist{title = 0}.title
+    local items, title = require("quickfix.util").getlist()
     if not next(items) then return end
 
     -- Parsing the pat
@@ -78,7 +77,7 @@ M.main = function(qfChk, pat, bang)
     end
 
     -- Store the previous item list
-    if #newItems ~= #items then require("quickfix.undo").lastItems = items end
+    if #newItems ~= #items then require("quickfix.modification").lastItems = items end
 
     -- Populate new items
     if qfChk then
