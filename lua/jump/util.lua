@@ -1,21 +1,30 @@
 local M = {}
 
 
-M.tblReverse = function(t)
+--- Reverse a list-like table
+---@param t table
+---@return table
+M.tblReverse = function(t) -- {{{
     local tblReversed = {}
     local len = #t
     for k, v in ipairs(t) do
         tblReversed[len + 1 - k] = v
     end
     return tblReversed
-end
-
-
-M.jumplistRegisterLines = function(startLineNr, lastLineNr)
+end -- }}}
+--- Register specific line region in current buffer
+---@param startLineNr? number
+---@param lastLineNr? number
+M.jumplistRegisterLines = function(startLineNr, lastLineNr) -- {{{
     startLineNr = startLineNr or 1
+    if not lastLineNr then
+        lastLineNr = vim.fn.line("$")
+    else
+        local bufferLastLine = vim.fn.line("$")
+        lastLineNr = lastLineNr > bufferLastLine and bufferLastLine or lastLineNr
+    end
     vim.cmd([[norm! ]] .. startLineNr .. [[G0]])
     vim.cmd [[clearjumps]]
-    lastLineNr = lastLineNr or vim.fn.line("$")
 
     for i = 1, lastLineNr, 1 do
         if i ~= lastLineNr then
@@ -24,10 +33,12 @@ M.jumplistRegisterLines = function(startLineNr, lastLineNr)
             vim.cmd [[norm! m```j]]
         end
     end
-end
-
-
-M.getJumpsCmd = function(noStdlib)
+end -- }}}
+--- Split the string output of `:jumps` into table by line break
+---@param noStdlib boolean Whether to use the `vim.split` function in standard
+--library to split the string
+---@return string[]
+M.getJumpsCmd = function(noStdlib) -- {{{
     local jumpsTbl = {}
     local jumpsOutput = vim.api.nvim_exec2("jumps", { output = true }).output
     if not noStdlib then
@@ -76,10 +87,10 @@ M.getJumpsCmd = function(noStdlib)
     end
 
     return jumpsTbl
-end
-
-
-M.jumpCmdParse = function(jumpCmdRaw)
+end -- }}}
+--- Parse data in a single line in the `:jumps`
+---@param jumpCmdRaw string
+M.jumpCmdParse = function(jumpCmdRaw) -- {{{
     local parseResult = { string.match(jumpCmdRaw, "^>?%s*(%d+)%s+(%d+)%s+(%d+)%s+(.*)$") }
     if not next(parseResult) then
         return parseResult
@@ -91,9 +102,6 @@ M.jumpCmdParse = function(jumpCmdRaw)
             text  = parseResult[4]
         }
     end
-end
-
-
 end -- }}}
 --- Register specific line region in the current buffer and generate the `:
 --jumps` output as table or redirect it to a scratch buffer

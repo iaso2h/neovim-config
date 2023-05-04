@@ -1,9 +1,8 @@
 -- File: jumplist
 -- Author: iaso2h
 -- Description: Enhance <C-i>/<C-o>
--- Version: 0.0.13
--- Last Modified: 05/03/2023 Wed
---BUG: <C-I> at the oldest local position
+-- Version: 0.0.14
+-- Last Modified: 05/04/2023 Thu 
 
 local defaultOpts  = {
     checkCursorRedundancy = true,
@@ -148,7 +147,7 @@ local getJumps = function(isNewer, winId, filter) -- {{{
     -- Get jumps from built-in function
     local jumps, jumpIdx = unpack(vim.fn.getjumplist(winId))
     local jumpsSliced = {}
-    if jumpIdx == 0 then
+    if #jumps == 0 then
         vim.notify("Jumplist is empty", vim.log.levels.INFO)
         return jumpsSliced
     end
