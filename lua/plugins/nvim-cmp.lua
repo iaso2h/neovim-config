@@ -1,6 +1,7 @@
 return function()
     local cmp     = require("cmp")
     local luasnip = require("luasnip")
+    local icon    = require("icon")
 
     local configArgs = { -- {{{
         enabled = function()
@@ -37,15 +38,9 @@ return function()
         window = {
             completion = cmp.config.window.bordered{
                 winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:PmenuSel',
-                col_offset = -3,
-                scrollbar = {
-                    thumb_char = "│",
-                    position = "edge",
-                },
+                col_offset   = 3,
+                scrollbar    = true
             },
-            documentation = cmp.config.window.bordered{
-                winhighlight = 'Normal:Normal,FloatBorder:FloatBorder',
-            }
         },
         mapping = {
             ["<CR>"] = cmp.mapping.confirm {
@@ -57,7 +52,7 @@ return function()
         sources = {
             {name = "nvim_lsp"},
             {name = "buffer"},
-            {name = "path"},
+            {name = "async_path"},
             {name = 'conjure'},
             {name = "luasnip"},
             {name = "cmp_tabnine"},
@@ -68,17 +63,18 @@ return function()
             format = function(entry, vimItem)
                 local maxWidth = 40
                 if #vimItem.abbr > maxWidth then
-                    vimItem.abbr = string.sub(vimItem.abbr, 1, maxWidth - 1) .. require("icon").ui.Ellipsis
+                    vimItem.abbr = string.sub(vimItem.abbr, 1, maxWidth - 1) .. icon.ui.Ellipsis
                 end
                 vimItem.menu = vimItem.kind
-                vimItem.kind = require("icon").kind[vimItem.kind]
-                -- vimItem.menu = ({
-                    -- nvim_lsp    = "[LSP]",
-                    -- buffer      = "[Buffer]",
-                    -- path        = "[Path]",
-                    -- luasnip     = "[LuaSnip]",
-                    -- cmp_tabnine = "[Tabnine]",
-                -- })[entry.source.name]
+                if entry.source.name == "cmp_tabnine" then
+                    vimItem.kind = icon.misc.Robot
+                    vimItem.kind_hl_group = "CmpItemKindTabnine"
+                elseif entry.source.name == "emoji" then
+                    vimItem.kind = icon.misc.Smiley
+                    vimItem.kind_hl_group = "CmpItemKindEmoji"
+                else
+                    vimItem.kind = icon.kind[vimItem.kind]
+                end
                 return vimItem
             end
         },

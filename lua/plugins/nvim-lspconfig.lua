@@ -3,13 +3,8 @@ return function()
     local lspConfig = require("lspconfig")
     local path      = require("plenary.path")
     local servers   = require("plugins.nvim-mason-lspconfig").servers
-    ----
-    -- Function: onAttach :Mappings or commands need to be loaded when specific LSP is attach
-    --
-    -- @param client: language-server client
-    -- @param bufNr: buffer number
-    ----
-    local conciseQuifix = function(tbl)
+
+    local conciseQuifix = function(tbl) -- {{{
         if tbl then
             local i = tbl.items[1]
             if #tbl.items == 1 or (#tbl.items == 2 and
@@ -33,8 +28,7 @@ return function()
                 require("quickfix.toggle")(false)
             end
         end
-    end
-
+    end -- }}} 
 
     local onAttach = function(client, bufNr) -- {{{
         -- Mappings
@@ -84,206 +78,211 @@ return function()
         end, "which_key_ignore")
     end -- }}}
 
-    -- LSP config override {{{
-    -- Setup() function: https://github.com/neovim/nvim-lspconfig#setup-function
-    -- Individual configuration: https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md
-    -- Python {{{
-    -- https://github.com/microsoft/pyright
-    -- https://github.com/microsoft/pyright/blob/master/docs/configuration.md
-    -- https://github.com/microsoft/pyright/blob/96871bec5a427048fead499ab151be87b7baf023/packages/vscode-pyright/package.json
-    servers.pyright = {
-        settings  = {
-            python = {
-                pythonPath = "python",
-                venvPath = "",
-                analysis = {
-                    -- autoSearchPaths = true,
-                    diagnosticMode = "workspace",
-                    -- diagnosticMode = "openFileOnly",
-                    -- extraPaths = "",
-                    typeCheckingMode = "basic",
-                    useLibraryCodeForTypes = true,
-                }
-            },
-            pyright = {
-                verboseOutput = true,
-                reportMissingImports = true,
+-- LSP servers override {{{
+-- Setup() function: https://github.com/neovim/nvim-lspconfig#setup-function
+-- Individual configuration: https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md
+-- Python {{{
+-- https://github.com/microsoft/pyright
+-- https://github.com/microsoft/pyright/blob/master/docs/configuration.md
+-- https://github.com/microsoft/pyright/blob/96871bec5a427048fead499ab151be87b7baf023/packages/vscode-pyright/package.json
+servers.pyright = {
+    settings  = {
+        python = {
+            pythonPath = "python",
+            venvPath = "",
+            analysis = {
+                -- autoSearchPaths = true,
+                diagnosticMode = "workspace",
+                -- diagnosticMode = "openFileOnly",
+                -- extraPaths = "",
+                typeCheckingMode = "basic",
+                useLibraryCodeForTypes = true,
             }
+        },
+        pyright = {
+            verboseOutput = true,
+            reportMissingImports = true,
         }
     }
-    -- }}} Python
-    -- Lua {{{
-    -- https://github.com/LuaLS/lua-language-server
-    -- Settings: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#lua_ls
-    servers.lua_ls = {
-        settings = {
-            Lua = {
-                runtime = {
-                    version = "LuaJIT",
+}
+-- }}} Python
+-- Lua {{{
+-- https://github.com/LuaLS/lua-language-server
+-- Settings: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#lua_ls
+servers.lua_ls = {
+    settings = {
+        Lua = {
+            hint = {
+                enable = true
+            },
+            completion = {
+                callSnippet    = "Replace",
+                keywordSnippet = "Replace",
+                workspaceWord  = true,
+                displayContext = true,
+                showWord = "Fallback",
+                showParams = true,
+            },
+            diagnostics = {
+                disable = {
+                    "trailing-space",
+                    "empty-block"
                 },
-                hint = {
-                    enable = true
-                },
-                completion = {
-                    callSnippet    = "Both",
-                    keywordSnippet = "Both",
-                    displayContext = 1,
-                },
-                diagnostics = {
-                    disable = {
-                        "trailing-space",
-                        "empty-block"
-                    },
-                    globals = {
-                        "vim",
-                        "map",
-                        "bmap",
-                        "luaRHS",
-                        "t",
-                        "Print",
-                        "ex",
-                        "tbl_idx",
-                        "tbl_replace",
-                        "nvim_buf_get_name",
-                    },
-                },
-                workspace = {
-                    -- Make the server aware of Neovim runtime files
-                    library = vim.api.nvim_get_runtime_file("", true),
-                    checkThirdParty = false,
-                    maxPreload      = 2000,
-                    preloadFileSize = 1000,
-                    ignoreDir       = {".vscode", ".git"},
-                    useGitIgnore    = true
+                globals = {
+                    "vim",
+                    "map",
+                    "bmap",
+                    "luaRHS",
+                    "t",
+                    "Print",
+                    "logBuf",
+                    "tbl_idx",
+                    "tbl_replace",
+                    "nvim_buf_get_name",
                 },
             },
-        }
-    }
-    -- }}} Lua
-    -- Fennel {{{
-    if _G._os_uname.sysname == "Linux" and _G._os_uname.machine ~= "aarch64" then
-        -- HACK: make fennel lsp realize neovim runtime
-        -- https://github.com/rydesun/fennel-language-server
-        -- local fennelRuntimePath = {vim.api.nvim_eval("$VIMRUNTIME")}
-        -- table.insert(fennelRuntimePath, _G._config_path)
-        -- table.insert(fennelRuntimePath, string.format("%s%sfnl%sruntimestub%s%s",
-        --                                     _G._config_path,
-        --                                     _G._sep,
-        --                                     _G._sep,
-        --                                     _G._sep,
-        --                                     _G._sep and "nightly" or "stable"))
-        servers.fennel_language_server = {
-            settings = {
-                fennel = {
-                    workspace = {
-                        library = vim.api.nvim_list_runtime_paths(),
-                    },
-                    diagnostics = {
-                        globals = {"vim"}
-                    }
-                }
-            }
-        }
-    end
-    -- }}} Fennel
-    -- Vimscript {{{
-    -- npm install -g vim-language-server
-    vim.g.markdown_fenced_languages = {
-        'vim',
-        'help'
-    }
-    servers.vimls = {
-        init_options = {
-            isNeovim    = true,
-            runtimepath = "",
-            vimruntime  = "",
-            suggest     = {
-                fromRuntimepath = true,
-                fromVimruntime = true
+            workspace = {
+                -- Make the server aware of Neovim runtime files
+                checkThirdParty = false,
+                maxPreload      = 2000,
+                preloadFileSize = 1000,
+                ignoreDir       = {".vscode", ".git"},
+                useGitIgnore    = true
             },
         },
     }
-    -- }}} Vimscript
-    -- Clangd {{{
-    if _G._os_uname.machine ~= "aarch64" then
-        -- https://github.com/llvm/llvm-project/tree/main/clang-tools-extra/clangd
-        local findClangd = function()
-            local args = {
-                "--all-scopes-completion",
-                "--background-index",
-                "--clang-tidy",
-                "--clang-tidy-checks=google-*,llvm-*,clang-analyzer-*, cert-*,performance-*,misc-,modernize-*,-modernize-use-trailing-return-type,concurrency-*,bugprone-*,readability-*,-readability-magic-numbers",
-                "--completion-parse=auto",
-                "--completion-style=detailed",
-                "--cross-file-rename",
-                "--header-insertion=iwyu",
-                "--j=4",
-                "--pretty",
-                "--suggest-missing-includes",
-                "--fallback-style=google",
-                "--offset-encoding=utf-16"
-            }
-            local dataPath   = path:new(vim.fn.stdpath("data"))
-            local binPath = dataPath:joinpath("mason", "packages", "clangd", "clangd", "bin", "clangd")
-            if _G._os_uname.sysname == "Windows_NT" then binPath = binPath .. ".exe" end
-            table.insert(args, 1, binPath)
-            return args
-        end
-
-        local clangdCMD = findClangd()
-        if clangdCMD ~= "" then
-            servers.clangd = {
-                cmd = clangdCMD,
-                init_options = {
-                    -- capabilities         = {},
-                    clangdFileStatus     = true,
-                    usePlaceholders      = true,
-                    completeUnimported   = true,
-                    semanticHighlighting = true,
-                    fallbackFlags = {
-                    "-std=c99",
-                    "-Wall",
-                    "-Wextra",
-                    "-Wno-deprecated-declarations"
-                    }
+}
+-- }}} Lua
+-- Fennel {{{
+if _G._os_uname.sysname == "Linux" and _G._os_uname.machine ~= "aarch64" then
+    -- HACK: make fennel lsp realize neovim runtime
+    -- https://github.com/rydesun/fennel-language-server
+    -- local fennelRuntimePath = {vim.api.nvim_eval("$VIMRUNTIME")}
+    -- table.insert(fennelRuntimePath, _G._config_path)
+    -- table.insert(fennelRuntimePath, string.format("%s%sfnl%sruntimestub%s%s",
+    --                                     _G._config_path,
+    --                                     _G._sep,
+    --                                     _G._sep,
+    --                                     _G._sep,
+    --                                     _G._sep and "nightly" or "stable"))
+    servers.fennel_language_server = {
+        settings = {
+            fennel = {
+                workspace = {
+                    library = vim.api.nvim_list_runtime_paths(),
                 },
-                root_dir = lspConfig.util.root_pattern(".git", "compile_commands.json", "compile_flags.txt", "build", "README.md", "makefile"),
+                diagnostics = {
+                    globals = {"vim"}
+                }
             }
-        end
+        }
+    }
+end
+-- }}} Fennel
+-- Vimscript {{{
+-- npm install -g vim-language-server
+vim.g.markdown_fenced_languages = {
+    'vim',
+    'help'
+}
+servers.vimls = {
+    init_options = {
+        isNeovim    = true,
+        runtimepath = "",
+        vimruntime  = "",
+        suggest     = {
+            fromRuntimepath = true,
+            fromVimruntime = true
+        },
+    },
+}
+-- }}} Vimscript
+-- Clangd {{{
+if _G._os_uname.machine ~= "aarch64" then
+    -- https://github.com/llvm/llvm-project/tree/main/clang-tools-extra/clangd
+    local findClangd = function()
+        local args = {
+            "--all-scopes-completion",
+            "--background-index",
+            "--clang-tidy",
+            "--clang-tidy-checks=google-*,llvm-*,clang-analyzer-*, cert-*,performance-*,misc-,modernize-*,-modernize-use-trailing-return-type,concurrency-*,bugprone-*,readability-*,-readability-magic-numbers",
+            "--completion-parse=auto",
+            "--completion-style=detailed",
+            "--cross-file-rename",
+            "--header-insertion=iwyu",
+            "--j=4",
+            "--pretty",
+            "--suggest-missing-includes",
+            "--fallback-style=google",
+            "--offset-encoding=utf-16"
+        }
+        local dataPath   = path:new(vim.fn.stdpath("data"))
+        local binPath = dataPath:joinpath("mason", "packages", "clangd", "clangd", "bin", "clangd")
+        if _G._os_uname.sysname == "Windows_NT" then binPath = binPath .. ".exe" end
+        table.insert(args, 1, binPath)
+        return args
     end
-    -- }}} Clangd
 
-    if _G._os_uname.sysname == "Windows_NT" then
-        servers.marksman = {
-            cmd = {
-                [[C:\Users\Hashub\AppData\Local\nvim-data\mason\packages\marksman\marksman.exe]],
-                "server"
-            }
-
+    local clangdCMD = findClangd()
+    if clangdCMD ~= "" then
+        servers.clangd = {
+            cmd = clangdCMD,
+            init_options = {
+                -- capabilities         = {},
+                clangdFileStatus     = true,
+                usePlaceholders      = true,
+                completeUnimported   = true,
+                semanticHighlighting = true,
+                fallbackFlags = {
+                "-std=c99",
+                "-Wall",
+                "-Wextra",
+                "-Wno-deprecated-declarations"
+                }
+            },
+            root_dir = lspConfig.util.root_pattern(".git", "compile_commands.json", "compile_flags.txt", "build", "README.md", "makefile"),
         }
     end
-    -- }}} LSP config override
-
-    -- vim.lsp and vim.diagnostic setups {{{
-    vim.diagnostic.config {
-        underline        = true,
-        virtual_text     = true,
-        signs            = true,
-        update_in_insert = false,
-        severity_sort    = true,
+end
+-- }}} Clangd
+if _G._os_uname.sysname == "Windows_NT" then
+    servers.marksman = {
+        cmd = {
+            [[C:\Users\Hashub\AppData\Local\nvim-data\mason\packages\marksman\marksman.exe]],
+            "server"
+        }
     }
-
-    vim.cmd [[
-    sign define DiagnosticSignError text= texthl=DiagnosticError linehl= numhl=DiagnosticError
-    sign define DiagnosticSignWarn  text= texthl=DiagnosticWarn  linehl= numhl=DiagnosticWarn
-    sign define DiagnosticSignInfo  text= texthl=DiagnosticInfo  linehl= numhl=DiagnosticInfo
-    sign define DiagnosticSignHint  text= texthl=DiagnosticHint  linehl= numhl=DiagnosticHint
-    ]]
-    vim.lsp.handlers["textDocument/hover"]         = vim.lsp.with(vim.lsp.handlers.hover,          {border = "rounded"})
-    vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {border = "rounded"})
-    -- }}} vim.lsp and vim.diagnostic setups
+end
+-- }}}
 
     -- Setup servers {{{
+    require("neodev").setup { -- {{{
+        library = {
+            enabled  = true,
+            runtimes = true,
+            types    = true,
+            plugins = {
+                "nvim-treesitter",
+                "nvim-dap",
+                "telescope.nvim",
+                "LuaSnip",
+                "plenary.nvim",
+
+                "global",
+                "icon",
+                "util",
+                "register",
+                "jump",
+                "buffer",
+                "selection",
+                "operator",
+                "quickfix"
+            },
+            setup_jsonls = true,
+            lspconfig    = true,
+            pathStrict   = true,
+        },
+    } -- }}} 
     local ok, _ = pcall(require, "cmp_nvim_lsp")
     local capabilities = ok and require("cmp_nvim_lsp").default_capabilities() or {}
     local basicConfig = {
@@ -299,5 +298,24 @@ return function()
         lspConfig[server].setup(config)
     end
     -- }}} Setup servers
+
+-- vim.lsp and vim.diagnostic setups {{{
+vim.diagnostic.config {
+    underline        = true,
+    virtual_text     = true,
+    signs            = true,
+    update_in_insert = false,
+    severity_sort    = true,
+}
+
+vim.cmd [[
+sign define DiagnosticSignError text= texthl=DiagnosticError linehl= numhl=DiagnosticError
+sign define DiagnosticSignWarn  text= texthl=DiagnosticWarn  linehl= numhl=DiagnosticWarn
+sign define DiagnosticSignInfo  text= texthl=DiagnosticInfo  linehl= numhl=DiagnosticInfo
+sign define DiagnosticSignHint  text= texthl=DiagnosticHint  linehl= numhl=DiagnosticHint
+]]
+vim.lsp.handlers["textDocument/hover"]         = vim.lsp.with(vim.lsp.handlers.hover,          {border = "rounded"})
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {border = "rounded"})
+-- }}} vim.lsp and vim.diagnostic setups
 
 end

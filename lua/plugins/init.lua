@@ -528,38 +528,12 @@ local pluginArgs = { -- {{{
         config = require("plugins.nvim-null-is"),
     },
     {
-        "folke/neodev.nvim",
+        "neovim/nvim-lspconfig",
         dependencies = {
-            "neovim/nvim-lspconfig",
-            "plenary.nvim",
-            "cmp-nvim-lsp"
+            "folke/neodev.nvim",
+            "mason-lspconfig.nvim",
         },
-        config = function()
-            require("neodev").setup {
-                library = {
-                    enabled  = true,
-                    runtimes = true,
-                    types    = true,
-                    plugins = {
-                        "nvim-dap",
-                        "nvim-dap",
-                        "plenary",
-                        "nvim-treesitter",
-                        "buffer",
-                        "jump",
-                        "quickfix",
-                        "util",
-                        "operator",
-                        "selection",
-                        "register"
-                    },
-                    setup_jsonls = true,
-                    lspconfig    = true,
-                    pathStrict   = true,
-                },
-            }
-            require("plugins.nvim-lspconfig")()
-        end,
+        config = require("plugins.nvim-lspconfig")
     },
     {
         "folke/trouble.nvim",
@@ -582,37 +556,19 @@ local pluginArgs = { -- {{{
         "windwp/nvim-autopairs",
         dependencies = { "nvim-treesitter" },
         event  = {"BufAdd"},
-        config = function()
-            require("nvim-autopairs").setup {
-                disable_filetype        = vim.list_extend(
-                    {"TelescopePrompt", "dap-repl"}, _G._lisp_language),
-                disable_in_macro        = true,
-                disable_in_visualblock  = false,
-                disable_in_replace_mode = true,
-                ignored_next_char         = [=[[%w%%%'%[%"%.%`%$]]=],
-                enable_moveright          = true,
-                enable_afterquote         = true,   -- add bracket pairs after quote
-                enable_check_bracket_line = true,   -- check bracket in same line
-                enable_bracket_in_quote   = false,
-                enable_abbr               = false,  -- trigger abbreviation
-                break_undo = true, -- switch for basic rule break undo sequence
-                check_ts   = true,
-                map_cr  = true,
-                map_bs  = true,
-                map_c_h = false,
-                map_c_w = false,
-                fast_wrap = {},
-            }
-        end,
+        config = require("plugins.nvim-autopairs")
     },
     {
         "hrsh7th/nvim-cmp",
         dependencies = {
             "nvim-autopairs",
             "nvim-lspconfig",
-            "hrsh7th/cmp-nvim-lsp",
+            {
+                "hrsh7th/cmp-nvim-lsp",
+                dependencies = { "nvim-lspconfig" }
+            },
             "hrsh7th/cmp-buffer",
-            "hrsh7th/cmp-path",
+            "FelipeLema/cmp-async-path",
             {
                 "tzachar/cmp-tabnine",
                 cond  = _G._os_uname.machine ~= "aarch64",

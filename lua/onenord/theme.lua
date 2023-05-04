@@ -558,6 +558,9 @@ theme.plugins = { -- {{{
     CmpItemKindInterface     = {fg = "#58B5A8"},
     CmpItemKindColor         = {fg = "#58B5A8"},
     CmpItemKindTypeParameter = {fg = p.orange},
+    -- Misc
+    CmpItemKindTabnine = {fg = p.n10},
+    CmpItemKindEmoji   = {fg = p.n13},
 
     -- https://github.com/ray-x/lsp_signature.nvim
     LspSignatureActiveParameter = {bg = p.n1, style = "bold"},
