@@ -162,7 +162,7 @@ end
 --- @param reloadCallback? function The callback function returned by reloading the lua module
 local hook = function(hookTbl, path, reloadCallback)
     for _, tbl in ipairs(hookTbl) do
-        if string.match(path.filename, tbl.pathPat) then
+        if path.filename == tbl.pathPat or string.match(path.filename, tbl.pathPat) then
             local ok, msg = pcall(tbl.callback, path, reloadCallback)
             if not ok then
                 vim.notify("Error occurs while loading lua config for " .. path.filename,
@@ -173,6 +173,9 @@ local hook = function(hookTbl, path, reloadCallback)
             if tbl.unloadOnlyChk then
                 M.unloadOnlyChk = true
             end
+
+            -- Load hook function only once
+            return
         end
     end
 end

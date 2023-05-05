@@ -1,9 +1,9 @@
 -- File: reloadConfig
 -- Author: iaso2h
 -- Description: reload lua package or vim file at Neovim configuration directory
--- Version: 0.0.24
--- Last Modified: 2023-4-8
-local util  = require("autoreload.util")
+-- Version: 0.0.25
+-- Last Modified: Fri 05 May 2023
+local util = require("autoreload.util")
 local ok, valOrMsg = pcall(require, "plenary.path")
 if not ok then
     valOrMsg = nil
@@ -32,11 +32,55 @@ M.opt.lua.setup  = {}
 M.opt.lua.config = { -- {{{
     {
         -- Call the config func from "<NvimConfig>/lua/config/" if it's callable
+        pathPat       =  M.opt.lua.moduleSearchPath:joinpath("plugins", "nvim-lspconfig.lua").filename,
+        unloadOnlyChk = false,
+        callback      = function(path, callback)
+            local err = function(msg)
+                vim.notify("Error detect while calling callback function at: " .. path.filename,
+                    vim.log.levels.ERROR)
+                vim.notify(msg, vim.log.levels.ERROR)
+            end
+
+            local ok, msg = pcall(callback)
+            if not ok then return err(msg) end
+
+            --- Check modified state of specified buffer numbers and prompt for saving if
+            --unsave changes found
+            local changeTick = false
+            local answer = -1
+            for _, bufNr in ipairs(require("buffer.util").bufNrs(true)) do
+                if vim.api.nvim_buf_get_option(bufNr, "modified") then
+                    changeTick = true
+                    break
+                end
+            end
+            -- Ask for saving, return when cancel is input
+            if changeTick then
+                vim.cmd "noa echohl MoreMsg"
+                answer = vim.fn.confirm("Save all modification?",
+                    ">>> &Save\n&Discard\n&Cancel", 3, "Question")
+                vim.cmd "noa echohl None"
+                if answer == 3 or answer == 0 then
+                    return
+                elseif answer == 1 then
+                    vim.cmd "noa silent bufdo update"
+                end
+            end
+
+            -- Reload server
+            vim.notify("Reloading lsp clients")
+            vim.lsp.stop_client(vim.lsp.get_active_clients())
+            vim.cmd [[bufdo e]]
+            for _, bufNr in ipairs(require("buffer.util").bufNrs(true)) do
+                vim.api.nvim_buf_call(bufNr, require("buffer.cursorRecall"))
+            end
+        end
+    },
+    {
+        -- Call the config func from "<NvimConfig>/lua/config/" if it's callable
         pathPat       = M.opt.lua.moduleSearchPath:joinpath("plugins").filename,
         unloadOnlyChk = false,
         callback      = function(path, callback)
-            if not _G._enable_plugin then return end
-
             local err = function(msg)
                 vim.notify("Error detect while calling callback function at: " .. path.filename,
                     vim.log.levels.ERROR)
