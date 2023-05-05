@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Derived from and simplified:
 -- Credit: https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
--- Version: 0.0.4
--- Last Modified: 2023-4-24
+-- Version: 0.0.5
+-- Last Modified: Fri 05 May 2023
 
 local ignoreBuftype = {
         'quickfix',
@@ -16,16 +16,14 @@ local ignoreFiletype = {
         'svn',
         'hgcommit',
 }
-local devMode = false
 local log = function(...)
-    if devMode then
-        print(...)
+    if _G._cursor_recall_dev then
+        logBuf(...)
     end
 end
-local M   = {}
 
 
-function M.main(args)
+return function(args)
     -- Only handle valid file
     if not args or args.file == "*" then
         log('DEBUGPRINT[1]: cursorRecall.lua:31 (after end)')
@@ -41,7 +39,7 @@ function M.main(args)
 
     -- Only deal with situation where curpos is placed at {1, 0}
     local cursorPos = vim.api.nvim_win_get_cursor(0)
-    if cursorPos[1] ~= 1 and cursorPos[2] ~= 0 then
+    if cursorPos[1] ~= 1 then
         log('DEBUGPRINT[3]: cursorRecall.lua:45 (after end)')
         return
     end
@@ -58,18 +56,18 @@ function M.main(args)
         return
     end
 
-    local lastpos  = vim.fn.line('`"')
-    local buffend  = vim.fn.line('$')
+    local lastPos  = vim.fn.line('`"')
+    local bufEnd  = vim.fn.line('$')
 
-    if lastpos > 0 and lastpos <= buffend then
-        local winend   = vim.fn.line('w$')
-        local winstart = vim.fn.line('w0')
+    if lastPos > 0 and lastPos <= bufEnd then
+        local winEnd   = vim.fn.line('w$')
+        local winStart = vim.fn.line('w0')
         -- Last edit pos is set and is less than the number of lines in this buffer
-        if winend == buffend then
+        if winEnd == bufEnd then
             log('DEBUGPRINT[6]: cursorRecall.lua:69 (after if winend == buffend then)')
             -- Last line in buffer is also the last line visible in this window
             vim.cmd 'normal! g`"'
-        elseif buffend - lastpos > ((winend - winstart) / 2) - 1 then
+        elseif bufEnd - lastPos > ((winEnd - winStart) / 2) - 1 then
             log('DEBUGPRINT[7]: cursorRecall.lua:73 (after elseif buffend - lastpos > ((winend - wi…)')
             vim.cmd 'normal! g`"zz'
         else
@@ -80,7 +78,7 @@ function M.main(args)
     else
         -- Jump to recent last change instead
         if vim.api.nvim_win_get_cursor(0)[1] == 1 then
-            -- Go newest first then the older one
+            -- Go to the newest change first then the older one
             local ok, msgOrVal = pcall(vim.api.nvim_command, "normal! g,")
             log("DEBUGPRINT[9]: cursorRecall.lua:85 (after local ok, _ = pcall(vim.api.nvim_command, normal! g,))")
             if not ok then
@@ -91,12 +89,8 @@ function M.main(args)
     end
 
     if vim.fn.foldclosed('.') ~= -1 then
+        log("DEBUGPRINT[11]: cursorRecall.lua:93 (after if not ok then)")
         -- Cursor was inside a fold; open it
-        vim.cmd 'normal! zvzz'
+        vim.cmd 'normal! zv'
     end
-
-
 end
-
-return M
-
