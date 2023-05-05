@@ -1,7 +1,7 @@
 -- File: /buf/close.lua
 -- Author: iaso2h
 -- Description: Deleting buffer without changing the window layout
--- Version: 0.1.4
+-- Version: 0.1.5
 -- Last Modified: 05/03/2023 Wed
 local u   = require("buffer.util")
 local var = require("buffer.var")
@@ -85,10 +85,9 @@ end -- }}}
 --buffers in smart way. The buffer is in good hand.
 ---@param postRearrange boolean Whether to rearrange the layout after the
 --deleting the buffer
----@param skipSpecialChk boolean Whether to go through the special
---file checking for the current buffer
-M.bufHandler = function(postRearrange, skipSpecialChk) -- {{{
-    if not skipSpecialChk and u.isSpecialBuf() then
+---@param isSpecial boolean Whether this buffer is a special buffer
+M.bufHandler = function(postRearrange, isSpecial) -- {{{
+    if isSpecial or u.isSpecialBuf() then
         if not specialBufHandler(postRearrange, "buffer") then
             if not saveModified(var.bufNr) then return end
             u.bufClose(nil, true and postRearrange)
@@ -174,22 +173,22 @@ end -- }}}
 ---@param resortToBufClose boolean Set it to true to call `bufHandler` to
 --close the window like closing a buffer when necessary
 M.winHandler = function(resortToBufClose) -- {{{
-    local fallback = function(skipSpecialChk) -- {{{
+    local fallback = function(isSpecial) -- {{{
         if resortToBufClose then
             if u.winsOccur() > 1 then
                 if u.bufsOccurInWins() == 0 then
-                    M.bufHandler(true, skipSpecialChk)
+                    M.bufHandler(true, isSpecial)
                 elseif u.bufsOccurInWins() == 1 then
                     if u.isSpecialBuf() then
                         u.winClose()
                     else
-                        M.bufHandler(true, skipSpecialChk)
+                        M.bufHandler(true, isSpecial)
                     end
                 else
                     u.winClose()
                 end
             else
-                M.bufHandler(true, skipSpecialChk)
+                M.bufHandler(true, isSpecial)
             end
         else
             u.winClose()
