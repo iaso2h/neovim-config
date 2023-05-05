@@ -292,10 +292,10 @@ end, "Select last yank")
 map("n", [[<leader>i]], [=[[I]=], "Inquiry word under cursor")
 map("x", [[<leader>i]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selection").get("string", false), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquiry selected words")
 -- Fast mark restore
-map("n", [[M]], [[<CMD>lua require("jump.util").posCenter("`m", false, false)<CR>]], "Restore mark M")
+map("n", [[M]], [[<CMD>lua require("jump.util").posCenter("normal! `m", false)<CR>]], "Restore mark M")
 -- Changelist/Jumplist jumping
-map("n", [[<A-o>]], [[<CMD>lua require("jump.util").posCenter("g;", false, false)<CR>]], {"silent"}, "Older change")
-map("n", [[<A-i>]], [[<CMD>lua require("jump.util").posCenter("g,", false, false)<CR>]], {"silent"}, "Newer change")
+map("n", [[<A-o>]], [[<CMD>lua require("jump.util").posCenter("normal! g;", false)<CR>]], {"silent"}, "Older change")
+map("n", [[<A-i>]], [[<CMD>lua require("jump.util").posCenter("normal! g,", false)<CR>]], {"silent"}, "Newer change")
 map("n", [[<C-o>]], function()
     require("jump.util").posCenter(function()
         require("jump.jumplist").go("n", false, "local")

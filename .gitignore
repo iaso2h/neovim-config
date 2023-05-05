@@ -1,17 +1,11 @@
 .vim/
 .idea/
 .vscode/
-.ccls-cache/
-.netrwhist
-dein/
-pack/
-packer.nvim/
 lsp/
 bk/
 log/
 __pycache__/
 
-packer_compiled*.lua
 lua/test**
 *.bk
 *~

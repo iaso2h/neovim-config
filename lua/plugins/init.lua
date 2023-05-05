@@ -525,7 +525,7 @@ local pluginArgs = { -- {{{
             "jose-elias-alvarez/null-ls.nvim",
             "mason.nvim"
         },
-        config = require("plugins.nvim-null-is"),
+        config = require("plugins.nvim-null-ls"),
     },
     {
         "neovim/nvim-lspconfig",

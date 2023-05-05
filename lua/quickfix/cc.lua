@@ -25,9 +25,13 @@ local setCurrentWin = function(closeQfChk, qfWinId, targetCursorPos)
 end
 
 
-local fallback = function(targetLineNr, ...)
-    vim.cmd([[cc ]] .. targetLineNr)
-    vim.cmd[[norm! zvzz]]
+--- Open quickfix item
+---@param targetLineNr number
+---@vararg any see `setCurrentWin()`
+local open = function(targetLineNr, ...)
+    require("jump.util").posCenter(function()
+        vim.cmd([[cc ]] .. targetLineNr)
+    end, false)
     if not vim.bo.buflisted then
         vim.opt_local.buflisted = true
     end
@@ -106,6 +110,6 @@ return function(closeQfChk, offset)
         return vim.notify("Cannot open this item")
     end
 
-    -- User the built-in :cc command to open quickfix item
-    return fallback(targetLineNr, closeQfChk, qfWinId, targetCursorPos)
+    -- User the built-in `:cc` command to open quickfix item
+    return open(targetLineNr, closeQfChk, qfWinId, targetCursorPos)
 end

@@ -1,4 +1,5 @@
 local icon = require("icon")
+-- TODO: allow write buffer
 
 local init = function(initValue, optName) -- {{{
     if optName then
@@ -157,7 +158,7 @@ _G.logBuf = function(...)
         local obj = select(i, ...)
         vim.list_extend(objects, vim.split(vim.inspect(obj), "\n", {plain=true}))
     end
-    table.insert(objects, 1, os.date("-----%Y-%m-%d-%H:%M:%S", os.time()) .. "-----")
+    table.insert(objects, 1, os.date("-----" .. vim.fn.bufname() .. ": %Y-%m-%d-%H:%M:%S", os.time()) .. "-----")
 
     -- Output the result into a new scratch buffer
     _G._log_buf_nr = require("buffer.util").redirScratch(objects, _G._log_buf_nr, true)

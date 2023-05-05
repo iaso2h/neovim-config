@@ -1,5 +1,4 @@
 return function()
-    local fn   = vim.fn
     local dap  = require("dap")
     local icon = require("icon")
 
@@ -23,19 +22,19 @@ return function()
     map("n", [[dK]],     [[<CMD>lua require("dap.ui.widgets").hover()<CR>]],  {"silent"}, "Dap hover")
     -- }}} General mappings
 
-    fn.sign_define("DapBreakpoint", {
+    vim.fn.sign_define("DapBreakpoint", {
         text   = icon.ui.Dot,
         texthl = "DiagnosticError",
         linehl = "",
         numhl  = "DiagnosticError",
     })
-    fn.sign_define("DapStopped",    {
+    vim.fn.sign_define("DapStopped",    {
         text   = icon.ui.BoldArrowRight,
         texthl = "DiagnosticWarn",
         linehl = "DapStoppedLine",
         numhl  = "DiagnosticWarn",
     })
-    fn.sign_define("DapLogPoint",   {
+    vim.fn.sign_define("DapLogPoint",   {
         text   = icon.debug.Logpoint,
         texthl = "MoreMsg",
         linehl = "DapLogPointLine",

@@ -34,7 +34,6 @@ local saveModified = function(bufNrs, saveBufNr)
         answer = vim.fn.confirm("Save all modification?",
             ">>> &Save\n&Discard\n&Cancel", 3, "Question")
         vim.cmd "noa echohl None"
-        -- Interrupt
         if answer == 3 or answer == 0 then
             return false
         elseif answer == 1 then

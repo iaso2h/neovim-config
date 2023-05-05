@@ -181,8 +181,7 @@ end -- }}}
 ---@param exCmd string|function Ex command or executable function
 ---@param suppressMsgChk? boolean Whether to suppress the error message when
 --execute the `exCmd` string or call the `exCmd` function
----@param remapChk? boolean Whether to use remap key when execute a ex command
-M.posCenter = function(exCmd, suppressMsgChk, remapChk) -- {{{
+M.posCenter = function(exCmd, suppressMsgChk) -- {{{
     local winID      = vim.api.nvim_get_current_win()
     local prevBufNr  = vim.api.nvim_get_current_buf()
     local preWinInfo = vim.fn.getwininfo(winID)[1]
@@ -190,8 +189,7 @@ M.posCenter = function(exCmd, suppressMsgChk, remapChk) -- {{{
 
     -- Execute the command first
     if type(exCmd) == "string" then
-        local remapStr = remapChk and "normal " or "normal! "
-        ok, valOrMsg = pcall(vim.api.nvim_command, remapStr .. vim.v.count1 .. t(exCmd))
+        ok, valOrMsg = pcall(vim.api.nvim_command, exCmd)
     elseif type(exCmd) == "function" then
         ok, valOrMsg = pcall(exCmd)
     else
