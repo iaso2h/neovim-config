@@ -528,9 +528,12 @@ local pluginArgs = { -- {{{
         config = require("plugins.nvim-null-ls"),
     },
     {
+        "folke/neodev.nvim",
+        lazy = true
+    },
+    {
         "neovim/nvim-lspconfig",
         dependencies = {
-            "folke/neodev.nvim",
             "mason-lspconfig.nvim",
         },
         config = require("plugins.nvim-lspconfig")

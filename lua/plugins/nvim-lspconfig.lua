@@ -28,7 +28,7 @@ return function()
                 require("quickfix.toggle")(false)
             end
         end
-    end -- }}} 
+    end -- }}}
 
     local onAttach = function(client, bufNr) -- {{{
         -- Mappings
@@ -109,12 +109,47 @@ servers.pyright = {
 -- Lua {{{
 -- https://github.com/LuaLS/lua-language-server
 -- Settings: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#lua_ls
-servers.lua_ls = {
+
+--- Get lua plugins repository directory. e.g. "/home/iaso2h/.local/share/nvim/lazy/nvim-treesitter/lua"
+---@param plugin string
+---@return string
+local luaGetPluginRepoDir = function(plugin)
+    return _G._plugin_root .. _G._sep .. plugin .. _G._sep .. "lua"
+    -- return _G._plugin_root .. _G._sep .. plugin
+end
+local luaLibrary = {
+    vim.fn.expand("$VIMRUNTIME") .. _G._sep .. "lua",
+    -- require("neodev.config").types(),
+    luaGetPluginRepoDir "nvim-treesitter",
+    luaGetPluginRepoDir "telescope.nvim",      -- HACK: failed to parse the lib
+    luaGetPluginRepoDir "plenary.nvim",
+    luaGetPluginRepoDir "mason-null-ls.nvim",  -- HACK: failed to parse the lib
+    luaGetPluginRepoDir "null-ls.nvim",        -- HACK: failed to parse the lib
+    luaGetPluginRepoDir "LuaSnip",             -- HACK: failed to parse the lib
+    luaGetPluginRepoDir "nvim-dap",
+}
+for _, dir in ipairs(luaLibrary) do
+    if not vim.loop.fs_stat(dir) then
+        vim.notify(debug.traceback(), vim.log.levels.WARN)
+        vim.notify("Path doesn't exist: " .. dir)
+    end
+end
+servers.lua_ls = { -- {{{
     settings = {
         Lua = {
-            hint = {
-                enable = true
+            -- https://github.com/LuaLS/lua-language-server/blob/076dd3e5c4e03f9cef0c5757dfa09a010c0ec6bf/locale/en-us/setting.lua#L5-L13
+            runtime = {
+                version = "LuaJIT",
+                pathStrict = false,
             },
+            hint = {
+                enable    = true,
+                paramType = true,
+                setType   = true,
+                paramName = "All",
+            },
+            format = {enable = false},
+            codeLens = {enable = true},
             completion = {
                 callSnippet    = "Replace",
                 keywordSnippet = "Replace",
@@ -128,30 +163,17 @@ servers.lua_ls = {
                     "trailing-space",
                     "empty-block"
                 },
-                globals = {
-                    "vim",
-                    "map",
-                    "bmap",
-                    "luaRHS",
-                    "t",
-                    "Print",
-                    "logBuf",
-                    "tbl_idx",
-                    "tbl_replace",
-                    "nvim_buf_get_name",
-                },
+                globals = { },
             },
             workspace = {
-                -- Make the server aware of Neovim runtime files
+                library = luaLibrary,
                 checkThirdParty = false,
-                maxPreload      = 2000,
-                preloadFileSize = 1000,
-                ignoreDir       = {".vscode", ".git"},
                 useGitIgnore    = true
             },
+            telemetry = {enable = false}
         },
-    }
-}
+    },
+} -- }}}
 -- }}} Lua
 -- Fennel {{{
 if _G._os_uname.sysname == "Linux" and _G._os_uname.machine ~= "aarch64" then
@@ -245,6 +267,7 @@ if _G._os_uname.machine ~= "aarch64" then
     end
 end
 -- }}} Clangd
+-- marksman {{{
 if _G._os_uname.sysname == "Windows_NT" then
     servers.marksman = {
         cmd = {
@@ -253,36 +276,10 @@ if _G._os_uname.sysname == "Windows_NT" then
         }
     }
 end
+-- }}} marksman
 -- }}}
 
     -- Setup servers {{{
-    require("neodev").setup { -- {{{
-        library = {
-            enabled  = true,
-            runtimes = true,
-            types    = true,
-            plugins = {
-                "nvim-treesitter",
-                "nvim-dap",
-                "telescope.nvim",
-                "LuaSnip",
-                "plenary.nvim",
-
-                "global",
-                "icon",
-                "util",
-                "register",
-                "jump",
-                "buffer",
-                "selection",
-                "operator",
-                "quickfix"
-            },
-            setup_jsonls = true,
-            lspconfig    = true,
-            pathStrict   = true,
-        },
-    } -- }}} 
     local ok, _ = pcall(require, "cmp_nvim_lsp")
     local capabilities = ok and require("cmp_nvim_lsp").default_capabilities() or {}
     local basicConfig = {
