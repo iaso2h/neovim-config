@@ -1,8 +1,8 @@
 -- File: cc.lua
 -- Author: iaso2h
 -- Description: Enhance version of the :cc
--- Version: 0.0.7
--- Last Modified: 05/03/2023 Wed
+-- Version: 0.0.8
+-- Last Modified: Sat 06 May 2023
 
 --- Set current window focus
 ---@param closeQfChk boolean Whether to close the quickfix window
@@ -28,17 +28,23 @@ end
 --- Open quickfix item
 ---@param targetLineNr number
 ---@vararg any see `setCurrentWin()`
-local open = function(targetLineNr, ...)
+local open = function(targetLineNr, ...) -- {{{
+    local prevBufNr = vim.fn.bufnr("$")
+    local prevWinId = require("buffer.util").winIdPrev()
     require("jump.util").posCenter(function()
         vim.cmd([[cc ]] .. targetLineNr)
-    end, false)
+    end, false, prevWinId, prevBufNr)
     if not vim.bo.buflisted then
         vim.opt_local.buflisted = true
     end
-    setCurrentWin(...)
-end
 
-
+    if vim.o.splitkeep ~= "cursor" then
+        local vargs = {...}
+        vim.defer_fn(function() setCurrentWin(unpack(vargs)) end, 0)
+    else
+        setCurrentWin(...)
+    end
+end -- }}}
 --- Open an item in quickfix window like :cc do, except that it will always use
 --- the last window to open a quickfix item, which is what I call the
 --- 'uselastWin' method for 'switchBuf' option. The vim.v.count will only open
@@ -46,7 +52,7 @@ end
 ---@param closeQfChk boolean Whether to close the quifix after open an item
 ---@param offset number Open the item based on the given offset to the
 --cursor. Set it to -1 to open the previous item, 1 to open the next item
-return function(closeQfChk, offset)
+return function(closeQfChk, offset) -- {{{
     local u = require("quickfix.util")
     local qfItems = u.getlist()
     if not next(qfItems) then
@@ -58,13 +64,13 @@ return function(closeQfChk, offset)
     local targetCursorPos = {}
 
     -- Get target line
-    local lastLine = vim.fn.line("$")
+    local qfLastLine = vim.fn.line("$")
     local targetLineNr
     if offset ~= 0 then
         targetLineNr = u.getlist({idx = 0}).idx + offset
-        if targetLineNr > lastLine then
-            targetCursorPos = {lastLine, qfCursorPos[2]}
-            targetLineNr = lastLine
+        if targetLineNr > qfLastLine then
+            targetCursorPos = {qfLastLine, qfCursorPos[2]}
+            targetLineNr = qfLastLine
         elseif targetLineNr < 1 then
             targetCursorPos = {1, qfCursorPos[2]}
             targetLineNr = 1
@@ -73,7 +79,7 @@ return function(closeQfChk, offset)
         end
     else
         targetLineNr = vim.v.count == 0 and qfCursorPos[1] or vim.v.count
-        if targetLineNr > lastLine then targetLineNr = lastLine end
+        if targetLineNr > qfLastLine then targetLineNr = qfLastLine end
         targetCursorPos = {targetLineNr, qfCursorPos[2]}
     end
 
@@ -112,4 +118,4 @@ return function(closeQfChk, offset)
 
     -- User the built-in `:cc` command to open quickfix item
     return open(targetLineNr, closeQfChk, qfWinId, targetCursorPos)
-end
+end -- }}}

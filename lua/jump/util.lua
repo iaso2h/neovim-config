@@ -176,11 +176,14 @@ end -- }}}
 --- Execute ex command then center the screen if necessary
 ---@param exCmd string|function Ex command or executable function
 ---@param suppressMsgChk? boolean Whether to suppress the error message when
---execute the `exCmd` string or call the `exCmd` function
-M.posCenter = function(exCmd, suppressMsgChk) -- {{{
-    local winID      = vim.api.nvim_get_current_win()
-    local prevBufNr  = vim.api.nvim_get_current_buf()
-    local preWinInfo = vim.fn.getwininfo(winID)[1]
+---@param providedPrevWinId? integer Use the provided window ID to compare
+--with the one after executing a ex command or function
+---@param providedPrevBufNr? integer Use the provided buffer number to compare
+--with the one after executing a ex command or function
+M.posCenter = function(exCmd, suppressMsgChk, providedPrevWinId, providedPrevBufNr) -- {{{
+    local preWinID  = providedPrevWinId and providedPrevWinId or vim.api.nvim_get_current_win()
+    local prevBufNr = providedPrevBufNr and providedPrevBufNr or vim.api.nvim_get_current_buf()
+    local preWinInfo = vim.fn.getwininfo(preWinID)[1]
     local ok, valOrMsg
 
     -- Execute the command first
@@ -198,13 +201,13 @@ M.posCenter = function(exCmd, suppressMsgChk) -- {{{
 
     local postBufNr = vim.api.nvim_get_current_buf()
 
+    vim.cmd[[norm! zv]]
+
     -- Jump to a different buffer
     if prevBufNr ~= postBufNr then return end
 
     -- Make sure cursor does not sit on a fold line
-    vim.cmd[[norm! zv]]
-
-    local postCursorPos = vim.api.nvim_win_get_cursor(winID)
+    local postCursorPos = vim.api.nvim_win_get_cursor(preWinID)
     if postCursorPos[1] < preWinInfo.topline or postCursorPos[1] > preWinInfo.botline then
         vim.cmd [[norm! zz]]
     end

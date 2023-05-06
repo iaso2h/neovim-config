@@ -192,6 +192,14 @@ M.winIds = function(relativeIncludeChk) -- {{{
         return vim.api.nvim_list_wins()
     end
 end -- }}}
+--- Get the window ID of previous window
+---@return integer
+M.winIdPrev = function()
+    vim.cmd [[noa wincmd p]]
+    local winId  = vim.api.nvim_get_current_win()
+    vim.cmd [[noa wincmd p]]
+    return winId
+end
 -- Return window occurrences in Neovim
 ---@return number The occurrence
 M.winsOccur = function() -- {{{
@@ -314,7 +322,7 @@ end -- }}}
 ---@param preHook? function Optional function to call before the redirection
 ---@param postHook? function Optional function to call after the redirection
 ---@return number The scratch bufffer
-M.redirScratch = function(lines, scratchBufNr, appendChk, preHook, postHook)
+M.redirScratch = function(lines, scratchBufNr, appendChk, preHook, postHook) -- {{{
     if preHook  and vim.is_callable(preHook)  then preHook()  end
     if postHook and vim.is_callable(postHook) then postHook() end
     local startLine = appendChk and -1 or 0
@@ -369,7 +377,7 @@ M.redirScratch = function(lines, scratchBufNr, appendChk, preHook, postHook)
     vim.api.nvim_win_set_cursor(scratchWinId, {lastLine, 0})
 
     return scratchBufNr
-end
+end -- }}}
 
 
 return M
