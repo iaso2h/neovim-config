@@ -250,7 +250,7 @@ M.requireSafe = function(mod) -- {{{
 end -- }}}
 --- Save the cursor position in current window, also respect the topline and
 --the botline of the current window
----@param printFormulaChk boolean Set it to true to debug print the data
+---@param printFormulaChk? boolean Set it to true to debug print the data
 M.saveViewCursor = function(printFormulaChk) -- {{{
     -- https://github.com/notomo/neovim/blob/da134270d3e9f8a4824b0e0540bf017f7e59b06e/src/nvim/ex_session.c#L436
     -- https://www.cs.cmu.edu/afs/club/contrib/build/debian8/vim/src/session.c

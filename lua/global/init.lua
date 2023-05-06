@@ -40,6 +40,18 @@ _G._short_line_infos = { -- {{{
         name = "Terminal",
         icon = icon.ui.Terminal
     },
+    lazy = {
+        name = "Lazy",
+        icon = ""
+    },
+    Mason = {
+        name = "Mason",
+        icon = ""
+    },
+    ["dap-float"] = {
+        name = "Dap Float",
+        icon = ""
+    },
     ["dap-repl"] = {
         name = "Repl",
         icon = icon.ui.Terminal

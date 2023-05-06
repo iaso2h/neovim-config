@@ -118,7 +118,7 @@ local checkOtherOpenMod = function (allAbsStr, topParentTailStr)
     local answer = vim.fn.confirm(
         string.format("Save the modification%s for file%s under the same [%s] directory?",
             pluralStr, pluralStr, topParentTailStr),
-        ">>> &Yes\n&No", 1, "Question")
+        ">>> &Yes\n&No", 2, "Question")
     vim.cmd "noa echohl None"
     if answer == 1 then
         for _, n in ipairs(allValidBufNr) do

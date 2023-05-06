@@ -366,8 +366,11 @@ map("x", [[<leader>h]], [[<CMD>exec "norm! \<lt>Esc>"<CR>]], {"silent"}, "Disabl
 map("", [[<C-m>]], [[%]], {"silent"}, "Go to match parenthesis")
 -- Visual selection
 map("n", [[gvv]], [[gv]], {"noremap"}, "Select previous selected region")
--- TODO: remove unnecessary screent center move
-map("n", [[gvo]], [[<CMD>lua require("selection").corner(-1)<CR>]], {"silent"}, "Go to opposite of the selection")
+map("n", [[gvo]], function()
+    require("jump.util").posCenter(function()
+        require("selection").corner(-1)
+    end, false)
+end, "Go to opposite of the selection")
 map({"n", "x"}, [[<A-v>]], [[<C-q>]], {"noremap"}, "Visual Block Mode")
 map({"n", "x"}, [[<C-q>]], [[<Nop>]], "which_key_ignore")
 -- }}} Search & Jumping

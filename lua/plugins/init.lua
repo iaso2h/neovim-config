@@ -446,8 +446,11 @@ local pluginArgs = { -- {{{
         "NvChad/nvim-colorizer.lua",
         event  = {"BufAdd"},
         config = function()
+            -- Construct excluded filetypes
+            local filetypes = vim.tbl_map(function(filetype) return "!" .. filetype end, _G._short_line_list)
+            table.insert(filetypes, 1, "*")
             require("colorizer").setup {
-                filetypes = { "*" },
+                filetypes = filetypes,
                 user_default_options = {
                     RGB      = true,  -- #RGB hex codes
                     RRGGBB   = true,  -- #RRGGBB hex codes
@@ -1146,7 +1149,7 @@ local pluginArgs = { -- {{{
     -- }}} Knowledge
 } -- }}}
 
-local opts = {
+local lazyOpts = { -- {{{
     root = _G._plugin_root,
     git  = { log = {"-30"} },
     install = {colorscheme = {"onenord"}},
@@ -1184,7 +1187,7 @@ local opts = {
         reset_packpath = true,
         rtp = {reset = true}
     }
-}
+} -- }}} 
 
 vim.api.nvim_create_user_command("CDLazyPlugin", function()
     vim.cmd("cd " .. vim.fn.stdpath("data") .. "/lazy")
@@ -1192,4 +1195,4 @@ vim.api.nvim_create_user_command("CDLazyPlugin", function()
 end, { desc  = "Change directory to lazy plug-ins path", })
 
 vim.opt.rtp:prepend(lazyPath)
-require("lazy").setup(pluginArgs, opts)
+require("lazy").setup(pluginArgs, lazyOpts)

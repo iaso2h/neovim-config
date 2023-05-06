@@ -1,4 +1,4 @@
--- TODO: bundle the quifix into a plugins?
+-- TODO: bundle the quickfix into a plugins?
 
 -- Location list detection
 if next(vim.fn.getloclist(0, {items = 0}).items) then

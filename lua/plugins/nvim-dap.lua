@@ -19,7 +19,7 @@ return function()
     map("n", [[<F5>]],   [[<CMD>lua require("dap").continue()<CR>]], "Dap continue")
     map("n", [[<S-F5>]], [[<CMD>lua require("dap").run_last()<CR>]], "Dap run last")
 
-    map("n", [[dK]],     [[<CMD>lua require("dap.ui.widgets").hover()<CR>]],  {"silent"}, "Dap hover")
+    map("n", [[dK]],     [[<CMD>lua require("dap.ui.widgets").hover("<cexpr>", {border = "rounded"})<CR>]],  {"silent"}, "Dap hover")
     -- }}} General mappings
 
     vim.fn.sign_define("DapBreakpoint", {
@@ -37,7 +37,7 @@ return function()
     vim.fn.sign_define("DapLogPoint",   {
         text   = icon.debug.Logpoint,
         texthl = "MoreMsg",
-        linehl = "DapLogPointLine",
+        linehl = "",
         numhl  = "MoreMsg",
     })
 
