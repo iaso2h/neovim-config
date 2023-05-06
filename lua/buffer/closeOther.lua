@@ -1,11 +1,9 @@
 -- File: closeOther
 -- Author: iaso2h
 -- Description: Close other buffers or windows
--- Version: 0.0.6
--- Last Modified: 05/03/2023 Wed
--- TODO: refresh cokeline
+-- Version: 0.0.7
+-- Last Modified: Sat 06 May 2023
 local u     = require("buffer.util")
-local var   = require("buffer.var")
 local close = require("buffer.close")
 
 local filetypeWhitelist = {"qf", "help", "terminal"}
@@ -18,17 +16,11 @@ local buftypeWhitelist  = {"terminal"}
 ---@param saveBufNr number
 ---@return boolean Evaluate to false if cancel signal has input
 local saveModified = function(bufNrs, saveBufNr)
-    local changeTick = false
+    local changeTick = require("util").any(function(bufNr)
+        if bufNr == saveBufNr then return false end
+        return vim.api.nvim_buf_get_option(bufNr, "modified")
+    end, bufNrs)
     local answer = -1
-    for _, bufNr in ipairs(bufNrs) do
-        if bufNr ~= saveBufNr then
-            local modified = vim.api.nvim_buf_get_option(bufNr, "modified")
-            if modified then
-                changeTick = true
-                break
-            end
-        end
-    end
     -- Ask for saving, return when cancel is input
     if changeTick then
         vim.cmd "noa echohl MoreMsg"
@@ -71,5 +63,9 @@ return function()
     -- Refocus window if necessary
     if vim.api.nvim_get_current_win() ~= saveWinId and vim.api.nvim_win_is_valid(saveWinId) then
         vim.api.nvim_set_current_win(saveWinId)
+    end
+
+    if package.loaded["cokeline"] then
+        require("cokeline/augroups").toggle()
     end
 end
