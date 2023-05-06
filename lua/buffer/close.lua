@@ -130,7 +130,7 @@ M.bufHandler = function(postRearrange, isSpecial) -- {{{
         if u.bufsNonScratchOccurInWins() == 1 then
             u.bufClose(nil, false)
 
-            if not require("historyStartup").historyStartupIsLoad() then
+            if not require("historyStartup").isLoaded() then
                 -- Neovim will crate a scratch buffer automatically as the
                 -- last resort after wiping out the last standard buffer. We
                 -- then use that scratch buffer to setup a historyStartup
@@ -149,7 +149,7 @@ M.bufHandler = function(postRearrange, isSpecial) -- {{{
                 -- Use the existing historyStartup as the only buffer in one window
                 if u.winsOccur() > 1 then
                     local bufNr = vim.api.nvim_get_current_buf()
-                    vim.api.nvim_win_set_buf(var.winId, require("historyStartup").curBuf)
+                    vim.api.nvim_win_set_buf(var.winId, require("historyStartup").initBuf)
                     vim.api.nvim_buf_delete(bufNr, {unload = false})
                     return vim.cmd [[only]]
                 end
