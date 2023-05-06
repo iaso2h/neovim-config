@@ -338,6 +338,7 @@ M.redirScratch = function(lines, scratchBufNr, appendChk, preHook, postHook) -- 
 
                 vim.api.nvim_buf_set_lines(scratchBufNr, startLine, -1, false, lines)
                 visibleTick = true
+                vim.notify("Scratch buffer refreshed")
                 break
             end
         end
@@ -347,7 +348,7 @@ M.redirScratch = function(lines, scratchBufNr, appendChk, preHook, postHook) -- 
             scratchWinId = vim.api.nvim_get_current_win()
 
             vim.api.nvim_buf_set_lines(scratchBufNr, startLine, -1, false, lines)
-            vim.cmd "wincmd p"
+            vim.cmd "noa wincmd p"
         end
     elseif vim.api.nvim_buf_get_name(0) == "" and vim.bo.modifiable and
             vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
@@ -368,7 +369,7 @@ M.redirScratch = function(lines, scratchBufNr, appendChk, preHook, postHook) -- 
 
         vim.api.nvim_buf_set_option(scratchBufNr, "bufhidden", "wipe")
         vim.api.nvim_buf_set_lines(scratchBufNr, 0, -1, false, lines)
-        vim.cmd "wincmd p"
+        vim.cmd "noa wincmd p"
     end
 
     local lastLine = vim.api.nvim_buf_call(scratchBufNr, function()

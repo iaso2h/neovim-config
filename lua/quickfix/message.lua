@@ -1,8 +1,8 @@
 -- File: cc.lua
 -- Author: iaso2h
 -- Description: Enhance version of the :cc
--- Version: 0.0.9
--- Last Modified: 05/04/2023 Thu
+-- Version: 0.0.10
+-- Last Modified: Sat 06 May 2023
 -- TODO: live update
 
 local filterChk = false
@@ -11,76 +11,64 @@ local filterChk = false
 --- Capture messages output and get ready to redirect
 ---@return table, table
 local getMsg = function()
-    local msg = vim.api.nvim_cmd({cmd = "messages"}, {output = true})
-    local msgTbl = vim.split(msg, "\n", {plain = true})
-
-    -- Filter messages
-    if filterChk then
-        msgTbl = vim.tbl_filter(function(m)
-            local regex1 = vim.regex([=[^\d\+ more line\(s\)\?;]=])
-            local regex2 = vim.regex([=[^\d\+ lines\? less;]=])
-            local regex3 = vim.regex([=[^\d\+ fewer line\(s\)\?$]=])
-            local regex4 = vim.regex([=[^\d\+ change\(s\)\?; \(before\|after\) #\d\+]=])
-            if not regex1:match_str(m) and
-                not regex2:match_str(m) and
-                not regex3:match_str(m) and
-            not regex4:match_str(m) then
-                return true end
-            -- if string.match(m, [=[%d more line; before]=])
-        end, msgTbl)
-    end
-    if not next(msgTbl) then
+    local msgOutput = vim.api.nvim_exec2("messages", {output = true}).output
+    -- msg = string.gsub(msg, "\n\t", "\n" .. string.rep(" ", vim.o.tabstop))
+    local msgs = vim.split(msgOutput, "\n", {plain = true})
+    if not next(msgs) then
         return vim.notify("No messages", vim.log.levels.INFO)
     end
 
     -- Refine and format
-    local errorLineNrTbl = {}
+    local errorLineNrs = {}
     local checkIndent = false
-    local msgRefinedTbl = {}
-    for _, m in ipairs(msgTbl) do -- {{{
-        -- Replace special characters
-        if checkIndent then
-            if string.find(m, "^\t") then
-                local reindentMsg = string.gsub(m, "^\t", string.rep(" ", vim.o.tabstop))
-                -- Close check in next iteration
-                if m == reindentMsg then
-                    checkIndent = false
-                else
-                    m = reindentMsg
-                end
-            elseif string.find(m, "^%^I") then
-                local indentMsg = string.gsub(m, "^%^I", string.rep(" ", vim.o.tabstop))
-                -- Close check in next iteration
-                if m == indentMsg then
-                    checkIndent = false
-                else
-                    m = indentMsg
-                end
-            else
-                checkIndent = false
-            end
-        end
-        msgRefinedTbl[#msgRefinedTbl+1] = {text = m}
+    local msgsRefined = {}
+    for _, m in ipairs(msgs) do -- {{{
+        if m ~= "" then
 
-        -- Checking vim error code
-        if string.find(m, [=[^E%d+: .*[^:]$]=]) or
-        string.find(m, [[^Error executing vim.schedule lua callback]]) then
-            errorLineNrTbl[#errorLineNrTbl+1] = #msgRefinedTbl
-            checkIndent = true
-        else
-            if string.find(m, [[^E%d+: .*:$]]) or
+            -- Replace special characters
+            if checkIndent then
+                local changeTick = false
+                for _, pat in ipairs({"^\t", "^%^I"}) do
+                    if string.find(m, pat) then
+                        local msgRefined, occurrence = string.gsub(m, pat, string.rep(" ", vim.o.tabstop))
+                        -- Close check in next iteration
+                        if occurrence == 0 then
+                            checkIndent = false
+                        else
+                            -- logBuf(m)
+                            m = msgRefined
+                        end
+                        changeTick = true
+                    end
+                end
+
+                if not changeTick then
+                    checkIndent = false
+                else
+                    errorLineNrs[#errorLineNrs+1] = #msgsRefined + 1
+                end
+            end
+
+            -- Checking vim error code
+            if string.find(m, [=[^E%d+: [ABCDEFGHIJKLMNOPQRSTUVWXYZ].*]=]) or
+                string.find(m, [[^Error executing vim.schedule lua callback]]) or
+                string.find(m, [[^Error executing [lL]ua]]) or
                 string.find(m, [[^stack traceback:]]) or
-                string.find(m, [[^Error executing l?L?ua]]) or
-                string.find(m, [[module '.\{-}' not found:$]])
-                then
-                -- Checking indent in the follow iteration
-                errorLineNrTbl[#errorLineNrTbl+1] = #msgRefinedTbl
+                string.find(m, [[module '.\{-}' not found:$]]) then
+
+                errorLineNrs[#errorLineNrs+1] = #msgsRefined + 1
+                -- Change the tick and enter next iteration, check and replace
+                -- the indent in the next iteration
                 checkIndent = true
             end
+
+            -- Append the msg
+            msgsRefined[#msgsRefined+1] = {text = m}
+
         end
     end -- }}}
 
-    return msgRefinedTbl, errorLineNrTbl
+    return msgsRefined, errorLineNrs
 end
 
 return function(des) -- {{{
