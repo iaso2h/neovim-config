@@ -1,8 +1,8 @@
 -- File: /buf/close.lua
 -- Author: iaso2h
 -- Description: Deleting buffer without changing the window layout
--- Version: 0.1.5
--- Last Modified: 05/03/2023 Wed
+-- Version: 0.1.6
+-- Last Modified: Sat 06 May 2023
 local u   = require("buffer.util")
 local var = require("buffer.var")
 local M   = {}
@@ -50,6 +50,9 @@ local specialBufHandler = function(postRearrange, handler) -- {{{
             return true
         elseif var.fileType == "DiffviewFileHistory" then
             vim.cmd [[DiffviewClose]]
+            return true
+        elseif var.fileType == "NvimTree" then
+            require("nvim-tree-api").tree.close()
             return true
         elseif string.match(var.bufName, [[%[nvim%-lua%]$]]) then
             -- Check for Lua pad
