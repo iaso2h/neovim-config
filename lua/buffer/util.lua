@@ -103,8 +103,8 @@ M.bufSwitchAlter = function(winId, bufNr) -- {{{
         return vim.api.nvim_win_set_buf(winId, altBufNr)
     else
         -- Fallback method
-        local curBufNrIdx = tbl_idx(var.bufNrs, bufNr)
-        if curBufNrIdx then
+        local curBufNrIdx = tbl_idx(var.bufNrs, bufNr, false)
+        if curBufNrIdx ~= -1 then
             for offset = 1, curBufNrIdx do
                 local idx = curBufNrIdx - offset
                 idx = idx > 0 and idx or idx + #var.bufNrs
@@ -173,7 +173,7 @@ M.bufsNonScratchOccurInWins = function(bufNrs) -- {{{
 
     if bufNrs then
         local cnt = #vim.tbl_filter(function(bufNr)
-            return not M.isScratchBuf(bufNr) and nvim_buf_get_name(bufNr) ~= ""
+            return not M.isScratchBuf(bufNr)
         end, bufNrs)
         return cnt
     else

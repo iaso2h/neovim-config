@@ -106,7 +106,7 @@ M.init = function(direction)
     end
 
     local currentBufIdx = tbl_idx(bufTbl, currentBufNr, false)
-    if not currentBufIdx then
+    if currentBufIdx == -1 then
         -- Use fallback function
         return bufferCycle(currentBufNr, direction)
     end

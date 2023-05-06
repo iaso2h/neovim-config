@@ -11,8 +11,10 @@ return function() -- {{{
 
     -- Filetypes contained in this list will be consider inactive all the time
     gl.short_line_list = vim.deepcopy(_G._short_line_list)
-    local idx = tbl_idx(gl.short_line_list, "help")
-    table.remove(gl.short_line_list, idx)
+    local idx = tbl_idx(gl.short_line_list, "help", false)
+    if idx ~= -1 then
+        table.remove(gl.short_line_list, idx)
+    end
 
     local colors = { -- {{{
         fg        = pallette.n10,

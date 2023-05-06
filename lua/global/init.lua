@@ -254,17 +254,17 @@ end
 
 --- Return the 1 based index of specific item in a list-liked table. Only support
 --- number and string for now
---- @param tbl table list-liked table
---- @param item number|string
---- @param returnIdxTbl? boolean whether to return all the indexes as a table
---- @return number|table|nil return table when returnIdxTbl is true
-_G.tbl_idx = function(tbl, item, returnIdxTbl)
+--- @param tbl any[] List-liked table
+--- @param item number|string Item to look up
+--- @param allIdx boolean Whether to return all the indexes as a table
+--- @return number|number[] return table when returnIdxTbl is true
+_G.tbl_idx = function(tbl, item, allIdx)
     assert(vim.tbl_islist(tbl), "Expect list-liked table")
     assert(type(item) == "string" or type(item) == "number", "Only support indexing string or number")
     local idxTbl = {}
     for idx, i in ipairs(tbl) do
         if i == item then
-            if not returnIdxTbl then
+            if not allIdx then
                 return idx
             else
                 idxTbl[#idxTbl+1] = idx
@@ -272,8 +272,8 @@ _G.tbl_idx = function(tbl, item, returnIdxTbl)
         end
     end
 
-    if not returnIdxTbl then
-        return nil
+    if not allIdx then
+        return -1
     else
         return idxTbl
     end

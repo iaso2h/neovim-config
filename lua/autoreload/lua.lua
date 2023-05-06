@@ -235,7 +235,7 @@ M.loadDir = function(path, opt) -- {{{
     -- Get the top parent folder under <configpath>/lua/
     local allParentStr = path:parents()
     local moduleSearchPathStr = opt.moduleSearchPath.filename
-    local i = tbl_idx(allParentStr, moduleSearchPathStr)
+    local i = tbl_idx(allParentStr, moduleSearchPathStr, false)
     local topParentStr     = allParentStr[i - 1]
     local topParentTailStr = util.getTail(topParentStr)
     local pathTailRootStr  = util.getTail(path.filename:sub(1, -5))
@@ -270,7 +270,7 @@ M.loadDir = function(path, opt) -- {{{
     -- init.lua when that module isn't loaded in runtime. Doesn't worth
     -- reloading the whole directory because of it
     if pathTailRootStr ~= "init" and pathTailRootStr ~= topParentTailStr and
-        not vim.tbl_contains(allLoadedModule, allModule[tbl_idx(allAbsStr, path.filename)]) then
+        not vim.tbl_contains(allLoadedModule, allModule[tbl_idx(allAbsStr, path.filename, false)]) then
         return
     end
 
@@ -294,7 +294,7 @@ M.loadDir = function(path, opt) -- {{{
 
     -- Reloading
     for idx, module in ipairs(allLoadedModule) do
-        local moduleIdx = tbl_idx(allModule, module)
+        local moduleIdx = tbl_idx(allModule, module, false)
         local relStr = allRelStr[moduleIdx]
         local absStr = allAbsStr[moduleIdx]
 
