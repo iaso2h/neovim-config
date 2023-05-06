@@ -337,6 +337,14 @@ M.getQueryNodes = function(bufNr, query, captureId) -- {{{
 
     return nodeTbl
 end -- }}}
-
+--- Return `true` if any match evaluated to `true`
+---@param func function Match against each element
+---@param tbl any[] List-like table
+M.any = function(func, tbl) -- {{{
+    for _, i in ipairs(tbl) do
+        if func(i) then return true end
+    end
+    return false
+end -- }}}
 
 return M

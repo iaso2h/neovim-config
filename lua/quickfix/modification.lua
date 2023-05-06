@@ -8,6 +8,8 @@ local M = {
     lastTitle = "",
     lastType  = ""
 }
+local util = require("util")
+local u    = require("quickfix.util")
 
 
 --- Delete quickfix item and reflect immediately. vim.v.count prefix will result
@@ -15,7 +17,7 @@ local M = {
 ---@param vimMode string Vim mode. "n" or "v"
 M.delete = function (vimMode) -- {{{
     local qfCursorPos = vim.api.nvim_win_get_cursor(0)
-    local qfItems, qfTitle = require("quickfix.util").getlist()
+    local qfItems, qfTitle = u.getlist()
     local qfLastline = vim.fn.line("$")
     vim.defer_fn(require("quickfix.highlight").clear, 0)
     if #qfItems == 0 then return end
@@ -83,15 +85,11 @@ end -- }}}
 
 
 M.interConvert = function ()
-    local qfItems, qfTitle = require("quickfix.util").getlist()
+    local qfItems, qfTitle = u.getlist()
     local winInfo = vim.fn.getwininfo()
-    local qfVisibleTick = false
-    for _, tbl in ipairs(winInfo) do
-        if tbl["quickfix"] == 1 then
-            qfVisibleTick = true
-            break
-        end
-    end
+    local qfVisibleTick = util.any(function(i)
+        return i.quickfix == 1
+    end, winInfo)
     if vim.b._is_local then
         vim.fn.setqflist({}, " ", {items = qfItems, title = qfTitle})
     else
@@ -106,7 +104,7 @@ end
 
 
 M.main = function ()
-    local qfItems, qfTitle = require("quickfix.util").getlist()
+    local qfItems, qfTitle = u.getlist()
     for idx, item in ipairs(qfItems) do
         if item.valid ~= 0 and item.bufnr ~= 0 and
             vim.api.nvim_buf_is_valid(item.bufnr) and

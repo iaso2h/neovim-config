@@ -46,14 +46,10 @@ M.opt.lua.config = { -- {{{
 
             --- Check modified state of specified buffer numbers and prompt for saving if
             --unsave changes found
-            local changeTick = false
+            local changeTick = require("util").any(function(bufNr)
+                return vim.api.nvim_buf_get_option(bufNr, "modified")
+            end, require("buffer.util").bufNrs(true))
             local answer = -1
-            for _, bufNr in ipairs(require("buffer.util").bufNrs(true)) do
-                if vim.api.nvim_buf_get_option(bufNr, "modified") then
-                    changeTick = true
-                    break
-                end
-            end
             -- Ask for saving, return when cancel is input
             if changeTick then
                 vim.cmd "noa echohl MoreMsg"

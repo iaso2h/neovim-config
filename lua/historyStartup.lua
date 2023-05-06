@@ -302,15 +302,11 @@ local execMap = function(key) -- {{{
         -- Related to spliting window or rearranging the window layout
         local lastBufVisibleTick = false
         if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
-            local winIDTbl = vim.tbl_filter(function(i)
-                return vim.api.nvim_win_get_config(i).relative == ""
-            end, vim.api.nvim_list_wins())
-            for _, win in ipairs(winIDTbl) do
-                if vim.api.nvim_win_get_buf(win) == M.lastBuf then
-                    lastBufVisibleTick = true
-                    break
-                end
-            end
+            local winIds = require("buffer.util").winIds(false)
+
+            lastBufVisibleTick = require("util").any(function(winId)
+                return vim.api.nvim_win_get_buf(winId) == M.lastBuf
+            end, winIds)
         end
         if key == "<C-s>" then -- {{{
             if lnum == 1 then

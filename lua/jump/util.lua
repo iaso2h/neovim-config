@@ -157,13 +157,9 @@ M.jumplistRegisterLinesToTbl = function(returnJumpsChk, startLineNr, lastLineNr,
 
     -- Check special character
     if onlyOutputSpecialCharChk then
-        local specialCharTick = false
-        for _, j in ipairs(jumpsTbl) do
-            if string.find(j, "^", 1, true) then
-                specialCharTick = true
-                break
-            end
-        end
+        local specialCharTick = require("util").any(function()
+            return string.find(j, "^", 1, true)
+        end, jumpsTbl)
         if not specialCharTick then
             vim.notify("No special characters found")
             return
