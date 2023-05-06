@@ -1,8 +1,8 @@
 -- File: foldmarker.lua
 -- Author: iaso2h
 -- Description: Improve fold marker
--- Version: 0.0.3
--- Last Modified: 2023-4-18
+-- Version: 0.0.4
+-- Last Modified: Sat 06 May 2023
 
 local util = require("util")
 local M = {
@@ -513,11 +513,13 @@ M.snap = function(exCmd, snapEnable, threshold)
                 return
             end
         else
-            local answer = vim.fn.confirm("Select direction: ", "&Up\n&Down", 0, "Info")
+            local answer = vim.fn.confirm("Select direction: ", "&Up\n&Down\nCancel", 0, "Info")
             if answer == 1 then
                 snapToLine(curWinNr, curBufNr, cursorPos, topLineNr)
             elseif answer == 2 then
                 snapToLine(curWinNr, curBufNr, cursorPos, botLineNr)
+            else
+                return
             end
         end
 
