@@ -486,15 +486,15 @@ return function() -- {{{
         }
     }
 
-    -- local ShortRightLineInfoWhitelist = {"help"}
+    local lineInfoWhitelist = {"qf"}
     gls.short_line_right[1] = {
         ShortRightLineInfo = {
             provider  = lineInfo,
             condition = function()
                 if isNoNeckPain() then
                     return false
-                    -- elseif vim.tbl_contains(ShortRightLineInfoWhitelist, vim.bo.filetype) then
-                    --     return true
+                elseif vim.tbl_contains(lineInfoWhitelist, vim.bo.filetype) then
+                    return true
                 else
                     return condition.buffer_not_empty() and not isSpecialFileType()
                 end

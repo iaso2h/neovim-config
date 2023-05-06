@@ -304,6 +304,11 @@ local pluginArgs = { -- {{{
         end,
     },
     {
+        "andymass/vim-matchup",
+        init   = require("plugins.vim-matchup").setup,
+        config = require("plugins.vim-matchup").config
+    },
+    {
         "szw/vim-maximizer",
         cmd  = "MaximizerToggle",
         init = function()

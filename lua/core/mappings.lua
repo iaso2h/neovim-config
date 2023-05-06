@@ -425,8 +425,8 @@ map("n", [[<A-q>]], [[q]], {"noremap"}, "Macro")
 -- Messages
 
 map({"n", "x"}, [[g<]], [[:s#^\s*\ze\S## | noh<CR>]], {"silent"}, "Clear all indents")
-map("n", [[gm]], [[g<]], {"noremap"}, "Clear messages")
-map("n", [[gM]], [[<CMD>messages<CR>]], {"silent"}, "Clear messages")
+map("n", [[gm]], [[g<]], {"noremap"}, "Recent messages")
+map("n", [[gM]], [[<CMD>messages<CR>]], {"silent"}, "All messages")
 map("n", [[<leader>m]], [[<CMD>execute 'messages clear<Bar>echohl Moremsg<Bar>echo "Message clear"<Bar>echohl None'<CR>]], "Clear messages")
 
 -- Register

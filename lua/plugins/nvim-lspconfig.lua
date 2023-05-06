@@ -139,6 +139,12 @@ servers.lua_ls = { -- {{{
         Lua = {
             -- https://github.com/LuaLS/lua-language-server/blob/076dd3e5c4e03f9cef0c5757dfa09a010c0ec6bf/locale/en-us/setting.lua#L5-L13
             runtime = {
+                path = {
+                    -- _G._config_path .. "/lua/?/init.lua",
+                    -- _G._config_path .. "/lua/?.lua",
+                    "?/init.lua",
+                    "?.lua",
+                },
                 version = "LuaJIT",
                 pathStrict = false,
             },

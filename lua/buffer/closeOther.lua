@@ -3,6 +3,7 @@
 -- Description: Close other buffers or windows
 -- Version: 0.0.6
 -- Last Modified: 05/03/2023 Wed
+-- TODO: refresh cokeline
 local u     = require("buffer.util")
 local var   = require("buffer.var")
 local close = require("buffer.close")
