@@ -24,4 +24,57 @@ globals:
     args:
       - type: string
       - type: function
+
+  map:
+    args:
+      - type: any
+      - type: string
+      - type: any
+      - required: false
+        type: ...
+  bmap:
+    args:
+      - type: number
+      - type: any
+      - type: string
+      - type: any
+      - required: false
+        type: ...
+
+  luaRHS:
+    args:
+      - type: string
+  t:
+    args:
+      - type: string
+
+  Print:
+    args:
+      - type: ...
+
+  ex:
+    args:
+      - type: string
+
+  tbl_idx:
+    args:
+      - type: table
+      - type: number
+      - type: bool
+        required: false
+  tbl_replace:
+    args:
+      - type: table
+      - type: any
+      - type: any
+      - type: bool
+        required: false
+      - type: number
+        required: false
+      - type: bool
+        required: false
+  nvim_buf_get_name:
+    args:
+      - type: number
+
 # vim:ts=2:sts=2:sw=2
