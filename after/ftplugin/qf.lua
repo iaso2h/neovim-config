@@ -14,8 +14,10 @@ else
     bmap(0, "n", [[#]],     [[<CMD>Cfilter #<CR>]], {"silent"}, "Filter other buffer in quickfix")
 end
 
-bmap(0, "n", [[q]], [[<CMD>lua require("quickfix.highlight").clear();vim.cmd"q"<CR>]], {"silent"}, "Close quickfix")
-bmap(0, "n", [[Q]], [[<CMD>lua require("quickfix.highlight").clear();vim.cmd"q"<CR>]], {"silent"}, "Close quickfix")
+-- bmap(0, "n", [[q]], [[<CMD>lua require("quickfix.highlight").clear();vim.cmd"q"<CR>]], {"silent"}, "Close quickfix")
+-- bmap(0, "n", [[Q]], [[<CMD>lua require("quickfix.highlight").clear();vim.cmd"q"<CR>]], {"silent"}, "Close quickfix")
+bmap(0, "n", [[q]], [[<CMD>wincmd p | cclose<CR>]], {"silent"}, "Close quickfix")
+bmap(0, "n", [[Q]], [[<CMD>wincmd p | cclose<CR>]], {"silent"}, "Close quickfix")
 bmap(0, "n", [[<leader>H]], [[<CMD>lua require("quickfix.highlight").clear()<CR>]], {"silent"}, "Clear known quickfix highlight")
 
 -- _G._qf_fallback_open is setup at '<stdpath("config")>/init.lua'

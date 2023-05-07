@@ -97,18 +97,20 @@ theme.editor =  {
     NormalFloat = {bg = p.n0},
     FloatBorder = {fg = p.n3b, bg = p.n0},
     FloatTitle  = {fg = p.n8,  bg = p.n0, style = "bold"},
-    TermCursor  = {link = "Normal"},
-    -- TermCursorNC
+
 
     NonText     = {fg = p.n3},
     Conceal     = {fg = p.n1},
     EndOfBuffer = {link = "NonText"},
 
 
-    Cursor       = {fg = p.n6, style = "reverse"},
-    CursorIM     = {fg = p.n6, style = "reverse"},
+    Cursor       = {fg = p.white, style = "reverse"},
+    CursorIM     = {fg = p.white, style = "reverse"},
     CursorColumn = {bg = p.n1},
     CursorLine   = {bg = p.n1},
+
+
+    TermCursor  = {link = "Cursor"},
 
 
     DiffAdd    = {bg = "#43514b"},

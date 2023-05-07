@@ -25,7 +25,7 @@ return function()
                 end, false)
             else
                 vim.fn.setqflist({}, "r", {items = tbl.items, title = tbl.title})
-                require("quickfix.toggle")(false)
+                require("buffer.toggle")("quickfix", false)
             end
         end
     end -- }}}

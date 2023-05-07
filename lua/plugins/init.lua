@@ -309,6 +309,16 @@ local pluginArgs = { -- {{{
         config = require("plugins.vim-matchup").config
     },
     {
+        "utilyre/sentiment.nvim",
+        config = function()
+            -- local excludedFiletypes = _G._short_line_list
+            require("sentiment").setup {
+                excluded_filetypes = _G._short_line_list,
+                delay = 250,
+            }
+        end
+    },
+    {
         "szw/vim-maximizer",
         cmd  = "MaximizerToggle",
         init = function()
@@ -1187,7 +1197,7 @@ local lazyOpts = { -- {{{
         reset_packpath = true,
         rtp = {reset = true}
     }
-} -- }}} 
+} -- }}}
 
 vim.api.nvim_create_user_command("CDLazyPlugin", function()
     vim.cmd("cd " .. vim.fn.stdpath("data") .. "/lazy")
