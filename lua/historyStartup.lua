@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Startup page with oldfiles
 -- Dependencies: 0
--- Version: 0.0.24
--- Last Modified: Sat 06 May 2023
+-- Version: 0.0.25
+-- Last Modified: Mon 08 May 2023
 -- TODO: ? to trigger menupage
 
 local M   = {
@@ -101,9 +101,18 @@ end -- }}}
 
 
 local autoCMD = function() -- {{{
+    local stopResize = function()
+        if M.autoresizeCmdId ~= -1 then
+            -- When `M.autoresizeCmdId` isn't the initiation value -1
+            vim.api.nvim_del_autocmd(M.autoresizeCmdId)
+            M.autoresizeCmdId = -1
+        end
+    end
+
     M.autoresizeCmdId = vim.api.nvim_create_autocmd("WinResized", {
         desc     = "Re-adjust filepath length",
         callback = function() -- {{{
+            if not vim.api.nvim_buf_is_valid(M.initBuf) then return stopResize() end
             -- Find the window contains historyStartup
             local winId = -1
             if vim.api.nvim_get_current_win() == M.initWin then
@@ -124,13 +133,7 @@ local autoCMD = function() -- {{{
 
             -- If historyStartup is not in sight, delete this autocmd
             if winId == -1 then
-                if M.autoresizeCmdId ~= -1 then
-                    -- When `M.autoresizeCmdId` isn't the initiation value -1
-                    vim.api.nvim_del_autocmd(M.autoresizeCmdId)
-                    M.autoresizeCmdId = -1
-                end
-
-                return
+                return stopResize()
             end
 
             -- Check window width exceeding
