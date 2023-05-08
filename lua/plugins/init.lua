@@ -443,9 +443,15 @@ local pluginArgs = { -- {{{
     },
     {
         "glepnir/galaxyline.nvim",
+        enabled = false,
         dependencies = { "nvim-web-devicons" },
         event  = {"BufAdd"},
         config = require("plugins.nvim-galaxyline")
+    },
+    {
+        "freddiehaddad/feline.nvim",
+        dependencies = { "nvim-web-devicons" },
+        config = require("plugins.nvim-feline")
     },
     {
         "iaso2h/nvim-cokeline",
@@ -1199,7 +1205,7 @@ local lazyOpts = { -- {{{
     }
 } -- }}}
 
-vim.api.nvim_create_user_command("CDLazyPlugin", function()
+vim.api.nvim_create_user_command("CDPlugin", function()
     vim.cmd("cd " .. vim.fn.stdpath("data") .. "/lazy")
     vim.notify("Change directory to Lazy plug-ins path", vim.log.levels.INFO)
 end, { desc  = "Change directory to lazy plug-ins path", })

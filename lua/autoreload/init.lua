@@ -18,7 +18,8 @@ local M = {
 }
 M.opt.lua.moduleSearchPath = M.configPath:joinpath("lua")
 M.opt.lua.blacklist        = {
-    M.configPath:joinpath("lua", "plugins", "nvim-galaxyline.lua").filename,
+    -- M.configPath:joinpath("lua", "plugins", "nvim-galaxyline.lua").filename,
+    M.configPath:joinpath("lua", "plugins", "nvim-feline.lua").filename,
     M.configPath:joinpath("lua", "plugins", "nvim-null-is.lua").filename,
     M.configPath:joinpath("lua", "plugins", "init.lua").filename,
     M.configPath:joinpath("lua", "core", "init.lua").filename,
