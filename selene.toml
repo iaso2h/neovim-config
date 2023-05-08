@@ -2,7 +2,7 @@ std = "neovim"
 
 # https://kampfkarren.github.io/selene/lints/index.html
 # As for filtering certain messages from lint type that cannot disable properly
-# here, deeper configuration is located at nvim-null-is.lua
+# here, deeper configuration is located at nvim-null-ls.lua
 [lints]
 empty_if = "allow"
 multiple_statements = "allow"

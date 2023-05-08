@@ -16,12 +16,12 @@ map("n", [[]e]], function()
         vim.diagnostic.goto_next { float = { border = "rounded" } }
     end, false)
 end, "Go to next diagnostic")
-map("n", [[[e]], function()
+map("n", [[[E]], function()
     require("jump.util").posCenter(function()
         vim.diagnostic.goto_prev { float = { border = "rounded" }, severity = "Error" }
     end, false)
 end, "Go to previous error")
-map("n", [[]e]], function()
+map("n", [[]E]], function()
     require("jump.util").posCenter(function()
         vim.diagnostic.goto_next { float = { border = "rounded" }, severity = "Error" }
     end, false)

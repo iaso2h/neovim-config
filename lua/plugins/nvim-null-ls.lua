@@ -1,6 +1,6 @@
 return function()
-    local null_ls = require "null-ls"
-    local mason_null_is = require "mason-null-ls"
+    local null_ls       = require "null-ls"
+    local mason_null_ls = require "mason-null-ls"
 
     local onAttach = function(client, bufNr)
         if client.supports_method("textDocument/formatting") then
@@ -168,7 +168,7 @@ return function()
         beautysh          = function() null_ls.register(null_ls.builtins.formatting.beautysh) end,
         ["write-good"]    = function() null_ls.register(null_ls.builtins.formatting.emacs_scheme_mode) end,
     }
-    mason_null_is.setup {
+    mason_null_ls.setup {
         ensure_installed       = vim.tbl_keys(handlerArgs),
         automatic_installation = true,
         automatic_setup        = true,
