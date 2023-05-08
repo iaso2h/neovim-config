@@ -44,6 +44,14 @@ _G._short_line_infos = { -- {{{
         name = "Lazy",
         icon = ""
     },
+    LogBuffer = {
+        name = "Log Buffer",
+        icon = icon.ui.NewFile
+    },
+    Message = {
+        name = "Message",
+        icon = icon.ui.NewFile
+    },
     Mason = {
         name = "Mason",
         icon = ""
@@ -174,6 +182,7 @@ _G.logBuf = function(...)
 
     -- Output the result into a new scratch buffer
     _G._log_buf_nr = require("buffer.util").redirScratch(objects, _G._log_buf_nr, true)
+    vim.api.nvim_buf_set_option(_G._log_buf_nr, "filetype", "LogBuffer")
 end
 
 

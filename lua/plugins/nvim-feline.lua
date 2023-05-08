@@ -47,7 +47,11 @@ return function()
 
         -- Check scratch buffer
         if absPath == "" then
-            return fileType .. padding
+            if fileType == "" then
+                return "Scratch" .. padding
+            else
+                return fileType .. padding
+            end
         end
         local fileStr
 
@@ -208,7 +212,7 @@ return function()
                 local iconStr, iconColor = require('nvim-web-devicons').get_icon_color(
                     vim.fn.expand('%:t'),
                     nil, -- extension is already computed by nvim-web-devicons
-                    { default = false }
+                    { default = true }
                 )
                 if iconStr then
                     return fileInfo, {

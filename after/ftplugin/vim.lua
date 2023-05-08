@@ -6,5 +6,12 @@ if vim.g.loaded_scriptease then
     bmap(0, "n", [[<C-b>d]], [[<CMD>Breakdel *<CR>]], {"silent"}, "Delete all breakpoints")
     bmap(0, "n", [[<C-b>l]], [[<CMD>breaklist<CR>]],  {"silent"}, "Display breakpoints")
 end
+-- Execute the command under cursor when hitting enter in the normal in the
+-- command line prompt window
+if vim.fn.bufname() == "[Command Line]" then
+    bmap(0, "n", [[<CR>]], function()
+        vim.api.nvim_feedkeys(t"i<CR>", "nt", false)
+    end, {"silent", "noremap"}, "Execute command")
+end
 
 vim.opt.textwidth = 78

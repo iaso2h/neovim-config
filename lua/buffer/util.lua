@@ -194,12 +194,12 @@ M.winIds = function(relativeIncludeChk) -- {{{
 end -- }}}
 --- Get the window ID of previous window
 ---@return integer
-M.winIdPrev = function()
+M.winIdPrev = function() -- {{{
     vim.cmd [[noa wincmd p]]
     local winId  = vim.api.nvim_get_current_win()
     vim.cmd [[noa wincmd p]]
     return winId
-end
+end -- }}}
 -- Return window occurrences in Neovim
 ---@return number The occurrence
 M.winsOccur = function() -- {{{
