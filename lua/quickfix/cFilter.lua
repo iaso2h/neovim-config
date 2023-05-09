@@ -77,7 +77,11 @@ M.main = function(qfChk, pat, bang)
     end
 
     -- Store the previous item list
-    if #newItems ~= #items then require("quickfix.modification").lastItems = items end
+    if #newItems ~= #items then
+        require("quickfix.modification").lastItems = items
+        require("quickfix.modification").lastTitle = title
+        require("quickfix.modification").lastType = vim.b._is_local and "local" or "quickfix"
+    end
 
     -- Populate new items
     if qfChk then

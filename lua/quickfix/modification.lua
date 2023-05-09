@@ -70,12 +70,12 @@ end -- }}}
 
 M.recovery = function () -- {{{
     if M.lastItems then
-        if M.lastType == "local" and vim.b._is_local then
+        if M.lastType == "quickfix" and not vim.b._is_local then
             vim.fn.setqflist({}, "r", {items = M.lastItems, title = M.lastTitle})
         elseif M.lastType == "local" and vim.b._is_local then
             vim.fn.setloclist(0, {}, "r", {items = M.lastItems, title = M.lastTitle})
         else
-            return vim.log.levels("Wrong quickfix type")
+            return vim.notify("Wrong quickfix type")
         end
         M.lastItems = nil
     else
