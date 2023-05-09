@@ -146,7 +146,7 @@ return function()
         local gsd = vim.b.gitsigns_status_dict
 
         if gsd and gsd[type] and gsd[type] > 0 then
-            return tostring(gsd[type]), devicon
+            return tostring(gsd[type])
         else
             return ""
         end

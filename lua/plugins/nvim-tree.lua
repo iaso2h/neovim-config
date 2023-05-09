@@ -299,7 +299,7 @@ return function()
             },
         },
     }
-    local toggleAndFocus = function()
+    map("n", [[<C-w>e]], function()
         local api = require("nvim-tree.api")
         if vim.bo.filetype == "NvimTree" then
             api.tree.close()
@@ -310,7 +310,10 @@ return function()
                 api.tree.toggle()
             end
         end
-    end
+    end , "Toggle Nvim tree")
 
-    map("n", [[<C-w>e]], toggleAndFocus, "Toggle Nvim tree")
+    map("n", [[<C-w>E]], function()
+        local api = require("nvim-tree.api")
+        if api.tree.is_visible() then api.tree.close() end
+    end , "Toggle Nvim tree")
 end

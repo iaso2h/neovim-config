@@ -109,7 +109,7 @@ M.insertPrompt = function(vimMode) -- {{{
                 vim.notify("\nInvalid register name", vim.log.levels.WARN)
             end
         end
-    until false -- Inifinite loop with multiple break points nested
+    until false -- Infinite loop with multiple break points nested
 end -- }}}
 
 

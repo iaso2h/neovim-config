@@ -201,14 +201,17 @@ M.winIdPrev = function() -- {{{
     return winId
 end -- }}}
 -- Return window occurrences in Neovim
+---@param winIds? integer[] If it isn't provided, the `var.winIds` will be used
+--instead
 ---@return number The occurrence
-M.winsOccur = function() -- {{{
+M.winsOccur = function(winIds) -- {{{
     -- Take two NNP windows into account
+    winIds = winIds or var.winIds
     if package.loaded["no-neck-pain"] and
         require("no-neck-pain").state.enabled then
 
-        local totalWinCnts = #var.winIds
-        for _, winId in ipairs(var.winIds) do
+        local totalWinCnts = #winIds
+        for _, winId in ipairs(winIds) do
             if vim.api.nvim_win_is_valid(winId) then
                 local bufNr    = vim.api.nvim_win_get_buf(winId)
                 local filetype = vim.api.nvim_buf_get_option(bufNr, "filetype")
@@ -221,7 +224,7 @@ M.winsOccur = function() -- {{{
         end
         return totalWinCnts
     else
-        return #var.winIds
+        return #winIds
     end
 end -- }}}
 --- Function wrap around `vim.api.nvim_win_close`

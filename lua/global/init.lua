@@ -301,9 +301,11 @@ _G.tbl_idx = function(tbl, item, allIdx)
 end
 
 
---- Unify separator in value returned by vim.api.nvim_buf_get_name()
----@vararg any Same as vim.api.nvim_buf_get_name()
+--- Unify separators in value returned by vim.api.nvim_buf_get_name()
+---@param bufNr? integer
+---@return string
 _G.nvim_buf_get_name = function(bufNr)
+    bufNr = bufNr or 0
     if _G._os_uname.sysname == "Windows_NT" then
         local name = vim.api.nvim_buf_get_name(bufNr)
         local retName = name:gsub("/", _G._sep)

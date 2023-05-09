@@ -442,6 +442,10 @@ map("i", [[<C-r><C-r>]], [[<C-\><C-o><CMD>lua require("register").insertPrompt("
 map("n", [[q]],     [[<CMD>lua require("buffer").close("window")<CR>]],    {"silent"}, "Close window")
 map("n", [[Q]],     [[<CMD>lua require("buffer").close("buffer")<CR>]],    {"silent"}, "Close buffer")
 map("n", [[<C-u>]], [[<CMD>lua require("buffer").restoreClosedBuf()<CR>]], {"silent"}, "Restore last closed buffer")
+map("n", [[<C-n>]], function()
+    local preCmd = require("buffer.split").handler(true)
+    vim.cmd(preCmd .. " new")
+end, "New buffer")
 -- Window
 map("n", [[<C-w>V]], [[<CMD>wincmd o | wincmd v<CR>]], {"silent"}, "Split only current window vertically")
 map("n", [[<C-w>S]], [[<CMD>wincmd o | wincmd s<CR>]], {"silent"}, "Split only current window vertically")

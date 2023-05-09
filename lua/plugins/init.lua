@@ -306,10 +306,11 @@ local pluginArgs = { -- {{{
     {
         "andymass/vim-matchup",
         init   = require("plugins.vim-matchup").setup,
-        config = require("plugins.vim-matchup").config
+        config = require("plugins.vim-matchup").config,
     },
     {
         "utilyre/sentiment.nvim",
+        event  = {"BufAdd"},
         config = function()
             -- local excludedFiletypes = _G._short_line_list
             require("sentiment").setup {
