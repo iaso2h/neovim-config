@@ -55,20 +55,18 @@ local typeToNum = function(t) -- {{{
         return 4
     end
 end -- }}}
-
-
 M.sortByFile = function(tbl, curBufNr)
-    local curBufName = vim.api.nvim_buf_get_name(curBufNr)
+    local curBufName = nvim_buf_get_name(curBufNr)
+
     table.sort(tbl, function(a, b)
-        if typeToNum(a.type) < typeToNum(b.type) then
-            return true
-        elseif a.type == b.type then
-            local aOk, aBufName = pcall(vim.api.nvim_buf_get_name, a.bufnr)
-            local bOk, bBufName = pcall(vim.api.nvim_buf_get_name, a.bufnr)
+        if a.type ~= b.type then
+            return typeToNum(a.type) < typeToNum(b.type)
+        else
+            local aOk, aBufName = pcall(nvim_buf_get_name, a.bufnr)
+            local bOk, bBufName = pcall(nvim_buf_get_name, a.bufnr)
             if aOk and bOk and aBufName == bBufName then
                 return a.lnum < b.lnum
-            end
-            if aOk then
+            elseif aOk then
                 return aBufName == curBufName
             end
         end

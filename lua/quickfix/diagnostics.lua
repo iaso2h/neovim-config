@@ -2,7 +2,7 @@
 -- Author: iaso2h
 -- Description: Open diagnostics in quickfix window
 -- Credit: https://github.com/onsails/diaglist.nvim
--- Version: 0.0.4
+-- Version: 0.0.5
 -- Last Modified: 04/30/2023 Sun
 -- TODO: Preview mode implementation
 -- TODO: Auto highlight selection
@@ -14,7 +14,7 @@ local M = {
 
     -- Options
     remainFocus  = true, -- Remain the focus in the current window when open a quickfix when it's not visible
-    debounceTime = 250,  -- The bigger it's, the longer time quickfix will react
+    debounceTime = 150,  -- The bigger it's, the longer time quickfix will react
     delAutocmd   = true  -- Delete autocmd when the quickfix title doesn't contain "Diagnostics" any more
 }
 local u  = require("quickfix.util")
@@ -25,7 +25,7 @@ local autocmdSetup = function()
     if not M.autocmdSetupTick then
         M.autocmdId = vim.api.nvim_create_autocmd({"DiagnosticChanged", "WinEnter", "BufEnter"}, {
             callback = function(args)
-                if M.changeTick and args.event == "DiagnosticChanged" and
+                if args.event == "DiagnosticChanged" and
                     not M.changeTick and not M.highlightParseTick then
 
                     local title = require("quickfix.util").getlist{title = 0}.title
@@ -60,7 +60,6 @@ end
 
 
 local moreHighlight = function(qfItems, qfBufNr)
-    M.changeTick = false
     M.highlightParseTick = true
 
     local qfLines = vim.api.nvim_buf_get_lines(qfBufNr, 0, -1, false)
@@ -79,9 +78,9 @@ local moreHighlight = function(qfItems, qfBufNr)
                 elseif item.type == "N" then
                     errorText = "note"
                     errorHighlightGroup = "DiagnosticHint"
-                else
-                    M.highlightParseTick = false
-                    return vim.notify("Unknown error type: " .. item.type, vim.log.levels.ERROR)
+                elseif item.type == "I" then
+                    errorText = "info"
+                    errorHighlightGroup = "DiagnosticInfo"
                 end
                 errorStartIdx = vBarIdx - errorText:len() -- 1 based index
                 vim.api.nvim_buf_add_highlight(qfBufNr, ns, errorHighlightGroup, qfLineNr - 1, errorStartIdx - 1, vBarIdx - 1)
@@ -105,9 +104,9 @@ M.open = function(forceChk, localChk)
     local qfBufNr
     local qfWinId
     local quickfixVisibleTick = false
-    local winIDTbl = require("buffer.util").winIds(false)
+    local winIds = require("buffer.util").winIds(false)
     local bufInWin
-    for _, win in ipairs(winIDTbl) do
+    for _, win in ipairs(winIds) do
         bufInWin = vim.api.nvim_win_get_buf(win)
         if vim.api.nvim_buf_get_option(bufInWin, "buftype") == "quickfix" then
             quickfixVisibleTick = true
@@ -148,23 +147,28 @@ M.open = function(forceChk, localChk)
     u.sortByFile(qfItems, qfBufNr)
 
     -- Clear the namespace highlight
-    local asyncHandler = vim.loop.new_async(
-        vim.schedule_wrap(function()
-            vim.api.nvim_buf_clear_namespace(qfBufNr, ns, 0, -1)
-        end)
-    )
-    if asyncHandler then asyncHandler:send() end
+    vim.api.nvim_buf_clear_namespace(qfBufNr, ns, 0, -1)
 
     -- Setting up quickfix
     local title = localChk and "Local " or "Workspace "
     if localChk then
         vim.fn.setloclist(qfWinId, {}, "r", { title = title .. "Diagnostics", items = qfItems })
     else
-        vim.fn.setqflist({},                 'r', { title = title .. "Diagnostics", items = qfItems })
+        vim.fn.setqflist({},           'r', { title = title .. "Diagnostics", items = qfItems })
     end
 
     -- Make up the highlights for character string "warning", "note"
-    moreHighlight(qfItems, qfBufNr)
+    M.changeTick = false
+    local asyncHandler = vim.loop.new_async(
+        vim.schedule_wrap(function()
+            moreHighlight(qfItems, qfBufNr)
+        end)
+    )
+    if asyncHandler then
+        asyncHandler:send()
+    else
+        M.highlightParseTick = true
+    end
 end
 
 
