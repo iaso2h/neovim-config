@@ -1,12 +1,25 @@
 return function()
+    -- TODO:
     local null_ls       = require "null-ls"
     local mason_null_ls = require "mason-null-ls"
 
     local onAttach = function(client, bufNr)
         if client.supports_method("textDocument/formatting") then
-            bmap(bufNr, "n", [[<A-f>]], [[<CMD>lua vim.lsp.buf.format{async=true}<CR>]], { "silent" }, "Format")
-            bmap(bufNr, "x", [[<A-f>]],
-[[:lua vim.lsp.buf.format{async=true,range={start=vim.api.nvim_buf_get_mark(0,"<"),["end"]=vim.api.nvim_buf_get_mark(0, ">")}}<CR>]], { "silent" }, "Format selection")
+            bmap(bufNr, "n", [[<A-f>]], function()
+                vim.lsp.buf.format { name = "null-ls",
+                    async = true
+                }
+            end, "Format")
+            bmap(bufNr, "x", [[<A-f>]], luaRHS[[:lua
+            local bufNr = vim.api.nvim_get_current_buf()
+            vim.lsp.buf.format {
+                name = "null-ls",
+                async = true,
+                range = {
+                    ["start"] = vim.api.nvim_buf_get_mark(bufNr, "<"),
+                    ["end"] = vim.api.nvim_buf_get_mark(bufNr, ">")
+                }
+            }<CR>]], { "silent" }, "Format selection")
         end
     end
 
@@ -27,7 +40,7 @@ return function()
             if type(diagnostic) == "string" then
                 -- HACK: https://bbs.archlinux.org/viewtopic.php?id=274705
                 if not string.match(diagnostic, "GLIBC") then
-                   vim.notify(diagnostic, vim.log.levels.ERROR)
+                    vim.notify(diagnostic, vim.log.levels.ERROR)
                 end
                 return false
             end
@@ -37,20 +50,20 @@ return function()
                 [[use of `_G` is not allowed]],
             }
             for _, msg in ipairs(filterMsg) do
-                 if string.match(diagnostic.message, msg) then
-                     return false
-                 end
+                if string.match(diagnostic.message, msg) then
+                    return false
+                end
             end
             return true
         end
-    } -- }}}
+    }                          -- }}}
     vim.g._cspellEnable = true -- {{{
     vim.api.nvim_create_user_command("CSpellToggle", function()
         vim.g._cspellEnable = not vim.g._cspellEnable
         local stateStr = vim.g._cspellEnable and "enabled" or "disabled"
         vim.api.nvim_echo({ { string.format("CSpell has been %s", stateStr), "Moremsg" } }, false, {})
     end, {
-        desc  = "Toggle CSpell checking",
+        desc = "Toggle CSpell checking",
     })
     -- UGLY: refresh virtual diagnostic text
     vim.api.nvim_create_user_command("CSpellBufToggle", function()
@@ -64,7 +77,7 @@ return function()
         local stateStr = state and "enabled" or "disabled"
         vim.api.nvim_echo({ { string.format("CSpell has been %s buffer locally", stateStr), "Moremsg" } }, false, {})
     end, {
-        desc  = "Toggle CSpell checking buffer locally",
+        desc = "Toggle CSpell checking buffer locally",
     })
     local cspell = null_ls.builtins.diagnostics.cspell.with {
         disabled_filetypes = _G._short_line_list,
@@ -81,7 +94,7 @@ return function()
                 return true
             end
             return false
-            end,
+        end,
         diagnostics_postprocess = function(diagnostic)
             if type(diagnostic) ~= "table" then return end
             diagnostic.severity = vim.diagnostic.severity.WARN
@@ -113,14 +126,14 @@ return function()
         filetypes = {},
         generator = {
             fn = function(_)
-                local cursorPos = vim.api.nvim_win_get_cursor(0)
-                local lnum = cursorPos[1] - 1
-                local col  = cursorPos[2]
+                local cursorPos   = vim.api.nvim_win_get_cursor(0)
+                local lnum        = cursorPos[1] - 1
+                local col         = cursorPos[2]
 
                 local diagnostics = vim.diagnostic.get(0, { lnum = lnum })
 
-                local word = ""
-                local regex = "^Unknown word %((%w+)%)$"
+                local word        = ""
+                local regex       = "^Unknown word %((%w+)%)$"
                 for _, v in pairs(diagnostics) do
                     -- HACK: v.end_col will be 0 if same error occurred on the
                     -- same line
@@ -148,7 +161,7 @@ return function()
     -- }}}
 
     local builtinSource = {
-        cspellAppend      = cspellAppendAction,
+        cspellAppend = cspellAppendAction,
     }
     if _G._os_uname.sysname == "Linux" then
         builtinSource.fnlfmt = null_ls.builtins.formatting.fnlfmt.with {
@@ -160,18 +173,18 @@ return function()
 
     -- Auto setup by mason
     local handlerArgs = {
-        cspell            = function() null_ls.register(cspell) end,
-        stylua            = function() null_ls.register(null_ls.builtins.formatting.stylua) end,
-        selene            = function() null_ls.register(selene) end,
-        deno              = function() null_ls.register(null_ls.builtins.formatting.deno_fmt) end,
-        black             = function() null_ls.register(null_ls.builtins.formatting.black) end,
-        beautysh          = function() null_ls.register(null_ls.builtins.formatting.beautysh) end,
-        ["write-good"]    = function() null_ls.register(null_ls.builtins.formatting.emacs_scheme_mode) end,
+        cspell         = function() null_ls.register(cspell) end,
+        stylua         = function() null_ls.register(null_ls.builtins.formatting.stylua) end,
+        selene         = function() null_ls.register(selene) end,
+        deno           = function() null_ls.register(null_ls.builtins.formatting.deno_fmt) end,
+        black          = function() null_ls.register(null_ls.builtins.formatting.black) end,
+        beautysh       = function() null_ls.register(null_ls.builtins.formatting.beautysh) end,
+        ["write-good"] = function() null_ls.register(null_ls.builtins.formatting.emacs_scheme_mode) end,
     }
     mason_null_ls.setup {
         ensure_installed       = vim.tbl_keys(handlerArgs),
         automatic_installation = true,
-        automatic_setup        = true,
+        automatic_setup        = false,
         handlers               = handlerArgs
     }
 

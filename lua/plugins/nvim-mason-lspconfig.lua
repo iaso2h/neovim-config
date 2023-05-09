@@ -1,24 +1,24 @@
 local M = {}
 
-M.servers = {
-    cmake = {},
-    cssls = {},
-    html = {},
-    jsonls = {},
-    lua_ls = {},
-    pyright = {},
+M.serverNames = {
+    cmake    = {},
+    cssls    = {},
+    html     = {},
+    jsonls   = {},
+    lua_ls   = {},
+    pyright  = {},
     tsserver = {},
-    vimls = {},
+    vimls    = {},
 }
 
 if _G._os_uname.sysname == "Linux" and _G._os_uname.machine ~= "aarch64" then
-    M.servers.fennel_language_server = {}
+    M.serverNames.fennel_language_server = {}
 elseif _G._os_uname.sysname == "Windows_NT" then
-    M.servers.powershell_es = {}
+    M.serverNames.powershell_es = {}
 end
 
 if _G._os_uname.machine ~= "aarch64" then
-    M.servers = vim.tbl_extend("keep", M.servers, {
+    M.serverNames = vim.tbl_extend("keep", M.serverNames, {
         grammarly = {},
         marksman = {},
         yamlls = {},
@@ -34,7 +34,7 @@ M.config = function()
         -- A list of servers to automatically install if they're not already
         -- installed. Example: { "rust_analyzer@nightly", "lua_ls" }
         -- This setting has no relation with the `automatic_installation` setting.
-        ensure_installed = vim.tbl_keys(require("plugins.nvim-mason-lspconfig").servers),
+        ensure_installed = vim.tbl_keys(require("plugins.nvim-mason-lspconfig").serverNames),
         -- Whether servers that are set up (via lspconfig) should be automatically
         -- installed if they're not already installed.
         -- This setting has no relation with the `ensure_installed` setting.

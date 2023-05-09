@@ -1,8 +1,8 @@
 -- https://github.com/neovim/nvim-lspconfig
 return function()
-    local lspConfig = require("lspconfig")
-    local path      = require("plenary.path")
-    local servers   = require("plugins.nvim-mason-lspconfig").servers
+    local lspConfig   = require("lspconfig")
+    local path        = require("plenary.path")
+    local serverNames = require("plugins.nvim-mason-lspconfig").serverNames
 
     local conciseQuifix = function(tbl) -- {{{
         if tbl then
@@ -30,10 +30,12 @@ return function()
         end
     end -- }}}
 
+    ---@param client table
+    ---@param bufNr integer
     local onAttach = function(client, bufNr) -- {{{
         -- Mappings
-        bmap(bufNr, "n", [[<C-f>o]], [[<CMD>lua require('telescope.builtin').lsp_document_symbols()<CR>]],  {"silent"}, "LSP document symbols")
-        bmap(bufNr, "n", [[<C-f>O]], [[<CMD>lua require('telescope.builtin').lsp_workspace_symbols()<CR>]], {"silent"}, "LSP workspace symbols")
+       bmap(bufNr, "n", [[<C-f>o]], [[<CMD>lua require('telescope.builtin').lsp_document_symbols()<CR>]],  {"silent"}, "LSP document symbols")
+          bmap(bufNr, "n", [[<C-f>O]], [[<CMD>lua require('telescope.builtin').lsp_workspace_symbols()<CR>]], {"silent"}, "LSP workspace symbols")
 
         bmap(bufNr, "n", [[gd]], function()
             vim.lsp.buf.definition { on_list = conciseQuifix }
@@ -49,9 +51,9 @@ return function()
         end, "LSP implementation")
 
         -- bmap(bufNr, {"x", "n"}, [[<leader>a]],  vim.lsp.buf.code_action,    "LSP code action")
-        bmap(bufNr, "n",        [[<leader>rn]], vim.lsp.buf.rename,         "LSP rename")
-        bmap(bufNr, "n",        [[K]],          vim.lsp.buf.hover,          "LSP hover")
-        bmap(bufNr, "n",        [[<C-p>]],      vim.lsp.buf.signature_help, "LSP signature help")
+        bmap(bufNr, "n", [[<leader>rn]], vim.lsp.buf.rename,         "LSP rename")
+        bmap(bufNr, "n", [[K]],          vim.lsp.buf.hover,          "LSP hover")
+        bmap(bufNr, "n", [[<C-p>]],      vim.lsp.buf.signature_help, "LSP signature help")
 
         bmap(bufNr, "n", [[<C-q>r]], [[<CMD>lua vim.lsp.buf.references{includeDeclaration=true}<CR>]], {"silent"}, "LSP references")
         -- bmap(bufNr, "n", [=[<leader>wa]=], vim.lsp.buf.add_workspace_folder, "LSP add workspace folder")
@@ -62,8 +64,8 @@ return function()
         -- format instead
         -- HACK: vim.lsp.formatexpr() is always set in:
         -- https://github.com/neovim/neovim/blob/f1b415b3abbcccb8b0d2aa1a41a45dd52de1a5ff/runtime/lua/vim/lsp.lua#L1130
-        -- vim.bo.formatexpr = ""
-        -- vim.opt.formatexpr = ""
+        vim.bo.formatexpr = ""
+        vim.opt.formatexpr = ""
         bmap(bufNr, "n", [[gqq]], function()
             if vim.bo.formatexpr ~= "" then
                 vim.bo.formatexpr = ""
@@ -85,7 +87,7 @@ return function()
 -- https://github.com/microsoft/pyright
 -- https://github.com/microsoft/pyright/blob/master/docs/configuration.md
 -- https://github.com/microsoft/pyright/blob/96871bec5a427048fead499ab151be87b7baf023/packages/vscode-pyright/package.json
-servers.pyright = {
+serverNames.pyright = {
     settings  = {
         python = {
             pythonPath = "python",
@@ -119,7 +121,7 @@ local luaGetPluginRepoDir = function(plugin)
 end
 local luaLibrary = {
     vim.fn.expand("$VIMRUNTIME") .. _G._sep .. "lua",
-    -- require("neodev.config").types(),
+    require("neodev.config").types(),
     luaGetPluginRepoDir "nvim-treesitter",
     luaGetPluginRepoDir "telescope.nvim",      -- HACK: failed to parse the lib
     luaGetPluginRepoDir "plenary.nvim",
@@ -134,7 +136,7 @@ for _, dir in ipairs(luaLibrary) do
         vim.notify("Path doesn't exist: " .. dir)
     end
 end
-servers.lua_ls = { -- {{{
+serverNames.lua_ls = { -- {{{
     settings = {
         Lua = {
             -- https://github.com/LuaLS/lua-language-server/blob/076dd3e5c4e03f9cef0c5757dfa09a010c0ec6bf/locale/en-us/setting.lua#L5-L13
@@ -154,6 +156,8 @@ servers.lua_ls = { -- {{{
                 setType   = true,
                 paramName = "All",
             },
+            -- Use stylua to format instead. Configured in
+            -- `lua/plugins/nvim-null-ls`
             format = {enable = false},
             codeLens = {enable = true},
             completion = {
@@ -193,7 +197,7 @@ if _G._os_uname.sysname == "Linux" and _G._os_uname.machine ~= "aarch64" then
     --                                     _G._sep,
     --                                     _G._sep,
     --                                     _G._sep and "nightly" or "stable"))
-    servers.fennel_language_server = {
+    serverNames.fennel_language_server = {
         settings = {
             fennel = {
                 workspace = {
@@ -213,7 +217,7 @@ vim.g.markdown_fenced_languages = {
     'vim',
     'help'
 }
-servers.vimls = {
+serverNames.vimls = {
     init_options = {
         isNeovim    = true,
         runtimepath = "",
@@ -253,7 +257,7 @@ if _G._os_uname.machine ~= "aarch64" then
 
     local clangdCMD = findClangd()
     if clangdCMD ~= "" then
-        servers.clangd = {
+        serverNames.clangd = {
             cmd = clangdCMD,
             init_options = {
                 -- capabilities         = {},
@@ -275,7 +279,7 @@ end
 -- }}} Clangd
 -- marksman {{{
 if _G._os_uname.sysname == "Windows_NT" then
-    servers.marksman = {
+    serverNames.marksman = {
         cmd = {
             [[C:\Users\Hashub\AppData\Local\nvim-data\mason\packages\marksman\marksman.exe]],
             "server"
@@ -296,9 +300,9 @@ end
     }
 
     local config
-    for _, server in pairs(vim.tbl_keys(servers)) do
-        config = vim.tbl_deep_extend("force", basicConfig, servers[server])
-        lspConfig[server].setup(config)
+    for _, serverName in pairs(vim.tbl_keys(serverNames)) do
+        config = vim.tbl_deep_extend("force", basicConfig, serverNames[serverName])
+        lspConfig[serverName].setup(config)
     end
     -- }}} Setup servers
 

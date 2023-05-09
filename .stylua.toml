@@ -1,11 +1,10 @@
-# https://github.com/JohnnyMorganz/StyLua
 column_width = 78
 line_endings = "Unix"
 indent_type  = "Spaces"
 indent_width = 4
 quote_style  = "AutoPreferDouble"
 
-call_parentheses = ["NoSingleString", "NoSingleTable"]
+call_parentheses = "NoSingleTable"
 collapse_simple_statement = "FunctionOnly"
 
 [sort_requires]
