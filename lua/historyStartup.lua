@@ -372,6 +372,8 @@ M.display = function(refreshChk) -- {{{
     -- The factor that vim will always display a buffer for you in the very beginning
     if vim.api.nvim_buf_is_valid(1) and vim.api.nvim_buf_get_option(1, "modifiable") and vim.api.nvim_buf_get_option(1, "filetype") ~= nil then
         -- Use the first buffer whenever possible
+        -- BUG: closing the last resort buffer will creates the new file in the tabline if neovim started with
+        -- argument to open the existing buffer
         M.initBuf = 1
         vim.api.nvim_buf_set_option(M.initBuf, "buftype", "nofile")
         vim.api.nvim_buf_set_option(M.initBuf, "buflisted", false)

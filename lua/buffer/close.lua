@@ -1,7 +1,7 @@
 -- File: /buf/close.lua
 -- Author: iaso2h
 -- Description: Deleting buffer without changing the window layout
--- Version: 0.1.6
+-- Version: 0.1.7
 -- Last Modified: Sat 06 May 2023
 local u   = require("buffer.util")
 local var = require("buffer.var")
@@ -130,7 +130,7 @@ M.bufHandler = function(postRearrange, isSpecial) -- {{{
             return u.bufClose(nil, false)
         end
 
-        if u.bufsNonScratchOccurInWins() == 1 then
+        if u.bufsNonScratchOccurInWins() == 1 and #var.bufNrs == 1 then
             u.bufClose(nil, false)
 
             if not require("historyStartup").isLoaded() then
