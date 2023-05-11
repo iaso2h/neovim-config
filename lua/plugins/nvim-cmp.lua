@@ -134,30 +134,34 @@ return function()
     local mapArgs = {
         ["<A-e>"] = cmp.mapping.scroll_docs(-4),
         ["<A-d>"] = cmp.mapping.scroll_docs(4),
-        ["<Down>"] = function ()
-            if cmp.visible() then
-                cmp.select_next_item()
-            else
-                vim.cmd(t"norm! <Down>")
-            end
-        end,
-        ["<Up>"] = function ()
-            if cmp.visible() then
-                cmp.select_prev_item()
-            else
-                vim.cmd(t"norm! <Up>")
-            end
-        end,
-        ["<C-p>"] = function()
-            if cmp.visible() then
-                cmp.select_prev_item()
-            end
-        end,
-        ["<C-n>"] = function()
-            if cmp.visible() then
+        ["<Down>"] = {function ()
+            if luasnip.choice_active() then
+                vim.api.nvim_feedkeys(t"<Plug>luasnip-next-choice", "m", false)
+            elseif cmp.visible() then
                 cmp.select_next_item()
             end
-        end,
+        end, {"i", "s"}},
+        ["<Up>"] = {function ()
+            if luasnip.choice_active() then
+                vim.api.nvim_feedkeys(t"<Plug>luasnip-prev-choice", "m", false)
+            elseif cmp.visible() then
+                cmp.select_prev_item()
+            end
+        end, {"i", "s"}},
+        ["<C-p>"] = {function()
+            if luasnip.choice_active() then
+                vim.api.nvim_feedkeys(t"<Plug>luasnip-prev-choice", "m", false)
+            elseif cmp.visible() then
+                cmp.select_prev_item()
+            end
+        end, {"i", "s"}},
+        ["<C-n>"] = {function()
+            if luasnip.choice_active() then
+                vim.api.nvim_feedkeys(t"<Plug>luasnip-next-choice", "m", false)
+            elseif cmp.visible() then
+                cmp.select_next_item()
+            end
+        end, {"i", "s"}},
         ["<Tab>"] = {function()
             if (luasnip.jumpable() and cursorWithinSnippet()) or
                     (luasnip.expandable() and cursorWithinSnippet()) then

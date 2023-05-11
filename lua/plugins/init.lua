@@ -574,11 +574,7 @@ local pluginArgs = { -- {{{
         dependencies = { "rafamadriz/friendly-snippets", },
         build  = "make install_jsregexp",
         event  = {"BufAdd"},
-        config = function ()
-            local mySnippets = _G._config_path .. _G._sep .. "snippets"
-            require("luasnip.loaders.from_vscode").lazy_load()
-            require("luasnip.loaders.from_vscode").lazy_load { paths = { mySnippets } }
-        end,
+        config = require("plugins.nvim-luasnip")
     },
     {
         "windwp/nvim-autopairs",
