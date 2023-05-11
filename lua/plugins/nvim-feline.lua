@@ -253,13 +253,12 @@ return function()
         }, -- }}}
         fileInfoSpecialFileType = { -- {{{
             provider = function()
-                -- Check quickfix
                 local fileType = vim.bo.filetype
                 local fileName = nvim_buf_get_name(0)
-                -- Check diffview
                 if fileType == "help" then
-                    return getFileInfo()
+                    return padding .. getFileInfo()
                 elseif fileType == "qf" then
+                    -- Check quickfix
                     local fileStr
                     if vim.b._is_local then
                         fileStr = vim.fn.getloclist(0, { title = 0 }).title
@@ -268,6 +267,7 @@ return function()
                     end
                     return fileStr and padding .. fileStr or ""
                 elseif vim.startswith(fileName, "diffview") then
+                    -- Check diffview
                     local fileStr = vim.fn.expand("%:t")
                     local commit = string.match(fileName, ".git" .. _G._sep .. "(%w%w%w%w%w%w%w%w)")
                     if commit then
@@ -446,7 +446,7 @@ return function()
             },
             {
                 condition = function()
-                    return vim.bo.filetype == "help"
+                    return vim.bo.filetype == "help" or vim.bo.filetype == "qf"
                 end,
                 active = {
                     {

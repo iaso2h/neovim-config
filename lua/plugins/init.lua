@@ -405,13 +405,18 @@ local pluginArgs = { -- {{{
         enabled = not (_G._os_uname.sysname == "Windows_NT"),
         dependencies = { "telescope.nvim", "kkharji/sqlite.lua"},
         config = function()
-            require 'telescope-all-recent'.setup { }
+            require "telescope-all-recent".setup { }
         end
     },
     {
-        "rafi/telescope-thesaurus.nvim",
-        enabled = false,
-        dependencies = { "telescope.nvim"},
+        "LinArcX/telescope-env.nvim",
+        dependencies = { "telescope.nvim" },
+        config = function() require("telescope").load_extension("env") end
+    },
+    {
+        "LinArcX/telescope-changes.nvim",
+        dependencies = { "telescope.nvim" },
+        config = function() require('telescope').load_extension('changes') end
     },
     {
         "benshuailyu/online-thesaurus-vim",

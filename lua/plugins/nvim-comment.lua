@@ -22,11 +22,11 @@ return function()
     end, {"expr"}, "Comment toggle current line")
     map("n", [[gcy]], function()
         vim.cmd [[noa norm! yy]]
-        vim.cmd("norm " .. t"<Plug>(comment_toggle_linewise_current)")
+        vim.cmd(t"norm <Plug>(comment_toggle_linewise_current)")
     end, "Yank then comment")
     map("x", [[gcy]], function()
         vim.cmd [[noa norm! ygv]]
-        vim.cmd("norm " .. t"<Plug>(comment_toggle_linewise_visual)")
+        vim.cmd(t"norm <Plug>(comment_toggle_linewise_visual)")
     end, "Yank then comment")
 
     map("n", [[gco]], require("Comment.api").insert.linewise.below,         "Comment insert below")
