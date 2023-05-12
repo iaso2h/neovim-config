@@ -87,7 +87,7 @@ return function()
     local getLineInfo = function() -- {{{
         local cursorPos       = vim.api.nvim_win_get_cursor(0)
         local bufferLineCount = vim.api.nvim_buf_line_count(0)
-        local lineColumn      = string.format("%d:%d%s", cursorPos[1], cursorPos[2] + 1, padding)
+        local lineColumn      = string.format("%d:%d ", cursorPos[1], cursorPos[2] + 1)
         local percentage
         if cursorPos[1] == 1 then
             percentage = "Top"
