@@ -19,12 +19,9 @@ local fmta          = require("luasnip.extras.fmt").fmta
 local types         = require("luasnip.util.types")
 local conds         = require("luasnip.extras.conditions")
 local condsExpand   = require("luasnip.extras.conditions.expand")
-
 return {
     s({ dscr = "Return value", trig = "rt", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         {
             t "return ",
@@ -32,9 +29,7 @@ return {
         }
     ), -- }}}
     s({ dscr = "Do return value", trig = "dor", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         {
             t "do return ",
@@ -42,9 +37,7 @@ return {
         }
     ), -- }}}
     s({ dscr = "Vim confirm", trig = "vcon", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         -- TODO:
         fmt(
@@ -64,9 +57,7 @@ return {
         )
     ), -- }}}
     s({ dscr = "Vim echo", trig = "vecho", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmta(
             [[
@@ -80,9 +71,7 @@ return {
         )
     ), -- }}}
     s({ dscr = "Vim notify", trig = "vnot", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmt(
             [[
@@ -94,9 +83,7 @@ return {
         )
     ), -- }}}
     s({ dscr = "Vim input", trig = "vin", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmta(
             [[
@@ -107,14 +94,12 @@ return {
             {
                 i(1, "PromptMsg"),
                 indent = t(string.rep(" ", vim.bo.ts)),
-                i(0),
+                i(2),
             }
         )
     ), -- }}}
     s({ dscr = "Protect call", trig = "pc", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         -- TODO:
         fmt(
@@ -137,19 +122,15 @@ return {
         )
     ), -- }}}
     s({ dscr = "Local variable declaration", trig = "l", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         {
             t"local ",
-            i(1, "var"),
+            i(0, "var"),
         }
     ), -- }}}
     s({ dscr = "Local variable assignment", trig = "ll", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         {
             t"local ",
@@ -159,23 +140,17 @@ return {
         }
     ), -- }}}
     s({ dscr = "Locally require a module", trig = "lr", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmt([[local {} = require("{}")]], {i(1, "var"), i(2, "module")})
     ), -- }}}
     s({ dscr = "Require a module", trig = "rq", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmt([[require("{}")]], {i(1, "module")})
     ), -- }}}
     s({ dscr = "If condition", trig = "if", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmt(
             [[
@@ -185,28 +160,24 @@ return {
             ]],
             {
                 i(1, "true"),
-                i(0)
+                i(2)
             }
         )
     ), -- }}}
     s({ dscr = "Elseif condition", trig = "elif", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmt(
             [[
             elseif {} then
             ]],
             {
-                i(0, "true"),
+                i(1, "true"),
             }
         )
     ), -- }}}
     s({ dscr = "For loop", trig = "for", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmt(
             [[
@@ -218,14 +189,12 @@ return {
                 i(1, "1"),
                 i(2, "10"),
                 i(3, "1"),
-                i(0)
+                i(4)
             }
         )
     ), -- }}}
     s({ dscr = "For in iparis() loop", trig = "fori", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmt(
             [[
@@ -237,14 +206,12 @@ return {
                 i(1, "i"),
                 i(2, "val"),
                 i(3, "tbl"),
-                i(0)
+                i(4)
             }
         )
     ), -- }}}
     s({ dscr = "For in paris() loop", trig = "forp", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmt(
             [[
@@ -256,14 +223,12 @@ return {
                 i(1, "key"),
                 i(2, "val"),
                 i(3, "tbl"),
-                i(0)
+                i(4)
             }
         )
     ), -- }}}
     s({ dscr = "While loop", trig = "whi", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmt(
             [[
@@ -273,14 +238,12 @@ return {
             ]],
             {
                 i(1, "true"),
-                i(0)
+                i(2)
             }
         )
     ), -- }}}
     s({ dscr = "Repeat until", trig = "dow", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmt(
             [[
@@ -290,14 +253,12 @@ return {
             ]],
             {
                 i(1),
-                i(0)
+                i(0),
             }
         )
     ), -- }}}
     s({ dscr = "Function definition1", trig = "def", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmt(
             [[
@@ -309,14 +270,12 @@ return {
                 i(1, "id"),
                 i(2, "args"),
                 indent = string.rep(" ", vim.bo.tabstop),
-                i(0, "tbl"),
+                i(3, "tbl"),
             }
         )
     ), -- }}}
     s({ dscr = "Function definition2", trig = "def", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmt(
             [[
@@ -328,7 +287,7 @@ return {
                 i(1, "id"),
                 i(2, "args"),
                 indent = string.rep(" ", vim.bo.tabstop),
-                i(0, "tbl"),
+                i(3, "tbl"),
             }
         )
     ), -- }}}

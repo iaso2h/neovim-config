@@ -37,23 +37,17 @@ end
 
 return {
     s({ dscr = "Put the date in (Y-m-d) format", trig = "date", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         partial(os.date, "%Y-%m-%d")
     ), -- }}}
     s({ dscr = "Put the date in (Y b d) format", trig = "dateb", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         partial(os.date, "%Y %b %d")
     ), -- }}}
     s({ dscr = "File information", trig = "fi", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmt (
             [[
@@ -77,9 +71,7 @@ return {
         }
     ), -- }}}
     s({ dscr = "Add modeline", trig = "model", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fmt (
             [[
@@ -95,20 +87,17 @@ return {
         )
     ), -- }}}
     s({ dscr = "List current directory", trig = "ls", -- {{{
-            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fn(u.terminal, {}, { user_args = { "ls" } })
     ), -- }}}
-    s({ dscr = "Add separators", trig = "(%d+)%-", -- {{{
+    s({ dscr = "Add separators", trig = "80-", -- {{{
             -- BUG:
-            regTrig     = true,
+            regTrig     = false,
             priority    = 1000,
-            snippetType = "snippet"
         },
         fn(function(_, snip)
-            return string.rep("-" ,tonumber(snip.captures[1]))
+            return string.rep("-", tonumber(snip.captures[1]))
         end, {})
     ), -- }}}
 }
