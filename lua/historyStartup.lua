@@ -1,9 +1,8 @@
 -- File: historyStartup
 -- Author: iaso2h
--- Description: Startup page with oldfiles
--- Dependencies: 0
--- Version: 0.0.25
--- Last Modified: Mon 08 May 2023
+-- Description: Startup page with oldfiles listed
+-- Version: 0.0.26
+-- Last Modified: Sat 13 May 2023
 -- TODO: ? to trigger menupage
 
 local M   = {
@@ -370,14 +369,7 @@ M.display = function(refreshChk) -- {{{
 
     -- Options
     -- The factor that vim will always display a buffer for you in the very beginning
-    if vim.api.nvim_buf_is_valid(1) and vim.api.nvim_buf_get_option(1, "modifiable") and vim.api.nvim_buf_get_option(1, "filetype") ~= nil then
-        -- Use the first buffer whenever possible
-        -- BUG: closing the last resort buffer will creates the new file in the tabline if neovim started with
-        -- argument to open the existing buffer
-        M.initBuf = 1
-        vim.api.nvim_buf_set_option(M.initBuf, "buftype", "nofile")
-        vim.api.nvim_buf_set_option(M.initBuf, "buflisted", false)
-    elseif vim.api.nvim_buf_get_name(0) == "" and vim.bo.modifiable and
+    if vim.api.nvim_buf_get_name(0) == "" and vim.bo.modifiable and
             vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
         -- Use the current buffer if it's a scratch buffer
         M.initBuf  = vim.api.nvim_get_current_buf()
