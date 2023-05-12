@@ -21,30 +21,6 @@
         ],
         "description": "#!/usr/bin/env lua"
     },
-    "return": {
-        "prefix": "rt",
-        "body": ["return $0"],
-        "description": "return value"
-    },
-    "vimecho": {
-        "prefix": "vimecho",
-        "body": [
-            "api.nvim_echo({{\"${1:text}\", \"${2:Normal}\"}}, ${3:true}, {})"
-        ],
-        "description": "Echo message using vim.api.nvim_echo()"
-    },
-    "vimconfirm": {
-        "prefix": "vimconfirm",
-        "body": [
-            "cmd \"echohl ${1:MoreMsg}\"",
-            "local answer = fn.confirm(\"${2:Save modification?}\",",
-            "\t\">>> &Save\n&Discard\n&Cancel",
-            3,
-            "Question\")",
-            "cmd \"echohl None\""
-        ],
-        "description": "vim confirm() in lua"
-    },
     "vimpcall": {
         "prefix": "pcallv",
         "body": [
@@ -64,11 +40,4 @@
         ],
         "description": "vim ui input"
     },
-    "do return": {
-        "prefix": "dor",
-        "body": [
-            "do return end"
-        ],
-        "description": "do return end"
-    }
 }
