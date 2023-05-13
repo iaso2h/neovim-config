@@ -194,7 +194,11 @@ return function()
                 elseif vim.startswith(nvim_buf_get_name(0), "diffview") then
                     return icon.ui.History .. padding .. "Diff"
                 else
-                    return fileType:upper()
+                    if fileType ~= "" then
+                        return fileType
+                    else
+                        return vim.bo.buftype
+                    end
                 end
             end,
             hl = getVimModeHighlight,

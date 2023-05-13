@@ -93,6 +93,7 @@ return function(des) -- {{{
             return m.text
         end, msgTbl)
         _G._message_scratch_buf = require("buffer.util").redirScratch(msg, _G._message_scratch_buf)
+        vim.api.nvim_buf_set_option(_G._message_scratch_buf, "filetype", "Messages")
 
         local ns = vim.api.nvim_create_namespace("myQuickfix")
         vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)

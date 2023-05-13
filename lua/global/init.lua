@@ -48,9 +48,9 @@ _G._short_line_infos = { -- {{{
         name = "Log Buffer",
         icon = icon.ui.NewFile
     },
-    Message = {
-        name = "Message",
-        icon = icon.ui.NewFile
+    Messages = {
+        name = "Messages",
+        icon = icon.ui.Dashboard
     },
     Mason = {
         name = "Mason",

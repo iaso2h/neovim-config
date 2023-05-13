@@ -248,8 +248,8 @@ if _G._os_uname.machine ~= "aarch64" then
             "--fallback-style=google",
             "--offset-encoding=utf-16"
         }
-        local dataPath   = path:new(vim.fn.stdpath("data"))
-        local binPath = dataPath:joinpath("mason", "packages", "clangd", "clangd", "bin", "clangd")
+        local dataPath = path:new(vim.fn.stdpath("data"))
+        local binPath = dataPath:joinpath("mason", "packages", "clangd", "clangd", "bin", "clangd").filename
         if _G._os_uname.sysname == "Windows_NT" then binPath = binPath .. ".exe" end
         table.insert(args, 1, binPath)
         return args
