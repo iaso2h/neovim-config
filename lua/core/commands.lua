@@ -203,19 +203,29 @@ vim.api.nvim_create_user_command("Se", function (opts)
     local sessionDir  = vim.fn.stdpath("state") .. _G._sep .. "my_session" .. _G._sep
     vim.cmd(string.format("so %s%s%s%s.vim",
         sessionDir, _G._sep, _G._sep, sessionName))
-
-    -- Delete invalid buffers
-    -- BUG:
-    -- vim.defer_fn(function()
-    --     local bufNrs = require("buffer.util").bufNrs(true) for _, bufNr in ipairs(bufNrs) do
-    --         if not vim.api.nvim_buf_call(bufNr, function() return vim.fn.line("$") > 1 end) then
-    --             vim.api.nvim_buf_delete(bufNr, {})
-    --         end
-    --     end
-    -- end, 1000)
 end, {
     desc  = "Load session",
     nargs = "?",
+})
+
+vim.api.nvim_create_user_command("Purge", function (opts)
+    -- Delete invalid buffers
+    local cond = function(bufNr)
+        local bufName = nvim_buf_get_name(bufNr)
+        return vim.api.nvim_buf_get_option(bufNr, "buflisted") and
+            not vim.loop.fs_stat(bufName)
+    end
+    local inValidBufNrs = vim.tbl_filter(cond, vim.api.nvim_list_bufs())
+    if not next(inValidBufNrs) then
+        return vim.notify("No buffer has been purged", vim.log.levels.INFO)
+    end
+    for _, bufNr in ipairs(inValidBufNrs) do
+        require("buffer.util").initBuf(bufNr)
+        require("buffer.close").bufHandler(false, false)
+    end
+end, {
+    desc  = "Purge invalid buffers",
+    nargs = 0,
 })
 
 vim.api.nvim_create_user_command("Dofile", function (opts)

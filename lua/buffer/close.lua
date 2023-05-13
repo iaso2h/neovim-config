@@ -1,7 +1,7 @@
 -- File: /buf/close.lua
 -- Author: iaso2h
 -- Description: Deleting buffer without changing the window layout
--- Version: 0.1.7
+-- Version: 0.1.8
 -- Last Modified: Sat 06 May 2023
 local u   = require("buffer.util")
 local var = require("buffer.var")
@@ -61,7 +61,7 @@ local specialBufHandler = function(postRearrange, handler) -- {{{
             else
                 if postRearrange then
                     -- HACK: hmm mm... I wonder when will this happen
-                    u.bufClose(nil, false)
+                    u.bufClose(nil, true)
                     return vim.notify("Closing lua pad", vim.log.levels.ERROR)
                 end
             end
@@ -93,7 +93,7 @@ M.bufHandler = function(postRearrange, isSpecial) -- {{{
     if isSpecial or u.isSpecialBuf() then
         if not specialBufHandler(postRearrange, "buffer") then
             if not saveModified(var.bufNr) then return end
-            u.bufClose(nil, true and postRearrange)
+            u.bufClose(nil, true)
         end
         var.lastClosedFilePath = nil
     else
@@ -109,7 +109,7 @@ M.bufHandler = function(postRearrange, isSpecial) -- {{{
             if not saveModified(var.bufNr) then return end
 
             if not postRearrange then
-                return u.bufClose(nil, false)
+                return u.bufClose(nil, true)
             else
                 if #var.bufNrs > 1 then
                     return u.bufClose(nil, true)
@@ -127,7 +127,7 @@ M.bufHandler = function(postRearrange, isSpecial) -- {{{
         if not saveModified(var.bufNr) then return end
 
         if not postRearrange then
-            return u.bufClose(nil, false)
+            return u.bufClose(nil, true)
         end
 
         if u.bufsNonScratchOccurInWins() == 1 and #var.bufNrs == 1 then
