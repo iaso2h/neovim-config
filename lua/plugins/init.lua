@@ -30,11 +30,12 @@ if not vim.loop.fs_stat(lazyPath) then
     promptOnMove(os.date("%Y-%m-%d %H:%M  ") .. "Cloning lazy.nvim complete. Please restart Neovim")
     return
 end
+
+vim.opt.rtp:prepend(lazyPath)
 -- }}} Bootstrap lazy.nvim
 
 -- Plug-ins configuration
 local icon = require("icon")
-local trailingSpaces = " "
 local pluginArgs = { -- {{{
     -- https://github.com/folke/lazy.nvim#-plugin-spec
     -- Dependencies {{{
@@ -558,13 +559,10 @@ local pluginArgs = { -- {{{
         config = require("plugins.nvim-null-ls"),
     },
     {
-        "folke/neodev.nvim",
-        lazy = true
-    },
-    {
         "neovim/nvim-lspconfig",
         dependencies = {
             "mason-lspconfig.nvim",
+            "folke/neodev.nvim",
         },
         config = require("plugins.nvim-lspconfig")
     },
@@ -1167,6 +1165,7 @@ local pluginArgs = { -- {{{
     -- }}} Knowledge
 } -- }}}
 
+local trailingSpaces = " "
 local lazyOpts = { -- {{{
     root = _G._plugin_root,
     git  = { log = {"-30"} },
@@ -1212,5 +1211,4 @@ vim.api.nvim_create_user_command("CDPlugin", function()
     vim.notify("Change directory to Lazy plug-ins path", vim.log.levels.INFO)
 end, { desc  = "Change directory to lazy plug-ins path", })
 
-vim.opt.rtp:prepend(lazyPath)
 require("lazy").setup(pluginArgs, lazyOpts)

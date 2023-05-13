@@ -3,6 +3,7 @@
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
 -- Version: 0.1.19
 -- Last Modified: 2023-4-25
+-- TODO: add support for folded line
 
 local util     = require("util")
 local operator = require("operator")

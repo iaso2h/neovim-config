@@ -48,8 +48,6 @@ opt.ignorecase = true
 opt.smartcase  = true
 opt.lazyredraw = true
 
-o.matchpairs = "[:],{:},(:),《:》,（:）,【:】,“:”,‘:’"
-
 opt.jumpoptions = "stack"
 opt.scrolloff   = 10
 
