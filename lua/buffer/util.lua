@@ -73,10 +73,12 @@ M.bufNrs = function(listedOnly, loadedOnly) -- {{{
     local rawBufNrs = vim.api.nvim_list_bufs()
     local cond = function(bufNr)
         if listedOnly then
-            return vim.api.nvim_buf_is_loaded(bufNr) and
-                vim.api.nvim_buf_get_option(bufNr, "buflisted")
+            return vim.api.nvim_buf_get_option(bufNr, "buflisted")
         else
             if loadedOnly then
+                -- BUG: When buffers are loaded from sourcing session and
+                -- paseed into `vim.api.nvim_buf_is_loaded` it may evaluated
+                -- to `false`
                 return vim.api.nvim_buf_is_loaded(bufNr)
             else
                 return true
