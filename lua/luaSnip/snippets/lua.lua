@@ -1,13 +1,14 @@
 local luasnip = require("luasnip")
 
 local s             = luasnip.snippet
-local node          = luasnip.snippet_node
+local sn            = luasnip.snippet_node
 local t             = luasnip.text_node
 local i             = luasnip.insert_node
 local fn            = luasnip.function_node
 local ch            = luasnip.choice_node
 local dy            = luasnip.dynamic_node
 local rst           = luasnip.restore_node
+local p             = luasnip.parser.parse_snippet
 local lambda        = require("luasnip.extras").lambda
 local rep           = require("luasnip.extras").rep
 local partial       = require("luasnip.extras").partial
@@ -19,26 +20,23 @@ local fmta          = require("luasnip.extras.fmt").fmta
 local types         = require("luasnip.util.types")
 local conds         = require("luasnip.extras.conditions")
 local condsExpand   = require("luasnip.extras.conditions.expand")
+-- LUARUN: vim.cmd [[h luasnip-snippets]]
+
+
 return {
-    s({ dscr = "Return value", trig = "rt", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "rt", dscr = "Return value"}, -- {{{
         {
             t "return ",
             i(0, "value")
         }
     ), -- }}}
-    s({ dscr = "Do return value", trig = "dor", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "dor", dscr = "Do return value"}, -- {{{
         {
             t "do return ",
             i(0, "value")
         }
     ), -- }}}
-    s({ dscr = "Vim confirm", trig = "vcon", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "vcon", dscr = "Vim confirm"}, -- {{{
         -- TODO:
         fmt(
             [[
@@ -56,9 +54,7 @@ return {
             }
         )
     ), -- }}}
-    s({ dscr = "Vim echo", trig = "vecho", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "vecho", dscr = "Vim echo"}, -- {{{
         fmta(
             [[
             vim.api.nvim_echo({{"<>", "<>"}}, <>, {})
@@ -70,9 +66,7 @@ return {
             }
         )
     ), -- }}}
-    s({ dscr = "Vim notify", trig = "vnot", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "vnot", dscr = "Vim notify"}, -- {{{
         fmt(
             [[
             vim.notify("{}", vim.log.levels.INFO)
@@ -82,9 +76,7 @@ return {
             }
         )
     ), -- }}}
-    s({ dscr = "Vim input", trig = "vin", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "vin", dscr = "Vim input"}, -- {{{
         fmta(
             [[
             vim.ui.input({prompt = "<>: "}, function(input),
@@ -98,9 +90,7 @@ return {
             }
         )
     ), -- }}}
-    s({ dscr = "Protect call", trig = "pc", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "pc", dscr = "Protect call"}, -- {{{
         -- TODO:
         fmt(
             [[
@@ -121,17 +111,13 @@ return {
             }
         )
     ), -- }}}
-    s({ dscr = "Local variable declaration", trig = "l", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "l", dscr = "Local variable declaration"}, -- {{{
         {
             t"local ",
             i(0, "var"),
         }
     ), -- }}}
-    s({ dscr = "Local variable assignment", trig = "ll", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "ll", dscr = "Local variable assignment"}, -- {{{
         {
             t"local ",
             i(1, "var"),
@@ -139,19 +125,13 @@ return {
             i(2, "value")
         }
     ), -- }}}
-    s({ dscr = "Locally require a module", trig = "lr", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "lr", dscr = "Locally require a module"}, -- {{{
         fmt([[local {} = require("{}")]], {i(1, "var"), i(2, "module")})
     ), -- }}}
-    s({ dscr = "Require a module", trig = "rq", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "rq", dscr = "Require a module"}, -- {{{
         fmt([[require("{}")]], {i(1, "module")})
     ), -- }}}
-    s({ dscr = "If condition", trig = "if", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "if", dscr = "If condition"}, -- {{{
         fmt(
             [[
             if {} then
@@ -164,9 +144,7 @@ return {
             }
         )
     ), -- }}}
-    s({ dscr = "Elseif condition", trig = "elif", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "elif", dscr = "Elseif condition"}, -- {{{
         fmt(
             [[
             elseif {} then
@@ -176,9 +154,7 @@ return {
             }
         )
     ), -- }}}
-    s({ dscr = "For loop", trig = "for", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "for", dscr = "For loop"}, -- {{{
         fmt(
             [[
             for i={}, {}, {} do
@@ -193,9 +169,7 @@ return {
             }
         )
     ), -- }}}
-    s({ dscr = "For in iparis() loop", trig = "fori", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "fori", dscr = "For in iparis() loop"}, -- {{{
         fmt(
             [[
             for {}, {} in ipairs({}) do
@@ -210,9 +184,7 @@ return {
             }
         )
     ), -- }}}
-    s({ dscr = "For in paris() loop", trig = "forp", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "forp", dscr = "For in paris() loop"}, -- {{{
         fmt(
             [[
             for {}, {} in pairs({}) do
@@ -227,9 +199,7 @@ return {
             }
         )
     ), -- }}}
-    s({ dscr = "While loop", trig = "whi", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "whi", dscr = "While loop"}, -- {{{
         fmt(
             [[
             while {} do
@@ -242,9 +212,7 @@ return {
             }
         )
     ), -- }}}
-    s({ dscr = "Repeat until", trig = "dow", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "dow", dscr = "Repeat until"}, -- {{{
         fmt(
             [[
             repeat
@@ -257,9 +225,7 @@ return {
             }
         )
     ), -- }}}
-    s({ dscr = "Function definition1", trig = "def", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "def", dscr = "Function definition1"}, -- {{{
         fmt(
             [[
             function{} ({})
@@ -274,20 +240,20 @@ return {
             }
         )
     ), -- }}}
-    s({ dscr = "Function definition2", trig = "def", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "fnnode", dscr = "Luasnip function node"}, -- {{{
         fmt(
             [[
-            function{} ({})
-            {indent}{}
-            end
+            f(function (nodeRefText, parent, userArgs)
+                {}
+            end, {}, {})
             ]],
             {
-                i(1, "id"),
-                i(2, "args"),
-                indent = string.rep(" ", vim.bo.tabstop),
-                i(3, "tbl"),
+                i(1),
+                i(2, "nodeRefs"),
+                ch(3, {
+                    t "userParams",
+                    t "{user_args = }",
+                }),
             }
         )
     ), -- }}}

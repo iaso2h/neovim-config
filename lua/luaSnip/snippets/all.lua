@@ -1,21 +1,14 @@
--- File: all.lua
--- Author: iaso2h
--- Description:
--- Version: 0.0.1
--- Last Modified: 2023 May 11
-
-
 local luasnip = require("luasnip")
 
 local s             = luasnip.snippet
-local p             = luasnip.parser.parse_snippet
-local node          = luasnip.snippet_node
+local sn            = luasnip.snippet_node
 local t             = luasnip.text_node
 local i             = luasnip.insert_node
 local fn            = luasnip.function_node
 local ch            = luasnip.choice_node
 local dy            = luasnip.dynamic_node
 local rst           = luasnip.restore_node
+local p             = luasnip.parser.parse_snippet
 local lambda        = require("luasnip.extras").lambda
 local rep           = require("luasnip.extras").rep
 local partial       = require("luasnip.extras").partial
@@ -27,28 +20,26 @@ local fmta          = require("luasnip.extras.fmt").fmta
 local types         = require("luasnip.util.types")
 local conds         = require("luasnip.extras.conditions")
 local condsExpand   = require("luasnip.extras.conditions.expand")
+-- LUARUN: vim.cmd [[h luasnip-snippets]]
 
 local u = require("luaSnip.util")
-local firstLine = function()
-    local lineNr = vim.fn.line(".")
-    return lineNr == 1
+local isFirstLine = function()
+    return vim.fn.line(".") == 1
+end
+local isLastLine = function ()
+    return vim.fn.line(".") == vim.api.nvim_buf_line_count(0)
 end
 
 
 return {
-    s({ dscr = "Put the date in (Y-m-d) format", trig = "date", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "date", dscr = "Put the date in (Y-m-d) format"}, -- {{{
         partial(os.date, "%Y-%m-%d")
     ), -- }}}
-    s({ dscr = "Put the date in (Y b d) format", trig = "dateb", -- {{{
-            priority    = 1000,
-        },
+    s({ trig = "dateb", dscr = "Put the date in (Y b d) format"}, -- {{{
         partial(os.date, "%Y %b %d")
     ), -- }}}
-    s({ dscr = "File information", trig = "fi", -- {{{
-            priority    = 1000,
-        },
+
+    s({ trig = "fi", dscr = "File information"}, -- {{{
         fmt (
             [[
             File: {file}
@@ -67,11 +58,11 @@ return {
             }
         ),
         {
-            condition = firstLine
+            condition      = isFirstLine,
+            show_condition = isFirstLine
         }
     ), -- }}}
-    s({ dscr = "Add modeline", trig = "model", -- {{{
-            priority    = 1000,
+    s({ trig = "ml", dscr = "Add modeline", -- {{{
         },
         fmt (
             [[
@@ -84,21 +75,24 @@ return {
                 i(2, tostring(vim.bo.ft)),
                 i(0, tostring(vim.wo.fdm)),
             }
-        )
+        ),
+        {
+            condition      = isLastLine,
+            show_condition = isLastLine
+        }
     ), -- }}}
-    s({ dscr = "List current directory", trig = "ls", -- {{{
-            priority    = 1000,
+    s({ trig = "ls", dscr = "List current directory", -- {{{
         },
         fn(u.terminal, {}, { user_args = { "ls" } })
     ), -- }}}
-    s({ dscr = "Add separators", trig = "80-", -- {{{
-            -- BUG:
-            regTrig     = false,
-            priority    = 1000,
-        },
+    s({ trig = "(%d+)([-=*])", dscr = "Add separators", -- {{{
+        regTrig = true },
         fn(function(_, snip)
-            return string.rep("-", tonumber(snip.captures[1]))
-        end, {})
+            return string.rep(snip.captures[2], tonumber(snip.captures[1]))
+        end, {}),
+        {
+            show_condition = function() return false end
+        }
     ), -- }}}
 }
 -- vim:ts=4:sts=4:sw=4:ft=lua:fdm=marker

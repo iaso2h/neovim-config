@@ -48,7 +48,6 @@ return function()
                 behavior = cmp.ConfirmBehavior.Replace,
             }
         },
-
         sources = {
             {name = "nvim_lsp"},
             {name = "buffer"},
@@ -57,7 +56,6 @@ return function()
             {name = "luasnip"},
             {name = "cmp_tabnine"},
         },
-
         formatting = {
             fields = {"kind", "abbr", "menu"},
             format = function(entry, vimItem)

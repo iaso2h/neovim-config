@@ -24,6 +24,9 @@ local conds         = require("luasnip.extras.conditions")
 local condsExpand   = require("luasnip.extras.conditions.expand")
 
 
+--- Return output of terminal command
+---@param command string
+---@return string
 M.terminal = function(_, _, command)
     local file = io.popen(command, "r")
     local res = {}

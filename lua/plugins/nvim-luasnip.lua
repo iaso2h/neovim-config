@@ -1,18 +1,17 @@
 return function()
-    -- TODO: customize highligh groups
-
-    require("luasnip.loaders.from_lua").lazy_load {paths = _G._config_path .. "/lua/luaSnip/snippets"}
+    -- TODO: customize highlight groups
 
     local luasnip = require("luasnip")
 
     local s             = luasnip.snippet
-    local node          = luasnip.snippet_node
+    local sn            = luasnip.snippet_node
     local t             = luasnip.text_node
     local i             = luasnip.insert_node
     local fn            = luasnip.function_node
     local ch            = luasnip.choice_node
     local dy            = luasnip.dynamic_node
     local rst           = luasnip.restore_node
+    local p             = luasnip.parser.parse_snippet
     local lambda        = require("luasnip.extras").lambda
     local rep           = require("luasnip.extras").rep
     local partial       = require("luasnip.extras").partial
@@ -25,13 +24,15 @@ return function()
     local conds         = require("luasnip.extras.conditions")
     local condsExpand   = require("luasnip.extras.conditions.expand")
 
-
-    local mySnippets = _G._config_path .. _G._sep .. "snippets"
-    require("luasnip.loaders.from_vscode").lazy_load()
-    require("luasnip.loaders.from_vscode").lazy_load { paths = { mySnippets } }
-
-    luasnip.filetype_extend("lua", { "c" })
+    -- Filetype
+    -- luasnip.filetype_extend("lua", { "c" })
     luasnip.filetype_set("cpp", { "c" })
+
+    -- Snippet paths
+    local mySnippets = _G._config_path .. "/lua/luaSnip/snippets"
+    require("luasnip.loaders.from_vscode").lazy_load {}
+    require("luasnip.loaders.from_lua").lazy_load { paths = { mySnippets } }
+
     luasnip.config.setup {
         -- LUARUN: :help luasnip-config-options
         history              = true,
@@ -40,7 +41,7 @@ return function()
         delete_check_events  = "TextChanged",
         enable_autosnippets  = true,
         ext_opts             = {
-                     -- https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md#ext_opts
+            -- https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md#ext_opts
             [types.choiceNode] = {
                 active = {
                     virt_text = { { "choiceNode", "Comment" } },
@@ -78,12 +79,12 @@ return function()
     -- 'recursive' dynamic snippet. Expands to some text followed by itself.
     local rec_ls
     rec_ls = function()
-        return node(
+        return sn(
             nil,
             ch(1, {
                 -- Order is important, nodeSnip(...) first would cause infinite loop of expansion.
                 t(""),
-                node(nil, { t({ "", "\t\\item " }), i(1), dy(2, rec_ls, {}) }),
+                sn(nil, { t({ "", "\t\\item " }), i(1), dy(2, rec_ls, {}) }),
             })
         )
     end
@@ -158,7 +159,7 @@ return function()
             insert = insert + 1
         end
         vim.list_extend(nodes, { t({ " */" }) })
-        local snip = node(nil, nodes)
+        local snip = sn(nil, nodes)
         -- Error on attempting overwrite.
         snip.old_state = param_nodes
         return snip
@@ -176,7 +177,7 @@ return function()
     -- text value is set to the current date in the desired format.
     local date_input = function(args, snip, old_state, fmt)
         local fmt = fmt or "%Y-%m-%d"
-        return node(nil, i(1, os.date(fmt)))
+        return sn(nil, i(1, os.date(fmt)))
     end
     -- snippets are added via ls.add_snippets(filetype, snippets[, opts]), where
     -- opts may specify the `type` of the snippets ("snippets" or "autosnippets",
@@ -217,14 +218,14 @@ return function()
                 t("{"),
                 -- sn: Nested Snippet. Instead of a trigger, it has a position, just like insertNodes. !!! These don't expect a 0-node!!!!
                 -- Inside Choices, Nodes don't need a position as the choice node is the one being jumped to.
-                node(nil, {
+                sn(nil, {
                     t("extends "),
                     -- restoreNode: stores and restores nodes.
                     -- pass position, store-key and nodes.
                     rst(1, "other_class", i(1)),
                     t(" {"),
                 }),
-                node(nil, {
+                sn(nil, {
                     t("implements "),
                     -- no need to define the nodes for a given key a second time.
                     rst(1, "other_class"),
@@ -254,9 +255,9 @@ return function()
             fmt(
                 [[
 		foo({1}, {3}) {{
-			return {2} * {4}
-		}}
-		]],
+            return {2} * {4}
+        }}
+        ]],
                 {
                     i(1, "x"),
                     rep(1),
@@ -300,13 +301,12 @@ return function()
             "Wow! This ${1:Stuff} really ${2:works. ${3:Well, a bit.}}"
         ),
         -- When wordTrig is set to false, snippets may also expand inside other words.
-        -- BUG:
+        -- NOTE: Still visible in cmp.nvim float win, but cannot expand by                 luasnip.expand_or_jump()
         luasnip.parser.parse_snippet(
-            { trig = "te", wordTrig = true },
+            { trig = "te", wordTrig = false },
             "${1:cond} ? ${2:true} : ${3:false}"
         ),
         -- When regTrig is set, trig is treated like a pattern, this snippet will expand after any number.
-        -- BUG:
         luasnip.parser.parse_snippet({ trig = "%d", regTrig = true }, "A Number!!"),
         -- Using the condition, it's possible to allow expansion only in specific cases.
         s("cond", {
@@ -314,7 +314,6 @@ return function()
         }, {
             condition = function(line_to_cursor, matched_trigger, captures)
                 -- optional whitespace followed by //
-                -- BUG:
                 return line_to_cursor:match("%s*//")
             end,
         }),
@@ -322,20 +321,17 @@ return function()
         s("cond2", {
             t("will only expand at the beginning of the line"),
         }, {
-            -- BUG:
             condition = condsExpand.line_begin,
         }),
         s("cond3", {
             t("will only expand at the end of the line"),
         }, {
-            -- BUG:
             condition = condsExpand.line_end,
         }),
         -- on conditions some logic operators are defined
         s("cond4", {
             t("will only expand at the end and the start of the line"),
         }, {
-            -- BUG:
             -- last function is just an example how to make own function objects and apply operators on them
             condition = condsExpand.line_end
                 + condsExpand.line_begin
@@ -345,7 +341,6 @@ return function()
         }),
         -- The last entry of args passed to the user-function is the surrounding snippet.
         s(
-            -- BUG:
             { trig = "a%d", regTrig = true },
             fn(function(_, snip)
                 return "Triggered with " .. snip.trigger .. "."
@@ -353,13 +348,11 @@ return function()
         ),
         -- It's possible to use capture-groups inside regex-triggers.
         s(
-            -- BUG:
             { trig = "b(%d)", regTrig = true },
             fn(function(_, snip)
                 return "Captured Text: " .. snip.captures[1] .. "."
             end, {})
         ),
-        -- BUG:
         s({ trig = "c(%d+)", regTrig = true }, {
             t("will only expand for even numbers"),
         }, {
@@ -385,7 +378,6 @@ return function()
             -- Lambdas can also apply transforms USING the text of other nodes:
             lambda(lambda._1:gsub("e", lambda._2), { 1, 2 }),
         }),
-        -- BUG:
         s({ trig = "trafo(%d+)", regTrig = true }, {
             -- env-variables and captures can also be used:
             lambda(lambda.CAPTURE1:gsub("1", lambda.TM_FILENAME), {}),
@@ -498,7 +490,7 @@ return function()
             t(")"),
             ch(5, {
                 t(""),
-                node(nil, {
+                sn(nil, {
                     t({ "", " throws " }),
                     i(1),
                 }),
