@@ -32,7 +32,7 @@ return function()
 
     luasnip.filetype_extend("lua", { "c" })
     luasnip.filetype_set("cpp", { "c" })
-    luasnip.setup {
+    luasnip.config.setup {
         -- LUARUN: :help luasnip-config-options
         history              = true,
         update_events        = "TextChanged,TextChangedI",

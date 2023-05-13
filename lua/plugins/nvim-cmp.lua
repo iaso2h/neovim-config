@@ -163,8 +163,9 @@ return function()
             end
         end, {"i", "s"}},
         ["<Tab>"] = {function()
-            if (luasnip.jumpable() and cursorWithinSnippet()) or
-                    (luasnip.expandable() and cursorWithinSnippet()) then
+            if luasnip.expand_or_jumpable() then
+            -- if (luasnip.jumpable(1) and cursorWithinSnippet()) or
+            --         (luasnip.expandable() and cursorWithinSnippet()) then
                 luasnip.expand_or_jump()
             elseif package.loaded["neogen"] and require("neogen").jumpable() then
                 require("neogen").jump_next()
