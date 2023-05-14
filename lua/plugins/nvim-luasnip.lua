@@ -7,6 +7,7 @@ return function()
     local sn            = luasnip.snippet_node
     local t             = luasnip.text_node
     local i             = luasnip.insert_node
+    local indent        = luasnip.indent_snippet_node
     local fn            = luasnip.function_node
     local ch            = luasnip.choice_node
     local dy            = luasnip.dynamic_node
@@ -284,6 +285,40 @@ return function()
             "fmt6",
             fmt("use {} only", { t("this"), t("not this") }, { strict = false })
         ),
+        s("isn0", {
+            i(
+                1,
+                {
+                    "This is indented as deep as the trigger",
+                    "and this is at the beginning of the next line"
+                }
+            )
+        }),
+        -- Not inherit from the trigger. (Decrease indent)
+        s("isn1", {
+            indent(1, {
+                t({"This is indented as deep as the trigger",
+                "and this is at the beginning of the next line"})
+            }, "")
+        }),
+        -- Increase indent
+        s("isn2", {
+            indent(1, t({"This is", "A multiline", "comment"}), "$PARENT_INDENT   ")
+        }),
+
+        -- Dynamic node
+        s("copy", {
+            t"text: ", i(1), t{"", "copy: "},
+            dy(2, function(args)
+                    -- the returned snippetNode doesn't need a position; it's inserted
+                    -- "inside" the dynamicNode.
+                    return sn(nil, {
+                        -- jump-indices are local to each snippetNode, so restart at 1.
+                        i(1, args[1])
+                    })
+                end,
+            {1})
+        }),
         -- Use a dynamicNode to interpolate the output of a
         -- function (see date_input above) into the initial
         -- value of an insertNode.
@@ -291,6 +326,46 @@ return function()
             t("It was a dark and stormy night on "),
             dy(1, date_input, {}, { user_args = { "%A, %B %d of %Y" } }),
             t(" and the clocks were striking thirteen."),
+        }),
+        s("update", {
+            i(1, "change to update"),
+            dy(
+                2,
+                function(_, _, old_state)
+                    logBuf(old_state)
+                    old_state = old_state or { updates = 0 }
+                    old_state.updates = old_state.updates + 1
+                    local snip = sn(nil, { t(tostring(old_state.updates)) })
+                    snip.old_state = old_state
+                    return snip
+                end,
+                { 1 }
+            )
+        }),
+        -- Restore node
+        s("paren_change", {
+            ch(1, {
+                sn(nil, { t("("), rst(1, "user_text"), t(")") }),
+                sn(nil, { t("["), rst(1, "user_text"), t("]") }),
+                sn(nil, { t("{"), rst(1, "user_text"), t("}") }),
+            }),
+        }, {
+            stored = {
+                -- key passed to restoreNodes.
+                ["user_text"] = i(1, "default_text")
+            }
+        }),
+        s("rest", {
+            i(1, "preset"), t{"",""},
+            dy(2, function(args, _)
+                return sn(
+                    nil,
+                    {
+                        i(1, args[1]),
+                        rst(2, "dyn", i(nil, "user_text"))
+                    }
+                )
+            end , 1)
         }),
         -- Parsing snippets: First parameter: Snippet-Trigger, Second: Snippet body.
         -- Placeholders are parsed into choices with 1. the placeholder text(as a snippet) and 2. an empty string.
