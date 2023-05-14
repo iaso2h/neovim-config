@@ -309,7 +309,7 @@ return function()
         }, -- }}}
         gitDiffAdded = { -- {{{
             provider = function()
-                return getGitDiff("changed"), padding .. icon.git.LineAdded .. padding
+                return getGitDiff("added"), padding .. icon.git.LineAdded .. padding
             end,
             hl = {
                 fg = colors.green,
@@ -329,7 +329,7 @@ return function()
         }, -- }}}
         gitDiffRemoved = { -- {{{
             provider = function()
-                return getGitDiff("changed"), padding .. icon.git.LineRemoved .. padding
+                return getGitDiff("removed"), padding .. icon.git.LineRemoved .. padding
             end,
             hl = {
                 fg = colors.red,
