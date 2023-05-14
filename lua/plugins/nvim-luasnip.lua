@@ -69,7 +69,6 @@ return function()
         -- TODO: `load_ft_func`:
     }
     -- https://github.com/L3MON4D3/LuaSnip/blob/master/Examples/snippets.lua
-    do return end
 
     -- args is a table, where 1 is the text in Placeholder 1, 2 the text in
     -- placeholder 2,...
