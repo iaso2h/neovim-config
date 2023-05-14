@@ -99,32 +99,37 @@ M.bufSwitchAlter = function(winId, bufNr) -- {{{
     ---@diagnostic disable-next-line: param-type-mismatch
     local altBufNr = vim.fn.bufnr("#")
     if altBufNr ~= bufNr and vim.api.nvim_buf_is_loaded(altBufNr) and
+        -- Switch to alternative buffer whenever possible
         vim.api.nvim_buf_get_option(altBufNr, "buflisted") and
         not M.isSpecialBuf(altBufNr) then
 
         return vim.api.nvim_win_set_buf(winId, altBufNr)
     else
         -- Fallback method
-        local curBufNrIdx = tbl_idx(var.bufNrs, bufNr, false)
-        if curBufNrIdx ~= -1 then
-            for offset = 1, curBufNrIdx do
-                local idx = curBufNrIdx - offset
-                idx = idx > 0 and idx or idx + #var.bufNrs
-                local b = var.bufNrs[idx]
-                if not M.isSpecialBuf(b) then
-                    return vim.api.nvim_win_set_buf(winId, b)
+        if #var.bufNrs ~= 0 then
+            local curBufNrIdx = tbl_idx(var.bufNrs, bufNr, false)
+            if curBufNrIdx ~= -1 then
+                for offset = 1, #var.bufNrs - 1, 1 do
+                    local idx = curBufNrIdx - offset
+                    idx = idx < 1 and idx + #var.bufNrs or idx
+                    local b = var.bufNrs[idx]
+                    if not M.isSpecialBuf(b) then
+                        return vim.api.nvim_win_set_buf(winId, b)
+                    end
+                end
+            else
+                for _, b in ipairs(var.bufNrs) do
+                    if b ~= bufNr and not M.isSpecialBuf(b) then
+                        return vim.api.nvim_win_set_buf(winId, b)
+                    end
                 end
             end
+            vim.notify("Failed to switch alternative buffer in Windows: " .. winId, vim.log.ERROR)
         else
-            for _, b in ipairs(var.bufNrs) do
-                if b ~= bufNr and not M.isSpecialBuf(b) then
-                    return vim.api.nvim_win_set_buf(winId, b)
-                end
-            end
+            -- Do nothing
         end
     end
 
-    vim.notify("Failed to switch alternative buffer in Windows: " .. winId, vim.log.ERROR)
 end -- }}}
 --- Check how many times the specified buffer occurs in all windows
 ---@param bufNr? number If it isn't provided, the `var.bufNr` will be used
