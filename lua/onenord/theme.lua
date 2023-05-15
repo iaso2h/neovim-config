@@ -581,6 +581,12 @@ theme.plugins = { -- {{{
     -- https://github.com/simrat39/symbols-outline.nvim
     FocusedSymbol           = {fg = p.n10, style = "bold,italic"},
     SymbolsOutlineConnector = {fg = p.n2},
+
+    -- https://github.com/L3MON4D3/LuaSnip
+    LuasnipSnippetNodeActive         = {style = "bold"},
+    -- LuasnipSnippetNodePassive        = {style = "NONE"},
+    -- LuasnipSnippetNodeSnippetPassive = {style = "NONE"},
+
 } -- }}}
 
 theme.loadTerminal = function()

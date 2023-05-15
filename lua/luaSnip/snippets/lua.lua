@@ -25,11 +25,11 @@ local condsExpand   = require("luasnip.extras.conditions.expand")
 return {
     s({ trig = "rt", dscr = "Return value" }, -- {{{
         ch(1, {
-            sn(nil, { t("return "),    rst(1, "user_text") }),
-            sn(nil, { t("do return "), rst(1, "user_text"), t(" end") }),
+            sn(nil, { t("return "),    rst(1, "value") }),
+            sn(nil, { t("do return "), rst(1, "value"), t(" end") }),
         }, {
             stored = {
-                ["user_text"] = i(1, "val"),
+                ["value"] = i(1, "val"),
             },
         })
     ), -- }}}
@@ -86,22 +86,45 @@ return {
         )
     ), -- }}}
     s({ trig = "pc", dscr = "Protect call"}, -- {{{
-        -- TODO:
         fmt(
             [[
-            local ok, msgOrVal = pcall({1}, {2})
+            local ok, {1} = pcall({2}, {3})
             if not ok then
-                vim.notify(msgOrVal, vim.log.levels.ERROR)
-                {3}
-            else
-                {}
+                {4}
+                {5}
+            {6}
             end
             ]],
             {
-                i(1, "func"),
-                i(2, "args"),
-                i(3),
-                i(0)
+                ch(1, {
+                    i(nil, "msgOrVal"),
+                    t "_"
+                }),
+                i(2, "func"),
+                i(3, "args"),
+                dy(4, function (nodeRefText, _, _, _)
+                    if nodeRefText[1][1] == "_" then
+                        return sn(nil, t "")
+                    else
+                        return sn(nil, {
+                            t "vim.notify(msgOrVal, vim.log.levels.",
+                            ch(1, {
+                                i(nil, "ERROR"),
+                                i(nil, "WARN"),
+                                i(nil, "INFO"),
+                            }),
+                            t ")"
+                        })
+                    end
+                end, {1}),
+                i(5),
+                ch(6, {
+                    sn(nil, {
+                        t {"else", "    "},
+                        i(1, "codeblock"),
+                    }),
+                    t ""
+                }),
             }
         )
     ), -- }}}
@@ -111,21 +134,21 @@ return {
                 nil,
                 {
                     t"local ",
-                    rst(1, "user_text"),
+                    rst(1, "identifier"),
                 }
             ),
             sn(
                 nil,
                 {
                     t"local ",
-                    rst(1, "user_text"),
+                    rst(1, "identifier"),
                     t" = ",
                     i(2, "val")
                 }
             )
         }, {
             stored = {
-                ["user_text"] = i(1, "var"),
+                ["identifier"] = i(1, "var"),
             },
         })
     ), -- }}}
@@ -226,32 +249,27 @@ return {
             }
         )
     ), -- }}}
-    -- TODO: merge while loop with repeat loop
     s({ trig = "whi", dscr = "While loop"}, -- {{{
-        fmt(
-            [[
-            while {} do
-                {}
-            end
-            ]],
-            {
-                i(1, "true"),
-                i(0)
-            }
-        )
-    ), -- }}}
-    s({ trig = "dow", dscr = "Repeat until"}, -- {{{
-        fmt(
-            [[
-            repeat
-                {}
-            until {}
-            ]],
-            {
-                i(1),
-                i(0),
-            }
-        )
+        ch(1, {
+            sn(nil, {
+                t "while ",
+                rst(1, "condition"),
+                t{" do", "    "},
+                rst(2, "block"),
+                t{"", "end"}
+            }),
+            sn(nil, {
+                t{"repeat", "    "},
+                rst(2, "block"),
+                t{"", "until "},
+                rst(1, "condition"),
+            }),
+        }, {
+            stored = {
+                ["condition"] = i(1, "true"),
+                ["block"]     = i(2, "codeblock"),
+            },
+        })
     ), -- }}}
     s({ trig = "def", dscr = "Function definition1"}, -- {{{
         fmt(
@@ -278,85 +296,18 @@ return {
     s({ trig = "lsfn", dscr = "Luasnip function node"}, -- {{{
         fmt(
             [[
-            fn(function ({1}{2}, {3})
-                {4}
-            end{5}{6})
-            ]],
-            {
-                ch(1, {
-                    i(nil, "nodeRefText"),
-                    t "_",
-                }),
-                ch(2, {
-                    t ", parent",
-                    t ", _",
-                }),
-                ch(3, {
-                    i(nil, "userArgs"),
-                    t "_",
-                }),
-                i(4),
-                dy(5, function(nodeRefText, _, _, _)
-                    local text = nodeRefText[1][1]
-                    if text == "_" then
-                        return sn(nil, {t ", nil"})
-                    else
-                        return sn(
-                            nil,
-                            {
-                                t ", {",
-                                i(1, "nodeRef"),
-                                t "}"
-                            }
-                        )
-                    end
-                end, {1}),
-                dy(6, function(nodeRefText, _, _, _)
-                    local text = nodeRefText[1][1]
-                    if text == "_" then
-                        return sn(nil, {t ""})
-                    else
-                        return sn(
-                            nil,
-                            {
-                                ch(
-                                    1, {
-                                        sn(nil, {
-                                            t ", ",
-                                            i(1, "userParams"),
-                                        }),
-                                        sn(nil, {
-                                            t ", {user_args = ",
-                                            i(1),
-                                            t "}"
-                                        }),
-                                    }
-                                )
-                            }
-                        )
-                    end
-                end, {3}),
-            }
-        )
-    ), -- }}}
-    s({ trig = "lsdy", dscr = "Luasnip dynamic node"}, -- {{{
-        fmt(
-            [[
-            dy(function ({1}{2}{3}, {4})
+            fn({}, function ({2}{3}, {4})
                 {5}
             end{6}{7})
             ]],
             {
-                ch(1, {
+                i(1, "idx"),
+                ch(2, {
                     i(nil, "nodeRefText"),
                     t "_",
                 }),
-                ch(2, {
-                    t ", parent",
-                    t ", _",
-                }),
                 ch(3, {
-                    t ", oldState",
+                    t ", parent",
                     t ", _",
                 }),
                 ch(4, {
@@ -378,7 +329,7 @@ return {
                             }
                         )
                     end
-                end, {1}),
+                end, {2}),
                 dy(7, function(nodeRefText, _, _, _)
                     local text = nodeRefText[1][1]
                     if text == "_" then
@@ -404,6 +355,75 @@ return {
                         )
                     end
                 end, {4}),
+            }
+        )
+    ), -- }}}
+    s({ trig = "lsdy", dscr = "Luasnip dynamic node"}, -- {{{
+        fmt(
+            [[
+            dy({1}, function ({2}{3}{4}, {5})
+                {6}
+            end{7}{8})
+            ]],
+            {
+                i(1, "idx"),
+                ch(2, {
+                    i(nil, "nodeRefText"),
+                    t "_",
+                }),
+                ch(3, {
+                    t ", parent",
+                    t ", _",
+                }),
+                ch(4, {
+                    t ", oldState",
+                    t ", _",
+                }),
+                ch(5, {
+                    i(nil, "userArgs"),
+                    t "_",
+                }),
+                i(6),
+                dy(7, function(nodeRefText, _, _, _)
+                    local text = nodeRefText[1][1]
+                    if text == "_" then
+                        return sn(nil, {t ", nil"})
+                    else
+                        return sn(
+                            nil,
+                            {
+                                t ", {",
+                                i(1, "nodeRef"),
+                                t "}"
+                            }
+                        )
+                    end
+                end, {2}),
+                dy(8, function(nodeRefText, _, _, _)
+                    local text = nodeRefText[1][1]
+                    if text == "_" then
+                        return sn(nil, {t ""})
+                    else
+                        return sn(
+                            nil,
+                            {
+                                ch(
+                                    1, {
+                                        sn(nil, {
+                                            t ", ",
+                                            i(1, "userParams"),
+                                        }),
+                                        sn(nil, {
+                                            t ", {user_args = ",
+                                            i(1),
+                                            t "}"
+                                        }),
+                                    }
+                                )
+                            }
+                        )
+                    end
+                end, {5}),
             }
         )
     ), -- }}}

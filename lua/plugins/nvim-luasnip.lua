@@ -45,7 +45,8 @@ return function()
             -- https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md#ext_opts
             [types.choiceNode] = {
                 active = {
-                    virt_text = { { "choiceNode", "Comment" } },
+                    hl_group = "LuasnipSnippetNodeActive",
+                    virt_text = { { "choiceNode", "Search" } }
                 },
             },
         },
@@ -69,7 +70,8 @@ return function()
         end,
         -- TODO: `load_ft_func`:
     }
-    -- https://github.com/L3MON4D3/LuaSnip/blob/master/Examples/snippets.lua
+    -- Learn Luasnip: https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md
+    -- Example: https://github.com/L3MON4D3/LuaSnip/blob/master/Examples/snippets.lua
 
     -- args is a table, where 1 is the text in Placeholder 1, 2 the text in
     -- placeholder 2,...
@@ -381,7 +383,7 @@ return function()
             "${1:cond} ? ${2:true} : ${3:false}"
         ),
         -- When regTrig is set, trig is treated like a pattern, this snippet will expand after any number.
-        luasnip.parser.parse_snippet({ trig = "%d", regTrig = true }, "A Number!!"),
+        luasnip.parser.parse_snippet({ trig = "%d!", regTrig = true }, "A Number!!"),
         -- Using the condition, it's possible to allow expansion only in specific cases.
         s("cond", {
             t("will only expand in c-style comments"),
