@@ -1,8 +1,8 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.19
--- Last Modified: 2023-4-25
+-- Version: 0.1.20
+-- Last Modified: 2023-5-16
 -- TODO: add support for folded line
 
 local util     = require("util")
@@ -23,18 +23,40 @@ local M = {
 -- TODO: test cases
 
 
+-- Known issue: Doesn't support target line number exceeding buffer range
 function M.VSCodeLineMove(vimMode, direction) -- {{{
     if not vim.bo.modifiable then
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
     end
-    ---@diagnostic disable-next-line: param-type-mismatch
-    if vim.fn.foldclosed('.') ~= -1 then return end
-
-    if vimMode == "n" then
-        if direction == "down" then
-            pcall(vim.api.nvim_command, [[noautocmd keepjump m .+1]])
-        elseif direction == "up" then
-            pcall(vim.api.nvim_command, [[noautocmd keepjump m .-2]])
+    if vimMode == "n"  then
+        ---@diagnostic disable-next-line: param-type-mismatch
+        if vim.fn.foldclosed('.') ~= -1 then
+            -- UGLY: fix the cursor position so that it's at the top of
+            -- the fold line
+            if vim.fn.line(".") ~= 1 then
+                vim.cmd [[noa norm! kj]]
+            else
+                vim.cmd [[noa norm! jk]]
+            end
+            local cursorPos = vim.api.nvim_win_get_cursor(0)
+            local closeEnd  = vim.fn.foldclosedend(cursorPos[1])
+            if direction == "down" then
+                -- Avoid clobbering in other foldclosed lines when they are
+                -- adjacent to each others
+                if vim.fn.foldclosed(closeEnd + 1) ~= -1 then return end
+                pcall(vim.api.nvim_command, string.format([[noautocmd keepjump %d,%dm +%d]], cursorPos[1], closeEnd, closeEnd - cursorPos[1] + 1))
+            elseif direction == "up" then
+                -- Avoid clobbering in other foldclosed lines when they are
+                -- adjacent to each others
+                if vim.fn.foldclosed(cursorPos[1] - 1) ~= -1 then return end
+                pcall(vim.api.nvim_command, string.format([[noautocmd keepjump %d,%dm %d]], cursorPos[1], closeEnd, -2))
+            end
+        else
+            if direction == "down" then
+                pcall(vim.api.nvim_command, [[noautocmd keepjump m .+1]])
+            elseif direction == "up" then
+                pcall(vim.api.nvim_command, [[noautocmd keepjump m .-2]])
+            end
         end
     elseif vimMode == "v" then
         if direction == "down" then
@@ -98,14 +120,34 @@ function M.VSCodeLineYank(vimMode, direction) -- {{{
             end
         end
     else
-        local cursorPos = vim.api.nvim_win_get_cursor(0)
-        local currentLine = vim.api.nvim_get_current_line()
-        if direction == "up" then
-            vim.api.nvim_put({currentLine}, "l", false, false)
-            vim.api.nvim_win_set_cursor(0, { cursorPos[1], cursorPos[2] })
-        elseif direction == "down" then
-            vim.api.nvim_put({ currentLine }, "l", true, false)
-            vim.api.nvim_win_set_cursor(0, { cursorPos[1] + 1, cursorPos[2] })
+        if vim.fn.foldclosed('.') ~= -1 then
+            -- UGLY: fix the cursor position so that it's at the top of
+            -- the fold line
+            if vim.fn.line(".") ~= 1 then
+                vim.cmd [[noa norm! kj]]
+            else
+                vim.cmd [[noa norm! jk]]
+            end
+            local cursorPos = vim.api.nvim_win_get_cursor(0)
+            local closeEnd  = vim.fn.foldclosedend(cursorPos[1])
+            local lines     = vim.api.nvim_buf_get_lines(0, cursorPos[1] - 1, closeEnd, false)
+            if direction == "up" then
+                vim.api.nvim_put(lines, "l", false, false)
+                vim.cmd [[.foldclose]]
+            elseif direction == "down" then
+                vim.api.nvim_put(lines, "l", true, false)
+                vim.api.nvim_win_set_cursor(0, { cursorPos[1] + 1 + closeEnd - cursorPos[1], cursorPos[2] })
+            end
+        else
+            local cursorPos = vim.api.nvim_win_get_cursor(0)
+            local lines = {vim.api.nvim_get_current_line()}
+            if direction == "up" then
+                vim.api.nvim_put(lines, "l", false, false)
+                vim.api.nvim_win_set_cursor(0, { cursorPos[1], cursorPos[2] })
+            elseif direction == "down" then
+                vim.api.nvim_put(lines, "l", true, false)
+                vim.api.nvim_win_set_cursor(0, { cursorPos[1] + 1, cursorPos[2] })
+            end
         end
     end
 end -- }}}
@@ -207,7 +249,7 @@ end -- }}}
 --- Execute the Vim Ex command
 --- @param pasteCMD string The literal Vim Ex command
 --- @param vimMode string Vim mode
-local function inplacePutExCmd(pasteCMD, vimMode)
+local function inplacePutExCmd(pasteCMD, vimMode) -- {{{
         -- Execute traditional EX command
     if vimMode == "n" then
         if vim.v.count ~= 0 then
@@ -220,7 +262,7 @@ local function inplacePutExCmd(pasteCMD, vimMode)
     else
         vim.cmd("noautocmd normal! gv\"" .. vim.v.register .. pasteCMD)
     end
-end
+end -- }}}
 
 
 --- Put text inplace
