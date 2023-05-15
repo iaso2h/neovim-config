@@ -2,6 +2,7 @@ local luasnip = require("luasnip")
 
 local s             = luasnip.snippet
 local sn            = luasnip.snippet_node
+local ms            = luasnip.multi_snippet
 local t             = luasnip.text_node
 local i             = luasnip.insert_node
 local fn            = luasnip.function_node
@@ -21,17 +22,26 @@ local types         = require("luasnip.util.types")
 local conds         = require("luasnip.extras.conditions")
 local condsExpand   = require("luasnip.extras.conditions.expand")
 -- LUARUN: vim.cmd [[h luasnip-snippets]]
-
 return {
     s({ trig = "rt", dscr = "Return value" }, -- {{{
-        ch(1, {
-            sn(nil, { t("return "),    rst(1, "value") }),
-            sn(nil, { t("do return "), rst(1, "value"), t(" end") }),
-        }, {
-            stored = {
-                ["value"] = i(1, "val"),
-            },
-        })
+        {
+            t("return "),
+            i(1, "val")
+        }
+    ), -- }}}
+    s({ trig = "dor", dscr = "Do return value" }, -- {{{
+        {
+            t "do return ",
+            i(1, "val"),
+            dy(2, function (nodeRefText, _, _, _)
+                local text = nodeRefText[1][1]
+                if text == "" or string.match(text, "^%s*$") then
+                    return sn(nil, {t "end"})
+                else
+                    return sn(nil, {t " end"})
+                end
+            end, {1})
+        }
     ), -- }}}
     s({ trig = "vcon", dscr = "Vim confirm"}, -- {{{
         -- TODO:
@@ -92,7 +102,8 @@ return {
             if not ok then
                 {4}
                 {5}
-            {6}
+            else
+                {}
             end
             ]],
             {
@@ -118,39 +129,15 @@ return {
                     end
                 end, {1}),
                 i(5),
-                ch(6, {
-                    sn(nil, {
-                        t {"else", "    "},
-                        i(1, "codeblock"),
-                    }),
-                    t ""
-                }),
+                i(0)
             }
         )
     ), -- }}}
     s({ trig = "ll", dscr = "Local variable assignment"}, -- {{{
-        ch(1, {
-            sn(
-                nil,
-                {
-                    t"local ",
-                    rst(1, "identifier"),
-                }
-            ),
-            sn(
-                nil,
-                {
-                    t"local ",
-                    rst(1, "identifier"),
-                    t" = ",
-                    i(2, "val")
-                }
-            )
-        }, {
-            stored = {
-                ["identifier"] = i(1, "var"),
-            },
-        })
+        {
+            t"local ",
+            rst(1, "identifier")
+        }
     ), -- }}}
     s({ trig = "rq", dscr = "Require a module"}, -- {{{
         fmt([[require("{}")]], {i(1, "module")})
@@ -223,7 +210,7 @@ return {
                     i(nil, "val"),
                     t("_")
                 }),
-                i(3, "tbl"),
+                i(3, "codeblock"),
                 i(0)
             }
         )
@@ -244,56 +231,64 @@ return {
                     i(nil, "val"),
                     t("_")
                 }),
-                i(3, "tbl"),
+                i(3, "codeblock"),
                 i(0)
             }
         )
     ), -- }}}
     s({ trig = "whi", dscr = "While loop"}, -- {{{
-        ch(1, {
-            sn(nil, {
-                t "while ",
-                rst(1, "condition"),
-                t{" do", "    "},
-                rst(2, "block"),
-                t{"", "end"}
-            }),
-            sn(nil, {
-                t{"repeat", "    "},
-                rst(2, "block"),
-                t{"", "until "},
-                rst(1, "condition"),
-            }),
-        }, {
-            stored = {
-                ["condition"] = i(1, "true"),
-                ["block"]     = i(2, "codeblock"),
-            },
-        })
-    ), -- }}}
-    s({ trig = "def", dscr = "Function definition1"}, -- {{{
         fmt(
             [[
-            function{}({})
+            while {1} do
+                {2}
+            end
+            ]],
+            {
+                i(1, "true"),
+                i(2)
+            }
+        )
+    ), -- }}}
+    ms({ "rep", "dow", common = {dscr = "While loop"} }, -- {{{
+        fmt(
+            [[
+            repeat
+                {2}
+            until {1}
+            ]],
+            {
+                i(1, "true"),
+                i(2)
+            }
+        )
+    ), -- }}}
+    ms({ "def", "fu", common = {dscr = "Function definition1"} }, -- {{{
+        fmt(
+            [[
+            {}{}({})
                 {}
             end
             ]],
             {
-                ch(1, {
-                        sn(1, {
-                            t " ",
-                            i(1, "id"),
-                            t " "
-                        }),
-                        t ""
-                    }
-                ),
-                i(2, "args"),
-                i(3, "tbl"),
+                dy(1, function (nodeRefText, _, _, _)
+                    local text = nodeRefText[1][1]
+                    if text == "" or string.match(text, "^%s*$") then
+                        return sn(nil, t "function")
+                    else
+                        return sn(nil, t "function ")
+                    end
+                end, {2}),
+                i(2, "id"),
+                i(3, "args"),
+                i(4, "codeblock"),
             }
         )
     ), -- }}}
-    s({ trig = "lsfn", dscr = "Luasnip function node"}, -- {{{
+
+-- Luasnip creation utilities
+    s({ trig = "fn", dscr = "Luasnip function node", -- {{{
+        snippetType = "autosnippet"
+        },
         fmt(
             [[
             fn({}, function ({2}{3}, {4})
@@ -356,9 +351,19 @@ return {
                     end
                 end, {4}),
             }
-        )
+        ), {
+            condition = function(line_to_cursor, _, _)
+                if not string.match(line_to_cursor, "^%s*fn$") then return false end
+
+                local bufName = nvim_buf_get_name(vim.api.nvim_get_current_buf())
+                return string.match(bufName, pathStr(_G._config_path .. "/lua/luaSnip/"))
+            end,
+            show_condition = function() return false end
+        }
     ), -- }}}
-    s({ trig = "lsdy", dscr = "Luasnip dynamic node"}, -- {{{
+    s({ trig = "dy", dscr = "Luasnip dynamic node", -- {{{
+        snippetType = "autosnippet"
+        },
         fmt(
             [[
             dy({1}, function ({2}{3}{4}, {5})
@@ -425,7 +430,15 @@ return {
                     end
                 end, {5}),
             }
-        )
+        ), {
+            condition = function(line_to_cursor, _, _)
+                if not string.match(line_to_cursor, "^%s*dy$") then return false end
+
+                local bufName = nvim_buf_get_name(vim.api.nvim_get_current_buf())
+                return string.match(bufName, pathStr(_G._config_path .. "/lua/luaSnip/"))
+            end,
+            show_condition = function() return false end
+        }
     ), -- }}}
 }
 

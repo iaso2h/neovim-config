@@ -5,6 +5,7 @@ return function()
 
     local s             = luasnip.snippet
     local sn            = luasnip.snippet_node
+    local ms            = luasnip.multi_snippet
     local t             = luasnip.text_node
     local i             = luasnip.insert_node
     local indent        = luasnip.indent_snippet_node
@@ -357,7 +358,19 @@ return function()
                 ["user_text"] = i(1, "default_text")
             }
         }),
-        s("rest", {
+        s("rst1", {
+            i(1, "preset"), t{"",""},
+            dy(2, function(args, _)
+                return sn(
+                    nil,
+                    {
+                        i(1, args[1]),
+                        i(2, "user_text")
+                    }
+                )
+            end , 1)
+        }),
+        s("rst2", {
             i(1, "preset"), t{"",""},
             dy(2, function(args, _)
                 return sn(
@@ -368,6 +381,25 @@ return function()
                     }
                 )
             end , 1)
+        }),
+
+        -- Multiple snippets
+        ms({
+            common = {snippetType = "autosnippet"},
+            "msa1",
+            "msb1"
+        }, {
+            t"a or b (but autotriggered!!)"
+        }),
+        ms({
+            common = {snippetType = "autosnippet"},
+            {trig = "msa2", snippetType = "snippet"},
+            "msb2",
+            {trig = "msc2", condition = function(line_to_cursor)
+                return line_to_cursor == ""
+            end}
+        }, {
+            t"a or b (but autotriggered!!)"
         }),
         -- Parsing snippets: First parameter: Snippet-Trigger, Second: Snippet body.
         -- Placeholders are parsed into choices with 1. the placeholder text(as a snippet) and 2. an empty string.

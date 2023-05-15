@@ -315,4 +315,12 @@ _G.nvim_buf_get_name = function(bufNr)
     end
 end
 
+
+--- Always make separator in a path string unified
+---@param pathStr string
+---@return string
+_G.pathStr = function(pathStr)
+    return _G._os_uname.sysname == "Linux" and pathStr or string.gsub(pathStr, "/", _G._sep)
+end
+
 -- }}} Global function
