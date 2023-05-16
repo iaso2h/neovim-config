@@ -1,23 +1,25 @@
 local M = {
-    winID = { }
+    winID = {},
 }
 
 M.filetypeSetup = function ()
     local winInfo = vim.fn.getwininfo()
     for _, win in ipairs(winInfo) do
-        local ft = vim.api.nvim_buf_get_option(win.bufnr, "filetype")
+        local bufNr    = win.bufnr
+        local winId    = win.winid
+        local fileType = vim.api.nvim_buf_get_option(bufNr, "filetype")
 
         if vim.tbl_contains({
-        "dap-repl",
-        "dapui_watches",
-        "dapui_console",
-        "dapui_stacks",
-        "dapui_breakpoints",
-        "dapui_scopes",
-    }, ft) then
-            M.winID[ft] = win.winid
-            vim.api.nvim_win_set_option(win.winid, "cursorline", false)
-            if ft == "dap-repl" or ft == "dapui_watches" then
+            "dap-repl",
+            "dapui_watches",
+            "dapui_console",
+            "dapui_stacks",
+            "dapui_breakpoints",
+            "dapui_scopes",
+        }, fileType) then
+            M.winID[fileType] = winId
+            vim.api.nvim_win_set_option(winId, "cursorline", false)
+            if fileType == "dap-repl" or fileType == "dapui_watches" then
                 vim.api.nvim_create_autocmd("BufEnter",{
                     buffer  = win.bufnr,
                     command = "startinsert"

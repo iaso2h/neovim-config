@@ -583,7 +583,7 @@ theme.plugins = { -- {{{
     SymbolsOutlineConnector = {fg = p.n2},
 
     -- https://github.com/L3MON4D3/LuaSnip
-    LuasnipSnippetNodeActive         = {style = "bold"},
+    -- LuasnipSnippetNodeActive         = {style = "bold"},
     -- LuasnipSnippetNodePassive        = {style = "NONE"},
     -- LuasnipSnippetNodeSnippetPassive = {style = "NONE"},
 

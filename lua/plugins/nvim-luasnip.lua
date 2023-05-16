@@ -46,7 +46,7 @@ return function()
             -- https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md#ext_opts
             [types.choiceNode] = {
                 active = {
-                    hl_group = "LuasnipSnippetNodeActive",
+                    -- hl_group = "LuasnipSnippetNodeActive",
                     virt_text = { { "choiceNode", "Search" } }
                 },
             },

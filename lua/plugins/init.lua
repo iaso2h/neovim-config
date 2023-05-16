@@ -824,6 +824,12 @@ local pluginArgs = { -- {{{
         "theHamsta/nvim-dap-virtual-text",
         lazy = true,
         dependencies = { "nvim-dap" },
+        cmd = {
+            "DapVirtualTextEnable",
+            "DapVirtualTextDisable",
+            "DapVirtualTextToggle",
+            "DapVirtualTextForceRefresh",
+        },
         config = function()
             require("nvim-dap-virtual-text").setup {
                 enabled = true,
