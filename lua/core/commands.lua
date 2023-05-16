@@ -198,17 +198,7 @@ end, {
     bang  = true,
 })
 
--- TODO: add completion menu
-vim.api.nvim_create_user_command("Se", function (opts)
-    local sessionName = opts.args == "" and "01" or opts.args
-    local sessionDir  = vim.fn.stdpath "state" .. pathStr "/my_session/"
-    vim.cmd("so " .. sessionDir .. sessionName .. ".vim")
-end, {
-    desc  = "Load session",
-    nargs = "?",
-})
-
-vim.api.nvim_create_user_command("Purge", function (opts)
+local purge = function()
     -- Delete invalid buffers
     local cond = function(bufNr)
         local bufName = nvim_buf_get_name(bufNr)
@@ -220,12 +210,29 @@ vim.api.nvim_create_user_command("Purge", function (opts)
         return vim.notify("No buffer has been purged", vim.log.levels.INFO)
     end
     for _, bufNr in ipairs(inValidBufNrs) do
-        require("buffer.util").initBuf(bufNr)
-        require("buffer.close").bufHandler(false, false)
+        vim.schedule_wrap(function()
+            require("buffer.util").initBuf(bufNr)
+            require("buffer.util").bufClose(bufNr, true, true)
+        end)()
     end
-end, {
+end
+vim.api.nvim_create_user_command("Purge", purge, {
     desc  = "Purge invalid buffers",
     nargs = 0,
+})
+
+-- TODO: add completion menu
+vim.api.nvim_create_user_command("Se", function (opts)
+    local sessionName = opts.args == "" and "01" or opts.args
+    local sessionDir  = vim.fn.stdpath "state" .. pathStr "/my_session/"
+    local ok, msgOrVal = pcall(vim.cmd, "source " .. sessionDir .. sessionName .. ".vim")
+    if not ok and not string.match(msgOrVal, "E592") then
+        vim.notify(msgOrVal, vim.log.levels.ERROR)
+    end
+    purge()
+end, {
+    desc  = "Load session",
+    nargs = "?",
 })
 
 vim.api.nvim_create_user_command("Dofile", function (opts)

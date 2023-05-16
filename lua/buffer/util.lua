@@ -39,7 +39,9 @@ end -- }}}
 ---@param switchBeforeClose? boolean Default is false. Set it to true to
 --switch all the buffer instance in all windows to an alternative buffer in
 --advance before closing up the buffer entirely
-M.bufClose = function(bufNr, switchBeforeClose) -- {{{
+---@param scheduleWrap? boolean Wether to use `vim.schedule_wrap()` to defer
+--the buffer close action
+M.bufClose = function(bufNr, switchBeforeClose, scheduleWrap) -- {{{
     bufNr = bufNr or var.bufNr
 
     if switchBeforeClose then
@@ -53,10 +55,16 @@ M.bufClose = function(bufNr, switchBeforeClose) -- {{{
             return vim.notify([[`require("buffer.var").winIds` isn't initialized]], vim.log.levels.ERROR)
         end
     end
-    local ok, msg = pcall(vim.api.nvim_command, "bdelete! " .. bufNr)
-    -- if not ok then
-    --     vim.notify(msg, vim.log.levels.ERROR)
-    -- end
+    if scheduleWrap then
+        vim.schedule_wrap(function()
+            vim.api.nvim_command("bdelete! " .. bufNr)
+        end)()
+    else
+        local ok, msg = pcall(vim.api.nvim_command, "bdelete! " .. bufNr)
+        if not ok then
+            vim.notify(msg, vim.log.levels.ERROR)
+        end
+    end
     -- `:bdelete` will register in both the jumplist and the changelist
     -- These two don't register in both the changelist and the changelist
     -- pcall(vim.api.nvim_command, "keepjump bwipe! " .. bufNr)
@@ -236,10 +244,18 @@ M.winsOccur = function(winIds) -- {{{
 end -- }}}
 --- Function wrap around `vim.api.nvim_win_close`
 ---@param winId? number Use `var.winId` if no window ID provided
-M.winClose = function(winId) -- {{{
+---@param scheduleWrap? boolean Wether to use `vim.schedule_wrap()` to defer
+--the window close action
+M.winClose = function(winId, scheduleWrap) -- {{{
     winId = winId or var.winId
-    local ok, msg = pcall(vim.api.nvim_win_close, winId, false)
-    if not ok then vim.notify(msg, vim.log.levels.ERROR) end
+    if scheduleWrap then
+        vim.schedule_wrap(function()
+            vim.api.nvim_win_close(winId, false)
+        end)()
+    else
+        local ok, msg = pcall(vim.api.nvim_win_close, winId, false)
+        if not ok then vim.notify(msg, vim.log.levels.ERROR) end
+    end
 end -- }}}
 --- Get the layout in which the target window nested in
 ---@param matchPattern? number|function Specify how to match a target window. Default is current window ID. You can pass in a specific window ID or a function that take window ID as its parameter, they will check against each window ID by calling this function recursively until it finds a match, which means the window IDs are equal or `matchPattern(<window ID>)` is evaluated to be `true`
