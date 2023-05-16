@@ -138,8 +138,129 @@ require('telescope').setup{
 
 -- Command
 vim.api.nvim_create_user_command("O", function()
-    require('telescope.builtin').oldfiles()
+        require("telescope.builtin").oldfiles()
 end, {desc = "Browse the oldfiles then prompt"} )
+
+local action_set   = require "telescope.actions.set"
+local action_state = require "telescope.actions.state"
+local finders      = require "telescope.finders"
+local make_entry   = require "telescope.make_entry"
+local Path         = require "plenary.path"
+local pickers      = require "telescope.pickers"
+local previewers   = require "telescope.previewers"
+local p_window     = require "telescope.pickers.window"
+local state        = require "telescope.state"
+local utils        = require "telescope.utils"
+local conf         = require("telescope.config").values
+-- https://github.com/nvim-telescope/telescope.nvim/blob/40c31fdde93bcd85aeb3447bb3e2a3208395a868/lua/telescope/builtin/__internal.lua#L663
+-- Commit:0900f6fcaa3dcc9a1ecfb1299300f5d6b16be5a4
+local helpTags = function(opts) -- {{{
+    opts = {}
+    opts.lang = vim.F.if_nil(opts.lang, vim.o.helplang)
+    opts.fallback = vim.F.if_nil(opts.fallback, true)
+    opts.file_ignore_patterns = {}
+    local langs = vim.split(opts.lang, ",", true)
+    if opts.fallback and not vim.tbl_contains(langs, "en") then
+        table.insert(langs, "en")
+    end
+    local langs_map = {}
+    for _, lang in ipairs(langs) do
+        langs_map[lang] = true
+    end
+    local tag_files = {}
+    local function add_tag_file(lang, file)
+        if langs_map[lang] then
+            if tag_files[lang] then
+                table.insert(tag_files[lang], file)
+            else
+                tag_files[lang] = { file }
+            end
+        end
+    end
+    local help_files = {}
+    local all_files = vim.api.nvim_get_runtime_file("doc/*", true)
+    for _, fullpath in ipairs(all_files) do
+        local file = utils.path_tail(fullpath)
+        if file == "tags" then
+            add_tag_file("en", fullpath)
+        elseif file:match("^tags%-..$") then
+            local lang = file:sub(-2)
+            add_tag_file(lang, fullpath)
+        else
+            help_files[file] = fullpath
+        end
+    end
+    local tags = {}
+    local tags_map = {}
+    local delimiter = string.char(9)
+    for _, lang in ipairs(langs) do
+        for _, file in ipairs(tag_files[lang] or {}) do
+            local lines = vim.split(Path:new(file):read(), "\n", true)
+            for _, line in ipairs(lines) do
+                -- TODO: also ignore tagComment starting with ';'
+                if not line:match("^!_TAG_") then
+                    local fields = vim.split(line, delimiter, true)
+                    if #fields == 3 and not tags_map[fields[1]] then
+                        if
+                            fields[1] ~= "help-tags"
+                            or fields[2] ~= "tags"
+                        then
+                            table.insert(tags, {
+                                name = fields[1],
+                                filename = help_files[fields[2]],
+                                cmd = fields[3],
+                                lang = lang,
+                            })
+                            tags_map[fields[1]] = true
+                        end
+                    end
+                end
+            end
+        end
+    end
+    pickers
+        .new(opts, {
+            prompt_title = "Help",
+            finder = finders.new_table {
+                results = tags,
+                entry_maker = function(entry)
+                    return make_entry.set_default_entry_mt({
+                        value = entry.name .. "@" .. entry.lang,
+                        display = entry.name,
+                        ordinal = entry.name,
+                        filename = entry.filename,
+                        cmd = entry.cmd,
+                    }, opts)
+                end,
+            },
+            previewer = previewers.help.new(opts),
+            sorter = conf.generic_sorter(opts),
+            attach_mappings = function(prompt_bufnr)
+                action_set.select:replace(function(_, cmd)
+                    local selection = action_state.get_selected_entry()
+                    if selection == nil then
+                        utils.__warn_no_selection("builtin.help_tags")
+                        return
+                    end
+                    actions.close(prompt_bufnr)
+                    if cmd == "default" then
+                        local preCmd = require("buffer.split").handler(true)
+                        vim.cmd(preCmd .. " help " .. selection.value)
+                    elseif cmd == "horizontal" then
+                        vim.cmd("horizontal help " .. selection.value)
+                    elseif cmd == "vertical" then
+                        vim.cmd("vert help " .. selection.value)
+                    elseif cmd == "tab" then
+                        vim.cmd("tab help " .. selection.value)
+                    end
+                end)
+                return true
+            end,
+        })
+        :find()
+end -- }}} 
+
+
 -- Mappings
 map("n", [[<C-f>a]], [[<CMD>lua require('telescope.builtin').builtin()<CR>]], {"silent"}, "All builtins")
 
@@ -165,7 +286,7 @@ map("n", [[<C-f>v]], [[<CMD>lua require('telescope.builtin').vim_options()<CR>]]
 map("n", [[<C-f>j]], [[<CMD>lua require('telescope.builtin').jumplist()<CR>]],        {"silent"}, "Jumplist")
 map("n", [[<C-f>m]], [[<CMD>lua require('telescope.builtin').marks()<CR>]],           {"silent"}, "Marks")
 map("n", [[<C-f>k]], [[<CMD>lua require('telescope.builtin').keymaps()<CR>]],         {"silent"}, "Keymaps")
-map("n", [[<C-f>h]], [[<CMD>lua require('telescope.builtin').help_tags()<CR>]],       {"silent"}, "Help tags")
+map("n", [[<C-f>h]], helpTags, "Help docs")
 map("n", [[<C-f>H]], [[<CMD>lua require('telescope.builtin').man_pages()<CR>]],       {"silent"}, "Man pages")
 map("n", [[<C-f>r]], [[<CMD>lua require('telescope.builtin').reloader()<CR>]],        {"silent"}, "Reloader")
 

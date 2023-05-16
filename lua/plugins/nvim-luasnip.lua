@@ -72,6 +72,7 @@ return function()
         -- TODO: `load_ft_func`:
     }
     -- Learn Luasnip: https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md
+    -- Commit: 7dc8d5122fdbc2ba3d7bb32c1d5424f13aa46af5
     -- Example: https://github.com/L3MON4D3/LuaSnip/blob/master/Examples/snippets.lua
 
     -- args is a table, where 1 is the text in Placeholder 1, 2 the text in

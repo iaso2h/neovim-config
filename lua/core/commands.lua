@@ -59,25 +59,19 @@ vim.api.nvim_create_autocmd({"FocusGained", "WinEnter"}, {
 
 -- Commands {{{
 if _G._os_uname.sysname == "Windows_NT" then
-    vim.api.nvim_create_user_command("PS", [[terminal powershell]], {
+    vim.api.nvim_create_user_command("PS", [[terminal powershell]], { -- {{{
         desc  = "Open powershell",
         nargs = 0,
-    })
+    }) -- }}} 
 end
 
-vim.api.nvim_create_user_command("DeleteEmptyLines", [['<,'>g#^\s*$#d]], {
+vim.api.nvim_create_user_command("DeleteEmptyLines", [['<,'>g#^\s*$#d]], { -- {{{
     desc  = "Delete empty lines from selection",
     nargs = 0,
     range = true,
-})
+}) -- }}} 
 
-vim.api.nvim_create_user_command([[PP strftime('%c') . ": " . <args>]], "Echo", {
-    desc     = "Echo from Scriptease plug-ins",
-    nargs    = "+",
-    complete = "command",
-})
-
-vim.api.nvim_create_user_command("Redir", function(opts)
+vim.api.nvim_create_user_command("Redir", function(opts) -- {{{
     local output = vim.api.nvim_exec2(opts.args, {output = true}).output
     local lines = vim.split(output, "\n", {plain = true, trimempty = true})
     require("buffer.util").redirScratch(lines, nil)
@@ -85,9 +79,9 @@ end, {
     desc     = "Echo from Scriptease plug-ins",
     nargs    = "+",
     complete = "command",
-})
+}) -- }}} 
 
-vim.api.nvim_create_user_command("ExtractToFile", function(opts)
+vim.api.nvim_create_user_command("ExtractToFile", function(opts) -- {{{
     if opts.range == 0 then
         -- Extract the current line when no range selected
         vim.cmd([[noa norm! V]] .. t"<Esc>")
@@ -99,9 +93,9 @@ end, {
     desc  = "Extract selection to a new file",
     range = true,
     nargs = 0,
-})
+}) -- }}} 
 
-vim.api.nvim_create_user_command("Reverse", function(opts)
+vim.api.nvim_create_user_command("Reverse", function(opts) -- {{{
     if opts.range == 0 then return end
     if vim.fn.visualmode() == "V" then
         return vim.notify("Not support visual line mode", vim.log.levels.WARN)
@@ -113,9 +107,20 @@ end, {
     desc  = "Reverse selection",
     range = true,
     nargs = 0,
-})
+}) -- }}} 
 
-vim.api.nvim_create_user_command("RunSelection", function()
+
+vim.api.nvim_create_user_command("CompileCode", -- {{{
+    function() require("compileRun").compileCode(true) end,
+    { desc = "Compile code",  }
+) -- }}} 
+
+vim.api.nvim_create_user_command("RunCode", -- {{{
+    require("compileRun").runCode,
+    { desc = "Run code",  }
+) -- }}} 
+
+vim.api.nvim_create_user_command("RunSelection", function() -- {{{
     if vim.bo.filetype ~= "lua" then
        return vim.notify("Only support in Lua file", vim.log.levels.WARN)
     end
@@ -136,37 +141,40 @@ vim.api.nvim_create_user_command("RunSelection", function()
 end, {
     desc  = "Run selection in lua syntax",
     range = true,
-})
+}) -- }}} 
 
-vim.api.nvim_create_user_command("Cfilter", function(opts)
+vim.api.nvim_create_user_command("Cfilter", function(opts) -- {{{
     require("quickfix.cFilter").main(true, opts.args, opts.bang)
 end, {
     desc  = "Filter quickfix window",
     bang  = true,
     nargs = "+",
-})
+}) -- }}} 
 
-vim.api.nvim_create_user_command("Lfilter", function(opts)
+vim.api.nvim_create_user_command("Lfilter", function(opts) -- {{{
     require("quickfix.cFilter").main(false, opts.args, opts.bang)
 end, {
     desc  = "Filter localfix window",
     bang  = true,
     nargs = "+",
-})
+}) -- }}} 
 
-vim.api.nvim_create_user_command("CD", [[execute "lcd " . expand("%:p:h")]], {
-    desc = "Change the current working directory to the current buffer locally",
-})
+vim.api.nvim_create_user_command("CD", -- {{{
+    [[execute "lcd " . expand("%:p:h")]],
+    { desc = "Change the current working directory to the current buffer locally",
+}) -- }}} 
 
-vim.api.nvim_create_user_command("CDConfig", [[execute "lcd " . stdpath("config")]], {
-    desc = "Change the current working directory to configuration path",
-})
+vim.api.nvim_create_user_command("CDConfig", -- {{{
+    [[execute "lcd " . stdpath("config")]],
+    { desc = "Change the current working directory to configuration path",
+}) -- }}} 
 
-vim.api.nvim_create_user_command("CDRuntime", [[execute "lcd $VIMRUNTIME"]], {
-    desc = "Change the current working directory to Neovim runtime path",
-})
+vim.api.nvim_create_user_command("CDRuntime", -- {{{
+    [[execute "lcd $VIMRUNTIME"]],
+    { desc = "Change the current working directory to Neovim runtime path",
+}) -- }}} 
 
-vim.api.nvim_create_user_command("E", function (opts)
+vim.api.nvim_create_user_command("E", function (opts) -- {{{
     vim.cmd [[noa mkview]]
     if not opts.bang then
         vim.cmd [[update! | e]]
@@ -178,11 +186,14 @@ vim.api.nvim_create_user_command("E", function (opts)
 end, {
     desc = "Reopen the the current file while maintaining the window layout",
     bang = true,
-})
+}) -- }}} 
 
-vim.api.nvim_create_user_command("O", [[browse oldfiles]], { desc = "Browse the oldfiles then prompt", })
+vim.api.nvim_create_user_command("O", -- {{{
+    [[browse oldfiles]],
+    { desc = "Browse the oldfiles then prompt",
+}) -- }}} 
 
-vim.api.nvim_create_user_command("Q", function (opts)
+vim.api.nvim_create_user_command("Q", function (opts) -- {{{
     local saveCMD = opts.bang and "noa silent " or "noa silent bufdo update | "
     local sessionName = opts.args == "" and "01" or opts.args
     local sessionDir  = vim.fn.stdpath("state") .. _G._sep .. "my_session" .. _G._sep
@@ -196,9 +207,9 @@ end, {
     desc  = "Quit and save the session",
     nargs = "?",
     bang  = true,
-})
+}) -- }}} 
 
-local purge = function()
+local purge = function() -- {{{
     -- Delete invalid buffers
     local cond = function(bufNr)
         local bufName = nvim_buf_get_name(bufNr)
@@ -215,14 +226,14 @@ local purge = function()
             require("buffer.util").bufClose(bufNr, true, true)
         end)()
     end
-end
-vim.api.nvim_create_user_command("Purge", purge, {
+end -- }}} 
+vim.api.nvim_create_user_command("Purge", purge, { -- {{{
     desc  = "Purge invalid buffers",
     nargs = 0,
-})
+}) -- }}} 
 
 -- TODO: add completion menu
-vim.api.nvim_create_user_command("Se", function (opts)
+vim.api.nvim_create_user_command("Se", function (opts) -- {{{
     local sessionName = opts.args == "" and "01" or opts.args
     local sessionDir  = vim.fn.stdpath "state" .. pathStr "/my_session/"
     local ok, msgOrVal = pcall(vim.cmd, "source " .. sessionDir .. sessionName .. ".vim")
@@ -233,9 +244,9 @@ vim.api.nvim_create_user_command("Se", function (opts)
 end, {
     desc  = "Load session",
     nargs = "?",
-})
+}) -- }}} 
 
-vim.api.nvim_create_user_command("Dofile", function (opts)
+vim.api.nvim_create_user_command("Dofile", function (opts) -- {{{
     local ft = vim.bo.filetype
     if ft == "lua" then
         if opts.bang then
@@ -269,16 +280,21 @@ vim.api.nvim_create_user_command("Dofile", function (opts)
 end, {
     desc = "Reload the current file in lua/vim runtime",
     bang = true
-})
+}) -- }}} 
 
-vim.api.nvim_create_user_command("O", [[browse oldfiles]], { desc = "Browse the oldfiles then prompt", })
-vim.api.nvim_create_user_command("OnSaveTrimSpaces", function ()
+vim.api.nvim_create_user_command("O", -- {{{
+    [[browse oldfiles]],
+    { desc = "Browse the oldfiles then prompt",  }
+) -- }}} 
+
+vim.api.nvim_create_user_command("OnSaveTrimSpaces", function () -- {{{
     _G._trim_space = _G._trim_space or true
     _G._trim_space = not _G._trim_space
     vim.api.nvim_echo({ { string.format("OnSaveTrimSpaces: %s", _G._trim_space), "Moremsg" } }, false, {})
-end, { desc = "Toggle trimming spaces on save", })
+end, { desc = "Toggle trimming spaces on save", }) -- }}} 
 
-vim.api.nvim_create_user_command("TrimBufferSpaces", function ()
-    require("util").trimSpaces()
-end, { desc = "Toggle trimming spaces on save", })
+vim.api.nvim_create_user_command("TrimBufferSpaces", -- {{{
+    function()require("util").trimSpaces()end,
+    { desc = "Toggle trimming spaces on save",  }
+) -- }}} 
 -- }}} Commands

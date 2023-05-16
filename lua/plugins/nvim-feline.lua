@@ -181,15 +181,15 @@ return function()
                     -- The value of vim.b._is_local is set up whenever a qf filetype
                     -- is set via `after/ftplugin/qf.lua`
                     fileType = vim.b._is_local and "Location list" or "Quickfix"
-                    return padding .. icon.ui.Quickfix .. padding .. fileType .. padding
+                    return icon.ui.Quickfix .. padding .. fileType
                 elseif vim.tbl_contains(_G._short_line_list, fileType)then
                     local bufIcon = _G._short_line_infos[fileType].icon
                     local fileStr
                     if bufIcon then
                         fileStr = _G._short_line_infos[fileType].name
-                        return bufIcon .. padding .. fileStr .. padding
+                        return bufIcon .. padding .. fileStr
                     else
-                        return fileStr .. padding
+                        return fileStr:upper()
                     end
                 elseif vim.startswith(nvim_buf_get_name(0), "diffview") then
                     return icon.ui.History .. padding .. "Diff"

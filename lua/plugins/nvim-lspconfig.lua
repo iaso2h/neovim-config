@@ -236,6 +236,8 @@ if _G._os_uname.machine ~= "aarch64" then
             "--all-scopes-completion",
             "--background-index",
             "--clang-tidy",
+            "--query-driver=C:/Program Files/w64devkit/bin/gcc*",
+            "--log=verbose",
             "--clang-tidy-checks=google-*,llvm-*,clang-analyzer-*, cert-*,performance-*,misc-,modernize-*,-modernize-use-trailing-return-type,concurrency-*,bugprone-*,readability-*,-readability-magic-numbers",
             "--completion-parse=auto",
             "--completion-style=detailed",
@@ -245,19 +247,26 @@ if _G._os_uname.machine ~= "aarch64" then
             "--pretty",
             "--suggest-missing-includes",
             "--fallback-style=google",
-            "--offset-encoding=utf-16"
         }
-        local dataPath = path:new(vim.fn.stdpath("data"))
-        local binPath = dataPath:joinpath("mason", "packages", "clangd", "clangd", "bin", "clangd").filename
+        local binDir = vim.fs.find(
+            "bin",
+            {
+                type = "directory",
+                path = vim.fn.stdpath("data") .. pathStr("/mason/packages/clangd")
+            }
+        )
+        if not binDir[1] then return {} end
+
+        local binPath = binDir[1] .. pathStr "/clangd"
         if _G._os_uname.sysname == "Windows_NT" then binPath = binPath .. ".exe" end
         table.insert(args, 1, binPath)
         return args
     end
 
     local clangdCMD = findClangd()
-    if clangdCMD ~= "" then
+    if next(clangdCMD) then
         serverNames.clangd = {
-            cmd = clangdCMD,
+            -- cmd = clangdCMD,
             init_options = {
                 -- capabilities         = {},
                 clangdFileStatus     = true,
@@ -301,6 +310,9 @@ end
     local config
     for _, serverName in pairs(vim.tbl_keys(serverNames)) do
         config = vim.tbl_deep_extend("force", basicConfig, serverNames[serverName])
+        if serverName == "clangd" then
+            config.capabilities.offsetEncoding = {"utf-16"}
+        end
         lspConfig[serverName].setup(config)
     end
     -- }}} Setup servers

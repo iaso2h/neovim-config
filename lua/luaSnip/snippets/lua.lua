@@ -33,14 +33,7 @@ return {
         {
             t "do return ",
             i(1, "val"),
-            dy(2, function (nodeRefText, _, _, _)
-                local text = nodeRefText[1][1]
-                if text == "" or string.match(text, "^%s*$") then
-                    return sn(nil, {t "end"})
-                else
-                    return sn(nil, {t " end"})
-                end
-            end, {1})
+            nonempty(1, " end", "end")
         }
     ), -- }}}
     s({ trig = "vcon", dscr = "Vim confirm"}, -- {{{
@@ -155,6 +148,22 @@ return {
             }
         )
     ), -- }}}
+    s({ trig = "ife", dscr = "If and else condition"}, -- {{{
+        fmt(
+            [[
+            if {} then
+                {}
+            else
+                {}
+            end
+            ]],
+            {
+                i(1, "true"),
+                i(2),
+                i(3)
+            }
+        )
+    ), -- }}}
     s({ trig = "elif", dscr = "Elseif condition"}, -- {{{
         fmt(
             [[
@@ -210,7 +219,7 @@ return {
                     i(nil, "val"),
                     t("_")
                 }),
-                i(3, "codeblock"),
+                i(3),
                 i(0)
             }
         )
@@ -231,7 +240,7 @@ return {
                     i(nil, "val"),
                     t("_")
                 }),
-                i(3, "codeblock"),
+                i(3),
                 i(0)
             }
         )
@@ -280,7 +289,7 @@ return {
                 end, {2}),
                 i(2, "id"),
                 i(3, "args"),
-                i(4, "codeblock"),
+                i(4),
             }
         )
     ), -- }}}

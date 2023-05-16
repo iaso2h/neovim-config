@@ -406,7 +406,13 @@ map("x", [[g)]], [[:lua require("trailingChar").main("v", ")")<CR>]],      {"sil
 map("n", [[g>]], [[<CMD>lua require("trailingChar").main("n", ">")<CR>]],  {"silent"}, "Add trailing >")
 map("n", [[g<C-CR>]], [[<CMD>call append(line("."),   repeat([""], v:count1))<CR>]], {"silent"}, "Add new line below")
 map("n", [[g<S-CR>]], [[<CMD>call append(line(".")-1, repeat([""], v:count1))<CR>]], {"silent"}, "Add new line above")
-map("n", [[g<CR>]],   [[<CMD>lua require("breakLine").main()<CR>]], {"silent"}, "Break line at cursor")
+map("n", [[g<CR>]], function()
+    local cursorPos  = vim.api.nvim_win_get_cursor(0)
+    local cursorChar = vim.api.nvim_buf_get_text(0, cursorPos[1] - 1, cursorPos[2], cursorPos[1] - 1, cursorPos[2] + 1, {})
+    return cursorChar == " " and
+        vim.api.nvim_feedkeys(t"s<CR><Esc>l", "n", false) or
+        vim.api.nvim_feedkeys(t"i<CR><Esc>l", "n", false)
+end, "Break line at cursor")
 -- }}} Trailing character
 
 -- PageUp/PageDown
