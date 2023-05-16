@@ -8,7 +8,7 @@ if vim.fn.has("python3") == 0 then
         vim.log.levels.ERROR)
     return
 end
-vim.g.thesaurusRoot = _G._config_path .. _G._sep .. "lua" .. _G._sep .. "thesaurus" .. _G._sep .. "python"
+vim.g.thesaurusRoot = _G._config_path .. pathStr "/lua/thesaurus/python"
 
 local pyExecLine = function(codeStr)
     vim.cmd(string.format([[

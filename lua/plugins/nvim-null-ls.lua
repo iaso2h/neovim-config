@@ -109,8 +109,7 @@ return function()
             word = vim.fn.expand("<cword>"):lower()
         end
 
-        local filePath = string.format([[%s%sdata%sdict%scspell%scspell.txt]],
-            _G._config_path, _G._sep, _G._sep, _G._sep, _G._sep)
+        local filePath = _G._config_path .. pathStr[[/data/dict/cspell/cspell.txt]]
         io.popen(string.format("echo %s >> %s", word, filePath))
         vim.notify(string.format([["%s" is appended to user dictionary.]], word), vim.log.levels.INFO)
 

@@ -61,7 +61,7 @@ function M.main(selectText)
 
         local filePath = fn.expand("%:p")
 
-        if filePath == string.format("%s%slua%splugins%sinit.lua", _G._config_path, _G._sep, _G._sep, _G._sep) then
+        if filePath == (_G._config_path .. pathStr "/lua/plugins/init.lua") then
             url = require("getLink.lazyPlugins")(curBufNr, cursorPos, getUrl)
             if type(url) == "string" and url ~= "" then
                 if string.find(url, "http") then

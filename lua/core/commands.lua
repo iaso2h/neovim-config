@@ -198,11 +198,11 @@ end, {
     bang  = true,
 })
 
+-- TODO: add completion menu
 vim.api.nvim_create_user_command("Se", function (opts)
     local sessionName = opts.args == "" and "01" or opts.args
-    local sessionDir  = vim.fn.stdpath("state") .. _G._sep .. "my_session" .. _G._sep
-    vim.cmd(string.format("so %s%s%s%s.vim",
-        sessionDir, _G._sep, _G._sep, sessionName))
+    local sessionDir  = vim.fn.stdpath "state" .. pathStr "/my_session/"
+    vim.cmd("so " .. sessionDir .. sessionName .. ".vim")
 end, {
     desc  = "Load session",
     nargs = "?",
@@ -243,7 +243,7 @@ vim.api.nvim_create_user_command("Dofile", function (opts)
         local filePath = nvim_buf_get_name(0)
         local idx = {string.find(
             filePath,
-            _G._config_path .. _G._sep .. "lua" .. _G._sep)}
+            _G._config_path .. pathStr "/lua/")}
         if next(idx) then
             local tail = filePath:sub(idx[2] + 1, -1)
             local root = tail:sub(1, -5)

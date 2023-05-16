@@ -117,7 +117,6 @@ serverNames.pyright = {
 ---@return string
 local luaGetPluginRepoDir = function(plugin)
     return _G._plugin_root .. _G._sep .. plugin .. _G._sep .. "lua"
-    -- return _G._plugin_root .. _G._sep .. plugin
 end
 local luaLibrary = {
     vim.fn.expand("$VIMRUNTIME") .. _G._sep .. "lua",
