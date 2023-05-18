@@ -1,4 +1,5 @@
 local luasnip = require("luasnip")
+local u       = require("luaSnip.util")
 
 local s             = luasnip.snippet
 local sn            = luasnip.snippet_node
@@ -22,7 +23,6 @@ local conds         = require("luasnip.extras.conditions")
 local condsExpand   = require("luasnip.extras.conditions.expand")
 -- LUARUN: vim.cmd [[h luasnip-snippets]]
 
-local u = require("luaSnip.util")
 local isFirstLine = function()
     return vim.fn.line(".") == 1
 end

@@ -1,4 +1,5 @@
 local luasnip = require("luasnip")
+local u       = require("luaSnip.util")
 
 local s             = luasnip.snippet
 local sn            = luasnip.snippet_node
@@ -22,6 +23,8 @@ local types         = require("luasnip.util.types")
 local conds         = require("luasnip.extras.conditions")
 local condsExpand   = require("luasnip.extras.conditions.expand")
 -- LUARUN: vim.cmd [[h luasnip-snippets]]
+
+
 return {
     s({ trig = "rt", dscr = "Return value" }, -- {{{
         {
@@ -129,7 +132,7 @@ return {
     s({ trig = "ll", dscr = "Local variable assignment"}, -- {{{
         {
             t"local ",
-            rst(1, "identifier")
+            i(1, "identifier")
         }
     ), -- }}}
     s({ trig = "rq", dscr = "Require a module"}, -- {{{
@@ -300,7 +303,7 @@ return {
         },
         fmt(
             [[
-            fn({}, function ({2}{3}, {4})
+            fn({}, function ({2}, {3}, {4})
                 {5}
             end{6}{7})
             ]],
@@ -311,8 +314,8 @@ return {
                     t "_",
                 }),
                 ch(3, {
-                    t ", parent",
-                    t ", _",
+                    t "parent",
+                    t "_",
                 }),
                 ch(4, {
                     i(nil, "userArgs"),
@@ -322,7 +325,7 @@ return {
                 dy(6, function(nodeRefText, _, _, _)
                     local text = nodeRefText[1][1]
                     if text == "_" then
-                        return sn(nil, {t ", nil"})
+                        return sn(nil, t ", nil")
                     else
                         return sn(
                             nil,
@@ -337,7 +340,7 @@ return {
                 dy(7, function(nodeRefText, _, _, _)
                     local text = nodeRefText[1][1]
                     if text == "_" then
-                        return sn(nil, {t ""})
+                        return sn(nil, t "")
                     else
                         return sn(
                             nil,
@@ -361,12 +364,7 @@ return {
                 end, {4}),
             }
         ), {
-            condition = function(line_to_cursor, _, _)
-                if not string.match(line_to_cursor, "^%s*fn$") then return false end
-
-                local bufName = nvim_buf_get_name(vim.api.nvim_get_current_buf())
-                return string.match(bufName, pathStr(_G._config_path .. "/lua/luaSnip/"))
-            end,
+            condition = u.inSnippetDir,
             show_condition = function() return false end
         }
     ), -- }}}
@@ -375,7 +373,7 @@ return {
         },
         fmt(
             [[
-            dy({1}, function ({2}{3}{4}, {5})
+            dy({1}, function ({2}, {3}, {4}, {5})
                 {6}
             end{7}{8})
             ]],
@@ -386,12 +384,12 @@ return {
                     t "_",
                 }),
                 ch(3, {
-                    t ", parent",
-                    t ", _",
+                    t "parent",
+                    t "_",
                 }),
                 ch(4, {
-                    t ", oldState",
-                    t ", _",
+                    t "oldState",
+                    t "_",
                 }),
                 ch(5, {
                     i(nil, "userArgs"),
@@ -401,7 +399,7 @@ return {
                 dy(7, function(nodeRefText, _, _, _)
                     local text = nodeRefText[1][1]
                     if text == "_" then
-                        return sn(nil, {t ", nil"})
+                        return sn(nil, t ", nil")
                     else
                         return sn(
                             nil,
@@ -416,7 +414,7 @@ return {
                 dy(8, function(nodeRefText, _, _, _)
                     local text = nodeRefText[1][1]
                     if text == "_" then
-                        return sn(nil, {t ""})
+                        return sn(nil, t "")
                     else
                         return sn(
                             nil,
@@ -440,12 +438,15 @@ return {
                 end, {5}),
             }
         ), {
-            condition = function(line_to_cursor, _, _)
-                if not string.match(line_to_cursor, "^%s*dy$") then return false end
-
-                local bufName = nvim_buf_get_name(vim.api.nvim_get_current_buf())
-                return string.match(bufName, pathStr(_G._config_path .. "/lua/luaSnip/"))
-            end,
+            condition = u.inSnippetDir,
+            show_condition = function() return false end
+        }
+    ), -- }}}
+    s({ trig = "snt", dscr = "Snippet type", -- {{{
+        },
+        t 'snippetType = "autosnippet"',
+        {
+            condition = u.inSnippetDir,
             show_condition = function() return false end
         }
     ), -- }}}
