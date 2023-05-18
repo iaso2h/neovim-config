@@ -5,7 +5,8 @@ return function()
     local onAttach = function(client, bufNr)
         if client.supports_method("textDocument/formatting") then
             bmap(bufNr, "n", [[<A-f>]], function()
-                vim.lsp.buf.format { name = "null-ls",
+                vim.lsp.buf.format {
+                    name = "null-ls",
                     async = true
                 }
             end, "Format")
@@ -15,8 +16,8 @@ return function()
                 name = "null-ls",
                 async = true,
                 range = {
-                    ["start"] = vim.api.nvim_buf_get_mark(bufNr, "<"),
-                    ["end"] = vim.api.nvim_buf_get_mark(bufNr, ">")
+                    ["start"] = {vim.api.nvim_buf_get_mark(bufNr, "<")[1], 0},
+                    ["end"]   = {vim.api.nvim_buf_get_mark(bufNr, ">")[1], 0}
                 }
             }<CR>]], { "silent" }, "Format selection")
         end

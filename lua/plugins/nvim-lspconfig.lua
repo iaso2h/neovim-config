@@ -61,9 +61,8 @@ return function()
         -- bmap(bufNr, "n", [=[<leader>wr]=], vim.lsp.buf.remove_workspace_folder, "LSP remove workspace folder")
         -- bmap(bufNr, "n", [=[<leader>wl]=], Print(vim.lsp.buf.list_workspace_folders, "LSP list workspace folder")
 
-        -- Bring back the gqq for formatting comments and stuff, use <A-f> to
-        -- format instead
-        -- HACK: vim.lsp.formatexpr() is always set in:
+        -- Bring back the gqq for formatting comments and stuff
+        --  HACK: vim.lsp.formatexpr() is always set in:
         -- https://github.com/neovim/neovim/blob/f1b415b3abbcccb8b0d2aa1a41a45dd52de1a5ff/runtime/lua/vim/lsp.lua#L1130
         vim.bo.formatexpr = ""
         vim.opt.formatexpr = ""
@@ -79,6 +78,25 @@ return function()
             end
             vim.cmd [[norm! gq]]
         end, "which_key_ignore")
+        vim.api.nvim_create_user_command("Format", function(opts)
+            if opts.range == 0 then
+                vim.lsp.buf.format { name = "null-ls",
+                    async = true
+                }
+            else
+                vim.lsp.buf.format {
+                    name = "null-ls",
+                    async = true,
+                    range = {
+                        ["start"] = {opts.line1, 0},
+                        ["end"] = {opts.line2, 0}
+                    }
+                }
+            end
+        end, {
+            desc  = "Format buffer or selected range",
+            range = true
+        })
     end -- }}}
 
 -- LSP servers override {{{
