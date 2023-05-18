@@ -1,6 +1,7 @@
 -- https://github.com/neovim/nvim-lspconfig
 return function()
     local lspConfig   = require("lspconfig")
+    local u           = require("lspconfig.util")
     local path        = require("plenary.path")
     local serverNames = require("plugins.nvim-mason-lspconfig").serverNames
 
@@ -81,12 +82,10 @@ return function()
     end -- }}}
 
 -- LSP servers override {{{
--- Setup() function: https://github.com/neovim/nvim-lspconfig#setup-function
 -- Individual configuration: https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md
 -- Python {{{
 -- https://github.com/microsoft/pyright
 -- https://github.com/microsoft/pyright/blob/master/docs/configuration.md
--- https://github.com/microsoft/pyright/blob/96871bec5a427048fead499ab151be87b7baf023/packages/vscode-pyright/package.json
 serverNames.pyright = {
     settings  = {
         python = {
@@ -115,19 +114,32 @@ serverNames.pyright = {
 --- Get lua plugins repository directory. e.g. "/home/iaso2h/.local/share/nvim/lazy/nvim-treesitter/lua"
 ---@param plugin string
 ---@return string
-local luaGetPluginRepoDir = function(plugin)
-    return _G._plugin_root .. _G._sep .. plugin .. _G._sep .. "lua"
+local luaGetPluginRepoDir = function(plugin, suffix)
+    return suffix and
+        _G._plugin_root .. _G._sep .. plugin .. _G._sep .. "lua" or
+        _G._plugin_root .. _G._sep .. plugin .. _G._sep
 end
 local luaLibrary = {
     vim.fn.expand("$VIMRUNTIME") .. _G._sep .. "lua",
     require("neodev.config").types(),
-    luaGetPluginRepoDir "nvim-treesitter",
-    luaGetPluginRepoDir "telescope.nvim",      -- HACK: failed to parse the lib
-    luaGetPluginRepoDir "plenary.nvim",
-    luaGetPluginRepoDir "mason-null-ls.nvim",  -- HACK: failed to parse the lib
-    luaGetPluginRepoDir "null-ls.nvim",        -- HACK: failed to parse the lib
-    luaGetPluginRepoDir "LuaSnip",             -- HACK: failed to parse the lib
-    luaGetPluginRepoDir "nvim-dap",
+    luaGetPluginRepoDir("nvim-treesitter", true),
+    luaGetPluginRepoDir("telescope.nvim", true),      -- HACK: failed to parse the lib
+    luaGetPluginRepoDir("plenary.nvim", true),
+    luaGetPluginRepoDir("mason-null-ls.nvim", true),  -- HACK: failed to parse the lib
+    luaGetPluginRepoDir("null-ls.nvim", true),        -- HACK: failed to parse the lib
+    luaGetPluginRepoDir("LuaSnip", true),             -- HACK: failed to parse the lib
+    luaGetPluginRepoDir("nvim-dap", true),
+}
+local fennelLibrary = {
+    vim.fn.expand("$VIMRUNTIME") .. _G._sep,
+    require("neodev.config").types(),
+    luaGetPluginRepoDir("nvim-treesitter", false),
+    luaGetPluginRepoDir("telescope.nvim", false),
+    luaGetPluginRepoDir("plenary.nvim", false),
+    luaGetPluginRepoDir("mason-null-ls.nvim", false),
+    luaGetPluginRepoDir("null-ls.nvim", false),
+    luaGetPluginRepoDir("LuaSnip", false),
+    luaGetPluginRepoDir("nvim-dap", false),
 }
 for _, dir in ipairs(luaLibrary) do
     if not vim.loop.fs_stat(dir) then
@@ -200,7 +212,7 @@ if _G._os_uname.sysname == "Linux" and _G._os_uname.machine ~= "aarch64" then
         settings = {
             fennel = {
                 workspace = {
-                    library = vim.api.nvim_list_runtime_paths(),
+                    library = fennelLibrary,
                 },
                 diagnostics = {
                     globals = {"vim"}
@@ -211,7 +223,6 @@ if _G._os_uname.sysname == "Linux" and _G._os_uname.machine ~= "aarch64" then
 end
 -- }}} Fennel
 -- Vimscript {{{
--- npm install -g vim-language-server
 vim.g.markdown_fenced_languages = {
     'vim',
     'help'
@@ -230,59 +241,36 @@ serverNames.vimls = {
 -- }}} Vimscript
 -- Clangd {{{
 if _G._os_uname.machine ~= "aarch64" then
-    -- https://github.com/llvm/llvm-project/tree/main/clang-tools-extra/clangd
-    local findClangd = function()
-        local args = {
-            "--all-scopes-completion",
-            "--background-index",
-            "--clang-tidy",
-            "--query-driver=C:/Program Files/w64devkit/bin/gcc*",
-            "--log=verbose",
-            "--clang-tidy-checks=google-*,llvm-*,clang-analyzer-*, cert-*,performance-*,misc-,modernize-*,-modernize-use-trailing-return-type,concurrency-*,bugprone-*,readability-*,-readability-magic-numbers",
-            "--completion-parse=auto",
-            "--completion-style=detailed",
-            "--cross-file-rename",
-            "--header-insertion=iwyu",
-            "--j=4",
-            "--pretty",
-            "--suggest-missing-includes",
-            "--fallback-style=google",
-        }
-        local binDir = vim.fs.find(
-            "bin",
-            {
-                type = "directory",
-                path = vim.fn.stdpath("data") .. pathStr("/mason/packages/clangd")
+    -- https://clangd.llvm.org/config
+    local clangdRootFiles = {
+    '.clangd',
+    '.clang-tidy',
+    '.clang-format',
+    'compile_commands.json',
+    'compile_flags.txt',
+    'configure.ac', -- AutoTools
+    'makefile',
+    'build',
+    }
+    local clangdRootDir = function(fname)
+      return u.root_pattern(unpack(clangdRootFiles))(fname) or u.find_git_ancestor(fname) or vim.loop.cwd()
+    end
+    serverNames.clangd = {
+        init_options = {
+            -- capabilities         = {},
+            clangdFileStatus     = true,
+            usePlaceholders      = true,
+            completeUnimported   = true,
+            semanticHighlighting = true,
+            fallbackFlags = {
+            "-std=c99",
+            "-Wall",
+            "-Wextra",
+            "-Wno-deprecated-declarations"
             }
-        )
-        if not binDir[1] then return {} end
-
-        local binPath = binDir[1] .. pathStr "/clangd"
-        if _G._os_uname.sysname == "Windows_NT" then binPath = binPath .. ".exe" end
-        table.insert(args, 1, binPath)
-        return args
-    end
-
-    local clangdCMD = findClangd()
-    if next(clangdCMD) then
-        serverNames.clangd = {
-            -- cmd = clangdCMD,
-            init_options = {
-                -- capabilities         = {},
-                clangdFileStatus     = true,
-                usePlaceholders      = true,
-                completeUnimported   = true,
-                semanticHighlighting = true,
-                fallbackFlags = {
-                "-std=c99",
-                "-Wall",
-                "-Wextra",
-                "-Wno-deprecated-declarations"
-                }
-            },
-            root_dir = lspConfig.util.root_pattern(".git", "compile_commands.json", "compile_flags.txt", "build", "README.md", "makefile"),
-        }
-    end
+        },
+        root_dir = clangdRootDir
+    }
 end
 -- }}} Clangd
 -- marksman {{{
@@ -307,13 +295,13 @@ end
         on_attach    = onAttach
     }
 
-    local config
     for _, serverName in pairs(vim.tbl_keys(serverNames)) do
-        config = vim.tbl_deep_extend("force", basicConfig, serverNames[serverName])
-        if serverName == "clangd" then
-            config.capabilities.offsetEncoding = {"utf-16"}
+        serverNames[serverName] = vim.tbl_deep_extend("force", basicConfig, serverNames[serverName])
+        if serverName ~= "clangd" then
+            lspConfig[serverName].setup(serverNames[serverName])
+        else
+            serverNames[serverName].capabilities.offsetEncoding = {"utf-16"}
         end
-        lspConfig[serverName].setup(config)
     end
     -- }}} Setup servers
 

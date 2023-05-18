@@ -1,6 +1,4 @@
 return function()
-    -- TODO: customize highlight groups
-
     local luasnip = require("luasnip")
 
     local s             = luasnip.snippet

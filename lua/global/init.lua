@@ -1,13 +1,12 @@
 local icon = require("icon")
--- TODO: allow write buffer
 
-local init = function(initValue, optName) -- {{{
-    if optName then
-        vim.api.nvim_create_user_command("Toggle" .. optName, function()
-            local key = string.format("_%sEnable", optName)
-            vim.g[key] = not vim.g[key]
-            local state = vim.g[key] and "Enabled" or "Disabled"
-            vim.api.nvim_echo({ { string.format("%s has been %s", optName, state), "Moremsg" } }, false, {})
+local init = function(initValue, cmdName, globalKey) -- {{{
+    if cmdName and globalKey then
+        vim.api.nvim_create_user_command("Toggle" .. cmdName, function()
+            _G[globalKey] = not _G[globalKey]
+
+            local state = _G[globalKey] and "Enabled" or "Disabled"
+            vim.api.nvim_echo({ { string.format("%s has been %s", cmdName, state), "Moremsg" } }, false, {})
         end, {})
     end
     return initValue
@@ -17,16 +16,16 @@ end -- }}}
 -- local nvimVersion = vim.split(vim.api.nvim_exec2("version", {output = true}).output, "\n", {trimempty = true})[1]
 -- _G._nvim_version, _G._is_nightly = select(3, string.find(nvimVersion, [[v(%d%.%d%.%d)%-(dev?)]]))
 
-_G._os_uname         = init(vim.loop.os_uname())
-_G._is_term          = init(vim.fn.has("gui_running") == 0)
-_G._sep              = init(_G._os_uname.sysname == "Windows_NT" and "\\" or "/")
-_G._config_path      = init(vim.fn.stdpath("config"))
-_G._plugin_root      = init(vim.fn.stdpath("data") .. _G._sep .. "lazy")
-_G._format_option    = init("cr/qn2mM1jpl")
-_G._trim_space       = init(true, "QuickTrimSpace")
-_G._autoreload       = init(true, "Autoreload")
-_G._enable_plugin    = init(true)
-_G._lisp_language    = init {"clojure", "scheme", "lisp", "racket", "hy", "fennel", "janet", "carp", "wast", "yuck"}
+_G._os_uname           = init(vim.loop.os_uname())
+_G._is_term            = init(vim.fn.has("gui_running") == 0)
+_G._sep                = init(_G._os_uname.sysname == "Windows_NT" and "\\" or "/")
+_G._config_path        = init(vim.fn.stdpath("config"))
+_G._plugin_root        = init(vim.fn.stdpath("data") .. _G._sep .. "lazy")
+_G._format_option      = init("cr/qn2mM1jpl")
+_G._trim_space_on_save = init(true, "TrimSpaceOnSave", "_trim_space_on_save")
+_G._autoreload         = init(true, "Autoreload", "_autoreload")
+_G._enable_plugin      = init(true)
+_G._lisp_language      = init {"clojure", "scheme", "lisp", "racket", "hy", "fennel", "janet", "carp", "wast", "yuck"}
 _G._short_line_infos = { -- {{{
     qf = {
         name = "Quickfix",

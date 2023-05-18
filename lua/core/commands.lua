@@ -282,16 +282,12 @@ end, {
     bang = true
 }) -- }}} 
 
-vim.api.nvim_create_user_command("O", -- {{{
-    [[browse oldfiles]],
-    { desc = "Browse the oldfiles then prompt",  }
-) -- }}} 
-
-vim.api.nvim_create_user_command("OnSaveTrimSpaces", function () -- {{{
+vim.api.nvim_create_user_command("O", [[browse oldfiles]], { desc = "Browse the oldfiles then prompt", })
+vim.api.nvim_create_user_command("OnSaveTrimSpaces", function ()
     _G._trim_space = _G._trim_space or true
     _G._trim_space = not _G._trim_space
     vim.api.nvim_echo({ { string.format("OnSaveTrimSpaces: %s", _G._trim_space), "Moremsg" } }, false, {})
-end, { desc = "Toggle trimming spaces on save", }) -- }}} 
+end, { desc = "Toggle trimming spaces on save", })
 
 vim.api.nvim_create_user_command("TrimBufferSpaces", -- {{{
     function()require("util").trimSpaces()end,

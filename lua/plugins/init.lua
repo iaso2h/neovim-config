@@ -167,7 +167,11 @@ local pluginArgs = { -- {{{
     },
     {
         "skywind3000/asyncrun.vim",
-        cmd = { "AsyncRun", "AsyncStop" },
+        cmd  = { "AsyncRun", "AsyncStop" },
+        init = function()
+            map("n", [[<F9>]],   [[:lua require("compileRun").compileCode(true)<CR>]], {"silent"}, "Compile code")
+            map("n", [[<F10>]], [[:lua require("compileRun").runCode()<CR>]],          {"silent"}, "Run code")
+        end,
         config = require("plugins.vim-asyncrun"),
     },
     {
@@ -590,6 +594,11 @@ local pluginArgs = { -- {{{
         config = require("plugins.nvim-lspconfig"),
     },
     {
+        "p00f/clangd_extensions.nvim",
+        dependencies = {"nvim-lspconfig"},
+        config = require("plugins.nvim-clangd-extensions")
+    },
+    {
         "folke/trouble.nvim",
         cmd = { "Trouble" },
         dependencies = { "nvim-lspconfig" },
@@ -646,7 +655,7 @@ local pluginArgs = { -- {{{
     },
     {
         "Exafunction/codeium.vim",
-        enabled = _G._os_uname.sysname ~= "Windows_NT" and _G._os_uname.machine ~= "aarch64",
+        enabled = false,
         event   = "BufModifiedSet",
         init    = function() vim.g.codeium_disable_bindings = 1 end,
         config  = function()

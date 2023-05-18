@@ -64,7 +64,6 @@ M.getTextObjSelection = function(textObjTbl, curBufNr, tsNode)
 
         -- Need to correct the i,w and iB text objects due to some malfunctions
         if selection.textObj == "i,w" then
-            -- TODO: improve ,w textobj
             local line = api.nvim_buf_get_lines(0, selection.posStart[1] - 1,
                                             selection.posStart[1], false)[1]
             local selectChars

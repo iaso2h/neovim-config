@@ -7,8 +7,8 @@ local M   = {
 }
 
 function M.compileCode(useAsyncRun) -- {{{
-    local srcPath  = vim.fn.expand('%:p')
-    local srcNoExt = vim.fn.expand('%:p:r')
+    local srcPath  = vim.fn.expand("%:p")
+    local srcNoExt = vim.fn.expand("%:p:r")
     local fileType = vim.bo.filetype
     if fileType == "c" then
         local ext = _G._os_uname.sysname == "Windows_NT" and ".exe" or ".out"
@@ -66,6 +66,18 @@ end -- }}}
 
 
 function M.runCode() -- {{{
+    -- Close the current window if it's a quickfix window
+    if vim.bo.buftype == "quickfix" then
+        vim.cmd [[cclose]]
+    end
+    -- Close quickfix in other windows
+    local winInfos = vim.fn.getwininfo()
+    for _, winInfo in ipairs(winInfos) do
+        if winInfo["quickfix"] == 1 then
+            vim.api.nvim_win_close(winInfo.winid, false)
+        end
+    end
+
     if vim.bo.modified then vim.cmd "up" end
     vim.api.nvim_echo({{"\n", "Normal"}}, false, {})
     if vim.bo.filetype == "c" or vim.bo.filetype == "cpp" then

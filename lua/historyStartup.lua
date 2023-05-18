@@ -242,7 +242,7 @@ end -- }}}
 
 local execMap = function(key) -- {{{
     local lnum = vim.api.nvim_win_get_cursor(0)[1]
-    if key == "o" or key == "<CR>" then -- {{{
+    if key == "o" or key == "<CR>" or key == "<2-LeftMouse>" then -- {{{
         if lnum == 1 then
             vim.cmd("enew")
         else
@@ -411,7 +411,7 @@ M.display = function(refreshChk) -- {{{
 
     -- Key mappings
     vim.defer_fn(function()
-        for _, key in ipairs {"o", "go", "<C-s>", "<C-v>", "<C-t>", "<CR>", "q", "Q", "K","yp"} do
+        for _, key in ipairs {"o", "<2-LeftMouse>", "go", "<C-s>", "<C-v>", "<C-t>", "<CR>", "q", "Q", "K","yp"} do
             vim.api.nvim_buf_set_keymap(M.initBuf, "n", key, "",
                 {callback = function() execMap(key) end} )
         end

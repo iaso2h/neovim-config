@@ -4,7 +4,6 @@
 --              by https://github.com/lfv89/vim-interestingwords/blob/master/plugin/interestingwords.vim
 -- Version: 0.0.5
 -- Last Modified: 2023-4-19
--- TODO: implement do repeat
 local M   = {
     hlIDs = {},
     guibgs = {},

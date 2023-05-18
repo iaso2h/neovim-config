@@ -60,9 +60,11 @@ M.bufClose = function(bufNr, switchBeforeClose, scheduleWrap) -- {{{
             vim.api.nvim_command("bdelete! " .. bufNr)
         end)()
     else
-        local ok, msg = pcall(vim.api.nvim_command, "bdelete! " .. bufNr)
+        local ok, msgOrVal = pcall(vim.api.nvim_command, "bdelete! " .. bufNr)
         if not ok then
-            vim.notify(msg, vim.log.levels.ERROR)
+            if not string.match(msgOrVal, "E516") then
+                vim.notify(msgOrVal, vim.log.levels.ERROR)
+            end
         end
     end
     -- `:bdelete` will register in both the jumplist and the changelist
@@ -85,7 +87,7 @@ M.bufNrs = function(listedOnly, loadedOnly) -- {{{
         else
             if loadedOnly then
                 -- BUG: When buffers are loaded from sourcing session and
-                -- paseed into `vim.api.nvim_buf_is_loaded` it may evaluated
+                -- passed into `vim.api.nvim_buf_is_loaded` it may evaluated
                 -- to `false`
                 return vim.api.nvim_buf_is_loaded(bufNr)
             else

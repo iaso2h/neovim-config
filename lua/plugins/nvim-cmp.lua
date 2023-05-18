@@ -132,31 +132,37 @@ return function()
     local mapArgs = {
         ["<A-e>"] = cmp.mapping.scroll_docs(-4),
         ["<A-d>"] = cmp.mapping.scroll_docs(4),
-        ["<Down>"] = {function ()
+        ["<A-p>"] = {function ()
+            if luasnip.choice_active() then
+                vim.api.nvim_feedkeys(t"<Plug>luasnip-prev-choice", "m", false)
+            end
+        end, {"i", "s", "n"}},
+        ["<A-n>"] = {function ()
             if luasnip.choice_active() then
                 vim.api.nvim_feedkeys(t"<Plug>luasnip-next-choice", "m", false)
-            elseif cmp.visible() then
+            end
+        end, {"i", "s", "n"}},
+        ["<Down>"] = {function ()
+            if cmp.visible() then
                 cmp.select_next_item()
+            else
+                vim.api.nvim_feedkeys(t"<Down>", "n", false)
             end
         end, {"i", "s"}},
         ["<Up>"] = {function ()
-            if luasnip.choice_active() then
-                vim.api.nvim_feedkeys(t"<Plug>luasnip-prev-choice", "m", false)
-            elseif cmp.visible() then
+            if cmp.visible() then
                 cmp.select_prev_item()
+            else
+                vim.api.nvim_feedkeys(t"<Up>", "n", false)
             end
         end, {"i", "s"}},
         ["<C-p>"] = {function()
-            if luasnip.choice_active() then
-                vim.api.nvim_feedkeys(t"<Plug>luasnip-prev-choice", "m", false)
-            elseif cmp.visible() then
+            if cmp.visible() then
                 cmp.select_prev_item()
             end
         end, {"i", "s"}},
         ["<C-n>"] = {function()
-            if luasnip.choice_active() then
-                vim.api.nvim_feedkeys(t"<Plug>luasnip-next-choice", "m", false)
-            elseif cmp.visible() then
+            if cmp.visible() then
                 cmp.select_next_item()
             end
         end, {"i", "s"}},
@@ -211,7 +217,7 @@ return function()
         if type(rhs) == "table" then
             map(rhs[2], lhs, rhs[1], "which_key_ignore")
         else
-            map({"i", "s"}, lhs, rhs, "which_key_ignore")
+            map("i", lhs, rhs, "which_key_ignore")
         end
     end
     -- }}} Mapping

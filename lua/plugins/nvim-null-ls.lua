@@ -1,5 +1,4 @@
 return function()
-    -- TODO:
     local null_ls       = require "null-ls"
     local mason_null_ls = require "mason-null-ls"
 
@@ -172,13 +171,14 @@ return function()
 
     -- Auto setup by mason
     local handlerArgs = {
-        cspell         = function() null_ls.register(cspell) end,
-        stylua         = function() null_ls.register(null_ls.builtins.formatting.stylua) end,
-        selene         = function() null_ls.register(selene) end,
-        deno           = function() null_ls.register(null_ls.builtins.formatting.deno_fmt) end,
-        black          = function() null_ls.register(null_ls.builtins.formatting.black) end,
-        beautysh       = function() null_ls.register(null_ls.builtins.formatting.beautysh) end,
-        ["write-good"] = function() null_ls.register(null_ls.builtins.formatting.emacs_scheme_mode) end,
+        cspell           = function() null_ls.register(cspell) end,
+        ["clang-format"] = function() null_ls.register(null_ls.builtins.formatting.clang_format) end,
+        stylua           = function() null_ls.register(null_ls.builtins.formatting.stylua) end,
+        selene           = function() null_ls.register(selene) end,
+        deno             = function() null_ls.register(null_ls.builtins.formatting.deno_fmt) end,
+        black            = function() null_ls.register(null_ls.builtins.formatting.black) end,
+        beautysh         = function() null_ls.register(null_ls.builtins.formatting.beautysh) end,
+        ["write-good"]   = function() null_ls.register(null_ls.builtins.formatting.emacs_scheme_mode) end,
     }
     mason_null_ls.setup {
         ensure_installed       = vim.tbl_keys(handlerArgs),

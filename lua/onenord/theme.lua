@@ -436,6 +436,7 @@ theme.plugins = { -- {{{
     NvimTreeMarkdownFile     = {fg    = p.blue},
     NvimTreeExecFile         = {fg    = p.n15},
     NvimTreeSpecialFile      = {fg    = p.n9 , style = "underline", sp = p.n9},
+    NvimTreeSymlink          = {fg    = p.purple},
     NvimTreeEmptyFolderName  = {fg    = p.n3b},
     NvimTreeIndentMarker     = {link  = "FoldColumn"},
 

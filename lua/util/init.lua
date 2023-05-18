@@ -89,7 +89,7 @@ end -- }}}
 ---@param prefix boolean Set to true to trim the suffix as well
 ---@return  table | nil Return table of trimmed string, otherwise return 0
 function M.trimSpaces(strTbl, silent, prefix) -- {{{
-    if not _G._trim_space then return end
+    if not _G._trim_space_on_save then return end
 
     if vim.bo.modified == false then return end
 
