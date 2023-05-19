@@ -1,8 +1,8 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.20
--- Last Modified: 2023-5-16
+-- Version: 0.1.21
+-- Last Modified: 2023-5-19
 -- TODO: add support for folded line
 
 local util     = require("util")
@@ -39,17 +39,17 @@ function M.VSCodeLineMove(vimMode, direction) -- {{{
                 vim.cmd [[noa norm! jk]]
             end
             local cursorPos = vim.api.nvim_win_get_cursor(0)
-            local closeEnd  = vim.fn.foldclosedend(cursorPos[1])
+            local foldEnd   = vim.fn.foldclosedend(cursorPos[1])
             if direction == "down" then
                 -- Avoid clobbering in other foldclosed lines when they are
                 -- adjacent to each others
-                if vim.fn.foldclosed(closeEnd + 1) ~= -1 then return end
-                pcall(vim.api.nvim_command, string.format([[noautocmd keepjump %d,%dm +%d]], cursorPos[1], closeEnd, closeEnd - cursorPos[1] + 1))
+                if vim.fn.foldclosed(foldEnd + 1) ~= -1 then return end
+                pcall(vim.api.nvim_command, string.format([[noautocmd keepjump %d,%dm +%d]], cursorPos[1], foldEnd, foldEnd - cursorPos[1] + 1))
             elseif direction == "up" then
                 -- Avoid clobbering in other foldclosed lines when they are
                 -- adjacent to each others
                 if vim.fn.foldclosed(cursorPos[1] - 1) ~= -1 then return end
-                pcall(vim.api.nvim_command, string.format([[noautocmd keepjump %d,%dm %d]], cursorPos[1], closeEnd, -2))
+                pcall(vim.api.nvim_command, string.format([[noautocmd keepjump %d,%dm %d]], cursorPos[1], foldEnd, -2))
             end
         else
             if direction == "down" then
@@ -166,7 +166,7 @@ function M.inplaceYank(args) -- {{{
     local motionType = args[1]
     local vimMode    = args[2]
     local plugMap    = operator.plugMap
-    local curWinID   = vim.api.nvim_get_current_win()
+    local curWinId   = vim.api.nvim_get_current_win()
     local curBufNr   = vim.api.nvim_get_current_buf()
     local posStart   = vim.api.nvim_buf_get_mark(0, "[")
     local posEnd     = vim.api.nvim_buf_get_mark(0, "]")
@@ -234,7 +234,7 @@ function M.inplaceYank(args) -- {{{
 
     -- Restor cursor position
     if operator.cursorPos then
-        vim.api.nvim_win_set_cursor(curWinID, operator.cursorPos)
+        vim.api.nvim_win_set_cursor(curWinId, operator.cursorPos)
         -- Always clear M.cursorPos after restoration to avoid restoring
         -- cursor in after repeat command is performed
         operator.cursorPos = nil
@@ -275,7 +275,25 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     if not vim.bo.modifiable then
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
     end
-    if vim.fn.foldclosed('.') ~= -1 then return end
+
+    local curBufNr      = vim.api.nvim_get_current_buf()
+    local curWinId      = vim.api.nvim_get_current_win()
+
+    -- Put cursor at the ends of folded line
+    if vim.fn.foldclosed('.') ~= -1 then
+        if pasteCMD == "p" then
+            local cursorPos = vim.api.nvim_win_get_cursor(curWinId)
+            local foldEnd   = vim.fn.foldclosedend(cursorPos[1])
+            vim.api.nvim_win_set_cursor(curWinId, {foldEnd, cursorPos[2]})
+        else
+            -- Make sure cursor is always locate at the fold beginning
+            if vim.fn.line(".") ~= 1 then
+                vim.cmd [[noa norm! kj]]
+            else
+                vim.cmd [[noa norm! jk]]
+            end
+        end
+    end
 
     -- Highlight Configuration
     opts = opts or {hlGroup=M.hlGroup, timeout=M.hlInterval}
@@ -296,9 +314,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     local regContentSave = vim.fn.getreg(vim.v.register, 1)
     local regContentNew
 
-    local curBufNr      = vim.api.nvim_get_current_buf()
-    local curWinID      = vim.api.nvim_get_current_win()
-    local cursorPos     = vim.api.nvim_win_get_cursor(curWinID)
+    local cursorPos     = vim.api.nvim_win_get_cursor(curWinId)
     local cursorNS      = vim.api.nvim_create_namespace("inplacePutCursor")
     local cursorExtmark = vim.api.nvim_buf_set_extmark(curBufNr, cursorNS, cursorPos[1] - 1, cursorPos[2], {})
 
@@ -390,10 +406,10 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     -- Restore cursor position
     if vimMode == "n" then
         local cursorResExtmark = vim.api.nvim_buf_get_extmark_by_id(curBufNr, cursorNS, cursorExtmark, {})
-        vim.api.nvim_win_set_cursor(curWinID, {cursorResExtmark[1] + 1, cursorResExtmark[2]})
+        vim.api.nvim_win_set_cursor(curWinId, {cursorResExtmark[1] + 1, cursorResExtmark[2]})
         vim.api.nvim_buf_clear_namespace(curBufNr, cursorNS, 0, -1)
     else
-        vim.api.nvim_win_set_cursor(curWinID, cursorPos)
+        vim.api.nvim_win_set_cursor(curWinId, cursorPos)
     end
     -- Restore register
     if convertPut then
