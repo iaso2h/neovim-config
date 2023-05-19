@@ -29,51 +29,67 @@ end
 local isLastLine = function ()
     return vim.fn.line(".") == vim.api.nvim_buf_line_count(0)
 end
+local getCommentStr = function()
+    if vim.bo.commentstring == "" then return "" end
+
+    local ok, msgOrVal = pcall(string.gsub, vim.bo.commentstring, "%s*%%s$", "")
+    if not ok then
+        vim.notify("Failed at retrieving comment string", vim.log.levels.ERROR)
+        vim.notify(msgOrVal, vim.log.levels.ERROR)
+        return ""
+    else
+        return msgOrVal .. " "
+    end
+end
 
 
 return {
-    s({ trig = "date", dscr = "Put the date in (Y-m-d) format"}, -- {{{
-        partial(os.date, "%Y-%m-%d")
+    s({ trig = "date", dscr = "Put the date in (d/m/Y) format"}, -- {{{
+        partial(os.date, "%d/%m/%Y")
     ), -- }}}
-    s({ trig = "dateb", dscr = "Put the date in (Y b d) format"}, -- {{{
-        partial(os.date, "%Y %b %d")
+    s({ trig = "dateb", dscr = "Put the date in (b d, Y) format"}, -- {{{
+        partial(os.date, "%b %d, %Y")
     ), -- }}}
-
     s({ trig = "fi", dscr = "File information"}, -- {{{
         fmt (
             [[
-            File: {file}
-            Author: iaso2h
-            Description: {}
-            Version: 0.0.{}
-            Last Modified: {date}
-
-            {}
-            ]], {
+            {1}File: {file}
+            {2}Author: iaso2h
+            {3}Description: {6}
+            {4}Version: 0.0.{7}
+            {5}Last Modified: {date}
+            {}]],
+            {
+                sn(1, partial(getCommentStr)),
+                rep(1),
+                rep(1),
+                rep(1),
+                rep(1),
+                i(2),
+                i(3, "1"),
+                -- file = partial(function() return vim.fn.expand("%:t") end),
+                -- date = partial(function() return os.date("%d/%m/%Y") end),
                 file = t(vim.fn.expand("%:t")),
-                i(1),
-                i(2, "1"),
                 date = os.date("%Y-%m-%d"),
-                i(0),
-            }
-        ),
+            }),
         {
             condition      = isFirstLine,
-            show_condition = isFirstLine
+            show_condition = isFirstLine,
         }
     ), -- }}}
     s({ trig = "ml", dscr = "Add modeline", -- {{{
         },
         fmt (
             [[
-            vim:ts={}:sts={}:sw={}:ft={}:fdm={}
+            {1}vim:ts={2}:sts={3}:sw={4}:ft={5}:fdm={6}
             ]],
             {
-                ch(1, vim.bo.ts == 4 and {t"4", t"2"} or {t"2", t"4"}),
-                rep(1),
-                rep(1),
-                i(2, tostring(vim.bo.ft)),
-                i(0, tostring(vim.wo.fdm)),
+                sn(1, partial(getCommentStr)),
+                ch(2, vim.bo.ts == 4 and {t"4", t"2"} or {t"2", t"4"}),
+                rep(2),
+                rep(2),
+                i(3, vim.bo.ft),
+                i(4, vim.wo.fdm),
             }
         ),
         {
@@ -95,4 +111,3 @@ return {
         }
     ), -- }}}
 }
--- vim:ts=4:sts=4:sw=4:ft=lua:fdm=marker

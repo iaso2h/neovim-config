@@ -28,7 +28,7 @@ local condsExpand   = require("luasnip.extras.conditions.expand")
 return {
     s({ trig = "rt", dscr = "Return value" }, -- {{{
         {
-            t("return "),
+            t "return ",
             i(1, "val")
         }
     ), -- }}}
@@ -138,7 +138,7 @@ return {
     s({ trig = "rq", dscr = "Require a module"}, -- {{{
         fmt([[require("{}")]], {i(1, "module")})
     ), -- }}}
-    s({ trig = "if", dscr = "If condition"}, -- {{{
+    s({ trig = "if", dscr = "If block"}, -- {{{
         fmt(
             [[
             if {} then
@@ -147,27 +147,23 @@ return {
             ]],
             {
                 i(1, "true"),
-                i(2)
+                ch(2, {
+                    sn(nil, rst(1, "codeblock1")),
+                    sn(nil, {
+                        rst(1, "codeblock1"),
+                        t {"", "else", "    "},
+                        rst(2, "codeblock2"),
+                    }),
+                }, {
+                    stored = {
+                        codeblock1 = i(1, "codeblock"),
+                        codeblock2 = i(1, "codeblock")
+                    }
+                }),
             }
         )
     ), -- }}}
-    s({ trig = "ife", dscr = "If and else condition"}, -- {{{
-        fmt(
-            [[
-            if {} then
-                {}
-            else
-                {}
-            end
-            ]],
-            {
-                i(1, "true"),
-                i(2),
-                i(3)
-            }
-        )
-    ), -- }}}
-    s({ trig = "elif", dscr = "Elseif condition"}, -- {{{
+    s({ trig = "elif", dscr = "Else block"}, -- {{{
         fmt(
             [[
             elseif {} then
@@ -179,7 +175,7 @@ return {
             }
         )
     ), -- }}}
-    s({ trig = "else", dscr = "Elseif condition"}, -- {{{
+    s({ trig = "el", dscr = "Elseif block"}, -- {{{
         fmt(
             [[
             else
@@ -261,7 +257,7 @@ return {
             }
         )
     ), -- }}}
-    ms({ "rep", "dow", common = {dscr = "While loop"} }, -- {{{
+    ms({ "rep", "dow", common = {dscr = "Repeat loop"} }, -- {{{
         fmt(
             [[
             repeat
@@ -274,7 +270,7 @@ return {
             }
         )
     ), -- }}}
-    ms({ "def", "fu", common = {dscr = "Function definition1"} }, -- {{{
+    ms({ "def", "fu", common = {dscr = "Function definition"} }, -- {{{
         fmt(
             [[
             {}{}({})
