@@ -60,6 +60,15 @@ return function()
             fields = {"kind", "abbr", "menu"},
             format = function(entry, vimItem)
                 local maxWidth = 40
+
+                -- Remove abbreviation starting with " " or "•" from clangd
+                -- extension: https://github.com/p00f/clangd_extensions.nvim
+                if string.match(vimItem.abbr, "^[ •]") then
+                -- if string.match(vimItem.abbr, "^[ •]") and entry.source.source.client.config.name == "clangd" then
+                    local byteIdx = vim.fn.byteidx(vimItem.abbr, 1)
+                    vimItem.abbr = vimItem.abbr:sub(byteIdx + 1, -1)
+                end
+
                 if #vimItem.abbr > maxWidth then
                     vimItem.abbr = string.sub(vimItem.abbr, 1, maxWidth - 1) .. icon.ui.Ellipsis
                 end
@@ -167,7 +176,8 @@ return function()
             end
         end, {"i", "s"}},
         ["<Tab>"] = {function()
-            if luasnip.expand_or_jumpable() then
+            if luasnip.expand_or_locally_jumpable() then
+            -- if luasnip.expand_or_jumpable() then
             -- if (luasnip.jumpable(1) and cursorWithinSnippet()) or
             --         (luasnip.expandable() and cursorWithinSnippet()) then
                 luasnip.expand_or_jump()
