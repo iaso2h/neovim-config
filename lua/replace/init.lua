@@ -1,10 +1,9 @@
 -- File: replace
 -- Author: iaso2h
 -- Description: Heavily inspired Ingo Karkat's work. Replace text with register
--- Version: 0.1.11
--- Last Modified: 2023-4-25
+-- Version: 0.1.12
+-- Last Modified: 2023-05-19
 -- TODO: tests for softtab convert
--- BUG: can't replace with nerd font character
 -- NOTE: break change: Dot-repeat no longer support jump to mark motion now
 -- because the new method of setting new line(or replace line) via
 -- api.nvim_buf_set_lines and api.nvim_buf_set_text has been adopted, which
@@ -319,12 +318,30 @@ function M.operator(args) -- {{{
     if vimMode == "n" then
         -- For Replace operator exclusively
 
-        -- Saving cursor part is done inside expr()
+        -- Saving count and register. The part of saving cursor is done inside
+        -- `expr()`
+        -- This is for normal mode. Because retrieving vim.v.count1 doesn't
+        -- work in `M.expr()`. Other Replace mapping will do this saving part
+        -- before calling operator(). In addition, Saving register in the
+        -- `expr()` will be ignore when using dot repeat
+        M.saveCountReg()
+
         -- Saving motionRegion region
         motionRegion = {
-            Start = api.nvim_buf_get_mark(bufNr, "["),
-            End   = api.nvim_buf_get_mark(bufNr, "]")
+            Start = vim.api.nvim_buf_get_mark(bufNr, "["),
+            End   = vim.api.nvim_buf_get_mark(bufNr, "]")
         }
+        if vim.deep_equal(motionRegion.Start, motionRegion.End) then
+            local endLine = vim.api.nvim_buf_get_lines(bufNr, motionRegion.End[1] - 1, motionRegion.End[1], false)[1]
+            if string.len(endLine) ~= vim.fn.strchars(endLine) then
+
+                local saveCursor = vim.api.nvim_win_get_cursor(0)
+                vim.cmd[[noa norm! l]]
+                local endCharByteIdx = vim.api.nvim_win_get_cursor(0)[2] - 1
+                motionRegion.End[2] = endCharByteIdx
+                vim.api.nvim_win_set_cursor(0, saveCursor)
+            end
+        end
 
         -- Saveing motionRegion direction
         if motionType == "line" then
@@ -351,13 +368,6 @@ function M.operator(args) -- {{{
             -- TODO: charwise and blockwise motionRegion parsing?
             M.motionDirection = nil
         end
-
-        -- Saving count and register.
-        -- This is for vimMode. Because retrieving vim.v.count1 failed at
-        -- M.expr() before "g@" get evaluted only. Other Replace mapping will
-        -- do this saving part before calling operator(). In addition, Saving
-        -- register in the expr() will be ignore when using dot repeat
-        M.saveCountReg()
     else
         -- For all replace modes other than the replace operator
 
