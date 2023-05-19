@@ -370,7 +370,7 @@ M.display = function(refreshChk) -- {{{
     -- Options
     -- The factor that vim will always display a buffer for you in the very beginning
     if vim.api.nvim_buf_get_name(0) == "" and vim.bo.modifiable and
-            vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
+            vim.api.nvim_buf_line_count(0) == 1 and vim.fn.getline(1) == "" then
         -- Use the current buffer if it's a scratch buffer
         M.initBuf  = vim.api.nvim_get_current_buf()
         M.lastBuf = nil

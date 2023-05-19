@@ -314,7 +314,7 @@ end -- }}}
 M.getQueryNodes = function(bufNr, query, captureId) -- {{{
     local lastLine = vim.api.nvim_buf_call(bufNr, function()
         ---@diagnostic disable-next-line: redundant-return-value
-        return vim.fn.line("$")
+        return vim.api.nvim_buf_line_count(0)
     end)
     local lang = vim.treesitter.language.get_lang(vim.api.nvim_buf_get_option(bufNr, "filetype"))
     local tsParser = vim.treesitter.get_parser(bufNr, lang)

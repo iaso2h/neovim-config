@@ -18,7 +18,7 @@ local u    = require("quickfix.util")
 M.delete = function (vimMode) -- {{{
     local qfCursorPos = vim.api.nvim_win_get_cursor(0)
     local qfItems, qfTitle = u.getlist()
-    local qfLastline = vim.fn.line("$")
+    local qfLastline = vim.api.nvim_buf_line_count(0)
     vim.defer_fn(require("quickfix.highlight").clear, 0)
     if #qfItems == 0 then return end
 

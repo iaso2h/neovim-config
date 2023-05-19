@@ -379,7 +379,7 @@ M.redirScratch = function(lines, scratchBufNr, appendChk, preHook, postHook) -- 
             vim.cmd "noa wincmd p"
         end
     elseif vim.api.nvim_buf_get_name(0) == "" and vim.bo.modifiable and
-            vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
+            vim.api.nvim_buf_line_count(0) == 1 and vim.fn.getline(1) == "" then
         -- Use current file as the log buffer
         scratchBufNr = vim.api.nvim_get_current_buf()
         scratchWinId = vim.api.nvim_get_current_win()
@@ -401,7 +401,7 @@ M.redirScratch = function(lines, scratchBufNr, appendChk, preHook, postHook) -- 
     end
 
     local lastLine = vim.api.nvim_buf_call(scratchBufNr, function()
-        return vim.fn.line("$")
+        return vim.api.nvim_buf_line_count(0)
     end)
     vim.api.nvim_win_set_cursor(scratchWinId, {lastLine, 0})
 

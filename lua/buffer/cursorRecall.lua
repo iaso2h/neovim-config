@@ -56,8 +56,8 @@ return function(args)
         return
     end
 
-    local lastPos  = vim.fn.line('`"')
-    local bufEnd  = vim.fn.line('$')
+    local lastPos = vim.fn.line('`"')
+    local bufEnd  = vim.api.nvim_buf_line_count(bufNr)
 
     if lastPos > 0 and lastPos <= bufEnd then
         local winEnd   = vim.fn.line('w$')

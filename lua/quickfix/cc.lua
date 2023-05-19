@@ -64,7 +64,7 @@ return function(closeQfChk, offset) -- {{{
     local targetCursorPos = {}
 
     -- Get target line
-    local qfLastLine = vim.fn.line("$")
+    local qfLastLine = vim.api.nvim_buf_line_count(0)
     local targetLineNr
     if offset ~= 0 then
         targetLineNr = u.getlist({idx = 0}).idx + offset

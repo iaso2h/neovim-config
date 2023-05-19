@@ -18,9 +18,9 @@ end -- }}}
 M.jumplistRegisterLines = function(startLineNr, lastLineNr) -- {{{
     startLineNr = startLineNr or 1
     if not lastLineNr then
-        lastLineNr = vim.fn.line("$")
+        lastLineNr = vim.api.nvim_buf_line_count(0)
     else
-        local bufferLastLine = vim.fn.line("$")
+        local bufferLastLine = vim.api.nvim_buf_line_count(0)
         lastLineNr = lastLineNr > bufferLastLine and bufferLastLine or lastLineNr
     end
     vim.cmd([[norm! ]] .. startLineNr .. [[G0]])
@@ -118,9 +118,9 @@ M.jumplistRegisterLinesToTbl = function(returnJumpsChk, startLineNr, lastLineNr,
     startLineNr = startLineNr or 1
     bufferThreshold = bufferThreshold or 50
     if not lastLineNr then
-        lastLineNr = vim.fn.line("$")
+        lastLineNr = vim.api.nvim_buf_line_count(0)
     else
-        local bufferLastLine = vim.fn.line("$")
+        local bufferLastLine = vim.api.nvim_buf_line_count(0)
         lastLineNr = lastLineNr > bufferLastLine and bufferLastLine or lastLineNr
     end
 

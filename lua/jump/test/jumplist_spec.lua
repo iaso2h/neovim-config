@@ -85,7 +85,7 @@ describe([[vim.fn.getjumplist() and ex-command :jumps. ]], function()
 
         -- Register every lines in jumplist
         local startLine = 1
-        local endLine = vim.fn.line("$")
+        local endLine = vim.api.nvim_buf_line_count(0)
         local isNewer = false
         local filter  = "local"
         local winId   = vim.api.nvim_get_current_win()
@@ -147,7 +147,7 @@ describe([[Local jump. ]], function()
         -- local file = vim.api.nvim_eval("$VIMRUNTIME") .. "/doc/usr_24.txt"
         vim.cmd([[e ]] .. file)
         vim.cmd("clearjumps")
-        local fileLastline = vim.fn.line("$")
+        local fileLastline = vim.api.nvim_buf_line_count(0)
         local eachIterAssert = function (i)
             local startLine
             if i >= jumplist._CMD_THRESHOLD then

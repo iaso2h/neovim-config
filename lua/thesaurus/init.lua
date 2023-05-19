@@ -53,7 +53,7 @@ else:
 
     if vim.g.thesaurusTestFamily then
         if vim.bo.modifiable and not vim.bo.buflisted and
-                vim.fn.line("$") == 1 and vim.fn.getline(1) == "" then
+                vim.api.nvim_buf_line_count(0) == 1 and vim.fn.getline(1) == "" then
             M.scratchBuf = vim.api.nvim_get_current_buf()
         else
             if not M.scratchBuf or (not vim.api.nvim_buf_is_valid(M.scratchBuf)) then
@@ -75,7 +75,7 @@ for each_family in definition_family_list:
     cb.append('ANTONYMS: ' + ', '.join(each_family._antonyms))
 cb[0] = None # delete the first empty line
 ]] -- }}}
-        vim.cmd([[noa resize]] .. vim.fn.line("$"))
+        vim.cmd([[noa resize]] .. vim.api.nvim_buf_line_count(M.scratchBuf))
         if vim.o.cmdheight ~= 2 then
             vim.o.cmdheight = 2
         end
