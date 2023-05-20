@@ -36,15 +36,15 @@ describe([[Register type is "v". ]], function()
             vim.fn.setreg([[a]], "obbin", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agrl]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg([[a]], "ushing and ro", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with h motion]], function() -- {{{
@@ -71,15 +71,15 @@ describe([[Register type is "v". ]], function()
             vim.fn.setreg([[a]], "dogl", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agrh]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg([[a]], "frandr", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with $ motion]], function() -- {{{
@@ -106,15 +106,15 @@ describe([[Register type is "v". ]], function()
             vim.fn.setreg([[a]], "uthless", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agr$]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg([[a]], "oom", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with Te motion]], function() -- {{{
@@ -141,15 +141,15 @@ describe([[Register type is "v". ]], function()
             vim.fn.setreg([[a]], "script p", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agrTe]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg([[a]], "r's ", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
     end) -- }}}
 
@@ -196,15 +196,15 @@ describe([[Register type is "v". ]], function()
             vim.fn.setreg([[a]], "nulla sunt exuis nsunt velit enim.", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agr3j]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg([[a]], "Lorem ipsum dolor sit amet.", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with 3k motion]], function() -- {{{
@@ -249,15 +249,15 @@ describe([[Register type is "v". ]], function()
             vim.fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agr3k]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "Lorem ipsum dolor sit amet.", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with 4k motion]], function() -- {{{
@@ -299,15 +299,15 @@ describe([[Register type is "v". ]], function()
             vim.fn.setreg("a", "endif", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agr4k]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "fidne", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with _ motion]], function() -- {{{
@@ -349,15 +349,15 @@ describe([[Register type is "v". ]], function()
             vim.fn.setreg("a", "foo", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agr3_]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "bar", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
     end) -- }}}
 
@@ -386,15 +386,15 @@ describe([[Register type is "v". ]], function()
             vim.fn.setreg("a", "find(val1, 2 ", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agr2W]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "global_sub(arg1, 55 ", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with 4ge motion]], function() -- {{{
@@ -424,15 +424,15 @@ describe([[Register type is "v". ]], function()
             vim.fn.setreg("a", " ge", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agr4ge]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", " + ", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with 5b motion]], function() -- {{{
@@ -463,15 +463,15 @@ It said: call_me
             vim.fn.setreg("a", "call_", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agr5b]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "It said: ", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with 6b motion]], function() -- {{{
@@ -506,15 +506,15 @@ It said: call_me
             vim.fn.setreg("a", "number ~", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agr6b]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "factor + ", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
     end) -- }}}
 
@@ -597,15 +597,15 @@ while true
             vim.fn.setreg("a", "while", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agr3{]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "foobar", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with 4} motion]], function() -- {{{
@@ -683,15 +683,15 @@ while true
             vim.fn.setreg("a", "foo", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agr4}]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "bar", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
     end) -- }}}
 
@@ -720,15 +720,15 @@ while true
             vim.fn.setreg("a", "foo", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agriw]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "bar", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with a) motion, charwise]], function() -- {{{
@@ -755,15 +755,15 @@ while true
             vim.fn.setreg("a", "(2 * (index - 1))", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agra)]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "[index]", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with a) motion, linewise]], function() -- {{{
@@ -791,15 +791,15 @@ while true
             vim.fn.setreg("a", "(bufNr, start, end, true)", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agra)]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "_tbl", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with a< motion, linewise]], function() -- {{{
@@ -833,15 +833,15 @@ while true
             vim.fn.setreg("a", '<List name="foo">', "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agra<]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "</li>", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with i< motion, charwise]], function() -- {{{
@@ -892,15 +892,15 @@ while true
             vim.fn.setreg("a", "meta none", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agri<]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "foobar", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with i< motion, linewise]], function() -- {{{
@@ -931,15 +931,15 @@ while true
             vim.fn.setreg("a", "URL", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agri<]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "/ul", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with i{ motion, charwise]], function() -- {{{
@@ -966,15 +966,15 @@ while true
             vim.fn.setreg("a", "timeout = 150", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agri{]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "vimMode = 'n'", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with i{ motion, linewise]], function() -- {{{
@@ -1008,15 +1008,15 @@ while true
             vim.fn.setreg("a", "foo", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agri{]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "bar", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with i[ motion, charwise]], function() -- {{{
@@ -1043,15 +1043,15 @@ api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols
             vim.fn.setreg("a", "myHighlightGroup", "c")
             outputLines, outputCursorPos     = feedkeysOutput([=["agri[]]=])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "'foo'", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with i" motion, test1]], function() -- {{{
@@ -1078,15 +1078,15 @@ api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols
             vim.fn.setreg("a", "bar", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agri"]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "foobar", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
 
         end) -- }}}
 
@@ -1114,15 +1114,15 @@ api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols
             vim.fn.setreg("a", "addSortedDataToTable", "c")
             outputLines, outputCursorPos     = feedkeysOutput([["agri"]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "foobar", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
     end) -- }}}
 
@@ -1151,8 +1151,8 @@ api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols
             vim.fn.setreg("a", "lsp.", "c")
             outputLines, outputCursorPos     = feedkeysOutput([[gg"agr`i]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
     end) -- }}}
 end)
@@ -1189,15 +1189,15 @@ describe('Register type is "V". ', function()
             vim.fn.setreg("a", "ubbin", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agrl]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "ashing", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with h motion]], function() -- {{{
@@ -1224,8 +1224,8 @@ describe('Register type is "V". ', function()
             vim.fn.setreg("a", "foobar", "v")
             outputLines, outputCursorPos     = feedkeysOutput([["agrh]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
@@ -1257,15 +1257,15 @@ describe('Register type is "V". ', function()
             vim.fn.setreg("a", "uthless", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agr$]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "oom", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with Te motion]], function() -- {{{
@@ -1292,15 +1292,15 @@ describe('Register type is "V". ', function()
             vim.fn.setreg("a", "script p", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agrTe]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "                                  r's lua      \n\t         ", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
     end) -- }}}
 
@@ -1347,15 +1347,15 @@ describe('Register type is "V". ', function()
             vim.fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agr3j]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "Lorem ipsum dolor sit amet.", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with 3k motion]], function() -- {{{
@@ -1400,15 +1400,15 @@ describe('Register type is "V". ', function()
             vim.fn.setreg("a", "nulla sunt exuis nsunt velit enim.", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agr3k]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "Lorem ipsum dolor sit amet.", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with 4k motion]], function() -- {{{
@@ -1450,15 +1450,15 @@ describe('Register type is "V". ', function()
             vim.fn.setreg("a", "endif", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agr4k]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "fidne", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with _ motion]], function() -- {{{
@@ -1500,15 +1500,15 @@ describe('Register type is "V". ', function()
             vim.fn.setreg("a", "foo", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agr3_]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "bar", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
     end) -- }}}
 
@@ -1537,15 +1537,15 @@ describe('Register type is "V". ', function()
             vim.fn.setreg("a", "find(val1, val2, val3\t", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agr2W]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "global_sub(arg1, arg2,\n", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with 4ge motion]], function() -- {{{
@@ -1575,15 +1575,15 @@ describe('Register type is "V". ', function()
             vim.fn.setreg("a", "ge", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agr4ge]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", " + g               \t             ", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with 5b motion]], function() -- {{{
@@ -1614,15 +1614,15 @@ foobar_help_me
             vim.fn.setreg("a", "help_", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agr5b]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "\tfoobar_\t", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with 6b motion]], function() -- {{{
@@ -1657,15 +1657,15 @@ foobar_help_me
             vim.fn.setreg("a", "number ~", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agr6b]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "M.factor +\t ", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
     end) -- }}}
 
@@ -1748,15 +1748,15 @@ while true
             vim.fn.setreg("a", "while", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agr3{]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "foobar2021", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with 4} motion]], function() -- {{{
@@ -1834,15 +1834,15 @@ while true
             vim.fn.setreg("a", "foo", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agr4}]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "bar", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
     end) -- }}}
 
@@ -1871,15 +1871,15 @@ while true
             vim.fn.setreg("a", "foo", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agriw]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "bar", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with a) motion, charwise]], function() -- {{{
@@ -1906,15 +1906,15 @@ while true
             vim.fn.setreg("a", "(2 * (index - 1))", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agra)]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "[index]", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with a) motion, linewise]], function() -- {{{
@@ -1942,15 +1942,15 @@ while true
             vim.fn.setreg("a", "(bufNr, start, end, true)", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agra)]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "_tbl", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with a< motion, linewise]], function() -- {{{
@@ -1984,15 +1984,15 @@ while true
             vim.fn.setreg("a", '<List name="foo">', "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agra<]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "</li>", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with i< motion, charwise]], function() -- {{{
@@ -2043,15 +2043,15 @@ while true
             vim.fn.setreg("a", "meta none", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agri<]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "foobar", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with i< motion, linewise]], function() -- {{{
@@ -2082,15 +2082,15 @@ while true
             vim.fn.setreg("a", "URL", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agri<]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "/ul", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with i{ motion, charwise]], function() -- {{{
@@ -2117,15 +2117,15 @@ while true
             vim.fn.setreg("a", "timeout = 150", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agri{]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "vimMode = 'n'", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with i{ motion, linewise]], function() -- {{{
@@ -2159,15 +2159,15 @@ while true
             vim.fn.setreg("a", "foo", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agri{]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "bar", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with i[ motion, charwise]], function() -- {{{
@@ -2194,15 +2194,15 @@ while true
             vim.fn.setreg("a", "myHighlightGroup", "V")
             outputLines, outputCursorPos     = feedkeysOutput([=["agri[]]=])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "'foo'", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
 
         it([[Replace with i[ motion, linewise]], function() -- {{{
@@ -2236,8 +2236,8 @@ M.replaceSave = function()
             vim.fn.setreg("a", '        if reg.type == "v" then\n            if motionType == "line" then\n', "V")
             outputLines, outputCursorPos     = feedkeysOutput([=["agri[]=])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
@@ -2270,15 +2270,15 @@ M.replaceSave = function()
             vim.fn.setreg("a", "bar", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agri"]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "foobar", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
 
         end) -- }}}
 
@@ -2306,15 +2306,15 @@ M.replaceSave = function()
             vim.fn.setreg("a", "addSortedDataToTable", "V")
             outputLines, outputCursorPos     = feedkeysOutput([["agri"]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
 
             -- replace, via dot
             ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg("a", "foobar", "V")
             outputLines, outputCursorPos     = feedkeysOutput([[.]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
     end) -- }}}
 
@@ -2343,8 +2343,8 @@ M.replaceSave = function()
             vim.cmd("norm! mm")
             outputLines, outputCursorPos     = feedkeysOutput([[gg"agr`m]])
             expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-            assert.are.same(outputCursorPos, expectedCursorPos)
-            assert.are.same(outputLines, expectedLines)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
         end) -- }}}
     end) -- }}}
 end)

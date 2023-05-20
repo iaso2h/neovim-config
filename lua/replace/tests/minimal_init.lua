@@ -1,5 +1,7 @@
 local configPath = vim.fn.stdpath("config")
 vim.opt.runtimepath:append(configPath)
+require("global")
+require("util.test")
 
 -- Add plenary.nvim, vim-repeat, vim-visualrepeat in your runtime path. In my
 -- case, I manage them via packer.nvim
@@ -9,8 +11,6 @@ vim.opt.runtimepath:append(packagePathHead .. "vim-repeat")
 vim.opt.runtimepath:append(packagePathHead .. "vim-visualrepeat")
 
 require("replace").suppressMessage = true
-require("global.keymap")
-require("util.test")
 
 -- Mapping
 map("n", [[<Plug>ReplaceOperatorInplace]], function ()
