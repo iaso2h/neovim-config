@@ -6,7 +6,7 @@
 -- Last Modified: 04/30/2023 Sun
 -- TODO: Preview mode implementation
 -- TODO: Auto highlight selection
-local M = {
+local setupAutoCmd = {
     changeTick         = false,
     highlightParseTick = false,
     autocmdSetupTick   = false,
@@ -21,26 +21,27 @@ local u  = require("quickfix.util")
 local ns = vim.api.nvim_create_namespace("myQuickfix")
 
 
-local autocmdSetup = function()
-    if not M.autocmdSetupTick then
-        M.autocmdId = vim.api.nvim_create_autocmd({"DiagnosticChanged", "WinEnter", "BufEnter"}, {
+--- Setup the Neovim autocmd
+local autocmdSetup = function() -- {{{
+    if not setupAutoCmd.autocmdSetupTick then
+        setupAutoCmd.autocmdId = vim.api.nvim_create_autocmd({"DiagnosticChanged", "WinEnter", "BufEnter"}, {
             callback = function(args)
                 if args.event == "DiagnosticChanged" and
-                    not M.changeTick and not M.highlightParseTick then
+                    not setupAutoCmd.changeTick and not setupAutoCmd.highlightParseTick then
 
                     local title = require("quickfix.util").getlist{title = 0}.title
                     if not string.find(title, "Diagnostics") then
                         -- Delete this autocmd if other items and titles get
                         -- populated into quickfix window
-                        if M.delAutocmd then
-                            vim.api.nvim_del_autocmd(M.autocmdId)
-                            M.autocmdId = -1
-                            M.autocmdSetupTick = false
+                        if setupAutoCmd.delAutocmd then
+                            vim.api.nvim_del_autocmd(setupAutoCmd.autocmdId)
+                            setupAutoCmd.autocmdId = -1
+                            setupAutoCmd.autocmdSetupTick = false
                         end
                         return
                     end
-                    M.debounceFunc(false, false)
-                    M.changeTick = true
+                    setupAutoCmd.debounceFunc(false, false)
+                    setupAutoCmd.changeTick = true
                 else
                     -- The "WinEnter" and "BufEnter" will trigger
                     -- "DiagnosticsChanged" somehow. If we are lucky enough,
@@ -49,18 +50,19 @@ local autocmdSetup = function()
                     -- true and the debounce function isn't called within
                     -- `debounceTime`, then we can't halt the processing at
                     -- earlier stage inside the `allDiagnostics` function
-                    M.changeTick = false
+                    setupAutoCmd.changeTick = false
                 end
             end,
         })
 
-        M.autocmdSetupTick = true
+        setupAutoCmd.autocmdSetupTick = true
     end
-end
-
-
-local moreHighlight = function(qfItems, qfBufNr)
-    M.highlightParseTick = true
+end -- }}} 
+--- Add missing highlight for warning, note, info in error column
+---@param qfItems table Returned value of `vim.fn.getqflist()`
+---@param qfBufNr integer The buffer number of quickfix
+local moreHighlight = function(qfItems, qfBufNr) -- {{{
+    setupAutoCmd.highlightParseTick = true
 
     local qfLines = vim.api.nvim_buf_get_lines(qfBufNr, 0, -1, false)
     for qfLineNr, item in ipairs(qfItems) do
@@ -88,17 +90,17 @@ local moreHighlight = function(qfItems, qfBufNr)
         end
     end
 
-    M.highlightParseTick = false
-end
-
+    setupAutoCmd.highlightParseTick = false
+end -- }}} 
 --- Open diagnostics in quickfix window
 ---@param forceChk boolean Set it to true if this function is called by a mapping instead of autocommand
-M.open = function(forceChk, localChk)
+---@param localChk boolean Whether it's a locallist or a quickfix
+setupAutoCmd.open = function(forceChk, localChk) -- {{{
     -- Setup autocmd monitoring the diagnostics changed event
-    if not M.autocmdSetupTick then autocmdSetup() end
+    if not setupAutoCmd.autocmdSetupTick then autocmdSetup() end
 
     -- Don't open quickfix if diagnostic haven't change
-    if not M.changeTick and not forceChk then return end
+    if not setupAutoCmd.changeTick and not forceChk then return end
 
     -- Check visibility of quickfix window
     local qfBufNr
@@ -158,7 +160,7 @@ M.open = function(forceChk, localChk)
     end
 
     -- Make up the highlights for character string "warning", "note"
-    M.changeTick = false
+    setupAutoCmd.changeTick = false
     local asyncHandler = vim.loop.new_async(
         vim.schedule_wrap(function()
             moreHighlight(qfItems, qfBufNr)
@@ -167,12 +169,12 @@ M.open = function(forceChk, localChk)
     if asyncHandler then
         asyncHandler:send()
     else
-        M.highlightParseTick = true
+        setupAutoCmd.highlightParseTick = true
     end
-end
+end -- }}} 
 
 
-M.debounceFunc = u.debounce(M.debounceTime, M.open)
+setupAutoCmd.debounceFunc = u.debounce(setupAutoCmd.debounceTime, setupAutoCmd.open)
 
 
-return M
+return setupAutoCmd

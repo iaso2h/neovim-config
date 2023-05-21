@@ -6,9 +6,9 @@
 
 --- Set current window focus
 ---@param closeQfChk boolean Whether to close the quickfix window
----@param qfWinId number Window ID of the quickfix window
+---@param qfWinId integer Window ID of the quickfix window
 ---@param targetCursorPos table target cursor position
-local setCurrentWin = function(closeQfChk, qfWinId, targetCursorPos)
+local setCurrentWin = function(closeQfChk, qfWinId, targetCursorPos) -- {{{
     if not closeQfChk then
         local ok, msg = pcall(vim.api.nvim_set_current_win, qfWinId)
         if not ok then
@@ -22,9 +22,7 @@ local setCurrentWin = function(closeQfChk, qfWinId, targetCursorPos)
     else
         vim.api.nvim_win_close(qfWinId, false)
     end
-end
-
-
+end -- }}}
 --- Open quickfix item
 ---@param targetLineNr number
 ---@vararg any see `setCurrentWin()`
@@ -50,7 +48,7 @@ end -- }}}
 --- 'uselastWin' method for 'switchBuf' option. The vim.v.count will only open
 --- a specific line, of which line number is decided by vim.v.count
 ---@param closeQfChk boolean Whether to close the quifix after open an item
----@param offset number Open the item based on the given offset to the
+---@param offset integer Open the item based on the given offset to the
 --cursor. Set it to -1 to open the previous item, 1 to open the next item
 return function(closeQfChk, offset) -- {{{
     local u = require("quickfix.util")

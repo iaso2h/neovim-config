@@ -16,7 +16,7 @@ local M   = {
 }
 
 
-local checkTsLoaded = function()
+local checkTreeSitterLoaded = function() -- {{{
     local bufPath = vim.api.nvim_buf_get_name(0)
     if bufPath ~= "" then
         -- Reload buffer if it's valid
@@ -25,10 +25,11 @@ local checkTsLoaded = function()
             vim.cmd "e! | norm zv"
         end
     end
-end
-
-
-local bufferCycle = function(currentBufNr, direction)
+end -- }}}
+--- Cycle through buffers until standard buffer is found
+---@param currentBufNr integer Buffer number
+---@param direction integer `1|-1` `1` indicate cycling forward
+local bufferCycle = function(currentBufNr, direction) -- {{{
     repeat
         -- Deliberately leave track on jumplist so that you can traceback to
         -- the help file or other non-standard buffer via <C-o>
@@ -53,33 +54,33 @@ local bufferCycle = function(currentBufNr, direction)
         end
     until bufNr == currentBufNr
 
-    checkTsLoaded()
-end
-
-
-local function findCandidate(bufTbl, currentBufIdx, direction)
+    checkTreeSitterLoaded()
+end -- }}}
+--- Find the standard buffer idx in the `bufNrs`
+---@param bufNrs integer[] Buffer numbers
+---@param currentBufIdx integer
+---@param direction `1|-1` `1` indicate cycling forward
+local function findCandidate(bufNrs, currentBufIdx, direction) -- {{{
     local candidateIdx
-    for i = 1, #bufTbl do
-        if i == #bufTbl then return 0 end
+    for i = 1, #bufNrs do
+        if i == #bufNrs then return 0 end
 
         candidateIdx = currentBufIdx + direction
         -- Loop through the buffer table
-        if direction == -1 and candidateIdx == 0 then candidateIdx = #bufTbl end
-        if direction == 1 and candidateIdx == #bufTbl + 1 then candidateIdx = 1 end
+        if direction == -1 and candidateIdx == 0 then candidateIdx = #bufNrs end
+        if direction == 1 and candidateIdx == #bufNrs + 1 then candidateIdx = 1 end
 
-        local candidateBuftype = api.nvim_buf_get_option(bufTbl[candidateIdx], "buftype")
+        local candidateBuftype = api.nvim_buf_get_option(bufNrs[candidateIdx], "buftype")
 
         -- Filter out quickfix
         if not vim.tbl_contains(M.buftypeBlacklist, candidateBuftype) then
             return candidateIdx
         end
     end
-end
-
-
+end -- }}}
 --- Get all listed buffers. Just like what you see in the :ls command
----@param direction number Set to 1 to jump to next buffer, -1 to previous buffer
-M.init = function(direction)
+---@param direction number `1|-1` `1` indicate cycling forward
+M.init = function(direction) -- {{{
     local currentBufNr = api.nvim_get_current_buf()
     local bufTbl
     ---@diagnostic disable-next-line: undefined-field
@@ -119,10 +120,11 @@ M.init = function(direction)
 
     -- Use the Ex command to enter a buffer without writing jumplist
     vim.cmd([[noa keepjump buffer ]] .. bufTbl[candidateIdx])
-    checkTsLoaded()
+    checkTreeSitterLoaded()
     if M.registerInJumplist then
         api.nvim_exec_autocmds("BufEnter", {modeline = false, buffer = bufTbl[candidateIdx]})
     end
-end
+end -- }}}
+
 
 return M

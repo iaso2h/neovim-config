@@ -144,7 +144,7 @@ end, {
 }) -- }}} 
 
 vim.api.nvim_create_user_command("Cfilter", function(opts) -- {{{
-    require("quickfix.cFilter").main(true, opts.args, opts.bang)
+    require("quickfix.cFilter")(true, opts.args, opts.bang)
 end, {
     desc  = "Filter quickfix window",
     bang  = true,
@@ -152,7 +152,7 @@ end, {
 }) -- }}} 
 
 vim.api.nvim_create_user_command("Lfilter", function(opts) -- {{{
-    require("quickfix.cFilter").main(false, opts.args, opts.bang)
+    require("quickfix.cFilter")(false, opts.args, opts.bang)
 end, {
     desc  = "Filter localfix window",
     bang  = true,

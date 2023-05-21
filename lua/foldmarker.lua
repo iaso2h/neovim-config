@@ -24,7 +24,9 @@ local foldmarkerEndQuery = [[
 ]]
 
 
-local chkMarkerOption = function()
+--- Condition to check fold methold
+---@return boolean Result Whether it's ok to highlight the fold marker with the current fold method settings
+local highlightCondition = function() -- {{{
     if not vim.wo.foldmethod == "marker" then
     -- if not (vim.wo.foldmethod == "expr" and
     --     vim.wo.foldexpr == "EnhanceFoldExpr()" and
@@ -33,13 +35,11 @@ local chkMarkerOption = function()
     else
         return true
     end
-end
-
-
+end -- }}} 
 --- Get all the comment nodes that contain foldmark in the current buffer
----@param bufNr number
----@return table Table of Treesitter nodes
-local getFoldmarkers = function(bufNr)
+---@param bufNr integer
+---@return table # Table of Treesitter nodes
+local getFoldmarkers = function(bufNr) -- {{{
     local nodesStart = util.getQueryNodes(bufNr, foldmarkerStartQuery, 2)
     local nodesEnd   = util.getQueryNodes(bufNr, foldmarkerEndQuery, 2)
 
@@ -54,14 +54,12 @@ local getFoldmarkers = function(bufNr)
         vim.notify("Can't get fold markers from queries")
         return {}
     end
-end
-
-
+end -- }}} 
 --- Get the current folder marker region
 ---@param cursorPos table (1, 0) indexed
----@param bufNr number
----@return table Table of Treesitter nodes
-local getCurrentMarkers = function(cursorPos, bufNr)
+---@param bufNr integer
+---@return table # Table of Treesitter nodes
+local getCurrentMarkers = function(cursorPos, bufNr) -- {{{
     local markers = getFoldmarkers(bufNr)
     if not markers.Start then return {} end
 
@@ -99,19 +97,17 @@ local getCurrentMarkers = function(cursorPos, bufNr)
     end
 
     return {Start = nodeStart, End = nodeEnd}
-end
-
-
-local clearNS = function(bufNr)
+end -- }}} 
+--- Clear namespace for specific buffer number
+---@param bufNr integer
+local clearNS = function(bufNr) -- {{{
     vim.api.nvim_buf_clear_namespace(bufNr, M.ns, 0, -1)
-end
-
-
+end -- }}} 
 --- Highlight Treesitter node content
 ---@param bufNr number
 ---@param markerNodes table Treesitter nodes
 ---@param highlightGroup string
-local addHighlight = function(bufNr, markerNodes, highlightGroup, markerOnlyChk)
+local addHighlight = function(bufNr, markerNodes, highlightGroup, markerOnlyChk) -- {{{
     -- Always clear all namespace
     clearNS(bufNr)
     for i, n in ipairs(markerNodes) do
@@ -128,11 +124,10 @@ local addHighlight = function(bufNr, markerNodes, highlightGroup, markerOnlyChk)
     end
     -- Clear highlight after certain timeout
     vim.defer_fn(function() clearNS(bufNr) end, M.highlightTimeout)
-end
-
-
-M.highlightCurrentMarkerRegion = function()
-    if not chkMarkerOption() then return end
+end -- }}} 
+--- Highlight the current fold marker region
+M.highlightCurrentMarkerRegion = function() -- {{{
+    if not highlightCondition() then return end
 
     local cursorPos = vim.api.nvim_win_get_cursor(0)
     if vim.fn.foldlevel(cursorPos[1]) == 0 then
@@ -147,18 +142,15 @@ M.highlightCurrentMarkerRegion = function()
     end
 
     addHighlight(bufNr, vim.tbl_values(markers), M.highlightNormalGroup)
-end
-
-
+end -- }}} 
 --- Modify a specific foldmarker
----@param bufNr number
----@param nodeRange table Captured by calling {node:range()}
+---@param bufNr integer
+---@param nodeRange table Captured by calling `{node:range()}`
 ---@param markerString string
----@param preserveHeadCommentChk boolean Whether to preserve the comment
---content from the start folder marker
+---@param preserveHeadCommentChk boolean Whether to preserve the comment content from the start folder marker
 ---@param newMarkerString string The new fold marker string
 ---@param commentString string See: `:h commentstring`
----@return boolean Return true when a buffer line is deleted
+---@return boolean # Return true when a buffer line is deleted
 local modifyMarker = function(bufNr, nodeRange, markerString, preserveHeadCommentChk, newMarkerString, commentString)
     local nodeText    = vim.api.nvim_buf_get_text(bufNr, nodeRange[1], nodeRange[2], nodeRange[1], nodeRange[4] + 1, {})[1]
     local nodePreText = vim.api.nvim_buf_get_text(bufNr, nodeRange[1], 0, nodeRange[1], nodeRange[2], {})[1]
@@ -194,7 +186,7 @@ end
 --content from the start folder marker
 ---@param changeChk boolean Whether to change the foldmarkers instead of deleting them
 M.modifyCurrentMarkerRegion = function(preserveHeadCommentChk, changeChk)
-    if not chkMarkerOption() then return end
+    if not highlightCondition() then return end
 
     local cursorPos = vim.api.nvim_win_get_cursor(0)
     if vim.fn.foldlevel(cursorPos[1]) == 0 then

@@ -32,33 +32,25 @@ local M    = {
 }
 
 
-----
--- Function: warnRead Warn when buffer is not modifiable
---
--- @return: return true when buffer is readonly
-----
-local warnRead = function()
+--- Warn when buffer is not modifiable
+---@return boolean Return true when buffer is readonly
+local warnRead = function() -- {{{
     if not vim.o.modifiable or vim.o.readonly then
         vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
         return false
     end
     return true
-end
+end -- }}}
 
 
----  https://github.com/tpope/vim-repeat/blob/master/autoload/repeat.vim
----  This function is used for preserving the vim.v.register value in case that
----  it's cleared during the file modification
-M.saveCountReg = function()
+---https://github.com/tpope/vim-repeat/blob/master/autoload/repeat.vim
+--- This function is used for preserving the vim.v.register value in case that it's cleared during the file modification
+M.saveCountReg = function() -- {{{
     register.saveReg()
     M.regName = vim.v.register
     M.count   = vim.v.count1
-end
-
-
-----
--- Function: saveOption:Store vim options before perform any replacement----
-----
+end -- }}}
+--- Store vim options before perform any replacement
 local saveOption = function() -- {{{
     local saveSelection
 
@@ -76,19 +68,14 @@ local saveOption = function() -- {{{
         M.restoreOption = nil
     end
 end -- }}}
-
-
---- Calculate how many spaces need to add or remove so that the indent of the
---- first line from both register and buffer matchup.
---- @param regContent string Value of register content
---- @param motionRegion table Contain start and end position of operator
---- movement. {1, 0} index
---- @param motionDirection number 1 indicate motionRegion like "j, w, f" is moving
---- forward -1 indicates motionRegion is moving backward
---- @param vimMode string Vim mode
---- @return string|nil Value of changed register content or nil if no
---- content changed
---- when reindentation is successful
+--- Calculate how many spaces need to add or remove so that the indent of the first line from both register and buffer matchup.
+---@param regContent string Value of register content
+---@param motionRegion table Contain start and end position of operator
+--movement. {1, 0} index
+---@param motionDirection number 1 indicate motionRegion like "j, w, f" is moving forward -1 indicates motionRegion is moving backward
+---@param vimMode string Vim mode
+---@return string|nil Value of changed register content or nil if no content changed
+---when reindentation is successful
 local reindent = function(regContent, motionRegion, motionDirection, vimMode) -- {{{
     -- The value of bufferIndent is the first line where motionRegion starts or
     -- visual selection starts
@@ -117,19 +104,13 @@ local reindent = function(regContent, motionRegion, motionDirection, vimMode) --
         return nil
     end
 end -- }}}
-
-
 --- Match the motionType type with register type
---- @param motionType string motionRegion type by which how the operator perform.
---- Can be "line", "char" or "block"
---- @param motionRegion table Contains start and end position of operator movement. {1, 0} indexed
---- @param motionDirection number 1 indicate motionRegion like "j, w, f" is moving
---- @param vimMode string Vim mode. See: `:help mode()`
---- @param reg table Contain name, type, content of v:register
---- Can be "line", "char" or "block"
---- forward, -1 indicates motionRegion is moving backward
---- @return table reg The new reg table(might or might not have been modified)
---- otherwise return false
+---@param motionType string motionRegion type by which how the operator perform. "line" or "char"
+---@param motionRegion table Contains start and end position of operator movement. {1, 0} indexed
+---@param motionDirection number 1 indicate motionRegion like "j, w, f" is moving
+---@param vimMode string Vim mode. See: `:help mode()`
+---@param reg table Contain name, type, content of v:register .Can be "line", "char" or "block" forward, -1 indicates motionRegion is moving backward
+---@return table reg The new reg table(might or might not have been modified) otherwise return false
 local matchRegType = function(motionType, motionRegion, motionDirection, vimMode, reg) -- {{{
     -- NOTE:"\<C-v>" for vimMode in vimscript is evaluated as "\22" in lua, which represents blockwise motionRegion
     -- NOTE:"\0261" in vimscript is evaluated as "\0221" in lua, which represents blockwise-visual register
@@ -157,7 +138,8 @@ local matchRegType = function(motionType, motionRegion, motionDirection, vimMode
                 regContentNew = string.gsub(reg.content, "\n", " ")
                 regContentNew = vim.trim(regContentNew)
             end
-        elseif motionType == "line" then
+        else
+        -- elseif motionType == "line" then
             if reg.type == "v" or reg.type == "c" then
                 regContentNew = reindent(reg.content, motionRegion, motionDirection, vimMode)
             else
@@ -228,17 +210,13 @@ local matchRegType = function(motionType, motionRegion, motionDirection, vimMode
 
     return reg
 end -- }}}
-
-
 --- Replace text by manipulating visual selection and put
---- @param motionType string motionRegion type by which how the operator
---- perform. Can be "line", "char" or "block"
---- @param motionRegion table Contains start and end position of operator movement. {1, 0} indexed
---- @param vimMode string Vim mode. See: `:help mode()`
---- @param reg table Contain name, type, content of v:register Can be "line",
---- "char" or "block"
---- @param bufNr integer Buffer handler(number)
---- @return table {repStart = {}, repEnd = {}}
+---@param motionType string motionRegion type by which how the operator perform. Can be "line" or "char"
+---@param motionRegion table Contains start and end position of operator movement. {1, 0} indexed
+---@param vimMode string Vim mode. See: `:help mode()`
+---@param reg table Contain name, type, content of v:register Can be "line", "char" or "block"
+---@param bufNr integer Buffer handler(number)
+---@return table {repStart = {}, repEnd = {}}
 local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
     -- With a put in visual mode, the previously selected text is put in the
     -- unnamed register, so we need to save and restore that.
@@ -273,7 +251,8 @@ local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
                 else
                     vim.api.nvim_buf_set_text(bufNr, Start[1], Start[2], End[1], End[2] + 1, {reg.content})
                 end
-            elseif motionType == "line" then
+            else
+            -- elseif motionType == "line" then
                 local Start = {motionRegion.Start[1] - 1, motionRegion.Start[2]}
                 local End   = {motionRegion.End[1] - 1, motionRegion.End[2]}
                 vim.api.nvim_buf_set_lines(bufNr, Start[1], End[1] + 1, false,
@@ -284,15 +263,8 @@ local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
         end
     end
 end -- }}}
-
-
---- This function will be called when g@ is evaluated by Neovim
---- @param args table {motionType, vimMode, plugMap}
---- motionType     string  motionRegion type by which how the operator perform.
---- Can be "line", "char" or "block"
---- vimMode        string  Vim mode. See: `:help mode()`
---- plugMap        string  eg: <Plug>myPlug
---- replaceLineChk boolean
+--- The replace operator
+---@param args GenericOperatorInfo
 function M.operator(args) -- {{{
     if not warnRead() then return end
 
@@ -557,7 +529,8 @@ function M.operator(args) -- {{{
                 else
                     if motionType == "char" then
                         vim.api.nvim_win_set_cursor(0, rep.Start)
-                    elseif motionType == "line" then
+                    else
+                    -- elseif motionType == "line" then
                         vim.cmd [[noa normal! ^]]
                     end
                 end
@@ -637,12 +610,9 @@ function M.operator(args) -- {{{
     -- Visual repeating
     vim.fn["visualrepeat#set"](t"<Plug>ReplaceVisual")
 end -- }}}
-
-
 ---Expression callback for replace operator
 ---@param restoreCursorChk boolean Whether to restore the cursor if possible
----@param highlightChangeChk boolean Whether to highlight the change. Only
---support turning off highlight changes in vim normal mode!
+---@param highlightChangeChk boolean Whether to highlight the change. Only support turning off highlight changes in vim normal mode!
 ---@return string "g@"
 function M.expr(restoreCursorChk, highlightChangeChk) -- {{{
     if not warnRead() then return "" end

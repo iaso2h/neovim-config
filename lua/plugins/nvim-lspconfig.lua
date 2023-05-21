@@ -2,7 +2,6 @@
 return function()
     local lspConfig   = require("lspconfig")
     local u           = require("lspconfig.util")
-    local path        = require("plenary.path")
     local serverNames = require("plugins.nvim-mason-lspconfig").serverNames
 
     local conciseQuifix = function(tbl) -- {{{

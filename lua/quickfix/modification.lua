@@ -66,8 +66,7 @@ M.delete = function (vimMode) -- {{{
         end
     end
 end -- }}}
-
-
+--- Restored the last modified quickfix items
 M.recovery = function () -- {{{
     if M.lastItems then
         if M.lastType == "quickfix" and not vim.b._is_local then
@@ -82,9 +81,8 @@ M.recovery = function () -- {{{
         return
     end
 end -- }}}
-
-
-M.interConvert = function ()
+--- Change a quickfix list into a local list and vice versa
+M.interConvert = function () -- {{{
     local qfItems, qfTitle = u.getlist()
     local winInfo = vim.fn.getwininfo()
     local qfVisibleTick = util.any(function(i)
@@ -100,27 +98,7 @@ M.interConvert = function ()
         local preCmd = require("buffer.split").handler(true)
         vim.cmd(preCmd .. " copen")
     end
-end
-
-
-M.main = function ()
-    local qfItems, qfTitle = u.getlist()
-    for idx, item in ipairs(qfItems) do
-        if item.valid ~= 0 and item.bufnr ~= 0 and
-            vim.api.nvim_buf_is_valid(item.bufnr) and
-            vim.api.nvim_buf_get_option(item.bufnr, "buflisted")
-            then
-            -- Only update listed buffer because otherwise
-            -- vim.api.nvim_buf_get_lines can't get content from unlisted buffer
-            qfItems[idx].text = vim.api.nvim_buf_get_lines(item.bufnr, item.lnum - 1, item.lnum, false)[1]
-        end
-    end
-    if vim.b._is_local then
-        vim.fn.setloclist(0, {}, "r", {items = qfItems, title = qfTitle})
-    else
-        vim.fn.setqflist({}, "r", {items = qfItems, title = qfTitle})
-    end
-end
+end -- }}}
 
 
 return M

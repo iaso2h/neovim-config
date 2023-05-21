@@ -23,6 +23,8 @@ local log = function(...)
 end
 
 
+--- Recall the cursor position
+---@param args table Argument from calling a Neovim command
 return function(args)
     -- Only handle valid file
     if not args or args.file == "*" then

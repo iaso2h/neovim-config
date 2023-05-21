@@ -31,13 +31,12 @@ local WidthExceedOffset = 6
 
 -- Modified options wrapped around the func
 ---@param func function Implementation of modifying the lines
-local modifyLines = function(func)
+local modifyLines = function(func) -- {{{
     vim.api.nvim_buf_set_option(M.initBuf, "modifiable", true)
     func()
     vim.api.nvim_buf_set_option(M.initBuf, "modifiable", false)
-end
-
---- Check whether historyStartup is visible
+end -- }}} 
+--- Check whether historyStartup is loaded
 ---@return boolean
 local isLoaded = function() -- {{{
     return vim.api.nvim_buf_is_loaded(M.initBuf)
@@ -52,8 +51,7 @@ local isVisible = function() -- {{{
         return fileType == "HistoryStartup"
     end, winIds)
 end -- }}}
-
-
+--- Initiate the absolute lines and relative lines
 local initLines = function () -- {{{
     M.lines.absolute = {}
     M.lines.relative = {}
@@ -85,8 +83,7 @@ local initLines = function () -- {{{
         end, M.lines.absolute)
     end
 end -- }}}
-
-
+--- Add strike thorugh style for the specific lines
 local strikeThroughOpened = function() -- {{{
     local bufNrs = require("buffer.util").bufNrs(true)
     for _, buf in ipairs(bufNrs) do
@@ -97,9 +94,8 @@ local strikeThroughOpened = function() -- {{{
         end
     end
 end -- }}}
-
-
-local autoCMD = function() -- {{{
+--- Setup autoCmd
+local setupAutoCmd = function() -- {{{
     local stopResize = function()
         if M.autoresizeCmdId ~= -1 then
             -- When `M.autoresizeCmdId` isn't the initiation value -1
@@ -168,8 +164,7 @@ local autoCMD = function() -- {{{
         end
     }) -- }}}
 end -- }}}
-
-
+--- Pop up the float window for current item
 local hover = function() -- {{{
     if not M.lines.relativeTick then return end
     local cursorPos = vim.api.nvim_win_get_cursor(M.initWin)
@@ -238,8 +233,8 @@ local hover = function() -- {{{
     -- be terminated too early by autocmd
     M.floatTick = true
 end -- }}}
-
-
+--- Execute actions for corresponding mappings
+---@param key string Left-Hand side key mappings
 local execMap = function(key) -- {{{
     local lnum = vim.api.nvim_win_get_cursor(0)[1]
     if key == "o" or key == "<CR>" or key == "<2-LeftMouse>" then -- {{{
@@ -343,8 +338,6 @@ local execMap = function(key) -- {{{
         end -- }}}
     end
 end -- }}}
-
-
 --- Display history in new buffer
 --- @param refreshChk boolean Set it true to refresh the history files everytime
 M.display = function(refreshChk) -- {{{
@@ -387,7 +380,7 @@ M.display = function(refreshChk) -- {{{
     vim.api.nvim_buf_set_option(M.initBuf, "filetype",  "HistoryStartup")
 
     -- Setting up autocmd
-    autoCMD()
+    setupAutoCmd()
 
     -- Set lines
     vim.defer_fn(function()

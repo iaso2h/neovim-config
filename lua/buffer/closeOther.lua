@@ -10,12 +10,11 @@ local filetypeWhitelist = {"qf", "help", "terminal"}
 local buftypeWhitelist  = {"terminal"}
 
 
---- Check modified state of specified buffer numbers and prompt for saving if
---unsave changes found
+--- Check modified state of specified buffer numbers and prompt for saving if unsave changes found
 ---@param bufNrs table
 ---@param saveBufNr number
----@return boolean Evaluate to false if cancel signal has input
-local saveModified = function(bufNrs, saveBufNr)
+---@return boolean # Evaluate to `false` if cancel signal has input
+local saveModified = function(bufNrs, saveBufNr)  -- {{{
     local changeTick = require("util").any(function(bufNr)
         if bufNr == saveBufNr then return false end
         return vim.api.nvim_buf_get_option(bufNr, "modified")
@@ -36,7 +35,8 @@ local saveModified = function(bufNrs, saveBufNr)
     end
 
     return true
-end
+end -- }}} 
+
 
 --- Wipe all the other buffers except for the special buffers without changing the window layout
 return function()
@@ -68,4 +68,4 @@ return function()
     if package.loaded["cokeline"] then
         require("cokeline/augroups").toggle()
     end
-end
+end 

@@ -1,4 +1,5 @@
 -- Credit: https://github.com/tjdevries/nlua.nvim/blob/master/lua/nlua/init.lua
+---@param word string
 return function(word)
     word = word or vim.fn.expand("<cword>")
     local helpTopics = {

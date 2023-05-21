@@ -158,7 +158,9 @@ vim.g.msql_sql_query = 1
 require("global.keymap")
 
 
-_G.Print = function(...)
+--- Print the objects
+---@vararg any
+_G.Print = function(...) -- {{{
     local objects = {}
     for i = 1, select('#', ...) do
         local obj = select(i, ...)
@@ -168,10 +170,10 @@ _G.Print = function(...)
     print(table.concat(objects, '\n'))
 
     return ...
-end
-
-
-_G.logBuf = function(...)
+end -- }}}
+--- Print the objects in a scratch buffer
+---@vararg any
+_G.logBuf = function(...) -- {{{
     local objects = {}
     for i = 1, select('#', ...) do
         local obj = select(i, ...)
@@ -182,9 +184,7 @@ _G.logBuf = function(...)
     -- Output the result into a new scratch buffer
     _G._log_buf_nr = require("buffer.util").redirScratch(objects, _G._log_buf_nr, true)
     vim.api.nvim_buf_set_option(_G._log_buf_nr, "filetype", "LogBuffer")
-end
-
-
+end -- }}}
 --- Remove value from list-liked lua table
 ---@param tbl table List-like table
 ---@param srcVal any Source value to be look up and removed
@@ -194,7 +194,7 @@ end
 --will be removed when firstOnlyChk is false
 ---@return number|table|nil Index of the value. Index of table will be return
 --when there are more than one idx to be return. nil will be return when no idx found
-local tbl_remove = function(tbl, srcVal, removeAllChk, cnt)
+local tbl_remove = function(tbl, srcVal, removeAllChk, cnt) -- {{{
     assert(next(tbl), "Empty table is not allowed")
     assert(vim.tbl_islist(tbl), "Expect list-liked table")
 
@@ -224,20 +224,17 @@ local tbl_remove = function(tbl, srcVal, removeAllChk, cnt)
 
     -- return nil when not idx found
     return nil
-end
-
-
+end -- }}}
 --- Replace value1 inside list-like table with value2
----@param tbl       table   List-like table of which value to be replaced
----@param repVal    any     Value to replace with
----@param srcVal    any     Source value to be replaced
----@param repAllChk boolean Default is true. Whether to replace all value or not
----@param cnt       number  Default is 1. Determine how many srcVal
---will be replaced
----@param alertOnFail boolean Default is false. Whether to alert when
+---@param tbl          table   List-like table of which value to be replaced
+---@param repVal       any     Value to replace with
+---@param srcVal       any     Source value to be replaced
+---@param repAllChk?   boolean Default is true. Whether to replace all value or not
+---@param cnt?         number  Default is 1. Determine how many srcVal will be replaced
+---@param alertOnFail? boolean Default is false. Whether to alert when
 --replace failed
 ---@return nil
-_G.tbl_replace = function(tbl, repVal, srcVal, repAllChk, cnt, alertOnFail)
+_G.tbl_replace = function(tbl, repVal, srcVal, repAllChk, cnt, alertOnFail) -- {{{
     repAllChk = repAllChk or true
     cnt = cnt or 1
     alertOnFail = alertOnFail or false
@@ -268,17 +265,14 @@ _G.tbl_replace = function(tbl, repVal, srcVal, repAllChk, cnt, alertOnFail)
             tbl[idx] = repVal
         end
     end
-
-end
-
-
+end -- }}}
 --- Return the 1 based index of specific item in a list-liked table. Only support
 --- number and string for now
---- @param tbl any[] List-liked table
---- @param item number|string Item to look up
+--- @param tbl    any[] List-liked table
+--- @param item   number|string Item to look up
 --- @param allIdx boolean Whether to return all the indexes as a table
---- @return number|number[] return table when returnIdxTbl is true
-_G.tbl_idx = function(tbl, item, allIdx)
+--- @return number|number[] # Return table when `returnIdxTbl` is true
+_G.tbl_idx = function(tbl, item, allIdx) -- {{{
     assert(vim.tbl_islist(tbl), "Expect list-liked table")
     assert(type(item) == "string" or type(item) == "number", "Only support indexing string or number")
     local idxTbl = {}
@@ -297,13 +291,11 @@ _G.tbl_idx = function(tbl, item, allIdx)
     else
         return idxTbl
     end
-end
-
-
+end -- }}}
 --- Unify separators in value returned by vim.api.nvim_buf_get_name()
----@param bufNr? integer
----@return string
-_G.nvim_buf_get_name = function(bufNr)
+---@param bufNr? integer Buffer number. Default is 0 (the current buffer)
+---@return string # Buffer name
+_G.nvim_buf_get_name = function(bufNr) -- {{{
     bufNr = bufNr or 0
     if _G._os_uname.sysname == "Windows_NT" then
         local name = vim.api.nvim_buf_get_name(bufNr)
@@ -312,14 +304,11 @@ _G.nvim_buf_get_name = function(bufNr)
     else
         return vim.api.nvim_buf_get_name(bufNr)
     end
-end
-
-
---- Always make separator in a path string unified
+end -- }}}
+--- Always make separator in a path string unified according to operating system
 ---@param pathStr string
 ---@return string
-_G.pathStr = function(pathStr)
+_G.pathStr = function(pathStr) -- {{{
     return _G._os_uname.sysname == "Linux" and pathStr or string.gsub(pathStr, "/", _G._sep)
-end
-
+end -- }}}
 -- }}} Global function

@@ -3,44 +3,38 @@
 -- Description: Operator func that wraps around refactor.nvim
 -- Version: 0.0.1
 -- Last Modified: 2023-2-23
-local api  = vim.api
+local vim.api  = vim.api
 require("operator")
 local M = {
     cursorPos = nil, -- (1, 0) indexed
 }
 
 
-----
--- Function: warnRead Warn when buffer is not modifiable
---
--- @return: return true when buffer is readonly
-----
-local warnRead = function()
+--- Warn when buffer is not modifiable
+---@return boolean # Return true when buffer is readonly
+local warnRead = function() -- {{{
     if not vim.o.modifiable or vim.o.readonly then
         vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
         return false
     end
     return true
-end
-
-
+end -- }}}
+--- The operator to perform in Normal mode
 function M.operator(_) -- {{{
     if not warnRead() then return end
 
     -- NOTE: see ":help g@" for details about motionType
-    local startPos = api.nvim_buf_get_mark(0, "[")
-    local endPos   = api.nvim_buf_get_mark(0, "]")
+    local startPos = vim.api.nvim_buf_get_mark(0, "[")
+    local endPos   = vim.api.nvim_buf_get_mark(0, "]")
 
     -- Set cursor
-    api.nvim_win_set_cursor(0, startPos)
+    vim.api.nvim_win_set_cursor(0, startPos)
     vim.cmd("noa normal! v")
-    api.nvim_win_set_cursor(0, endPos)
+    vim.api.nvim_win_set_cursor(0, endPos)
 
     require("refactoring").select_refactor()
 end -- }}}
-
-
---- Expression callback for refactor operator
+--- Expression callback for `vim.v.opfunc`
 --- @param restoreCursorChk boolean Whether to restore the cursor if possible
 --- @return string "g@"
 function M.expr(restoreCursorChk) -- {{{
@@ -52,7 +46,7 @@ function M.expr(restoreCursorChk) -- {{{
     if restoreCursorChk then
         -- Preserving cursor position as its position will changed once the
         -- vim.o.opfunc() being called
-        M.cursorPos = api.nvim_win_get_cursor(0)
+        M.cursorPos = vim.api.nvim_win_get_cursor(0)
     else
         M.cursorPos = nil
     end

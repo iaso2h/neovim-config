@@ -23,6 +23,7 @@ local M = {
     opts = defaultOpts
 }
 
+
 --- Echo info in the cmdline when there's no available jump
 ---@param isNewer boolean
 ---@param filter string "local"|"buffer"
@@ -32,12 +33,10 @@ local overJumpInfo = function(isNewer, filter) -- {{{
         string.format("Cannot jump to any %s place in the %s jumplist",
             directionStr, filter), vim.log.levels.INFO)
 end -- }}}
-
-
 --- 1-based index of the ">" character in the ex-command `:jumps` output
 ---@param jumpsCmdRaw table Captured output of `:jumps`
----@return number
-local getJumpCmdIdx = function(jumpsCmdRaw)
+---@return integer
+local getJumpCmdIdx = function(jumpsCmdRaw) -- {{{
     local CmdRawIdx = 0
     -- Loop backward because the index character ">" is more likely closer to
     -- the end of the `:jumps` list
@@ -50,17 +49,15 @@ local getJumpCmdIdx = function(jumpsCmdRaw)
     end
 
     return CmdRawIdx
-end
-
-
----@param isNewer boolean
+end -- }}} 
+---@param isNewer boolean Whether jump to newer position
 ---@param filter string "local"|"buffer"
----@param CmdIdx number
+---@param CmdIdx integer
 ---@param jumpsCmdRaw table
----@param jumpIdx? number
+---@param jumpIdx? integer
 ---@param jumps? table
 ---@return table
-local getJumpsSliced = function(isNewer, filter, CmdIdx, jumpsCmdRaw, jumpIdx, jumps)
+local getJumpsSliced = function(isNewer, filter, CmdIdx, jumpsCmdRaw, jumpIdx, jumps) -- {{{
     local jumpsSliced = {}
     local cmdStart
     local cmdEnd
@@ -135,12 +132,10 @@ local getJumpsSliced = function(isNewer, filter, CmdIdx, jumpsCmdRaw, jumpIdx, j
     end
 
     return jumpsSliced
-end
-
-
+end -- }}} 
 --- Get the filtered out jumplist so that is ready to filter out and decide to perform a local jump or buffer jump
----@param isNewer boolean
----@param winId number
+---@param isNewer boolean Whether jump to newer position
+---@param winId integer Window ID
 ---@param filter string "local"|"buffer"
 ---@return table
 local getJumps = function(isNewer, winId, filter) -- {{{
@@ -179,14 +174,12 @@ local getJumps = function(isNewer, winId, filter) -- {{{
 
     return jumpsSliced
 end -- }}}
-
-
----@param bufNr number
+---@param bufNr integer Buffer number
 ---@param jumps table
 ---@param filter string "local"|"buffer"
 ---@param cursorPos table (1, 0) based. If target and cursor are on the same line in local filter, that target jump will be discard. Set it to empty table to turn off this behavior
 ---@return table,table
-local filterJumps = function(bufNr, jumps, filter, cursorPos)
+local filterJumps = function(bufNr, jumps, filter, cursorPos) -- {{{
     -- jumps = M.jumpsDummy
     local filterFunc = function(jump)
         -- Remove redandunt `jumps` that have the same line number as
@@ -238,17 +231,15 @@ local filterJumps = function(bufNr, jumps, filter, cursorPos)
     else
         return {}, jumpsFiltered
     end
-end
-
-
+end -- }}} 
 --- Execute the ex-command and start jumping
----@param vimMode string
----@param isNewer boolean
----@param winId number
----@param cursorPos table
+---@param vimMode string "v" or "n" to indicate Neovim mode
+---@param isNewer boolean Whether jump to newer position
+---@param winId integer
+---@param cursorPos table (1, 0) based
 ---@param jumpsFiltered? table
----@return number The count number of target jump
-local execute = function(vimMode, isNewer, winId, cursorPos, jumpsFiltered)
+---@return integer The count number of target jump
+local execute = function(vimMode, isNewer, winId, cursorPos, jumpsFiltered) -- {{{
     -- Get the target jump, then execute the built-in command
     local count
     if type(jumpsFiltered) == "table" then
@@ -271,14 +262,12 @@ local execute = function(vimMode, isNewer, winId, cursorPos, jumpsFiltered)
     end
 
     return count
-end
-
-
+end -- }}} 
 --- Handler of vimMode, direction and filter
----@param vimMode string
----@param isNewer boolean
+---@param vimMode string "v" or "n" to indicate Neovim mode
+---@param isNewer boolean Whether jump to newer position
 ---@param filter string "local"|"buffer"
-M.go = function(vimMode, isNewer, filter)
+M.go = function(vimMode, isNewer, filter) -- {{{
     local bufNr     = vim.api.nvim_get_current_buf()
     local winId     = vim.api.nvim_get_current_win()
     local cursorPos = M.opts.checkCursorRedundancy and vim.api.nvim_win_get_cursor(winId) or {}
@@ -316,13 +305,13 @@ M.go = function(vimMode, isNewer, filter)
     end
 
     -- TODO:echo the next jump?
-end
-
-
-M.setup = function(opts)
+end -- }}} 
+--- Set up plug-in configuration
+---@param opts table
+M.setup = function(opts) -- {{{
     opts = opts or defaultOpts
     M.opts = vim.tbl_deep_extend("keep", opts, defaultOpts)
-end
+end -- }}} 
 
 
 -- Exposed API

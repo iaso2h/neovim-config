@@ -11,6 +11,7 @@ return function() -- {{{
 
     -- Filetypes contained in this list will be consider inactive all the time
     gl.short_line_list = vim.deepcopy(_G._short_line_list)
+    ---@type integer
     local idx = tbl_idx(gl.short_line_list, "help", false)
     if idx ~= -1 then
         table.remove(gl.short_line_list, idx)
@@ -71,6 +72,7 @@ return function() -- {{{
         ["!"]  = colors.blue
     } -- }}}
 
+    ---@type string
     local vimMode
     local tightWinChk = false
     local padding = _G._os_uname.machine ~= "aarch64" and " " or ""

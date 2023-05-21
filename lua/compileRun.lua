@@ -6,6 +6,8 @@ local M   = {
     }
 }
 
+--- Compile the code in current buffer
+---@param useAsyncRun boolean Whether to use AsyncRun plug-in to display the compile result
 function M.compileCode(useAsyncRun) -- {{{
     local srcPath  = vim.fn.expand("%:p")
     local srcNoExt = vim.fn.expand("%:p:r")
@@ -63,8 +65,7 @@ function M.compileCode(useAsyncRun) -- {{{
         end
     end
 end -- }}}
-
-
+--- Run the code in Neovim terminal
 function M.runCode() -- {{{
     -- Close the current window if it's a quickfix window
     if vim.bo.buftype == "quickfix" then
@@ -95,4 +96,3 @@ end -- }}}
 
 
 return M
-

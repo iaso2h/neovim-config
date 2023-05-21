@@ -6,7 +6,7 @@
 local M = {}
 
 --- Echo search pattern and result index at the commandline
-local echo = function()
+local echo = function() -- {{{
     local searchDict = vim.fn.searchcount()
     local result = string.format("[%s/%s]", searchDict.current, searchDict.total)
     local searchPat = vim.fn.histget("search")
@@ -19,12 +19,10 @@ local echo = function()
     else
         vim.api.nvim_echo({{echoStr}}, false, {})
     end
-end
-
-
+end -- }}}
 --- Search func wraps around the native n/N exCmd
 ---@param exCmd string "n" or "N"
-M.cycle = function(exCmd)
+M.cycle = function(exCmd) -- {{{
     local ok, msg = pcall(vim.api.nvim_command, "noa norm! " .. exCmd)
     if not ok then
         ---@diagnostic disable-next-line: param-type-mismatch
@@ -38,13 +36,11 @@ M.cycle = function(exCmd)
 
     vim.cmd("norm! " .. "zv")
     echo()
-end
-
-
+end -- }}}
 --- Search func wraps around the native //? exCmd in Visual mode
 ---@param exCmd string "/" or "?"
 -- Similar project: https://github.com/bronson/vim-visual-star-search
-M.searchSelected = function(exCmd)
+M.searchSelected = function(exCmd) -- {{{
     local cursorPos = vim.api.nvim_win_get_cursor(0)
     local selectedStr = vim.fn.escape(
         require("selection").get("string", true),
@@ -54,11 +50,12 @@ M.searchSelected = function(exCmd)
     vim.cmd(selectedStr)
     vim.api.nvim_echo({{selectedStr}}, false, {})
     vim.api.nvim_win_set_cursor(0, cursorPos)
-end
-
-
-M.cword = function(exCmd, WORDChk)
-    exCmd = WORDChk and "g" .. exCmd or exCmd
+end -- }}}
+--- Search the word under cursor
+---@param exCmd string The non-recursive key mapping for searching. "*" or "#"
+---@param ignoreWordBoundary boolean Whether to ignore the word boundary by surround the word with `\<` and `\>`
+M.cword = function(exCmd, ignoreWordBoundary) -- {{{
+    exCmd = ignoreWordBoundary and "g" .. exCmd or exCmd
     local util = require("util")
 
     util.saveViewCursor()
@@ -67,7 +64,7 @@ M.cword = function(exCmd, WORDChk)
         util.restoreViewCursor(vim.fn.winheight(0))
     end
     echo()
-end
+end -- }}}
 
 
 return M

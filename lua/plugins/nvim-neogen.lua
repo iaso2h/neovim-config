@@ -5,6 +5,7 @@ return function()
         languages = {
             lua = {
                 template = {
+                    -- https://github.com/LuaLS/lua-language-server/wiki/Annotations
                     annotation_convention = "emmylua"
                 }
             },

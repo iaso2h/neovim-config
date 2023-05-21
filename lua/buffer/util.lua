@@ -33,13 +33,10 @@ M.isScratchBuf = function(bufNr) -- {{{
         return nvim_buf_get_name(bufNr) == ""
     end
 end -- }}}
---- Force wipe the given buffer, if no bufNr is provided, then current buffer
---- will be wiped
+--- Force wipe the given buffer, if no bufNr is provided, then current buffer will be wiped
 ---@param bufNr? number If it isn't provided, the `var.bufNr` will be used instead
----@param switchBeforeClose? boolean Default is false. Set it to true to
---switch all the buffer instance in all windows to an alternative buffer in
---advance before closing up the buffer entirely
----@param scheduleWrap? boolean Wether to use `vim.schedule_wrap()` to defer
+---@param switchBeforeClose? boolean Default is false. Set it to true to switch all the buffer instance in all windows to an alternative buffer in advance before closing up the buffer entirely
+---@param scheduleWrap? boolean Whether to use `vim.schedule_wrap()` to defer
 --the buffer close action
 M.bufClose = function(bufNr, switchBeforeClose, scheduleWrap) -- {{{
     bufNr = bufNr or var.bufNr
@@ -72,12 +69,9 @@ M.bufClose = function(bufNr, switchBeforeClose, scheduleWrap) -- {{{
     -- pcall(vim.api.nvim_command, "keepjump bwipe! " .. bufNr)
     -- pcall(api.nvim_buf_delete, bufNr and bufNr or 0, {force = true})
 end -- }}}
---- Function wrapped around the vim.api.nvim_list_bufs(). Produce result just
---like you type `:ls` in Neovim commandline
----@param listedOnly? boolean Whether contains listed buffers only. This
---argument will overide the `loadedOnly` if it's set to true, because listed
---buffer is also loaded
----@param loadedOnly? boolean Whether contains loaded buffers only
+--- Function wrapped around the `vim.api.nvim_list_bufs().` Produce result just like you type `:ls` in Neovim commandline
+---@param listedOnly? boolean Whether to contain listed buffers only. This argument will overide the `loadedOnly` if it's set to true, because listed buffer is also loaded
+---@param loadedOnly? boolean Whether to contain loaded buffers only
 ---@return table
 M.bufNrs = function(listedOnly, loadedOnly) -- {{{
     local rawBufNrs = vim.api.nvim_list_bufs()
@@ -99,9 +93,8 @@ M.bufNrs = function(listedOnly, loadedOnly) -- {{{
     return vim.tbl_filter(cond, rawBufNrs)
 end -- }}}
 --- Switch to alternative buffer or previous buffer before wiping current buffer
----@param winId? number Window ID in which the buffer nest will be switch to
---an alternative buffer. Default is `var.winId` if no window ID provided
----@param bufNr? number What bufNr will be switch away in the specific
+---@param winId? number Window ID in which the buffer nest will be switch to an alternative buffer. Default is `var.winId` if no window ID provided
+---@param bufNr? number What buffer number will be switch away in the specific
 --window. Default is `var.bufNr` if no buffer number provided
 M.bufSwitchAlter = function(winId, bufNr) -- {{{
     winId = winId or var.winId
@@ -142,13 +135,9 @@ M.bufSwitchAlter = function(winId, bufNr) -- {{{
 
 end -- }}}
 --- Check how many times the specified buffer occurs in all windows
----@param bufNr? number If it isn't provided, the `var.bufNr` will be used
---instead
----@param winIds? table If it isn't provided, the `var.winIds` will be used
---instead
----@return number,table How many same provided buffer instances display in
---other windows and the window IDs that contain the provided buffer Note that
---the function will always take the current window into account
+---@param bufNr? number If it isn't provided, the `var.bufNr` will be used instead
+---@param winIds? table If it isn't provided, the `var.winIds` will be used instead
+---@return number,table # How many same provided buffer instances display in other windows and the window IDs that contain the provided buffer Note that the function will always take the current window into account
 M.bufOccurInWins = function(bufNr, winIds) -- {{{
     bufNr  = bufNr  or var.bufNr
     winIds = winIds or var.winIds
@@ -163,13 +152,10 @@ M.bufOccurInWins = function(bufNr, winIds) -- {{{
 
     return bufCnt, winIds
 end -- }}}
---- Check how many buffers in the specified buffer table occur in the
---specified window table
----@param bufNrs? table If it isn't provided, the `var.bufNrs` will be used
---instead
----@param winIds? table If it isn't provided, the `var.winIds` will be used
---instead
----@return number The occurrence number
+--- Check how many buffers in the specified buffer table occur in the specified window table
+---@param bufNrs? table If it isn't provided, the `var.bufNrs` will be used instead
+---@param winIds? table If it isn't provided, the `var.winIds` will be used instead
+---@return number # The occurrence time
 M.bufsOccurInWins = function(bufNrs, winIds) -- {{{
     bufNrs = bufNrs or var.bufNrs
     winIds = winIds or var.winIds
@@ -184,7 +170,7 @@ M.bufsOccurInWins = function(bufNrs, winIds) -- {{{
 end -- }}}
 --- Return valid and loaded buffer count
 ---@param bufNrs? table Use `var.bufNrs` if no buffer table provided
----@return number The occurrence
+---@return number # The occurrence time
 M.bufsNonScratchOccurInWins = function(bufNrs) -- {{{
     bufNrs = bufNrs or var.bufNrs
 
@@ -218,8 +204,7 @@ M.winIdPrev = function() -- {{{
     return winId
 end -- }}}
 -- Return window occurrences in Neovim
----@param winIds? integer[] If it isn't provided, the `var.winIds` will be used
---instead
+---@param winIds? integer[] If it isn't provided, the `var.winIds` will be used instead
 ---@return number The occurrence
 M.winsOccur = function(winIds) -- {{{
     -- Take two NNP windows into account
@@ -246,8 +231,7 @@ M.winsOccur = function(winIds) -- {{{
 end -- }}}
 --- Function wrap around `vim.api.nvim_win_close`
 ---@param winId? number Use `var.winId` if no window ID provided
----@param scheduleWrap? boolean Wether to use `vim.schedule_wrap()` to defer
---the window close action
+---@param scheduleWrap? boolean Wether to use `vim.schedule_wrap()` to defer the window close action
 M.winClose = function(winId, scheduleWrap) -- {{{
     winId = winId or var.winId
     if scheduleWrap then
@@ -343,13 +327,13 @@ end -- }}}
 ---Redirect the lines into a scratch buffer
 ---@param lines string[] List-like table contains strings that represent
 --different lines respectively
----@param scratchBufNr number|nil The scratch buffer to which the lines will
+---@param scratchBufNr integer|nil The scratch buffer to which the lines will
 --be redirect to. If nil provided, a new buffer number will be created
 ---@param appendChk? boolean Whether to append the new lines at the end if the
 --scracth buffer exist
 ---@param preHook? function Optional function to call before the redirection
 ---@param postHook? function Optional function to call after the redirection
----@return number The scratch bufffer
+---@return integer # The scratch bufffer
 M.redirScratch = function(lines, scratchBufNr, appendChk, preHook, postHook) -- {{{
     if preHook  and vim.is_callable(preHook)  then preHook()  end
     if postHook and vim.is_callable(postHook) then postHook() end

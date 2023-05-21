@@ -3,7 +3,6 @@
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
 -- Version: 0.1.21
 -- Last Modified: 2023-5-19
--- TODO: add support for folded line
 
 local util     = require("util")
 local operator = require("operator")
@@ -23,7 +22,15 @@ local M = {
 -- TODO: test cases
 
 
--- Known issue: Doesn't support target line number exceeding buffer range
+-- TODO: Doesn't support target line number exceeding buffer range
+
+---@class GenericOperatorInfo
+---@field motionType string "line" or "char". Determine whether the motion is linewise
+---@field vimMode string Vim mode. See: `:help mode()`
+
+--- Move them up or down just like in VS Code
+---@param vimMode string Vim mode. See: `:help mode()`
+---@param direction string "up" or "down". Determine wether the lines go up or down
 function M.VSCodeLineMove(vimMode, direction) -- {{{
     if not vim.bo.modifiable then
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
@@ -68,8 +75,9 @@ function M.VSCodeLineMove(vimMode, direction) -- {{{
         vim.cmd [[noautocmd keepjump normal! gv]]
     end
 end -- }}}
-
-
+--- Duplicate the lines and move them up or down just like in VS Code
+---@param vimMode string Vim mode. See: `:help mode()`
+---@param direction string "up" or "down". Determine wether the new lines go up or down
 function M.VSCodeLineYank(vimMode, direction) -- {{{
     if not vim.bo.modifiable then
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
@@ -151,15 +159,8 @@ function M.VSCodeLineYank(vimMode, direction) -- {{{
         end
     end
 end -- }}}
-
-
 --- Yank text without moving cursor. Also comes with yanked area highlighted
---- @param args table {motionType, vimMode, plugMap}
----        motionType string Motion type by which how the operator perform.
----                    Can be "line", "char" or "block"
----        vimMode    string Vim mode. See: `:help mode()`
----        plugMap    string eg: <Plug>myPlug
----        vimMode    string Vim mode. See: `:help mode()`
+---@param args GenericOperatorInfo
 function M.inplaceYank(args) -- {{{
     -- opts = opts or {hlGroup="Search", timeout=500}
     local opts = {hlGroup=M.hlGroup, timeout=M.hlInterval}
@@ -244,11 +245,9 @@ function M.inplaceYank(args) -- {{{
         vim.fn["visualrepeat#set"](t(plugMap))
     end
 end -- }}}
-
-
 --- Execute the Vim Ex command
---- @param pasteCMD string The literal Vim Ex command
---- @param vimMode string Vim mode
+---@param pasteCMD string The literal Vim Ex command
+---@param vimMode string Vim mode. See: `:help mode()`
 local function inplacePutExCmd(pasteCMD, vimMode) -- {{{
         -- Execute traditional EX command
     if vimMode == "n" then
@@ -263,14 +262,11 @@ local function inplacePutExCmd(pasteCMD, vimMode) -- {{{
         vim.cmd("noautocmd normal! gv\"" .. vim.v.register .. pasteCMD)
     end
 end -- }}}
-
-
 --- Put text inplace
---- @param vimMode    string Vim mode. See: `:help mode()`
---- @param pasteCMD   string Normal mode command to execute. "p" or "P"
---- @param convertPut boolean Wether to convert "V" type register into "v"
---- type register or vice versa
---- @param opts       table
+---@param vimMode    string Vim mode. See: `:help mode()`
+---@param pasteCMD   string Normal mode command to execute. "p" or "P"
+---@param convertPut boolean Wether to convert "V" type register into "v" type register or vice versa
+---@param opts       table
 function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     if not vim.bo.modifiable then
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)

@@ -25,8 +25,6 @@ M.clear = function() -- {{{
     end
     vim.api.nvim_echo({{"Register cleared", "MoreMsg"}}, true, {})
 end -- }}}
-
-
 --- Prompt for inserting register
 M.insertPrompt = function(vimMode) -- {{{
     local regexAll = vim.regex(M.regAll)
@@ -111,9 +109,10 @@ M.insertPrompt = function(vimMode) -- {{{
         end
     until false -- Infinite loop with multiple break points nested
 end -- }}}
-
-
-local stringCount = function(str, pattern)
+--- Get the specific pattern occurrence count in a string
+---@param str string In what string to look up
+---@param pattern string What pattern to be looked up
+local stringCount = function(str, pattern) -- {{{
     local count = 0
     local init = 0
     while true do
@@ -121,14 +120,11 @@ local stringCount = function(str, pattern)
         if not init then return count end
         count = count + 1
     end
-end
-
-
---- Reindent the register content
---- @param indentOffset integer Can be negative integer. How many indents
---- the source register content going to be prefixed or trimmed
---- @param srcContent string The content return by vim.fn.getreg()
---- @return string Reindented register content
+end -- }}} 
+---Reindent the register content
+---@param indentOffset integer Can be negative integer. How many indents the source register content going to be prefixed or trimmed
+---@param srcContent string The content return by vim.fn.getreg()
+---@return string Reindented register content
 M.reindent = function(indentOffset, srcContent) -- {{{
     if indentOffset == 0 then return srcContent end
 
@@ -153,13 +149,9 @@ M.reindent = function(indentOffset, srcContent) -- {{{
 
     return newContent
 end -- }}}
-
-
---- Get the correct indent count of a register content by its leading space
---- number. It also converts leading tabs into corresponding spaces and takes
---- that into account
---- @param regContent string Value return by vim.fn.getreg()
---- @return integer Value of the corresponding leading spaces of a register
+---Get the correct indent count of a register content by its leading space number. It also converts leading tabs into corresponding spaces and takes that into account
+---@param regContent string Value return by vim.fn.getreg()
+---@return integer # Value of the corresponding leading spaces of a register
 M.getIndent = function(regContent) -- {{{
     local _, regIndent = string.find(regContent, "^%s*")
     local _, prefixLineBreak = string.find(regContent, "^\n*")
@@ -180,10 +172,7 @@ M.getIndent = function(regContent) -- {{{
 
     return regIndent
 end -- }}}
-
-
---- Save the star registers, plus and unnamed registers - independently,
---- restoreReg can be accessed after saveReg is called
+--- Save the star registers, plus and unnamed registers - independently, restoreReg can be accessed after saveReg is called
 function M.saveReg() -- {{{
     local unnamedContent
     local unnamedType
@@ -229,14 +218,12 @@ function M.saveReg() -- {{{
         vim.defer_fn(function() M.restoreReg = nil end, 1000)
     end
 end -- }}}
-
-
 --- Copy indent of specific line number in current buffer
----@param lineNr number (1, 0) indexed
----@return string Corresponding line indent
-M.indentCopy = function(lineNr)
+---@param lineNr integer (1, 0) indexed
+---@return string # Corresponding line indent
+M.indentCopy = function(lineNr) -- {{{
     return string.rep(" ", vim.fn.indent(lineNr))
-end
+end -- }}} 
 
 
 return M

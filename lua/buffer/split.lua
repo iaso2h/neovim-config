@@ -15,7 +15,7 @@ end
 
 
 --- Setting up the corresponding width and height number for Neovim
----@param opts table {<width>, <height>}
+---@param opts table `{<width>, <height>}`
 M.setup = function(opts)
     width, height = unpack(opts)
 end
@@ -23,7 +23,7 @@ end
 
 --- Return ex command for spliting Neovim windows
 ---@param prefixCmdChk boolean If the function resolve to vertical split solution. Whether to return `vertical` form ex command prefix or `vsplit` to split a window first
----@return string Neovim ex command string
+---@return string # Neovim ex-command string
 M.handler = function(prefixCmdChk)
     local vertCmd = prefixCmdChk and "vertical" or "vsplit"
     local horiCmd = prefixCmdChk and "horizontal" or "split"

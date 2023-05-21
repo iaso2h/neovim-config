@@ -7,10 +7,10 @@ local M    = {
 
 local getAllRelStr
 --- Get all path strings relative to the lua module search path
----@param parentStr           object Plenary path object with a directory path as its - filename property
----@param moduleSearchPathStr string The lua module search path(Deafult: vim.fn.stdpath("config") .. "lua")
----@return table              Table  that contains relative file paths. The table might
-getAllRelStr = function(parentStr, moduleSearchPathStr)
+---@param parentStr           string  Parent directory string
+---@param moduleSearchPathStr string  The lua module search path(Deafult: `vim.fn.stdpath("config")` .. "lua")
+---@return table # Table that contains relative file paths. The table might contain heavily nested tables
+getAllRelStr = function(parentStr, moduleSearchPathStr) -- {{{
     -- Value of tbl in each iteration:
     -- || { {
     -- ||     name = "var.lua",
@@ -32,8 +32,9 @@ getAllRelStr = function(parentStr, moduleSearchPathStr)
     -- Output:
     -- || { "buf", { "buf\\action", "buf\\action\\close.lua", "buf\\action\\closeOther.lua", "buf\\action\\cursorRecall.lua", "buf\\action\\cycle.lua", "buf\\action\\newSplit.lua", "buf\\action\\redir.lua" }, "buf\\util.lua", "buf\\var.lua" }
 
-    ---@diagnostic disable-next-line: param-type-mismatch
     local parentFS = vim.loop.fs_opendir(parentStr)
+    if not parentFS then return {} end
+
     local parentPath = p:new(parentStr)
     local parentRelToSearchStr = p:new(parentPath.filename):make_relative(moduleSearchPathStr)
     -- The value of directory name should always at the first place in each
@@ -42,7 +43,6 @@ getAllRelStr = function(parentStr, moduleSearchPathStr)
     local fileRelStrs = {parentRelToSearchStr}
 
     while true do
-        ---@diagnostic disable-next-line: param-type-mismatch
         local tbl = vim.loop.fs_readdir(parentFS)
 
         if not tbl then break end
@@ -64,21 +64,18 @@ getAllRelStr = function(parentStr, moduleSearchPathStr)
         end
     end
 
-    ---@diagnostic disable-next-line: param-type-mismatch
     vim.loop.fs_closedir(parentFS)
 
     return fileRelStrs
-end
-
-
+end -- }}} 
 --- Check whether other lua modules under the same lua directory have been
 --opened and modified in other buffers. If any did, prompt the user to save the
 --changes before reloading them all.
 ---@param allAbsStr        table  Contains all absolute path strings under the
 --top parent folder
 ---@param topParentTailStr string String of the top parent folder directly under
---the lua module search path(Deafult: vim.fn.stdpath("config") .. "lua")
-local checkOtherOpenMod = function (allAbsStr, topParentTailStr)
+--the lua module search path(Deafult: `vim.fn.stdpath("config")` .. "lua")
+local checkOtherOpenMod = function (allAbsStr, topParentTailStr) -- {{{
     local allBufNr = vim.tbl_map(function(absStr)
         local bufnr
         if absStr:sub(-4, -1) ~= ".lua" then
@@ -125,21 +122,18 @@ local checkOtherOpenMod = function (allAbsStr, topParentTailStr)
             vim.cmd(string.format("%sbufdo noa update", n))
         end
     end
-end
-
-
---- Get the relative lua module path that can be passed directly in func require()
---- @param path             object Plenary path object of the current file
---- @param parentPath       object Plenary path object of the parent folder
---- @param moduleSearchPath object Plenary path object of the lua module search path(Deafult: vim.fn.stdpath("config") .. "lua")
---- @return string Relative lua module path
-local getModuleName = function(path, parentPath, moduleSearchPath)
+end -- }}} 
+--- Get the relative lua module path that can be passed directly in the `require()` function
+---@param path             userdata Plenary path object of the current file
+---@param parentPath       userdata Plenary path object of the parent folder
+---@param moduleSearchPath userdata Plenary path object of the lua module search path(Deafult: `vim.fn.stdpath("config") .. "lua"`)
+---@return string # Relative lua module path
+local getModuleName = function(path, parentPath, moduleSearchPath) -- {{{
     local fileRelToSearchStr = path:new(path.filename):make_relative(moduleSearchPath.filename)
 
     if parentPath:parent().filename == moduleSearchPath.filename then
         -- Handle file has the same root(name without extension) string with the
         -- parent folder or the file is a init.lua file as per.
-
         local tailStr     = util.getTail(path.filename)
         local tailRootStr = tailStr:sub(1, -5)
         local parentTail  = util.getTail(parentPath.filename)
@@ -153,14 +147,12 @@ local getModuleName = function(path, parentPath, moduleSearchPath)
         local moduleTail = string.gsub(fileRelToSearchStr, util.sep, ".")
         return moduleTail:sub(1, -5)
     end
-end
-
-
+end -- }}} 
 --- Call functions before or after reloading specifc lua module
---- @param hookTbl         table
---- @param path            object   Plenary path object of the absolute file path
---- @param reloadCallback? function The callback function returned by reloading the lua module
-local hook = function(hookTbl, path, reloadCallback)
+---@param hookTbl         table
+---@param path            userdata Plenary path object of the absolute file path
+---@param reloadCallback? function The callback function returned by reloading the lua module
+local hook = function(hookTbl, path, reloadCallback) -- {{{
     for _, tbl in ipairs(hookTbl) do
         if path.filename == tbl.pathPat or string.match(path.filename, tbl.pathPat) then
             local ok, msg = pcall(tbl.callback, path, reloadCallback)
@@ -178,13 +170,11 @@ local hook = function(hookTbl, path, reloadCallback)
             return
         end
     end
-end
-
-
+end -- }}} 
 --- Reload a file lua module
----@param path       object Plenary path object. Lua module file
----@param parentPath object Plenary path object. Parent folder of the lua module file
----@param opt        table  Options table initialized in reload/init.lua
+---@param path       userdata Plenary path object. Lua module file
+---@param parentPath userdata Plenary path object. Parent folder of the lua module file
+---@param opt        table    Options table initialized in `reload/init.lua`
 M.loadFile = function(path, parentPath, opt) -- {{{
     -- Load setup hook
     hook(opt.setup, path)
@@ -226,13 +216,11 @@ M.loadFile = function(path, parentPath, opt) -- {{{
     end
 
 end -- }}}
-
-
 --- Reload a lua directory module
----@param path object Plenary path object. Lua module file
----@param opt table Options table initialized in reload/init.lua
+---@param path userdata Plenary path object. Lua module file
+---@param opt  table    Options table initialized in `reload/init.lua`
 M.loadDir = function(path, opt) -- {{{
-    -- Get the top parent folder under <configpath>/lua/
+    -- Get the top parent folder under `<configpath>/lua/`
     local allParentStr = path:parents()
     local moduleSearchPathStr = opt.moduleSearchPath.filename
     local i = tbl_idx(allParentStr, moduleSearchPathStr, false)
@@ -241,22 +229,24 @@ M.loadDir = function(path, opt) -- {{{
     local pathTailRootStr  = util.getTail(path.filename:sub(1, -5))
 
     local allRelStr = vim.tbl_flatten((getAllRelStr(topParentStr, moduleSearchPathStr)))
+    if not next(allRelStr) then return end
+
     local allAbsStr = vim.tbl_map(function(relStr)
         return moduleSearchPathStr .. util.sep .. relStr
     end, allRelStr)
 
-    -- Convert to module name form valid for require() function call
+    -- Convert to module name form valid for `require()` function call
     local allModule = vim.tbl_map(function(relStr)
         relStr = relStr:gsub(util.sep, ".")
         relStr = relStr:gsub(".lua$", "")
         return relStr
     end, allRelStr)
-    -- Avoid the first lua directory module loaded as "<dirname>.lua" instead as "<dirname>"
+    -- Avoid the first lua directory module loaded as `<dirname>.lua` instead as `<dirname>`
     if not package.loaded[allModule[1]] then
         allModule[1] = allModule[1] .. ".lua"
     end
 
-    -- Only unload and reload module found in the package.loaded table
+    -- Only unload and reload module found in the `package.loaded` table
     local allLoadedModule = vim.tbl_filter(function(module)
         if package.loaded[module] ~= nil then
             return true
@@ -266,7 +256,7 @@ M.loadDir = function(path, opt) -- {{{
     end, allModule)
 
     if #allLoadedModule == 0 then return end
-    -- No need to reload other module except the <dirname>.lua file and the
+    -- No need to reload other module except the `<dirname>.lua` file and the
     -- init.lua when that module isn't loaded in runtime. Doesn't worth
     -- reloading the whole directory because of it
     if pathTailRootStr ~= "init" and pathTailRootStr ~= topParentTailStr and
@@ -299,7 +289,7 @@ M.loadDir = function(path, opt) -- {{{
         local absStr = allAbsStr[moduleIdx]
 
         local fileChkStr
-        -- When moduleIdx == 1, even if the file ends with ".lua", it's
+        -- When moduleIdx == 1, even if the file ends with `.lua`, it's
         -- still considered as a directory module
         if moduleIdx ~= 1 and relStr:sub(-4, -1) == ".lua" then
             fileChkStr = " at"

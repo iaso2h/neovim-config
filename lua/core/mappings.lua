@@ -490,7 +490,7 @@ map("x", [[g{]], [[:lua require("trailingChar").main("v", "{")<CR>]],     {"sile
 map("n", [[g}]], [[<CMD>lua require("trailingChar").main("n", "}")<CR>]], {"silent"}, "Add fold marker end")
 map("x", [[g}]], [[:lua require("trailingChar").main("v", "}")<CR>]],     {"silent"}, "Add fold marker end")
 
--- map("n", [[<leader>z]], [[<CMD>lua require("foldmarker").highlightCurrentMarkerRegion()<CR>]], {"silent"}, "Highlight current fold marker")
+-- map("n", [[<leader>z]], [[<CMD>lua require("foldmarker").highlightCurrentRegion()<CR>]], {"silent"}, "Highlight current fold marker")
 map("", [[zm]], [[zM]],   {"noremap"}, "Close all folds recursively")
 map("", [[zr]], [[zRzz]], {"noremap"}, "Open all folds recursively")
 map("", [[zM]], [[zm]],   {"noremap"}, "Close folds recursively")

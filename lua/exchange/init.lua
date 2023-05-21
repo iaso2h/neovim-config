@@ -20,21 +20,19 @@ local M = {
 }
 
 
-----
--- Function: warnRead Warn when buffer is not modifiable
---
--- @return: return true when buffer is readonly
-----
-local warnRead = function()
+--- Warn when buffer is not modifiable
+---@return: return true when buffer is readonly
+local warnRead = function() -- {{{
     if not vim.o.modifiable or vim.o.readonly then
         vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
         return false
     end
     return true
-end
-
-
-local swap = function(motionType, bufNr)
+end -- }}}
+--- Swap the text
+---@param motionType string "char" or "line". Determine whether the motion is linewise
+---@param bufNr integer Buffer number
+local swap = function(motionType, bufNr) -- {{{
     -- (0, 0) index
     local extmark1 = vim.api.nvim_buf_get_extmark_by_id(bufNr, M.ns, M.srcExtmark[1], {details = true})
     local extmark2 = vim.api.nvim_buf_get_extmark_by_id(bufNr, M.ns, M.srcExtmark[2], {details = true})
@@ -135,15 +133,10 @@ local swap = function(motionType, bufNr)
     else
 
     end
-end
-
-
+end -- }}}
 --- This function will be called when g@ is evaluated by Neovim
---- @param args table {motionType, vimMode, plugMap}
---- motionType     string  Motion type by which how the operator perform.
---- Can be "line", "char" or "block"
---- vimMode        string  Vim mode. See: `:help mode()`
---- plugMap        string  eg: <Plug>myPlugin
+---@class GenericOperatorInfo
+---@param args GenericOperatorInfo
 function _G._exchangeOperator(args) -- {{{
     if not warnRead() then return end
     -- NOTE: see ":help g@" for details about motionType
@@ -248,26 +241,23 @@ function _G._exchangeOperator(args) -- {{{
         vim.fn["repeat#set"](t(plugMap), M.count)
     end
 end -- }}}
-
-
----Expression function that evaluated to return str for mapping
+---Callback function of `vim.o.opfunc`
 ---@param func    function
 ---@param plugMap string
 ---@return string "g@" if successful
-function M.expr(func, plugMap)
+function M.expr(func, plugMap) -- {{{
     _G._opfunc   = func
     M.plugMap    = plugMap
     M.cursorPos  = vim.api.nvim_win_get_cursor(0)
     vim.o.opfunc = "v:lua._exchangeOperator"
     return "g@"
-end
-
-
-function M.clear()
+end -- }}}
+--- Clear the highlight
+function M.clear() -- {{{
     local bufNr = vim.api.nvim_get_current_buf()
     pcall(vim.api.nvim_buf_clear_namespace, bufNr, M.ns, 0, -1)
     M.srcExtmark = {}
-end
+end -- }}}
 
 
 return M

@@ -1,11 +1,20 @@
-local function getPluginInfo(bufNr, nodes)
+--- Retrieve plugin repository infos via treesitter
+---@class nodeInfo
+---@field names string[] Node names
+---@field specRanges table Node ranges
+---@field tableCheck boolean[] Whether the node at different index is a table node
+---@field nodes userdata[] Tressitter nodes
+---@param bufNr integer Buffer number
+---@param nodes userdata Tressitter node
+---@return nodeInfo
+local function getPluginInfo(bufNr, nodes) -- {{{
     local tbl = {
         names = {},
         specRanges = {},
         tableCheck = {},
         nodes = {}
     }
-    for i, node in ipairs(nodes) do
+    for _, node in ipairs(nodes) do
         local nodeType = node:type()
         local tableCheck = false
         local specRange = {node:range()}
@@ -31,10 +40,13 @@ local function getPluginInfo(bufNr, nodes)
     end
 
     return tbl
-end
-
-
-return function(bufNr, cursorPos, fallback)
+end -- }}} 
+--- Get the Github repository url link near cursor or open the configration file
+---@param bufNr integer Buffer number
+---@param cursorPos table (1, 0) based
+---@param fallback function the fallback function to handle the link at the `cursorPos`
+---@return string # The url string
+return function(bufNr, cursorPos, fallback) -- {{{
     -- Get buffer number from buffer list
     -- bufNr = getBuf()
     -- if bufNr == -1 then return end
@@ -84,7 +96,7 @@ return function(bufNr, cursorPos, fallback)
 
     -- pluginsInfo = {specRanges, names, tableCheck, nodes}
     local pluginInfos = getPluginInfo(bufNr, pluginRepoNodes)
-    if not next(pluginInfos) then return end
+    if not next(pluginInfos) then return "" end
 
     -- Convert cursorPos into (0, 0) index
     local cursorIdx = {cursorPos[1] - 1 ,cursorPos[2]}
@@ -150,5 +162,4 @@ return function(bufNr, cursorPos, fallback)
 
     -- Fall back to the plugin repository url
     return "https://github.com/" .. pluginInfos.names[pluginIdx]
-end
-
+end -- }}} 

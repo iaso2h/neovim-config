@@ -71,6 +71,8 @@ local getMsg = function()
     return msgsRefined, errorLineNrs
 end
 
+--- Redirect the message to either a scratch buffer or a quickfix window
+---@param des string "quickfix" or "scratch"
 return function(des) -- {{{
     local msgTbl, errorLineNrTbl = getMsg()
 

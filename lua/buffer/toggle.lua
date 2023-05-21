@@ -4,6 +4,8 @@
 -- Last Modified: 05/07/2023 Sun
 -- Version: 0.0.6
 
+--- Toggle the quickfix window
+---@param closeChk boolean Whether to close the quickfix window if it's visible
 local quickfix = function(closeChk) -- {{{
     -- Close the current window if it's a quickfix window
     if vim.bo.buftype == "quickfix" then
@@ -29,6 +31,8 @@ local quickfix = function(closeChk) -- {{{
     -- Fallback
     vim.cmd "copen"
 end -- }}}
+--- Toggle the terminal window
+---@param closeChk boolean Whether to close the terminal window if it's visible
 local terminal = function(closeChk) -- {{{
     local winInfos = vim.fn.getwininfo()
 
@@ -68,6 +72,10 @@ local terminal = function(closeChk) -- {{{
     end
 end -- }}}
 
+
+--- Toggle different window based on `type`
+---@param type string `"quickfix"|"terminal"`
+---@param closeChk boolean Wether to close the target window if it's visible
 return function(type, closeChk)
     if type == "quickfix" then
         return quickfix(closeChk)

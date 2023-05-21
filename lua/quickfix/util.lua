@@ -1,9 +1,9 @@
 local M   = {}
 
 
---- Universally warp around getlocist() and getqflist()
+--- Universally warp around `getlocist()` and `getqflist()`
 ---@vararg any
-M.getlist = function(...)
+M.getlist = function(...) -- {{{
     local title
     if vim.b._is_local then
         title = vim.fn.getloclist(0, {title = 0}).title
@@ -12,10 +12,10 @@ M.getlist = function(...)
         title = vim.fn.getqflist({title = 0}).title
         return vim.fn.getqflist(...), title
     end
-end
-
-
-M.isVisible = function()
+end -- }}}
+--- Whether the quickfix window is visible
+---@return boolean
+M.isVisible = function() -- {{{
     local winIDTbl = require("buffer.util").winIds(false)
     local bufInWin
     for _, win in ipairs(winIDTbl) do
@@ -26,10 +26,12 @@ M.isVisible = function()
     end
 
     return false
-end
-
-
-M.debounce = function(ms, func)
+end -- }}}
+--- Delay the function after `ms` then call it
+---@param ms integer How long the function will be after a certain milliseconds
+---@param func function The function to be called
+---@return function
+M.debounce = function(ms, func) -- {{{
     local timer = vim.loop.new_timer()
     if not timer then return end
 
@@ -42,9 +44,10 @@ M.debounce = function(ms, func)
             end)()
         end)
     end
-end
-
-local typeToNum = function(t) -- {{{
+end -- }}}
+--- Convert diagnostics type into number
+---@param t table `vim.diagnostic.severity`
+local diagnosticsTypeToNum = function(t) -- {{{
     if t == 'E' then
         return 1
     elseif t == 'W' then
@@ -55,12 +58,15 @@ local typeToNum = function(t) -- {{{
         return 4
     end
 end -- }}}
-M.sortByFile = function(tbl, curBufNr)
+--- Sort the diagnostics table in place by nearest to current file path
+---@param tbl table
+---@param curBufNr integer
+M.sortByFile = function(tbl, curBufNr) -- {{{
     local curBufName = nvim_buf_get_name(curBufNr)
 
     table.sort(tbl, function(a, b)
         if a.type ~= b.type then
-            return typeToNum(a.type) < typeToNum(b.type)
+            return diagnosticsTypeToNum(a.type) < diagnosticsTypeToNum(b.type)
         else
             local aOk, aBufName = pcall(nvim_buf_get_name, a.bufnr)
             local bOk, bBufName = pcall(nvim_buf_get_name, a.bufnr)
@@ -73,7 +79,7 @@ M.sortByFile = function(tbl, curBufNr)
 
         return false
     end)
-end
+end -- }}}
 
 
 return M

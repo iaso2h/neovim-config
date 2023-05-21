@@ -4,18 +4,12 @@
 -- Version: 0.0.5
 -- Last Modified: 2023-4-26
 
-local M   = {}
+local M = {}
 local zealGlobalChk
 
 --- Look up motionwise selected text with Zeal, Goldendict, Cheat or TL;DR
---- @param args table {motionType, vimMode, plugMap}
----        motionType: String. Motion type by which how the operator perform.
----                    Can be "line", "char" or "block"
----        vimMode:    String. Vim mode. See: `:help mode()`
----        plugMap:    String. eg: <Plug>myPlug
----        vimMode:    String. Vim mode. See: `:help mode()`
-local function lookUp(args)
-
+---@param args GenericOperatorInfo
+local function lookUp(args) -- {{{
     -- local opts     = {hlGroup="Search", timeout=500}
     -- local curBufNr = api.nvim_get_current_buf()
     local operator   = require("operator")
@@ -52,6 +46,7 @@ local function lookUp(args)
     local answer = vim.fn.confirm("Save modification?",
         ">>> &Zeal\n&Goldendict\nch&Eat\n&Thesaurus\n&Cancel", 5, "Question")
     vim.cmd "noa echohl None"
+
     if answer == 1 then
         if vim.fn.executable("zeal") ~= 1 then
             return vim.notify("Zeal not found on environment", vim.log.levels.ERROR)
@@ -84,15 +79,18 @@ local function lookUp(args)
         vim.fn["repeat#set"](t(plugMap))
         vim.fn["visualrepeat#set"](t(plugMap))
     end
+end -- }}}
 
-end
-
+--- Look up keyword globally in the zeal(ignore language)
+---@param args any
 function M.zealGlobal(args)
     zealGlobalChk = true
     lookUp(args)
 end
 
 
+--- Look up keyword specific to its language in the zeal
+---@param args any
 function M.zeal(args)
     zealGlobalChk = false
     lookUp(args)

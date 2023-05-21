@@ -5,7 +5,7 @@
 -- Version: 0.0.5
 -- Last Modified: 2023-4-19
 local M   = {
-    hlIDs = {},
+    hlIds = {},
     guibgs = {},
     lastWord = {}
 }
@@ -28,20 +28,16 @@ local defaultOpts = {
     noWordBoundary  = true,
     guiStyle        = "bold"
 }
-
-
----Navigating by the highlighted interesting word under -          the cursor
+--- Navigating by the highlighted interesting word under the cursor
 ---@param direction number Previous by -1, Next by 1
-M.colorNav = function(direction)
+M.colorNav = function(direction) -- {{{
     if type(direction) ~= "number" and math.abs(direction) ~= 1 then
         vim.notify("Expected -1 or 1 for the argument of colorNav()", vim.log.levels.ERROR)
     end
-end
-
-
+end -- }}}
 ---Generate guifg and guibg in hexadecimal string
----@return string, string hexadecimal color string value
-local randomGUI = function()
+---@return string, string # Hexadecimal color string value
+local randomGUI = function() -- {{{
     local guibg
     local guifg
     local randomNr
@@ -58,21 +54,19 @@ local randomGUI = function()
     guifg = randomNr >= 8388608 and "#000000" or "#ffffff"
 
     return guifg, guibg
-end
-
-
----Get highlight group base on how many guibgs have been created
+end -- }}}
+--- Get the highlight group based on how many guibgs have been created in current window
 ---@param opts table Table value contain option configurations
 ---@param curWinID number Window ID
----@return string, string String value of highlight group name and string value of guibg in hexadecimal
-local getHLGroup = function(opts, curWinID)
+---@return string, string # String value of highlight group name and string value of guibg in hexadecimal
+local getHlGroup = function(opts, curWinID) -- {{{
     -- Reuse highlightgroup when there are 10
     if #M.guibgs == 10 then
         if not M.lastWord[curWinID] then
             return opts.highlightPrefix ..  1
         else
             local lastWord = M.lastWord[curWinID]
-            local offset   = (M.hlIDs[curWinID][lastWord]["count"] % 10) + 1
+            local offset   = (M.hlIds[curWinID][lastWord]["count"] % 10) + 1
             return opts.highlightPrefix .. offset
         end
     -- Create new highlight group
@@ -88,15 +82,13 @@ local getHLGroup = function(opts, curWinID)
 
         return highlightGroup, guibg
     end
-end
-
-
----Apply color for interesting words by calling and wrapping around matchadd()
+end -- }}}
+--- Apply color for interesting words by calling and wrapping around matchadd()
 ---@param word string String value of word to be highlighted
 ---@param opts table Table value contain option configurations
----@param curWinID number Window ID
-local applyColor = function(word, opts, curWinID)
-    M.hlIDs[curWinID] = M.hlIDs[curWinID] or {}
+---@param curWinID integer Window ID
+local applyColor = function(word, opts, curWinID) -- {{{
+    M.hlIds[curWinID] = M.hlIds[curWinID] or {}
 
     local ignoreCase = opts.ignoreCase and [[\c]] or [[\C]]
     local pattern
@@ -105,29 +97,21 @@ local applyColor = function(word, opts, curWinID)
     else
         pattern = string.format([[\V%s\<%s\>]], ignoreCase, word)
     end
-    local hlGroup, guibg = getHLGroup(opts, curWinID)
+    local hlGroup, guibg = getHlGroup(opts, curWinID)
     local hlID    = vim.fn.matchadd(hlGroup, pattern, opts.priority)
 
     -- Record {{{
-    M.hlIDs[curWinID][word] = {}
-    M.hlIDs[curWinID][word].count   = #vim.tbl_keys(M.hlIDs[curWinID])
-    M.hlIDs[curWinID][word].hlID    = hlID
-    M.hlIDs[curWinID][word].hlGroup = hlGroup
-    M.hlIDs[curWinID][word].guibg   = guibg
+    M.hlIds[curWinID][word] = {}
+    M.hlIds[curWinID][word].count   = #vim.tbl_keys(M.hlIds[curWinID])
+    M.hlIds[curWinID][word].hlID    = hlID
+    M.hlIds[curWinID][word].hlGroup = hlGroup
+    M.hlIds[curWinID][word].guibg   = guibg
     M.lastWord[curWinID] = word
     -- }}} Record
-end
-
-
----This the function where g@ function call in normal mode and visual mode to
---start adding the highlighting to interesting words
----@param args table {motionType, vimMode, plugMap}
---        motionType: String. Motion type by which how the operator perform.
---                    Can be "line", "char" or "block"
---        vimMode:    String. Vim mode. See: `:help mode()`
---        plugMap:    String. eg: <Plug>myPlug
----@return nil
-local operator = function(args)
+end -- }}}
+---This the function where g@ function call in normal mode and visual mode to start adding the highlighting to interesting words
+---@param args GenericOperatorInfo
+local operator = function(args) -- {{{
     local motionType = args[1]
     -- Only support characterwise
     if motionType == "block" or motionType == "line" then
@@ -174,50 +158,43 @@ local operator = function(args)
         vim.fn["visualrepeat#set"](t(plugMap))
     end
     -- }}} Get content
-end
-
-
-M.operatorWordBoundary = function(args)
+end -- }}}
+--- Mark the word with no word boundary
+---@param args table see `operator()`
+M.operatorWordBoundary = function(args) -- {{{
     local opts = defaultOpts
     opts.noWordBoundary = false
     args[4] = opts
     operator(args)
-end
-
-
-M.operatorNoWordBoundary = function(args)
+end -- }}}
+--- Mark the word with no word boundary(`\<` and `\>`)
+---@param args table see `operator()`
+M.operatorNoWordBoundary = function(args) -- {{{
     local opts = defaultOpts
     opts.noWordBoundary = true
     args[4] = opts
     operator(args)
-end
-
-
+end -- }}}
 ---Reapplying color to the last word when you feels like the last highlighting word not favouring you
 ---@param opts table Table value contain option configurations
----@return nil
-M.reapplyColor = function(opts)
+M.reapplyColor = function(opts) -- {{{
     local curWinID = vim.api.nvim_get_current_win()
     local lastWord = M.lastWord[curWinID]
     if not lastWord then return vim.notify("No interesting highlighted word in this window yet", vim.log.levels.WARN) end
 
     opts = opts or defaultOpts
-    local hlGroup = M.hlIDs[curWinID][lastWord]["hlGroup"]
-    local guibg   = M.hlIDs[curWinID][lastWord]["guibg"]
+    local hlGroup = M.hlIds[curWinID][lastWord]["hlGroup"]
+    local guibg   = M.hlIds[curWinID][lastWord]["guibg"]
 
     local guifg, guibgNew = randomGUI()
     tbl_replace(M.guibgs, guibgNew, guibg, false, 1, true)
     vim.cmd(string.format("noa hi! %s guifg=%s guibg=%s gui=%s", hlGroup, guifg, guibgNew, opts.guiStyle))
-    M.hlIDs[curWinID][lastWord]["guibg"] = guibgNew
-end
-
-
----Clear all the highlightings on all interesting words in current window.
--- But it still can recovered by call restoreColor()
----@return nil
-M.clearColor = function()
+    M.hlIds[curWinID][lastWord]["guibg"] = guibgNew
+end -- }}}
+---Clear all the highlightings on all interesting words in current window. But it still can recovered by call restoreColor()
+M.clearColor = function() -- {{{
     local curWinID = vim.api.nvim_get_current_win()
-    if not M.hlIDs[curWinID] then
+    if not M.hlIds[curWinID] then
         vim.cmd "noa echohl MoreMsg"
         local answer = vim.fn.confirm("There're no match set in this window, do you want perform a clearmatch() anyway?",
             ">>> &Yes\n&No", 2, "Question")
@@ -229,30 +206,27 @@ M.clearColor = function()
         end
     end
 
-    for _, word in ipairs(vim.tbl_keys(M.hlIDs[curWinID])) do
-        vim.fn.matchdelete(M.hlIDs[curWinID][word]["hlID"])
+    for _, word in ipairs(vim.tbl_keys(M.hlIds[curWinID])) do
+        vim.fn.matchdelete(M.hlIds[curWinID][word]["hlID"])
     end
-    restore = {hlIDs = M.hlIDs, guibgs = M.guibgs, lastWord = M.lastWord}
-    M.hlIDs    = {}
+    restore = {hlIDs = M.hlIds, guibgs = M.guibgs, lastWord = M.lastWord}
+    M.hlIds    = {}
     M.guibgs   = {}
     M.lastWord = {}
-end
-
-
+end -- }}}
 ---Only restorable when you called clear in current window
 ---@param opts table Table value contain option configurations
----@return nil
-M.restoreColor = function(opts)
-    if next(M.hlIDs) then return vim.notify("Interesting highlighted words in this window need to be clear before restoration", vim.log.levels.WARN) end
+M.restoreColor = function(opts) -- {{{
+    if next(M.hlIds) then return vim.notify("Interesting highlighted words in this window need to be clear before restoration", vim.log.levels.WARN) end
 
     opts = opts or defaultOpts
 
-    M.hlIDs    = restore.hlIDs
+    M.hlIds    = restore.hlIDs
     M.guibgs   = restore.guibgs
     M.lastWord = restore.lastWord
-    for _, win in ipairs(vim.tbl_keys(M.hlIDs)) do
+    for _, win in ipairs(vim.tbl_keys(M.hlIds)) do
         if not vim.api.nvim_win_is_valid(win) then
-            M.hlIDs[win]    = nil
+            M.hlIds[win]    = nil
             M.lastWord[win] = nil
         end
     end
@@ -262,14 +236,14 @@ M.restoreColor = function(opts)
     local pattern
     local hlID
 
-    if not M.hlIDs[curWinID] then return vim.notify("No interesting highlighted words to be recolored in this window", vim.log.levels.WARN) end
-    for _, word in ipairs(vim.tbl_keys(M.hlIDs[curWinID])) do
-        hlGroup = M.hlIDs[curWinID][word]["hlGroup"]
-        hlID    = M.hlIDs[curWinID][word]["hlID"]
+    if not M.hlIds[curWinID] then return vim.notify("No interesting highlighted words to be recolored in this window", vim.log.levels.WARN) end
+    for _, word in ipairs(vim.tbl_keys(M.hlIds[curWinID])) do
+        hlGroup = M.hlIds[curWinID][word]["hlGroup"]
+        hlID    = M.hlIds[curWinID][word]["hlID"]
         pattern = opts.ignoreCase and string.format([[\c%s]], word) or string.format([[\C%s]], word)
         vim.fn.matchadd(hlGroup, pattern, opts.priority, hlID)
     end
-end
+end -- }}}
 
 
 return M

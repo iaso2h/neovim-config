@@ -17,15 +17,13 @@
 --   :Lfilter[!] /{pat}/
 --       Same as :Cfilter but operates on the current location list.
 --
-local M   = { }
 
 local lastFilterPat = ""
 --- Filter out quickfix list or locallist by specific pattern
 --- @param qfChk boolean whether filter out quickfix or not
 --- @param pat string pattern to filter out
---- @param bang string if bang value is "!", then items not matching the
----        pattern will be preserved
-M.main = function(qfChk, pat, bang)
+--- @param bang string if bang value is "!", then items not matching the pattern will be preserved
+return function(qfChk, pat, bang)
     local items, title = require("quickfix.util").getlist()
     if not next(items) then return end
 
@@ -93,5 +91,3 @@ M.main = function(qfChk, pat, bang)
     -- Optional step need to do for todo-comment
     vim.defer_fn(require("quickfix.highlight").clear, 0)
 end
-
-return M

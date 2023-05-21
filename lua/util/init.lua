@@ -1,10 +1,13 @@
 local M   = {}
 
 
+--- Check whether the given string is executable
+---@param exec string
+---@return boolean
 M.ex = function(exec) return vim.fn.executable(exec) == 1 end
 
 
-function M.convertMap(mode, lhs, rhs, optsTbl)
+function M.convertMap(mode, lhs, rhs, optsTbl) -- {{{
     local specArg = ""
     local noremap = ""
     local mapString
@@ -29,8 +32,6 @@ function M.convertMap(mode, lhs, rhs, optsTbl)
     end
     return mapString
 end
-
-
 function M.readInitLua()
     local targetF = io.open("C:/users/hashub/desktop/convertedmap1.vim", "w")
     local srcF = io.open("C:/Users/Hashub/AppData/Local/nvim/lua/init.lua", "r")
@@ -64,7 +65,7 @@ function M.readInitLua()
     end
     targetF:close()
     srcF:close()
-end
+end -- }}}
 --- Find all the pat in a string aggressively, based on string.find()
 ---@param srcStr string
 ---@param pat string
@@ -81,13 +82,11 @@ function M.findAll(srcStr, pat) -- {{{
 
     return idxTbl
 end -- }}}
---- Function: M.trimSpaces :Trim all trailing white spaces in current buffer
----
----@param strTbl table of source string need to be trimmed. If no table
----        provided, the whole buffer will be trimmed instead.
+--- Trim all trailing white spaces in current buffer
+---@param strTbl string[] Strings need to be trimmed. If no table provided, the whole buffer will be trimmed instead.
 ---@param silent boolean Default is true. Set this to true to not show trimming result
 ---@param prefix boolean Set to true to trim the suffix as well
----@return  table | nil Return table of trimmed string, otherwise return 0
+---@return table|nil # Return table of trimmed string, otherwise return 0
 function M.trimSpaces(strTbl, silent, prefix) -- {{{
     if not _G._trim_space_on_save then return end
 
@@ -120,11 +119,11 @@ function M.trimSpaces(strTbl, silent, prefix) -- {{{
     end
 end -- }}}
 --- Calculate the distance from pos1 to pos2
----@param pos1       table      {1, 0} based number. Can be retrieved by calling vim.api.nvim_buf_get_mark()
----@param pos2       table      Same as pos1
----@param biasFactor number|nil
----@param biasIdx    number|nil To which value the factor is going to apply
----@return number value of distance from pos1 to pos2
+---@param pos1       table      {1, 0} based. Can be retrieved by calling `vim.api.nvim_buf_get_mark()`
+---@param pos2       table      Same as `pos1`
+---@param biasFactor? number Bias towards `biasIdx`. Deafult is 1
+---@param biasIdx?    number To which value the factor is going to apply. Default is 1
+---@return number # Value of distance from pos1 to pos2
 function M.posDist(pos1, pos2, biasFactor, biasIdx) -- {{{
     biasFactor = biasFactor or 1
     biasIdx    = biasIdx or 1
@@ -149,9 +148,8 @@ function M.compareDist(a, b) -- {{{
     end
     return a[1] == b[1] and a[2] - b[2] or a[1] - b[1]
 end -- }}}
---- Check if pos is whithin a defined region. Note that all position have to
---be the same index based. e.g They must be all (0, 0) indexed or all (1, 0)
---indexed etc
+--- Check if pos is whithin a defined region. Note that all position have to be the same index based.
+--e.g They must be all (0, 0) indexed or all (1, 0) indexed etc
 ---@param pos table
 ---@param regionStart table
 ---@param regionEnd table
@@ -163,22 +161,16 @@ function M.withinRegion(pos, regionStart, regionEnd) -- {{{
         return true
     end
 end -- }}}
---- Create highlights for region in a buffer. The region is defined by two
---- tables containing position info represent the start and the end
---- respectively. The region can be multi-lines across in a buffer
----@param bufNr      number     Buffer number/handler
----@param posStart   table      (1, 0)-indexed values from vim.api.nvim_buf_get_mark()
----@param posEnd     table      (1, 0)-indexed values from vim.api.nvim_buf_get_mark()
----@param regType    string     Register type from vim.fn.getregtype()
----@param hlGroup    string     Highlight group name
----@param hlTimeout  number     Determine how long the highlight will be clear
---- after being created
----@param presNS     number|nil Optional ID of the preserved namespace, in which the
---- preserved extmark will be stored to keep track of highlight content
+--- Create highlights for region in a buffer. The region is defined by two tables containing position info represent the start and the end respectively. The region can be multi-lines across in a buffer
+---@param bufNr      number Buffer number handler
+---@param posStart   table  (1, 0)-indexed values from `vim.api.nvim_buf_get_mark()`
+---@param posEnd     table  (1, 0)-indexed values from `vim.api.nvim_buf_get_mark()`
+---@param regType    string Register type from `vim.fn.getregtype()`
+---@param hlGroup    string Highlight group name
+---@param hlTimeout  number Determine how long the highlight will be clear after being created
+---@param presNS?    number Optional ID of the preserved namespace, in which the preserved extmark will be returned to keep track of the highlighted content
 ---@param zeroBasedChk? boolean Set to true if the posStart and posEnd is (0, 0) based
----@return number|boolean Return integer or true when successful, which is the
---- ID of the preserved namespace of the content defined by. Return false when
---- failed posStart and posEnd
+---@return number|boolean # Return integer or return true when successful. Integer is the ID of the preserved namespace of the content defined by. Return false when failed `posStart` and `posEnd`
 M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, presNS, zeroBasedChk) -- {{{
     if zeroBasedChk == nil then zeroBasedChk = false end
     local presExtmark
@@ -233,8 +225,7 @@ end -- }}}
 -- Credit: https://github.com/LunarVim/LunarVim/blob/2d373036493b3a61ef24d98efdeecbe8e74467be/lua/lvim/utils/modules.lua#L68
 --- A safer require function
 ---@param mod string Module name
----@return any|boolean Data returned by require lua module or false to signify
---a failure require
+---@return module|boolean # Date returned by require lua module or false to signify a failure require
 M.requireSafe = function(mod) -- {{{
     local ok, module = pcall(require, mod)
     if not ok then
@@ -285,12 +276,9 @@ M.saveViewCursor = function(printFormulaChk) -- {{{
 end -- }}}
 --- Get node text at given range
 ---@param bufNr number
----@param range table Captured indices return by calling tsnode:range() . All
----values are 0 index
----@param xOffset? number Negative number to expand the same unit from column
----start and column end, and positive number to shrink. Default 0
----@param yOffset? number Negative number to expand the same unit from row
----start and column end, and positive number to shrink. Default 0
+---@param range table Captured indices return by calling tsnode:range() . All values are 0 index
+---@param xOffset? number Negative number to expand the same unit from column start and column end, and positive number to shrink. Default 0
+---@param yOffset? number Negative number to expand the same unit from row start and column end, and positive number to shrink. Default 0
 ---@param concatChar? string What character will be used as the separator to
 ---concatenate table elements. Default ""
 M.getNodeText = function(bufNr, range, xOffset, yOffset, concatChar) -- {{{
@@ -310,11 +298,11 @@ end -- }}}
 ---@param bufNr number
 ---@param query string
 ---@param captureId? number Specific id to be capture when calling query.iter_captures()
----@return table
+---@return userdata[] Treesitter nodes
 M.getQueryNodes = function(bufNr, query, captureId) -- {{{
     local lastLine = vim.api.nvim_buf_call(bufNr, function()
         ---@diagnostic disable-next-line: redundant-return-value
-        return vim.api.nvim_buf_line_count(0)
+        return vim.api.nvim_buf_line_count(bufNr)
     end)
     local lang = vim.treesitter.language.get_lang(vim.api.nvim_buf_get_option(bufNr, "filetype"))
     local tsParser = vim.treesitter.get_parser(bufNr, lang)
@@ -340,6 +328,7 @@ end -- }}}
 --- Return `true` if any match evaluated to `true`
 ---@param func function Match against each element
 ---@param tbl any[] List-like table
+---@return boolean
 M.any = function(func, tbl) -- {{{
     for _, i in ipairs(tbl) do
         if func(i) then return true end

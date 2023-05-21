@@ -12,8 +12,7 @@ local pallette = require("onenord.pallette")
 
 vim.cmd(string.format([[hi! quickfixHoverKey guifg=%s ]], pallette.n9))
 
---- Destroy floating window and the buffer within created by M.info() before
---- leaving quickfix. This func is mainly used as a autocmd callback
+--- Destroy floating window and the buffer within created by `M.info()` before leaving quickfix. This func is mainly used as a autocmd callback
 M.closeFloatWin = function(_) -- {{{
     if not M.floatWinID then return end
     if not vim.api.nvim_win_is_valid(M.floatWinID) then
@@ -32,8 +31,6 @@ M.closeFloatWin = function(_) -- {{{
     vim.api.nvim_buf_delete(M.hoverBufNr, {force = true})
     M.hoverBufNr = nil
 end -- }}}
-
-
 --- Display quickfix item info under the current cursor
 ---@param printChk boolean Set it to true to print the info table instead
 M.hover = function(printChk) -- {{{

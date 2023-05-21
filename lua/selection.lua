@@ -71,20 +71,20 @@ function M.corner(bias) -- {{{
         end
     end
 end -- }}}
-
-
 --- Get the text of selected area
 ---@param returnType   string  Set to decide to return "string" or "list"
 ---@param exitToNormal boolean Set to decide to return in Normal mode in Neovim
----@return string|table|nil Decided by returnType
+---@return string|string[] # Decided by returnType
 M.get = function(returnType, exitToNormal) -- {{{
     if returnType ~= "list" and returnType ~= "string" then
-        return vim.notify("Not a supported string value", vim.log.levels.ERROR)
+        vim.notify("Not a supported string value", vim.log.levels.ERROR)
+        return ""
     end
     -- Not support blockwise visual mode
     local mode = vim.fn.visualmode()
     if mode == "\22" then
-        return vim.notify("Blockwise visual mode is not supported", vim.log.levels.WARN)
+        vim.notify("Blockwise visual mode is not supported", vim.log.levels.WARN)
+        return ""
     end
 
     -- Return (1,0)-indexed line,col info
@@ -117,8 +117,6 @@ M.get = function(returnType, exitToNormal) -- {{{
     ---@diagnostic disable-next-line: missing-return
     end
 end -- }}}
-
-
 --- Extmark select
 ---@param ns number namespace
 ---@param extmark number

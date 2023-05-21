@@ -10,8 +10,7 @@ local M   = {}
 
 --- Prompt for saving changes
 ---@param bufNr number Buffer number handler
----@return boolean false will be returned if cancel in input, otherwise true
---will be return
+---@return boolean # `false` will be returned if cancel in input, otherwise true will be return
 local function saveModified(bufNr) -- {{{
     if not vim.api.nvim_buf_is_valid(bufNr) then return false end
 
@@ -35,14 +34,10 @@ local function saveModified(bufNr) -- {{{
         end
     end
 end -- }}}
-
-
 --- Go through different special buffers to delete them properly
----@param postRearrange boolean Whether to rearrange the layout after the
---deleting the buffer
----@param handler string "buffer"|"window" Define the specific way to deal with some special
---buffers
----@return boolean false will be return if failed to resolve the special buffer
+---@param postRearrange boolean Whether to rearrange the layout after the deleting the buffer
+---@param handler string `"buffer"|"window"` Define the specific way to deal with some special buffers
+---@return boolean # `false` will be return if failed to resolve the special buffer
 local specialBufHandler = function(postRearrange, handler) -- {{{
     if var.bufType == "nofile" then
         if var.fileType == "tsplayground" then
@@ -82,12 +77,8 @@ local specialBufHandler = function(postRearrange, handler) -- {{{
 
     return false
 end -- }}}
-
-
---- Handler function for closing special buffers, scratch buffers and standard
---buffers in smart way. The buffer is in good hand.
----@param postRearrange boolean Whether to rearrange the layout after the
---deleting the buffer
+--- Handler function for closing special buffers, scratch buffers and standard buffers in smart way. The buffer is in good hand.
+---@param postRearrange boolean Whether to rearrange the layout after the deleting the buffer
 ---@param isSpecial boolean Whether this buffer is a special buffer
 M.bufHandler = function(postRearrange, isSpecial) -- {{{
     if isSpecial or u.isSpecialBuf() then
@@ -171,11 +162,8 @@ M.bufHandler = function(postRearrange, isSpecial) -- {{{
          -- }}}
     end
 end -- }}}
-
-
 --- Handler function for closing window
----@param resortToBufClose boolean Set it to true to call `bufHandler` to
---close the window like closing a buffer when necessary
+---@param resortToBufClose boolean Set it to true to call `bufHandler` to close the window like closing a buffer when necessary
 M.winHandler = function(resortToBufClose) -- {{{
     local fallback = function(isSpecial) -- {{{
         if resortToBufClose then
@@ -214,12 +202,7 @@ M.winHandler = function(resortToBufClose) -- {{{
         end
     end
 end -- }}}
-
-
---- Close window safely and wipe buffer without modifying the layout. The
---window handler function and the buffer handler function both follow the
---pattern that deal with special buffer first, then scratch buffer, then the
---standard buffers
+--- Close window safely and wipe buffer without modifying the layout. The window handler function and the buffer handler function both follow the pattern that deal with special buffer first, then scratch buffer, then the standard buffers
 ---@param type string Expect string value. Possible value: "buffer", "window"
  M.deleteBufferOrWindow = function(type) -- {{{
     u.initBuf()

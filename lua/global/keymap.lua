@@ -50,14 +50,13 @@ local argCheck = function (lhs, rhs, arg) -- {{{
 
     return opts, doc
 end -- }}}
---- Convert arguments to match up the specified ones in vim.api.nvim_set_keymap()
----@param mode string|table Same as vim.api.nvim_set_keymap()
----@param lhs string Same as vim.api.nvim_set_keymap()
----@param rhs string|function Same as vim.api.nvim_set_keymap()
----@param opts table|nil Table value contain `h:map-arguments` strings
--- that will be convert into table then passed into vim.api.nvim_set_keymap
----@param doc string|nil key mapping description
----@return table, table, string
+--- Convert arguments to match up the specified ones in `vim.api.nvim_set_keymap()`
+---@param mode string|table   Same as `vim.api.nvim_set_keymap()`
+---@param lhs string          Same as `vim.api.nvim_set_keymap()`
+---@param rhs string|function Same as `vim.api.nvim_set_keymap()`
+---@param opts? table Table value contain `h:map-arguments` strings that will be convert into table then passed into `vim.api.nvim_set_keymap`
+---@param doc? string key mapping description
+---@return table,table,string
 local argConvert = function(mode, lhs, rhs, opts, doc) -- {{{
     local modeTbl
     -- Parameter "mode" can be either table value or string value, but convert
@@ -109,13 +108,11 @@ local argConvert = function(mode, lhs, rhs, opts, doc) -- {{{
 
     return modeTbl, optsKeyValTbl, rhsStr
 end -- }}}
---- Handy mapping func that wrap around the vim.api.nvim_set_keymap()
----@param mode string|table    Same as vim.api.nvim_set_keymap()
----@param lhs  string          Same as vim.api.nvim_set_keymap()
----@param rhs  string|function Same as vim.api.nvim_set_keymap()
----@vararg ... table|string    Optional table value contain `h:map-arguments` strings
---- that will be convert into table then passed into vim.api.nvim_set_keymap.
---- Optional key mapping description
+--- Handy mapping func that wrap around the `vim.api.nvim_set_keymap()`
+---@param mode string|table    Same as `vim.api.nvim_set_keymap()`
+---@param lhs  string          Same as `vim.api.nvim_set_keymap()`
+---@param rhs  string|function Same as `vim.api.nvim_set_keymap()`
+---@vararg table|string    Optional table value contain `h:map-arguments` strings that will be convert into table then passed into vim.api.nvim_set_keymap. Optional key mapping description
 _G.map = function(mode, lhs, rhs, ...) -- {{{
     -- Behavior difference between vim.keymap.set() and api.nvim_set_keymap()
     -- https://github.com/neovim/neovim/commit/6d41f65aa45f10a93ad476db01413abaac21f27d
@@ -141,14 +138,12 @@ _G.map = function(mode, lhs, rhs, ...) -- {{{
         return vim.api.nvim_del_keymap("s", lhs)
     end
 end -- }}}
---- Handy mapping func that wrap around the vim.api.nvim_buf_set_keymap()
----@param bufNr number          Same as vim.api.nvim_buf_set_keymap()
----@param mode  string|table    Same as vim.api.nvim_buf_set_keymap()
----@param lhs   string          Same as vim.api.nvim_buf_set_keymap()
----@param rhs   string|function Same as vim.api.nvim_buf_set_keymap()
----@vararg ...  table|string     Optional table value contain `h:map-arguments` strings
---- that will be convert into table then passed into vim.api.nvim_set_keymap.
---- Optional key mapping description
+--- Handy mapping func that wrap around the `vim.api.nvim_buf_set_keymap()`
+---@param bufNr number          Same as `vim.api.nvim_buf_set_keymap()`
+---@param mode  string|table    Same as `vim.api.nvim_buf_set_keymap()`
+---@param lhs   string          Same as `vim.api.nvim_buf_set_keymap()`
+---@param rhs   string|function Same as `vim.api.nvim_buf_set_keymap()`
+---@vararg table|string    Optional table value contain `h:map-arguments` strings -that will be convert into table then passed into vim.api.nvim_set_keymap. -Optional key mapping description
 _G.bmap = function(bufNr, mode, lhs, rhs, ...) -- {{{
     assert(type(bufNr) == "number", "#1 argument is not a valid number")
     local opts, doc = argCheck(lhs, rhs, {...})
@@ -172,11 +167,13 @@ _G.bmap = function(bufNr, mode, lhs, rhs, ...) -- {{{
         return vim.api.nvim_buf_del_keymap(bufNr, "s", lhs)
     end
 end -- }}}
+--- Replaces terminal codes and keycodes
+---@param str string
+---@return string
 _G.t = function(str) -- {{{
     return vim.api.nvim_replace_termcodes(str, true, true, true)
 end -- }}}
-----
--- Function: _G.luaRHS: Let you write rhs of mapping in a comafortable way
+--- Let you write rhs of mapping in a comafortable way
 
 -- Before:
             -- map("n", [[<Plug>ReplaceCurLine]], [[:lua vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register); require("replace").replaceSave(); if require("replace").regType == "=" then vim.g.ReplaceExpr = vim.fn.getreg("=") end; vim.cmd("norm! V" .. vim.v.count1 .. "_" .. "<lt>Esc>"); require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>]], {"silent"})
@@ -196,10 +193,8 @@ end -- }}}
                 -- require("replace").operator({"line", "V", "<Plug>ReplaceCurLine", true})<CR>
                 -- ]],
                 -- {"silent"})
---
--- @param str: RHS mapping
--- @return: nil
-----
+---@param str string
+---@return string
 _G.luaRHS = function(str) -- {{{
     assert(type(str) == "string", "Expected string value")
 
@@ -211,15 +206,4 @@ _G.luaRHS = function(str) -- {{{
     return tostring(
         concatStr:sub(1, 1) == " " and
         concatStr:sub(2, -1) or concatStr)
-end -- }}}
-_G.vimRHS = function(str) -- {{{
-    assert(type(str) == "string", "Expected string value")
-
-    local strTbl = vim.split(str, "\n", false)
-    strTbl = vim.tbl_filter(function(i) return not i:match("^%s*$") end, strTbl)
-        local concatStr = string.gsub(table.concat(strTbl, "<Bar> "), "%s+", " ")
-
-    return tostring(
-        concatStr:sub(1, 1) == " " and
-        concatStr:sub(2, -1) or concatStr:sub(1, -1))
 end -- }}}

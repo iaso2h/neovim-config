@@ -31,10 +31,10 @@ local langSuffix = {
 
 
 --- Return different prefix of variable assignment based on language type
---- @param lang string Value of code language
---- @param lhs  string Value of LHS
---- @return string value of prefix
-local getPrefix = function(lang, lhs)
+---@param lang string Value of code language
+---@param lhs  string Value of LHS
+---@return string value of prefix
+local getPrefix = function(lang, lhs) -- {{{
     if lang == "vim" then
         return "let "
     elseif lang == "lua" then
@@ -46,24 +46,18 @@ local getPrefix = function(lang, lhs)
     else
         return ""
     end
-end
-
-
+end -- }}}
 --- Join string table based on language
---- @param rhs string RHS of language expression
---- @return string
-local joinRHS = function(rhs)
+---@param rhs string RHS of language expression
+---@return string
+local joinRHS = function(rhs) -- {{{
     local lines = vim.split(rhs, "\n", {plain = true})
     lines = util.trimSpaces(lines, false, true)
     -- TODO remove line suffix like ";" in c, cpp language when concatenate the line
     return table.concat(lines, " ")
-end
-
-
+end -- }}}
 --- Get the source content from visual selection
---- @return table For "v" mode, return string value of source content value, and the
---- namespace together with the extmark to track the position information; For
---- "V" mode return string value of source content value for "V" mode only.
+---@return table # For "v" mode, return string value of source content value, and the namespace together with the extmark to track the position information; For "V" mode return string value of source content value for "V" mode only.
 local getSrcContent = function() -- {{{
     local startPos
     local endPos
@@ -130,14 +124,12 @@ local getSrcContent = function() -- {{{
         return {srcContent}
     end
 end -- }}}
-
-
 --- Create new variable
---- @param lhs          string Value of the LHS
---- @param rhs          string Value of the RHS
---- @param namespace    number Value of the namespace handler
---- @param extmark      number Value of the extmark ID
---- @param linebreakChk boolean
+---@param lhs          string Value of the LHS
+---@param rhs          string Value of the RHS
+---@param namespace    number Value of the namespace handler
+---@param extmark      number Value of the extmark ID
+---@param linebreakChk boolean
 local newVar = function(lhs, rhs, namespace, extmark, linebreakChk) -- {{{
     local lang = vim.bo.filetype
     local prefix = getPrefix(lang, lhs)
@@ -175,10 +167,8 @@ local newVar = function(lhs, rhs, namespace, extmark, linebreakChk) -- {{{
     vim.api.nvim_win_set_cursor(0, newLineStart)
     -- }}} Put new content
 end -- }}}
-
-
 --- Create new file at given path
---- @param filePath string value contain new file path
+---@param filePath string value contain new file path
 M.newFile = function(filePath) -- {{{
     -- Find index of last slash
     -- local newFilePath = [[C:/user/test\test123\test321.lua]]
@@ -229,30 +219,22 @@ M.newFile = function(filePath) -- {{{
     local openFileAnswer = vim.fn.confirm("Load the new file into buffer?", "&Yes\n&No", 1)
     if openFileAnswer == 1 then vim.cmd("e " .. filePath) end
 end -- }}}
-
-
-M.newIdentifier = function(newID)
+--- Get the new identifier for statements block of file
+---@param newId integer The new window ID
+M.newIdentifier = function(newId) -- {{{
     -- Get source content
     local src, namespace, extmark, linebreakChk = unpack(getSrcContent())
     if not src then return end -- Sanity check
 
     -- Create new variable or new file
     if M.vimMode == "v" or M.vimMode == "n" then
-        return newVar(newID, src, namespace, extmark, linebreakChk)
+        return newVar(newId, src, namespace, extmark, linebreakChk)
     elseif M.vimMode == "V" then
-        return M.newFile(newID)
+        return M.newFile(newId)
     end
-end
-
-
---- Main function to start the extraction for creating either
---- new variable or new file
---- @param args table {motionType, vimMode, plugMap}
----        motionType string Motion type by which how the operator perform.
----                    Can be "line", "char" or "block"
----        vimMode    string Vim mode. See `help mode()`
----        plugMap    string eg <Plug>myPlug
----        vimMode     string Vim mode. See `help mode()`
+end -- }}}
+--- Main function to start the extraction for creating either -new variable or new file
+---@param args GenericOperatorInfo
 function M.main(args) -- {{{
     M.vimMode    = args[2]
     M.motionType = args[1]
