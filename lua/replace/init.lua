@@ -72,7 +72,7 @@ end -- }}}
 ---@param regContent string Value of register content
 ---@param motionRegion table Contain start and end position of operator
 --movement. {1, 0} index
----@param motionDirection number 1 indicate motionRegion like "j, w, f" is moving forward -1 indicates motionRegion is moving backward
+---@param motionDirection integer 1 indicate motionRegion like "j, w, f" is moving forward -1 indicates motionRegion is moving backward
 ---@param vimMode string Vim mode
 ---@return string|nil Value of changed register content or nil if no content changed
 ---when reindentation is successful
@@ -107,7 +107,7 @@ end -- }}}
 --- Match the motionType type with register type
 ---@param motionType string motionRegion type by which how the operator perform. "line" or "char"
 ---@param motionRegion table Contains start and end position of operator movement. {1, 0} indexed
----@param motionDirection number 1 indicate motionRegion like "j, w, f" is moving
+---@param motionDirection integer 1 indicate motionRegion like "j, w, f" is moving
 ---@param vimMode string Vim mode. See: `:help mode()`
 ---@param reg table Contain name, type, content of v:register .Can be "line", "char" or "block" forward, -1 indicates motionRegion is moving backward
 ---@return table reg The new reg table(might or might not have been modified) otherwise return false

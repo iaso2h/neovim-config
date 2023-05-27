@@ -29,7 +29,7 @@ local defaultOpts = {
     guiStyle        = "bold"
 }
 --- Navigating by the highlighted interesting word under the cursor
----@param direction number Previous by -1, Next by 1
+---@param direction integer Previous by -1, Next by 1
 M.colorNav = function(direction) -- {{{
     if type(direction) ~= "number" and math.abs(direction) ~= 1 then
         vim.notify("Expected -1 or 1 for the argument of colorNav()", vim.log.levels.ERROR)
@@ -57,7 +57,7 @@ local randomGUI = function() -- {{{
 end -- }}}
 --- Get the highlight group based on how many guibgs have been created in current window
 ---@param opts table Table value contain option configurations
----@param curWinID number Window ID
+---@param curWinID integer Window ID
 ---@return string, string # String value of highlight group name and string value of guibg in hexadecimal
 local getHlGroup = function(opts, curWinID) -- {{{
     -- Reuse highlightgroup when there are 10

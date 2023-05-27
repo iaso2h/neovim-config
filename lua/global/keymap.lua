@@ -139,7 +139,7 @@ _G.map = function(mode, lhs, rhs, ...) -- {{{
     end
 end -- }}}
 --- Handy mapping func that wrap around the `vim.api.nvim_buf_set_keymap()`
----@param bufNr number          Same as `vim.api.nvim_buf_set_keymap()`
+---@param bufNr integer          Same as `vim.api.nvim_buf_set_keymap()`
 ---@param mode  string|table    Same as `vim.api.nvim_buf_set_keymap()`
 ---@param lhs   string          Same as `vim.api.nvim_buf_set_keymap()`
 ---@param rhs   string|function Same as `vim.api.nvim_buf_set_keymap()`

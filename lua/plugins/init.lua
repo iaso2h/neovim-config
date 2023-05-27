@@ -1172,7 +1172,7 @@ local lazyOpts = { -- {{{
 } -- }}}
 
 vim.api.nvim_create_user_command("CDPlugin", function()
-    vim.cmd("cd " .. vim.fn.stdpath("data") .. "/lazy")
+    vim.cmd("cd " .. _G._plugin_root)
     vim.notify("Change directory to Lazy plug-ins path", vim.log.levels.INFO)
 end, { desc = "Change directory to lazy plug-ins path" })
 

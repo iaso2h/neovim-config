@@ -24,7 +24,7 @@ local setCurrentWin = function(closeQfChk, qfWinId, targetCursorPos) -- {{{
     end
 end -- }}}
 --- Open quickfix item
----@param targetLineNr number
+---@param targetLineNr integer
 ---@vararg any see `setCurrentWin()`
 local open = function(targetLineNr, ...) -- {{{
     local prevBufNr = vim.fn.bufnr("$")

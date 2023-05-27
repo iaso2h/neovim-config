@@ -121,9 +121,9 @@ end -- }}}
 --- Calculate the distance from pos1 to pos2
 ---@param pos1       table      {1, 0} based. Can be retrieved by calling `vim.api.nvim_buf_get_mark()`
 ---@param pos2       table      Same as `pos1`
----@param biasFactor? number Bias towards `biasIdx`. Deafult is 1
----@param biasIdx?    number To which value the factor is going to apply. Default is 1
----@return number # Value of distance from pos1 to pos2
+---@param biasFactor? integer Bias towards `biasIdx`. Deafult is 1
+---@param biasIdx?    integer To which value the factor is going to apply. Default is 1
+---@return integer # Value of distance from pos1 to pos2
 function M.posDist(pos1, pos2, biasFactor, biasIdx) -- {{{
     biasFactor = biasFactor or 1
     biasIdx    = biasIdx or 1
@@ -141,7 +141,7 @@ end -- }}}
 --- Compare the distance from a to b by subtracting them
 ---@param a table list-liked table
 ---@param b table list-liked table
----@return number
+---@return integer
 function M.compareDist(a, b) -- {{{
     for idx, val in ipairs({a, b}) do
         assert(vim.tbl_islist(val), string.format("Argument %s expects list-liked table", idx))
@@ -162,15 +162,15 @@ function M.withinRegion(pos, regionStart, regionEnd) -- {{{
     end
 end -- }}}
 --- Create highlights for region in a buffer. The region is defined by two tables containing position info represent the start and the end respectively. The region can be multi-lines across in a buffer
----@param bufNr      number Buffer number handler
+---@param bufNr      integer Buffer number handler
 ---@param posStart   table  (1, 0)-indexed values from `vim.api.nvim_buf_get_mark()`
 ---@param posEnd     table  (1, 0)-indexed values from `vim.api.nvim_buf_get_mark()`
 ---@param regType    string Register type from `vim.fn.getregtype()`
 ---@param hlGroup    string Highlight group name
----@param hlTimeout  number Determine how long the highlight will be clear after being created
----@param presNS?    number Optional ID of the preserved namespace, in which the preserved extmark will be returned to keep track of the highlighted content
+---@param hlTimeout  integer Determine how long the highlight will be clear after being created
+---@param presNS?    integer Optional ID of the preserved namespace, in which the preserved extmark will be returned to keep track of the highlighted content
 ---@param zeroBasedChk? boolean Set to true if the posStart and posEnd is (0, 0) based
----@return number|boolean # Return integer or return true when successful. Integer is the ID of the preserved namespace of the content defined by. Return false when failed `posStart` and `posEnd`
+---@return integer|boolean # Return integer or return true when successful. Integer is the ID of the preserved namespace of the content defined by. Return false when failed `posStart` and `posEnd`
 M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, presNS, zeroBasedChk) -- {{{
     if zeroBasedChk == nil then zeroBasedChk = false end
     local presExtmark
@@ -275,10 +275,10 @@ M.saveViewCursor = function(printFormulaChk) -- {{{
     end -- }}}
 end -- }}}
 --- Get node text at given range
----@param bufNr number
+---@param bufNr integer
 ---@param range table Captured indices return by calling tsnode:range() . All values are 0 index
----@param xOffset? number Negative number to expand the same unit from column start and column end, and positive number to shrink. Default 0
----@param yOffset? number Negative number to expand the same unit from row start and column end, and positive number to shrink. Default 0
+---@param xOffset? integer Negative number to expand the same unit from column start and column end, and positive number to shrink. Default 0
+---@param yOffset? integer Negative number to expand the same unit from row start and column end, and positive number to shrink. Default 0
 ---@param concatChar? string What character will be used as the separator to
 ---concatenate table elements. Default ""
 M.getNodeText = function(bufNr, range, xOffset, yOffset, concatChar) -- {{{
@@ -295,9 +295,9 @@ M.getNodeText = function(bufNr, range, xOffset, yOffset, concatChar) -- {{{
     return table.concat(text, concatChar)
 end -- }}}
 --- Get nodes from Treesitter query
----@param bufNr number
+---@param bufNr integer
 ---@param query string
----@param captureId? number Specific id to be capture when calling query.iter_captures()
+---@param captureId? integer Specific id to be capture when calling query.iter_captures()
 ---@return userdata[] Treesitter nodes
 M.getQueryNodes = function(bufNr, query, captureId) -- {{{
     local lastLine = vim.api.nvim_buf_call(bufNr, function()

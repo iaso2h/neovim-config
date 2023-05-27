@@ -3,7 +3,7 @@ local var = require("buffer.var")
 
 
 --- Gather information about buffers and windows for further processing
----@param bufNr? number
+---@param bufNr? integer
 M.initBuf = function(bufNr) -- {{{
     var.bufNr    = bufNr or vim.api.nvim_get_current_buf()
     var.bufNrs   = M.bufNrs(true, false)
@@ -14,7 +14,7 @@ M.initBuf = function(bufNr) -- {{{
     var.winIds   = M.winIds(false)
 end -- }}}
 --- Check if the provided buffer is a special buffer
----@param bufNr? number If it isn't provided, the `var.bufNr` will be used
+---@param bufNr? integer If it isn't provided, the `var.bufNr` will be used
 ---@return boolean
 M.isSpecialBuf = function(bufNr) -- {{{
     bufNr = bufNr or var.bufNr
@@ -24,7 +24,7 @@ M.isSpecialBuf = function(bufNr) -- {{{
     return bufType ~= "" and (not modifiable or not bufListed)
 end -- }}}
 --- Check if the provided buffer is a scratch buffer
----@param bufNr? number If it isn't provided, the `var.bufName` will be used instead
+---@param bufNr? integer If it isn't provided, the `var.bufName` will be used instead
 ---@return boolean
 M.isScratchBuf = function(bufNr) -- {{{
     if not bufNr then
@@ -34,7 +34,7 @@ M.isScratchBuf = function(bufNr) -- {{{
     end
 end -- }}}
 --- Force wipe the given buffer, if no bufNr is provided, then current buffer will be wiped
----@param bufNr? number If it isn't provided, the `var.bufNr` will be used instead
+---@param bufNr? integer If it isn't provided, the `var.bufNr` will be used instead
 ---@param switchBeforeClose? boolean Default is false. Set it to true to switch all the buffer instance in all windows to an alternative buffer in advance before closing up the buffer entirely
 ---@param scheduleWrap? boolean Whether to use `vim.schedule_wrap()` to defer
 --the buffer close action
@@ -93,8 +93,8 @@ M.bufNrs = function(listedOnly, loadedOnly) -- {{{
     return vim.tbl_filter(cond, rawBufNrs)
 end -- }}}
 --- Switch to alternative buffer or previous buffer before wiping current buffer
----@param winId? number Window ID in which the buffer nest will be switch to an alternative buffer. Default is `var.winId` if no window ID provided
----@param bufNr? number What buffer number will be switch away in the specific
+---@param winId? integer Window ID in which the buffer nest will be switch to an alternative buffer. Default is `var.winId` if no window ID provided
+---@param bufNr? integer What buffer number will be switch away in the specific
 --window. Default is `var.bufNr` if no buffer number provided
 M.bufSwitchAlter = function(winId, bufNr) -- {{{
     winId = winId or var.winId
@@ -135,9 +135,9 @@ M.bufSwitchAlter = function(winId, bufNr) -- {{{
 
 end -- }}}
 --- Check how many times the specified buffer occurs in all windows
----@param bufNr? number If it isn't provided, the `var.bufNr` will be used instead
+---@param bufNr? integer If it isn't provided, the `var.bufNr` will be used instead
 ---@param winIds? table If it isn't provided, the `var.winIds` will be used instead
----@return number,table # How many same provided buffer instances display in other windows and the window IDs that contain the provided buffer Note that the function will always take the current window into account
+---@return integer,table # How many same provided buffer instances display in other windows and the window IDs that contain the provided buffer Note that the function will always take the current window into account
 M.bufOccurInWins = function(bufNr, winIds) -- {{{
     bufNr  = bufNr  or var.bufNr
     winIds = winIds or var.winIds
@@ -155,7 +155,7 @@ end -- }}}
 --- Check how many buffers in the specified buffer table occur in the specified window table
 ---@param bufNrs? table If it isn't provided, the `var.bufNrs` will be used instead
 ---@param winIds? table If it isn't provided, the `var.winIds` will be used instead
----@return number # The occurrence time
+---@return integer # The occurrence time
 M.bufsOccurInWins = function(bufNrs, winIds) -- {{{
     bufNrs = bufNrs or var.bufNrs
     winIds = winIds or var.winIds
@@ -170,7 +170,7 @@ M.bufsOccurInWins = function(bufNrs, winIds) -- {{{
 end -- }}}
 --- Return valid and loaded buffer count
 ---@param bufNrs? table Use `var.bufNrs` if no buffer table provided
----@return number # The occurrence time
+---@return integer # The occurrence time
 M.bufsNonScratchOccurInWins = function(bufNrs) -- {{{
     bufNrs = bufNrs or var.bufNrs
 
@@ -205,7 +205,7 @@ M.winIdPrev = function() -- {{{
 end -- }}}
 -- Return window occurrences in Neovim
 ---@param winIds? integer[] If it isn't provided, the `var.winIds` will be used instead
----@return number The occurrence
+---@return integer The occurrence
 M.winsOccur = function(winIds) -- {{{
     -- Take two NNP windows into account
     winIds = winIds or var.winIds
@@ -230,7 +230,7 @@ M.winsOccur = function(winIds) -- {{{
     end
 end -- }}}
 --- Function wrap around `vim.api.nvim_win_close`
----@param winId? number Use `var.winId` if no window ID provided
+---@param winId? integer Use `var.winId` if no window ID provided
 ---@param scheduleWrap? boolean Wether to use `vim.schedule_wrap()` to defer the window close action
 M.winClose = function(winId, scheduleWrap) -- {{{
     winId = winId or var.winId
@@ -244,7 +244,7 @@ M.winClose = function(winId, scheduleWrap) -- {{{
     end
 end -- }}}
 --- Get the layout in which the target window nested in
----@param matchPattern? number|function Specify how to match a target window. Default is current window ID. You can pass in a specific window ID or a function that take window ID as its parameter, they will check against each window ID by calling this function recursively until it finds a match, which means the window IDs are equal or `matchPattern(<window ID>)` is evaluated to be `true`
+---@param matchPattern? integer|function Specify how to match a target window. Default is current window ID. You can pass in a specific window ID or a function that take window ID as its parameter, they will check against each window ID by calling this function recursively until it finds a match, which means the window IDs are equal or `matchPattern(<window ID>)` is evaluated to be `true`
 ---@param layout? table Return value of `vim.fn.winlayout()`, contains the layout data of target window. It's used for internal loop only, and should be not passed in any value in the first calling stack. This layout is heavily nested when it's initialized in the first place, so we need to iterating through it over and over again
 ---@param superiorLayout? string The parent layout the target nested in. It's used for internal loop only as the `layout` argument does
 ---@return string,table The parent layout string and the table contain sibling data

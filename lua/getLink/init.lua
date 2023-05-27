@@ -28,16 +28,16 @@ local function openUrl(url, timeout, bufNr) -- {{{
             vim.fn.system{"xdg-open", url}
         end
     end, timeout)
-end -- }}} 
+end -- }}}
 --- Highlight area in current line
----@param bufNr number
----@param lnum number
----@param colStart number
----@param colEnd number
+---@param bufNr integer
+---@param lnum integer
+---@param colStart integer
+---@param colEnd integer
 local function highlight(bufNr, lnum, colStart, colEnd) -- {{{
     vim.api.nvim_buf_clear_namespace(bufNr, M.ns, 0, -1)
     vim.api.nvim_buf_add_highlight(bufNr, M.ns, M.highlightGroup, lnum - 1, colStart, colEnd)
-end -- }}} 
+end -- }}}
 --- Get the url link
 ---@param bufNr integer
 ---@param cursorPos table (1, 0) based
@@ -51,7 +51,7 @@ local getUrl = function(bufNr, cursorPos, curLine) -- {{{
         return url
     end
     return ""
-end -- }}} 
+end -- }}}
 ---@param url string The url string
 function M.main(url) -- {{{
     if not url then
@@ -90,7 +90,7 @@ function M.main(url) -- {{{
                 vim.fn.system{"xdg-open", url}
         end
     end
-end -- }}} 
+end -- }}}
 
 
 return M

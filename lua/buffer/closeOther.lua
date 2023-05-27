@@ -12,7 +12,7 @@ local buftypeWhitelist  = {"terminal"}
 
 --- Check modified state of specified buffer numbers and prompt for saving if unsave changes found
 ---@param bufNrs table
----@param saveBufNr number
+---@param saveBufNr integer
 ---@return boolean # Evaluate to `false` if cancel signal has input
 local saveModified = function(bufNrs, saveBufNr)  -- {{{
     local changeTick = require("util").any(function(bufNr)
@@ -35,7 +35,7 @@ local saveModified = function(bufNrs, saveBufNr)  -- {{{
     end
 
     return true
-end -- }}} 
+end -- }}}
 
 
 --- Wipe all the other buffers except for the special buffers without changing the window layout
@@ -68,4 +68,4 @@ return function()
     if package.loaded["cokeline"] then
         require("cokeline/augroups").toggle()
     end
-end 
+end

@@ -35,7 +35,7 @@ local highlightCondition = function() -- {{{
     else
         return true
     end
-end -- }}} 
+end -- }}}
 --- Get all the comment nodes that contain foldmark in the current buffer
 ---@param bufNr integer
 ---@return table # Table of Treesitter nodes
@@ -54,7 +54,7 @@ local getFoldmarkers = function(bufNr) -- {{{
         vim.notify("Can't get fold markers from queries")
         return {}
     end
-end -- }}} 
+end -- }}}
 --- Get the current folder marker region
 ---@param cursorPos table (1, 0) indexed
 ---@param bufNr integer
@@ -97,14 +97,14 @@ local getCurrentMarkers = function(cursorPos, bufNr) -- {{{
     end
 
     return {Start = nodeStart, End = nodeEnd}
-end -- }}} 
+end -- }}}
 --- Clear namespace for specific buffer number
 ---@param bufNr integer
 local clearNS = function(bufNr) -- {{{
     vim.api.nvim_buf_clear_namespace(bufNr, M.ns, 0, -1)
-end -- }}} 
+end -- }}}
 --- Highlight Treesitter node content
----@param bufNr number
+---@param bufNr integer
 ---@param markerNodes table Treesitter nodes
 ---@param highlightGroup string
 local addHighlight = function(bufNr, markerNodes, highlightGroup, markerOnlyChk) -- {{{
@@ -124,7 +124,7 @@ local addHighlight = function(bufNr, markerNodes, highlightGroup, markerOnlyChk)
     end
     -- Clear highlight after certain timeout
     vim.defer_fn(function() clearNS(bufNr) end, M.highlightTimeout)
-end -- }}} 
+end -- }}}
 --- Highlight the current fold marker region
 M.highlightCurrentMarkerRegion = function() -- {{{
     if not highlightCondition() then return end
@@ -142,7 +142,7 @@ M.highlightCurrentMarkerRegion = function() -- {{{
     end
 
     addHighlight(bufNr, vim.tbl_values(markers), M.highlightNormalGroup)
-end -- }}} 
+end -- }}}
 --- Modify a specific foldmarker
 ---@param bufNr integer
 ---@param nodeRange table Captured by calling `{node:range()}`
@@ -246,9 +246,9 @@ end
 
 --- Get the next non-folded line number. If topline is already a non-folded
 --- line, then topline will be return
----@param topline number
----@param botline number
----@return number
+---@param topline integer
+---@param botline integer
+---@return integer
 local getNextNonFoldLine = function(topline, botline)
     local nextline = topline
     while nextline < botline do
@@ -286,8 +286,8 @@ end
 
 --- Get the first non-folded region in a bigger region specified by a topline
 --- number and a botline number
----@param topline number
----@param botline number
+---@param topline integer
+---@param botline integer
 ---@return table Ex: {1, 34}
 local getNonFoldRegion = function(topline, botline)
     for i = topline, botline, 1 do
@@ -304,8 +304,8 @@ end
 
 --- Get all non-folded regions inside a bigger region specified by a topline
 --- number and a botline number
----@param topline number
----@param botline number
+---@param topline integer
+---@param botline integer
 ---@return table Ex: {{1, 34}, {54, 131}, {185, 202}}
 M.getAllNonFoldRegion = function(topline, botline)
     local region
@@ -345,10 +345,10 @@ end
 
 
 --- Snap to a specific line
----@param curWinNr  number Current window number
----@param curBufNr  number Current buffer number
+---@param curWinNr  integer Current window number
+---@param curBufNr  integer Current buffer number
 ---@param cursorPos table  Cursor info retrieved by calling nvim_win_set_cursor
----@param lineNr    number Destination line number
+---@param lineNr    integer Destination line number
 local function snapToLine(curWinNr, curBufNr, cursorPos, lineNr)
     local regionEndTextLen = #vim.api.nvim_buf_get_lines(curBufNr, lineNr - 1, lineNr, false)[1]
     if regionEndTextLen - 1 < cursorPos[2] then
@@ -380,7 +380,7 @@ end
 ---end
 ---@param snapEnable boolean Whether to enable the snap. If this set to false,
 --- the exCmd will act like a right hand side of a normal mapping
----@param threshold number Multiplied by the Neovim window height to get the
+---@param threshold integer Multiplied by the Neovim window height to get the
 --- minimum number for the snap taking place
 M.snap = function(exCmd, snapEnable, threshold)
     --

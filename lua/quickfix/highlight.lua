@@ -18,8 +18,8 @@ end -- }}}
 --- Highlight lines in quickfix window
 ---@param lineTbl table Contains 1-indexed line number
 ---@param hlGroup string Highlight group
----@param ns number Namespace handler return by calling `vim.api.nvim_create_namespace()`
----@param bufNr? number Optional buffer number
+---@param ns integer Namespace handler return by calling `vim.api.nvim_create_namespace()`
+---@param bufNr? integer Optional buffer number
 M.addLines = function(lineTbl, hlGroup, ns, bufNr) -- {{{
     bufNr = bufNr or vim.api.nvim_get_current_buf()
 

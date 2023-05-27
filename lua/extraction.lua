@@ -127,8 +127,8 @@ end -- }}}
 --- Create new variable
 ---@param lhs          string Value of the LHS
 ---@param rhs          string Value of the RHS
----@param namespace    number Value of the namespace handler
----@param extmark      number Value of the extmark ID
+---@param namespace    integer Value of the namespace handler
+---@param extmark      integer Value of the extmark ID
 ---@param linebreakChk boolean
 local newVar = function(lhs, rhs, namespace, extmark, linebreakChk) -- {{{
     local lang = vim.bo.filetype

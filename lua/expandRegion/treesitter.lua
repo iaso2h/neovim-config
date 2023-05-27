@@ -1,6 +1,3 @@
-local fn      = vim.fn
--- local cmd  = vim.cmd
-local api     = vim.api
 local util    = require("util")
 local cbPairs = require("expandRegion.treesitterCodeBlockPairs")
 local M       = {}
@@ -9,12 +6,12 @@ local codeBlockPairBlackList = {"python"}
 
 
 --- Get the region range of a treesitter node
---- @param tsNode object treesitter node
---- @param getStrNodeContent boolean set it true to subtract the region to the
+--- @param tsNode TSNode Treesitter node
+--- @param getStrNodeContent boolean Set it true to subtract the region to the
 ---        content a string, excluding the quotation marks
 --- @return table (1,0) index based region position of the treesitter node, can be passed to
 --- vim.api.nvim_win_set_cursor()
-M.getNodeRange = function(tsNode, getStrNodeContent)
+M.getNodeRange = function(tsNode, getStrNodeContent) -- {{{
     local startRow, startCol, endRow, endCol = tsNode:range()
     if getStrNodeContent and tsNode:type() == "string" then
         -- Convert to (1,0) based to be passed to vim.api.nvim_win_set_cursor
@@ -28,14 +25,11 @@ M.getNodeRange = function(tsNode, getStrNodeContent)
             posEnd   = {endRow + 1,   endCol - 1}
         }
     end
-end
-
-
+end -- }}}
 --- Get the two treesitter nodes at the start and end of a code block
 --- determined by a parentNode
---- @param parentNode userdata two treesitter node objects or just one treesitter when
----        there is only one child node for the parentNode
-M.getPairNode = function(parentNode)
+--- @param parentNode TSNode Treesitter Node
+M.getPairNode = function(parentNode) -- {{{
     -- The first node at code block determined by parentNode
     local startNode = parentNode:named_child(
         cbPairs["ts_" .. parentNode:type()].childStart)
@@ -60,14 +54,12 @@ M.getPairNode = function(parentNode)
             return startNode, nextNamedSibling, parentNode
         end
     end
-end
-
-
+end -- }}}
 --- Get the parent node of a treesitter node
 --- @param nodeTbl table Treesitter node object
 --- the start node and the end node to indicate the code block
---- @return boolean or objects of treesitter node If no available parent node, false will be return
-M.getParentNode = function(nodeTbl)
+--- @return boolean|TSNode If no available parent node, false will be return
+M.getParentNode = function(nodeTbl) -- {{{
     -- When arguments is composed of two treesitter nodes, which are used to
     -- determined the code block they wrap around, we can just use the parent
     -- node of the first argument as the the new parent node. If the new
@@ -84,7 +76,7 @@ M.getParentNode = function(nodeTbl)
     local cmpStart
     local cmpEnd
 
-    local indentical
+    local identical
     repeat
         -- looping threshold set to 5
         cnt            = cnt + 1
@@ -96,11 +88,11 @@ M.getParentNode = function(nodeTbl)
         parentNodeRange = M.getNodeRange(parentNode, false)
         cmpStart = util.compareDist(nodeRange.posStart, parentNodeRange.posStart)
         cmpEnd   = util.compareDist(nodeRange.posEnd,   parentNodeRange.posEnd)
-        indentical = cmpStart == 0 and cmpEnd == 0
-    until (cmpStart >= 0 and cmpEnd <= 0 and not indentical) or cnt == 5
+        identical = cmpStart == 0 and cmpEnd == 0
+    until (cmpStart >= 0 and cmpEnd <= 0 and not identical) or cnt == 5
 
     -- Abort when line index of posEnd is larger than the whole buffer line count
-    if parentNodeRange.posEnd[1] > fn.line("$") then return false end
+    if parentNodeRange.posEnd[1] > vim.fn.line("$") then return false end
 
     -- Make sure paren node has no error
     if parentNode:has_error() then return false end
@@ -116,17 +108,15 @@ M.getParentNode = function(nodeTbl)
     else
         return parentNode
     end
-end
-
-
+end -- }}}
 --- Generate a region table containing all the treesitter node infos needed to
 --- be selected in visual mode
---- @param startNode  treesitter object
---- @param pairNode   optional treesitter object
---- @param parentNode optional treesitter object Parent node of last treesitter candidate
---- @param lastCand   optional table Last candidate
+--- @param startNode      TSNode Treesitter object
+--- @param pairNode?      TSNode Treesitter object
+--- @param parentNode?    TSNode Treesitter object Parent node of last treesitter candidate
+--- @param lastCandidate? table  Last candidate
 --- @return table
-M.getNodeCandidate = function(startNode, pairNode, parentNode, lastCand)
+M.getNodeCandidate = function(startNode, pairNode, parentNode, lastCandidate) -- {{{
     local tsRange
 
     if not pairNode then
@@ -156,9 +146,9 @@ M.getNodeCandidate = function(startNode, pairNode, parentNode, lastCand)
         -- Check whether the range of new code block is identical to
         -- the last candidate. This usually happens when the code
         -- block is composed of only one single statement
-        if lastCand then
-            local cmpStart = util.compareDist(lastCand.posStart, tsRange.posStart)
-            local cmpEnd = util.compareDist(lastCand.posEnd, tsRange.posEnd)
+        if lastCandidate then
+            local cmpStart = util.compareDist(lastCandidate.posStart, tsRange.posStart)
+            local cmpEnd = util.compareDist(lastCandidate.posEnd, tsRange.posEnd)
             if cmpStart == 0 and cmpEnd == 0 then
                 -- Fallback to the parentNode instead
                 tsRange = M.getNodeRange(parentNode, false)
@@ -174,7 +164,7 @@ M.getNodeCandidate = function(startNode, pairNode, parentNode, lastCand)
     tsRange.type  = "treesitter"
 
     return tsRange
-end
+end -- }}}
 
 
 return M

@@ -4,9 +4,6 @@
 -- For treesitter support, only tested on python, lua, c files
 -- Version: 0.0.18
 -- Last Modified: 2023-3-20
-local fn   = vim.fn
-local cmd  = vim.cmd
-local api  = vim.api
 local ts      = require("expandRegion.treesitter")
 local tx      = require("expandRegion.textobj")
 local cbPairs = require("expandRegion.treesitterCodeBlockPairs")
@@ -33,11 +30,10 @@ M.restoreOption = nil
 --- Save vim options
 local saveOption = function()
     if vim.o.wrapscan == false and vim.o.selection == "inclusive" then return end
-    local wrapscan
-    local selection
-    wrapscan = vim.o.wrapscan
-    vim.o.wrapscan = false
-    selection = vim.o.selection
+
+    local wrapscan  = vim.o.wrapscan
+    local selection = vim.o.selection
+    vim.o.wrapscan  = false
     vim.o.selection = "inclusive"
 
     M.restoreOption = function()
@@ -49,11 +45,11 @@ end
 
 --- Initiate all the settings
 local initExpand = function()
-    M.curBufNr     = api.nvim_get_current_buf()
-    M.cursorPos    = api.nvim_win_get_cursor(0)
+    M.curBufNr     = vim.api.nvim_get_current_buf()
+    M.cursorPos    = vim.api.nvim_win_get_cursor(0)
     M.candidates   = {}
     M.candidateIdx = 0
-    M.saveView     = fn.winsaveview()
+    M.saveView     = vim.fn.winsaveview()
 end
 
 
@@ -66,13 +62,13 @@ local selectRegion = function(opts, candidate)
         Print(candidate.nodes[1]:type())
     end
     if opts.putCursorAtStart then
-        api.nvim_win_set_cursor(0, candidate.posEnd)
-        cmd [[noa norm v]]
-        api.nvim_win_set_cursor(0, candidate.posStart)
+        vim.api.nvim_win_set_cursor(0, candidate.posEnd)
+        vim.cmd [[noa norm v]]
+        vim.api.nvim_win_set_cursor(0, candidate.posStart)
     else
-        api.nvim_win_set_cursor(0, candidate.posStart)
-        cmd [[noa norm v]]
-        api.nvim_win_set_cursor(0, candidate.posEnd)
+        vim.api.nvim_win_set_cursor(0, candidate.posStart)
+        vim.cmd [[noa norm v]]
+        vim.api.nvim_win_set_cursor(0, candidate.posEnd)
     end
 end
 
@@ -81,11 +77,11 @@ end
 local validateCandidates = function()
     if #M.candidates == 0 then return false end
 
-    if api.nvim_get_current_buf() == M.curBufNr
+    if vim.api.nvim_get_current_buf() == M.curBufNr
         -- Compare the visual selected region with the last candidate
         and (M.candidateIdx <= #M.candidates and M.candidateIdx >= 1) then
-        local posStart  = api.nvim_buf_get_mark(M.curBufNr, "<")
-        local posEnd    = api.nvim_buf_get_mark(M.curBufNr, ">")
+        local posStart  = vim.api.nvim_buf_get_mark(M.curBufNr, "<")
+        local posEnd    = vim.api.nvim_buf_get_mark(M.curBufNr, ">")
         local candidate = M.candidates[M.candidateIdx]
 
         if util.compareDist(posStart, candidate.posStart) == 0
@@ -102,7 +98,7 @@ end
 
 --- Decide which region to be selected
 --- @param opts table option table
---- @param direction number 1 indicates expand, -1 indicates shrink
+--- @param direction integer 1 indicates expand, -1 indicates shrink
 local getCandidate = function(opts, direction)
     local lastCandidate = M.candidates[M.candidateIdx]
     M.candidateIdx = M.candidateIdx + direction
@@ -138,7 +134,7 @@ local getCandidate = function(opts, direction)
 
     elseif M.candidateIdx == 0 then
         -- index value of 0 means get back to normal mode
-        fn.winrestview(M.saveView)
+        vim.fn.winrestview(M.saveView)
     else
         selectRegion(opts, M.candidates[M.candidateIdx])
     end
@@ -147,7 +143,7 @@ end
 
 --- Compute and generate candidates table, which contain info about the start and end of regions
 --- @param opts table option table
---- @param direction number 1 indicates expand, -1 indicates shrink
+--- @param direction integer 1 indicates expand, -1 indicates shrink
 --- @return boolean, string
 local computeCandidate = function(opts, direction)
     if not package.loaded["nvim-treesitter.parsers"] or
@@ -185,7 +181,7 @@ end
 
 --- Start the expanding and shrinking of region
 --- @param vimMode string
---- @param direction number 1 indicates expand, -1 indicates shrink
+--- @param direction integer 1 indicates expand, -1 indicates shrink
 --- @param opts table option table
 M.expandShrink = function(vimMode, direction, opts)
     -- Don't support visual block or visual line mode

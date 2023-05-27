@@ -7,8 +7,8 @@ local M    = {
 
 local getAllRelStr
 --- Get all path strings relative to the lua module search path
----@param parentStr           string  Parent directory string
----@param moduleSearchPathStr string  The lua module search path(Deafult: `vim.fn.stdpath("config")` .. "lua")
+---@param parentStr           string Parent directory string
+---@param moduleSearchPathStr string The lua module search path(Deafult: `vim.fn.stdpath("config")` .. "lua")
 ---@return table # Table that contains relative file paths. The table might contain heavily nested tables
 getAllRelStr = function(parentStr, moduleSearchPathStr) -- {{{
     -- Value of tbl in each iteration:
@@ -67,7 +67,7 @@ getAllRelStr = function(parentStr, moduleSearchPathStr) -- {{{
     vim.loop.fs_closedir(parentFS)
 
     return fileRelStrs
-end -- }}} 
+end -- }}}
 --- Check whether other lua modules under the same lua directory have been
 --opened and modified in other buffers. If any did, prompt the user to save the
 --changes before reloading them all.
@@ -122,11 +122,11 @@ local checkOtherOpenMod = function (allAbsStr, topParentTailStr) -- {{{
             vim.cmd(string.format("%sbufdo noa update", n))
         end
     end
-end -- }}} 
+end -- }}}
 --- Get the relative lua module path that can be passed directly in the `require()` function
----@param path             userdata Plenary path object of the current file
----@param parentPath       userdata Plenary path object of the parent folder
----@param moduleSearchPath userdata Plenary path object of the lua module search path(Deafult: `vim.fn.stdpath("config") .. "lua"`)
+---@param path             Path Plenary path object of the current file
+---@param parentPath       Path Plenary path object of the parent folder
+---@param moduleSearchPath Path Plenary path object of the lua module search path(Deafult: `vim.fn.stdpath("config") .. "lua"`)
 ---@return string # Relative lua module path
 local getModuleName = function(path, parentPath, moduleSearchPath) -- {{{
     local fileRelToSearchStr = path:new(path.filename):make_relative(moduleSearchPath.filename)
@@ -147,10 +147,10 @@ local getModuleName = function(path, parentPath, moduleSearchPath) -- {{{
         local moduleTail = string.gsub(fileRelToSearchStr, util.sep, ".")
         return moduleTail:sub(1, -5)
     end
-end -- }}} 
+end -- }}}
 --- Call functions before or after reloading specifc lua module
 ---@param hookTbl         table
----@param path            userdata Plenary path object of the absolute file path
+---@param path            Path Plenary path object of the absolute file path
 ---@param reloadCallback? function The callback function returned by reloading the lua module
 local hook = function(hookTbl, path, reloadCallback) -- {{{
     for _, tbl in ipairs(hookTbl) do
@@ -170,11 +170,11 @@ local hook = function(hookTbl, path, reloadCallback) -- {{{
             return
         end
     end
-end -- }}} 
+end -- }}}
 --- Reload a file lua module
----@param path       userdata Plenary path object. Lua module file
----@param parentPath userdata Plenary path object. Parent folder of the lua module file
----@param opt        table    Options table initialized in `reload/init.lua`
+---@param path       Path  Plenary path object. Lua module file
+---@param parentPath Path  Plenary path object. Parent folder of the lua module file
+---@param opt        table Options table initialized in `reload/init.lua`
 M.loadFile = function(path, parentPath, opt) -- {{{
     -- Load setup hook
     hook(opt.setup, path)
@@ -217,8 +217,8 @@ M.loadFile = function(path, parentPath, opt) -- {{{
 
 end -- }}}
 --- Reload a lua directory module
----@param path userdata Plenary path object. Lua module file
----@param opt  table    Options table initialized in `reload/init.lua`
+---@param path Path  Plenary path object. Lua module file
+---@param opt  table Options table initialized in `reload/init.lua`
 M.loadDir = function(path, opt) -- {{{
     -- Get the top parent folder under `<configpath>/lua/`
     local allParentStr = path:parents()

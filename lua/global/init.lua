@@ -190,9 +190,9 @@ end -- }}}
 ---@param srcVal any Source value to be look up and removed
 ---@param removeAllChk boolean|nil Default is true. Whether to remove the
 --all values or not
----@param cnt number|nil default is 1. Determine how many value
+---@param cnt integer|nil default is 1. Determine how many value
 --will be removed when firstOnlyChk is false
----@return number|table|nil Index of the value. Index of table will be return
+---@return integer|table|nil Index of the value. Index of table will be return
 --when there are more than one idx to be return. nil will be return when no idx found
 local tbl_remove = function(tbl, srcVal, removeAllChk, cnt) -- {{{
     assert(next(tbl), "Empty table is not allowed")
@@ -230,7 +230,7 @@ end -- }}}
 ---@param repVal       any     Value to replace with
 ---@param srcVal       any     Source value to be replaced
 ---@param repAllChk?   boolean Default is true. Whether to replace all value or not
----@param cnt?         number  Default is 1. Determine how many srcVal will be replaced
+---@param cnt?         integer  Default is 1. Determine how many srcVal will be replaced
 ---@param alertOnFail? boolean Default is false. Whether to alert when
 --replace failed
 ---@return nil
@@ -269,9 +269,9 @@ end -- }}}
 --- Return the 1 based index of specific item in a list-liked table. Only support
 --- number and string for now
 --- @param tbl    any[] List-liked table
---- @param item   number|string Item to look up
+--- @param item   integer|string Item to look up
 --- @param allIdx boolean Whether to return all the indexes as a table
---- @return number|number[] # Return table when `returnIdxTbl` is true
+--- @return integer|integer[] # Return table when `returnIdxTbl` is true
 _G.tbl_idx = function(tbl, item, allIdx) -- {{{
     assert(vim.tbl_islist(tbl), "Expect list-liked table")
     assert(type(item) == "string" or type(item) == "number", "Only support indexing string or number")

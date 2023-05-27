@@ -3,9 +3,9 @@
 ---@field names string[] Node names
 ---@field specRanges table Node ranges
 ---@field tableCheck boolean[] Whether the node at different index is a table node
----@field nodes userdata[] Tressitter nodes
+---@field nodes TSNode Tressitter nodes
 ---@param bufNr integer Buffer number
----@param nodes userdata Tressitter node
+---@param nodes TSNode[]
 ---@return nodeInfo
 local function getPluginInfo(bufNr, nodes) -- {{{
     local tbl = {
@@ -40,7 +40,7 @@ local function getPluginInfo(bufNr, nodes) -- {{{
     end
 
     return tbl
-end -- }}} 
+end -- }}}
 --- Get the Github repository url link near cursor or open the configration file
 ---@param bufNr integer Buffer number
 ---@param cursorPos table (1, 0) based
@@ -162,4 +162,4 @@ return function(bufNr, cursorPos, fallback) -- {{{
 
     -- Fall back to the plugin repository url
     return "https://github.com/" .. pluginInfos.names[pluginIdx]
-end -- }}} 
+end -- }}}

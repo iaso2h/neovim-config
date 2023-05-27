@@ -8,7 +8,7 @@ local M    = {}
 
 
 --- Jump to the corner position of the last previous selection area
----@param bias number 1 or -1. Set to 1 will make cursor jump to the closest
+---@param bias integer 1 or -1. Set to 1 will make cursor jump to the closest
 --- corner. Set to -1 to make cursor jump to furthest corner
 function M.corner(bias) -- {{{
     local cursorPos      = vim.api.nvim_win_get_cursor(0)
@@ -118,8 +118,8 @@ M.get = function(returnType, exitToNormal) -- {{{
     end
 end -- }}}
 --- Extmark select
----@param ns number namespace
----@param extmark number
+---@param ns integer namespace
+---@param extmark integer
 ---@param linewise boolean
 function M.extmarkSelect(ns, extmark, linewise) -- {{{
     -- Create jump location in jumplist

@@ -1,24 +1,19 @@
-local fn     = vim.fn
-local cmd    = vim.cmd
-local api    = vim.api
 local ts     = require("expandRegion.treesitter")
 local util   = require("util")
 local M    = {}
 
 
 --- Get the start position and end position of the visual selected area
---- @param curBufNr number current buffer number
+--- @param curBufNr integer current buffer number
 --- @return table
-M.getVisualStartEnd = function(curBufNr)
-    return api.nvim_buf_get_mark(curBufNr, "<"), api.nvim_buf_get_mark(curBufNr, ">")
-end
-
-
+M.getVisualStartEnd = function(curBufNr) -- {{{
+    return vim.api.nvim_buf_get_mark(curBufNr, "<"), vim.api.nvim_buf_get_mark(curBufNr, ">")
+end -- }}} 
 --- Compare the selected text object region with treesitter node
---- @param selection table a text object region table
---- @param tsNode object treesitter node
---- @return boolean whether both the region infos provided by parameter is the same
-M.compareWithNode = function(selection, tsNode)
+--- @param selection table A text object region table
+--- @param tsNode TSNode Treesitter node
+--- @return boolean Whether both the region infos provided by parameter is the same
+M.compareWithNode = function(selection, tsNode) -- {{{
     local tsNodeRange
     if tsNode:type() == "string" then
         tsNodeRange = ts.getNodeRange(tsNode, true)
@@ -27,22 +22,20 @@ M.compareWithNode = function(selection, tsNode)
     end
     return util.compareDist(selection.posStart, tsNodeRange.posStart) == 0
         and util.compareDist(selection.posEnd, tsNodeRange.posEnd) == 0
-end
-
-
+end -- }}} 
 --- Generate a region table contain different types of text object, might
 --- contain duplicated items
---- @param textObjTbl table list-liked text object table
---- @param curBufNr number current buffer number
---- @param tsNode object treesitter node
---- @return table region table
-M.getTextObjSelection = function(textObjTbl, curBufNr, tsNode)
+--- @param textObjTbl table List-liked text object table
+--- @param curBufNr integer Current buffer number
+--- @param tsNode TSNode Treesitter node
+--- @return table # Region table
+M.getTextObjSelection = function(textObjTbl, curBufNr, tsNode) -- {{{
     local saveView
     local selectionTbl = {}
 
     for _, textObj in ipairs(textObjTbl) do
-        saveView = fn.winsaveview()
-        cmd([[noa norm v]] .. textObj .. t"<Esc>")
+        saveView = vim.fn.winsaveview()
+        vim.cmd([[noa norm v]] .. textObj .. t"<Esc>")
 
         -- Store selection info in a table. e.g.
         -- {textObj = ..., length = ..., content = ..., posStart = ..., posEnd = ...}
@@ -64,7 +57,7 @@ M.getTextObjSelection = function(textObjTbl, curBufNr, tsNode)
 
         -- Need to correct the i,w and iB text objects due to some malfunctions
         if selection.textObj == "i,w" then
-            local line = api.nvim_buf_get_lines(0, selection.posStart[1] - 1,
+            local line = vim.api.nvim_buf_get_lines(0, selection.posStart[1] - 1,
                                             selection.posStart[1], false)[1]
             local selectChars
             if selection.posStart[1] == selection.posEnd[1] then
@@ -87,7 +80,7 @@ M.getTextObjSelection = function(textObjTbl, curBufNr, tsNode)
                 selection.length  = #selectChars
             end
         elseif selection.textObj == "iB" then
-            local line = api.nvim_buf_get_lines(0, selection.posEnd[1] - 1,
+            local line = vim.api.nvim_buf_get_lines(0, selection.posEnd[1] - 1,
                                             selection.posEnd[1], false)[1]
             if #line == selection.posEnd[2] then
                 selection.content = string.sub(selection.content,
@@ -97,8 +90,8 @@ M.getTextObjSelection = function(textObjTbl, curBufNr, tsNode)
             end
         end
 
-        -- Resotre view for next iteration and insert the result into selectionTbl
-        fn.winrestview(saveView)
+        -- Restore view for next iteration and insert the result into selectionTbl
+        vim.fn.winrestview(saveView)
         selectionTbl[#selectionTbl+1] = selection
 
         -- Stop parsing text objects when a treesitter node has the same
@@ -118,14 +111,12 @@ M.getTextObjSelection = function(textObjTbl, curBufNr, tsNode)
     end
 
     return selectionTbl
-end
-
-
+end -- }}} 
 --- Remove the items with the same length and same position of column and row
 --- @param tbl table position table. e.g. {pos}
 --         {textObj = ..., length = ..., content = ..., posStart = ..., posEnd = ...}
---- @return table with unique length
-M.removeDuplicate = function(tbl)
+--- @return table # Table with unique length
+M.removeDuplicate = function(tbl) -- {{{
     local i = 1
     local t = {}
     while i < #tbl do
@@ -140,16 +131,14 @@ M.removeDuplicate = function(tbl)
     t[#t+1] = tbl[i]
 
     return t
-end
-
-
+end -- }}} 
 --- Generate a region table containing different types of text object
 --- @param opts table option table
---- @param curBufNr number current buffer number
+--- @param curBufNr integer current buffer number
 --- @param cursorPos table cursor position of current window
 --- @param tsNode object treesitter node
---- @return table region table
-M.getTextObj = function(opts, curBufNr, cursorPos, tsNode)
+--- @return table # Region table
+M.getTextObj = function(opts, curBufNr, cursorPos, tsNode) -- {{{
 
     local filterSelection = function(i)
         return i.length > 1 and util.withinRegion(cursorPos, i.posStart, i.posEnd)
@@ -171,7 +160,7 @@ M.getTextObj = function(opts, curBufNr, cursorPos, tsNode)
         end
         -- Avoide the last selection is empty
         if selectionTbl[#selectionTbl].length == 0 then
-            cmd([[noa norm v]]  .. t"<Esc>")
+            vim.cmd([[noa norm v]]  .. t"<Esc>")
         end
 
         -- Sort by text length
@@ -183,6 +172,6 @@ M.getTextObj = function(opts, curBufNr, cursorPos, tsNode)
     until #selectionTbl ~= 0 or cnt == 3
 
     return M.removeDuplicate(selectionTbl)
-end
+end -- }}} 
 
 return M

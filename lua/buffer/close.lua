@@ -9,7 +9,7 @@ local M   = {}
 
 
 --- Prompt for saving changes
----@param bufNr number Buffer number handler
+---@param bufNr integer Buffer number handler
 ---@return boolean # `false` will be returned if cancel in input, otherwise true will be return
 local function saveModified(bufNr) -- {{{
     if not vim.api.nvim_buf_is_valid(bufNr) then return false end

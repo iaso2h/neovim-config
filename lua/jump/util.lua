@@ -13,8 +13,8 @@ M.tblReverse = function(t) -- {{{
     return tblReversed
 end -- }}}
 --- Register specific line region in current buffer
----@param startLineNr? number
----@param lastLineNr? number
+---@param startLineNr? integer
+---@param lastLineNr? integer
 M.jumplistRegisterLines = function(startLineNr, lastLineNr) -- {{{
     startLineNr = startLineNr or 1
     if not lastLineNr then
@@ -107,11 +107,11 @@ end -- }}}
 --jumps` output as table or redirect it to a scratch buffer
 ---@param returnJumpsChk? boolean Whether to return output as table or
 --redirect the output into a scratch buffer
----@param startLineNr? number
----@param lastLineNr? number
+---@param startLineNr? integer
+---@param lastLineNr? integer
 ---@param onlyOutputSpecialCharChk boolean Whether to generate output only
 --when non-printable character found in the `:jumps` prompt
----@param bufferThreshold? number How many lines to capture the `:jumps`
+---@param bufferThreshold? integer How many lines to capture the `:jumps`
 --output. Default is 50, which is the gerneral line number the `:jumps` will
 --remember
 M.jumplistRegisterLinesToTbl = function(returnJumpsChk, startLineNr, lastLineNr, onlyOutputSpecialCharChk, bufferThreshold) -- {{{

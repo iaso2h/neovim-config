@@ -79,7 +79,7 @@ local function findCandidate(bufNrs, currentBufIdx, direction) -- {{{
     end
 end -- }}}
 --- Get all listed buffers. Just like what you see in the :ls command
----@param direction number `1|-1` `1` indicate cycling forward
+---@param direction integer `1|-1` `1` indicate cycling forward
 M.init = function(direction) -- {{{
     local currentBufNr = api.nvim_get_current_buf()
     local bufTbl
