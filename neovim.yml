@@ -51,10 +51,9 @@ globals:
   Print:
     args:
       - type: ...
-
-  ex:
+  logBuf:
     args:
-      - type: string
+      - type: ...
 
   tbl_idx:
     args:
@@ -76,5 +75,8 @@ globals:
   nvim_buf_get_name:
     args:
       - type: number
+  pathStr:
+    args:
+      - type: string
 
 # vim:ts=2:sts=2:sw=2
