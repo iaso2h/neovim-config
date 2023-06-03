@@ -1,11 +1,24 @@
 -- File: changeUnder.lua
 -- Author: iaso2h
 -- Description: Change word under cursor
--- Version: 0.0.3
--- Last Modified: 2023-3-6
-local M   = {
+-- Version: 0.0.4
+-- Last Modified: 2023-06-03
+local M = {
+    dev = false,
     pattern = nil,
 }
+
+--- Get the last search pattern string
+---@return string
+local getLastPattern = function()
+    local searchCmdRaw = vim.api.nvim_exec2("history search", {output = true}).output
+    local searchRaw = vim.split(searchCmdRaw, "\n", {plain = true})
+    if not next(searchRaw) then
+        return ""
+    end
+    local parseResult = { string.match(searchRaw[#searchRaw], "^>?%s*(%d+)%s+(.*)$") }
+    return parseResult[2]
+end
 
 
 --- Change the whole word under cursor, highlight it with search highlight
@@ -15,6 +28,8 @@ local M   = {
 M.init = function(keybinding, direction, plugMap) -- {{{
     local searchCMD = direction == 1 and "*" or "#"
     if vim.v.hlsearch == 1 then
+        -- Highlight mode is on
+
         local curLine = vim.api.nvim_get_current_line()
         if #curLine == 0 then
             vim.cmd("norm! n")
@@ -25,16 +40,29 @@ M.init = function(keybinding, direction, plugMap) -- {{{
             return
         end
 
-        -- col and result are both 0-indexed
-        local col = vim.api.nvim_win_get_cursor(0)[2]
+        -- Fix pattern
+        local lastPattern = getLastPattern()
+        if lastPattern == "" then return end
 
+        if not M.pattern or lastPattern ~= M.pattern then
+            if M.dev then
+                logBuf("Last pattern: " .. lastPattern)
+                logBuf("M.pattern: " .. M.pattern)
+            end
+            M.pattern = lastPattern
+        end
         local regex = vim.regex(M.pattern)
-        local result = {regex:match_str(curLine)}
+        if not regex then return end
+
+        -- Check whether pattern is in current line
+        local result = {regex:match_str(curLine)} -- 0-indexed
         if not next(result) then
             vim.cmd("norm! n")
             vim.cmd(string.format("norm %s", keybinding))
         else
+            local col = vim.api.nvim_win_get_cursor(0)[2] -- 0-indexed
             if col >= result[1] and col < result[2] then
+                -- Cursor is within the region of the string that match the pattern
                 vim.cmd(string.format("norm %s", keybinding))
             else
                 vim.cmd("norm! n")
