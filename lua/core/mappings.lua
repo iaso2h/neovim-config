@@ -45,14 +45,14 @@ map("x", [[<A-a>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmod
 map("x", [[<A-s>]], [[:lua require("expandRegion").expandShrink(vim.fn.visualmode(), -1)<CR>]], {"silent"}, "Shrink selection")
 -- Interesting word {{{
 -- TODO:Conceal word: https://github.com/inkarkat/vim-Concealer
-map("n", [[<Plug>InterestingWordOperatorWordBoundary]], function ()
+map("n", [[<Plug>InterestingWordOperatorWordBoundary]], function()
         return vim.fn.luaeval[[
         require("operator").expr(require("interestingWord").operatorWordBoundary,
         false,
         "<Plug>InterestingWordOperatorWordBoundary")
         ]]
 end, {"expr", "silent"}, "Interesting word operator")
-map("n", [[<Plug>InterestingWordOperatorNoWordBoundary]], function ()
+map("n", [[<Plug>InterestingWordOperatorNoWordBoundary]], function()
         return vim.fn.luaeval[[
         require("operator").expr(require("interestingWord").operatorNoWordBoundary,
         false,
@@ -64,34 +64,34 @@ map("x", [[<Plug>InterestingWordVisualWordBoundary]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisualWordBoundary", vim.v.register);
 
-    local vMotion = require("operator").vMotion(true);
-    table.insert(vMotion, "<Plug>InterestingWordVisualWordBoundary");
-    require("interestingWord").operatorWordBoundary(vMotion)<CR>]],
+    require("interestingWord").plugMap = "<Plug>InterestingWordVisualWordBoundary";
+    local visualOpInfo = require("operator").visualOpInfo(true);
+    require("interestingWord").operatorWordBoundary(visualOpInfo)<CR>]],
 {"silent"}, "Mark selected as interesting words")
-map("n", [[<Plug>InterestingWordVisualWordBoundary]], function ()
+map("n", [[<Plug>InterestingWordVisualWordBoundary]], function()
     vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisualWordBoundary", vim.v.register)
     vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
 
-    local vMotion = require("operator").vMotion(true)
-    table.insert(vMotion, "<Plug>InterestingWordVisualWordBoundary")
-    require("interestingWord").operatorWordBoundary(vMotion)
+    require("interestingWord").plugMap = "<Plug>InterestingWordVisualWordBoundary"
+    local visualOpInfo = require("operator").visualOpInfo(true)
+    require("interestingWord").operatorWordBoundary(visualOpInfo)
 end, {"silent"}, "Visual-repeat for interesting words")
 
 map("x", [[<Plug>InterestingWordVisualNoWordBoundary]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisualNoWordBoundary", vim.v.register);
 
-    local vMotion = require("operator").vMotion(true);
-    table.insert(vMotion, "<Plug>InterestingWordVisualNoWordBoundary");
-    require("interestingWord").operatorNoWordBoundary(vMotion)<CR>]],
+    local visualOpInfo = require("operator").visualOpInfo(true);
+    table.insert(visualOpInfo, "<Plug>InterestingWordVisualNoWordBoundary");
+    require("interestingWord").operatorNoWordBoundary(visualOpInfo)<CR>]],
 {"silent"}, "Mark selected as interesting words")
-map("n", [[<Plug>InterestingWordVisualNoWordBoundary]], function ()
+map("n", [[<Plug>InterestingWordVisualNoWordBoundary]], function()
     vim.fn["repeat#setreg"](t"<Plug>InterestingWordVisualNoWordBoundary", vim.v.register)
     vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
 
-    local vMotion = require("operator").vMotion(true)
-    table.insert(vMotion, "<Plug>InterestingWordVisualNoWordBoundary")
-    require("interestingWord").operatorNoWordBoundary(vMotion)
+    local visualOpInfo = require("operator").visualOpInfo(true)
+    table.insert(visualOpInfo, "<Plug>InterestingWordVisualNoWordBoundary")
+    require("interestingWord").operatorNoWordBoundary(visualOpInfo)
 end, {"silent"}, "Visual-repeat for interesting words")
 
 map("n", [[gw]], [[<Plug>InterestingWordOperatorWordBoundary]],   "Highlight interesting word operator")
@@ -104,7 +104,7 @@ map("n", [[<leader>w]], [[<CMD>lua require("interestingWord").clearColor()<CR>]]
 map("n", [[<leader>W]], [[<CMD>lua require("interestingWord").restoreColor()<CR>]], {"silent"}, "Restore interesting word")
 -- }}} Interesting word
 -- Zeal query {{{
-map("n", [[<Plug>ZealOperator]], function ()
+map("n", [[<Plug>ZealOperator]], function()
     return vim.fn.luaeval[[
     require("operator").expr(
         require("zeal").zeal,
@@ -113,7 +113,7 @@ map("n", [[<Plug>ZealOperator]], function ()
     ]]
 end, {"silent", "expr"}, "Zeal look up operator")
 
-map("n", [[<Plug>ZealOperatorGlobal]], function ()
+map("n", [[<Plug>ZealOperatorGlobal]], function()
     return vim.fn.luaeval[[
     require("operator").expr{
         require("zeal").zealGlobal,
@@ -126,18 +126,19 @@ map("x", [[<Plug>ZealVisual]],
 luaRHS[[:lua
     vim.fn["repeat#setreg"](t"<Plug>ZealVisual", vim.v.register);
 
-    local vMotion = require("operator").vMotion(true);
-    table.insert(vMotion, "<Plug>ZealVisual");
-    require("zeal").zeal(vMotion)<CR>]],
+    require("zeal").plugMap = "<Plug>ZealVisual";
+    local visualOpInfo = require("operator").visualOpInfo(true);
+    require("zeal").zeal(visualOpInfo)<CR>]],
 {"silent"}, "Zeal look up selected")
 
-map("n", [[<Plug>ZealVisual]], function ()
+map("n", [[<Plug>ZealVisual]], function()
     vim.fn["repeat#setreg"](t"<Plug>ZealVisual", vim.v.register)
     vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
 
-    local vMotion = require("operator").vMotion(true)
-    table.insert(vMotion, "<Plug>ZealVisual")
-    require("zeal").zeal(vMotion)
+    require("zeal").plugMap = "<Plug>ZealVisual"
+    local visualOpInfo = require("operator").visualOpInfo(true)
+    table.insert(visualOpInfo, "<Plug>ZealVisual")
+    require("zeal").zeal(visualOpInfo)
 end, {"silent"}, "Zeal look up selected")
 
 map("n", [[gz]], [[<Plug>ZealOperator]],       "Zeal look up...")
@@ -153,7 +154,7 @@ map("n", [[<C-s>]], [[<CMD>lua require("historyStartup").display(true)<CR>]], {"
 map("n", [[<Plug>Extract]], function ()
     return vim.fn.luaeval[[
     require("operator").expr(
-        require("extraction").main,
+        require("extraction").operator,
         false,
         "<Plug>Extract")
     ]]
@@ -200,15 +201,18 @@ map("n", [[<Plug>ReplaceExpr]],
 )
 
 map("n", [[<Plug>ReplaceCurLine]], function ()
-    require("replace").saveCountReg()
+    local rp = require("replace")
+    rp.saveCountReg()
+    rp.currentLineChk = true
+    rp.plugMap        = "<Plug>ReplaceCurLine"
 
-    vim.fn["repeat#setreg"](t"<Plug>ReplaceCurLine", vim.v.register)
+    vim.fn["repeat#setreg"](t, vim.v.register)
 
-    if require("replace").regType == "=" then
+    if rp.regType == "=" then
         vim.g.ReplaceExpr = vim.fn.getreg("=")
     end
 
-    require("replace").operator{"line", "V", "<Plug>ReplaceCurLine", true}
+    rp.operator{"line", "V"}
 end, {"noremap", "silent"}, "Replace current line")
 
 -- NOTE: function passed in to arg will ignore current selected region
@@ -222,9 +226,9 @@ end, {"noremap", "silent"}, "Replace current line")
         -- vim.g.ReplaceExpr = vim.fn.getreg("=")
     -- end
 
-    -- local vMotion = require("operator").vMotion(false)
-    -- table.insert(vMotion, "<Plug>ReplaceVisual")
-    -- require("replace").operator(vMotion)
+    -- local visualOpInfo = require("operator").visualOpInfo(false)
+    -- table.insert(visualOpInfo, "<Plug>ReplaceVisual")
+    -- require("replace").operator(visualOpInfo)
 -- end, {"noremap", "silent"}, "Replace selected")
 
 map("x", [[<Plug>ReplaceVisual]],
@@ -237,9 +241,9 @@ map("x", [[<Plug>ReplaceVisual]],
         vim.g.ReplaceExpr = vim.fn.getreg("=")
     end;
 
-    local vMotion = require("operator").vMotion(false);
-    table.insert(vMotion, "<Plug>ReplaceVisual");
-    require("replace").operator(vMotion)<CR>
+    require("replace").plugMap = "<Plug>ReplaceVisual";
+    local visualOpInfo = require("operator").visualOpInfo(false);
+    require("replace").operator(visualOpInfo)<CR>
     ]],
     {"noremap", "silent"}, "Replace selected")
 
@@ -254,9 +258,9 @@ map("n", [[<Plug>ReplaceVisual]], function ()
 
     vim.cmd("noa norm! " .. vim.fn["visualrepeat#reapply#VisualMode"](0))
 
-    local vMotion = require("operator").vMotion(false)
-    table.insert(vMotion, "<Plug>ReplaceVisual")
-    require("replace").operator(vMotion)
+    require("replace").plugMap = "<Plug>ReplaceVisual"
+    local visualOpInfo = require("operator").visualOpInfo(false)
+    require("replace").operator(visualOpInfo)
 end, {"noremap", "silent"}, "Visual-repeat for replaced selected")
 
 map("n", [[gr]],  [[<Plug>ReplaceOperatorInplace]], "Replace operator and restore the cursor position")
@@ -273,8 +277,13 @@ map("n", [[<Plug>ReplaceUnderBackward]],
 map("n", [[grn]], [[<Plug>ReplaceUnderForward]], "Replace the whole word under cursor, then highlight it forward")
 map("n", [[grN]], [[<Plug>ReplaceUnderBackward]], "Replace the whole word under cursor, then highlight it backward")
 -- Exchange
-map("n", [[<Plug>exchangeOperatorInplace]], function ()
-    return vim.fn.luaeval [[require("exchange").expr(true, true)]]
+map("n", [[<Plug>exchangeOperatorInplace]], function()
+    return vim.fn.luaeval[[
+    require("operator").expr(
+        require("exchange").operator,
+        true,
+        "<Plug>exchangeOperatorInplace")
+    ]]
 end, {"silent", "expr"}, "Exchange operator and restore the cursor position")
 map("n", [[gx]],  [[<Plug>exchangeOperatorInplace]], "Exchange operator and restore the cursor position")
 map("n", [[gxc]], [[<CMD>lua require("exchange").clear()<CR>]], "Exchange clear")
@@ -503,7 +512,7 @@ map("",  [[<leader><Space>]], [[:lua require("foldmarker").snap("norm! za", true
 -- }}} Folding
 
 -- Paste mode
-map({"i","n"}, [[<F3>]], function ()
+map({"i","n"}, [[<F3>]], function()
     if vim.o.paste then
         vim.api.nvim_echo({{"Paste mode off", "Moremsg"}}, false, {})
         vim.opt.paste = false
@@ -513,11 +522,11 @@ map({"i","n"}, [[<F3>]], function ()
     end
 end, "Toggle paste mode")
 -- Inplace join
-map("n", [[J]], function ()
+map("n", [[J]], function()
     vim.cmd("norm! m`" .. vim.v.count1 .. "J``")
 end, {"noremap"}, "Join line in place")
 -- Inplace yank
-map("", [[<Plug>InplaceYank]], function ()
+map("", [[<Plug>InplaceYank]], function()
    return vim.fn.luaeval[[require("operator").expr(require("yankPut").inplaceYank, false, "<Plug>InplaceYank")]]
 end, {"expr", "silent"}, "Yank operator")
 

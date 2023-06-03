@@ -233,11 +233,11 @@ M.newIdentifier = function(newId) -- {{{
         return M.newFile(newId)
     end
 end -- }}}
---- Main function to start the extraction for creating either -new variable or new file
----@param args GenericOperatorInfo
-function M.main(args) -- {{{
-    M.vimMode    = args[2]
-    M.motionType = args[1]
+--- Operator to extract for creating either a new variable or a new file
+---@param opInfo GenericOperatorInfo
+function M.operator(opInfo) -- {{{
+    M.motionType = opInfo.motionType
+    M.vimMode    = opInfo.vimMode
     if not vim.o.modifiable or vim.o.readonly then
         reset()
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)

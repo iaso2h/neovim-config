@@ -7,7 +7,8 @@
 local M   = {
     hlIds = {},
     guibgs = {},
-    lastWord = {}
+    lastWord = {},
+    plugMap = ""
 }
 local restore
 -- e.g:
@@ -26,8 +27,10 @@ local defaultOpts = {
     priority        = 0,
     ignoreCase      = false,
     noWordBoundary  = true,
-    guiStyle        = "bold"
+    guiStyle        = "bold",
 }
+
+local opts = {}
 --- Navigating by the highlighted interesting word under the cursor
 ---@param direction integer Previous by -1, Next by 1
 M.colorNav = function(direction) -- {{{
@@ -110,25 +113,21 @@ local applyColor = function(word, opts, curWinID) -- {{{
     -- }}} Record
 end -- }}}
 ---This the function where g@ function call in normal mode and visual mode to start adding the highlighting to interesting words
----@param args GenericOperatorInfo
-local operator = function(args) -- {{{
-    local motionType = args[1]
+---@param opInfo GenericOperatorInfo
+local operator = function(opInfo) -- {{{
     -- Only support characterwise
-    if motionType == "block" or motionType == "line" then
-        return vim.notify(string.format("%swise is not supported", motionType), vim.log.levels.WARN)
+    if opInfo.motionType == "block" or opInfo.motionType == "line" then
+        return vim.notify(string.format("%swise is not supported", opInfo.motionType), vim.log.levels.WARN)
     end
 
-    local vimMode = args[2]
-    local op      = require("operator")
-    local plugMap = vimMode == "n" and op.plugMap or args[3]
-    local opts    = args[4]
+    local op       = require("operator")
     local curWinID = vim.api.nvim_get_current_win()
 
     local posStart
     local posEnd
     local word
     -- Get content {{{
-    if vimMode == "n" then
+    if opInfo.vimMode == "n" then
         posStart = vim.api.nvim_buf_get_mark(0, "[")
         posEnd   = vim.api.nvim_buf_get_mark(0, "]")
         vim.api.nvim_win_set_cursor(curWinID, posStart)
@@ -146,19 +145,19 @@ local operator = function(args) -- {{{
 
     applyColor(word, opts, curWinID)
     -- Restore cursor position
-    if vimMode == "n" and not require("util").withinRegion(op.cursorPos, posStart, posEnd) then
+    if opInfo.vimMode == "n" and not require("util").withinRegion(op.cursorPos, posStart, posEnd) then
         return
     else
         vim.api.nvim_win_set_cursor(curWinID, op.cursorPos)
     end
 
     -- Dot repeat
-    if vimMode ~= "n" then
+    if opInfo.vimMode ~= "n" then
         if vim.fn.exists("g:loaded_repeat") == 1 then
-            vim.fn["repeat#set"](t(plugMap))
+            vim.fn["repeat#set"](t(M.plugMap))
         end
         if vim.fn.exists("g:loaded_visualrepeat") == 1 then
-            vim.fn["visualrepeat#set"](t(plugMap))
+            vim.fn["visualrepeat#set"](t(M.plugMap))
         end
     end
     -- }}} Get content
@@ -166,17 +165,17 @@ end -- }}}
 --- Mark the word with no word boundary
 ---@param args table see `operator()`
 M.operatorWordBoundary = function(args) -- {{{
-    local opts = defaultOpts
+    opts = defaultOpts
     opts.noWordBoundary = false
-    args[4] = opts
+    M.plugMap = [[<Plug>InterestingWordOperatorWordBoundary]]
     operator(args)
 end -- }}}
 --- Mark the word with no word boundary(`\<` and `\>`)
 ---@param args table see `operator()`
 M.operatorNoWordBoundary = function(args) -- {{{
-    local opts = defaultOpts
+    opts = defaultOpts
     opts.noWordBoundary = true
-    args[4] = opts
+    M.plugMap = [[<Plug>InterestingWordOperatorNoWordBoundary]]
     operator(args)
 end -- }}}
 ---Reapplying color to the last word when you feels like the last highlighting word not favouring you

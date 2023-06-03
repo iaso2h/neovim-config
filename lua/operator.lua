@@ -1,14 +1,15 @@
 local M = {
     plugMap   = nil,
-    cursorPos = nil,
-    extraArgs = nil
+    cursorPos = {},
 }
 
+---@class GenericOperatorInfo
+---@field motionType string "line" or "char". Determine whether the motion is linewise
+---@field vimMode string Vim mode. See: `:help mode()`
+-- NOTE: see ":help g@" for details about motionType
 vim.cmd [[
-function! LuaExprCallback(...)
-    let l:args = deepcopy(a:000)
-    call add(l:args, mode())
-    return v:lua._opfunc(l:args)
+function! LuaExprCallback(motionType)
+    return v:lua._opfunc({"motionType": a:motionType, "vimMode": mode()})
 endfunction
 ]]
 
@@ -38,19 +39,13 @@ function M.expr(func, checkModifiable, plugMap) -- {{{
     return "g@"
 end -- }}}
 ---Using to detect the motion type of Neovim visual mode
----@class visualInfo
----@field motionType string "char" or "line". Determine whether the motion is linewise
----@field visualMode string Returned value from calling `vim.fn.visualmode()`
 ---@param saveCursorChk boolean Whether to save cursor position
----@return visualInfo
-function M.vMotion(saveCursorChk) -- {{{
+---@return GenericOperatorInfo
+function M.visualOpInfo(saveCursorChk) -- {{{
     -- NOTE: see ":help g@" for details about motionType
-    local visualMode = vim.fn.visualmode()
+    local vimMode = vim.fn.visualmode()
     local motionType
-    if visualMode == "v" then
-        motionType = "char"
-        if saveCursorChk then M.cursorPos = vim.api.nvim_win_get_cursor(0) end
-    elseif visualMode == "V" then
+    if vimMode == "V" then
         -- Visual Line Mode the cursor will place at the first column once
         -- entering commandline mode.
         motionType = "line"
@@ -59,13 +54,12 @@ function M.vMotion(saveCursorChk) -- {{{
             M.cursorPos = vim.api.nvim_win_get_cursor(0)
             vim.cmd([[noa norm! ]] .. t"<Esc>")
         end
-    elseif visualMode == "\22" then
+    else
         motionType = "char"
         if saveCursorChk then M.cursorPos = vim.api.nvim_win_get_cursor(0) end
-    else
-        vim.notify(string.format([[Uncaptrued visual mode: %s]], visualMode), vim.log.levels.ERROR)
     end
-    return {motionType, visualMode}
+
+    return {motionType = motionType, vimMode = vimMode}
 end -- }}}
 
 

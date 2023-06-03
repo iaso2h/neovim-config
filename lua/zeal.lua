@@ -4,19 +4,16 @@
 -- Version: 0.0.5
 -- Last Modified: 2023-4-26
 
-local M = {}
+local M = {
+    plugMap = ""
+}
 local zealGlobalChk
 
 --- Look up motionwise selected text with Zeal, Goldendict, Cheat or TL;DR
----@param args GenericOperatorInfo
-local function lookUp(args) -- {{{
-    -- local opts     = {hlGroup="Search", timeout=500}
-    -- local curBufNr = api.nvim_get_current_buf()
-    local operator   = require("operator")
-    local motionType = args[1]
-    local vimMode    = args[2]
-    local plugMap    = vimMode == "n" and operator.plugMap or args[3]
-    if motionType == "block" or motionType == "line" then
+---@param opInfo GenericOperatorInfo
+local function lookUp(opInfo) -- {{{
+    local operator = require("operator")
+    if opInfo.motionType == "block" or opInfo.motionType == "line" then
         return vim.notify("Blockwise or linewise is not supported", vim.log.levels.WARN)
     end
 
@@ -27,7 +24,7 @@ local function lookUp(args) -- {{{
     local curWinID  = vim.api.nvim_get_current_win()
 
     -- Get content {{{
-    if vimMode == "n" then
+    if opInfo.vimMode == "n" then
         posStart = vim.api.nvim_buf_get_mark(0, "[")
         posEnd   = vim.api.nvim_buf_get_mark(0, "]")
         vim.api.nvim_win_set_cursor(0, posStart)
@@ -68,25 +65,25 @@ local function lookUp(args) -- {{{
     end
 
     -- Restore cursor position
-    if vimMode == "n" and not require("util").withinRegion(operator.cursorPos, posStart, posEnd) then
+    if opInfo.vimMode == "n" and not require("util").withinRegion(operator.cursorPos, posStart, posEnd) then
         return
     else
         vim.api.nvim_win_set_cursor(curWinID, operator.cursorPos)
     end
 
     -- Dot repeat
-    if vimMode ~= "n" then
+    if opInfo.vimMode ~= "n" then
         if vim.fn.exists("g:loaded_repeat") == 1 then
-            vim.fn["repeat#set"](t(plugMap))
+            vim.fn["repeat#set"](t(M.plugMap))
         end
         if vim.fn.exists("g:loaded_visualrepeat") == 1 then
-            vim.fn["visualrepeat#set"](t(plugMap))
+            vim.fn["visualrepeat#set"](t(M.plugMap))
         end
     end
 end -- }}}
 
 --- Look up keyword globally in the zeal(ignore language)
----@param args any
+---@param args table see `operator()`
 function M.zealGlobal(args)
     zealGlobalChk = true
     lookUp(args)
@@ -94,7 +91,7 @@ end
 
 
 --- Look up keyword specific to its language in the zeal
----@param args any
+---@param args table see `operator()`
 function M.zeal(args)
     zealGlobalChk = false
     lookUp(args)

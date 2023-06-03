@@ -136,42 +136,32 @@ local swap = function(motionType, bufNr) -- {{{
 end -- }}}
 --- This function will be called when g@ is evaluated by Neovim
 ---@class GenericOperatorInfo
----@param args GenericOperatorInfo
-function _G._exchangeOperator(args) -- {{{
-    if not warnRead() then return end
-    -- NOTE: see ":help g@" for details about motionType
+---@param opInfo GenericOperatorInfo
+function M.operator(opInfo) -- {{{
+    -- TODO: necessity of implementing line motion???
+    if opInfo.motionType == "line" then return end
     local bufNr = vim.api.nvim_get_current_buf()
-    local motionType
-    local vimMode
-    local plugMap
     local regionMotion
-    if type(args) ~= "table" then
-        -- For exchange operator exclusively
 
-        motionType = args
-        -- TODO: necessity of implementing line motion???
-        if motionType == "line" then return end
-        vimMode = "n"
-        -- Saving cursor part is done inside expr()
-        -- Saving motion region
-        regionMotion = {
-            Start = vim.api.nvim_buf_get_mark(bufNr, "["),
-            End   = vim.api.nvim_buf_get_mark(bufNr, "]")
-        }
-        if vim.deep_equal(regionMotion.Start, regionMotion.End) then
-            local endLine = vim.api.nvim_buf_get_lines(bufNr, regionMotion.End[1] - 1, regionMotion.End[1], false)[1]
-            if string.len(endLine) ~= vim.fn.strchars(endLine) then
+    -- Saving cursor part is done inside expr()
+    -- Saving motion region
+    regionMotion = {
+        Start = vim.api.nvim_buf_get_mark(bufNr, "["),
+        End   = vim.api.nvim_buf_get_mark(bufNr, "]")
+    }
+    if vim.deep_equal(regionMotion.Start, regionMotion.End) then
+        local endLine = vim.api.nvim_buf_get_lines(bufNr, regionMotion.End[1] - 1, regionMotion.End[1], false)[1]
+        if string.len(endLine) ~= vim.fn.strchars(endLine) then
 
-                local saveCursor = vim.api.nvim_win_get_cursor(0)
-                vim.cmd[[noa norm! l]]
-                local endCharByteIdx = vim.api.nvim_win_get_cursor(0)[2] - 1
-                regionMotion.End[2] = endCharByteIdx
-                vim.api.nvim_win_set_cursor(0, saveCursor)
-            end
+            local saveCursor = vim.api.nvim_win_get_cursor(0)
+            vim.cmd[[noa norm! l]]
+            local endCharByteIdx = vim.api.nvim_win_get_cursor(0)[2] - 1
+            regionMotion.End[2] = endCharByteIdx
+            vim.api.nvim_win_set_cursor(0, saveCursor)
         end
-        plugMap = "<Plug>exchangeOperatorInplace"
     end
-    local regionRegType = motionType:sub(1, 1) == "c" and "v" or "V"
+
+    local regionRegType = opInfo.motionType:sub(1, 1) == "c" and "v" or "V"
 
     -- Change to 0-based for extmark creation
     if regionRegType == "V" then
@@ -204,7 +194,7 @@ function _G._exchangeOperator(args) -- {{{
     end
 
     if #M.srcExtmark == 2 then
-        ok, valOrMsg = pcall(swap, motionType, bufNr)
+        ok, valOrMsg = pcall(swap, opInfo.motionType, bufNr)
         if not ok then
             vim.notify(valOrMsg, vim.log.levels.ERROR)
         end
@@ -220,7 +210,7 @@ function _G._exchangeOperator(args) -- {{{
     end
 
     -- Restoration
-    if vimMode == "n" then
+    if opInfo.vimMode == "n" then
         if not M.cursorPos then
             -- TODO: Supported cursor recall in normal mode
         else
@@ -229,30 +219,6 @@ function _G._exchangeOperator(args) -- {{{
             M.cursorPos = nil
         end
     end
-    do return end
-
-    -- Mapping repeating
-    if vim.fn.exists("g:loaded_repeat") == 1 then
-        if vimMode ~= "n" then
-            vim.fn["repeat#setreg"](t(plugMap), M.regName)
-        end
-
-        if #args == 4 then
-            -- ExchangeCurLine
-            vim.fn["repeat#set"](t(plugMap), M.count)
-        end
-    end
-end -- }}}
----Callback function of `vim.o.opfunc`
----@param func    function
----@param plugMap string
----@return string "g@" if successful
-function M.expr(func, plugMap) -- {{{
-    _G._opfunc   = func
-    M.plugMap    = plugMap
-    M.cursorPos  = vim.api.nvim_win_get_cursor(0)
-    vim.o.opfunc = "v:lua._exchangeOperator"
-    return "g@"
 end -- }}}
 --- Clear the highlight
 function M.clear() -- {{{

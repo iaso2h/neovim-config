@@ -12,12 +12,14 @@ local util     = require("util")
 local register = require("register")
 require("operator")
 
-local M    = {
-    regName              = nil,
-    cursorPos            = nil, -- (1, 0) indexed
-    count                = nil,
-    motionDirection      = nil,
-    restoreOption        = nil,
+local M = {
+    regName         = nil,
+    cursorPos       = nil, -- (1, 0) indexed
+    currentLineChk  = false,
+    plugMap         = "",
+    count           = nil,
+    motionDirection = nil,
+    restoreOption   = nil,
 
     lastReplaceNs       = vim.api.nvim_create_namespace("inplaceReplace"),
     lastReplaceExtmark  = -1,
@@ -25,10 +27,10 @@ local M    = {
 
     -- Options
     highlightChangeChk = false,
-    placeCursor = true,
-    suppressMessage = false,
-    hlGroup = "Search",
-    timeout = 550
+    placeCursor        = true,
+    suppressMessage    = false,
+    hlGroup            = "Search",
+    timeout            = 550
 }
 
 
@@ -264,21 +266,17 @@ local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
     end
 end -- }}}
 --- The replace operator
----@param args GenericOperatorInfo
-function M.operator(args) -- {{{
+---@param opInfo GenericOperatorInfo
+function M.operator(opInfo) -- {{{
     if not warnRead() then return end
 
     -- NOTE: see ":help g@" for details about motionType
-    local motionType = args[1]
-    local vimMode    = args[2]
-    -- if vimMode == "n", plugMap will be nil
-    local plugMap    = args[3]
-    local bufNr      = vim.api.nvim_get_current_buf()
+    local bufNr = vim.api.nvim_get_current_buf()
 
     -- Saving cursor position, motionRegion count, motionRegion region and register  {{{
     local motionRegion
     local motionDirection
-    if vimMode == "n" then
+    if opInfo.vimMode == "n" then
         -- For Replace operator exclusively
 
         -- Saving count and register. The part of saving cursor is done inside
@@ -307,7 +305,7 @@ function M.operator(args) -- {{{
         end
 
         -- Saveing motionRegion direction
-        if motionType == "line" then
+        if opInfo.motionType == "line" then
             if M.cursorPos then
                 if M.cursorPos[1] == motionRegion.End[1] then
                     -- motionRegion direction detection for k
@@ -342,7 +340,7 @@ function M.operator(args) -- {{{
         -- mode, the saveCountReg() is always called in the key mapping stage
         -- to achieve a consistent mapping layout just like the other visual
         -- modes
-        if vimMode == "V" and args[4] then
+        if M.currentLineChk then
             -- For mapping of replacing current line
 
             M.cursorPos = vim.api.nvim_win_get_cursor(0)
@@ -415,7 +413,7 @@ function M.operator(args) -- {{{
 
     -- Match the motionType type with register type
     ---@diagnostic disable-next-line: cast-local-type
-    ok, msgOrVal = pcall(matchRegType, motionType, motionRegion, motionDirection, vimMode, reg)
+    ok, msgOrVal = pcall(matchRegType, opInfo.motionType, motionRegion, motionDirection, opInfo.vimMode, reg)
     if not ok then
         ---@diagnostic disable-next-line: param-type-mismatch
         return vim.notify(msgOrVal, vim.log.levels.ERROR)
@@ -426,7 +424,7 @@ function M.operator(args) -- {{{
     -- Replace with new content
     local rep
     ---@diagnostic disable-next-line: cast-local-type
-    ok, msgOrVal = pcall(replace, motionType, motionRegion, vimMode, reg, bufNr)
+    ok, msgOrVal = pcall(replace, opInfo.motionType, motionRegion, opInfo.vimMode, reg, bufNr)
     if not ok then
         ---@diagnostic disable-next-line: param-type-mismatch
         vim.notify(msgOrVal, vim.log.levels.ERROR)
@@ -441,7 +439,7 @@ function M.operator(args) -- {{{
     local repEndLine
     if not next(rep) then
         local repPos = vim.api.nvim_buf_get_extmark_by_id(bufNr, M.lastReplaceNs, repExtmark, {details = true})
-        if vimMode == "n" and motionType == "line" and repPos[3].end_col == 0 and repPos[2] == 0 then
+        if opInfo.vimMode == "n" and opInfo.motionType == "line" and repPos[3].end_col == 0 and repPos[2] == 0 then
             if repPos[3].end_row < repPos[1] then
                 -- NOTE: the END ROW has to subtract 1 offset
                 repEndLine = vim.api.nvim_buf_get_lines(bufNr, repPos[1] - 1, repPos[1], false)[1]
@@ -476,7 +474,7 @@ function M.operator(args) -- {{{
 
     -- Create highlight
     -- Creates a new namespace or gets an existing one.
-    if not (vimMode == "n" and not M.highlightChangeChk) then
+    if not (opInfo.vimMode == "n" and not M.highlightChangeChk) then
         local newContentExmark = util.nvimBufAddHl(bufNr, rep.Start, rep.End,
                 reg.type, M.hlGroup, M.timeout, M.lastReplaceNs)
         if newContentExmark then
@@ -510,7 +508,7 @@ function M.operator(args) -- {{{
 
     -- Cursor {{{
     if M.placeCursor and M.cursorPos then
-        if vimMode == "n" then
+        if opInfo.vimMode == "n" then
             if not M.cursorPos then
                 -- TODO: Supported cursor recall in dot-repeat mode
             else
@@ -527,18 +525,15 @@ function M.operator(args) -- {{{
                         vim.api.nvim_win_set_cursor(0, {M.cursorPos[1], #cursorLine - 1})
                     end
                 else
-                    if motionType == "char" then
+                    if opInfo.motionType == "char" then
                         vim.api.nvim_win_set_cursor(0, rep.Start)
                     else
                     -- elseif motionType == "line" then
                         vim.cmd [[noa normal! ^]]
                     end
                 end
-
-                -- Always clear M.cursorPos after restoration
-                M.cursorPos = nil
             end
-        elseif vimMode == "v" then
+        elseif opInfo.vimMode == "v" then
             if reg.type == "V" or reg.type == "l" then
                 if M.cursorPos[1] == motionRegion.Start[1] and M.cursorPos[2] == motionRegion.Start[2] then
                     local startLine = vim.api.nvim_buf_get_lines(bufNr,
@@ -560,8 +555,7 @@ function M.operator(args) -- {{{
                     vim.api.nvim_win_set_cursor(0, rep.End)
                 end
             end
-
-        elseif vimMode == "V" then
+        elseif opInfo.vimMode == "V" then
             if util.compareDist(M.cursorPos, rep.End) <= 0 then
                 -- Avoid cursor out of scope
                 local cursorLine = vim.api.nvim_buf_get_lines(bufNr,
@@ -591,30 +585,27 @@ function M.operator(args) -- {{{
     -- }}} Cursor
 
     -- Mapping repeating
-    if vimMode ~= "n" then
-        if vim.fn.exists("g:loaded_repeat") == 1 then
-            vim.fn["repeat#setreg"](t(plugMap), M.regName);
-        end
-    end
-
-    if vim.fn.exists("g:loaded_repeat") == 1 then
-        if #args > 2 then
-            if #args == 4 then
-                -- ReplaceCurLine
-                vim.fn["repeat#set"](t(plugMap), M.count)
-            else
-                -- VisualChar
-                -- VisualLine
-                vim.fn["repeat#set"](t(plugMap))
-            end
+    if opInfo.vimMode ~= "n" and vim.fn.exists("g:loaded_repeat") == 1 then
+        vim.fn["repeat#setreg"](t(M.plugMap), M.regName);
+        if M.currentLineChk then
+            -- ReplaceCurLine
+            vim.fn["repeat#set"](t(M.plugMap), M.count)
         elseif M.regName == "=" then
             vim.fn["repeat#set"](t"<Plug>ReplaceExpr")
+        else
+            -- VisualChar
+            -- VisualLine
+            vim.fn["repeat#set"](t(M.plugMap))
         end
     end
     -- Visual repeating
     if vim.fn.exists("g:loaded_visualrepeat") == 1 then
         vim.fn["visualrepeat#set"](t"<Plug>ReplaceVisual")
     end
+
+    -- Reset
+    M.cursorPos      = nil
+    M.currentLineChk = false
 end -- }}}
 ---Expression callback for replace operator
 ---@param restoreCursorChk boolean Whether to restore the cursor if possible

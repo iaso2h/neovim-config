@@ -24,13 +24,9 @@ local M = {
 
 -- TODO: Doesn't support target line number exceeding buffer range
 
----@class GenericOperatorInfo
----@field motionType string "line" or "char". Determine whether the motion is linewise
----@field vimMode string Vim mode. See: `:help mode()`
-
 --- Move them up or down just like in VS Code
 ---@param vimMode string Vim mode. See: `:help mode()`
----@param direction string "up" or "down". Determine wether the lines go up or down
+---@param direction string "up" or "down". Determine wether the lines to go up or down
 function M.VSCodeLineMove(vimMode, direction) -- {{{
     if not vim.bo.modifiable then
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
@@ -77,7 +73,7 @@ function M.VSCodeLineMove(vimMode, direction) -- {{{
 end -- }}}
 --- Duplicate the lines and move them up or down just like in VS Code
 ---@param vimMode string Vim mode. See: `:help mode()`
----@param direction string "up" or "down". Determine wether the new lines go up or down
+---@param direction string "up" or "down". Determine wether the new lines to go up or down
 function M.VSCodeLineYank(vimMode, direction) -- {{{
     if not vim.bo.modifiable then
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
@@ -159,18 +155,15 @@ function M.VSCodeLineYank(vimMode, direction) -- {{{
         end
     end
 end -- }}}
---- Yank text without moving cursor. Also comes with yanked area highlighted
----@param args GenericOperatorInfo
-function M.inplaceYank(args) -- {{{
-    -- opts = opts or {hlGroup="Search", timeout=500}
+--- Yank text without moving the cursor
+---@param opInfo GenericOperatorInfo
+function M.inplaceYank(opInfo) -- {{{
     local opts = {hlGroup=M.hlGroup, timeout=M.hlInterval}
-    local motionType = args[1]
-    local vimMode    = args[2]
-    local plugMap    = operator.plugMap
-    local curWinId   = vim.api.nvim_get_current_win()
-    local curBufNr   = vim.api.nvim_get_current_buf()
-    local posStart   = vim.api.nvim_buf_get_mark(0, "[")
-    local posEnd     = vim.api.nvim_buf_get_mark(0, "]")
+    local plugMap  = operator.plugMap
+    local curWinId = vim.api.nvim_get_current_win()
+    local curBufNr = vim.api.nvim_get_current_buf()
+    local posStart = vim.api.nvim_buf_get_mark(0, "[")
+    local posEnd   = vim.api.nvim_buf_get_mark(0, "]")
 
     local regName
     if vim.o.clipboard == "unnamed" then
@@ -182,7 +175,7 @@ function M.inplaceYank(args) -- {{{
     end
 
     -- Change the col info to the end of line if motionType is line-wise
-    if motionType == "line" then
+    if opInfo.motionType == "line" then
         -- Get the exact end position to avoid surprising posEnd value like {88, 2147483647}
         local lines = #vim.api.nvim_buf_get_lines(0, posEnd[1] - 1, posEnd[1], false)[1]
         if lines ~= 0 then
@@ -193,10 +186,10 @@ function M.inplaceYank(args) -- {{{
         end
     end
 
-    if motionType == "char" then
+    if opInfo.motionType == "char" then
         vim.cmd(string.format([[noautocmd normal! g`[vg`]%sy]], regName))
         M.lastYankLinewise = false
-    elseif motionType == "line" then
+    elseif opInfo.motionType == "line" then
         vim.cmd(string.format([[noautocmd normal! g`[Vg`]%sy]], regName))
         M.lastYankLinewise = true
     else
@@ -241,14 +234,14 @@ function M.inplaceYank(args) -- {{{
         operator.cursorPos = nil
     end
 
-    if vimMode ~= "n" then
+    if opInfo.vimMode ~= "n" then
         if vim.fn.exists("g:loaded_repeat") == 1 then
             vim.fn["visualrepeat#set"](t(plugMap))
         end
     end
 end -- }}}
---- Execute the Vim Ex command
----@param pasteCMD string The literal Vim Ex command
+--- Enhanced version of putting text
+---@param pasteCMD string The literal Vim Ex-command
 ---@param vimMode string Vim mode. See: `:help mode()`
 local function inplacePutExCmd(pasteCMD, vimMode) -- {{{
         -- Execute traditional EX command
@@ -266,8 +259,8 @@ local function inplacePutExCmd(pasteCMD, vimMode) -- {{{
 end -- }}}
 --- Put text inplace
 ---@param vimMode    string Vim mode. See: `:help mode()`
----@param pasteCMD   string Normal mode command to execute. "p" or "P"
----@param convertPut boolean Wether to convert "V" type register into "v" type register or vice versa
+---@param pasteCMD   string Ex-command to be executed. "p" or "P"
+---@param convertPut boolean Wether to convert a "V" type register into "v" type register or vice versa
 ---@param opts       table
 function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     if not vim.bo.modifiable then

@@ -8,6 +8,7 @@ vim.opt.runtimepath:append(packagePathHead .. "vim-repeat")
 
 require("global.keymap")
 require("util.test")
+require("core.mappings")
 
 require("exchange")._dev = true
 require("exchange").highlightChangeChk = false

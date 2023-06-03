@@ -1,6 +1,7 @@
 # Dependencies
 * `/lua/global/keymap.lua`
 * `/lua/util/test.lua`
+* `/lua/core/mappings.lua`
 * [vim-repeat](https://github.com/tpope/vim-repeat) to make replace operator repeatable in normal mode
 * [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) to run tests
 
