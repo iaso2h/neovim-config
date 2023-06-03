@@ -1,10 +1,10 @@
--- File: Change word under cursor
+-- File: changeUnder.lua
 -- Author: iaso2h
--- Description: Heavily inspired Ingo Karkat's work. Replace text with register
+-- Description: Change word under cursor
 -- Version: 0.0.3
 -- Last Modified: 2023-3-6
 local M   = {
-    pat = nil,
+    pattern = nil,
 }
 
 
@@ -13,8 +13,7 @@ local M   = {
 ---@param direction integer 1 indicates searching forward, -1 indicates searching backward
 ---@param plugMap string The plug mapping to bind with when press dot-repeat key
 M.init = function(keybinding, direction, plugMap) -- {{{
-    -- local cycleCMD = direction == 1 and "n" or "N"
-    local searchCMD = direction == 1 and "g*" or "g#"
+    local searchCMD = direction == 1 and "*" or "#"
     if vim.v.hlsearch == 1 then
         local curLine = vim.api.nvim_get_current_line()
         if #curLine == 0 then
@@ -29,7 +28,7 @@ M.init = function(keybinding, direction, plugMap) -- {{{
         -- col and result are both 0-indexed
         local col = vim.api.nvim_win_get_cursor(0)[2]
 
-        local regex = vim.regex(M.pat)
+        local regex = vim.regex(M.pattern)
         local result = {regex:match_str(curLine)}
         if not next(result) then
             vim.cmd("norm! n")
@@ -43,7 +42,7 @@ M.init = function(keybinding, direction, plugMap) -- {{{
             end
         end
     else
-        M.pat = string.format([[\<%s\>]], vim.fn.expand("<cword>"))
+        M.pattern = vim.fn.expand("<cword>")
         vim.cmd(string.format("norm! %s``", searchCMD))
         vim.cmd(string.format("norm %s", keybinding))
     end
