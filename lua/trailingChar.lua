@@ -4,7 +4,6 @@
 -- Version: 0.0.6
 -- Last Modified: 2023-3-21
 local ts  = vim.treesitter
-local M   = {}
 
 --- Find if a comment node exist in a line
 ---@param commentStr string The trimmed version of vim.bo.commentstring
@@ -20,8 +19,8 @@ end
 
 
 --- Find if a comment node exist in a line, start at col 2
----@param cursorPos table (0, 0) indexing. Row(Line) and column.
----@param lastNode object The treesitter object can be retrieved by calling `ts.get_node_at_post(0, <lineNum>, 0)`
+---@param cursorPos table (0, 0) indexed. Row(Line) and column.
+---@param lastNode TSNode The treesitter object can be retrieved by calling `ts.get_node_at_post(0, <lineNum>, 0)`
 ---@param lineLen integer The length of current cursor
 ---@return boolean # Whether comment node is found
 local function findCommentNode(cursorPos, lastNode, lineLen) -- {{{
@@ -129,10 +128,10 @@ local function findEmptyLine(line)
 end
 
 
---- Add trailing character
+--- Add trailing character in current line
 ---@param vimMode string
 ---@param char string
-function M.main(vimMode, char) -- {{{
+return function(vimMode, char) -- {{{
     local cursorPos = vim.api.nvim_win_get_cursor(0)
     local lines
     if vimMode == "n" then
@@ -220,5 +219,3 @@ function M.main(vimMode, char) -- {{{
         vim.api.nvim_buf_set_lines(0, startPos[1] - 1, endPos[1], false, lines)
     end
 end -- }}}
-
-return M

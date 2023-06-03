@@ -3,12 +3,11 @@
 -- Description: Get url link in browser
 -- Version: 0.0.15
 -- Last Modified: 2023-4-26
-local M   = {
+local opts = {
     ns = vim.api.nvim_create_namespace('getLink'),
     highlightTimout = 500,
     highlightGroup = "Search",
 }
-
 
 --- Open the url link
 ---@param url string
@@ -20,7 +19,7 @@ local function openUrl(url, timeout, bufNr) -- {{{
     ---@diagnostic disable-next-line: param-type-mismatch
     vim.defer_fn(function()
         if timeout ~= 0 and bufNr then
-            vim.api.nvim_buf_clear_namespace(bufNr, M.ns, 0, -1)
+            vim.api.nvim_buf_clear_namespace(bufNr, opts.ns, 0, -1)
         end
         if vim.fn.has('win32') == 1 then
             vim.fn.system{"explorer", url}
@@ -35,8 +34,8 @@ end -- }}}
 ---@param colStart integer
 ---@param colEnd integer
 local function highlight(bufNr, lnum, colStart, colEnd) -- {{{
-    vim.api.nvim_buf_clear_namespace(bufNr, M.ns, 0, -1)
-    vim.api.nvim_buf_add_highlight(bufNr, M.ns, M.highlightGroup, lnum - 1, colStart, colEnd)
+    vim.api.nvim_buf_clear_namespace(bufNr, opts.ns, 0, -1)
+    vim.api.nvim_buf_add_highlight(bufNr, opts.ns, opts.highlightGroup, lnum - 1, colStart, colEnd)
 end -- }}}
 --- Get the url link
 ---@param bufNr integer
@@ -53,7 +52,7 @@ local getUrl = function(bufNr, cursorPos, curLine) -- {{{
     return ""
 end -- }}}
 ---@param url string The url string
-function M.main(url) -- {{{
+return function(url) -- {{{
     if not url then
         -- Normal mode with no selected text provided
         local curBufNr  = vim.api.nvim_get_current_buf()
@@ -66,7 +65,7 @@ function M.main(url) -- {{{
             url = require("getLink.lazyPlugins")(curBufNr, cursorPos, getUrl)
             if type(url) == "string" and url ~= "" then
                 if string.find(url, "http") then
-                    openUrl(url, M.highlightTimout, curBufNr)
+                    openUrl(url, opts.highlightTimout, curBufNr)
                 else
                     vim.cmd(url)
                 end
@@ -77,7 +76,7 @@ function M.main(url) -- {{{
         else
             -- Support for opening normal http[s] link
             url = getUrl(curBufNr, cursorPos, curLine)
-            if url ~= "" then openUrl(url, M.highlightTimout, curBufNr) end
+            if url ~= "" then openUrl(url, opts.highlightTimout, curBufNr) end
         end
     else
         -- Visual mode with selected text provided
@@ -91,6 +90,3 @@ function M.main(url) -- {{{
         end
     end
 end -- }}}
-
-
-return M
