@@ -242,7 +242,9 @@ function M.inplaceYank(args) -- {{{
     end
 
     if vimMode ~= "n" then
-        vim.fn["visualrepeat#set"](t(plugMap))
+        if vim.fn.exists("g:loaded_repeat") == 1 then
+            vim.fn["visualrepeat#set"](t(plugMap))
+        end
     end
 end -- }}}
 --- Execute the Vim Ex command

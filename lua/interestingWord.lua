@@ -154,8 +154,12 @@ local operator = function(args) -- {{{
 
     -- Dot repeat
     if vimMode ~= "n" then
-        vim.fn["repeat#set"](t(plugMap))
-        vim.fn["visualrepeat#set"](t(plugMap))
+        if vim.fn.exists("g:loaded_repeat") == 1 then
+            vim.fn["repeat#set"](t(plugMap))
+        end
+        if vim.fn.exists("g:loaded_visualrepeat") == 1 then
+            vim.fn["visualrepeat#set"](t(plugMap))
+        end
     end
     -- }}} Get content
 end -- }}}

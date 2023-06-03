@@ -232,13 +232,15 @@ function _G._exchangeOperator(args) -- {{{
     do return end
 
     -- Mapping repeating
-    if vimMode ~= "n" then
-        vim.fn["repeat#setreg"](t(plugMap), M.regName)
-    end
+    if vim.fn.exists("g:loaded_repeat") == 1 then
+        if vimMode ~= "n" then
+            vim.fn["repeat#setreg"](t(plugMap), M.regName)
+        end
 
-    if #args == 4 then
-        -- ExchangeCurLine
-        vim.fn["repeat#set"](t(plugMap), M.count)
+        if #args == 4 then
+            -- ExchangeCurLine
+            vim.fn["repeat#set"](t(plugMap), M.count)
+        end
     end
 end -- }}}
 ---Callback function of `vim.o.opfunc`

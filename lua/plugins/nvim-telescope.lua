@@ -264,9 +264,9 @@ end -- }}}
 -- Mappings
 map("n", [[<C-f>a]], [[<CMD>lua require('telescope.builtin').builtin()<CR>]], {"silent"}, "All builtins")
 
-map("n", [[<C-f>E]], [[<CMD>lua require('telescope.builtin').find_files({no_ignore=true})<CR>]],
+map("n", [[<C-f>E]], [[<CMD>lua require('telescope.builtin').find_files({cwd=vim.loop.cwd(),no_ignore=true})<CR>]],
         {"silent"}, "Find files(ignore git file)")
-map("n", [[<C-f>e]], [[<CMD>lua require('telescope.builtin').find_files({no_ignore=false})<CR>]],
+map("n", [[<C-f>e]], [[<CMD>lua require('telescope.builtin').find_files({cwd=vim.loop.cwd(),no_ignore=false})<CR>]],
         {"silent"}, "Find all files")
 
 map("n", [[<C-f>f]], [[<CMD>lua require('telescope.builtin').live_grep()<CR>]], {"silent"}, "Live grep")

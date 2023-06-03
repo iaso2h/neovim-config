@@ -592,23 +592,29 @@ function M.operator(args) -- {{{
 
     -- Mapping repeating
     if vimMode ~= "n" then
-        vim.fn["repeat#setreg"](t(plugMap), M.regName);
+        if vim.fn.exists("g:loaded_repeat") == 1 then
+            vim.fn["repeat#setreg"](t(plugMap), M.regName);
+        end
     end
 
-    if #args > 2 then
-        if #args == 4 then
-            -- ReplaceCurLine
-            vim.fn["repeat#set"](t(plugMap), M.count)
-        else
-            -- VisualChar
-            -- VisualLine
-            vim.fn["repeat#set"](t(plugMap))
+    if vim.fn.exists("g:loaded_repeat") == 1 then
+        if #args > 2 then
+            if #args == 4 then
+                -- ReplaceCurLine
+                vim.fn["repeat#set"](t(plugMap), M.count)
+            else
+                -- VisualChar
+                -- VisualLine
+                vim.fn["repeat#set"](t(plugMap))
+            end
+        elseif M.regName == "=" then
+            vim.fn["repeat#set"](t"<Plug>ReplaceExpr")
         end
-    elseif M.regName == "=" then
-        vim.fn["repeat#set"](t"<Plug>ReplaceExpr")
     end
     -- Visual repeating
-    vim.fn["visualrepeat#set"](t"<Plug>ReplaceVisual")
+    if vim.fn.exists("g:loaded_visualrepeat") == 1 then
+        vim.fn["visualrepeat#set"](t"<Plug>ReplaceVisual")
+    end
 end -- }}}
 ---Expression callback for replace operator
 ---@param restoreCursorChk boolean Whether to restore the cursor if possible

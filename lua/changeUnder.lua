@@ -20,7 +20,10 @@ M.init = function(keybinding, direction, plugMap) -- {{{
         if #curLine == 0 then
             vim.cmd("norm! n")
             vim.cmd(string.format("norm %s", keybinding))
-            return vim.fn["repeat#set"](t(plugMap))
+            if vim.fn.exists("g:loaded_repeat") == 1 then
+                vim.fn["repeat#set"](t(plugMap))
+            end
+            return
         end
 
         -- col and result are both 0-indexed
@@ -45,7 +48,9 @@ M.init = function(keybinding, direction, plugMap) -- {{{
         vim.cmd(string.format("norm %s", keybinding))
     end
 
-    vim.fn["repeat#set"](t(plugMap))
+    if vim.fn.exists("g:loaded_repeat") == 1 then
+        vim.fn["repeat#set"](t(plugMap))
+    end
 end -- }}}
 
 

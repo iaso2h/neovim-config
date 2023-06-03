@@ -606,6 +606,7 @@ local pluginArgs = { -- {{{
     },
     {
         "L3MON4D3/LuaSnip",
+        pin = true,
         dependencies = { "rafamadriz/friendly-snippets", },
         build  = "make install_jsregexp",
         event  = {"BufAdd"},
