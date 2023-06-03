@@ -1,14 +1,14 @@
-if vim.fn.has("nvim-0.9.0") ~= 1 then
+-- THE MOST IMPORTANT OPTION
+vim.opt.undofile = true
+
+if vim.fn.has("nvim-0.9.1") ~= 1 then
     vim.notify(" ", vim.log.levels.WARN)
     vim.notify(" ", vim.log.levels.WARN)
-    vim.notify("Neovim with 0.9.0 or higher build version required", vim.log.levels.WARN)
+    vim.notify("Neovim with 0.9.1 or higher build version is required", vim.log.levels.WARN)
     vim.notify(" ", vim.log.levels.WARN)
     vim.notify(" ", vim.log.levels.WARN)
     return
 end
-
--- THE MOST IMPORTANT OPTION
-vim.opt.undofile = true
 
 local ok, msg = pcall(require, "global")
 if not ok then

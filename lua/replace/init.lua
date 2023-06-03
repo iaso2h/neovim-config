@@ -273,7 +273,7 @@ function M.operator(opInfo) -- {{{
     -- NOTE: see ":help g@" for details about motionType
     local bufNr = vim.api.nvim_get_current_buf()
 
-    -- Saving cursor position, motionRegion count, motionRegion region and register  {{{
+    -- Get cursor position, motionRegion count, motionRegion region and register  {{{
     local motionRegion
     local motionDirection
     if opInfo.vimMode == "n" then
@@ -388,7 +388,7 @@ function M.operator(opInfo) -- {{{
 
     -- Save vim options
     saveOption()
-    -- }}} Saving cursor position, motionRegion count, motionRegion region and register
+    -- }}}
 
     -- Gather more register
     local reg
@@ -606,6 +606,7 @@ function M.operator(opInfo) -- {{{
     -- Reset
     M.cursorPos      = nil
     M.currentLineChk = false
+    M.plugMap        = ""
 end -- }}}
 ---Expression callback for replace operator
 ---@param restoreCursorChk boolean Whether to restore the cursor if possible
