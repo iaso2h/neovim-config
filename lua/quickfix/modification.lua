@@ -15,7 +15,7 @@ local u    = require("quickfix.util")
 --- Delete quickfix item and reflect immediately. vim.v.count prefix will result
 --- in delete corresponding line in quickfix
 ---@param vimMode string Vim mode. "n" or "v"
-M.delete = function (vimMode) -- {{{
+M.delete = function(vimMode) -- {{{
     local qfCursorPos = vim.api.nvim_win_get_cursor(0)
     local qfItems, qfTitle = u.getlist()
     local qfLastline = vim.api.nvim_buf_line_count(0)
@@ -67,7 +67,7 @@ M.delete = function (vimMode) -- {{{
     end
 end -- }}}
 --- Restored the last modified quickfix items
-M.recovery = function () -- {{{
+M.recovery = function() -- {{{
     if M.lastItems then
         if M.lastType == "quickfix" and not vim.b._is_local then
             vim.fn.setqflist({}, "r", {items = M.lastItems, title = M.lastTitle})
@@ -82,7 +82,7 @@ M.recovery = function () -- {{{
     end
 end -- }}}
 --- Change a quickfix list into a local list and vice versa
-M.interConvert = function () -- {{{
+M.interConvert = function() -- {{{
     local qfItems, qfTitle = u.getlist()
     local winInfo = vim.fn.getwininfo()
     local qfVisibleTick = util.any(function(i)
@@ -97,6 +97,25 @@ M.interConvert = function () -- {{{
     if not qfVisibleTick then
         local preCmd = require("buffer.split").handler(true)
         vim.cmd(preCmd .. " copen")
+    end
+end -- }}}
+--- Refresh quickfix item
+M.refresh = function() -- {{{
+    local qfItems, qfTitle = u.getlist()
+    for idx, item in ipairs(qfItems) do
+        if item.valid ~= 0 and item.bufnr ~= 0 and
+            vim.api.nvim_buf_is_valid(item.bufnr) and
+            vim.api.nvim_buf_get_option(item.bufnr, "buflisted")
+            then
+            -- Only update listed buffer because otherwise
+            -- vim.api.nvim_buf_get_lines can't get content from unlisted buffer
+            qfItems[idx].text = vim.api.nvim_buf_get_lines(item.bufnr, item.lnum - 1, item.lnum, false)[1]
+        end
+    end
+    if vim.b._is_local then
+        vim.fn.setloclist(0, {}, "r", {items = qfItems, title = qfTitle})
+    else
+        vim.fn.setqflist({}, "r", {items = qfItems, title = qfTitle})
     end
 end -- }}}
 
