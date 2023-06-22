@@ -1073,7 +1073,7 @@ local pluginArgs = { -- {{{
             vim.g.git_messenger_floating_win_opts   = {border = "rounded"}
         end,
         config = function()
-            map("n", [[<C-h>b]], [[<Plug>(git-messenger)]], "Git Messenger")
+            map("n", [[<C-h>b]], [[<Plug>(git-messenger)]], "Git Messenger blame")
             vim.api.nvim_create_autocmd("FileType",{
                 pattern  = "gitmessengerpopup",
                 desc     = "Key binding for git messenger",

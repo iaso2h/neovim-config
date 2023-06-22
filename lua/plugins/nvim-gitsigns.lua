@@ -1,72 +1,111 @@
-return function ()
-require('gitsigns').setup{
-    signs = {
-        add          = {hl = 'GitSignsAdd'   , text = '┃', numhl='GitSignsAddNr'   , linehl='GitSignsAddLn'},
-        change       = {hl = 'GitSignsChange', text = '┃', numhl='GitSignsChangeNr', linehl='GitSignsChangeLn'},
-        delete       = {hl = 'GitSignsDelete', text = '┃', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn'},
-        topdelete    = {hl = 'GitSignsDelete', text = '┃', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn'},
-        changedelete = {hl = 'GitSignsDelete', text = '┃', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn'},
-    },
-    signcolumn = true,  -- Toggle with `:Gitsigns toggle_signs`
-    numhl      = false, -- Toggle with `:Gitsigns toggle_numhl`
-    linehl     = false, -- Toggle with `:Gitsigns toggle_linehl`
-    word_diff  = false, -- Toggle with `:Gitsigns toggle_word_diff`
-    keymaps    = {
-        -- Default keymap options
-        noremap = true,
+return function()
+    local onAttach = function()
+        local gs = package.loaded.gitsigns
+        map("n", [[<C-h>s]], gs.stage_hunk, "Gitsigns stage hunk")
+        map(
+            "x",
+            [[<C-h>s]],
+            function() gs.stage_hunk { vim.fn.line("."), vim.fn.line("v") } end,
+            "Gitsigns stage hunk"
+        )
+        map("n", [[<C-h>S]], gs.stage_buffer, "Gitsigns stage buffer")
 
-        ['n ]h'] = {expr = true, "&diff ? ']h' : '<cmd>lua require\"gitsigns.actions\".next_hunk()<CR>'"},
-        ['n [h'] = {expr = true, "&diff ? '[h' : '<cmd>lua require\"gitsigns.actions\".prev_hunk()<CR>'"},
+        map("n", [[<C-h>r]], gs.reset_hunk, "Gitsigns reset hunk")
+        map(
+            "x",
+            [[<C-h>r]],
+            function() gs.reset_hunk { vim.fn.line("."), vim.fn.line("v") } end,
+            "Gitsigns stage hunk"
+        )
+        map("n", [[<C-h>R]], gs.reset_buffer, "Gitsigns reset buffer")
 
-        ['n <C-h>s'] = '<cmd>Gitsigns stage_hunk<CR>',
-        ['v <C-h>s'] = ':Gitsigns stage_hunk<CR>',
-        ['n <C-h>S'] = '<cmd>Gitsigns stage_buffer<CR>',
-        ['n <C-h>u'] = '<cmd>Gitsigns undo_stage_hunk<CR>',
-        ['n <C-h>U'] = '<cmd>Gitsigns reset_buffer_index<CR>',
+        map("n", [[<C-h>u]], gs.undo_stage_hunk, "Gitsigns undo stage hunk")
 
-        ['n <C-h>r'] = '<cmd>Gitsigns reset_hunk<CR>',
-        ['v <C-h>r'] = ':Gitsigns reset_hunk<CR>',
-        ['n <C-h>R'] = '<cmd>Gitsigns reset_buffer<CR>',
+        map("n", [[<C-h>p]], gs.preview_hunk, "Gitsigns preview hunk")
 
-        ['n <C-h>p'] = '<cmd>Gitsigns preview_hunk<CR>',
+        -- Navigation
+        map("n", "]h", function()
+            if vim.wo.diff then return "]h" end
+            vim.schedule(function() gs.next_hunk() end)
+            return "<Ignore>"
+        end, { expr = true }, "Gitsigns next hunk")
+        map("n", "[h", function()
+            if vim.wo.diff then return "[h" end
+            vim.schedule(function() gs.prev_hunk() end)
+            return "<Ignore>"
+        end, { expr = true }, "Gitsigns previous hunk")
 
-        ['n <C-h>d'] = '<cmd>Gitsigns diffthis<CR>',
-        ['n <C-h>D'] = '<cmd>lua require"gitsigns".diffthis("~")<CR>',
         -- Text objects
-        ['o ih'] = ':<C-u>lua require"gitsigns.actions".select_hunk()<CR>',
-        ['x ih'] = ':<C-u>lua require"gitsigns.actions".select_hunk()<CR>'
-    },
-    watch_gitdir = {
-        interval     = 1000,
-        follow_files = true
-    },
-    attach_to_untracked     = true,
-    current_line_blame      = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
-    current_line_blame_opts = {
-        virt_text         = true,
-        virt_text_pos     = 'eol', -- 'eol' | 'overlay' | 'right_align'
-        delay             = 1000,
-        ignore_whitespace = false
-    },
-    current_line_blame_formatter_opts = {
-        relative_time = false
-    },
-    sign_priority    = 6,
-    update_debounce  = 100,
-    status_formatter = nil, -- Use default
-    max_file_length  = 40000,
-    preview_config   = {
-        -- Options passed to nvim_open_win
-        border   = 'rounded',
-        style    = 'minimal',
-        relative = 'cursor',
-        row      = 0,
-        col      = 1
-    },
-    yadm              = {
-        enable = false
-    },
-}
+        map( { "o", "x" }, "ih", ":<C-u>Gitsigns select_hunk<CR>", { "silent" }, "Gitsigns hunk text object")
+    end
 
+    require("gitsigns").setup {
+        on_attach = onAttach,
+        signs = {
+            add = {
+                hl = "GitSignsAdd",
+                text = "┃",
+                numhl = "GitSignsAddNr",
+                linehl = "GitSignsAddLn",
+            },
+            change = {
+                hl = "GitSignsChange",
+                text = "┃",
+                numhl = "GitSignsChangeNr",
+                linehl = "GitSignsChangeLn",
+            },
+            delete = {
+                hl = "GitSignsDelete",
+                text = "┃",
+                numhl = "GitSignsDeleteNr",
+                linehl = "GitSignsDeleteLn",
+            },
+            topdelete = {
+                hl = "GitSignsDelete",
+                text = "┃",
+                numhl = "GitSignsDeleteNr",
+                linehl = "GitSignsDeleteLn",
+            },
+            changedelete = {
+                hl = "GitSignsDelete",
+                text = "┃",
+                numhl = "GitSignsDeleteNr",
+                linehl = "GitSignsDeleteLn",
+            },
+        },
+        signcolumn = true, -- Toggle with `:Gitsigns toggle_signs`
+        numhl = false, -- Toggle with `:Gitsigns toggle_numhl`
+        linehl = false, -- Toggle with `:Gitsigns toggle_linehl`
+        word_diff = false, -- Toggle with `:Gitsigns toggle_word_diff`
+        watch_gitdir = {
+            interval = 1000,
+            follow_files = true,
+        },
+        attach_to_untracked = true,
+        current_line_blame = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
+        current_line_blame_opts = {
+            virt_text = true,
+            virt_text_pos = "eol", -- 'eol' | 'overlay' | 'right_align'
+            delay = 1000,
+            ignore_whitespace = false,
+        },
+        current_line_blame_formatter_opts = {
+            relative_time = false,
+        },
+        sign_priority = 6,
+        update_debounce = 100,
+        status_formatter = nil, -- Use default
+        max_file_length = 40000,
+        preview_config = {
+            -- Options passed to nvim_open_win
+            border = "rounded",
+            style = "minimal",
+            relative = "cursor",
+            row = 0,
+            col = 1,
+        },
+        yadm = {
+            enable = false,
+        },
+    }
 end
-
