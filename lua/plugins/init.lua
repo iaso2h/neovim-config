@@ -1005,6 +1005,7 @@ local pluginArgs = { -- {{{
     -- Fennel {{{
     {
         "rktjmp/hotpot.nvim",
+        enabled = false,
         config = require("plugins.nvim-hotpot"),
     },
     {
