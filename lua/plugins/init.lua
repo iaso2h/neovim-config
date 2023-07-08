@@ -334,17 +334,21 @@ local pluginArgs = { -- {{{
         config = function()
             local ftExclude = vim.deepcopy(_G._short_line_list)
             ftExclude[#ftExclude + 1] = "help"
+
             require("indent_blankline").setup {
                 use_treesitter = true,
                 char             = require("icon").ui.LineLeft,
                 char_blankline   = require("icon").ui.LineLeft,
                 context_char     = require("icon").ui.LineLeft,
+
                 buftype_exclude  = {"terminal", "nofile"},
                 filetype_exclude = ftExclude,
                 bufname_exclude  = {"*.md"},
+
                 char_highlight_list = {"SignColumn"},
                 show_current_context           = true,
                 show_trailing_blankline_indent = false,
+                show_current_context_start     = true
             }
         end,
     },
