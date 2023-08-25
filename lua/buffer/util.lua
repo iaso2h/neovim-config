@@ -337,6 +337,7 @@ end -- }}}
 M.redirScratch = function(lines, scratchBufNr, appendChk, preHook, postHook) -- {{{
     if preHook  and vim.is_callable(preHook)  then preHook()  end
     if postHook and vim.is_callable(postHook) then postHook() end
+
     local startLine = appendChk and -1 or 0
     local scratchWinId
 

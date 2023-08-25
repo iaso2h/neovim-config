@@ -1,8 +1,7 @@
 return function()
     local icon = require("icon")
 
-
-    local function onAttach(bufNr)
+    local function onAttach(bufNr) -- {{{
         local api = require("nvim-tree.api")
         local function opts(desc)
             return { desc = "nvim-tree: " .. desc, buffer = bufNr, noremap = true, silent = true, nowait = true }
@@ -67,22 +66,25 @@ return function()
         vim.keymap.set("n", "m", api.marks.toggle, opts("Toggle mark"))
         vim.keymap.set("n", "q", api.tree.close, opts("Close"))
         vim.keymap.set("n", "?", api.tree.toggle_help, opts("Toggle help"))
-    end
+    end -- }}} 
 
-    require("nvim-tree").setup { -- BEGIN_DEFAULT_OPTS
+    require("nvim-tree").setup {
         on_attach = onAttach,
+    
         auto_reload_on_write               = true,
         disable_netrw                      = true,
         hijack_netrw                       = true,
         hijack_cursor                      = false,
         hijack_unnamed_buffer_when_opening = false,
-        sort_by = "name",  -- name, case_sensitive, modification_time, extension or a
+        sort = {
+          sorter = "name",
+          folders_first = true,
+        },
         root_dirs = {},    -- Only relevant when update_focused_file.update_root is true
         prefer_startup_root = false,  -- Only relevant when update_focused_file.update_root is true
         sync_root_with_cwd  = true,
         reload_on_bufenter  = false,
         respect_buf_cwd     = true,
-        remove_keymaps      = false,  -- Remove the default mappings in the tree.
         select_prompts      = false,
         view = {
             centralize_selection        = true,
@@ -95,7 +97,6 @@ return function()
             number                      = false,
             relativenumber              = false,
             signcolumn                  = "no",
-            mappings = {custom_only = true},
             float = {
                 enable = false,
                 quit_on_focus_loss = true,
@@ -200,11 +201,12 @@ return function()
             },
         },
         filters = {
-            dotfiles  = false,
-            git_clean = false,
-            no_buffer = false,
-            custom    = {},
-            exclude   = {},
+            git_ignored = false,
+            dotfiles    = false,
+            git_clean   = false,
+            no_buffer   = false,
+            custom      = {},
+            exclude     = {},
         },
         filesystem_watchers = {
             enable         = true,
@@ -216,6 +218,7 @@ return function()
             ignore            = false,
             show_on_dirs      = true,
             show_on_open_dirs = true,
+            disable_for_dirs = {},
             timeout           = 400,
         },
         modified = {
@@ -245,6 +248,7 @@ return function()
             },
             open_file = {
                 quit_on_open = false,
+                eject = true,
                 resize_window = true,
                 window_picker = {
                     enable  = true,
@@ -265,8 +269,8 @@ return function()
             cmd = "gio trash",
         },
         live_filter = {
-            always_show_folders = true,
             prefix              = "[FILTER]: ",
+            always_show_folders = true,
         },
         tab = {
             sync = {
@@ -277,6 +281,7 @@ return function()
         },
         notify = {
             threshold = vim.log.levels.INFO,
+            absolute_path = true,
         },
         ui = {
             confirm = {
@@ -284,6 +289,7 @@ return function()
                 trash  = true,
             },
         },
+        experimental = {},
         log = {
             enable = false,
             truncate = false,
@@ -299,6 +305,8 @@ return function()
             },
         },
     }
+
+    -- Mapping
     map("n", [[<C-w>e]], function()
         local api = require("nvim-tree.api")
         if vim.bo.filetype == "NvimTree" then

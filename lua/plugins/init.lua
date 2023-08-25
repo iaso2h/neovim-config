@@ -176,6 +176,7 @@ local pluginArgs = { -- {{{
     },
     {
         "inkarkat/vim-EnhancedJumps",
+        enabled = false,
         lazy = true,
         dependencies = { "inkarkat/vim-ingo-library" },
         init = function() vim.g.EnhancedJumps_no_mappings = 1 end,
@@ -508,20 +509,14 @@ local pluginArgs = { -- {{{
         config = function() require("nvim-nonicons").setup() end,
     },
     {
-        "glepnir/galaxyline.nvim",
-        enabled = false,
-        dependencies = { "nvim-web-devicons" },
-        event  = {"BufAdd"},
-        config = require("plugins.nvim-galaxyline")
-    },
-    {
         "freddiehaddad/feline.nvim",
         dependencies = { "nvim-web-devicons" },
         config = require("plugins.nvim-feline")
     },
     {
-        "iaso2h/nvim-cokeline",
+        "willothy/nvim-cokeline",
         dependencies = { "nvim-web-devicons" },
+        -- HACK: use sort by bufnr?
         config = require("plugins.nvim-cokeline"),
     },
     {
@@ -696,6 +691,11 @@ local pluginArgs = { -- {{{
                     "treesitter",
                 },
                 filetypes_denylist = _G._short_line_list,
+                filetype_overrides = {
+                    autohotkey = {
+                        providers = { "regex" }
+                    }
+                },
                 min_count_to_highlight = 2,
             }
         end,
@@ -881,8 +881,8 @@ local pluginArgs = { -- {{{
                 "DapCompletionSupport",
                 function()
                     local text = require("dap").session().capabilities.supportsCompletionsRequest
-                            and "true"
-                        or "false"
+                            and "true" or "false"
+
                     vim.api.nvim_echo({ { text, "MoreMsg" } }, false, {})
                 end,
                 { desc = "Check Dap completion support" }

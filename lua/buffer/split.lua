@@ -24,6 +24,7 @@ end
 --- Return ex command for spliting Neovim windows
 ---@param prefixCmdChk boolean If the function resolve to vertical split solution. Whether to return `vertical` form ex command prefix or `vsplit` to split a window first
 ---@return string # Neovim ex-command string
+-- TODO: avoid split on specifal buffer/filetype like nvim-tree
 M.handler = function(prefixCmdChk)
     local vertCmd = prefixCmdChk and "vertical" or "vsplit"
     local horiCmd = prefixCmdChk and "horizontal" or "split"

@@ -441,8 +441,6 @@ map("t", [[<A-d>]], [[<C-\><C-n><PageDown>]], "Scroll one window down")
 map("n", [[<A-q>]], [[q]], {"noremap"}, "Macro")
 
 -- Messages
-
-map({"n", "x"}, [[g<]], [[:s#^\s*\ze\S## | noh<CR>]], {"silent"}, "Clear all indents")
 map("n", [[gm]], [[g<]], {"noremap"}, "Recent messages")
 map("n", [[gM]], [[<CMD>messages<CR>]], {"silent"}, "All messages")
 map("n", [[<leader>m]], [[<CMD>execute 'messages clear<Bar>echohl Moremsg<Bar>echo "Message clear"<Bar>echohl None'<CR>]], "Clear messages")
@@ -602,7 +600,9 @@ map("i", [[<C-[>]], [[<C-[>l]], {"noremap"}, "which_key_ignore")
 if _G._os_uname.machine == "aarch64" then
     map("i", [[jj]], [[<C-[>]], "Exit insert mode")
 end
+
 -- Insert
+map({"n", "x"}, [[g<]], [[:s#^\s*\ze\S## | noh<CR>]], {"silent"}, "Clear all indents")
 map("i", [[<S-Tab>]], [[<C-d>]], {"noremap"}, "Delete indent")
 map("i", [[<A-[>]],   [[<C-d>]], {"noremap"}, "Delete indent")
 map("i", [[<A-]>]],   [[<C-t>]], {"noremap"}, "Add indent")

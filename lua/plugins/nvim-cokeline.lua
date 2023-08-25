@@ -85,7 +85,14 @@ return function()
             space
         },
         sidebar = {
-            filetype = {"NvimTree", "dapui_"},
+            filetype = {
+                "NvimTree",
+                "dapui_watches",
+                "dapui_console",
+                "dapui_stacks",
+                "dapui_breakpoints",
+                "dapui_scopes"
+            },
             components = {
                 {
                     text = "",
