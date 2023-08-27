@@ -169,8 +169,8 @@ local pluginArgs = { -- {{{
         "skywind3000/asyncrun.vim",
         cmd  = { "AsyncRun", "AsyncStop" },
         init = function()
-            map("n", [[<F9>]],   [[:lua require("compileRun").compileCode(true)<CR>]], {"silent"}, "Compile code")
-            map("n", [[<F10>]], [[:lua require("compileRun").runCode()<CR>]],          {"silent"}, "Run code")
+            map("n", [[<F9>]],  [[<CMD>lua require("compileRun").compileCode(true)<CR>]], {"silent"}, "Compile code")
+            map("n", [[<F10>]], [[<CMD>lua require("compileRun").runCode()<CR>]],          {"silent"}, "Run code")
         end,
         config = require("plugins.vim-asyncrun"),
     },
@@ -246,7 +246,7 @@ local pluginArgs = { -- {{{
             require("hop").setup {
                 case_insensitive = false,
             }
-            map("", [[<leader>f]], [[:lua require("hop").hint_char1()<CR>]], "Hop char")
+            map("", [[<leader>f]], require("hop").hint_char1, "Hop char")
         end
     },
     -- TODO: skip asking for input when performing a dot-repeat
@@ -1011,7 +1011,7 @@ local pluginArgs = { -- {{{
         "mrjones2014/lua-gf.nvim",
         ft = "lua",
         config = function()
-            map("n", [[gF]], [[<CMD>lua require("plugins.nvim-lua-gf")()<CR>]], {"silent"}, "Go to file")
+            map("n", [[gF]], require("plugins.nvim-lua-gf"), "Go to file")
         end
     },
     {

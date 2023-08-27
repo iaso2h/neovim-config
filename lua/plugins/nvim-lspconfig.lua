@@ -331,7 +331,6 @@ vim.diagnostic.config {
     severity_sort    = true,
 }
 
-local icon = require("icon")
 vim.cmd [[
 sign define DiagnosticSignError text= texthl=DiagnosticError linehl= numhl=DiagnosticError
 sign define DiagnosticSignWarn  text= texthl=DiagnosticWarn  linehl= numhl=DiagnosticWarn
