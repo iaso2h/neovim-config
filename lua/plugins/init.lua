@@ -670,16 +670,28 @@ local pluginArgs = { -- {{{
         dependencies = { "nvim-lspconfig" },
         config = require("plugins.nvim-lsp-signature"),
     },
-    -- TODO: highlight group
     {
-        "weilbith/nvim-code-action-menu",
-        cmd = "CodeActionMenu",
-        init = function()
-            vim.g.code_action_menu_window_border    = "rounded"
-            vim.g.code_action_menu_show_details     = true
-            vim.g.code_action_menu_show_diff        = true
-            vim.g.code_action_menu_show_action_kind = true
-            map("n", "<leader>a", "<CMD>CodeActionMenu<CR>", "Lsp code action menu")
+        "kosayoda/nvim-lightbulb",
+        config = require("plugins.nvim-lightbulb")
+    },
+    {
+        "aznhe21/actions-preview.nvim",
+        keys = { { "<leader>a", mode = "n" } },
+        config = function()
+            map("n", "<leader>a", require("actions-preview").code_actions, "Lsp code action")
+
+            require("actions-preview").setup {
+                -- options for vim.diff(): https://neovim.io/doc/user/lua.html#vim.diff()
+                diff = {
+                    algorithm         = "histogram",
+                    ignore_whitespace = true,
+                    ctxlen            = 3,
+                    filler            = true
+                },
+                -- priority list of preferred backend
+                backend = { "telescope"},
+                telescope = require("telescope.themes").get_dropdown()
+            }
         end,
     },
     {

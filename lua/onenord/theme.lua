@@ -525,8 +525,7 @@ theme.plugins = { -- {{{
     HistoryStartupFileRoot = {fg = p.n8,  style = "bold"},
 
     -- https://github.com/kosayoda/nvim-lightbulb
-    LightBulbVirtualText = {link = "NormalFloat"},
-    LightBulbFloatWin    = {link = "NormalFloat"},
+    -- LightBulbVirtualText = {link = "DiagnosticHint"},
 
     -- https://github.com/hrsh7th/nvim-cmp
     CmpItemAbbr           = {fg = p.white},
@@ -587,7 +586,6 @@ theme.plugins = { -- {{{
     -- LuasnipSnippetNodeActive         = {style = "bold"},
     -- LuasnipSnippetNodePassive        = {style = "NONE"},
     -- LuasnipSnippetNodeSnippetPassive = {style = "NONE"},
-
 } -- }}}
 
 theme.loadTerminal = function()

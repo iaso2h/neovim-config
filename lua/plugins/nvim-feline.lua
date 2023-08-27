@@ -346,7 +346,7 @@ return function()
         }, -- }}}
         diagnosticHints = { -- {{{
             provider = function()
-                return getDiagnostics(vim.diagnostic.severity.HINT), padding .. icon.diagnostics.HintBold .. padding
+                return getDiagnostics(vim.diagnostic.severity.HINT), padding .. icon.diagnostics.Hint .. padding
             end,
             hl = {
                 fg = colors.blueLight,
