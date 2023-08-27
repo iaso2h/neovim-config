@@ -1,8 +1,8 @@
 -- File: extraction
 -- Author: iaso2h
 -- Description: Extract selected content into new variable or new file
--- Version: 0.0.9
--- Last Modified: 05/03/2023 Wed
+-- Version: 0.0.10
+-- Last Modified: 2023-08-27
 -- TODO: Deprecated: Please use refactor.nvim instead for visual line mode
 require("operator")
 local util     = require("util")
@@ -237,6 +237,7 @@ end -- }}}
 ---@param opInfo GenericOperatorInfo
 function M.operator(opInfo) -- {{{
     M.vimMode = opInfo.vimMode
+    M.argPath = opInfo.path
     if not vim.o.modifiable or vim.o.readonly then
         reset()
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
@@ -257,14 +258,18 @@ function M.operator(opInfo) -- {{{
             end
         end)
     elseif M.vimMode == "V" then
-        vim.ui.input({
-            prompt = "Enter new file path: ",
-            default = vim.fn.getcwd(),
-        }, function(input)
-            if input and input ~= "" then
-                require("extraction").newFile(input)
-            end
-        end)
+        if M.argPath == "" then
+            vim.ui.input({
+                prompt = "Enter new file path: ",
+                default = vim.fn.getcwd(),
+            }, function(input)
+                if input and input ~= "" then
+                    require("extraction").newFile(input)
+                end
+            end)
+        else
+            M.newFile(M.argPath)
+        end
     else
         return vim.notify("Not support in current mode", vim.log.levels.WARN)
     end
