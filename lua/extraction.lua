@@ -236,8 +236,7 @@ end -- }}}
 --- Operator to extract for creating either a new variable or a new file
 ---@param opInfo GenericOperatorInfo
 function M.operator(opInfo) -- {{{
-    M.motionType = opInfo.motionType
-    M.vimMode    = opInfo.vimMode
+    M.vimMode = opInfo.vimMode
     if not vim.o.modifiable or vim.o.readonly then
         reset()
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)

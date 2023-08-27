@@ -85,10 +85,9 @@ vim.api.nvim_create_user_command("ExtractToFile", function(opts) -- {{{
     if opts.range == 0 then
         -- Extract the current line when no range selected
         vim.cmd([[noa norm! V]] .. t"<Esc>")
-        require("extraction").main({ nil, vim.fn.visualmode() })
-    elseif opts.range == 2 then
-        require("extraction").main({ nil, vim.fn.visualmode() })
     end
+
+    require("extraction").operator { vimMode = vim.fn.visualmode() }
 end, {
     desc  = "Extract selection to a new file",
     range = true,
