@@ -57,8 +57,6 @@ return function()
             close.bufHandler(false, false)
         end
     end
-    -- TODO: whether to close windows don't contain the current buffer as
-    -- post processing
 
     -- Refocus window if necessary
     if vim.api.nvim_get_current_win() ~= saveWinId and vim.api.nvim_win_is_valid(saveWinId) then
