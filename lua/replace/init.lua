@@ -1,7 +1,7 @@
 -- File: replace
 -- Author: iaso2h
--- Description: Heavily inspired Ingo Karkat's work. Replace text with register
--- Version: 0.1.13
+-- Description: Heavily inspired by Ingo Karkat's work. Replace text with register
+-- Version: 0.1.14
 -- Last Modified: 2023-05-20
 -- TODO: tests for softtab convert
 -- NOTE: break change: Dot-repeat no longer support jump to mark motion now
@@ -57,7 +57,7 @@ local saveOption = function() -- {{{
     local saveSelection
 
     if vim.api.nvim_get_option("selection") ~= "inclusive" then
-        saveSelection = vim.o.clipboard
+        saveSelection = vim.o.selection
         -- Avoid clobbering the selection and clipboard registers.
         vim.opt.selection = "inclusive"
     end
