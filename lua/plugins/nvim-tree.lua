@@ -131,7 +131,16 @@ return function()
                 },
             },
             icons = {
-                webdev_colors      = true,
+                web_devicons = {
+                    file = {
+                        enable = true,
+                        color = true,
+                    },
+                    folder = {
+                        enable = false,
+                        color = true,
+                    },
+                },
                 git_placement      = "before",
                 modified_placement = "after",
                 padding            = " ",
