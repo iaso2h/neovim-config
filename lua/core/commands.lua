@@ -229,7 +229,7 @@ end, {
     complete = sessionComp
 }) -- }}}
 
-local purge = function() -- {{{
+local purge = function(slientChk) -- {{{
     -- Delete invalid buffers
     local cond = function(bufNr)
         local bufName = nvim_buf_get_name(bufNr)
@@ -238,7 +238,11 @@ local purge = function() -- {{{
     end
     local inValidBufNrs = vim.tbl_filter(cond, vim.api.nvim_list_bufs())
     if not next(inValidBufNrs) then
-        return vim.notify("No buffer has been purged", vim.log.levels.INFO)
+        if not slientChk then
+            return vim.notify("No buffer has been purged", vim.log.levels.INFO)
+        else
+            return
+        end
     end
     for _, bufNr in ipairs(inValidBufNrs) do
         vim.schedule_wrap(function()
@@ -247,7 +251,7 @@ local purge = function() -- {{{
         end)()
     end
 end -- }}}
-vim.api.nvim_create_user_command("Purge", purge, { -- {{{
+vim.api.nvim_create_user_command("Purge", function() purge(false) end, { -- {{{
     desc  = "Purge invalid buffers",
     nargs = 0,
 }) -- }}}
@@ -261,7 +265,7 @@ vim.api.nvim_create_user_command("Se", function (opts) -- {{{
     if not ok and not string.match(msgOrVal, "E592") then
         vim.notify(msgOrVal, vim.log.levels.ERROR)
     end
-    purge()
+    purge(true)
 end, {
     desc  = "Load session",
     nargs = "?",
@@ -305,11 +309,6 @@ end, {
 }) -- }}}
 
 vim.api.nvim_create_user_command("O", [[browse oldfiles]], { desc = "Browse the oldfiles then prompt", })
-vim.api.nvim_create_user_command("OnSaveTrimSpaces", function ()
-    _G._trim_space = _G._trim_space or true
-    _G._trim_space = not _G._trim_space
-    vim.api.nvim_echo({ { string.format("OnSaveTrimSpaces: %s", _G._trim_space), "Moremsg" } }, false, {})
-end, { desc = "Toggle trimming spaces on save", })
 
 vim.api.nvim_create_user_command("TrimBufferSpaces", -- {{{
     function()require("util").trimSpaces()end,
