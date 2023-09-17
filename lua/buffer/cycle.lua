@@ -1,8 +1,8 @@
 -- File: cycle.lua
 -- Author: iaso2h
 -- Description: Improved bp and bn
--- Version: 0.0.9
--- Last Modified: 2023-4-20
+-- Version: 0.0.10
+-- Last Modified: 2023-09-17
 
 
 local api = vim.api
@@ -83,22 +83,18 @@ end -- }}}
 M.init = function(direction) -- {{{
     local currentBufNr = api.nvim_get_current_buf()
     local bufTbl
-    ---@diagnostic disable-next-line: undefined-field
-    if _G.cokeline and type(_G.cokeline) == "table" then
+    if package.loaded["cokeline"] and next(require("cokeline.state").visible_buffers) then
+        -- Use buffers from cokeline plug-in
         bufTbl = vim.tbl_map(function(buffer)
             return buffer.number
-        end, _G.cokeline.visible_buffers)
-    end
-
-    -- Deal with non-standard buffer
-    if (_G.cokeline and type(_G.cokeline) == "table" and
-        vim.tbl_contains(bufTbl, currentBufNr)) or
-        vim.o.buftype ~= "" or nvim_buf_get_name(0) == "" then
-        return bufferCycle(currentBufNr, direction)
-    end
-
-    -- Create buffer table when data from cokeline is unavailable
-    if not(_G.cokeline and type(_G.cokeline) == "table") then
+        end, require("cokeline.state").visible_buffers)
+        -- Deal with non-standard buffer
+        if vim.tbl_contains(bufTbl, currentBufNr) or
+            vim.o.buftype ~= "" or nvim_buf_get_name(0) == "" then
+            return bufferCycle(currentBufNr, direction)
+        end
+    else
+        -- Create buffer table when data from cokeline is unavailable
         bufTbl = api.nvim_list_bufs()
         local cond = function (buf)
             return api.nvim_buf_get_option(buf, "buflisted")
@@ -108,7 +104,7 @@ M.init = function(direction) -- {{{
 
     local currentBufIdx = tbl_idx(bufTbl, currentBufNr, false)
     if currentBufIdx == -1 then
-        -- Use fallback function
+        -- Use fallback function if current buffer index is not found
         return bufferCycle(currentBufNr, direction)
     end
 
