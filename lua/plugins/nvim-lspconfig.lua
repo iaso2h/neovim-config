@@ -34,8 +34,8 @@ return function()
     ---@param bufNr integer
     local onAttach = function(client, bufNr) -- {{{
         -- Mappings
-       bmap(bufNr, "n", [[<C-f>o]], [[<CMD>lua require('telescope.builtin').lsp_document_symbols()<CR>]],  {"silent"}, "LSP document symbols")
-          bmap(bufNr, "n", [[<C-f>O]], [[<CMD>lua require('telescope.builtin').lsp_workspace_symbols()<CR>]], {"silent"}, "LSP workspace symbols")
+        bmap(bufNr, "n", [[<C-f>o]], [[<CMD>lua require('telescope.builtin').lsp_document_symbols()<CR>]],  {"silent"}, "LSP document symbols")
+        bmap(bufNr, "n", [[<C-f>O]], [[<CMD>lua require('telescope.builtin').lsp_workspace_symbols()<CR>]], {"silent"}, "LSP workspace symbols")
 
         bmap(bufNr, "n", [[gd]], function()
             vim.lsp.buf.definition { on_list = conciseQuifix }
@@ -50,7 +50,7 @@ return function()
             vim.lsp.buf.implementation { on_list = conciseQuifix }
         end, "LSP implementation")
 
-        -- bmap(bufNr, {"x", "n"}, [[<leader>a]],  vim.lsp.buf.code_action,    "LSP code action")
+        bmap(bufNr, {"x", "n"}, [[<leader>a]],  vim.lsp.buf.code_action,    "LSP code action")
         bmap(bufNr, "n", [[<leader>rn]], vim.lsp.buf.rename,         "LSP rename")
         bmap(bufNr, "n", [[K]],          vim.lsp.buf.hover,          "LSP hover")
         bmap(bufNr, "n", [[<C-p>]],      vim.lsp.buf.signature_help, "LSP signature help")

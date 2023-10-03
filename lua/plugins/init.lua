@@ -677,6 +677,7 @@ local pluginArgs = { -- {{{
     {
         "aznhe21/actions-preview.nvim",
         keys = { { "<leader>a", mode = "n" } },
+        enabled = false,
         config = function()
             map("n", "<leader>a", require("actions-preview").code_actions, "Lsp code action")
 
