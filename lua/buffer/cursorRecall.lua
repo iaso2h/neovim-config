@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Derived from and simplified:
 -- Credit: https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
--- Version: 0.0.5
--- Last Modified: Fri 05 May 2023
+-- Version: 0.0.6
+-- Last Modified: 2023-10-03
 
 local ignoreBuftype = {
         'quickfix',
@@ -81,11 +81,22 @@ return function(args)
         -- Jump to recent last change instead
         if vim.api.nvim_win_get_cursor(0)[1] == 1 then
             -- Go to the newest change first then the older one
-            local ok, msgOrVal = pcall(vim.api.nvim_command, "normal! g,")
-            log("DEBUGPRINT[9]: cursorRecall.lua:85 (after local ok, _ = pcall(vim.api.nvim_command, normal! g,))")
-            if not ok then
-                log("DEBUGPRINT[10]: cursorRecall.lua:87 (after if not ok then)")
-                pcall(vim.api.nvim_command, "normal! g;")
+            local jumpUtil = require("jump.util")
+            local changesCmdRaw = jumpUtil.getJumpsCmd("changes", false)
+            local changesCmd = vim.tbl_map(jumpUtil.jumpCmdParse, changesCmdRaw)
+            if not next(changesCmd) or not next(changesCmd[#changesCmd]) then
+                -- It's a newfile with no changelist or it's already at newest change
+                return
+            else
+                local cmdIdx = jumpUtil.getJumpCmdIdx(changesCmdRaw)
+                if cmdIdx == #changesCmdRaw then
+                    -- Already at neweast change
+                    return
+                else
+                    local count = changesCmd[#changesCmd].count
+                    local exCmd = "g,"
+                    vim.cmd(string.format("norm! %s%s", count, exCmd))
+                end
             end
         end
     end

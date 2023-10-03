@@ -8,8 +8,8 @@ local jumplist = require("jump.jumplist")
 
 
 local getJumpsCmdSliced = function(isNewer, filter)
-    local jumpsCmdRaw = jumpUtil.getJumpsCmd()
-    local CmdIdx = jumplist.getJumpCmdIdx(jumpsCmdRaw)
+    local jumpsCmdRaw = jumpUtil.getJumpsCmd("jumps", false)
+    local CmdIdx = jumpUtil.getJumpCmdIdx(jumpsCmdRaw)
     local jumpsExpectedCmd = jumplist.getJumpsSliced(isNewer, filter, CmdIdx, jumpsCmdRaw)
 
     return jumpsExpectedCmd
@@ -37,7 +37,7 @@ describe([[vim.fn.getjumplist() and ex-command :jumps. ]], function()
         local jumpsExpectedCmdRaw = jumpUtil.jumplistRegisterLinesToTbl(true, 1, jumplist._CMD_THRESHOLD, false, jumplist._CMD_THRESHOLD)
 
         jumpUtil.jumplistRegisterLines(1, jumplist._CMD_THRESHOLD)
-        local currentJumpsTbl = jumpUtil.getJumpsCmd()
+        local currentJumpsTbl = jumpUtil.getJumpsCmd("jumps", false)
         assert.are.same(#jumpsExpectedCmdRaw, #currentJumpsTbl - 2)
     end) -- }}}
 
@@ -130,9 +130,9 @@ describe([[vim.fn.getjumplist() and ex-command :jumps. ]], function()
             vim.api.nvim_put({"line: " .. i}, "l", true, true)
         end
 
-        local expectedOutput = jumpUtil.getJumpsCmd()
+        local expectedOutput = jumpUtil.getJumpsCmd("jumps", false)
         _G._noStdlib = true
-        local myOutput = jumpUtil.getJumpsCmd()
+        local myOutput = jumpUtil.getJumpsCmd("jumps", false)
         assert.are.same(expectedOutput, myOutput)
     end)
 end) -- }}}

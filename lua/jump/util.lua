@@ -35,12 +35,13 @@ M.jumplistRegisterLines = function(startLineNr, lastLineNr) -- {{{
     end
 end -- }}}
 --- Split the string output of `:jumps` into table by line break
+---@param exCommand string Vim Ex command to be executed. Either "jumps" or "changes"
 ---@param noStdlib boolean Whether to use the `vim.split` function in standard
 --library to split the string
 ---@return string[]
-M.getJumpsCmd = function(noStdlib) -- {{{
+M.getJumpsCmd = function(exCommand, noStdlib) -- {{{
     local jumpsTbl = {}
-    local jumpsOutput = vim.api.nvim_exec2("jumps", { output = true }).output
+    local jumpsOutput = vim.api.nvim_exec2(exCommand, { output = true }).output
     if not noStdlib then
         return vim.split(jumpsOutput, "\n", { plain = true, trimempty = false })
     else
@@ -90,11 +91,13 @@ M.getJumpsCmd = function(noStdlib) -- {{{
 end -- }}}
 --- Parse data in a single line in the `:jumps`
 ---@param jumpCmdRaw string
+---@return table
 M.jumpCmdParse = function(jumpCmdRaw) -- {{{
     local parseResult = { string.match(jumpCmdRaw, "^>?%s*(%d+)%s+(%d+)%s+(%d+)%s+(.*)$") }
     if not next(parseResult) then
         return parseResult
     else
+        -- NOTE: the `lnum` and `col` is (1, 1) based
         return {
             count = parseResult[1],
             lnum  = tonumber(parseResult[2]),
@@ -102,6 +105,24 @@ M.jumpCmdParse = function(jumpCmdRaw) -- {{{
             text  = parseResult[4]
         }
     end
+end -- }}}
+--- 1-based index of the ">" character in the ex-command `:jumps` output
+---@param jumpsCmdRaw table Captured output of `:jumps`
+---@return integer
+M.getJumpCmdIdx = function(jumpsCmdRaw) -- {{{
+    local CmdRawIdx = 0
+    -- Loop backward because the index character ">" is more likely closer to
+    -- the end of the `:jumps` list
+    -- Ignore the header, starting at 2
+    for i = #jumpsCmdRaw, 2, -1 do
+        local jumpCmdRaw = jumpsCmdRaw[i]
+        if string.sub(jumpCmdRaw, 1, 1) == ">" then
+            CmdRawIdx = i
+            break
+        end
+    end
+
+    return CmdRawIdx
 end -- }}}
 --- Register specific line region in the current buffer and generate the `:
 --jumps` output as table or redirect it to a scratch buffer
@@ -126,7 +147,7 @@ M.jumplistRegisterLinesToTbl = function(returnJumpsChk, startLineNr, lastLineNr,
 
     local jumpsTbl = {}
     local extendJump = function()
-        local jumps = M.getJumpsCmd()
+        local jumps = M.getJumpsCmd("jumps", false)
         vim.cmd [[noa clearjumps]]
         for _, jump in ipairs(jumps) do
             if jump ~= " jump line  col file/text" and string.sub(jump, 1, 1) ~= ">" then

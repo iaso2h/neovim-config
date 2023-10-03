@@ -1,8 +1,8 @@
 -- File: jumplist
 -- Author: iaso2h
 -- Description: Enhance <C-i>/<C-o>
--- Version: 0.0.14
--- Last Modified: 05/04/2023 Thu 
+-- Version: 0.0.15
+-- Last Modified: 2023-10-03
 
 local defaultOpts  = {
     checkCursorRedundancy = true,
@@ -33,23 +33,6 @@ local overJumpInfo = function(isNewer, filter) -- {{{
         string.format("Cannot jump to any %s place in the %s jumplist",
             directionStr, filter), vim.log.levels.INFO)
 end -- }}}
---- 1-based index of the ">" character in the ex-command `:jumps` output
----@param jumpsCmdRaw table Captured output of `:jumps`
----@return integer
-local getJumpCmdIdx = function(jumpsCmdRaw) -- {{{
-    local CmdRawIdx = 0
-    -- Loop backward because the index character ">" is more likely closer to
-    -- the end of the `:jumps` list
-    for i = #jumpsCmdRaw, 2, -1 do
-        local jumpCmdRaw = jumpsCmdRaw[i]
-        if string.sub(jumpCmdRaw, 1, 1) == ">" then
-            CmdRawIdx = i
-            break
-        end
-    end
-
-    return CmdRawIdx
-end -- }}} 
 ---@param isNewer boolean Whether jump to newer position
 ---@param filter string "local"|"buffer"
 ---@param CmdIdx integer
@@ -81,6 +64,7 @@ local getJumpsSliced = function(isNewer, filter, CmdIdx, jumpsCmdRaw, jumpIdx, j
         jumpEnd = #jumps
         step    = 1
     else
+        -- Ignoring the header(cmdidx == 1)
         if CmdIdx == 2 then
             overJumpInfo(isNewer, filter)
             return jumpsSliced
@@ -132,7 +116,7 @@ local getJumpsSliced = function(isNewer, filter, CmdIdx, jumpsCmdRaw, jumpIdx, j
     end
 
     return jumpsSliced
-end -- }}} 
+end -- }}}
 --- Get the filtered out jumplist so that is ready to filter out and decide to perform a local jump or buffer jump
 ---@param isNewer boolean Whether jump to newer position
 ---@param winId integer Window ID
@@ -148,9 +132,9 @@ local getJumps = function(isNewer, winId, filter) -- {{{
     end
 
     -- Get jumps from ex-command :jumps
-    local jumpsCmdRaw = jumpUtil.getJumpsCmd()
+    local jumpsCmdRaw = jumpUtil.getJumpsCmd("jumps", false)
 
-    local CmdIdx = getJumpCmdIdx(jumpsCmdRaw)
+    local CmdIdx = jumpUtil.getJumpCmdIdx(jumpsCmdRaw)
     if CmdIdx == 0 then
         vim.notify("Can't find current index", vim.log.levels.ERROR)
         return jumpsSliced
@@ -231,7 +215,7 @@ local filterJumps = function(bufNr, jumps, filter, cursorPos) -- {{{
     else
         return {}, jumpsFiltered
     end
-end -- }}} 
+end -- }}}
 --- Execute the ex-command and start jumping
 ---@param vimMode string "v" or "n" to indicate Neovim mode
 ---@param isNewer boolean Whether jump to newer position
@@ -262,7 +246,7 @@ local execute = function(vimMode, isNewer, winId, cursorPos, jumpsFiltered) -- {
     end
 
     return count
-end -- }}} 
+end -- }}}
 --- Handler of vimMode, direction and filter
 ---@param vimMode string "v" or "n" to indicate Neovim mode
 ---@param isNewer boolean Whether jump to newer position
@@ -271,6 +255,8 @@ M.go = function(vimMode, isNewer, filter) -- {{{
     local bufNr     = vim.api.nvim_get_current_buf()
     local winId     = vim.api.nvim_get_current_win()
     local cursorPos = M.opts.checkCursorRedundancy and vim.api.nvim_win_get_cursor(winId) or {}
+    -- Buffer that has the filetype matching the patterns in
+    -- `M.opts.fileTypeUseBuiltIn` will always execute and built-in command
     if vim.tbl_contains(M.opts.fileTypeUseBuiltIn, vim.bo.filetype) then
         return execute(vimMode, isNewer, winId, cursorPos)
     end
@@ -305,17 +291,16 @@ M.go = function(vimMode, isNewer, filter) -- {{{
     end
 
     -- TODO:echo the next jump?
-end -- }}} 
+end -- }}}
 --- Set up plug-in configuration
 ---@param opts table
 M.setup = function(opts) -- {{{
     opts = opts or defaultOpts
     M.opts = vim.tbl_deep_extend("keep", opts, defaultOpts)
-end -- }}} 
+end -- }}}
 
 
 -- Exposed API
-M.getJumpCmdIdx = getJumpCmdIdx
 M.getJumpsSliced = getJumpsSliced
 M.getJumps = getJumps
 
