@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Expand region in visual character mode.
 -- For treesitter support, only tested on python, lua, c files
--- Version: 0.0.18
--- Last Modified: 2023-3-20
+-- Version: 0.0.19
+-- Last Modified: 2023-10-03
 local ts      = require("expandRegion.treesitter")
 local tx      = require("expandRegion.textobj")
 local cbPairs = require("expandRegion.treesitterCodeBlockPairs")
@@ -144,17 +144,21 @@ end
 --- Compute and generate candidates table, which contain info about the start and end of regions
 --- @param opts table option table
 --- @param direction integer 1 indicates expand, -1 indicates shrink
---- @return boolean, string
+--- @return boolean true if successful
 local computeCandidate = function(opts, direction)
-    if not package.loaded["nvim-treesitter.parsers"] or
-        not require("nvim-treesitter.parsers").has_parser() then
-        return false, "Need Tree-sitter support"
+    if not require("vim.treesitter.highlighter").active[M.curBufNr] then
+        -- treesitter highlighting is enabled
+        vim.notify("Need Tree-sitter support", vim.log.levels.WARN)
+        return false
     end
 
     local startNode, pairNode, parentNode
     if opts.treesitterExtent then
         startNode = vim.treesitter.get_node()
-        if not startNode then return false, "Unable to find Tree-sitter node at cursor position" end
+        if not startNode then
+            vim.notify("Unable to find Tree-sitter node at cursor position", vim.log.levels.WARN)
+            return false
+        end
         -- Check code block if the treesitter node matches the compound statement
         if cbPairs["ts_" .. startNode:type()] then
             startNode, pairNode, parentNode = ts.getPairNode(startNode)
@@ -176,6 +180,8 @@ local computeCandidate = function(opts, direction)
             vim.notify("No candidates", vim.log.levels.INFO)
         end
     end
+
+    return true
 end
 
 
@@ -199,8 +205,10 @@ M.expandShrink = function(vimMode, direction, opts)
         initExpand()
         saveOption()
 
-        local ok, msg = pcall(computeCandidate, opts, direction)
-        if not ok then vim.notify(msg, vim.log.levels.ERROR) end
+        local ok, resultOrErrorMsg = pcall(computeCandidate, opts, direction)
+        if not ok then
+            vim.notify(resultOrErrorMsg, vim.log.levels.ERROR)
+        end
 
         -- Restore vim options
         if vim.is_callable(M.restoreOption) then M.restoreOption(); M.restoreOption = nil end

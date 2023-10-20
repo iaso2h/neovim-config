@@ -98,7 +98,6 @@ return function(args)
                     -- >
                     local newestChangeCmd = jumpUtil.jumpCmdParse(changesCmdRaw[#changesCmdRaw - 1])
                     vim.cmd(string.format("norm! %s%s", newestChangeCmd.count, "g,"))
-                    return
                 else
                     local newestChangeCmd = jumpUtil.jumpCmdParse(changesCmdRaw[#changesCmdRaw])
                     vim.cmd(string.format("norm! %s%s", newestChangeCmd.count, "g,"))
