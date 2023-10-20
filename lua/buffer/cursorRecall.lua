@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Derived from and simplified:
 -- Credit: https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
--- Version: 0.0.6
--- Last Modified: 2023-10-03
+-- Version: 0.0.7
+-- Last Modified: 2023-10-20
 
 local ignoreBuftype = {
         'quickfix',
@@ -83,19 +83,25 @@ return function(args)
             -- Go to the newest change first then the older one
             local jumpUtil = require("jump.util")
             local changesCmdRaw = jumpUtil.getJumpsCmd("changes", false)
-            local changesCmd = vim.tbl_map(jumpUtil.jumpCmdParse, changesCmdRaw)
-            if not next(changesCmd) or not next(changesCmd[#changesCmd]) then
+            if #changesCmdRaw == 2 then
                 -- It's a newfile with no changelist or it's already at newest change
                 return
             else
                 local cmdIdx = jumpUtil.getJumpCmdIdx(changesCmdRaw)
-                if cmdIdx == #changesCmdRaw then
-                    -- Already at neweast change
+                if cmdIdx == #changesCmdRaw and
+                    not next(jumpUtil.jumpCmdParse(changesCmdRaw[#changesCmdRaw])) then
+                    -- Empty change record like:
+                    --     4    93    0 not next(jumpUtil.jumpCmdParse(changesCmdRaw[#changesCmdRaw])) then
+                    --     3    96    0 local newestChangeCmd = jumpUtil.jumpCmdParse(changesCmdRaw[#changesCmdRaw - 1])
+                    --     2    95    0
+                    --     1    94   47 -- Empty change record like:
+                    -- >
+                    local newestChangeCmd = jumpUtil.jumpCmdParse(changesCmdRaw[#changesCmdRaw - 1])
+                    vim.cmd(string.format("norm! %s%s", newestChangeCmd.count, "g,"))
                     return
                 else
-                    local count = changesCmd[#changesCmd].count
-                    local exCmd = "g,"
-                    vim.cmd(string.format("norm! %s%s", count, exCmd))
+                    local newestChangeCmd = jumpUtil.jumpCmdParse(changesCmdRaw[#changesCmdRaw])
+                    vim.cmd(string.format("norm! %s%s", newestChangeCmd.count, "g,"))
                 end
             end
         end
