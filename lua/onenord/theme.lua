@@ -267,12 +267,13 @@ theme.treesitter         = {
     ["@text.underline"]        = {link = "TSUnderline"},
     ["@text.literal"]          = {link = "TSLiteral"},
     ["@text.uri"]              = {link = "TSURI"},
+    ["@text.strike"]           = {fg = p.n4, style = "strikethrough"},
+    ["@text.math"]             = {fg = p.n7 },
+    -- @ (e.g. for LaTeX math environments)
     -- @todo Missing highlights
     -- @function.call
     -- @method.call
     -- @type.qualifier
-    -- @text.strike
-    -- @text.math (e.g. for LaTeX math environments)
     -- @text.environment (e.g. for text environments of markup languages)
     -- @text.environment.name (e.g. for the name/the string indicating the type of text environment)
     -- @text.note
