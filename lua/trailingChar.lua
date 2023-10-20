@@ -1,8 +1,8 @@
 -- File: trailingChar
 -- Author: iaso2h
 -- Description: Add character at the end of line
--- Version: 0.0.6
--- Last Modified: 2023-3-21
+-- Version: 0.0.7
+-- Last Modified: 2023-10-20
 local ts  = vim.treesitter
 
 --- Find if a comment node exist in a line
@@ -20,49 +20,55 @@ end
 
 --- Find if a comment node exist in a line, start at col 2
 ---@param cursorPos table (0, 0) indexed. Row(Line) and column.
----@param lastNode TSNode The treesitter object can be retrieved by calling `ts.get_node_at_post(0, <lineNum>, 0)`
----@param lineLen integer The length of current cursor
----@return boolean # Whether comment node is found
-local function findCommentNode(cursorPos, lastNode, lineLen) -- {{{
-    local commentTick = false
+---@param cursorNode TSNode The treesitter object can be retrieved by calling `ts.get_node_at_post(0, <lineNum>, 0)`. The row and column value is (0, 0) indexing
+---@param cursorLineLen integer The length of current line
+---@return integer # Whether comment node is found
+local function findCommentNode(cursorPos, cursorNode, cursorLineLen) -- {{{
     local cnt = 0
-    local i = 1
+    local i = 1 -- 1 indexing
     repeat
-        local node = ts.get_node(0, cursorPos[1], i) -- This is (0, 0) indexing
-        if not node then
-            vim.notify("Failed to get treesitter node", vim.log.levels.WARN)
-            return commentTick
+        -- Break condition 1
+        if i > cursorLineLen then
+            i = i - 1
+            return -1
         end
 
         -- Break condition 2
-        if node:type() == "comment" then
-            commentTick = true
-            break
-        end
-
-        local range = { node:range() } -- This is (0, 0) indexing
-        if node:id() == lastNode:id() then
-            -- Next loop start at the end of the same node
-            i = range[4]
-        else
-            i = i + 1
-            lastNode = node
+        local node = ts.get_node {0, cursorPos[1], i}
+        if not node then
+            vim.notify("Failed to get treesitter node", vim.log.levels.WARN)
+            return -1
         end
 
         -- Break condition 3
+        if node:type() == "comment" or
+            node:type() == "comment_content" or
+            node:type () == "TSComment" then
+
+            return i
+        end
+
+        local range = { node:range() }
+        if node:id() == cursorNode:id() then
+            -- Next loop start at the end column of the same node
+            i = range[4] + 1
+        else
+            i = i + 1
+            cursorNode = node
+        end
+
+        -- Break condition 4
         cnt = cnt + 1
         if cnt > 20 then
-            vim.notify("Reoccurred too many times", vim.log.levels.WARN)
-            break
+            vim.notify("Loop too many times", vim.log.levels.WARN)
+            return -1
         end
-    until i > lineLen  -- Break condition 1
-
-    return commentTick
+    until false
 end -- }}}
 
 
 --- Find if a comment node exist in a line
----@param cursorPos table (0, 0) based. Row(Line) and column.
+---@param cursorPos table (1, 0) based. Row(Line) and column.
 ---@param line string The value of current line
 ---@param char string The character to be added
 local trailingMarker = function(cursorPos, line, char)
@@ -80,31 +86,27 @@ local trailingMarker = function(cursorPos, line, char)
         trailingMarkerFallback(commentStr, char, line)
     end
     -- Convert to (0, 0) based
-    cursorPos = { cursorPos[1] - 1, cursorPos[2] }
-
+    local cursorIdx = { cursorPos[1] - 1, cursorPos[2] }
 
     -- Use treesitter to find comment node
-    -- Get node across line
-    local lastNode = ts.get_node(0, cursorPos[1], 0)
-
-    if not lastNode then
+    local cursorNode = ts.get_node {0, cursorIdx[1], 1}
+    if not cursorNode then
         vim.notify("Failed to get treesitter node. Using fallback func", vim.log.levels.WARN)
         return trailingMarkerFallback(commentStr, char, line)
     end
-    if lastNode:has_error() then
+    if cursorNode:has_error() then
         return vim.notify("Fix the syntax error first", vim.log.levels.WARN)
     end
 
-
-    -- Call ts.get_node_at_pos() at every row until eol
-    if not findCommentNode(cursorPos, lastNode, lineLen) then
+    local commentNodeStartColumn = findCommentNode(cursorIdx, cursorNode, lineLen)
+    if commentNodeStartColumn == -1 then
         trailingMarkerFallback(commentStr, char, line)
     else
         local newLine
         if char == "{" then
             newLine = line .. " {{{"
         else
-            local commentStrIdx = { string.find(line, commentStr, 1, true) }
+            local commentStrIdx = { string.find(line, commentStr, commentNodeStartColumn, true) }
             if not next(commentStrIdx) then
                 return vim.notify("Failed to index comment string in: " .. line, vim.log.levels.ERROR)
             end
@@ -203,7 +205,7 @@ return function(vimMode, char) -- {{{
                 end
                 lines[1] = lines[1] .. newLine
 
-                newLine = " " .. commentStr .. " }}} " .. note
+                newLine = " " .. commentStr .. " }}}"
                 lines[#lines] = lines[#lines] .. newLine
             end
         else
