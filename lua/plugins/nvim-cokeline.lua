@@ -1,6 +1,6 @@
 -- https://github.com/iaso2h/nvim-cokeline/tree/master
 return function()
-    local getHex = require("cokeline/utils").get_hex
+    local getHighlightAttr = require("cokeline.hlgroups").get_hl_attr
     local icon   = require("icon")
     local space  = {text = " "}
     require("cokeline").setup{
@@ -9,10 +9,10 @@ return function()
         },
         default_hl = {
             fg = function(buffer)
-                return buffer.is_focused and getHex("Normal", "fg") or getHex("Comment", "fg")
+                return buffer.is_focused and getHighlightAttr("Normal", "fg") or getHighlightAttr("Comment", "fg")
             end,
             bg = function(buffer)
-                return buffer.is_focused and getHex("StatusLine", "bg") or getHex("Normal", "bg")
+                return buffer.is_focused and getHighlightAttr("StatusLine", "bg") or getHighlightAttr("Normal", "bg")
             end,
         },
         components = {
@@ -74,9 +74,9 @@ return function()
                 end,
                 fg = function(buffer)
                     if buffer.is_readonly then
-                        return getHex("Comment", "fg")
+                        return getHighlightAttr("Comment", "fg")
                     elseif buffer.is_modified then
-                        return getHex("diffChanged", "fg")
+                        return getHighlightAttr("diffChanged", "fg")
                     else
                         return nil
                     end
@@ -96,7 +96,7 @@ return function()
             components = {
                 {
                     text = "",
-                    bg = getHex("Normal", "bg"),
+                    bg = getHighlightAttr("Normal", "bg"),
                 },
             }
         },

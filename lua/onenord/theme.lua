@@ -450,8 +450,8 @@ theme.plugins = { -- {{{
     WhichKeyFloat =     {link = "FloatBorder"},
 
     -- https://github.com/lukas-reineke/indent-blankline.nvim
-    IndentBlanklineChar        = {link = "SignColumn"},
-    IndentBlanklineContextChar = {fg = p.n8},
+    IblIndent = {fg = p.n1},
+    IblScope  = {fg = p.n2},
 
     -- https://github.com/RRethy/vim-illuminate
     illuminatedWordText  = {link = "LspReferenceText"},

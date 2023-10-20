@@ -5,7 +5,6 @@
 -- Last Modified: 2023-09-17
 
 
-local api = vim.api
 local M   = {
     buftypeBlacklist = {
         "quickfix"
@@ -16,7 +15,11 @@ local M   = {
 }
 
 
-local checkTreeSitterLoaded = function() -- {{{
+local checkTreeSitterLoaded = function(bufNr) -- {{{
+    -- BUG: Automatically undo a non-treesitter supported buffer
+    -- Potential solution: https://neovim.discourse.group/t/check-if-treesitter-is-enabled-in-the-current-buffer/902/3
+    -- HACK: figuring out when to call this function. Using ex-command "Q" and "SE"??
+    bufNr = bufNr or vim.api.nvim_get_current_buf()
     local bufPath = vim.api.nvim_buf_get_name(0)
     if bufPath ~= "" then
         -- Reload buffer if it's valid
@@ -47,14 +50,14 @@ local bufferCycle = function(currentBufNr, direction) -- {{{
             end
         end
 
-        local bufNr = api.nvim_get_current_buf()
-        local bufType = api.nvim_buf_get_option(bufNr, "buftype")
+        local bufNr = vim.api.nvim_get_current_buf()
+        local bufType = vim.api.nvim_buf_get_option(bufNr, "buftype")
         if bufType == "" or bufType == "nofile" then
             break
         end
     until bufNr == currentBufNr
 
-    checkTreeSitterLoaded()
+    -- checkTreeSitterLoaded()
 end -- }}}
 --- Find the standard buffer idx in the `bufNrs`
 ---@param bufNrs integer[] Buffer numbers
@@ -70,7 +73,7 @@ local function findCandidate(bufNrs, currentBufIdx, direction) -- {{{
         if direction == -1 and candidateIdx == 0 then candidateIdx = #bufNrs end
         if direction == 1 and candidateIdx == #bufNrs + 1 then candidateIdx = 1 end
 
-        local candidateBuftype = api.nvim_buf_get_option(bufNrs[candidateIdx], "buftype")
+        local candidateBuftype = vim.api.nvim_buf_get_option(bufNrs[candidateIdx], "buftype")
 
         -- Filter out quickfix
         if not vim.tbl_contains(M.buftypeBlacklist, candidateBuftype) then
@@ -81,7 +84,7 @@ end -- }}}
 --- Get all listed buffers. Just like what you see in the :ls command
 ---@param direction integer `1|-1` `1` indicate cycling forward
 M.init = function(direction) -- {{{
-    local currentBufNr = api.nvim_get_current_buf()
+    local currentBufNr = vim.api.nvim_get_current_buf()
     local bufTbl
     if package.loaded["cokeline"] and next(require("cokeline.state").visible_buffers) then
         -- Use buffers from cokeline plug-in
@@ -89,15 +92,15 @@ M.init = function(direction) -- {{{
             return buffer.number
         end, require("cokeline.state").visible_buffers)
         -- Deal with non-standard buffer
-        if vim.tbl_contains(bufTbl, currentBufNr) or
+        if not vim.tbl_contains(bufTbl, currentBufNr) or
             vim.o.buftype ~= "" or nvim_buf_get_name(0) == "" then
             return bufferCycle(currentBufNr, direction)
         end
     else
         -- Create buffer table when data from cokeline is unavailable
-        bufTbl = api.nvim_list_bufs()
+        bufTbl = vim.api.nvim_list_bufs()
         local cond = function (buf)
-            return api.nvim_buf_get_option(buf, "buflisted")
+            return vim.api.nvim_buf_get_option(buf, "buflisted")
         end
         bufTbl = vim.tbl_filter(cond, bufTbl)
     end
@@ -116,9 +119,10 @@ M.init = function(direction) -- {{{
 
     -- Use the Ex command to enter a buffer without writing jumplist
     vim.cmd([[noa keepjump buffer ]] .. bufTbl[candidateIdx])
-    checkTreeSitterLoaded()
+
+    -- checkTreeSitterLoaded()
     if M.registerInJumplist then
-        api.nvim_exec_autocmds("BufEnter", {modeline = false, buffer = bufTbl[candidateIdx]})
+        vim.api.nvim_exec_autocmds("BufEnter", {modeline = false, buffer = bufTbl[candidateIdx]})
     end
 end -- }}}
 
