@@ -212,7 +212,7 @@ map("n", [[<Plug>ReplaceCurLine]], function ()
         vim.g.ReplaceExpr = vim.fn.getreg("=")
     end
 
-    rp.operator{"line", "V"}
+    rp.operator{motionType="line", vimMode="V"}
 end, {"noremap", "silent"}, "Replace current line")
 
 -- NOTE: function passed in to arg will ignore current selected region
