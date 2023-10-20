@@ -47,25 +47,23 @@ M.getHighlightName = function () -- {{{
     return names
 end -- }}}
 
-M.guibgs = {}
+M.hexes = {}
 local randomHex = function() -- {{{
-    local guibg
-    -- local guifg
+    local hex
     local randomNr
 
-    -- while true do
+    repeat
         randomNr = math.random(0, 16777216)
-        guibg = string.format("#%x", randomNr)
+        hex = string.format("#%x", randomNr)
         if randomNr < 1048576 then
-            guibg = "#" .. string.rep("0", (7 - #guibg)) .. string.sub(guibg, 2, -1)
+            hex = "#" .. string.rep("0", (7 - #hex)) .. string.sub(hex, 2, -1)
         end
-        return guibg
-    --     if not M.guibgs[guibg] then break end
-    -- end
 
-    -- guifg = randomNr >= 8388608 and "#000000" or "#ffffff"
-
-    -- return guifg, guibg
+        if tbl_idx(M.hexes, hex, false) ~= -1 then
+            table.insert(M.hexes, hex)
+            return hex
+        end
+    until false
 end -- }}}
 
 M.apply = function () -- {{{

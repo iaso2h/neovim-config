@@ -1,6 +1,5 @@
 local p     = require("onenord.pallette")
 local theme = {}
--- TODO: supper random
 
 -- Syntax highlight {{{
 theme.syntax = {

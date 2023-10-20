@@ -308,10 +308,17 @@ end, {
     bang = true
 }) -- }}}
 
+
 vim.api.nvim_create_user_command("O", [[browse oldfiles]], { desc = "Browse the oldfiles then prompt", })
 
 vim.api.nvim_create_user_command("TrimBufferSpaces", -- {{{
     function()require("util").trimSpaces()end,
     { desc = "Toggle trimming spaces on save",  }
 ) -- }}}
+
+vim.api.nvim_create_user_command("RandomTheme", function (opts) -- {{{
+    require("randomTheme").apply()
+end, {
+    desc = "Randomize all highlight groups",
+}) -- }}}
 -- }}} Commands
