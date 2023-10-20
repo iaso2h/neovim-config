@@ -1,5 +1,6 @@
 local p     = require("onenord.pallette")
 local theme = {}
+-- TODO: supper random
 
 -- Syntax highlight {{{
 theme.syntax = {
@@ -149,7 +150,7 @@ theme.editor =  {
 
 
     Folded       = {fg = p.n8, style = "bold"},
-    FoldColumn   = {fg = p.n3},
+    FoldColumn   = {fg = p.n2},
     ColorColumn  = {bg = p.n1},
     LineNr       = {fg = p.n3},
     CursorLineNr = {fg = p.n6, style = "bold"},
@@ -450,8 +451,8 @@ theme.plugins = { -- {{{
     WhichKeyFloat =     {link = "FloatBorder"},
 
     -- https://github.com/lukas-reineke/indent-blankline.nvim
-    IblIndent = {fg = p.n1},
-    IblScope  = {fg = p.n2},
+    IblIndent = {fg = p.n2},
+    IblScope  = {fg = p.n3b},
 
     -- https://github.com/RRethy/vim-illuminate
     illuminatedWordText  = {link = "LspReferenceText"},
