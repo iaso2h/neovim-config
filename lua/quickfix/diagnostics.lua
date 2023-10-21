@@ -2,19 +2,18 @@
 -- Author: iaso2h
 -- Description: Open diagnostics in quickfix window
 -- Credit: https://github.com/onsails/diaglist.nvim
--- Version: 0.0.5
--- Last Modified: 04/30/2023 Sun
+-- Version: 0.0.6
+-- Last Modified: 2023-10-21
 -- TODO: Preview mode implementation
 -- TODO: Auto highlight selection
 local setupAutoCmd = {
     changeTick         = false,
-    highlightParseTick = false,
     autocmdSetupTick   = false,
     autocmdId          = -1,
 
     -- Options
     remainFocus  = true, -- Remain the focus in the current window when open a quickfix when it's not visible
-    debounceTime = 150,  -- The bigger it's, the longer time quickfix will react
+    debounceTime = 100,  -- The bigger it's, the longer time quickfix will react
     delAutocmd   = true  -- Delete autocmd when the quickfix title doesn't contain "Diagnostics" any more
 }
 local u  = require("quickfix.util")
@@ -27,7 +26,7 @@ local autocmdSetup = function() -- {{{
         setupAutoCmd.autocmdId = vim.api.nvim_create_autocmd({"DiagnosticChanged", "WinEnter", "BufEnter"}, {
             callback = function(args)
                 if args.event == "DiagnosticChanged" and
-                    not setupAutoCmd.changeTick and not setupAutoCmd.highlightParseTick then
+                    not setupAutoCmd.changeTick then
 
                     local title = require("quickfix.util").getlist{title = 0}.title
                     if not string.find(title, "Diagnostics") then
@@ -57,13 +56,11 @@ local autocmdSetup = function() -- {{{
 
         setupAutoCmd.autocmdSetupTick = true
     end
-end -- }}} 
+end -- }}}
 --- Add missing highlight for warning, note, info in error column
 ---@param qfItems table Returned value of `vim.fn.getqflist()`
 ---@param qfBufNr integer The buffer number of quickfix
 local moreHighlight = function(qfItems, qfBufNr) -- {{{
-    setupAutoCmd.highlightParseTick = true
-
     local qfLines = vim.api.nvim_buf_get_lines(qfBufNr, 0, -1, false)
     for qfLineNr, item in ipairs(qfItems) do
         if item.type ~= "E" then
@@ -89,9 +86,7 @@ local moreHighlight = function(qfItems, qfBufNr) -- {{{
             end
         end
     end
-
-    setupAutoCmd.highlightParseTick = false
-end -- }}} 
+end -- }}}
 --- Open diagnostics in quickfix window
 ---@param forceChk boolean Set it to true if this function is called by a mapping instead of autocommand
 ---@param localChk boolean Whether it's a locallist or a quickfix
@@ -160,18 +155,10 @@ setupAutoCmd.open = function(forceChk, localChk) -- {{{
     end
 
     -- Make up the highlights for character string "warning", "note"
+    moreHighlight(qfItems, qfBufNr)
+
     setupAutoCmd.changeTick = false
-    local asyncHandler = vim.loop.new_async(
-        vim.schedule_wrap(function()
-            moreHighlight(qfItems, qfBufNr)
-        end)
-    )
-    if asyncHandler then
-        asyncHandler:send()
-    else
-        setupAutoCmd.highlightParseTick = true
-    end
-end -- }}} 
+end -- }}}
 
 
 setupAutoCmd.debounceFunc = u.debounce(setupAutoCmd.debounceTime, setupAutoCmd.open)
