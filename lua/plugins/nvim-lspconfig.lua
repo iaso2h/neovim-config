@@ -1,4 +1,5 @@
 -- https://github.com/neovim/nvim-lspconfig
+
 return function()
     local lspConfig   = require("lspconfig")
     local u           = require("lspconfig.util")
@@ -140,11 +141,11 @@ local luaLibrary = {
     vim.fn.expand("$VIMRUNTIME") .. _G._sep .. "lua",
     require("neodev.config").types(),
     luaGetPluginRepoDir("nvim-treesitter", true),
-    luaGetPluginRepoDir("telescope.nvim", true),      -- HACK: failed to parse the lib
+    luaGetPluginRepoDir("telescope.nvim", true),
     luaGetPluginRepoDir("plenary.nvim", true),
-    luaGetPluginRepoDir("mason-null-ls.nvim", true),  -- HACK: failed to parse the lib
-    luaGetPluginRepoDir("null-ls.nvim", true),        -- HACK: failed to parse the lib
-    luaGetPluginRepoDir("LuaSnip", true),             -- HACK: failed to parse the lib
+    luaGetPluginRepoDir("mason-null-ls.nvim", true),
+    luaGetPluginRepoDir("null-ls.nvim", true),
+    luaGetPluginRepoDir("LuaSnip", true),
     luaGetPluginRepoDir("nvim-dap", true),
 }
 local fennelLibrary = {
@@ -167,7 +168,7 @@ end
 serverNames.lua_ls = { -- {{{
     settings = {
         Lua = {
-            -- https://github.com/LuaLS/lua-language-server/blob/076dd3e5c4e03f9cef0c5757dfa09a010c0ec6bf/locale/en-us/setting.lua#L5-L13
+            -- https://luals.github.io/wiki/settings/
             runtime = {
                 path = {
                     -- _G._config_path .. "/lua/?/init.lua",

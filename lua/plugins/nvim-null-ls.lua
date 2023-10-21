@@ -1,3 +1,4 @@
+-- TODO: add custom adding stubs action
 return function()
     local null_ls       = require "null-ls"
     local mason_null_ls = require "mason-null-ls"
@@ -23,18 +24,60 @@ return function()
         end
     end
 
+    --- Create Toggle Ex command for lanuage server
+    ---@param valName string Prefix for control variable name in vim.g[] and vim.b[]
+    ---@param exCmdName string Prefix for Ex command name
+    ---@param initialState boolean
+    local toggleCmdCreator = function(valName, exCmdName, initialState) -- {{{
+        -- Create Global Ex Command
+        vim.g["_" .. valName .. "Enabled"] = initialState
+        vim.api.nvim_create_user_command(exCmdName .. "Toggle", function()
+            vim.g["_" .. valName .. "Enabled"] = not vim.g["_" .. valName .. "Enabled"]
+
+            local notifyStr = vim.g["_" .. valName .. "Enabled"] and "enabled" or "disabled"
+            vim.api.nvim_echo({ { string.format("%s has been %s", exCmdName, notifyStr), "Moremsg" } }, false, {})
+        end, {
+            desc = string.format("Toggle %s checking", exCmdName),
+        })
+
+        -- Create Buffer Ex Command
+        vim.b["_" .. valName .. "Enabled"] = true
+        vim.api.nvim_create_user_command(exCmdName .. "BufToggle", function()
+            -- Toggle
+            vim.b["_" .. valName .. "Enabled"] = not vim.b["_" .. valName .. "Enabled"]
+            -- Overall State
+            local state = vim.g["_" .. valName .. "Enabled"] and vim.b["_" .. valName .. "Enabled"]
+
+            vim.diagnostic.reset(nil, vim.api.nvim_get_current_buf())
+            vim.diagnostic.show(nil, vim.api.nvim_get_current_buf(), nil, nil)
+            -- UGLY: refresh virtual diagnostic text
+            if vim.o.modifiable then
+                vim.api.nvim_set_current_line(vim.api.nvim_get_current_line())
+            end
+            local notifyStr = state and "enabled" or "disabled"
+            vim.api.nvim_echo({ { string.format("%s has been %s buffer locally", exCmdName, notifyStr), "Moremsg" } }, false, {})
+        end, {
+            desc = string.format("Toggle %s checking buffer locally", exCmdName),
+        })
+    end -- }}}
 
     local selene = null_ls.builtins.diagnostics.selene.with { -- {{{
         extra_args = function(params)
             local results = vim.fs.find({ "selene.toml" }, {
                 upward = true,
-                path = nvim_buf_get_name(0),
+                path   = vim.fs.dirname( nvim_buf_get_name(0)),
             })
             if #results == 0 then
                 return params
             else
                 return { "--config", results[1] }
             end
+        end,
+        runtime_condition = function(params)
+            if vim.g._seleneEnabled and vim.b._seleneEnabled then
+                return true
+            end
+            return false
         end,
         filter = function(diagnostic)
             if type(diagnostic) == "string" then
@@ -56,30 +99,10 @@ return function()
             end
             return true
         end
-    }                          -- }}}
-    vim.g._cspellEnable = true -- {{{
-    vim.api.nvim_create_user_command("CSpellToggle", function()
-        vim.g._cspellEnable = not vim.g._cspellEnable
-        local stateStr = vim.g._cspellEnable and "enabled" or "disabled"
-        vim.api.nvim_echo({ { string.format("CSpell has been %s", stateStr), "Moremsg" } }, false, {})
-    end, {
-        desc = "Toggle CSpell checking",
-    })
-    -- UGLY: refresh virtual diagnostic text
-    vim.api.nvim_create_user_command("CSpellBufToggle", function()
-        vim.b._cspellDisable = not vim.b._cspellDisable
-        local state = vim.g._cspellEnable and not vim.b._cspellDisable
-        vim.diagnostic.reset(nil, vim.api.nvim_get_current_buf())
-        vim.diagnostic.show(nil, vim.api.nvim_get_current_buf(), nil, nil)
-        if vim.o.modifiable then
-            vim.api.nvim_set_current_line(vim.api.nvim_get_current_line())
-        end
-        local stateStr = state and "enabled" or "disabled"
-        vim.api.nvim_echo({ { string.format("CSpell has been %s buffer locally", stateStr), "Moremsg" } }, false, {})
-    end, {
-        desc = "Toggle CSpell checking buffer locally",
-    })
-    local cspell = null_ls.builtins.diagnostics.cspell.with {
+    } -- }}}
+    toggleCmdCreator("selene", "Selene", false)
+
+    local cspell = null_ls.builtins.diagnostics.cspell.with { -- {{{
         disabled_filetypes = _G._short_line_list,
         extra_args = {
             "--gitignore",
@@ -90,7 +113,7 @@ return function()
             if params.bufname == "" or not vim.api.nvim_buf_get_option(params.bufnr, "buflisted") then
                 return false
             end
-            if vim.g._cspellEnable and not vim.b._cspellDisable then
+            if vim.g._cspellEnabled and vim.b._cspellEnabled then
                 return true
             end
             return false
@@ -158,6 +181,7 @@ return function()
         },
     } -- }}} Add new word to ignore dictionary
     -- }}}
+    toggleCmdCreator("cspell", "CSpell", true)
 
     local builtinSource = {
         cspellAppend = cspellAppendAction,

@@ -577,7 +577,7 @@ local pluginArgs = { -- {{{
         cond  = true,
         event = {"BufAdd", "BufNewFile"},
         dependencies = {
-            "jose-elias-alvarez/null-ls.nvim",
+            "nvimtools/none-ls.nvim",
             "mason.nvim"
         },
         config = require("plugins.nvim-null-ls"),

@@ -1,7 +1,6 @@
 .vim/
 .idea/
 .vscode/
-lsp/
 bk/
 log/
 __pycache__/
@@ -10,7 +9,6 @@ lua/test**
 *.bk
 *~
 *temp*
-*.snippets
 *session*
 .luarc.json
 debug.lua
