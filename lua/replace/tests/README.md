@@ -8,6 +8,7 @@
 * [vim-repeat](https://github.com/tpope/vim-repeat) to make replace operator repeatable in normal mode
 * [vim-visualrepeat](https://github.com/inkarkat/vim-visualrepeat) to make replace visually repeatable in both visual mode and normal mode
 * [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) to run tests
+    * NOTE: Please use the commit version before "9ce85b0". The "9ce85b0" commit replace the old `plenary.busted.run` with the new `plenary.test_harness` implementation in Neovim Ex Command, which will break all the tests(It just occupied the test buffer as plenary's floating output window)
 
 # How to run test
 * Navigate to the tests folder in terminal

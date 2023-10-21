@@ -265,7 +265,8 @@ publishing it under the OPL!  It has been a great help while writing the user
            ^
         ]]
         expectedLines = [[
-Many thanks to Steve New Riders for thisOualline and  book and publishing creating it under the OPL!  It has been a great help while writing the user
+Many thanks to Steve Oualline and New Riders for this book and publishing creating it under the OPL!  It has been a great help while writing the user
+                                                 ^
         ]]
     --      expectedDotLines = [[
     -- if reg.type == "v" or (rushing and robbing.type == "V" and linesCnt == 1) then

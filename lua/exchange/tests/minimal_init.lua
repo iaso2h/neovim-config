@@ -6,15 +6,9 @@ local packagePathHead = vim.fn.stdpath("data") .. "/lazy/"
 vim.opt.runtimepath:append(packagePathHead .. "plenary.nvim")
 vim.opt.runtimepath:append(packagePathHead .. "vim-repeat")
 
-require("global.keymap")
+require("global")
 require("util.test")
 require("core.mappings")
 
 require("exchange")._dev = true
 require("exchange").highlightChangeChk = false
--- Mapping
-map("n", [[<Plug>exchangeOperatorInplace]], function ()
-    return vim.fn.luaeval [[require("exchange").expr(true, true)]]
-end, {"silent", "expr"}, "exchange operator and restore the cursor position")
-
-map("n", [[gx]],  [[<Plug>exchangeOperatorInplace]], "exchange operator and restore the cursor position")

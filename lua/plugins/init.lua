@@ -47,7 +47,10 @@ local icon = require("icon")
 local pluginArgs = { -- {{{
     -- https://github.com/folke/lazy.nvim#-plugin-spec
     -- Dependencies {{{
-    "nvim-lua/plenary.nvim",
+    {
+        "nvim-lua/plenary.nvim",
+        commit = "4cd4c29"
+    },
     "inkarkat/vim-visualrepeat",
     "tpope/vim-repeat",
     -- }}} Dependencies
