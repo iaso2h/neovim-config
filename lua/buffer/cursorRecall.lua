@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Derived from and simplified:
 -- Credit: https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
--- Version: 0.0.7
--- Last Modified: 2023-10-20
+-- Version: 0.0.8
+-- Last Modified: 2023-10-21
 
 local ignoreBuftype = {
         'quickfix',
@@ -88,6 +88,7 @@ return function(args)
                 return
             else
                 local cmdIdx = jumpUtil.getJumpCmdIdx(changesCmdRaw)
+                local newestRecord
                 if cmdIdx == #changesCmdRaw and
                     not next(jumpUtil.jumpCmdParse(changesCmdRaw[#changesCmdRaw])) then
                     -- Empty change record like:
@@ -96,11 +97,18 @@ return function(args)
                     --     2    95    0
                     --     1    94   47 -- Empty change record like:
                     -- >
-                    local newestChangeCmd = jumpUtil.jumpCmdParse(changesCmdRaw[#changesCmdRaw - 1])
-                    vim.cmd(string.format("norm! %s%s", newestChangeCmd.count, "g,"))
+                    newestRecord = jumpUtil.jumpCmdParse(changesCmdRaw[#changesCmdRaw - 1])
                 else
-                    local newestChangeCmd = jumpUtil.jumpCmdParse(changesCmdRaw[#changesCmdRaw])
-                    vim.cmd(string.format("norm! %s%s", newestChangeCmd.count, "g,"))
+                    newestRecord = jumpUtil.jumpCmdParse(changesCmdRaw[#changesCmdRaw])
+                end
+
+                if newestRecord.text == "-invalid-" then
+                    -- Sometimes file will be modified by external editor while the
+                    -- change record within neovim become outdated, which will
+                    -- incur problems like line number doesn't match up
+                    return
+                else
+                    vim.cmd(string.format("norm! %s%s", newestRecord.count, "g,"))
                 end
             end
         end
