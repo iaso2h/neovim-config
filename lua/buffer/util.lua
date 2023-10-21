@@ -18,10 +18,12 @@ end -- }}}
 ---@return boolean
 M.isSpecialBuf = function(bufNr) -- {{{
     bufNr = bufNr or var.bufNr
+    local specialBufType = {"nofile", "nowrite", "prompt"}
     local bufType    = vim.api.nvim_buf_get_option(bufNr, "buftype")
     local modifiable = vim.api.nvim_buf_get_option(bufNr, "modifiable")
     local bufListed  = vim.api.nvim_buf_get_option(bufNr, "buflisted")
-    return bufType ~= "" and (not modifiable or not bufListed)
+    return (bufType ~= "" and (not modifiable or not bufListed)) or
+        vim.tbl_contains(specialBufType, bufType)
 end -- }}}
 --- Check if the provided buffer is a scratch buffer
 ---@param bufNr? integer If it isn't provided, the `var.bufName` will be used instead
