@@ -17,10 +17,5 @@ M.restoreClosedBuf = function()
 end
 
 
--- TODO:
-M.newSplit = function(...)
-    require("buffer.newSplit").init(...)
-end
-
 return M
 

@@ -432,7 +432,7 @@ function M.operator(opInfo) -- {{{
     end
 
     ---@diagnostic disable-next-line: param-type-mismatch
-    -- HACK: extmark changed by nvim_buf_set_lines and nvim_buf_set_text are
+    -- HACK: extmark covered by nvim_buf_set_lines and nvim_buf_set_text are
     -- always reversed?
     local repEndLine
     if not next(rep) then

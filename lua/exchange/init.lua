@@ -10,7 +10,6 @@ local M = {
     _suppressMessage     = nil,
     _acrossLineComponent = {},
 
-    cursorPos  = nil, -- (1, 0) indexed
     count      = nil,
     srcExtmark = {},
 
@@ -139,7 +138,6 @@ end -- }}}
 ---@class GenericOperatorInfo
 ---@param opInfo GenericOperatorInfo
 function M.operator(opInfo) -- {{{
-    -- TODO: necessity of implementing line motion???
     if opInfo.motionType == "line" then return end
     local bufNr = vim.api.nvim_get_current_buf()
     local regionMotion
@@ -206,17 +204,6 @@ function M.operator(opInfo) -- {{{
             pcall(vim.api.nvim_buf_clear_namespace, bufNr, M.ns, 0, -1)
         end
         M.srcExtmark = {}
-    end
-
-    -- Restoration
-    if opInfo.vimMode == "n" then
-        if not M.cursorPos then
-            -- TODO: Supported cursor recall in normal mode
-        else
-            vim.api.nvim_win_set_cursor(0, M.cursorPos)
-            -- Reset
-            M.cursorPos = nil
-        end
     end
 end -- }}}
 --- Clear the highlight

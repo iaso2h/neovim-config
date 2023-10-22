@@ -108,7 +108,12 @@ return function(args)
                     -- incur problems like line number doesn't match up
                     return
                 else
-                    vim.cmd(string.format("norm! %s%s", newestRecord.count, "g,"))
+                    local cmdStr = string.format("norm! %s%s", newestRecord.count, "g,")
+                    local ok, msgOrVal = pcall(vim.api.nvim_command, cmdStr)
+                    if not ok then
+                        vim.notify(msgOrVal, vim.log.levels.ERROR)
+                        vim.notify("Error occurred when executing command: " .. cmdStr, vim.log.levels.ERROR)
+                    end
                 end
             end
         end

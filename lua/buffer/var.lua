@@ -7,6 +7,5 @@ return {
     winId    = nil,
     winIds   = nil,
 
-    newSplitLastBufNr = nil,
     lastClosedFilePath = nil
 }
