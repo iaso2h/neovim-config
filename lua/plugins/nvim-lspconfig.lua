@@ -144,7 +144,7 @@ local luaLibrary = {
     luaGetPluginRepoDir("telescope.nvim", true),
     luaGetPluginRepoDir("plenary.nvim", true),
     luaGetPluginRepoDir("mason-null-ls.nvim", true),
-    luaGetPluginRepoDir("null-ls.nvim", true),
+    luaGetPluginRepoDir("none-ls.nvim", true),
     luaGetPluginRepoDir("LuaSnip", true),
     luaGetPluginRepoDir("nvim-dap", true),
 }
@@ -155,7 +155,7 @@ local fennelLibrary = {
     luaGetPluginRepoDir("telescope.nvim", false),
     luaGetPluginRepoDir("plenary.nvim", false),
     luaGetPluginRepoDir("mason-null-ls.nvim", false),
-    luaGetPluginRepoDir("null-ls.nvim", false),
+    luaGetPluginRepoDir("none-ls.nvim", false),
     luaGetPluginRepoDir("LuaSnip", false),
     luaGetPluginRepoDir("nvim-dap", false),
 }

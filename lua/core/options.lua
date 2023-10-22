@@ -126,7 +126,7 @@ if _G._os_uname.sysname == "Windows_NT" then -- {{{ Setting up python backen env
                 on_exit = findPynvim
             })
         end
-    end, 10000)
+    end, 30000)
 end -- }}}
 
 -- GUI

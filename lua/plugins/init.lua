@@ -342,6 +342,7 @@ local pluginArgs = { -- {{{
             require("ibl").setup {
                 indent = {
                     char = require("icon").ui.LineLeft,
+                    tab_char = ""
                 },
                 exclude = {
                     buftypes  = {"terminal", "nofile"},
