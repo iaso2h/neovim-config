@@ -2,45 +2,62 @@
 -- Author: iaso2h
 -- Description: Open diagnostics in quickfix window
 -- Credit: https://github.com/onsails/diaglist.nvim
--- Version: 0.0.6
--- Last Modified: 2023-10-21
+-- Version: 0.0.7
+-- Last Modified: 2023-10-22
 -- TODO: Preview mode implementation
 -- TODO: Auto highlight selection
-local setupAutoCmd = {
-    changeTick         = false,
+local M = {
+    changedTick         = false,
     autocmdSetupTick   = false,
     autocmdId          = -1,
 
     -- Options
     remainFocus  = true, -- Remain the focus in the current window when open a quickfix when it's not visible
     debounceTime = 100,  -- The bigger it's, the longer time quickfix will react
-    delAutocmd   = true  -- Delete autocmd when the quickfix title doesn't contain "Diagnostics" any more
+    delAutocmd   = true,  -- Delete autocmd when the quickfix title doesn't contain "Diagnostics" any more
+
+    filteredChk = false -- Set this to true if the the diagnostics list has been filtered before
 }
 local u  = require("quickfix.util")
-local ns = vim.api.nvim_create_namespace("myQuickfix")
 
 
+local vimModeValidate = function()
+    local vimMode = vim.api.nvim_get_mode().mode
+    local filterModes = {
+        "i", "ic", "ix"
+    }
+    if vim.tbl_contains(filterModes, vimMode) then
+        return false
+    end
+    return true
+end
 --- Setup the Neovim autocmd
 local autocmdSetup = function() -- {{{
-    if not setupAutoCmd.autocmdSetupTick then
-        setupAutoCmd.autocmdId = vim.api.nvim_create_autocmd({"DiagnosticChanged", "WinEnter", "BufEnter"}, {
+    if not M.autocmdSetupTick then
+        M.autocmdId = vim.api.nvim_create_autocmd({"DiagnosticChanged", "WinEnter", "BufEnter"}, {
             callback = function(args)
+                if not vimModeValidate() then
+                    -- Don't refresh the quickfix while editing in certain Vim mode
+                    M.changedTick = false
+                    return
+                end
+
                 if args.event == "DiagnosticChanged" and
-                    not setupAutoCmd.changeTick then
+                    not M.changedTick then
 
                     local title = require("quickfix.util").getlist{title = 0}.title
                     if not string.find(title, "Diagnostics") then
                         -- Delete this autocmd if other items and titles get
                         -- populated into quickfix window
-                        if setupAutoCmd.delAutocmd then
-                            vim.api.nvim_del_autocmd(setupAutoCmd.autocmdId)
-                            setupAutoCmd.autocmdId = -1
-                            setupAutoCmd.autocmdSetupTick = false
+                        if M.delAutocmd then
+                            vim.api.nvim_del_autocmd(M.autocmdId)
+                            M.autocmdId = -1
+                            M.autocmdSetupTick = false
                         end
                         return
                     end
-                    setupAutoCmd.debounceFunc(false, false)
-                    setupAutoCmd.changeTick = true
+                    M.changedTick = true
+                    M.debounceFunc(false, false)
                 else
                     -- The "WinEnter" and "BufEnter" will trigger
                     -- "DiagnosticsChanged" somehow. If we are lucky enough,
@@ -49,23 +66,23 @@ local autocmdSetup = function() -- {{{
                     -- true and the debounce function isn't called within
                     -- `debounceTime`, then we can't halt the processing at
                     -- earlier stage inside the `allDiagnostics` function
-                    setupAutoCmd.changeTick = false
+                    M.changedTick = false
                 end
             end,
         })
 
-        setupAutoCmd.autocmdSetupTick = true
+        M.autocmdSetupTick = true
     end
 end -- }}}
 --- Open diagnostics in quickfix window
 ---@param forceChk boolean Set it to true if this function is called by a mapping instead of autocommand
 ---@param localChk boolean Whether it's a locallist or a quickfix
-setupAutoCmd.open = function(forceChk, localChk) -- {{{
+M.refresh = function(forceChk, localChk) -- {{{
     -- Setup autocmd monitoring the diagnostics changed event
-    if not setupAutoCmd.autocmdSetupTick then autocmdSetup() end
+    if not M.autocmdSetupTick then autocmdSetup() end
 
     -- Don't open quickfix if diagnostic haven't change
-    if not setupAutoCmd.changeTick and not forceChk then return end
+    if not M.changedTick and not forceChk then return end
 
     -- Check visibility of quickfix window
     local qfBufNr
@@ -113,25 +130,25 @@ setupAutoCmd.open = function(forceChk, localChk) -- {{{
     -- Sort file so that errors from current buffer has a higher priority
     u.sortByFile(qfItems, qfBufNr)
 
-    -- Clear the namespace highlight
-    vim.api.nvim_buf_clear_namespace(qfBufNr, ns, 0, -1)
-
     -- Setting up quickfix
-    local title = localChk and "Local " or "Workspace "
+    local qfTitle = localChk and "Local Diagnostics" or "Workspace Diagnostics"
     if localChk then
-        vim.fn.setloclist(qfWinId, {}, "r", { title = title .. "Diagnostics", items = qfItems })
+        vim.fn.setloclist(qfWinId, {}, "r", { title = qfTitle, items = qfItems })
     else
-        vim.fn.setqflist({},           'r', { title = title .. "Diagnostics", items = qfItems })
+        vim.fn.setqflist({},           'r', { title = qfTitle, items = qfItems })
     end
 
-    -- Make up the highlights for character string "warning", "note"
-    moreHighlight(qfItems, qfBufNr)
+    -- Reset the filtered check since it has been refreshed an updated
+    if M.filtered then M.filtered = false end
 
-    setupAutoCmd.changeTick = false
+    -- Make up the highlights for character string "warning", "note"
+    require("quickfix.highlight").refreshHighlight(qfBufNr, qfItems, qfTitle)
+
+    M.changedTick = false
 end -- }}}
 
 
-setupAutoCmd.debounceFunc = u.debounce(setupAutoCmd.debounceTime, setupAutoCmd.open)
+M.debounceFunc = u.debounce(M.debounceTime, M.refresh)
 
 
-return setupAutoCmd
+return M

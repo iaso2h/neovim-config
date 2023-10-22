@@ -1,8 +1,8 @@
 -- File: cFilter
 -- Author: iaso2h
 -- Description: Lua migration of cfilter.vim
--- Version: 0.0.5
--- Last Modified: 04/29/2023 Sat
+-- Version: 0.0.6
+-- Last Modified: 2023-10-22
 
 -- Commands to filter the quickfix list:
 --   :Cfilter[!] /{pat}/
@@ -61,9 +61,9 @@ return function(qfChk, pat, bang)
         end
     end
 
-    local newItems = vim.tbl_filter(cond, items)
+    local itemsFiltered = vim.tbl_filter(cond, items)
     -- Check whether item list is emptry and prompt for continuation
-    if not next(newItems) then
+    if not next(itemsFiltered) then
         vim.cmd "noa echohl MoreMsg"
         local answer = vim.fn.confirm("No satisified items, proceed?  ",
             ">>> &Yes\n&No\n&Cancel", 3, "Question")
@@ -74,20 +74,19 @@ return function(qfChk, pat, bang)
         end
     end
 
-    -- Store the previous item list
-    if #newItems ~= #items then
-        require("quickfix.modification").lastItems = items
-        require("quickfix.modification").lastTitle = title
-        require("quickfix.modification").lastType = vim.b._is_local and "local" or "quickfix"
+    if #itemsFiltered ~= #items then
+        -- Store the previous item list
+        require("quickfix.modification").infoCheck(items, title)
+    else
+        return vim.notify("No items was filtered", vim.log.levels.INFO)
     end
-
     -- Populate new items
     if qfChk then
-        vim.fn.setqflist({}, "r", {items = newItems, title = title})
+        vim.fn.setqflist({}, "r", {items = itemsFiltered, title = title})
     else
-        vim.fn.setloclist(0, {}, "r", {items = newItems, title = title})
+        vim.fn.setloclist(0, {}, "r", {items = itemsFiltered, title = title})
     end
 
-    -- Optional step need to do for todo-comment
-    vim.defer_fn(require("quickfix.highlight").clear, 0)
+    local qfBufNr = vim.api.nvim_get_current_buf()
+    require("quickfix.highlight").refreshHighlight(qfBufNr, itemsFiltered, title)
 end

@@ -5,13 +5,6 @@ local M   = {}
 ---@param qfBufNr? integer
 M.generalClear = function(qfBufNr) -- {{{
     qfBufNr = qfBufNr or 0
-    if package.loaded["todo-comments"] then
-        local ns = require("todo-comments.config").ns
-        if ns then
-            vim.api.nvim_buf_clear_namespace(qfBufNr, ns, 0, -1)
-        end
-        -- require("todo-comments.highlight").highlight_win(api.nvim_get_current_win(), true)
-    end
 
     vim.api.nvim_buf_clear_namespace(qfBufNr, require("quickfix").ns, 0, -1)
 end -- }}}
@@ -68,6 +61,30 @@ M.diagnosticsComplement = function(qfItems, qfBufNr) -- {{{
             end
         end
     end
+end -- }}}
+--- Refresh highligh in quickfix window
+---@param qfBufNr integer Quickfix buffer number
+---@param qfItems table Returned value of `vim.fn.getqflist()`
+---@param qfTitle string Quickfix title
+M.refreshHighlight = function(qfBufNr, qfItems, qfTitle) -- {{{
+    if qfTitle == "Local Diagnostics" or qfTitle == "Workspace Diagnostics" then
+        local diagnostics = require("quickfix.diagnostics")
+        diagnostics.filteredChk = true
+        -- Wrap it around the `dianostics.changedTick` value to avoid the
+        -- quifix being updated from calling `require("quickfix.diagnostics").refresh()`
+        diagnostics.changedTick = false
+        M.diagnosticsComplement(qfItems, qfBufNr)
+        diagnostics.changedTick = true
+    elseif qfTitle == "Todo" then
+        if package.loaded["todo-comments"] then
+            local ns = require("todo-comments.config").ns
+            if ns then
+                vim.api.nvim_buf_clear_namespace(qfBufNr, ns, 0, -1)
+            end
+        end
+    end
+
+    M.generalClear(qfBufNr)
 end -- }}}
 
 return M

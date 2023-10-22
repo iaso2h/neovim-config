@@ -76,7 +76,7 @@ return function(des) -- {{{
     end
 
     if des == "quickfix" then
-        require("quickfix.highlight").clear()
+        require("quickfix.highlight").generalClear()
         vim.fn.setqflist({}, "r", {title = "Messages", items = msgRefined})
         vim.cmd [[copen | clast]]
 
