@@ -3,7 +3,6 @@
 -- Description: Operator func that wraps around refactor.nvim
 -- Version: 0.0.1
 -- Last Modified: 2023-2-23
-local vim.api  = vim.api
 require("operator")
 local M = {
     cursorPos = nil, -- (1, 0) indexed

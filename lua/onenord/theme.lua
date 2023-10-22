@@ -178,7 +178,7 @@ theme.editor =  {
     Directory  = {fg = p.n7},
 
 
-    QuickFixLine = {bg = "NONE", style = "bold,italic"},
+    QuickFixLine = {bg = p.n1, style = "bold"},
     qfLineNr     = {link = "LineNr"},
     qfFileName   = {link = "Directory"},
     qfError      = {fg = p.n11, style = "bold"},

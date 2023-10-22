@@ -186,6 +186,9 @@ vim.api.nvim_create_user_command("CDRuntime", -- {{{
 }) -- }}}
 
 vim.api.nvim_create_user_command("E", function (opts) -- {{{
+    if require("buffer.util").isSpecialBuf() then
+        return
+    end
     vim.cmd [[noa mkview]]
     if not opts.bang then
         vim.cmd [[update! | e]]
