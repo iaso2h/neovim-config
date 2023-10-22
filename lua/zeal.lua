@@ -1,8 +1,8 @@
 -- File: zeal.lua
 -- Author: iaso2h
--- Description: Loop up words
--- Version: 0.0.5
--- Last Modified: 2023-4-26
+-- Description: Look up words in Zeal
+-- Version: 0.0.7
+-- Last Modified: 2023-10-22
 
 local M = {
     plugMap = ""
@@ -21,12 +21,14 @@ local function lookUp(opInfo) -- {{{
     local content
     local posStart
     local posEnd
-    local curWinID  = vim.api.nvim_get_current_win()
+    local winID = vim.api.nvim_get_current_win()
+    local bufNr = vim.api.nvim_get_current_buf()
 
     -- Get content {{{
     if opInfo.vimMode == "n" then
-        posStart = vim.api.nvim_buf_get_mark(0, "[")
-        posEnd   = vim.api.nvim_buf_get_mark(0, "]")
+        local motionRegion = operator.getMotionRegion(bufNr)
+        posStart = motionRegion.Start
+        posEnd   = motionRegion.End
         vim.api.nvim_win_set_cursor(0, posStart)
         vim.cmd "noa normal! v"
         vim.api.nvim_win_set_cursor(0, posEnd)
@@ -36,7 +38,7 @@ local function lookUp(opInfo) -- {{{
         posStart = vim.api.nvim_buf_get_mark(0, "<")
         posEnd   = vim.api.nvim_buf_get_mark(0, ">")
     end
-    content = require("selection").get("string")
+    content = require("selection").get("string", false)
     -- }}} Get content
 
     vim.cmd "noa echohl MoreMsg"
@@ -68,7 +70,7 @@ local function lookUp(opInfo) -- {{{
     if opInfo.vimMode == "n" and not require("util").withinRegion(operator.cursorPos, posStart, posEnd) then
         return
     else
-        vim.api.nvim_win_set_cursor(curWinID, operator.cursorPos)
+        vim.api.nvim_win_set_cursor(winID, operator.cursorPos)
     end
 
     -- Dot repeat

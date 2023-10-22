@@ -1,9 +1,10 @@
 -- File: exchange
 -- Author: iaso2h
 -- Description: exchange operator
--- Version: 0.0.6
--- Last Modified: 2023-05-20
-require("operator")
+-- Version: 0.0.7
+-- Last Modified: 2023-10-22
+local op = require("operator")
+
 local M = {
     _dev                 = false,
     _suppressMessage     = nil,
@@ -145,10 +146,8 @@ function M.operator(opInfo) -- {{{
 
     -- Saving cursor part is done inside expr()
     -- Saving motion region
-    regionMotion = {
-        Start = vim.api.nvim_buf_get_mark(bufNr, "["),
-        End   = vim.api.nvim_buf_get_mark(bufNr, "]")
-    }
+    regionMotion = op.getMotionRegion(bufNr)
+
     if vim.deep_equal(regionMotion.Start, regionMotion.End) then
         local endLine = vim.api.nvim_buf_get_lines(bufNr, regionMotion.End[1] - 1, regionMotion.End[1], false)[1]
         if string.len(endLine) ~= vim.fn.strchars(endLine) then

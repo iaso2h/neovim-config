@@ -1157,11 +1157,6 @@ api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols
     end) -- }}}
 end)
 
-describe('-----------------------------------', function()
-    it("-----------------------------------", function()
-        end)
-end)
-
 describe('Register type is "V". ', function()
 
     describe('Left-right-motions. ', function() -- {{{
@@ -2347,4 +2342,82 @@ M.replaceSave = function()
             assert.are.same(expectedLines, outputLines)
         end) -- }}}
     end) -- }}}
+end)
+
+describe('Replace with multibyte characters', function()
+
+        it([[Replace 3 bytes character with 1 byte charcter]], function() -- {{{
+            initLines = [[
+            ct.progressBar.Hint = "等待玩家进入街霸6练习模式"
+            log("Pause till palyer enter practice mode")
+                                    ^
+            ]]
+            expectedLines = [[
+            ct.progressBar.Hint = "Pause till palyer enter practice mode"
+                                   ^
+            log("Pause till palyer enter practice mode")
+            ]]
+            initLines     = vim.split(initLines, "\n")
+            expectedLines = vim.split(expectedLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            outputLines, outputCursorPos     = feedkeysOutput([[yi"kgri"]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
+        end) -- }}}
+
+        it([[Replace 3 byte character with 3 byte character]], function() -- {{{
+            initLines = [[
+            ct.progressBar.Hint = "等待玩家关闭街霸6练习菜单"
+                                   ^
+            ct.progressBar.Hint = "等待玩家进入街霸6练习模式"
+            ]]
+            expectedLines = [[
+            ct.progressBar.Hint = "等待玩家关闭街霸6练习菜单"
+            ct.progressBar.Hint = "等待玩家关闭街霸6练习菜单"
+                                   ^
+            ]]
+            initLines     = vim.split(initLines, "\n")
+            expectedLines = vim.split(expectedLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            outputLines, outputCursorPos     = feedkeysOutput([[yi"jgri"]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
+        end) -- }}}
+
+        it([[Replace 4 byte character with 2 byte character]], function() -- {{{
+            initLines = [[
+            🤐🤑🤒
+            àáâãä
+            ^
+            ]]
+            expectedLines = [[
+            àáâãä
+            ^
+            àáâãä
+            ]]
+            initLines     = vim.split(initLines, "\n")
+            expectedLines = vim.split(expectedLines, "\n")
+
+            -- Setup buffer lines
+            initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+            -- replace
+            ---@diagnostic disable-next-line: param-type-mismatch
+            outputLines, outputCursorPos     = feedkeysOutput([[y$kgr$]])
+            expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+            assert.are.same(expectedCursorPos, outputCursorPos)
+            assert.are.same(expectedLines, outputLines)
+        end) -- }}}
 end)

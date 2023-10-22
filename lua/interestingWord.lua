@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Highlight word in different random colors, heavily inspired
 --              by https://github.com/lfv89/vim-interestingwords/blob/master/plugin/interestingwords.vim
--- Version: 0.0.5
--- Last Modified: 2023-4-19
+-- Version: 0.0.6
+-- Last Modified: 2023-10-22
 local M   = {
     hlIds = {},
     guibgs = {},
@@ -120,35 +120,37 @@ local operator = function(opInfo) -- {{{
         return vim.notify(string.format("%swise is not supported", opInfo.motionType), vim.log.levels.WARN)
     end
 
-    local op       = require("operator")
-    local curWinID = vim.api.nvim_get_current_win()
+    local op = require("operator")
+    local winId = vim.api.nvim_get_current_win()
+    local bufNr = vim.api.nvim_get_current_buf()
 
     local posStart
     local posEnd
     local word
     -- Get content {{{
     if opInfo.vimMode == "n" then
-        posStart = vim.api.nvim_buf_get_mark(0, "[")
-        posEnd   = vim.api.nvim_buf_get_mark(0, "]")
-        vim.api.nvim_win_set_cursor(curWinID, posStart)
+        local motionRegion = op.getMotionRegion(bufNr)
+        posStart = motionRegion.Start
+        posEnd   = motionRegion.End
+        vim.api.nvim_win_set_cursor(winId, posStart)
         vim.cmd "noa normal! v"
-        vim.api.nvim_win_set_cursor(curWinID, posEnd)
+        vim.api.nvim_win_set_cursor(winId, posEnd)
         vim.cmd "noa normal! v"
     else
         vim.cmd("noa normal! gv" .. t"<Esc>")
         posStart = vim.api.nvim_buf_get_mark(0, "<")
         posEnd   = vim.api.nvim_buf_get_mark(0, ">")
     end
-    word = vim.fn.escape(require("selection").get("string"), [=[\/.-][]=])
+    word = vim.fn.escape(require("selection").get("string", false), [=[\/.-][]=])
 
     -- }}} Store word info
 
-    applyColor(word, opts, curWinID)
+    applyColor(word, opts, winId)
     -- Restore cursor position
     if opInfo.vimMode == "n" and not require("util").withinRegion(op.cursorPos, posStart, posEnd) then
         return
     else
-        vim.api.nvim_win_set_cursor(curWinID, op.cursorPos)
+        vim.api.nvim_win_set_cursor(winId, op.cursorPos)
     end
 
     -- Dot repeat

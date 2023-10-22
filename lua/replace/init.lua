@@ -1,8 +1,8 @@
 -- File: replace
 -- Author: iaso2h
 -- Description: Heavily inspired by Ingo Karkat's work. Replace text with register
--- Version: 0.1.14
--- Last Modified: 2023-05-20
+-- Version: 0.1.15
+-- Last Modified: 2023-10-22
 -- TODO: tests for softtab convert
 -- NOTE: break change: Dot-repeat no longer support jump to mark motion now
 -- because the new method of setting new line(or replace line) via
@@ -10,7 +10,7 @@
 -- will clear the mark location after buffer being changed
 local util     = require("util")
 local register = require("register")
-require("operator")
+local op       = require("operator")
 
 local M = {
     regName         = nil,
@@ -288,10 +288,8 @@ function M.operator(opInfo) -- {{{
         M.saveCountReg()
 
         -- Saving motionRegion region
-        motionRegion = {
-            Start = vim.api.nvim_buf_get_mark(bufNr, "["),
-            End   = vim.api.nvim_buf_get_mark(bufNr, "]")
-        }
+        motionRegion = op.getMotionRegion(bufNr)
+
         if vim.deep_equal(motionRegion.Start, motionRegion.End) then
             local endLine = vim.api.nvim_buf_get_lines(bufNr, motionRegion.End[1] - 1, motionRegion.End[1], false)[1]
             if string.len(endLine) ~= vim.fn.strchars(endLine) then

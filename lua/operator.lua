@@ -6,6 +6,12 @@ local M = {
 ---@class GenericOperatorInfo
 ---@field motionType string "line" or "char". Determine whether the motion is linewise
 ---@field vimMode string Vim mode. See: `:help mode()`
+
+---@class MotionRegion
+---@field Start integer[] The row number and column index where motion started
+---@field End integer[] The row number and column index where motion ended
+
+
 -- NOTE: see ":help g@" for details about motionType
 vim.cmd [[
 function! LuaExprCallback(motionType)
@@ -17,7 +23,7 @@ endfunction
 function _G.saveCursorPos() -- {{{
     M.cursorPos = vim.api.nvim_win_get_cursor(0)
 end -- }}}
----Expression function that evaluated to return str for mapping
+--- Expression function that evaluated to return str for mapping
 ---@param func            function
 ---@param checkModifiable boolean Set this to true if the operator will modify the buffer
 ---@param plugMap         string e.g: <Plug>myPlug
@@ -38,7 +44,7 @@ function M.expr(func, checkModifiable, plugMap) -- {{{
     vim.o.opfunc = "LuaExprCallback"
     return "g@"
 end -- }}}
----Using to detect the motion type of Neovim visual mode
+--- Using to detect the motion type of Neovim visual mode
 ---@param saveCursorChk boolean Whether to save cursor position
 ---@return GenericOperatorInfo
 function M.visualOpInfo(saveCursorChk) -- {{{
@@ -61,6 +67,26 @@ function M.visualOpInfo(saveCursorChk) -- {{{
 
     return {motionType = motionType, vimMode = vimMode}
 end -- }}}
+--- Get motion region in `"[` and `"]`. Support multibyte character
+---@param bufNr? integer Retrieved by calling `vim.api.nvim_get_current_bufnr()`
+---@retrun MotionRegion
+function M.getMotionRegion(bufNr)
+    bufNr = bufNr or 0
+    local region = {
+        Start = vim.api.nvim_buf_get_mark(bufNr, "["),
+        End   = vim.api.nvim_buf_get_mark(bufNr, "]")
+    }
+    local endCharToEnd = vim.api.nvim_buf_get_text(
+        0,
+        region.End[1] - 1,
+        region.End[2],
+        region.End[1] - 1,
+        -1,
+        {}
+    )[1]
+    region.End[2] = region.End[2] + vim.fn.byteidx(endCharToEnd, 1) - 1
 
+    return region
+end
 
 return M

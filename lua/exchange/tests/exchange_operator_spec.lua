@@ -9,9 +9,9 @@ local expectedLines
 local expectedCursorPos
 local expectedDotLines
 local cursorIndicatorChar = "^"
-describe([[Exchange on the same line.]], function()
+describe([[Exchange on the same line.]], function() -- {{{
 
-    it([[Region1 is ahead of Region2, adjacent]], function()
+    it([[Region1 is ahead of Region2, adjacent]], function() -- {{{
         initLines = [[
 the middle part
        ^
@@ -36,12 +36,11 @@ the dlemid part
         -- Setup buffer lines
         initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-        -- replace
+        -- Get output
         vim.cmd[[norm! mm]]
         outputLines, outputCursorPos     = feedkeysOutput([[gxb`mgxe]])
         expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
         -- assert.are.same(outputCursorPos, expectedCursorPos)
-        print(vim.inspect(exchange))
         assert.are.same(component, exchange._acrossLineComponent)
         assert.are.same(outputLines, expectedLines)
         -- Post
@@ -51,9 +50,9 @@ the dlemid part
         -- outputLines, outputCursorPos     = feedkeysOutput([[.]])
         -- expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
         -- assert.are.same(outputLines, expectedLines)
-    end)
+    end) -- }}}
 
-    it([[Region1 is ahead of Region2, not adjacent]], function()
+    it([[Region1 is ahead of Region2, not adjacent]], function() -- {{{
         initLines = [[
 vim.api.nvim_get_current_buf(bufnr)
     ^
@@ -78,7 +77,7 @@ vim.bufnr.nvim_get_current_buf(api)
         -- Setup buffer lines
         initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-        -- replace
+        -- Get output
         outputLines, outputCursorPos     = feedkeysOutput([[gxiw4wgxiw]])
         expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
         -- assert.are.same(outputCursorPos, expectedCursorPos)
@@ -86,14 +85,9 @@ vim.bufnr.nvim_get_current_buf(api)
         assert.are.same(outputLines, expectedLines)
         -- Post
         exchange._acrossLineComponent = {}
+    end) -- }}}
 
-        -- replace, via dot
-        -- outputLines, outputCursorPos     = feedkeysOutput([[.]])
-        -- expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-        -- assert.are.same(outputLines, expectedLines)
-    end)
-
-    it([[Region2 is ahead of Region1, adjacent]], function()
+    it([[Region2 is ahead of Region1, adjacent]], function() -- {{{
         initLines = [[
 vim.api.feedkeysOutput()
                 ^
@@ -118,7 +112,7 @@ vim.api.Outputfeedkeys()
         -- Setup buffer lines
         initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-        -- replace
+        -- Get output
         outputLines, outputCursorPos     = feedkeysOutput([[gxebgxtO]])
         expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
         -- assert.are.same(outputCursorPos, expectedCursorPos)
@@ -126,14 +120,9 @@ vim.api.Outputfeedkeys()
         assert.are.same(outputLines, expectedLines)
         -- Post
         exchange._acrossLineComponent = {}
+    end) -- }}}
 
-        -- replace, via dot
-        -- outputLines, outputCursorPos     = feedkeysOutput([[.]])
-        -- expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-        -- assert.are.same(outputLines, expectedLines)
-    end)
-
-    it([[Region2 is ahead of Region1, not adjacent]], function()
+    it([[Region2 is ahead of Region1, not adjacent]], function() -- {{{
         initLines = [[
 Lorem ipsum dolor sit amet
                   ^
@@ -158,7 +147,7 @@ Lorem sit dolor ipsum amet
         -- Setup buffer lines
         initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-        -- replace
+        -- Get output
         outputLines, outputCursorPos     = feedkeysOutput([[gxiw2bgxiw]])
         expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
         -- assert.are.same(outputCursorPos, expectedCursorPos)
@@ -166,29 +155,28 @@ Lorem sit dolor ipsum amet
         assert.are.same(outputLines, expectedLines)
         -- Post
         exchange._acrossLineComponent = {}
+    end) -- }}}
 
-        -- replace, via dot
-        -- outputLines, outputCursorPos     = feedkeysOutput([[.]])
-        -- expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-        -- assert.are.same(outputLines, expectedLines)
-    end)
-end)
+end) -- }}}
 
-describe([[Exchange on lines that across a mutual line.]], function()
+describe([[Exchange on lines that across a mutual line.]], function() -- {{{
 
-    it([[Region1 is ahead of Region2, adjacent]], function()
+    it([[Region1 is ahead of Region2, adjacent]], function() -- {{{
         initLines = [[
         ex fugiat reprehenderit enim labore culpa sint
                                                   ^
 Lorem ipsum dolor sit amet, officia excepteur
+
         ]]
         expectedLines = [[
         ex fugiat reprehenderit enim labore culpa dolorsint Lorem ipsum  sit amet, officia excepteur
-                                                  ^
+
+^
         ]]
     --      expectedDotLines = [[
     -- if reg.type == "v" or (rushing and robbing.type == "V" and linesCnt == 1) then
     --      ]]
+
         initLines        = vim.split(initLines, "\n")
         expectedLines    = vim.split(expectedLines, "\n")
         -- expectedDotLines = vim.split(expectedDotLines, "\n")
@@ -202,7 +190,7 @@ Lorem ipsum dolor sit amet, officia excepteur
         -- Setup buffer lines
         initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-        -- replace
+        -- Get output
         outputLines, outputCursorPos     = feedkeysOutput([[gx3w3wgxiw]])
         expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
         -- assert.are.same(outputCursorPos, expectedCursorPos)
@@ -210,14 +198,9 @@ Lorem ipsum dolor sit amet, officia excepteur
         assert.are.same(outputLines, expectedLines)
         -- Post
         exchange._acrossLineComponent = {}
+    end) -- }}}
 
-        -- replace, via dot
-        -- outputLines, outputCursorPos     = feedkeysOutput([[.]])
-        -- expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-        -- assert.are.same(outputLines, expectedLines)
-    end)
-
-    it([[Region1 is ahead of Region2, not adjacent]], function()
+    it([[Region1 is ahead of Region2, not adjacent]], function() -- {{{
         initLines = [[
 Lorem ipsum dolor sit amet, officia excepteur
                                     ^
@@ -243,22 +226,18 @@ Lorem ipsum dolor sit amet, officia enimfugiat reprehenderit excepteur ex  labor
         -- Setup buffer lines
         initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-        -- replace
+        -- Get output
         outputLines, outputCursorPos     = feedkeysOutput([[gx2w4wgxiw]])
         expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+        -- TODO: the width of neovim client might affect how the cursor is relocated
         -- assert.are.same(outputCursorPos, expectedCursorPos)
         assert.are.same(component, exchange._acrossLineComponent)
         assert.are.same(outputLines, expectedLines)
         -- Post
         exchange._acrossLineComponent = {}
+    end) -- }}}
 
-        -- replace, via dot
-        -- outputLines, outputCursorPos     = feedkeysOutput([[.]])
-        -- expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-        -- assert.are.same(outputLines, expectedLines)
-    end)
-
-    it([[Region2 is ahead of Region1, adjacent]], function()
+    it([[Region2 is ahead of Region1, adjacent]], function() -- {{{
         initLines = [[
 Many thanks to Steve Oualline and New Riders for creating this book and
 publishing it under the OPL!  It has been a great help while writing the user
@@ -284,22 +263,18 @@ Many thanks to Steve Oualline and New Riders for this book and publishing creati
         -- Setup buffer lines
         initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-        -- replace
+
+        -- Get output
         outputLines, outputCursorPos     = feedkeysOutput([[gx4b`[gxb]])
         expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-        -- assert.are.same(outputCursorPos, expectedCursorPos)
+        assert.are.same(outputCursorPos, expectedCursorPos)
         assert.are.same(component, exchange._acrossLineComponent)
         assert.are.same(outputLines, expectedLines)
         -- Post
         exchange._acrossLineComponent = {}
+    end) -- }}}
 
-        -- replace, via dot
-        -- outputLines, outputCursorPos     = feedkeysOutput([[.]])
-        -- expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-        -- assert.are.same(outputLines, expectedLines)
-    end)
-
-    it([[Region2 is ahead of Region1, not adjacent]], function()
+    it([[Region2 is ahead of Region1, not adjacent]], function() -- {{{
         initLines = [[
 The Vim user manual and reference
 manual are Copyright (c) 1988-2003 by Bram
@@ -307,7 +282,7 @@ manual are Copyright (c) 1988-2003 by Bram
         ]]
         expectedLines = [[
 The manual and reference manual are user Vim Copyright (c) 1988-2003 by Bram
-          ^
+    ^
         ]]
     --      expectedDotLines = [[
     -- if reg.type == "v" or (rushing and robbing.type == "V" and linesCnt == 1) then
@@ -325,19 +300,71 @@ The manual and reference manual are user Vim Copyright (c) 1988-2003 by Bram
         -- Setup buffer lines
         initLinesCursor(initLines, "lua", cursorIndicatorChar)
 
-        -- replace
+        -- Get output
         outputLines, outputCursorPos     = feedkeysOutput([[gx5b`[2bgxiw]])
         expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
-        -- assert.are.same(outputCursorPos, expectedCursorPos)
+        assert.are.same(outputCursorPos, expectedCursorPos)
         assert.are.same(component, exchange._acrossLineComponent)
         assert.are.same(outputLines, expectedLines)
         -- Post
         exchange._acrossLineComponent = {}
+    end) -- }}}
 
-        -- replace, via dot
-        -- outputLines, outputCursorPos     = feedkeysOutput([[.]])
-        -- expectedLines, expectedCursorPos = lineFilterCursor(expectedDotLines, cursorIndicatorChar)
-        -- assert.are.same(outputLines, expectedLines)
-    end)
+end) -- }}}
 
+describe([[Exchange with multibyte characters.]], function()
+    it([[exchange 3 bytes character within delimiter]], function() -- {{{
+        initLines = [[
+            Hint = "等待玩家进入街霸6练习模式"
+                            ^
+            Hint = "等待玩家离开铁拳3"
+        ]]
+        expectedLines = [[
+            Hint = "等待玩家离开铁拳3"
+            Hint = "等待玩家进入街霸6练习模式"
+                    ^
+        ]]
+    --      expectedDotLines = [[
+    -- if reg.type == "v" or (rushing and robbing.type == "V" and linesCnt == 1) then
+    --      ]]
+        initLines        = vim.split(initLines, "\n")
+        expectedLines    = vim.split(expectedLines, "\n")
+        -- expectedDotLines = vim.split(expectedDotLines, "\n")
+
+        -- Setup buffer lines
+        initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+        -- Get output
+        outputLines, outputCursorPos     = feedkeysOutput([[gxi"jgxi"]])
+        expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+        assert.are.same(outputCursorPos, expectedCursorPos)
+        assert.are.same(outputLines, expectedLines)
+    end) -- }}}
+    it([[exchange 3 bytes character with 2 bytes character]], function() -- {{{
+        initLines = [[
+            foo = '🤔🥴' are emojis
+                   ^
+            foo = 'Ӕӕ' are symbols
+        ]]
+        expectedLines = [[
+            foo = 'Ӕӕ' are emojis
+            foo = '🤔🥴' are symbols
+                   ^
+        ]]
+    --      expectedDotLines = [[
+    -- if reg.type == "v" or (rushing and robbing.type == "V" and linesCnt == 1) then
+    --      ]]
+        initLines        = vim.split(initLines, "\n")
+        expectedLines    = vim.split(expectedLines, "\n")
+        -- expectedDotLines = vim.split(expectedDotLines, "\n")
+
+        -- Setup buffer lines
+        initLinesCursor(initLines, "lua", cursorIndicatorChar)
+
+        -- Get output
+        outputLines, outputCursorPos     = feedkeysOutput([[gxi'jgxi']])
+        expectedLines, expectedCursorPos = lineFilterCursor(expectedLines, cursorIndicatorChar)
+        assert.are.same(outputCursorPos, expectedCursorPos)
+        assert.are.same(outputLines, expectedLines)
+    end) -- }}}
 end)

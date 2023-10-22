@@ -1,10 +1,10 @@
 -- File: extraction
 -- Author: iaso2h
 -- Description: Extract selected content into new variable or new file
--- Version: 0.0.10
--- Last Modified: 2023-08-27
+-- Version: 0.0.11
+-- Last Modified: 2023-10-22
 -- TODO: Deprecated: Please use refactor.nvim instead for visual line mode
-require("operator")
+local op       = require("operator")
 local util     = require("util")
 local register = require("register")
 local M = {}
@@ -59,19 +59,21 @@ end -- }}}
 --- Get the source content from visual selection
 ---@return table # For "v" mode, return string value of source content value, and the namespace together with the extmark to track the position information; For "V" mode return string value of source content value for "V" mode only.
 local getSrcContent = function() -- {{{
-    local startPos
-    local endPos
+    local posStart
+    local posEnd
 
     if M.vimMode == "n" then
-        startPos = vim.api.nvim_buf_get_mark(0, "[")
-        endPos   = vim.api.nvim_buf_get_mark(0, "]")
-
+        local motionRegion = op.getMotionRegion()
+        posStart = motionRegion.Start
+        posEnd   = motionRegion.End
+        posStart = vim.api.nvim_buf_get_mark(0, "[")
+        posEnd   = vim.api.nvim_buf_get_mark(0, "]")
     elseif M.vimMode:lower() == "v" then
-        startPos = vim.api.nvim_buf_get_mark(0, "<")
-        endPos   = vim.api.nvim_buf_get_mark(0, ">")
+        posStart = vim.api.nvim_buf_get_mark(0, "<")
+        posEnd   = vim.api.nvim_buf_get_mark(0, ">")
 
         -- Abort when selection is invalid
-        if startPos[1] == endPos[1] and startPos[2] == endPos[2] then
+        if posStart[1] == posEnd[1] and posStart[2] == posEnd[2] then
             vim.notify("Too small selection", vim.log.levels.ERROR)
             return {}
         end
@@ -85,14 +87,14 @@ local getSrcContent = function() -- {{{
     local srcContent
     if M.vimMode == "v" or M.vimMode == "n" then
         -- Avoid delete "\n" line break character in the end of line
-        local endLineLen = #vim.api.nvim_buf_get_lines(0, endPos[1] - 1, endPos[1], false)[1]
+        local endLineLen = #vim.api.nvim_buf_get_lines(0, posEnd[1] - 1, posEnd[1], false)[1]
         if M.vimMode == "v" then
-            if endPos[2] == endLineLen then
+            if posEnd[2] == endLineLen then
                 linebreakChk = true
-                endPos = {endPos[1], endPos[2] - 1}
+                posEnd = {posEnd[1], posEnd[2] - 1}
             end
         else
-            if endPos[2] == endLineLen - 1 then
+            if posEnd[2] == endLineLen - 1 then
                 linebreakChk = true
             end
         end
@@ -101,13 +103,13 @@ local getSrcContent = function() -- {{{
         local namespace = vim.api.nvim_create_namespace("extractToVar")
         -- (0, 0) indexed
         local extmark   = vim.api.nvim_buf_set_extmark(0, namespace,
-                                    startPos[1] - 1,           startPos[2],
-                                    {end_line = endPos[1] - 1, end_col = endPos[2]})
+                                    posStart[1] - 1,           posStart[2],
+                                    {end_line = posEnd[1] - 1, end_col = posEnd[2]})
 
         -- Cut source content into register
-        vim.api.nvim_win_set_cursor(0, startPos)
+        vim.api.nvim_win_set_cursor(0, posStart)
         vim.cmd "noa normal! v"
-        vim.api.nvim_win_set_cursor(0, endPos)
+        vim.api.nvim_win_set_cursor(0, posEnd)
         vim.cmd "noa normal! d"
         srcContent = vim.fn.getreg("\"", 1)
 

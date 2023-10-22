@@ -1,8 +1,8 @@
 -- File: trailingChar
 -- Author: iaso2h
 -- Description: Add character at the end of line
--- Version: 0.0.6
--- Last Modified: 2023-4-28
+-- Version: 0.0.7
+-- Last Modified: 2023-10-21
 local M = {
     regAllWritable = [=[[-a-zA-Z0-9"_/]]=],
     regAll         = [=[[-a-zA-Z0-9":.%#=*+~/]]=]
@@ -120,7 +120,7 @@ local stringCount = function(str, pattern) -- {{{
         if not init then return count end
         count = count + 1
     end
-end -- }}} 
+end -- }}}
 ---Reindent the register content
 ---@param indentOffset integer Can be negative integer. How many indents the source register content going to be prefixed or trimmed
 ---@param srcContent string The content return by vim.fn.getreg()
@@ -174,14 +174,15 @@ M.getIndent = function(regContent) -- {{{
 end -- }}}
 --- Save the star registers, plus and unnamed registers - independently, restoreReg can be accessed after saveReg is called
 function M.saveReg() -- {{{
-    local unnamedContent
-    local unnamedType
+    local unnamedContent = vim.fn.getreg('"', 1)
+    local unnamedType    = vim.fn.getregtype('"')
+    local zeroContent = vim.fn.getreg('0', 1)
+    local zeroType    = vim.fn.getregtype('0')
+
     local starContent
     local starType
     local plusContent
     local plusType
-    unnamedContent = vim.fn.getreg('"', 1)
-    unnamedType    = vim.fn.getregtype('"')
     if _G._os_uname.machine == "aarch64" then
         starContent = ""
         plusContent = ""
@@ -192,17 +193,18 @@ function M.saveReg() -- {{{
         plusType       = vim.fn.getregtype('+')
     end
 
-    local nonDefaultContent
-    local nonDefaultType
+    local specificRegName
+    local specificRegContent
+    local specificRegType
     if not vim.tbl_contains({'"', "*", "+"}, vim.v.register) then
-        nonDefaultContent = vim.fn.getreg(vim.v.register, 1)
-        nonDefaultType    = vim.fn.getregtype(vim.v.register)
+        specificRegName    = vim.v.register
+        specificRegContent = vim.fn.getreg(vim.v.register, 1)
+        specificRegType    = vim.fn.getregtype(vim.v.register)
     end
 
-
     M.restoreReg = function()
-        if nonDefaultContent and nonDefaultContent ~= "" then
-            vim.fn.setreg(vim.v.register, nonDefaultContent, nonDefaultType)
+        if specificRegName and specificRegContent ~= "" then
+            vim.fn.setreg(specificRegName, specificRegContent, specificRegType)
         end
 
         if starContent ~= "" then
@@ -213,6 +215,9 @@ function M.saveReg() -- {{{
         end
         if unnamedContent ~= "" then
             vim.fn.setreg('"', unnamedContent, unnamedType)
+            -- Assign new value to unnamed register will overwirte the zero
+            -- register, so a further step is needed
+            vim.fn.setreg('0', zeroContent, zeroType)
         end
 
         vim.defer_fn(function() M.restoreReg = nil end, 1000)
@@ -223,7 +228,7 @@ end -- }}}
 ---@return string # Corresponding line indent
 M.indentCopy = function(lineNr) -- {{{
     return string.rep(" ", vim.fn.indent(lineNr))
-end -- }}} 
+end -- }}}
 
 
 return M

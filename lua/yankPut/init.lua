@@ -1,8 +1,8 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.21
--- Last Modified: 2023-5-19
+-- Version: 0.1.22
+-- Last Modified: 2023-10-22
 
 local util     = require("util")
 local operator = require("operator")
@@ -160,10 +160,11 @@ end -- }}}
 function M.inplaceYank(opInfo) -- {{{
     local opts = {hlGroup=M.hlGroup, timeout=M.hlInterval}
     local plugMap  = operator.plugMap
-    local curWinId = vim.api.nvim_get_current_win()
-    local curBufNr = vim.api.nvim_get_current_buf()
-    local posStart = vim.api.nvim_buf_get_mark(0, "[")
-    local posEnd   = vim.api.nvim_buf_get_mark(0, "]")
+    local winId = vim.api.nvim_get_current_win()
+    local bufNr = vim.api.nvim_get_current_buf()
+    local motionRegion = operator.getMotionRegion(bufNr)
+    local posStart = motionRegion.Start
+    local posEnd   = motionRegion.End
 
     local regName
     if vim.o.clipboard == "unnamed" then
@@ -202,7 +203,7 @@ function M.inplaceYank(opInfo) -- {{{
     local newContentExmark
     if M.hlEnable then
         newContentExmark = util.nvimBufAddHl(
-            curBufNr,
+            bufNr,
             posStart,
             posEnd,
             vim.fn.getregtype(),
@@ -214,7 +215,7 @@ function M.inplaceYank(opInfo) -- {{{
         posStart = {posStart[1] - 1, posStart[2]}
         posEnd   = {posEnd[1] - 1, posEnd[2]}
         newContentExmark = vim.api.nvim_buf_set_extmark(
-            curBufNr,
+            bufNr,
             M.lastYankNs,
             posStart[1],
             posStart[2],
@@ -228,7 +229,11 @@ function M.inplaceYank(opInfo) -- {{{
 
     -- Restor cursor position
     if operator.cursorPos then
-        vim.api.nvim_win_set_cursor(curWinId, operator.cursorPos)
+        local ok, msgOrVal = pcall(vim.api.nvim_win_set_cursor, winId, operator.cursorPos)
+        if not ok then
+            print('DEBUGPRINT[1]: init.lua:230: cursorPos=' .. vim.inspect(operator.cursorPos))
+            vim.notify(msgOrVal, vim.log.levels.ERROR)
+        end
         -- Always clear M.cursorPos after restoration to avoid restoring
         -- cursor in after repeat command is performed
         operator.cursorPos = nil
@@ -267,15 +272,15 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
         return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
     end
 
-    local curBufNr      = vim.api.nvim_get_current_buf()
-    local curWinId      = vim.api.nvim_get_current_win()
+    local bufNr = vim.api.nvim_get_current_buf()
+    local winId = vim.api.nvim_get_current_win()
 
     -- Put cursor at the ends of folded line
     if vim.fn.foldclosed('.') ~= -1 then
         if pasteCMD == "p" then
-            local cursorPos = vim.api.nvim_win_get_cursor(curWinId)
+            local cursorPos = vim.api.nvim_win_get_cursor(winId)
             local foldEnd   = vim.fn.foldclosedend(cursorPos[1])
-            vim.api.nvim_win_set_cursor(curWinId, {foldEnd, cursorPos[2]})
+            vim.api.nvim_win_set_cursor(winId, {foldEnd, cursorPos[2]})
         else
             -- Make sure cursor is always locate at the fold beginning
             if vim.fn.line(".") ~= 1 then
@@ -305,9 +310,9 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     local regContentSave = vim.fn.getreg(vim.v.register, 1)
     local regContentNew
 
-    local cursorPos     = vim.api.nvim_win_get_cursor(curWinId)
+    local cursorPos     = vim.api.nvim_win_get_cursor(winId)
     local cursorNS      = vim.api.nvim_create_namespace("inplacePutCursor")
-    local cursorExtmark = vim.api.nvim_buf_set_extmark(curBufNr, cursorNS, cursorPos[1] - 1, cursorPos[2], {})
+    local cursorExtmark = vim.api.nvim_buf_set_extmark(bufNr, cursorNS, cursorPos[1] - 1, cursorPos[2], {})
 
 
     -- Format the register content {{{
@@ -363,13 +368,14 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
 
     -- Create highlight {{{
     -- Position of new created content
-    local posStart = vim.api.nvim_buf_get_mark(curBufNr, "[")
-    local posEnd = vim.api.nvim_buf_get_mark(curBufNr, "]")
+    local motionRegion = operator.getMotionRegion(bufNr)
+    local posStart = motionRegion.Start
+    local posEnd   = motionRegion.End
     -- Creates a new namespace or gets an existing one.
     local newContentExmark
     if M.hlEnable then
         newContentExmark = util.nvimBufAddHl(
-            curBufNr,
+            bufNr,
             posStart,
             posEnd,
             regTypeNew,
@@ -381,7 +387,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
         posStart = {posStart[1] - 1, posStart[2]}
         posEnd   = {posEnd[1] - 1, posEnd[2]}
         newContentExmark = vim.api.nvim_buf_set_extmark(
-            curBufNr,
+            bufNr,
             M.lastPutNs,
             posStart[1],
             posStart[2],
@@ -396,11 +402,11 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     -- Restoration {{{
     -- Restore cursor position
     if vimMode == "n" then
-        local cursorResExtmark = vim.api.nvim_buf_get_extmark_by_id(curBufNr, cursorNS, cursorExtmark, {})
-        vim.api.nvim_win_set_cursor(curWinId, {cursorResExtmark[1] + 1, cursorResExtmark[2]})
-        vim.api.nvim_buf_clear_namespace(curBufNr, cursorNS, 0, -1)
+        local cursorResExtmark = vim.api.nvim_buf_get_extmark_by_id(bufNr, cursorNS, cursorExtmark, {})
+        vim.api.nvim_win_set_cursor(winId, {cursorResExtmark[1] + 1, cursorResExtmark[2]})
+        vim.api.nvim_buf_clear_namespace(bufNr, cursorNS, 0, -1)
     else
-        vim.api.nvim_win_set_cursor(curWinId, cursorPos)
+        vim.api.nvim_win_set_cursor(winId, cursorPos)
     end
     -- Restore register
     if convertPut then
