@@ -59,10 +59,11 @@ local randomHex = function() -- {{{
             hex = "#" .. string.rep("0", (7 - #hex)) .. string.sub(hex, 2, -1)
         end
 
-        if tbl_idx(M.hexes, hex, false) ~= -1 then
-            table.insert(M.hexes, hex)
+        -- TODO: a highly efficient way of checking duplicate
+        -- if tbl_idx(M.hexes, hex, false) ~= -1 then
+        --     table.insert(M.hexes, hex)
             return hex
-        end
+        -- end
     until false
 end -- }}}
 
