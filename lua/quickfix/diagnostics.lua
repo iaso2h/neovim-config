@@ -57,36 +57,6 @@ local autocmdSetup = function() -- {{{
         setupAutoCmd.autocmdSetupTick = true
     end
 end -- }}}
---- Add missing highlight for warning, note, info in error column
----@param qfItems table Returned value of `vim.fn.getqflist()`
----@param qfBufNr integer The buffer number of quickfix
-local moreHighlight = function(qfItems, qfBufNr) -- {{{
-    local qfLines = vim.api.nvim_buf_get_lines(qfBufNr, 0, -1, false)
-    for qfLineNr, item in ipairs(qfItems) do
-        if item.type ~= "E" then
-            local fileName = vim.fn.bufname(item.bufnr)
-            local qfLine   = qfLines[qfLineNr]
-            local vBarIdx  = string.find(qfLine, "|", fileName:len() + 2, true) -- 1 based index
-            if vBarIdx then
-                local errorText
-                local errorStartIdx
-                local errorHighlightGroup
-                if item.type == "W" then
-                    errorText = "warning"
-                    errorHighlightGroup = "DiagnosticWarn"
-                elseif item.type == "N" then
-                    errorText = "note"
-                    errorHighlightGroup = "DiagnosticHint"
-                elseif item.type == "I" then
-                    errorText = "info"
-                    errorHighlightGroup = "DiagnosticInfo"
-                end
-                errorStartIdx = vBarIdx - errorText:len() -- 1 based index
-                vim.api.nvim_buf_add_highlight(qfBufNr, ns, errorHighlightGroup, qfLineNr - 1, errorStartIdx - 1, vBarIdx - 1)
-            end
-        end
-    end
-end -- }}}
 --- Open diagnostics in quickfix window
 ---@param forceChk boolean Set it to true if this function is called by a mapping instead of autocommand
 ---@param localChk boolean Whether it's a locallist or a quickfix

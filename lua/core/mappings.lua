@@ -4,8 +4,7 @@
 vim.g.mapleader = " "
 
 -- Diagnostic mapping
--- map("n", [[<leader>E]], [[<CMD>lua vim.diagnostic.open_float()<CR>]], {"silent"}, "LSP diagnostics")
-map("n", [[<C-q>d]], [[<CMD>lua require("quickfix.diagnostics").open(true, false)<CR>]], {"silent"}, "LSP add workspace folder")
+map("n", [[<C-q>d]], [[<CMD>lua require("quickfix.diagnostics").refresh(true, false)<CR>]], {"silent"}, "LSP add workspace folder")
 map("n", [[[e]], function()
     require("jump.util").posCenter(function()
         vim.diagnostic.goto_prev { float = { border = "rounded" } }

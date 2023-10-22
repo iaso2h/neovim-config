@@ -4,13 +4,10 @@ local M   = {}
 --- Universally warp around `getlocist()` and `getqflist()`
 ---@vararg any
 M.getlist = function(...) -- {{{
-    local title
     if vim.b._is_local then
-        title = vim.fn.getloclist(0, {title = 0}).title
-        return vim.fn.getloclist(0, ...), title
+        return vim.fn.getloclist(0, ...), vim.fn.getloclist(0, {title = 0}).title
     else
-        title = vim.fn.getqflist({title = 0}).title
-        return vim.fn.getqflist(...), title
+        return vim.fn.getqflist(...), vim.fn.getqflist({title = 0}).title
     end
 end -- }}}
 --- Whether the quickfix window is visible
