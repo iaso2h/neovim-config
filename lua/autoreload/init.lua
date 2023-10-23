@@ -1,7 +1,7 @@
 -- File: reloadConfig
 -- Author: iaso2h
 -- Description: reload lua package or vim file at Neovim configuration directory
--- Version: 0.0.27
+-- Version: 0.0.28
 -- Last Modified: 2023-10-23
 
 ---@class ReloadHook

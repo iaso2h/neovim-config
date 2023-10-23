@@ -155,6 +155,10 @@ end -- }}}
 local hook = function(hookTbl, path, reloadCallback) -- {{{
     ---@type ReloadHook
     local currentHook
+    --- Match the current reloading module against given path pattern
+    ---@param filename string
+    ---@param pathPattern string
+    ---@return boolean # Return true if a match pattern is found
     local matchPathPattern = function(filename, pathPattern)
         if filename == pathPattern or string.match(filename, pathPattern) then
             if type(currentHook.callbackHandler) == "function" then
@@ -170,8 +174,10 @@ local hook = function(hookTbl, path, reloadCallback) -- {{{
                 M.unloadOnlyChk = true
             end
 
-            -- Load hook function only once
-            return
+            -- Load hook function only once, return ture to signify the termination
+            return true
+        else
+            return false
         end
     end
 
@@ -179,10 +185,14 @@ local hook = function(hookTbl, path, reloadCallback) -- {{{
         currentHook = hook
         if type(hook.pathPat) == "table" then
             for _, pathPat in ipairs(hook.pathPat) do
-                matchPathPattern(path.filename, pathPat)
+                if matchPathPattern(path.filename, pathPat) then
+                    return
+                end
             end
         elseif type(hook.pathPat) == "string" then
-            matchPathPattern(path.filename, hook.pathPat)
+            if matchPathPattern(path.filename, hook.pathPat) then
+                return
+            end
         end
     end
 end -- }}}
