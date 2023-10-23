@@ -1017,7 +1017,7 @@ local pluginArgs = { -- {{{
         "mrjones2014/lua-gf.nvim",
         ft = "lua",
         config = function()
-            map("n", [[gF]], require("plugins.nvim-lua-gf"), "Go to file")
+            map("n", [[gF]], [[<CMD>lua require("plugins.nvim-lua-gf")()<CR>]], {"silent"}, "Go to file")
         end
     },
     {

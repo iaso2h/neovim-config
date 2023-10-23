@@ -157,10 +157,10 @@ local hook = function(hookTbl, path, reloadCallback) -- {{{
     local currentHook
     local matchPathPattern = function(filename, pathPattern)
         if filename == pathPattern or string.match(filename, pathPattern) then
-            if type(currentHook.callback) == "function" then
-                local ok, msg = pcall(currentHook.callback, path, reloadCallback)
+            if type(currentHook.callbackHandler) == "function" then
+                local ok, msg = pcall(currentHook.callbackHandler, path, reloadCallback)
                 if not ok then
-                    vim.notify("Error occurs while loading lua config for " .. filename,
+                    vim.notify("Error occurs while calling callback function from reloading " .. filename,
                         vim.log.levels.ERROR)
                     vim.notify(msg, vim.log.levels.ERROR)
                 end
