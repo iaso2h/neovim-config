@@ -225,7 +225,7 @@ end -- }}}
 -- Credit: https://github.com/LunarVim/LunarVim/blob/2d373036493b3a61ef24d98efdeecbe8e74467be/lua/lvim/utils/modules.lua#L68
 --- A safer require function
 ---@param mod string Module name
----@return module|boolean # Date returned by require lua module or false to signify a failure require
+---@return any|boolean # Date returned by require lua module or false to signify a failure require
 M.requireSafe = function(mod) -- {{{
     local ok, module = pcall(require, mod)
     if not ok then
@@ -298,7 +298,7 @@ end -- }}}
 ---@param bufNr integer
 ---@param query string
 ---@param captureId? integer Specific id to be capture when calling query.iter_captures()
----@return userdata[] Treesitter nodes
+---@return TSNode
 M.getQueryNodes = function(bufNr, query, captureId) -- {{{
     local lastLine = vim.api.nvim_buf_call(bufNr, function()
         ---@diagnostic disable-next-line: redundant-return-value
@@ -327,7 +327,7 @@ M.getQueryNodes = function(bufNr, query, captureId) -- {{{
 end -- }}}
 --- Return `true` if any match evaluated to `true`
 ---@param func function Match against each element
----@param tbl any[] List-like table
+---@param tbl table List-like table
 ---@return boolean
 M.any = function(func, tbl) -- {{{
     for _, i in ipairs(tbl) do

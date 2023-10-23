@@ -1,8 +1,14 @@
 -- File: reloadConfig
 -- Author: iaso2h
 -- Description: reload lua package or vim file at Neovim configuration directory
--- Version: 0.0.26
+-- Version: 0.0.27
 -- Last Modified: 2023-10-23
+
+---@class ReloadHook
+---@field pathPat string|string[] Absolute file path string
+---@field unloadOnlyChk boolean Unload the module only, don't reload it
+---@field callback function Callback function to executed specifically
+
 local util = require("autoreload.util")
 local ok, valOrMsg = pcall(require, "plenary.path")
 local p
@@ -33,16 +39,18 @@ M.opt.lua.overrideFileModulePath = {
     M.configPath:joinpath("lua", "plugins"),
 }
 
----@class reloadHook
----@field pathPat string|string[] Absolute file path string
----@field unloadOnlyChk boolean Unload the module only, don't reload it
----@field callback function Callback function to executed specifically
-M.opt.lua.setup  = {}
-M.opt.lua.config = { -- {{{
+---@type ReloadHook
+local defaultHook = {
+    pathPat = "",
+    unloadOnlyChk = false,
+}
+---@type ReloadHook
+M.opt.lua.setupHook  = {}
+---@type ReloadHook
+M.opt.lua.configHook = { -- {{{
     {
         -- Call the config func from "<NvimConfig>/lua/config/" if it's callable
         pathPat       =  M.opt.lua.moduleSearchPath:joinpath("plugins", "nvim-lspconfig.lua").filename,
-        unloadOnlyChk = false,
         callback      = function(path, callback)
             local err = function(msg)
                 vim.notify("Error detect while calling callback function at: " .. path.filename,
@@ -84,7 +92,6 @@ M.opt.lua.config = { -- {{{
     {
         -- Call the config func from "<NvimConfig>/lua/config/" if it's callable
         pathPat       = M.opt.lua.moduleSearchPath:joinpath("plugins").filename,
-        unloadOnlyChk = false,
         callback      = function(path, callback)
             local err = function(msg)
                 vim.notify("Error detect while calling callback function at: " .. path.filename,
@@ -111,7 +118,6 @@ M.opt.lua.config = { -- {{{
             M.opt.lua.moduleSearchPath:joinpath("core", "options.lua").filename,
             M.opt.lua.moduleSearchPath:joinpath("onenord").filename,
         },
-        unloadOnlyChk = false,
         callback      = function(...)
             vim.defer_fn(function()
                 vim.cmd [[silent colorscheme onenord]]
@@ -119,6 +125,13 @@ M.opt.lua.config = { -- {{{
         end
     },
 } -- }}}
+
+for idx, hook in ipairs(M.opt.lua.setupHook) do
+    M.opt.lua.setupHook[idx] = vim.tbl_deep_extend("keep", hook, defaultHook)
+end
+for idx, hook in ipairs(M.opt.lua.configHook) do
+    M.opt.lua.configHook[idx] = vim.tbl_deep_extend("keep", hook, defaultHook)
+end
 
 
 ---Reload lua module path. Called in autocmd

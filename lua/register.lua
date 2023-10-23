@@ -1,8 +1,8 @@
 -- File: trailingChar
 -- Author: iaso2h
 -- Description: Add character at the end of line
--- Version: 0.0.7
--- Last Modified: 2023-10-21
+-- Version: 0.0.8
+-- Last Modified: 2023-10-23
 local M = {
     regAllWritable = [=[[-a-zA-Z0-9"_/]]=],
     regAll         = [=[[-a-zA-Z0-9":.%#=*+~/]]=]
@@ -58,9 +58,11 @@ M.insertPrompt = function(vimMode) -- {{{
             ---@diagnostic disable-next-line: need-check-nil
             if regexAll:match_str(input:sub(1, 1)) then
                 if exCmd:lower() == "p" then
+                    -- Support pasting the register before/after
                     -- Use remap keybinding
                     return vim.api.nvim_feedkeys('"' .. input, "m", false)
                 elseif exCmd:lower() == "e" then
+                    -- Suport converting first, then pasting the register into buffer
                     regType = vim.fn.getregtype(regName)
                     if regType == "v" then
                         vim.api.nvim_feedkeys('"' .. regName .. "cpj", "m", false)
@@ -73,6 +75,7 @@ M.insertPrompt = function(vimMode) -- {{{
                         vim.notify("\nRegister" .. regName .. " isn't a characterwise register for editing macro", vim.log.levels.WARN)
                     end
                 elseif exCmd:lower() == "r" then
+                    -- Suport replace target register(macro) content with the text of current line
                     local regexWritable = vim.regex(M.regAllWritable)
                     ---@diagnostic disable-next-line: need-check-nil
                     if regexWritable:match_str(regName) then
@@ -172,52 +175,67 @@ M.getIndent = function(regContent) -- {{{
 
     return regIndent
 end -- }}}
+
+---@class RegisterInfo
+---@field name string
+---@field content string
+---@field type string "v" for character-wise, "V" for line-wise, "\022<width>" for block-wise
+
+--- Get register information
+---@param name string
+---@return RegisterInfo
+local getReg = function(name)
+    local content = vim.fn.getreg(name, 1)
+    local type = vim.fn.getregtype(name)
+    return {
+        name = name,
+        content = content,
+        type = type
+    }
+end
+--- Set register information
+---@param reg RegisterInfo
+local setReg = function(reg)
+    vim.fn.setreg(reg.name, reg.content, reg.type)
+end
 --- Save the star registers, plus and unnamed registers - independently, restoreReg can be accessed after saveReg is called
 function M.saveReg() -- {{{
-    local unnamedContent = vim.fn.getreg('"', 1)
-    local unnamedType    = vim.fn.getregtype('"')
-    local zeroContent = vim.fn.getreg('0', 1)
-    local zeroType    = vim.fn.getregtype('0')
+    local unnamed = getReg('"')
+    local zero = getReg("0")
 
-    local starContent
-    local starType
-    local plusContent
-    local plusType
+    local star
+    local plus
     if _G._os_uname.machine == "aarch64" then
-        starContent = ""
-        plusContent = ""
+        star = {}
+        plus = {}
     else
-        starContent    = vim.fn.getreg('*', 1)
-        starType       = vim.fn.getregtype('*')
-        plusContent    = vim.fn.getreg('+', 1)
-        plusType       = vim.fn.getregtype('+')
+        star = getReg('*')
+        plus = getReg("+")
     end
 
-    local specificRegName
-    local specificRegContent
-    local specificRegType
+    local specific
     if not vim.tbl_contains({'"', "*", "+"}, vim.v.register) then
-        specificRegName    = vim.v.register
-        specificRegContent = vim.fn.getreg(vim.v.register, 1)
-        specificRegType    = vim.fn.getregtype(vim.v.register)
+        specific = getReg(vim.v.register)
+    else
+        specific = {}
     end
 
     M.restoreReg = function()
-        if specificRegName and specificRegContent ~= "" then
-            vim.fn.setreg(specificRegName, specificRegContent, specificRegType)
+        if not next(specific) then
+            setReg(specific)
         end
 
-        if starContent ~= "" then
-            vim.fn.setreg('*', starContent,    starType)
+        if not next(star) then
+            setReg(star)
         end
-        if plusContent ~= "" then
-            vim.fn.setreg('+', plusContent,    plusType)
+
+        if not next(plus) then
+            setReg(plus)
         end
-        if unnamedContent ~= "" then
-            vim.fn.setreg('"', unnamedContent, unnamedType)
-            -- Assign new value to unnamed register will overwirte the zero
-            -- register, so a further step is needed
-            vim.fn.setreg('0', zeroContent, zeroType)
+
+        if not next(unnamed) then
+            setReg(unnamed)
+            setReg(zero)
         end
 
         vim.defer_fn(function() M.restoreReg = nil end, 1000)

@@ -1,5 +1,3 @@
-local fn  = vim.fn
-local api = vim.api
 local M   = {}
 
 M.sep = _G._os_uname.sysname == "Windows_NT" and "\\" or "/"

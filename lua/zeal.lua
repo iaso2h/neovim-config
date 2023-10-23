@@ -85,7 +85,7 @@ local function lookUp(opInfo) -- {{{
 end -- }}}
 
 --- Look up keyword globally in the zeal(ignore language)
----@param args table see `operator()`
+---@param args GenericOperatorInfo
 function M.zealGlobal(args)
     zealGlobalChk = true
     lookUp(args)
@@ -93,7 +93,7 @@ end
 
 
 --- Look up keyword specific to its language in the zeal
----@param args table see `operator()`
+---@param args GenericOperatorInfo
 function M.zeal(args)
     zealGlobalChk = false
     lookUp(args)

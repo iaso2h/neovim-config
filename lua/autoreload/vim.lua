@@ -1,5 +1,5 @@
----@path userdata Plenary path object of vim module
----@configPath userdata Plenary path object of configpath
+---@param path Path Plenary path object of vim module
+---@param configPath Path Plenary path object of configpath
 return function(path, configPath)
     local p = require("plenary.path")
     -- Module path is always full path in VimL

@@ -54,9 +54,8 @@ end
 
 
 --- Select region in visual character mode
---- @param opts table Option table
---- @param candidate table A region contain infomation about the start and end of
----        an area going to be selected
+---@param opts table Option table
+---@param candidate table A region contain infomation about the start and end of an area going to be selected
 local selectRegion = function(opts, candidate)
     if ExpandRegionDebugMode and candidate.type == "treesitter" then
         Print(candidate.nodes[1]:type())
@@ -97,8 +96,8 @@ end
 
 
 --- Decide which region to be selected
---- @param opts table option table
---- @param direction integer 1 indicates expand, -1 indicates shrink
+---@param opts table option table
+---@param direction integer 1 indicates expand, -1 indicates shrink
 local getCandidate = function(opts, direction)
     local lastCandidate = M.candidates[M.candidateIdx]
     M.candidateIdx = M.candidateIdx + direction
@@ -142,9 +141,9 @@ end
 
 
 --- Compute and generate candidates table, which contain info about the start and end of regions
---- @param opts table option table
---- @param direction integer 1 indicates expand, -1 indicates shrink
---- @return boolean true if successful
+---@param opts table option table
+---@param direction integer 1 indicates expand, -1 indicates shrink
+---@return boolean true if successful
 local computeCandidate = function(opts, direction)
     if not require("vim.treesitter.highlighter").active[M.curBufNr] then
         -- treesitter highlighting is enabled
@@ -186,9 +185,9 @@ end
 
 
 --- Start the expanding and shrinking of region
---- @param vimMode string
---- @param direction integer 1 indicates expand, -1 indicates shrink
---- @param opts table option table
+---@param vimMode string
+---@param direction integer 1 indicates expand, -1 indicates shrink
+---@param opts table option table
 M.expandShrink = function(vimMode, direction, opts)
     -- Don't support visual block or visual line mode
     if vimMode == "\22" or vimMode == "V" then return end

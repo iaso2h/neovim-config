@@ -149,18 +149,21 @@ local getModuleName = function(path, parentPath, moduleSearchPath) -- {{{
     end
 end -- }}}
 --- Call functions before or after reloading specifc lua module
----@param hookTbl         reloadHook
+---@param hookTbl         ReloadHook
 ---@param path            Path Plenary path object of the absolute file path
 ---@param reloadCallback? function The callback function returned by reloading the lua module
 local hook = function(hookTbl, path, reloadCallback) -- {{{
+    ---@type ReloadHook
     local currentHook
     local matchPathPattern = function(filename, pathPattern)
         if filename == pathPattern or string.match(filename, pathPattern) then
-            local ok, msg = pcall(currentHook.callback, path, reloadCallback)
-            if not ok then
-                vim.notify("Error occurs while loading lua config for " .. filename,
-                    vim.log.levels.ERROR)
-                vim.notify(msg, vim.log.levels.ERROR)
+            if type(currentHook.callback) == "function" then
+                local ok, msg = pcall(currentHook.callback, path, reloadCallback)
+                if not ok then
+                    vim.notify("Error occurs while loading lua config for " .. filename,
+                        vim.log.levels.ERROR)
+                    vim.notify(msg, vim.log.levels.ERROR)
+                end
             end
 
             if currentHook.unloadOnlyChk then
@@ -171,6 +174,7 @@ local hook = function(hookTbl, path, reloadCallback) -- {{{
             return
         end
     end
+
     for _, hook in ipairs(hookTbl) do
         currentHook = hook
         if type(hook.pathPat) == "table" then
@@ -188,7 +192,7 @@ end -- }}}
 ---@param opt        table Options table initialized in `reload/init.lua`
 M.loadFile = function(path, parentPath, opt) -- {{{
     -- Load setup hook
-    hook(opt.setup, path)
+    hook(opt.setupHook, path)
 
     -- Get lua module name
     local module = getModuleName(path, parentPath, opt.moduleSearchPath)
@@ -223,7 +227,7 @@ M.loadFile = function(path, parentPath, opt) -- {{{
             vim.log.levels.INFO)
 
         -- Load configuration AFTER reloading for specific module match the given path
-        hook(opt.config, path, reloadCallback)
+        hook(opt.configHook, path, reloadCallback)
     end
 
 end -- }}}
@@ -288,7 +292,7 @@ M.loadDir = function(path, opt) -- {{{
     end
 
     -- Load setup hook
-    hook(opt.setup, path)
+    hook(opt.setupHook, path)
 
     -- Unloading
     for _, module in ipairs(allLoadedModules) do
@@ -346,7 +350,7 @@ M.loadDir = function(path, opt) -- {{{
         -- Load configuration AFTER reloading for specific module match the given path
         -- Load the hook func at the last element
         if idx == #allLoadedModules then
-            hook(opt.config, path)
+            hook(opt.configHook, path)
         end
     end
 end -- }}}

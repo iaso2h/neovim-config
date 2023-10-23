@@ -268,7 +268,7 @@ _G.tbl_replace = function(tbl, repVal, srcVal, repAllChk, cnt, alertOnFail) -- {
 end -- }}}
 --- Return the 1 based index of specific item in a list-liked table. Only support
 --- number and string for now
---- @param tbl    any[] List-liked table
+--- @param tbl    table List-liked table
 --- @param item   integer|string Item to look up
 --- @param allIdx boolean Whether to return all the indexes as a table
 --- @return integer|integer[] # Return table when `returnIdxTbl` is true

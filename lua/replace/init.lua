@@ -111,29 +111,28 @@ end -- }}}
 ---@param motionRegion table Contains start and end position of operator movement. {1, 0} indexed
 ---@param motionDirection integer 1 indicate motionRegion like "j, w, f" is moving
 ---@param vimMode string Vim mode. See: `:help mode()`
----@param reg table Contain name, type, content of v:register .Can be "line", "char" or "block" forward, -1 indicates motionRegion is moving backward
+---@param reg RegisterInfo
 ---@return table reg The new reg table(might or might not have been modified) otherwise return false
 local matchRegType = function(motionType, motionRegion, motionDirection, vimMode, reg) -- {{{
     -- NOTE:"\<C-v>" for vimMode in vimscript is evaluated as "\22" in lua, which represents blockwise motionRegion
-    -- NOTE:"\0261" in vimscript is evaluated as "\0221" in lua, which represents blockwise-visual register
     -- Vim mode
     --  ├── Normal mode
     --  │    ├── "char" motionRegion type(charwise)
-    --  │    │     ├── "v"     register type
-    --  │    │     ├── "V"     register type
-    --  │    │     └── "<C-v>" register type
+    --  │    │     ├── "v"            register type
+    --  │    │     ├── "V"            register type
+    --  │    │     └── "<C-v>{width}" register type
     --  │    └── "line" motionRegion type(linewise)
     --  └── 3 Visual modes
     --       └── Motion type is the same as the visual mode type("visual", "char", "block").
     --           Defined in operator.lua. Kinda meaningless TBH.
-    --            ├── "v"     register type
-    --            ├── "V"     register type
-    --            └── "<C-v>" register type
+    --            ├── "v"            register type
+    --            ├── "V"            register type
+    --            └── "<C-v>{width}" register type
     local regContentNew
 
     if vimMode == "n" then
         if motionType == "char" then
-            if reg.type == "v" or reg.type == "c" then
+            if reg.type == "v" then
                 -- Do nothing
             else
                 -- Blockwise register type and linewise register type
@@ -142,7 +141,7 @@ local matchRegType = function(motionType, motionRegion, motionDirection, vimMode
             end
         else
         -- elseif motionType == "line" then
-            if reg.type == "v" or reg.type == "c" then
+            if reg.type == "v" then
                 regContentNew = reindent(reg.content, motionRegion, motionDirection, vimMode)
             else
                 -- Blockwise register type and linewise register type
@@ -163,7 +162,8 @@ local matchRegType = function(motionType, motionRegion, motionDirection, vimMode
             reg.content = regContentNew
         end
 
-        reg.type    = "c"
+        -- Always override the register type with character-wise
+        reg.type = "v"
     elseif vimMode == "v" then
         -- No need to modify register
     elseif vimMode == "V" then
@@ -180,10 +180,7 @@ local matchRegType = function(motionType, motionRegion, motionDirection, vimMode
         local lines    = vim.split(reg.content, "\n", {plain = true, trimempty = true})
         local linesCnt = #lines
 
-        if reg.type == "v" or
-                reg.type == "c" or
-                (reg.type == "V" and linesCnt == 1) or
-                (reg.type == "l" and linesCnt == 1) then
+        if reg.type == "v" or (reg.type == "V" and linesCnt == 1) then
             -- If the register contains just a single line, temporarily duplicate
             -- the line to match the height of the blockwise selection.
             local height = motionRegion.Start[1] - motionRegion.End[1] + 1
@@ -199,8 +196,7 @@ local matchRegType = function(motionType, motionRegion, motionDirection, vimMode
                 reg.content = regContentNew
                 reg.type    = "b"
             end
-        elseif (reg.type == "V" and linesCnt > 1) or
-                (reg.type == "l" and linesCnt > 1) then
+        elseif reg.type == "V" and linesCnt > 1 then
             -- If the register contains multiple lines, paste as blockwise. then
             -- TODO:
             ---@diagnostic disable-next-line: param-type-mismatch
@@ -216,7 +212,7 @@ end -- }}}
 ---@param motionType string motionRegion type by which how the operator perform. Can be "line" or "char"
 ---@param motionRegion table Contains start and end position of operator movement. {1, 0} indexed
 ---@param vimMode string Vim mode. See: `:help mode()`
----@param reg table Contain name, type, content of v:register Can be "line", "char" or "block"
+---@param reg RegisterInfo
 ---@param bufNr integer Buffer handler(number)
 ---@return table {repStart = {}, repEnd = {}}
 local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
@@ -395,12 +391,14 @@ function M.operator(opInfo) -- {{{
         -- To get the expression result into the buffer, we use the unnamed
         -- register; this will be restored anyway.
         vim.fn.setreg('"', vim.g.ReplaceExpr)
+        ---@type RegisterInfo
         reg = {
             name    = '"',
             type    = vim.fn.getregtype(M.regName),
             content = vim.g.ReplaceExpr
         }
     else
+        ---@type RegisterInfo
         reg = {
             name    = M.regName,
             type    = vim.fn.getregtype(M.regName),
@@ -478,7 +476,7 @@ function M.operator(opInfo) -- {{{
         if newContentExmark then
             M.lastReplaceExtmark = newContentExmark
         end
-        if reg.type == "l" or reg.type == "V" then
+        if reg.type == "V" then
             M.lastReplaceLinewise = true
         else
             M.lastReplaceLinewise = false
@@ -532,7 +530,7 @@ function M.operator(opInfo) -- {{{
                 end
             end
         elseif opInfo.vimMode == "v" then
-            if reg.type == "V" or reg.type == "l" then
+            if reg.type == "V" then
                 if M.cursorPos[1] == motionRegion.Start[1] and M.cursorPos[2] == motionRegion.Start[2] then
                     local startLine = vim.api.nvim_buf_get_lines(bufNr,
                         rep.Start[1] - 1, rep.Start[1], false)[1]
