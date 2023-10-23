@@ -71,10 +71,9 @@ M.apply = function () -- {{{
     local names = M.getHighlightName()
 
     for _, name in ipairs(names) do
-        local guibg = randomHex()
-        local guifg = randomHex()
-        local cmd = string.format("highlight! %s guifg=%s guibg=%s", name, guifg, guibg)
-        pcall(vim.api.nvim_command, cmd)
+        local bg = randomHex()
+        local fg = randomHex()
+        pcall(vim.api.nvim_set_hl, 0, name, {fg=fg, bg=bg})
     end
 end -- }}}
 

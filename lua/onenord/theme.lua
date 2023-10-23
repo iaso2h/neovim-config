@@ -3,11 +3,11 @@ local theme = {}
 
 -- Syntax highlight {{{
 theme.syntax = {
-    Comment        = {fg = p.n3b, style = "italic"},
+    Comment        = {fg = p.n3b, italic = true},
 
-    Conditional    = {fg = p.purple, style = "italic"},
-    Keyword        = {fg = p.purple, style = "italic"},
-    Repeat         = {fg = p.purple, style = "italic"},
+    Conditional    = {fg = p.purple, italic = true},
+    Keyword        = {fg = p.purple, italic = true},
+    Repeat         = {fg = p.purple, italic = true},
     Function       = {fg = p.blue},
     Identifier     = {fg = p.white},
     Variable       = {link = "Identifier"},
@@ -24,11 +24,11 @@ theme.syntax = {
     Boolean        = {fg = p.orange}, -- a boolean constant: TRUE, false
     Float          = {fg = p.orange}, -- a floating point constant: 2.3e10
 
-    Statement      = {fg = p.purple, style = "italic"}, -- any statement
+    Statement      = {fg = p.purple, italic = true}, -- any statement
     Parameter      = {fg = p.orange}, -- function parameter
     Decorator      = {fg = p.orange},
     Annotation     = {link = "Decorator"},
-    Label          = {fg = p.red, style = "bold"}, -- case, default, etc.
+    Label          = {fg = p.red, bold = true}, -- case, default, etc.
     Operator       = {fg = p.n8}, -- sizeof", "+", "*", etc.
     Exception      = {fg = p.purple}, -- try, catch, throw
     PreProc        = {fg = p.yellow}, -- generic Preprocessor
@@ -43,21 +43,21 @@ theme.syntax = {
     SpecialComment = {fg = p.n8}, -- special things inside a comment
 
     Debug          = {fg = p.n11}, -- debugging statements
-    Underlined     = {fg = p.n10, style = "underline", sp = p.n10}, -- text that stands out, HTML links
+    Underlined     = {fg = p.n10, underline = true, sp = p.n10}, -- text that stands out, HTML links
     Ignore         = {fg = p.n1}, -- left blank, hidden
 
-    Error          = {fg = p.n11, style = "bold", sp = p.n11}, -- any erroneous construct
-    Todo           = {fg = p.n13, style = "bold,italic"}, -- anything that needs extra attention; mostly the keywords TODO FIXME and XXX
+    Error          = {fg = p.n11, bold = true, sp = p.n11}, -- any erroneous construct
+    Todo           = {fg = p.n13, bold = true, italic = true}, -- anything that needs extra attention; mostly the keywords TODO FIXME and XXX
 
-    htmlLink            = {fg = p.n14,  style = "underline", sp = p.n14},
-    htmlH1              = {fg = p.n8,   style = "bold"},
-    htmlH2              = {fg = p.n11,  style = "bold"},
-    htmlH3              = {fg = p.n14,  style = "bold"},
-    htmlH4              = {fg = p.n15,  style = "bold"},
-    htmlH5              = {fg = p.n9,   style = "bold"},
-    markdownH1          = {fg = p.n8,   style = "bold"},
-    markdownH2          = {fg = p.n11,  style = "bold"},
-    markdownH3          = {fg = p.n14,  style = "bold"},
+    htmlLink            = {fg = p.n14,  underline = true, sp = p.n14},
+    htmlH1              = {fg = p.n8,   bold = true},
+    htmlH2              = {fg = p.n11,  bold = true},
+    htmlH3              = {fg = p.n14,  bold = true},
+    htmlH4              = {fg = p.n15,  bold = true},
+    htmlH5              = {fg = p.n9,   bold = true},
+    markdownH1          = {fg = p.n8,   bold = true},
+    markdownH2          = {fg = p.n11,  bold = true},
+    markdownH3          = {fg = p.n14,  bold = true},
     markdownH1Delimiter = {fg = p.n8},
     markdownH2Delimiter = {fg = p.n11},
     markdownH3Delimiter = {fg = p.n14},
@@ -80,8 +80,8 @@ theme.syntax = {
     vimNotation  = {link = "Character"},
 
     vimSynRegPat = {fg = p.blue},
-    vimSynRegOpt = {fg = "Parameter"},
-    vimSynKeyOpt = {fg = "Parameter"},
+    vimSynRegOpt = {link = "Parameter"},
+    vimSynKeyOpt = {link = "Parameter"},
 
     vimAutoCmdSfxList = {fg = p.cyan},
 
@@ -96,7 +96,7 @@ theme.editor =  {
     Normal      = {fg = p.n4,  bg = p.n0},
     NormalFloat = {bg = p.n0},
     FloatBorder = {fg = p.n3b, bg = p.n0},
-    FloatTitle  = {fg = p.n8,  bg = p.n0, style = "bold"},
+    FloatTitle  = {fg = p.n8,  bg = p.n0, bold = true},
 
 
     NonText     = {fg = p.n3},
@@ -104,8 +104,8 @@ theme.editor =  {
     EndOfBuffer = {link = "NonText"},
 
 
-    Cursor       = {fg = p.white, style = "reverse"},
-    CursorIM     = {fg = p.white, style = "reverse"},
+    Cursor       = {fg = p.white, reverse = true},
+    CursorIM     = {fg = p.white, reverse = true},
     CursorColumn = {bg = p.n1},
     CursorLine   = {bg = p.n1},
 
@@ -116,43 +116,43 @@ theme.editor =  {
     DiffAdd    = {bg = "#43514b"},
     DiffChange = {bg = "#3e4d5a"},
     DiffDelete = {bg = "#4b3d48", fg = p.n3},
-    DiffText   = {bg = "#526c7a", style = "bold"},
+    DiffText   = {bg = "#526c7a", bold = true},
 
 
-    IncSearch = {fg = p.w, bg = "#ED427C", style = "bold"},
-    Search    = {fg = p.w, bg = p.n8,      style = "bold"},
+    IncSearch = {fg = p.w, bg = "#ED427C", bold = true},
+    Search    = {fg = p.w, bg = p.n8,      bold = true},
     CurSearch = {link = "IncSearch"},
 
 
-    MatchParen = {fg = p.n8, bg = p.n3b, style = "bold"},
-    MatchWord  = {fg = p.n8, bg = p.n3,  style = "bold"},
+    MatchParen = {fg = p.n8, bg = p.n3b, bold = true},
+    MatchWord  = {fg = p.n8, bg = p.n3,  bold = true},
 
 
     ErrorMsg    = {fg = p.n4, bg = p.n11},
     WarningMsg  = {fg = p.b,  bg = p.n13},
     ModeMsg     = {fg = p.n4},
-    MoreMsg     = {fg = p.n8, style = "bold"},
-    Question    = {fg = p.n8, style = "italic"},
+    MoreMsg     = {fg = p.n8, bold = true},
+    Question    = {fg = p.n8, italic = true},
 
 
     Pmenu      = {fg = p.n4,   bg = p.n1},
-    PmenuSel   = {fg = "NONE", bg = p.n2,   style = "bold"},
+    PmenuSel   = {fg = "", bg = p.n2,   bold = true},
     PmenuSbar  = {fg = p.n4,   bg = p.n3},
     PmenuThumb = {fg = p.n4,   bg = p.n10},
     WildMenu   = {link = "PmenuSel"},
 
 
-    SpellBad   = {fg = p.n11, style = "italic,undercurl"},
-    SpellCap   = {fg = p.n7,  style = "italic,undercurl"},
-    SpellLocal = {fg = p.n8,  style = "italic,undercurl"},
-    SpellRare  = {fg = p.n9,  style = "italic,undercurl"},
+    SpellBad   = {fg = p.n11, italic = true, undercurl = true},
+    SpellCap   = {fg = p.n7,  italic = true, undercurl = true},
+    SpellLocal = {fg = p.n8,  italic = true, undercurl = true},
+    SpellRare  = {fg = p.n9,  italic = true, undercurl = true},
 
 
-    Folded       = {fg = p.n8, style = "bold"},
+    Folded       = {fg = p.n8, bold = true},
     FoldColumn   = {fg = p.n2},
     ColorColumn  = {bg = p.n1},
     LineNr       = {fg = p.n3},
-    CursorLineNr = {fg = p.n6, style = "bold"},
+    CursorLineNr = {fg = p.n6, bold = true},
 
 
     SignColumn = {fg = p.n1},
@@ -173,19 +173,19 @@ theme.editor =  {
     TabLineSel  = {fg = p.n8, bg = p.n3},
 
 
-    Title      = {fg = p.n8, style = "bold"},
+    Title      = {fg = p.n8, bold = true},
     SpecialKey = {fg = p.n12},
     Directory  = {fg = p.n7},
 
 
-    QuickFixLine = {bg = p.n1, style = "bold"},
+    QuickFixLine = {bg = p.n1, bold = true},
     qfLineNr     = {link = "LineNr"},
     qfFileName   = {link = "Directory"},
-    qfError      = {fg = p.n11, style = "bold"},
+    qfError      = {fg = p.n11, bold = true},
 
 
-    Visual    = {bg = p.n2, style = "bold"},
-    VisualNOS = {bg = p.n2, style = "bold"},
+    Visual    = {bg = p.n2, bold = true},
+    VisualNOS = {bg = p.n2, bold = true},
 
 
     healthError   = {fg = p.n11, bg = p.n1},
@@ -195,7 +195,7 @@ theme.editor =  {
     helpHyperTextEntry = {link = "Label"},
     helpHyperTextJump  = {fg = p.n15},
     helpSpecial        = {fg = p.orange},
-    helpHeader         = {fg = p.n10, style = "bold"}
+    helpHeader         = {fg = p.n10, bold = true}
 }
 -- }}} Editor highlight
 
@@ -203,8 +203,8 @@ theme.editor =  {
 
 theme.treesitter         = {
     TSNone               = {fg   = p.n4},
-    TSStrong             = {fg   = p.n4,  style = "bold"},
-    TSStrike             = {fg   = p.n4,  style = "strikethrough"},
+    TSStrong             = {fg   = p.n4,  bold = true},
+    TSStrike             = {fg   = p.n4,  strikethrough = true},
     TSMath               = {fg   = p.n15},
     TSEnviroment         = {fg   = p.n15},
     TSEnviromentName     = {link = "TSEnviroment"},
@@ -218,7 +218,7 @@ theme.treesitter         = {
     TSNumber             = {link = "Number"},                    -- For all number
     TSAttribute          = {fg   = p.n15 },                      -- (unstable) TODO: docs
 
-    TSError              = {fg   = p.n6, style = "bold"},        -- For syntax/parser errors.
+    TSError              = {fg   = p.n6, bold = true},        -- For syntax/parser errors.
     TSException          = {link = "Exception"},                 -- For exception related keywords.
     TSFuncMacro          = {link = "Macro"},                    -- For macro defined fuctions (calls and definitions): each `macro_rules` in Rust.
     TSInclude            = {link = "Include"},                   -- For includes: `#include` in C, `use` or `extern crate` in Rust, or `require` in Lua.
@@ -231,22 +231,22 @@ theme.treesitter         = {
     TSPunctSpecial       = {fg   = p.n8 },                       -- For special punctutation that does not fall in the catagories before.
     TSSymbol             = {fg   = p.n15 },                      -- For identifiers referring to symbols or atoms.
     TSType               = {link = "Type"},                      -- For types.
-    TSTypeBuiltin        = {fg = p.yellow, style = "bold"},      -- For builtin types.
+    TSTypeBuiltin        = {fg = p.yellow, bold = true},      -- For builtin types.
     TSTag                = {link = "Tag"},                       -- Tags like html tag names.
     TSTagDelimiter       = {link = "Tag"},                       -- Tag delimiter like `<` `>` `/`
     TSText               = {link = "Identifier"},                -- For strings considen11 text in a markup language.
     TSTextReference      = {link = "helpHyperTextJump"},         -- FIXME
-    TSEmphasis           = {fg   = p.n4, style = "bold"},        -- For text to be represented with emphasis.
-    TSUnderline          = {fg   = p.n4, style = "underline", sp = p.n4 },  -- For text to be represented with an underline.
+    TSEmphasis           = {fg   = p.n4, bold = true},        -- For text to be represented with emphasis.
+    TSUnderline          = {fg   = p.n4, underline = true, sp = p.n4 },  -- For text to be represented with an underline.
     TSLiteral            = {link = "Comment"},                   -- Help document code.
-    TSURI                = {fg   = p.n4, style = "underline", sp = p.n4 },  -- Any URI like a link or email.
+    TSURI                = {fg   = p.n4, underline = true, sp = p.n4 },  -- Any URI like a link or email.
     TSAnnotation         = {link = "Decorator"},                 -- For C++/Dart attributes, annotations that can be attached to the code to denote some kind of meta information.
     ["@constructor"]           = {link = "Structure"},
     ["@constant"]              = {link = "Constant"},
     ["@float"]                 = {link = "Float"},
     ["@number"]                = {link = "Number"},
     ["@attribute"]             = {fg   = p.n15 },
-    ["@error"]                 = {fg   = p.n6, style = "bold"},
+    ["@error"]                 = {fg   = p.n6, bold = true},
     ["@exception"]             = {link = "Exception"},
     ["@funtion.macro"]         = {link = "Macro"},
     ["@include"]               = {link = "Include"},
@@ -267,7 +267,7 @@ theme.treesitter         = {
     ["@text.underline"]        = {link = "TSUnderline"},
     ["@text.literal"]          = {link = "TSLiteral"},
     ["@text.uri"]              = {link = "TSURI"},
-    ["@text.strike"]           = {fg = p.n4, style = "strikethrough"},
+    ["@text.strike"]           = {fg = p.n4, strikethrough = true},
     ["@text.math"]             = {fg = p.n7 },
     -- @ (e.g. for LaTeX math environments)
     -- @todo Missing highlights
@@ -282,10 +282,10 @@ theme.treesitter         = {
     -- @tag.attribute
     -- @string.special
 }
-    theme.treesitter.TSVariableBuiltin    = {fg   = p.cyan, style  = "bold" }
+    theme.treesitter.TSVariableBuiltin    = {fg   = p.cyan, bold = true }
     theme.treesitter.TSBoolean            = {link = "Boolean"}
-    theme.treesitter.TSConstBuiltin       = {fg   = p.orange, style = "bold" }
-    theme.treesitter.TSConstMacro         = {fg   = p.orange, style = "bold" }
+    theme.treesitter.TSConstBuiltin       = {fg   = p.orange, bold = true }
+    theme.treesitter.TSConstMacro         = {fg   = p.orange, bold = true }
     theme.treesitter.TSVariable           = {link = "Identifier"}
     theme.treesitter.TSTitle              = {link = "helpHeader"}
     theme.treesitter["@variable"]         = {link = "Identifier"}
@@ -311,13 +311,13 @@ theme.treesitter         = {
     -- Language keywords
     theme.treesitter.TSKeyword         = {link = "Keyword"} -- For keywords that don't fall in other categories.
     theme.treesitter.TSKeywordFunction = {link = "Keyword"}
-    theme.treesitter.TSKeywordReturn   = {fg   = p.purple, bg = "#564167", style = "italic,bold"}
+    theme.treesitter.TSKeywordReturn   = {fg   = p.purple, bg = "#564167", bold = true, italic = true}
     theme.treesitter.TSKeyordOperator  = {link = "Keyword"}
     theme.treesitter.TSRepeat          = {link = "Repeat"} -- For keywords related to loops.
     -- Strings
     theme.treesitter.TSString             = {link = "String"}                  -- For strings.
-    theme.treesitter.TSStringRegex        = {fg   = p.n7, style  = "italic" }  -- For regexes.
-    theme.treesitter.TSStringEscape       = {fg   = p.n15, style = "italic" }  -- For escape characters within a string.
+    theme.treesitter.TSStringRegex        = {fg   = p.n7, italic = true }  -- For regexes.
+    theme.treesitter.TSStringEscape       = {fg   = p.n15, italic = true }  -- For escape characters within a string.
     theme.treesitter.TSCharacter           = {link = "String"}                  -- For characters.
     theme.treesitter["@comment"]           = {link = "Comment"}
     theme.treesitter["@conditional"]       = {link = "Conditional"}
@@ -325,7 +325,7 @@ theme.treesitter         = {
     theme.treesitter["@function.builtin"]  = {link = "TSFuncBuiltin"}
     theme.treesitter["@method"]            = {link = "Function"}
     theme.treesitter["@namespace"]         = {link = "TSNamespace"}
-    theme.treesitter["@namespace.builtin"] = {fg = "#00ffe5", style = "bold"}
+    theme.treesitter["@namespace.builtin"] = {fg = "#00ffe5", bold = true}
     theme.treesitter["@field"]             = {link = "TSField"}
     theme.treesitter["@property"]          = {link = "TSField"}
     theme.treesitter["@keyword"]           = {link = "Keyword"}
@@ -341,14 +341,14 @@ theme.treesitter         = {
 -- }}}
 
 theme.lsp = { -- {{{
-    DiagnosticError          = {fg = p.n11, style = "bold"},
-    DiagnosticWarn           = {fg = p.n13, style = "bold"},
-    DiagnosticInfo           = {fg = p.n10, style = "bold"},
-    DiagnosticHint           = {fg = p.n9,  style = "bold"},
-    DiagnosticUnderlineError = {sp = p.n11, style = "undercurl"},
-    DiagnosticUnderlineWarn  = {sp = p.n13, style = "undercurl"},
-    DiagnosticUnderlineInfo  = {sp = p.n10, style = "undercurl"},
-    DiagnosticUnderlineHint  = {sp = p.n9,  style = "undercurl"},
+    DiagnosticError          = {fg = p.n11, bold = true},
+    DiagnosticWarn           = {fg = p.n13, bold = true},
+    DiagnosticInfo           = {fg = p.n10, bold = true},
+    DiagnosticHint           = {fg = p.n9,  bold = true},
+    DiagnosticUnderlineError = {sp = p.n11, undercurl = true},
+    DiagnosticUnderlineWarn  = {sp = p.n13, undercurl = true},
+    DiagnosticUnderlineInfo  = {sp = p.n10, undercurl = true},
+    DiagnosticUnderlineHint  = {sp = p.n9,  undercurl = true},
 
     LspDiagnosticsError                = {link = "DiagnosticError"},
     LspDiagnosticsWarning              = {link = "DiagnosticWarn"},
@@ -390,7 +390,7 @@ theme.plugins = { -- {{{
     diffIndexLine = {fg = p.n9},
 
     -- https://github.com/rhysd/git-messenger.vim
-    gitmessengerHeader  = {fg = p.n8, style = "bold"},
+    gitmessengerHeader  = {fg = p.n8, bold = true},
     gitmessengerHistory = {fg = p.n11},
 
     -- https://github.com/lewis6991/gitsigns.nvim
@@ -405,25 +405,25 @@ theme.plugins = { -- {{{
     GitSignsDeleteLn = {fg = p.n11}, -- diff mode: Deleted line |diff.txt|
 
     -- https://github.com/nvim-telescope/telescope.nvim
-    TelescopePromptTitle   = {fg = p.n4, style = "bold"},
+    TelescopePromptTitle   = {fg = p.n4, bold = true},
     TelescopePromptBorder  = {link = "FloatBorder"},
-    TelescopePromptCounter = {fg = p.n13, style = "bold"},
-    TelescopePromptPrefix  = {fg = p.n13, style = "bold"},
+    TelescopePromptCounter = {fg = p.n13, bold = true},
+    TelescopePromptPrefix  = {fg = p.n13, bold = true},
 
     TelescopePreviewBorder = {link = "FloatBorder"},
     TelescopePreviewTitle  = {link = "TelescopePromptTitle"},
 
     TelescopeResultsBorder = {fg = p.n8},
-    TelescopeResultsTitle  = {fg = p.n8, style = "bold"},
-    TelescopeSelection     = {bg = p.n2, style = "bold"},
+    TelescopeResultsTitle  = {fg = p.n8, bold = true},
+    TelescopeSelection     = {bg = p.n2, bold = true},
     TelescopeMatching      = {fg = p.n13},
 
     -- https://github.com/kyazdani42/nvim-tree.lua
     NvimTreeNormal           = {fg    = p.n4, bg = p.sidebar},
     NvimTreeFolderName       = {fg    = p.white},
     NvimTreeFolderIcon       = {link  = "NvimTreeFolderName"},
-    NvimTreeRootFolder       = {fg    = p.n10, style = "bold"},
-    NvimTreeOpenedFolderName = {fg    = p.w,  style = "bold,italic"},
+    NvimTreeRootFolder       = {fg    = p.n10, bold = true},
+    NvimTreeOpenedFolderName = {fg    = p.w,  bold = true, italic = true},
     NvimTreeOpenedFolderIcon = {link  = "NvimTreeOpenedFolderName"},
     NvimTreeOpenedFile       = {link  = "NvimTreeOpenedFolderName"},
     NvimTreeGitIgnored       = {fg    = p.n3},
@@ -436,15 +436,15 @@ theme.plugins = { -- {{{
     NvimTreeImageFile        = {fg    = p.n15},
     NvimTreeMarkdownFile     = {fg    = p.blue},
     NvimTreeExecFile         = {fg    = p.n15},
-    NvimTreeSpecialFile      = {fg    = p.n9 , style = "underline", sp = p.n9},
+    NvimTreeSpecialFile      = {fg    = p.n9 , underline = true, sp = p.n9},
     NvimTreeSymlink          = {fg    = p.purple},
     NvimTreeEmptyFolderName  = {fg    = p.n3b},
     NvimTreeIndentMarker     = {link  = "FoldColumn"},
 
     -- https://github.com/folke/which-key.nvim
-    WhichKey =          {fg = p.n4 , style = "bold"},
+    WhichKey =          {fg = p.n4 , bold = true},
     WhichKeyGroup =     {fg = p.n4},
-    WhichKeyDesc =      {fg = p.n7, style = "italic"},
+    WhichKeyDesc =      {fg = p.n7, italic = true},
     WhichKeySeperator = {fg = p.n9},
     WhichKeyFloating =  {link = "FloatBorder"},
     WhichKeyFloat =     {link = "FloatBorder"},
@@ -467,13 +467,13 @@ theme.plugins = { -- {{{
     -- https://github.com/rcarriga/nvim-dap-ui
     DapUINormal                  = {link = "Normal"},
     DapUIVariable                = {fg   = p.n9},
-    DapUIScope                   = {fg   = p.n14, style = "bold"},
+    DapUIScope                   = {fg   = p.n14, bold = true},
     DapUIType                    = {fg   = p.orange},
     DapUIValue                   = {link = "Identifier"},
-    DapUIModifiedValue           = {fg   = p.n13, style = "bold"},
+    DapUIModifiedValue           = {fg   = p.n13, bold = true},
     DapUIDecoration              = {fg   = p.n8},
     DapUIThread                  = {fg   = p.n14},
-    DapUIStoppedThread           = {fg   = p.n14, style = "bold"},
+    DapUIStoppedThread           = {fg   = p.n14, bold = true},
     DapUIFrameName               = {link = "NormalFloat"},
     DapUISource                  = {fg   = p.purple},
     DapUILineNumber              = {fg   = p.n13},
@@ -484,7 +484,7 @@ theme.plugins = { -- {{{
     DapUIWatchesValue            = {fg   = p.n14},
     DapUIBreakpointsPath         = {link = "DapUIStoppedThread"},
     DapUIBreakpointsInfo         = {fg   = p.n14},
-    DapUIBreakpointsCurrentLine  = {fg   = p.n14, style = "bold"},
+    DapUIBreakpointsCurrentLine  = {fg   = p.n14, bold = true},
     DapUIBreakpointsLine         = {link = "DapUILineNumber"},
     DapUIBreakpointsDisabledLine = {fg   = p.n3b},
     DapUICurrentFrameName        = {link = "DapUIBreakpointsCurrentLine"},
@@ -509,7 +509,7 @@ theme.plugins = { -- {{{
     DapUIStepOutNC               = {link = "DapUIStepOut"},
 
     -- https://github.com/theHamsta/nvim-dap-virtual-text
-    NvimDapVirtualText        = {fg = p.n9, bg = p.n1, style = "italic"},
+    NvimDapVirtualText        = {fg = p.n9, bg = p.n1, italic = true},
     NvimDapVirtualTextChanged = {link = "DapUIModifiedValue"},
 
     -- https://github.com/phaazon/hop.nvim
@@ -522,19 +522,19 @@ theme.plugins = { -- {{{
     NvimSurroundHighlight = {link = "Search"},
 
     -- HistoryStartup
-    HistoryStartupCreate   = {fg = p.n10, style = "bold"},
-    HistoryStartupFileRoot = {fg = p.n8,  style = "bold"},
+    HistoryStartupCreate   = {fg = p.n10, bold = true},
+    HistoryStartupFileRoot = {fg = p.n8,  bold = true},
 
     -- https://github.com/kosayoda/nvim-lightbulb
     -- LightBulbVirtualText = {link = "DiagnosticHint"},
 
     -- https://github.com/hrsh7th/nvim-cmp
     CmpItemAbbr           = {fg = p.white},
-    CmpItemAbbrDeprecated = {fg = p.white, bg = "NONE", style = "strikethrough" },
-    CmpItemAbbrMatch      = {fg = p.w,     bg = "NONE", style = "bold"},
+    CmpItemAbbrDeprecated = {fg = p.white, bg = "", strikethrough = true },
+    CmpItemAbbrMatch      = {fg = p.w,     bg = "", bold = true},
     CmpItemAbbrMatchFuzzy = {link = "CmpItemAbbrMatch"},
     CmpItemKind           = {fg = p.n15},
-    CmpItemMenu           = {fg = p.n3b,  bg = "NONE", style = "italic" },
+    CmpItemMenu           = {fg = p.n3b,  bg = "", italic = true },
     -- https://github.com/hrsh7th/nvim-cmp/wiki/Menu-Appearance#how-to-add-visual-studio-code-codicons-to-the-menu
     CmpItemKindField         = {fg = p.cyan},
     CmpItemKindProperty      = {link = "CmpItemKindField"},
@@ -566,7 +566,7 @@ theme.plugins = { -- {{{
     CmpItemKindEmoji   = {fg = p.n13},
 
     -- https://github.com/ray-x/lsp_signature.nvim
-    LspSignatureActiveParameter = {bg = p.n1, style = "bold"},
+    LspSignatureActiveParameter = {bg = p.n1, bold = true},
 
     -- https://github.com/michaelb/sniprun
     SniprunVirtualTextOk  = {bg=p.n8, fg=p.w},
@@ -575,18 +575,18 @@ theme.plugins = { -- {{{
     SniprunFloatingWinErr = {fg=p.n11},
 
     -- https://github.com/nvim-treesitter/nvim-treesitter-context
-    TreesitterContext           = {style = "bold"},
-    TreesitterContextLineNumber = {fg = p.n3b, style = "bold"},
+    TreesitterContext           = {bold = true},
+    TreesitterContextLineNumber = {fg = p.n3b, bold = true},
     TreesitterContextBottom     = {link  = "TreesitterContextLineNumber"},
 
     -- https://github.com/simrat39/symbols-outline.nvim
-    FocusedSymbol           = {fg = p.n10, style = "bold,italic"},
+    FocusedSymbol           = {fg = p.n10, bold = true, italic = true},
     SymbolsOutlineConnector = {fg = p.n2},
 
     -- https://github.com/L3MON4D3/LuaSnip
-    -- LuasnipSnippetNodeActive         = {style = "bold"},
-    -- LuasnipSnippetNodePassive        = {style = "NONE"},
-    -- LuasnipSnippetNodeSnippetPassive = {style = "NONE"},
+    -- LuasnipSnippetNodeActive         = {bold = true},
+    -- LuasnipSnippetNodePassive        = {},
+    -- LuasnipSnippetNodeSnippetPassive = {},
 } -- }}}
 
 theme.loadTerminal = function()

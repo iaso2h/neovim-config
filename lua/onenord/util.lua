@@ -1,5 +1,4 @@
 local M   = {}
-local ok, msg
 
 --- Go trough the table and highlight the group with the color values
 ---@class colors
@@ -9,24 +8,13 @@ local ok, msg
 ---@field bg string
 ---@field sp string
 ---@param groupName string
----@param color colors Hex code of color(with "#" prefix)
-M.hi = function (groupName, color)
-    if color.link then
-        ok, msg = pcall(vim.api.nvim_command, string.format([[highlight! link %s %s]], groupName, color.link))
-    else
-        local style = color.style and "gui="   .. color.style or "gui=NONE"
-        local fg    = color.fg    and "guifg=" .. color.fg    or "guifg=NONE"
-        local bg    = color.bg    and "guibg=" .. color.bg    or "guibg=NONE"
-        local sp    = color.sp    and "guisp=" .. color.sp    or ""
-
-        local hl = string.format("highlight %s %s %s %s %s", groupName, style, fg, bg, sp)
-
-        ok, msg = pcall(vim.api.nvim_command, hl)
-    end
-
+---@param opts table Highlight definition options
+M.hi = function (groupName, opts)
+    opts.default = false
+    local ok, msgOrVal = pcall(vim.api.nvim_set_hl, 0, groupName, opts)
     if not ok then
-        vim.notify("Error detect while setting " .. groupName, vim.log.levels.ERROR)
-        vim.notify(msg, vim.log.levels.ERROR)
+        vim.notify("Error detected while setting highlight for " .. groupName, vim.log.levels.ERROR)
+        vim.notify(msgOrVal, vim.log.levels.ERROR)
     end
 end
 
