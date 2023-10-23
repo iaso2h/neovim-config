@@ -209,7 +209,7 @@ function M.saveReg() -- {{{
         star = {}
         plus = {}
     else
-        star = getReg('*')
+        star = getReg("*")
         plus = getReg("+")
     end
 
@@ -221,19 +221,19 @@ function M.saveReg() -- {{{
     end
 
     M.restoreReg = function()
-        if not next(specific) then
+        if next(specific) then
             setReg(specific)
         end
 
-        if not next(star) then
+        if next(star) then
             setReg(star)
         end
 
-        if not next(plus) then
+        if next(plus) then
             setReg(plus)
         end
 
-        if not next(unnamed) then
+        if next(unnamed) then
             setReg(unnamed)
             setReg(zero)
         end
