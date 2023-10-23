@@ -129,7 +129,7 @@ M.bufSwitchAlter = function(winId, bufNr) -- {{{
                     end
                 end
             end
-            vim.notify("Failed to switch alternative buffer in Windows: " .. winId, vim.log.ERROR)
+            vim.notify(string.format("Failed to switch alternative buffer for the buffer %d in Windows: %d", bufNr, winId), vim.log.ERROR)
         else
             -- Do nothing
         end
@@ -146,15 +146,17 @@ M.bufOccurInWins = function(bufNr, winIds) -- {{{
     local bufCnt = 0
     local winIds = {}
     for _, winId in ipairs(var.winIds) do
-        if bufNr == vim.api.nvim_win_get_buf(winId) then
-            bufCnt = bufCnt + 1
-            winIds[#winIds+1] = winId
+        if vim.api.nvim_win_is_valid(winId) then
+            if bufNr == vim.api.nvim_win_get_buf(winId) then
+                bufCnt = bufCnt + 1
+                winIds[#winIds+1] = winId
+            end
         end
     end
 
     return bufCnt, winIds
 end -- }}}
---- Check how many buffers in the specified buffer table occur in the specified window table
+--- Check how many buffers from the specified buffer table occur in the specified window table
 ---@param bufNrs? table If it isn't provided, the `var.bufNrs` will be used instead
 ---@param winIds? table If it isn't provided, the `var.winIds` will be used instead
 ---@return integer # The occurrence time

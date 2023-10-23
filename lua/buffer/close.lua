@@ -1,8 +1,8 @@
 -- File: /buf/close.lua
 -- Author: iaso2h
 -- Description: Deleting buffer without changing the window layout
--- Version: 0.1.8
--- Last Modified: Sat 06 May 2023
+-- Version: 0.1.9
+-- Last Modified: 2023-10-23
 local u   = require("buffer.util")
 local var = require("buffer.var")
 local M   = {}
@@ -51,14 +51,11 @@ local specialBufHandler = function(postRearrange, handler) -- {{{
             return true
         elseif string.match(var.bufName, [[%[nvim%-lua%]$]]) then
             -- Check for Lua pad
-            if u.bufsOccurInWins() >= 1 and postRearrange then
+            -- The nvim-lua buffer is already included in the `var.bufNrs`
+            if u.bufsOccurInWins() >= 2 and postRearrange then
                 u.bufSwitchAlter()
             else
-                if postRearrange then
-                    -- HACK: hmm mm... I wonder when will this happen
-                    u.bufClose(nil, true)
-                    return vim.notify("Closing lua pad", vim.log.levels.ERROR)
-                end
+                require("historyStartup").display(true)
             end
             return true
         end
