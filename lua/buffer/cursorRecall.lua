@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Derived from and simplified:
 -- Credit: https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
--- Version: 0.0.8
--- Last Modified: 2023-10-21
+-- Version: 0.0.9
+-- Last Modified: 2023-10-23
 
 local ignoreBuftype = {
         'quickfix',
@@ -83,7 +83,7 @@ return function(args)
             -- Go to the newest change first then the older one
             local jumpUtil = require("jump.util")
             local changesCmdRaw = jumpUtil.getJumpsCmd("changes", false)
-            if #changesCmdRaw == 2 then
+            if #changesCmdRaw <= 2 then
                 -- It's a newfile with no changelist or it's already at newest change
                 return
             else
