@@ -238,7 +238,7 @@ local pluginArgs = { -- {{{
         init  = function() vim.g.camelcasemotion_key = "," end
     },
     {
-        "phaazon/hop.nvim",
+        "iaso2h/hop.nvim",
         keys = {
             { [[<leader>f]], mode = "n" },
             { [[<leader>f]], mode = "x" },
@@ -248,8 +248,10 @@ local pluginArgs = { -- {{{
         config = function()
             require("hop").setup {
                 case_insensitive = false,
+                create_hl_autocmd = false
             }
             map("", [[<leader>f]], require("hop").hint_char1, "Hop char")
+            map("", [[<leader>F]], require("hop").hint_nodes, "Hop char")
         end
     },
     -- TODO: skip asking for input when performing a dot-repeat
