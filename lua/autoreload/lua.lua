@@ -149,25 +149,36 @@ local getModuleName = function(path, parentPath, moduleSearchPath) -- {{{
     end
 end -- }}}
 --- Call functions before or after reloading specifc lua module
----@param hookTbl         table
+---@param hookTbl         reloadHook
 ---@param path            Path Plenary path object of the absolute file path
 ---@param reloadCallback? function The callback function returned by reloading the lua module
 local hook = function(hookTbl, path, reloadCallback) -- {{{
-    for _, tbl in ipairs(hookTbl) do
-        if path.filename == tbl.pathPat or string.match(path.filename, tbl.pathPat) then
-            local ok, msg = pcall(tbl.callback, path, reloadCallback)
+    local currentHook
+    local matchPathPattern = function(filename, pathPattern)
+        if filename == pathPattern or string.match(filename, pathPattern) then
+            local ok, msg = pcall(currentHook.callback, path, reloadCallback)
             if not ok then
-                vim.notify("Error occurs while loading lua config for " .. path.filename,
+                vim.notify("Error occurs while loading lua config for " .. filename,
                     vim.log.levels.ERROR)
                 vim.notify(msg, vim.log.levels.ERROR)
             end
 
-            if tbl.unloadOnlyChk then
+            if currentHook.unloadOnlyChk then
                 M.unloadOnlyChk = true
             end
 
             -- Load hook function only once
             return
+        end
+    end
+    for _, hook in ipairs(hookTbl) do
+        currentHook = hook
+        if type(hook.pathPat) == "table" then
+            for _, pathPat in ipairs(hook.pathPat) do
+                matchPathPattern(path.filename, pathPat)
+            end
+        elseif type(hook.pathPat) == "string" then
+            matchPathPattern(path.filename, hook.pathPat)
         end
     end
 end -- }}}
@@ -224,56 +235,63 @@ M.loadDir = function(path, opt) -- {{{
     local allParentStr = path:parents()
     local moduleSearchPathStr = opt.moduleSearchPath.filename
     local i = tbl_idx(allParentStr, moduleSearchPathStr, false)
-    local topParentStr     = allParentStr[i - 1]
-    local topParentTailStr = util.getTail(topParentStr)
-    local pathTailRootStr  = util.getTail(path.filename:sub(1, -5))
+    local directParentStr     = allParentStr[i - 1]
+    local directParentTailStr = util.getTail(directParentStr)
+    local pathTailRootStr     = util.getTail(path.filename:sub(1, -5))
 
-    local allRelStr = vim.tbl_flatten((getAllRelStr(topParentStr, moduleSearchPathStr)))
-    if not next(allRelStr) then return end
+    local allRelStrs = vim.tbl_flatten((getAllRelStr(directParentStr, moduleSearchPathStr)))
+    if not next(allRelStrs) then return end
 
-    local allAbsStr = vim.tbl_map(function(relStr)
+    local allAbsStrs = vim.tbl_map(function(relStr)
         return moduleSearchPathStr .. util.sep .. relStr
-    end, allRelStr)
+    end, allRelStrs)
 
     -- Convert to module name form valid for `require()` function call
-    local allModule = vim.tbl_map(function(relStr)
+    local allModules = vim.tbl_map(function(relStr)
         relStr = relStr:gsub(util.sep, ".")
         relStr = relStr:gsub(".lua$", "")
         return relStr
-    end, allRelStr)
-    -- Avoid the first lua directory module loaded as `<dirname>.lua` instead as `<dirname>`
-    if not package.loaded[allModule[1]] then
-        allModule[1] = allModule[1] .. ".lua"
+    end, allRelStrs)
+    -- Fix the first lua module, namingly the directory module, wasn't loaded as
+    -- `require(<dirname>.lua)` instead of `require(<dirname>)`
+    if not package.loaded[allModules[1]] then
+        if package.loaded[allModules[1] .. ".lua"] then
+            allModules[1] = allModules[1] .. ".lua"
+        end
     end
 
-    -- Only unload and reload module found in the `package.loaded` table
-    local allLoadedModule = vim.tbl_filter(function(module)
+
+    -- Only unload and reload modules found in the `package.loaded` table
+    local allLoadedModules = vim.tbl_filter(function(module)
         if package.loaded[module] ~= nil then
             return true
         else
             return false
         end
-    end, allModule)
+    end, allModules)
 
-    if #allLoadedModule == 0 then return end
-    -- No need to reload other module except the `<dirname>.lua` file and the
-    -- init.lua when that module isn't loaded in runtime. Doesn't worth
+    if #allLoadedModules == 0 then return end
+
+    -- No need to reload other modules except the `<dirname>.lua` file and the
+    -- `init.lua` file when that module isn't loaded in runtime. Doesn't worth
     -- reloading the whole directory because of it
-    if pathTailRootStr ~= "init" and pathTailRootStr ~= topParentTailStr and
-        not vim.tbl_contains(allLoadedModule, allModule[tbl_idx(allAbsStr, path.filename, false)]) then
+    if pathTailRootStr ~= "init" and pathTailRootStr ~= directParentTailStr and
+        not vim.tbl_contains(allLoadedModules, allModules[tbl_idx(allAbsStrs, path.filename, false)]) then
+
         return
     end
 
     -- Prompt to save other buffers under the same directory when they are modified
-    if #allRelStr ~= 1 then
-        checkOtherOpenMod(allAbsStr, topParentTailStr)
+    if #allRelStrs ~= 1 then
+        -- TODO:
+        checkOtherOpenMod(allAbsStrs, directParentTailStr)
     end
 
     -- Load setup hook
     hook(opt.setup, path)
 
     -- Unloading
-    for _, module in ipairs(allLoadedModule) do
+    for _, module in ipairs(allLoadedModules) do
         package.loaded[module] = nil
     end
 
@@ -283,10 +301,10 @@ M.loadDir = function(path, opt) -- {{{
     end
 
     -- Reloading
-    for idx, module in ipairs(allLoadedModule) do
-        local moduleIdx = tbl_idx(allModule, module, false)
-        local relStr = allRelStr[moduleIdx]
-        local absStr = allAbsStr[moduleIdx]
+    for idx, module in ipairs(allLoadedModules) do
+        local moduleIdx = tbl_idx(allModules, module, false)
+        local relStr = allRelStrs[moduleIdx]
+        local absStr = allAbsStrs[moduleIdx]
 
         local fileChkStr
         -- When moduleIdx == 1, even if the file ends with `.lua`, it's
@@ -309,9 +327,9 @@ M.loadDir = function(path, opt) -- {{{
                 vim.notify(" ", vim.log.levels.INFO)
                 vim.notify(msg, vim.log.levels.ERROR)
                 vim.notify(" ", vim.log.levels.INFO)
-                for j = idx, #allLoadedModule, 1 do
+                for j = idx, #allLoadedModules, 1 do
                     vim.notify(
-                        string.format("Lua module[%s] has been unloaded", allLoadedModule[j]),
+                        string.format("Lua module[%s] has been unloaded", allLoadedModules[j]),
                         vim.log.levels.INFO)
                 end
             else
@@ -327,7 +345,7 @@ M.loadDir = function(path, opt) -- {{{
 
         -- Load configuration AFTER reloading for specific module match the given path
         -- Load the hook func at the last element
-        if idx == #allLoadedModule then
+        if idx == #allLoadedModules then
             hook(opt.config, path)
         end
     end
