@@ -49,9 +49,11 @@ return {
         FileUnmerged     = "",
         FileUnstaged     = "",
         FileUntracked    = "U",
-        Diff             = "",
+        Diff             = "",
         Repo             = "",
         Octoface         = "",
+        Octocat          = "",
+        OctocatSolid     = "",
         Branch           = "",
     }, -- }}}
     ui = { -- {{{
@@ -164,15 +166,18 @@ return {
         Trace           = "",
         Warning         = "",
         WarningBold     = "",
+        Doctor          = "",
+        Stethoscope     = ""
     }, -- }}}
     misc = { -- {{{
         CircuitBoard = "",
         Package      = "",
-        Robot        = "ﮧ",
+        Robot        = "",
         Smiley       = "",
         Squirrel     = "",
         Tag          = "",
         Watch        = "",
+        Remote       = "",
     }, -- }}}
     debug = { -- {{{
         Breakpoint = "",

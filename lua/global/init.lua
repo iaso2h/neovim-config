@@ -55,6 +55,10 @@ _G._short_line_infos = { -- {{{
         name = "Mason",
         icon = ""
     },
+    checkhealth = {
+        name = "Checkhealth",
+        icon = icon.diagnostics.Doctor
+    },
     ["dap-float"] = {
         name = "Dap Float",
         icon = ""
@@ -83,10 +87,6 @@ _G._short_line_infos = { -- {{{
         name = "Scopes",
         icon = icon.ui.Scopes
     },
-    tsplayground = {
-        name = "Tree-sitter Playground",
-        icon = icon.kind.Keyword
-    },
     Outline = {
         name = "Outline",
         icon = icon.ui.Outline
@@ -94,6 +94,14 @@ _G._short_line_infos = { -- {{{
     startuptime = {
         name = "Startup Time",
         icon = icon.ui.Dashboard
+    },
+    tsplayground = {
+        name = "Tree-sitter Playground",
+        icon = icon.kind.Keyword
+    },
+    man = {
+        name = "Manual",
+        icon = icon.ui.Documentation
     },
     help = {
         name = "Help",
@@ -103,12 +111,16 @@ _G._short_line_infos = { -- {{{
         name = "Nvim Tree",
         icon = icon.ui.Flag
     },
+    gitcommit = {
+        name = "Git commit",
+        icon = icon.git.Octocat
+    },
     DiffviewFiles = {
         name = "Diffview Files",
         icon = icon.ui.Flag
     },
     DiffviewFileHistory = {
-    name = "Diffview History",
+        name = "Diffview History",
         icon = icon.ui.History
     },
     HistoryStartup = {
