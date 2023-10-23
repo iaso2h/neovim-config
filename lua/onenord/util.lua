@@ -26,17 +26,4 @@ end
     -- end
 -- end
 
--- Change the background for the terminal, packer and qf windows
--- M.contrast = function ()
-    -- cmd [[
-    -- augroup onenord
-    -- autocmd!
-    -- autocmd ColorScheme *      lua      require("onenord.util").onColorScheme()
-    -- autocmd TermOpen    *      setlocal winhighlight=Normal:NormalFloat,SignColumn:NormalFloat
-    -- autocmd FileType    packer setlocal winhighlight=Normal:NormalFloat,SignColumn:NormalFloat
-    -- autocmd FileType    qf     setlocal winhighlight=Normal:NormalFloat,SignColumn:NormalFloat
-    -- augroup end
-    -- ]]
--- end
-
 return M

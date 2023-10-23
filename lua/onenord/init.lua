@@ -1,16 +1,24 @@
 -- Unload lua modules
-for _, m in ipairs { "onenord", "onenord.lua", "onenord.pallette",
-    "onenord.theme", "onenord.util" } do
-    if package.loaded[m] then
-        package.loaded[m] = nil
+local foreceReload = function()
+    for _, m in ipairs {
+        "onenord",
+        "onenord.pallette",
+        "onenord.theme",
+        "onenord.util"
+    } do
+        if package.loaded[m] then
+            package.loaded[m] = nil
+        end
     end
+    require("onenord")
 end
 local util = require("onenord.util")
 local theme = require('onenord.theme')
 -- Set the theme environment
 vim.cmd("hi clear")
-if vim.fn.exists("syntax_on") then vim.cmd("syntax reset") end
-vim.g.colors_name = "onenord"
+if vim.fn.exists("syntax_on") then
+    vim.cmd("syntax reset")
+end
 
 for group, colors in pairs(theme.editor) do
     util.hi(group, colors)
@@ -32,7 +40,4 @@ for group, colors in pairs(theme.plugins) do
     util.hi(group, colors)
 end
 
--- if contrast is enabled, apply it to sidebars and floating windows
--- if vim.g.onenord_contrast == true then
-    -- util.contrast()
--- end
+return {foreceReload = foreceReload}
