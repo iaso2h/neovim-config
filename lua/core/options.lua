@@ -135,8 +135,8 @@ local guiFont
 local guiFallbackFont
 local guiFontSize
 local guiFontSizeDefault
--- guiFont = "VictorMono NFM"
-guiFont = "Cascadia Code"
+guiFont = "VictorMono NFM"
+-- guiFont = "Cascadia Code"
 -- guiFallbackFont = ""
 -- guiFallbackFont = ",codicon"
 guiFallbackFont = ",nonicons"

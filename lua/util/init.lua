@@ -298,7 +298,7 @@ end -- }}}
 ---@param bufNr integer
 ---@param query string
 ---@param captureId? integer Specific id to be capture when calling query.iter_captures()
----@return TSNode
+---@return TSNode[]
 M.getQueryNodes = function(bufNr, query, captureId) -- {{{
     local lastLine = vim.api.nvim_buf_call(bufNr, function()
         ---@diagnostic disable-next-line: redundant-return-value

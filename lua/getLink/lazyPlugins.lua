@@ -64,8 +64,8 @@ return function(bufNr, cursorPos, fallback) -- {{{
         (expression_list
           (table_constructor
             (_)
-              (field
-                . (_) @the-first-child))))
+            (field
+              . (_) @the-first-child))))
     ]]
     local dependencyRepo = [[
     (assignment_statement

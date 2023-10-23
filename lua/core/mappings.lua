@@ -572,8 +572,8 @@ map("n", [[g/]], [[m`:s#\\#\/#e<CR>:noh<CR>g``]],   {"noremap", "silent"}, [[Con
 map("n", [[g\]], [[m`:s#\/#\\\\#e<CR>:noh<CR>g``]], {"noremap", "silent"}, [[Convert / to \]])
 -- Mode: Terminal {{{
 map("t", [[<A-n>]],      [[<C-\><C-n>]], "Enter Normal mode")
-map("n", [[<leader>t]], [[<CMD>lua require("buffer.toggle")("terminal", false)<CR>]], {"silent"}, "Toggle terminal")
-map("n", [[<leader>T]], [[<CMD>lua require("buffer.toggle")("terminal", true)<CR>]], {"silent"}, "Close visible terminal")
+map("n", [[<leader>t]],  [[<CMD>lua require("buffer.toggle")("terminal", false)<CR>]], {"silent"}, "Toggle terminal")
+map("n", [[<leader>T]],  [[<CMD>lua require("buffer.toggle")("terminal", true)<CR>]], {"silent"}, "Close visible terminal")
 map("t", [[<A-h>]],      [[<A-n><A-h>]], "Previous buffer")
 map("t", [[<A-l>]],      [[<A-n><A-l>]], "Next buffer")
 map("t", [[<A-C-h>]],    [[<A-n><A-C-h>]], "Previous tab")

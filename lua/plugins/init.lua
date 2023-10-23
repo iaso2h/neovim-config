@@ -64,7 +64,7 @@ local pluginArgs = { -- {{{
         "nvim-treesitter/playground",
         commit = "934cb4c",
         dependencies = {"nvim-treesitter"},
-        cmd    = "TSPlaygroundToggle",
+        cmd    = {"TSPlaygroundToggle", "TSNodeUnderCursor" },
         keys   = {{"gH", mode = "n"}},
         config = function()
             require("nvim-treesitter.configs").setup {
@@ -173,7 +173,7 @@ local pluginArgs = { -- {{{
         cmd  = { "AsyncRun", "AsyncStop" },
         init = function()
             map("n", [[<F9>]],  [[<CMD>lua require("compileRun").compileCode(true)<CR>]], {"silent"}, "Compile code")
-            map("n", [[<F10>]], [[<CMD>lua require("compileRun").runCode()<CR>]],          {"silent"}, "Run code")
+            map("n", [[<F10>]], [[<CMD>lua require("compileRun").runCode()<CR>]],         {"silent"}, "Run code")
         end,
         config = require("plugins.vim-asyncrun"),
     },
