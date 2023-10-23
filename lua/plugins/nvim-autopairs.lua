@@ -1,7 +1,7 @@
 return function()
     require("nvim-autopairs").setup {
         disable_filetype          = vim.list_extend(
-            { "TelescopePrompt", "dap-repl" }, _G._lisp_language),
+            { "TelescopePrompt", "dap-repl", "lua" }, _G._lisp_language),
         disable_in_macro          = true,
         disable_in_visualblock    = true,
         disable_in_replace_mode   = true,

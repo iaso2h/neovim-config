@@ -340,14 +340,15 @@ local pluginArgs = { -- {{{
         config = function()
             local ftExclude = vim.deepcopy(_G._short_line_list)
             ftExclude[#ftExclude + 1] = "help"
+            ftExclude[#ftExclude + 1] = ""
 
-            require("ibl").setup {
+            require("ibl").overwrite {
                 indent = {
                     char = require("icon").ui.LineLeft,
                     tab_char = ""
                 },
                 exclude = {
-                    buftypes  = {"terminal", "nofile"},
+                    buftypes  = {"terminal", "prompt"},
                     filetypes = ftExclude,
                 },
                 scope = {

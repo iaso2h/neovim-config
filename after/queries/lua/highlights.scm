@@ -1,6 +1,7 @@
 ; extends
 ;; https://github.com/nvim-treesitter/nvim-treesitter/tree/master/queries/lua
-;; commit: #b8a0791
+;; commit: #794266a
+;; 2023-10-23
 (break_statement) @keyword.break
 
 ((identifier) @constant.builtin
@@ -13,6 +14,9 @@
 
 ((identifier) @variable.builtin
   (#any-of? @variable.builtin "self")
+  (#set! "priority" 130))
+
+((nil) @constant.builtin
   (#set! "priority" 130))
 
 (function_call
