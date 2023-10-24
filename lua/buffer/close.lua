@@ -1,8 +1,8 @@
 -- File: /buf/close.lua
 -- Author: iaso2h
 -- Description: Deleting buffer without changing the window layout
--- Version: 0.1.9
--- Last Modified: 2023-10-23
+-- Version: 0.1.10
+-- Last Modified: 2023-10-24
 local u   = require("buffer.util")
 local var = require("buffer.var")
 local M   = {}
@@ -87,8 +87,7 @@ M.bufHandler = function(postRearrange, isSpecial) -- {{{
     else
         if u.isScratchBuf() then -- {{{
             -- Close NNP
-            if package.loaded["no-neck-pain"] and
-                require("no-neck-pain").state.enabled and
+            if package.loaded["no-neck-pain"] and _G.NoNeckPain.state.enabled and
                 var.fileType == "no-neck-pain" then
 
                 return require("no-neck-pain").toggle()
@@ -190,7 +189,7 @@ M.winHandler = function(resortToBufClose) -- {{{
         end
     else
         if u.isScratchBuf() and package.loaded["no-neck-pain"] and
-            require("no-neck-pain").state.enabled and
+            _G.NoNeckPain.state.enabled and
             var.fileType == "no-neck-pain" then
             return require("no-neck-pain").toggle()
         else

@@ -213,8 +213,7 @@ end -- }}}
 M.winsOccur = function(winIds) -- {{{
     -- Take two NNP windows into account
     winIds = winIds or var.winIds
-    if package.loaded["no-neck-pain"] and
-        require("no-neck-pain").state.enabled then
+    if package.loaded["no-neck-pain"] and _G.NoNeckPain.state.enabled then
 
         local totalWinCnts = #winIds
         for _, winId in ipairs(winIds) do
