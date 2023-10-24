@@ -1,8 +1,8 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.22
--- Last Modified: 2023-10-22
+-- Version: 0.1.23
+-- Last Modified: 2023-10-24
 
 local util     = require("util")
 local operator = require("operator")
@@ -22,8 +22,6 @@ local M = {
 -- TODO: test cases
 
 
--- TODO: Doesn't support target line number exceeding buffer range
-
 --- Move them up or down just like in VS Code
 ---@param vimMode string Vim mode. See: `:help mode()`
 ---@param direction string "up" or "down". Determine wether the lines to go up or down
@@ -36,13 +34,14 @@ function M.VSCodeLineMove(vimMode, direction) -- {{{
         if vim.fn.foldclosed('.') ~= -1 then
             -- UGLY: fix the cursor position so that it's at the top of
             -- the fold line
-            if vim.fn.line(".") ~= 1 then
+            local cursorPos = vim.api.nvim_win_get_cursor(0)
+            if cursorPos[1] ~= 1 then
                 vim.cmd [[noa norm! kj]]
             else
+                if vim.fn.line("$") == cursorPos[1] then return end
                 vim.cmd [[noa norm! jk]]
             end
-            local cursorPos = vim.api.nvim_win_get_cursor(0)
-            local foldEnd   = vim.fn.foldclosedend(cursorPos[1])
+            local foldEnd = vim.fn.foldclosedend(cursorPos[1])
             if direction == "down" then
                 -- Avoid clobbering in other foldclosed lines when they are
                 -- adjacent to each others
@@ -127,12 +126,13 @@ function M.VSCodeLineYank(vimMode, direction) -- {{{
         if vim.fn.foldclosed('.') ~= -1 then
             -- UGLY: fix the cursor position so that it's at the top of
             -- the fold line
-            if vim.fn.line(".") ~= 1 then
+            local cursorPos = vim.api.nvim_win_get_cursor(0)
+            if cursorPos[1] ~= 1 then
                 vim.cmd [[noa norm! kj]]
             else
+                if vim.fn.line("$") == cursorPos[1] then return end
                 vim.cmd [[noa norm! jk]]
             end
-            local cursorPos = vim.api.nvim_win_get_cursor(0)
             local closeEnd  = vim.fn.foldclosedend(cursorPos[1])
             local lines     = vim.api.nvim_buf_get_lines(0, cursorPos[1] - 1, closeEnd, false)
             if direction == "up" then
@@ -277,15 +277,16 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
 
     -- Put cursor at the ends of folded line
     if vim.fn.foldclosed('.') ~= -1 then
+        local cursorPos = vim.api.nvim_win_get_cursor(winId)
         if pasteCMD == "p" then
-            local cursorPos = vim.api.nvim_win_get_cursor(winId)
             local foldEnd   = vim.fn.foldclosedend(cursorPos[1])
             vim.api.nvim_win_set_cursor(winId, {foldEnd, cursorPos[2]})
         else
             -- Make sure cursor is always locate at the fold beginning
-            if vim.fn.line(".") ~= 1 then
+            if cursorPos[1] ~= 1 then
                 vim.cmd [[noa norm! kj]]
             else
+                if vim.fn.line("$") == cursorPos[1] then return end
                 vim.cmd [[noa norm! jk]]
             end
         end
