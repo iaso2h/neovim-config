@@ -264,8 +264,12 @@ vim.api.nvim_create_user_command("Se", function (opts) -- {{{
     local sessionPath = sessionDir .. sessionName
     if not vim.loop.fs_stat(sessionPath) then return vim.notify("Session file doesn't exist.", vim.log.levels.WARN) end
 
-    local ok, msgOrVal = pcall(vim.cmd, "source " .. sessionDir .. sessionName)
-    if not ok and not string.match(msgOrVal, "E592") then
+    local ok, msgOrVal = pcall(vim.cmd, "source " .. sessionPath)
+    if not ok and
+        -- not string.find(msgOrVal, "E592: ", 1, true) and
+        not string.find(msgOrVal, "E490: ", 1, true) then
+
+        vim.notify("Error occurred while soucing " .. sessionPath)
         vim.notify(msgOrVal, vim.log.levels.ERROR)
     end
     purge(true)

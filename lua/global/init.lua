@@ -26,6 +26,16 @@ _G._trim_space_on_save = init(true, "TrimSpaceOnSave", "_trim_space_on_save")
 _G._autoreload         = init(true, "Autoreload", "_autoreload")
 _G._enable_plugin      = init(true)
 _G._lisp_language      = init {"query", "clojure", "scheme", "lisp", "racket", "hy", "fennel", "janet", "carp", "wast", "yuck"}
+
+_G._treesitter_supported_languages = {} -- {{{
+-- Credit: https://github.com/spywhere/detect-language.nvim/blob/2aa314ed46b68d89fe939cf3ecb12933c71ce49f/lua/detect-language/provider/treesitter.lua#L26
+local parsers = vim.api.nvim_get_runtime_file('parser/*', true)
+for _, parser in ipairs(parsers) do
+    local language = string.gsub(parser, '.*[\\/]', '')
+    language = string.gsub(language, '[.][^.]*$', '')
+    _G._treesitter_supported_languages[language] = true
+end -- }}}
+
 _G._short_line_infos = { -- {{{
     qf = {
         name = "Quickfix",
