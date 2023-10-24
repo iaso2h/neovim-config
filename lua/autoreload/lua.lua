@@ -71,11 +71,11 @@ end -- }}}
 --- Check whether other lua modules under the same lua directory have been
 --opened and modified in other buffers. If any did, prompt the user to save the
 --changes before reloading them all.
----@param allAbsStr        table  Contains all absolute path strings under the
+---@param allAbsStr table  Contains all absolute path strings under the
 --top parent folder
----@param topParentTailStr string String of the top parent folder directly under
+---@param directParentTailStr string String of the top parent folder directly under
 --the lua module search path(Deafult: `vim.fn.stdpath("config")` .. "lua")
-local checkOtherOpenMod = function (allAbsStr, topParentTailStr) -- {{{
+local checkOtherOpenMod = function (allAbsStr, directParentTailStr) -- {{{
     local allBufNr = vim.tbl_map(function(absStr)
         local bufnr
         if absStr:sub(-4, -1) ~= ".lua" then
@@ -83,13 +83,21 @@ local checkOtherOpenMod = function (allAbsStr, topParentTailStr) -- {{{
 
             ---@diagnostic disable-next-line: param-type-mismatch
             bufnr = vim.fn.bufnr(string.format(
-                "%s%sinit.lua", absStr, util.sep, "init.lua"))
+                "%s%sinit.lua",
+                absStr,
+                util.sep,
+                "init.lua"
+            ))
 
             if bufnr == -1 then
                 -- fn.bufnr() will return -1 if buffer doesn't exist
                 ---@diagnostic disable-next-line: param-type-mismatch
                 bufnr = vim.fn.bufnr(string.format(
-                    "%s%s%s.lua", absStr, util.sep, topParentTailStr, ".lua"))
+                    "%s%s%s.lua",
+                    absStr,
+                    util.sep,
+                    directParentTailStr
+                ))
             end
         else
             bufnr = vim.fn.bufnr(absStr)
@@ -100,7 +108,8 @@ local checkOtherOpenMod = function (allAbsStr, topParentTailStr) -- {{{
 
     local currentBufNr = vim.api.nvim_get_current_buf()
     local allValidBufNr = vim.tbl_filter(function(bufNr)
-        if bufNr ~= -1 and bufNr ~= currentBufNr and vim.api.nvim_buf_get_option(bufNr, "modified") then
+        if bufNr ~= -1 and -- What bufnr() will return for invalid path
+            bufNr ~= currentBufNr and vim.api.nvim_buf_get_option(bufNr, "modified") then
             return true
         else
             return false
@@ -114,7 +123,7 @@ local checkOtherOpenMod = function (allAbsStr, topParentTailStr) -- {{{
     vim.cmd "noa echohl MoreMsg"
     local answer = vim.fn.confirm(
         string.format("Save the modification%s for file%s under the same [%s] directory?",
-            pluralStr, pluralStr, topParentTailStr),
+            pluralStr, pluralStr, directParentTailStr),
         ">>> &Yes\n&No", 2, "Question")
     vim.cmd "noa echohl None"
     if answer == 1 then
@@ -297,7 +306,6 @@ M.loadDir = function(path, opt) -- {{{
 
     -- Prompt to save other buffers under the same directory when they are modified
     if #allRelStrs ~= 1 then
-        -- TODO:
         checkOtherOpenMod(allAbsStrs, directParentTailStr)
     end
 

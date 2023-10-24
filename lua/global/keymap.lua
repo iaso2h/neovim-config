@@ -42,6 +42,7 @@ local argCheck = function (lhs, rhs, arg) -- {{{
     end
 
     -- Warn the lack of desc
+    assert(type(rhs) == "function" or type(rhs) == "string", "rhs argument must be a function or a string")
     if type(rhs) == "string" and string.upper(rhs) ~= "<NOP>"  and not doc then
         vim.notify(
             string.format([=[Lack of desc in mapping: [[%s]] for [[%s]]]=], lhs, rhs),
@@ -60,10 +61,10 @@ end -- }}}
 local argConvert = function(mode, lhs, rhs, opts, doc) -- {{{
     local modeTbl
     -- Parameter "mode" can be either table value or string value, but convert
-    -- it as table anyway
+    -- it into table anyway
     if type(mode) == "string" then
         -- Convert "" into {"n", "x", "o"}. Do not use "" to map visual mode
-        -- Inexplicitly, and possibly apply mapping to select mode as well
+        -- Inexplicitly, and to possibly apply mapping to select mode as well
         if mode == "" then
             modeTbl = {"n", "x", "o"}
         else
@@ -99,7 +100,7 @@ local argConvert = function(mode, lhs, rhs, opts, doc) -- {{{
     else
         rhsStr = rhs
     end
-    -- Cycle through optsTbl
+    -- Complement the optsTbl
     if opts and next(opts) then
         for _, val in ipairs(opts) do
             optsKeyValTbl[val] = true
@@ -132,7 +133,7 @@ _G.map = function(mode, lhs, rhs, ...) -- {{{
         end
     end
 
-    -- Always disable Select mode mapping for key mapping like: R,C,A,S,X
+    -- Always disable Select mode mapping when LHS mapping comes from: R,C,A,S,X
     -- when lhs is "". See: ":help map-table"
     if string.match(lhs, "[A-Z]") and modeTbl == "" then
         return vim.api.nvim_del_keymap("s", lhs)
@@ -161,7 +162,7 @@ _G.bmap = function(bufNr, mode, lhs, rhs, ...) -- {{{
         end
     end
 
-    -- Always disable Select modemapping for key mapping like: R,C,A,S,X
+    -- Always disable Select mode mapping when LHS mapping comes from: R,C,A,S,X
     -- when lhs is "". See: ":help map-table"
     if string.match(lhs, "[A-Z]") and modeTbl == "" then
         return vim.api.nvim_buf_del_keymap(bufNr, "s", lhs)
