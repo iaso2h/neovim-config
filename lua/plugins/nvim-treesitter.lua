@@ -51,14 +51,15 @@ return function()
 
     vim.api.nvim_create_user_command("TSGetNodeAtCursor", function()
         local bufNr = vim.api.nvim_get_current_buf()
-        if not package.loaded["nvim-treesitter.parsers"] or
-            not require("vim.treesitter.highlighter").active[bufNr] then
+        if not require("vim.treesitter.highlighter").active[bufNr] then
             return vim.cmd [[norm! gf]]
         end
         local ns = vim.api.nvim_create_namespace("treesitterHighlightUtil")
         local u    = require "nvim-treesitter.ts_utils"
         local util = require("util")
         local node = u.get_node_at_cursor(vim.api.nvim_get_current_win())
+        if not node then return end
+
         vim.api.nvim_buf_clear_namespace(bufNr, ns, 0, -1)
         u.highlight_node(node, bufNr, ns, "Search")
         vim.defer_fn(function()
