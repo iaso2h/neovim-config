@@ -2,7 +2,7 @@
 -- Author: iaso2h
 -- Description: Expand region in visual character mode.
 -- For treesitter support, only tested on python, lua, c files
--- Version: 0.1.2
+-- Version: 0.1.3
 -- Last Modified: 2023-10-25
 local ts   = require("expandRegion.treesitter")
 local tx   = require("expandRegion.textobj")

@@ -285,6 +285,11 @@ M.getNodeText = function(bufNr, range, xOffset, yOffset, concatChar) -- {{{
     xOffset = xOffset or 0
     yOffset = yOffset or 0
     concatChar = concatChar or ""
+    if range[4] == 0 then
+        local endLine = vim.api.nvim_buf_get_lines(bufNr, range[3] - 1, range[3], false)[1]
+        range[3] = range[3] - 1
+        range[4] = #endLine
+    end
     local text = vim.api.nvim_buf_get_text(
         bufNr,
         range[1] + yOffset,

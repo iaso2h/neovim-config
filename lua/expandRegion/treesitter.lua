@@ -4,8 +4,13 @@ local util = require("util")
 --- Get the region range of a treesitter node
 ---@param tsNode TSNode Treesitter node
 ---@return table (1,0) index based region position of the treesitter node, can be passed to
-M.getNodeRange = function(tsNode) -- {{{
+M.getNodeRange = function(bufNr, tsNode) -- {{{
     local startRow, startCol, endRow, endCol = tsNode:range()
+    if endCol == 0 then
+        local endLine = vim.api.nvim_buf_get_lines(bufNr, endRow - 1, endRow, false)[1]
+        endRow = endRow - 1
+        endCol = #endLine
+    end
     return {
         posStart = {startRow + 1, startCol},
         posEnd   = {endRow + 1,   endCol - 1}
@@ -65,7 +70,7 @@ M.getNodeCandidate = function(bufNr, initNode, direction, cursorPos) -- {{{
         end
     until false
 
-    local candidate = M.getNodeRange(node)
+    local candidate = M.getNodeRange(bufNr, node)
     candidate.type = "treesitter"
     candidate.tsNode = node
     candidate.content = util.getNodeText(bufNr, {initNode:range()})
@@ -84,7 +89,7 @@ M.getNodeCandidateBySelection = function(bufNr, visualStart, visualEnd, directio
 
     -- Loop until find a treesitter candidate has a bigger range than
     -- the current selected region
-    local candidate = M.getNodeRange(initNode)
+    local candidate = M.getNodeRange(bufNr, initNode)
     candidate.type = "treesitter"
     candidate.tsNode = initNode
     candidate.content = util.getNodeText(bufNr, {initNode:range()})
