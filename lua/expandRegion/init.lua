@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Expand region in visual character mode.
 -- For treesitter support, only tested on python, lua, c files
--- Version: 0.1.0
--- Last Modified: 2023-10-24
+-- Version: 0.1.1
+-- Last Modified: 2023-10-25
 local ts   = require("expandRegion.treesitter")
 local tx   = require("expandRegion.textobj")
 local util = require("util")
@@ -60,7 +60,7 @@ M.restoreOption = nil
 
 
 --- Save vim options
-local saveOption = function()
+local saveOption = function() -- {{{
     if vim.o.wrapscan == false and vim.o.selection == "inclusive" then return end
 
     local wrapscan  = vim.o.wrapscan
@@ -72,22 +72,24 @@ local saveOption = function()
         vim.o.wrapscan  = wrapscan
         vim.o.selection = selection
     end
-end
-
-
+end -- }}}
 --- Check the whether the targetCandidateIdx is out of scope of table candidates
-local validateCandidates = function()
-    if #M.candidates == 0 then return false end
-
-    if vim.api.nvim_get_current_buf() == M.bufNr
+---@param visualStart table Line number and column index in (1, 0) based
+---@param visualEnd table Line number and column index in (1, 0) based
+---@return boolean # Return true to indicate the current visual selection has
+--the same range of the current candidate and it's ok to expand or shrink by
+--selecting the sibling candidates on the fly. Return false to indicate that
+--the existing candidates doesn't apply to the visual selection
+local compareSelectionWithCandidate = function(visualStart, visualEnd) -- {{{
+    if M.candidates and
+        vim.api.nvim_get_current_buf() == M.bufNr and
         -- Compare the visual selected region with the last candidate
-        and (M.candidateIdx <= #M.candidates and M.candidateIdx >= 1) then
-        local posStart  = vim.api.nvim_buf_get_mark(M.bufNr, "<")
-        local posEnd    = vim.api.nvim_buf_get_mark(M.bufNr, ">")
+        (M.candidateIdx <= #M.candidates and M.candidateIdx >= 1) then
+
         local candidate = M.candidates[M.candidateIdx]
 
-        if util.compareDist(posStart, candidate.posStart) == 0
-            and util.compareDist(posEnd, candidate.posEnd) == 0 then
+        if util.compareDist(visualStart, candidate.posStart) == 0
+            and util.compareDist(visualEnd, candidate.posEnd) == 0 then
             return true
         else
             return false
@@ -95,18 +97,13 @@ local validateCandidates = function()
     else
         return false
     end
-end
-
-
+end -- }}}
 --- Decide which region to be selected
 ---@param direction integer 1 indicates expand, -1 indicates shrink
 local selectCandidate = function(direction) -- {{{
-    --- Select region in visual character mode
-    ---@param candidate table A region contain infomation about the start and end of an area going to be selected
+    --- Select candidate in Neovim according to its field
+    ---@param candidate ExpandRegionCandidate
     local selectRegion = function(candidate) -- {{{
-        if M.dev and candidate.type == "treesitter" then
-            Print(candidate.nodes[1]:type())
-        end
         if M.opts.putCursorAtStart then
             vim.api.nvim_win_set_cursor(0, candidate.posEnd)
             vim.cmd [[noa norm v]]
@@ -126,7 +123,6 @@ local selectCandidate = function(direction) -- {{{
         -- generated for textobject type candidate, but treesitter might still
         -- can get new parent node on the fly
         if lastCandidate.type == "textobject" then
-            -- Text Object
             -- Do not generate any more candidates when reach maximum index
             vim.notify("No more textobject candidates", vim.log.levels.INFO)
 
@@ -135,12 +131,13 @@ local selectCandidate = function(direction) -- {{{
             -- Remain selection
             selectRegion(M.candidates[M.candidateIdx])
         else
-            -- Treesitter
+            -- Treesitter type candidate
+
             -- Try to get new treesitter node candidate
             -- NOTE: pairNode and parentNode might be empty
-            local parentCandidate = ts.getNodeCandidate(lastCandidate.tsNode)
+            local parentCandidate = ts.getNodeCandidate(M.bufNr, lastCandidate.tsNode, 1)
             if next(parentCandidate) and parentCandidate.tsNode:id() ~= lastCandidate.tsNode:id() then
-                M.candidates[#M.candidates+1] = parentCandidate
+                table.insert(M.candidates, parentCandidate)
                 selectRegion(M.candidates[M.candidateIdx])
             else
                 vim.notify("No more treesitter candidates", vim.log.levels.INFO)
@@ -151,18 +148,37 @@ local selectCandidate = function(direction) -- {{{
             end
         end
     elseif M.candidateIdx == 0 then
-        -- index value of 0 means get back to normal mode
-        vim.fn.winrestview(M.saveView)
+        -- When target index is qeual 0. Exit into normal mode for textobject
+        -- type candidate, but treesitter might still can get new parent node on the fly
+        if lastCandidate.type == "textobject" then
+            -- index value of 0 means get back to normal mode
+            vim.fn.winrestview(M.saveView)
+        else
+            -- Treesitter
+            -- Try to get new treesitter node candidate
+            -- NOTE: pairNode and parentNode might be empty
+            local childCandidate = ts.getNodeCandidate(M.bufNr, lastCandidate.tsNode, -1)
+            if next(childCandidate) and childCandidate.tsNode:id() ~= lastCandidate.tsNode:id() then
+                table.insert(M.candidates, 1, childCandidate)
+                selectRegion(M.candidates[1])
+            else
+                vim.notify("No more treesitter candidates", vim.log.levels.INFO)
+
+                -- Always reset the index to 1 to refer to the first candidate
+                M.candidateIdx = 1
+                selectRegion(M.candidates[M.candidateIdx])
+            end
+        end
     else
         selectRegion(M.candidates[M.candidateIdx])
     end
 end -- }}}
 --- Compute and generate textobject candidates
-local computeCandidateTextObject = function()
+local computeCandidateTextObject = function() -- {{{
     M.candidates = tx.getTextObjCandidate(M.opts, M.bufNr, M.cursorPos)
-end
+end -- }}}
 --- Compute and generate candidates table, which contain info about the start and end of regions
-local generateCandidates = function()
+local generateCandidates = function() -- {{{
     if require("vim.treesitter.highlighter").active[M.bufNr] then
         local initNode = vim.treesitter.get_node()
         if not initNode then
@@ -170,10 +186,11 @@ local generateCandidates = function()
             return computeCandidateTextObject()
         end
 
+        ---@diagnostic disable-next-line: undefined-field
         if not initNode:has_error() then
             -- Generate subword text objects first, and then append
             -- Treesitter node in the end
-            local initCandidate = ts.getNodeCandidate(initNode)
+            local initCandidate = ts.getNodeCandidate(M.bufNr, initNode, 1)
             M.candidates = tx.getTextObjCandidate(
                 M.opts,
                 M.bufNr,
@@ -186,32 +203,60 @@ local generateCandidates = function()
     else
         return computeCandidateTextObject()
     end
-end
-
+end -- }}}
 --- Initiate all the settings
-local initExpand = function()
+local initExpand = function() -- {{{
     M.bufNr        = vim.api.nvim_get_current_buf()
     M.cursorPos    = vim.api.nvim_win_get_cursor(0)
     M.candidates   = {}
     M.candidateIdx = 0
     M.saveView     = vim.fn.winsaveview()
-end
+end -- }}}
 --- Start the expanding and shrinking of region
 ---@param vimMode string See: `:help mode()`
 ---@param direction integer 1 indicates expand, -1 indicates shrink
 ---@param opts? table Option table
-M.expandShrink = function(vimMode, direction, opts)
+M.expandShrink = function(vimMode, direction, opts) -- {{{
     -- Don't support visual block or visual line mode
     if vimMode == "\22" or vimMode == "V" then return end
+    assert(direction == 1 or direction == -1, "#2 parameter must be either 1 or -1")
 
     opts = opts or {}
     M.opts = vim.tbl_deep_extend("keep", opts, optsDefault)
 
     if vimMode == "v" then
         -- TODO: not support custom visual selected region yet
-        if not validateCandidates() then return end
+        local bufNrTemp   = vim.api.nvim_get_current_buf()
+        local visualStart = vim.api.nvim_buf_get_mark(bufNrTemp, "<")
+        local visualEnd   = vim.api.nvim_buf_get_mark(bufNrTemp, ">")
 
-        selectCandidate(direction)
+        if compareSelectionWithCandidate(visualStart, visualEnd) then
+            selectCandidate(direction)
+        else
+            if require("vim.treesitter.highlighter").active[bufNrTemp] then
+                -- TODO: placing cursor at anthoer end of the selection might
+                -- lead to a different treesitter node outcome
+                local candidate = ts.getNodeCandidateBySelection(bufNrTemp, visualStart, visualEnd, direction)
+
+                if not next(candidate) then
+                    local descStr = direction == 1 and "wider" or "narrower"
+                    vim.notify("Can't find treesitter node that has a " .. descStr .. " region than the current visual selection", vim.log.levels.INFO)
+                else
+                    initExpand()
+                    M.candidates = {candidate}
+                    if direction == 1 then
+                        M.candidateIdx = 0
+                    else
+                        M.candidateIdx = 2
+                    end
+                    selectCandidate(direction)
+                end
+            else
+                -- saveOption()
+                local descStr = direction == 1 and "wider" or "narrower"
+                vim.notify("Can't find textobject that has a " .. descStr .. " region than the current visual selection", vim.log.levels.INFO)
+            end
+        end
     elseif vimMode == "n" then
         initExpand()
         saveOption()
@@ -232,6 +277,6 @@ M.expandShrink = function(vimMode, direction, opts)
         if vim.is_callable(M.restoreOption) then M.restoreOption(); M.restoreOption = nil end
     end
 
-end
+end -- }}}
 
 return M

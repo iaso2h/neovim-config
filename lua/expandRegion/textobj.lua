@@ -260,7 +260,8 @@ M.getTextObjCandidate = function(opts, bufNr, cursorPos, tsNodeCandidate) -- {{{
             break
         end
 
-        -- Store the new addition of candidates at current iteration
+        -- Before entering into next iteration, store the new addition of
+        -- candidates at current iteration
         textObjectCountAddLastIter = #currentIterCandidates
     until false
 
