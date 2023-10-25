@@ -1,8 +1,8 @@
 -- File: foldmarker.lua
 -- Author: iaso2h
 -- Description: Improve fold marker
--- Version: 0.0.4
--- Last Modified: Sat 06 May 2023
+-- Version: 0.0.5
+-- Last Modified: 2023-10-25
 
 local util = require("util")
 local M = {
@@ -367,7 +367,12 @@ end
 ---@param exCmd string|function
 local function exeCommand(exCmd)
     if type(exCmd) == "string" then
-        return vim.cmd(exCmd)
+        local ok, msgOrVal = pcall(vim.api.nvim_command, exCmd)
+        if not ok and
+            not string.find(msgOrVal, "E490: ", 1, true) then -- No fold found
+
+            vim.notify(msgOrVal, vim.log.levels.ERROR)
+        end
     elseif type(exCmd) == "function" then
         exCmd()
     end
