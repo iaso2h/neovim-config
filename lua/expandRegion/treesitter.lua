@@ -16,24 +16,6 @@ M.getNodeRange = function(bufNr, tsNode) -- {{{
         posEnd   = {endRow + 1,   endCol - 1}
     }
 end -- }}}
---- Get the first named child treesitter node form the given parent treesitter
---and make sure the position table is inside the range of that named child
---treesitter node
----@param parentNode TSNode
----@param position integer[] (1, 0) indexed.
----@return TSNode
-local getNamedChildNode = function(parentNode, position) -- {{{
-    for node in parentNode:iter_children() do
-        if node:named() then
-            if vim.treesitter.is_in_node_range(node, position[1] - 1, position[2]) then
-                return node
-            end
-        end
-    end
-
-    -- Fallback returned treesitter node
-    return parentNode:named_child(0)
-end -- }}}
 --- Generate a region table containing all the treesitter node infos needed to
 --be selected in visual mode
 ---@param bufNr integer Buffer number
@@ -59,7 +41,7 @@ M.getNodeCandidate = function(bufNr, initNode, direction, cursorPos) -- {{{
             nextHierarchyNode = node:parent()
         else
             ---@diagnostic disable-next-line: param-type-mismatch
-            getNamedChildNode(node, cursorPos)
+            nextHierarchyNode = node:named_child(0)
         end
 
         -- Before entering into next iteration
@@ -77,6 +59,44 @@ M.getNodeCandidate = function(bufNr, initNode, direction, cursorPos) -- {{{
 
     return candidate
 end -- }}}
+--- Get the first named child treesitter node form the given parent treesitter
+--and make sure the position table is inside the range of that named child
+--treesitter node
+---@param bufNr integer Buffer number
+---@param parentNode TSNode
+---@param visualStart table Line number and column index in (1, 0) based
+---@param visualEnd table Line number and column index in (1, 0) based
+---@return TSNode|nil
+local getSmallerNodeBySelection = function(bufNr, parentNode, visualStart, visualEnd) -- {{{
+    --- Iterate through all children inside a treesitter node
+    ---@param node TSNode
+    ---@return TSNode|nil, boolean
+    local function recursiveIterChildren(node)
+        for n in node:iter_children() do
+            if n:named() then
+                local nodeRange = M.getNodeRange(bufNr, n)
+                if util.compareDist(nodeRange.posStart, visualStart) >= 0 and
+                    util.compareDist(nodeRange.posEnd, visualEnd) <= 0 then
+                    return n, true
+                end
+
+                if n:child_count() > 0 then
+                    -- Entering into deeper recursive call
+                    local childNode, returnCode = recursiveIterChildren(n)
+                    if returnCode then
+                        return childNode, true
+                    end
+                end
+            end
+        end
+
+        -- Fallback returned treesitter node
+        return nil, false
+    end
+
+    local childNode, _ = recursiveIterChildren(parentNode)
+    return childNode
+end -- }}}
 --- Get treesitter node candidate by visual selection
 ---@param bufNr integer Buffer number
 ---@param visualStart table Line number and column index in (1, 0) based
@@ -84,51 +104,38 @@ end -- }}}
 ---@param direction integer 1 indicates expand, -1 indicates shrink
 ---@return ExpandRegionCandidate
 M.getNodeCandidateBySelection = function(bufNr, visualStart, visualEnd, direction) -- {{{
-    local initNode = vim.treesitter.get_node()
-    if not initNode then return {} end
+    local candidateLarger
+    local tree = vim.treesitter.get_parser(bufNr, vim.bo.filetype)
+    local nodeLarger = tree:named_node_for_range({
+        visualStart[1] - 1,
+        visualStart[2],
+        visualEnd[1] - 1,
+        visualEnd[2],
+    }, {
+        ignore_injections = true
+    })
+    if not nodeLarger then
+        return {}
+    else
+        candidateLarger = M.getNodeRange(bufNr, nodeLarger)
+        candidateLarger.type = "treesitter"
+        candidateLarger.tsNode = nodeLarger
+        candidateLarger.content = util.getNodeText(bufNr, {nodeLarger:range()})
+    end
 
-    -- Loop until find a treesitter candidate has a bigger range than
-    -- the current selected region
-    local candidate = M.getNodeRange(bufNr, initNode)
-    candidate.type = "treesitter"
-    candidate.tsNode = initNode
-    candidate.content = util.getNodeText(bufNr, {initNode:range()})
-    local candidateLastIter
-    repeat
-        if util.compareDist(visualStart, candidate.posStart) == 0 and
-            util.compareDist(visualEnd, candidate.posEnd) == 0 then
-            if direction == -1 then
-                if candidateLastIter then
-                    return candidateLastIter
-                else
-                    return {}
-                end
-            end
-        elseif util.compareDist(visualStart, candidate.posStart) >= 0 and
-            util.compareDist(visualEnd, candidate.posEnd) <= 0 then
-            if direction == -1 then
-                if candidateLastIter then
-                    return candidateLastIter
-                else
-                    return {}
-                end
-            else
-                return candidate
-            end
-        end
+    if direction == 1 then return candidateLarger end
 
-        local parentCandidate = M.getNodeCandidate(bufNr, candidate.tsNode, 1)
-        if not next(parentCandidate) then
-            return {}
-        end
-
-
-        -- Before entering into next iteration
-        candidateLastIter = candidate
-        candidate = parentCandidate
-    until false
-
-    return {}
+    local candidateSmaller
+    local nodeSmaller = getSmallerNodeBySelection(bufNr, candidateLarger.tsNode, visualStart, visualEnd)
+    if not nodeSmaller then
+        return {}
+    else
+        candidateSmaller = M.getNodeRange(bufNr, nodeSmaller)
+        candidateSmaller.type = "treesitter"
+        candidateSmaller.tsNode = nodeSmaller
+        candidateSmaller.content = util.getNodeText(bufNr, {nodeSmaller:range()})
+        return candidateSmaller
+    end
 end -- }}}
 
 

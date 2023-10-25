@@ -2,7 +2,7 @@
 -- Author: iaso2h
 -- Description: Expand region in visual character mode.
 -- For treesitter support, only tested on python, lua, c files
--- Version: 0.1.3
+-- Version: 0.1.4
 -- Last Modified: 2023-10-25
 local ts   = require("expandRegion.treesitter")
 local tx   = require("expandRegion.textobj")
@@ -105,13 +105,13 @@ local selectCandidate = function(direction) -- {{{
     ---@param candidate ExpandRegionCandidate
     local selectRegion = function(candidate) -- {{{
         if M.opts.putCursorAtStart then
-            vim.api.nvim_win_set_cursor(0, candidate.posEnd)
+            vim.api.nvim_win_set_cursor(M.winId, candidate.posEnd)
             vim.cmd [[noa norm v]]
-            vim.api.nvim_win_set_cursor(0, candidate.posStart)
+            vim.api.nvim_win_set_cursor(M.winId, candidate.posStart)
         else
-            vim.api.nvim_win_set_cursor(0, candidate.posStart)
+            vim.api.nvim_win_set_cursor(M.winId, candidate.posStart)
             vim.cmd [[noa norm v]]
-            vim.api.nvim_win_set_cursor(0, candidate.posEnd)
+            vim.api.nvim_win_set_cursor(M.winId, candidate.posEnd)
         end
     end -- }}}
 
@@ -140,7 +140,7 @@ local selectCandidate = function(direction) -- {{{
                 table.insert(M.candidates, parentCandidate)
                 selectRegion(M.candidates[M.candidateIdx])
             else
-                vim.notify("No more treesitter candidates", vim.log.levels.INFO)
+                vim.notify("No more wider treesitter candidates", vim.log.levels.INFO)
 
                 -- Always reset the index to the length of the candidates table
                 M.candidateIdx = #M.candidates
@@ -162,7 +162,7 @@ local selectCandidate = function(direction) -- {{{
                 table.insert(M.candidates, 1, childCandidate)
                 selectRegion(M.candidates[1])
             else
-                vim.notify("No more treesitter candidates", vim.log.levels.INFO)
+                vim.notify("No more narrower treesitter candidates", vim.log.levels.INFO)
 
                 -- Always reset the index to 1 to refer to the first candidate
                 M.candidateIdx = 1
@@ -206,8 +206,9 @@ local generateCandidates = function() -- {{{
 end -- }}}
 --- Initiate all the settings
 local initExpand = function() -- {{{
+    M.winId        = vim.api.nvim_get_current_win()
     M.bufNr        = vim.api.nvim_get_current_buf()
-    M.cursorPos    = vim.api.nvim_win_get_cursor(0)
+    M.cursorPos    = vim.api.nvim_win_get_cursor(M.winId)
     M.candidates   = {}
     M.candidateIdx = 0
     M.saveView     = vim.fn.winsaveview()
