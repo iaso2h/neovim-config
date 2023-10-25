@@ -2,7 +2,7 @@
 -- Author: iaso2h
 -- Description: Expand region in visual character mode.
 -- For treesitter support, only tested on python, lua, c files
--- Version: 0.1.1
+-- Version: 0.1.2
 -- Last Modified: 2023-10-25
 local ts   = require("expandRegion.treesitter")
 local tx   = require("expandRegion.textobj")
@@ -157,7 +157,7 @@ local selectCandidate = function(direction) -- {{{
             -- Treesitter
             -- Try to get new treesitter node candidate
             -- NOTE: pairNode and parentNode might be empty
-            local childCandidate = ts.getNodeCandidate(M.bufNr, lastCandidate.tsNode, -1)
+            local childCandidate = ts.getNodeCandidate(M.bufNr, lastCandidate.tsNode, -1, M.cursorPos)
             if next(childCandidate) and childCandidate.tsNode:id() ~= lastCandidate.tsNode:id() then
                 table.insert(M.candidates, 1, childCandidate)
                 selectRegion(M.candidates[1])
@@ -225,7 +225,6 @@ M.expandShrink = function(vimMode, direction, opts) -- {{{
     M.opts = vim.tbl_deep_extend("keep", opts, optsDefault)
 
     if vimMode == "v" then
-        -- TODO: not support custom visual selected region yet
         local bufNrTemp   = vim.api.nvim_get_current_buf()
         local visualStart = vim.api.nvim_buf_get_mark(bufNrTemp, "<")
         local visualEnd   = vim.api.nvim_buf_get_mark(bufNrTemp, ">")
@@ -276,7 +275,6 @@ M.expandShrink = function(vimMode, direction, opts) -- {{{
         -- Restore vim options
         if vim.is_callable(M.restoreOption) then M.restoreOption(); M.restoreOption = nil end
     end
-
 end -- }}}
 
 return M
