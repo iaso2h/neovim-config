@@ -82,9 +82,6 @@ M.bufNrs = function(listedOnly, loadedOnly) -- {{{
             return vim.api.nvim_buf_get_option(bufNr, "buflisted")
         else
             if loadedOnly then
-                -- BUG: When buffers are loaded from sourcing session and
-                -- passed into `vim.api.nvim_buf_is_loaded` it may evaluated
-                -- to `false`
                 return vim.api.nvim_buf_is_loaded(bufNr)
             else
                 return true

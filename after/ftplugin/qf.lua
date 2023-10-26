@@ -1,5 +1,3 @@
--- TODO: bundle the quickfix into a plugins?
-
 -- Location list detection
 if next(vim.fn.getloclist(0, {items = 0}).items) then
     vim.b._is_local = true

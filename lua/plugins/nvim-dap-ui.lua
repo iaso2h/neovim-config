@@ -19,6 +19,7 @@ M.filetypeSetup = function ()
         }, fileType) then
             M.winID[fileType] = winId
             vim.api.nvim_win_set_option(winId, "cursorline", false)
+
             if fileType == "dap-repl" or fileType == "dapui_watches" then
                 vim.api.nvim_create_autocmd("BufEnter",{
                     buffer  = win.bufnr,
@@ -137,8 +138,6 @@ M.config = function()
 
 
     -- key mappings {{{
-    local uiToggle = function(bangChk) require("dapui").toggle{layout = nil, reset = bangChk} end
-
     local windowFocus = function(filetype) -- {{{
         if not next(M.winID) then return end
         vim.cmd(t[[norm! <C-\><C-n>]])
@@ -166,8 +165,8 @@ M.config = function()
     vim.api.nvim_create_user_command("DapUIUpdateRender", function()
         dapui.update_render()
     end, {desc = "Dap UI Update"} )
-    vim.api.nvim_create_user_command("DapUIToggle", function()
-        uiToggle()
+    vim.api.nvim_create_user_command("DapUIToggle", function(args)
+        require("dapui").toggle{layout = nil, reset = args.bang}
     end, {desc = "Dap UI Toggle"} )
 
     map("n", [[<C-w>dd]], [[<CMD>lua require("dapui").toggle {layout=nil,reset=true}<CR>]], {"silent"}, "Dap UI toggle")

@@ -46,11 +46,6 @@ return function()
             type = "nlua",
             request = "attach",
             name = "Attach to running Neovim instance",
-            -- port = function()
-                -- local val = tonumber(fn.input("Port: "))
-                -- assert(val, "Please provide a port number")
-                -- return val
-            -- end
         }
     }
 

@@ -62,8 +62,6 @@ return function()
         -- bmap(bufNr, "n", [=[<leader>wl]=], Print(vim.lsp.buf.list_workspace_folders, "LSP list workspace folder")
 
         -- Bring back the gqq for formatting comments and stuff
-        --  HACK: vim.lsp.formatexpr() is always set in:
-        -- https://github.com/neovim/neovim/blob/f1b415b3abbcccb8b0d2aa1a41a45dd52de1a5ff/runtime/lua/vim/lsp.lua#L1130
         vim.bo.formatexpr = ""
         vim.opt.formatexpr = ""
         bmap(bufNr, "n", [[gqq]], function()

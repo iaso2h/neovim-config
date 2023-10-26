@@ -234,8 +234,6 @@ M.expandShrink = function(vimMode, direction, opts) -- {{{
             selectCandidate(direction)
         else
             if require("vim.treesitter.highlighter").active[bufNrTemp] then
-                -- TODO: placing cursor at anthoer end of the selection might
-                -- lead to a different treesitter node outcome
                 local candidate = ts.getNodeCandidateBySelection(bufNrTemp, visualStart, visualEnd, direction)
 
                 if not next(candidate) then

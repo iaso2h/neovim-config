@@ -129,9 +129,6 @@ M.bufHandler = function(postRearrange, isSpecial) -- {{{
                 if u.isScratchBuf(postBufNr) then
                     return require("historyStartup").display(true)
                 else
-                    -- HACK: hmm mm... I wonder when will this happen
-                    Print('DEBUGPRINT[1]: close.lua:146: postBufNr=' .. vim.inspect(postBufNr))
-                    Print('DEBUGPRINT[1]: close.lua:147: var.bufNrs=' .. vim.inspect(var.bufNrs))
                     return vim.notify(
                         "Unabled to enter the historyStartup correctly for the last scratch file",
                         vim.log.levels.ERROR)
