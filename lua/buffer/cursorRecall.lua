@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Derived from and simplified:
 -- Credit: https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
--- Version: 0.0.9
--- Last Modified: 2023-10-23
+-- Version: 0.0.11
+-- Last Modified: 2023-10-26
 
 local ignoreBuftype = {
         'quickfix',
@@ -79,7 +79,7 @@ return function(args)
         end
     else
         -- Jump to recent last change instead
-        if vim.api.nvim_win_get_cursor(0)[1] == 1 then
+        if not vim.bo.readonly and vim.api.nvim_win_get_cursor(0)[1] == 1 then
             -- Go to the newest change first then the older one
             local jumpUtil = require("jump.util")
             local changesCmdRaw = jumpUtil.getJumpsCmd("changes", false)
@@ -122,6 +122,7 @@ return function(args)
     if vim.fn.foldclosed('.') ~= -1 then
         log("DEBUGPRINT[11]: cursorRecall.lua:93 (after if not ok then)")
         -- Cursor was inside a fold; open it
-        vim.cmd 'normal! zv'
+        -- Sometime execute 'normal! zv' inside a fold will sometime incur error
+        pcall(vim.api.nvim_command, "normal! zv")
     end
 end
