@@ -4,9 +4,6 @@ return function()
     local icon   = require("icon")
     local space  = {text = " "}
     require("cokeline").setup{
-        buffers = {
-            new_buffers_position = "bufnr"
-        },
         default_hl = {
             fg = function(buffer)
                 return buffer.is_focused and getHighlightAttr("Normal", "fg") or getHighlightAttr("Comment", "fg")

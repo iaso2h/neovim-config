@@ -186,7 +186,7 @@ vim.api.nvim_create_user_command("CDRuntime", -- {{{
 }) -- }}}
 
 vim.api.nvim_create_user_command("E", function (opts) -- {{{
-    if require("buffer.util").isSpecialBuf() then
+    if require("buffer.util").isSpecialBuf(vim.api.nvim_get_current_buf()) then
         return
     end
     vim.cmd [[noa mkview]]
@@ -272,7 +272,7 @@ vim.api.nvim_create_user_command("Se", function (opts) -- {{{
         vim.notify("Error occurred while soucing " .. sessionPath)
         vim.notify(msgOrVal, vim.log.levels.ERROR)
     end
-    purge(true)
+    -- purge(true)
 end, {
     desc  = "Load session",
     nargs = "?",

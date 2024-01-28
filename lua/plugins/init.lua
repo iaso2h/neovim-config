@@ -544,7 +544,6 @@ local pluginArgs = { -- {{{
     {
         "willothy/nvim-cokeline",
         dependencies = { "nvim-web-devicons" },
-        -- HACK: use sort by bufnr?
         config = require("plugins.nvim-cokeline"),
     },
     {

@@ -66,7 +66,6 @@ return function()
     vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
 
     -- Optionally, make builtin f, F, t, T also repeatable with ; and ,
-    -- BUG: dT" motion
     -- vim.keymap.set({ "n", "x", "o" }, "f", ts_repeat_move.builtin_f)
     -- vim.keymap.set({ "n", "x", "o" }, "F", ts_repeat_move.builtin_F)
     -- vim.keymap.set({ "n", "x", "o" }, "t", ts_repeat_move.builtin_t)
