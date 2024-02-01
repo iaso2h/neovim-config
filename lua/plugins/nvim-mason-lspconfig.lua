@@ -1,7 +1,7 @@
 local M = {}
 
 M.serverNames = {
-    cmake    = {},
+    -- cmake    = {},
     cssls    = {},
     html     = {},
     jsonls   = {},
