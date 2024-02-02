@@ -1,8 +1,8 @@
 local pallette = {
     -- n3b stands for nord3_bright
     --16 colors
-    n0             = _G._os_uname.sysname == "Windows_NT" and "#252A33" or "#353c4a",
-    n1             = _G._os_uname.sysname == "Windows_NT" and "#303642"or "#3B4252",
+    n0             = _G._os_uname.sysname == "Windows_NT" and "#252A33" or "#1e2127",
+    n1             = _G._os_uname.sysname == "Windows_NT" and "#303642" or "#252830",
     n2             = "#434C5E",
     n3             = "#4C566A",
     n3b            = "#616E88",
