@@ -57,6 +57,8 @@ local pluginArgs = { -- {{{
     -- Treesitter {{{
     {
         "nvim-treesitter/nvim-treesitter",
+        lazy = false,
+        priority = 100,
         build = function() vim.cmd([[TSUpdate]]) end,
         config = require("plugins.nvim-treesitter"),
     },
