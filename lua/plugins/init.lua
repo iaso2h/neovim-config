@@ -49,6 +49,7 @@ local pluginArgs = { -- {{{
     -- Dependencies {{{
     {
         "nvim-lua/plenary.nvim",
+        priority = 100,
         commit = "4cd4c29"
     },
     "inkarkat/vim-visualrepeat",
@@ -153,23 +154,12 @@ local pluginArgs = { -- {{{
     -- }}} Treesitter
     -- Vim enhancement {{{
     {
-        "tpope/vim-eunuch",
+        "lambdalisue/suda.vim",
+        enabled = not (_G._os_uname.sysname == "Windows_NT"),
         cmd = {
-            "Delete",
-            "Unlink",
-            "Remove",
-            "Move",
-            "Rename",
-            "Chmod",
-            "Mkdir",
-            "Cfind",
-            "Lfind",
-            "Clocate",
-            "Llocate",
-            "SudoEdit",
-            "SudoWrite",
-            "Wall",
-        },
+            "SudaRead",
+            "SudaWrite",
+        }
     },
     {
         "skywind3000/asyncrun.vim",
