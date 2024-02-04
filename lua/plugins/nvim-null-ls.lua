@@ -205,6 +205,11 @@ return function()
         beautysh         = function() null_ls.register(null_ls.builtins.formatting.beautysh) end,
         ["write-good"]   = function() null_ls.register(null_ls.builtins.formatting.emacs_scheme_mode) end,
     }
+
+    if _G._os_uname.sysname == "Linux" and _G._os_uname.machine == "aarch64" then
+        handlerArgs.deno = nil
+        handlerArgs.selene = nil
+    end
     mason_null_ls.setup {
         ensure_installed       = vim.tbl_keys(handlerArgs),
         automatic_installation = true,

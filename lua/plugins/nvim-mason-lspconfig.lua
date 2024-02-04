@@ -18,13 +18,13 @@ M.serverNames = {
 
 if _G._os_uname.sysname == "Linux" then
     if _G._os_uname.machine ~= "aarch64" then
+        M.serverNames.fennel_language_server = {}
+    else
         M.serverNames.grammarly = nil
         M.serverNames.marksman  = nil
         M.serverNames.yamlls    = nil
         M.serverNames.bashls    = nil
         M.serverNames.clangd    = nil
-    else
-        M.serverNames.fennel_language_server = {}
     end
 elseif _G._os_uname.sysname == "Windows_NT" then
     M.serverNames.powershell_es = {}
