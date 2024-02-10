@@ -1,8 +1,8 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.23
--- Last Modified: 2023-10-24
+-- Version: 0.1.24
+-- Last Modified: 2024-02-11
 
 local util     = require("util")
 local operator = require("operator")
@@ -167,10 +167,12 @@ function M.inplaceYank(opInfo) -- {{{
     local posEnd   = motionRegion.End
 
     local regName
-    if vim.o.clipboard == "unnamed" then
-        regName = vim.v.register == "*" and '' or '"' .. vim.v.register
-    elseif string.find(vim.o.clipboard, "unnamedplus") then
-        regName = vim.v.register == "+" and '' or '"' .. vim.v.register
+    if vim.o.clipboard ~= "" then
+        if vim.o.clipboard == "unnamed" or vim.o.string.find(vim.o.clipboard, "unnamed") then
+            regName = vim.v.register == "*" and '' or '"' .. vim.v.register
+        elseif vim.o.clipboard == "unnamedplus" or string.find(vim.o.clipboard, "unnamedplus") then
+            regName = vim.v.register == "+" and '' or '"' .. vim.v.register
+        end
     else
         regName = '"' .. vim.v.register
     end

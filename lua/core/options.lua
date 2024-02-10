@@ -10,6 +10,9 @@ end
 
 opt.cindent    = true
 opt.copyindent = true
+if _G._os_uname.sysname == "Linux" and _G._os_uname.machine ~= "aarch64" then
+    opt.clipboard = "unnamed,unnamedplus"
+end
 
 opt.expandtab   = true
 opt.shiftround  = true
