@@ -3,16 +3,9 @@ return function()
         -- Possible highlighter exception for vim ejection:
         -- https://github.com/nvim-treesitter/nvim-treesitter/issues/3317
         ensure_installed = {
-            "bash",
             "c",
-            "comment",
-            "cpp",
-            "fish",
             "lua",
-            "markdown",
-            "python",
             "query",
-            "regex",
             "vim",
             "vimdoc",
         },
