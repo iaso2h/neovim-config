@@ -107,7 +107,7 @@ return function()
         extra_args = {
             "--gitignore",
             "--config",
-            string.format([[%s%scspell.json]], _G._config_path, _G._sep),
+            string.format([[%s%sspell%scspell.json]], _G._config_path, _G._sep, _G._sep),
         },
         runtime_condition = function(params)
             if params.bufname == "" or not vim.api.nvim_buf_get_option(params.bufnr, "buflisted") then
