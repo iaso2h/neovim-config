@@ -116,7 +116,7 @@ theme.editor =  {
     DiffAdd    = {bg = "#43514b"},
     DiffChange = {bg = "#3e4d5a"},
     DiffDelete = {bg = "#4b3d48", fg = p.n3},
-    DiffText   = {bg = "#526c7a", bold = true},
+    DiffText   = {bg = "#4a5b6a", bold = true},
 
 
     IncSearch = {fg = p.w, bg = "#ED427C", bold = true},
