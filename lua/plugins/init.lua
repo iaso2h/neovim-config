@@ -837,7 +837,12 @@ local pluginArgs = { -- {{{
                 create_keymaps = false,
             }
             -- TODO: prehook buffer-wise
-            map("n", [[dp]], function() return require("debugprint").debugprint()
+            map("n", [[dp]], function()
+                if vim.wo.diff then
+                    vim.api.nvim_feedkeys("dp", "n", false)
+                else
+                    return require("debugprint").debugprint()
+                end
                 end, {"expr"}, "Debug print below")
             map("n", [[dP]], function() return require("debugprint").debugprint { above = true}
                 end, {"expr"}, "Debug print above")
