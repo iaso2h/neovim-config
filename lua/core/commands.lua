@@ -333,9 +333,15 @@ vim.api.nvim_create_user_command("TSLoaded", function (opts) -- {{{
     if require("vim.treesitter.highlighter").active[vim.api.nvim_get_current_buf()] then
         vim.api.nvim_echo({{"Treesitter is loaded in current buffer", "MoreMsg"}}, false, {})
     else
-        vim.api.nvim_echo({{"Treesitter isn't loaded in current buffer", "MoreMsg"}}, false, {})
+        vim.api.nvim_echo({{"Treesitter isn't loaded in current buffer", "DiagnosticWarn"}}, false, {})
     end
 end, {
     desc = "Check if treesitter is loaded in current buffer",
+}) -- }}}
+
+vim.api.nvim_create_user_command("DiffPutAll", function (opts) -- {{{
+    vim.cmd [[%diffget | windo if &diff | noa update | endif | diffoff | qa!]]
+end, {
+    desc = "Put all change in current file towoards other file and save the changes",
 }) -- }}}
 -- }}} Commands
