@@ -462,6 +462,14 @@ local pluginArgs = { -- {{{
         lazy = true,
     },
     {
+        "2KAbhishek/nerdy.nvim",
+        cmd = "Nerdy",
+        dependencies = {
+            "dressing.nvim",
+            "telescope.nvim"
+        },
+    },
+    {
         "debugloop/telescope-undo.nvim",
         dependencies = { "telescope.nvim" },
         keys   = {[[<C-f>u]], mode = "n"},
@@ -472,7 +480,7 @@ local pluginArgs = { -- {{{
                 [[<C-f>u]],
                 [[<CMD>lua require("telescope").extensions.undo.undo()<CR>]],
                 { "silent" },
-                "Telescope undo"
+                "Undo history"
             )
         end,
     },
@@ -498,7 +506,7 @@ local pluginArgs = { -- {{{
                 [[<C-f>J]],
                 [[<CMD>Telescope changes<CR>]],
                 { "silent" },
-                "Telescope changes"
+                "Changes history"
             )
         end,
     },
@@ -673,15 +681,16 @@ local pluginArgs = { -- {{{
         config = require("plugins.nvim-cmp"),
     },
     {
-        "Exafunction/codeium.vim",
+        "Exafunction/codeium.nvim",
         enabled = false,
-        event   = "BufModifiedSet",
-        init    = function() vim.g.codeium_disable_bindings = 1 end,
-        config  = function()
-            map("i", "<C-f>", function() return vim.fn["codeium#Accept"]() end,             { expr = true }, "Codeium accept")
-            map("i", "<C-,>", function() return vim.fn["codeium#CycleCompletions"](-1) end, { expr = true }, "Codeium previous")
-            map("i", "<C-.>", function() return vim.fn["codeium#CycleCompletions"](1) end,  { expr = true }, "Codeium next")
-            map("i", "<A-f>", function() return vim.fn["codeium#Clear"]() end,              { expr = true }, "Codeium clear")
+        dependencies = {
+            "plenary.nvim",
+            "nvim-cmp"
+        },
+        config = function()
+            require("codeium").setup {
+                detect_proxy = true
+            }
         end
     },
     {
@@ -696,6 +705,7 @@ local pluginArgs = { -- {{{
     {
         "aznhe21/actions-preview.nvim",
         keys = { { "<leader>a", mode = "n" } },
+        -- BUG:
         enabled = false,
         config = function()
             map("n", "<leader>a", require("actions-preview").code_actions, "Lsp code action")
@@ -710,7 +720,10 @@ local pluginArgs = { -- {{{
                 },
                 -- priority list of preferred backend
                 backend = { "telescope"},
-                telescope = require("telescope.themes").get_dropdown()
+                telescope = require("telescope.themes").get_dropdown(),
+                highlight_command = {
+                    require("actions-preview.highlight").delta("path/to/delta --option1 --option2"),
+                }
             }
         end,
     },
@@ -1042,6 +1055,26 @@ local pluginArgs = { -- {{{
     {
         "dzeban/vim-log-syntax",
         ft = "log",
+    },
+    {
+        "HakonHarnes/img-clip.nvim",
+        ft = {
+            "log",
+            "md",
+            "tex",
+            "typst",
+            "rst",
+            "asciidoc",
+            "org",
+        },
+        opts = {
+            -- add options here
+            -- or leave it empty to use the default settings
+        },
+        keys = {
+            -- suggested keymap
+            { "<leader>p", "<cmd>PasteImage<cr>", desc = "Paste clipboard image" },
+        },
     },
     -- Fennel {{{
     {

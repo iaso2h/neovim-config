@@ -300,8 +300,8 @@ map("n", [[<C-f>gs]], [[<CMD>lua require('telescope.builtin').git_status()<CR>]]
 
 map("n", [[<C-f>b]], [[<CMD>lua require('telescope.builtin').buffers()<CR>]], {"silent"}, "Buffers")
 map("n", [[<C-f>d]], [[<CMD>lua require('telescope.builtin').diagnostics{bufnr=0}<CR>]],
-    {"silent"}, "Telescope LSP document diagnostics")
+    {"silent"}, "LSP document diagnostics")
 map("n", [[<C-f>D]], [[<CMD>lua require('telescope.builtin').diagnostics{bufnr=nil}<CR>]],
-    {"silent"}, "Telescope LSP workspace diagnostics")
+    {"silent"}, "LSP workspace diagnostics")
 
 end

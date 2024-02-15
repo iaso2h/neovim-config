@@ -338,10 +338,4 @@ vim.api.nvim_create_user_command("TSLoaded", function (opts) -- {{{
 end, {
     desc = "Check if treesitter is loaded in current buffer",
 }) -- }}}
-
-vim.api.nvim_create_user_command("DiffPutAll", function (opts) -- {{{
-    vim.cmd [[%diffget | windo if &diff | noa update | endif | diffoff | qa!]]
-end, {
-    desc = "Put all change in current file towoards other file and save the changes",
-}) -- }}}
 -- }}} Commands

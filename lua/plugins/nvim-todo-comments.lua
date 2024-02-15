@@ -91,7 +91,7 @@ return function()
 
     vim.api.nvim_create_user_command("TodoTelescope", "Telescope todo-comments todo theme=ivy",
         { desc = "Telescope todo" })
-    map("n", [[<C-f>t]], [[<CMD>TodoTelescope<CR>]], { "silent" }, "Telescope todo")
+    map("n", [[<C-f>t]], [[<CMD>TodoTelescope<CR>]], { "silent" }, "Todo")
     map("n", [[<C-q>t]], [[<CMD>TodoQuickFix<CR>]], { "silent" }, "Toggle todo in quickfix")
 
     vim.keymap.set("n", "]t", function()
