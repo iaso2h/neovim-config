@@ -54,6 +54,7 @@ local pluginArgs = { -- {{{
     },
     "inkarkat/vim-visualrepeat",
     "tpope/vim-repeat",
+    "nvim-neotest/nvim-nio",
     -- }}} Dependencies
     -- Treesitter {{{
     {
@@ -606,6 +607,7 @@ local pluginArgs = { -- {{{
         cond  = true,
         event = {"BufAdd", "BufNewFile"},
         dependencies = {
+            "davidmh/cspell.nvim",
             "nvimtools/none-ls.nvim",
             "mason.nvim"
         },
@@ -844,7 +846,10 @@ local pluginArgs = { -- {{{
             { "dv", mode = "n" },
             { "dV", mode = "n" },
         },
-        cmd = { "DeleteDebugPrints" },
+        cmd = {
+            "ToggleCommentDebugPrints",
+            "DeleteDebugPrints",
+        },
         config = function()
             require("debugprint").setup {
                 create_keymaps = false,
@@ -881,7 +886,10 @@ local pluginArgs = { -- {{{
     },
     {
         "rcarriga/nvim-dap-ui",
-        dependencies = { "nvim-dap" },
+        dependencies = {
+            "nvim-dap",
+            "nvim-nio"
+        },
         config = require("plugins.nvim-dap-ui").config,
     },
     {
@@ -970,6 +978,7 @@ local pluginArgs = { -- {{{
             "nvim-neotest/neotest-python",
             "antoinemadec/FixCursorHold.nvim",
             "plenary.nvim",
+            "nvim-nio",
             "nvim-treesitter",
         },
         cmd = {

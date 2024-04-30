@@ -27,6 +27,11 @@ return function()
                 return true
             end
         end,
+        view = {
+            entries = {
+                follow_cursor = true
+            },
+        },
         preselect        = cmp.PreselectMode.None,
         keyword_length   = 3,
         default_behavior = cmp.ConfirmBehavior.Insert,
@@ -37,8 +42,8 @@ return function()
         },
         window = {
             completion = cmp.config.window.bordered{
-                winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:PmenuSel',
-                col_offset   = 3,
+                winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None',
+                col_offset   = 1,
                 scrollbar    = true
             },
         },

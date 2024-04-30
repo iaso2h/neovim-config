@@ -102,7 +102,8 @@ return function()
     } -- }}}
     toggleCmdCreator("selene", "Selene", false)
 
-    local cspell = null_ls.builtins.diagnostics.cspell.with { -- {{{
+    -- {{{ CSpell
+    local cspellConfig = {
         disabled_filetypes = _G._short_line_list,
         extra_args = {
             "--gitignore",
@@ -113,15 +114,26 @@ return function()
             if params.bufname == "" or not vim.api.nvim_buf_get_option(params.bufnr, "buflisted") then
                 return false
             end
+
             if vim.g._cspellEnabled and vim.b._cspellEnabled then
                 return true
             end
+
             return false
         end,
         diagnostics_postprocess = function(diagnostic)
             if type(diagnostic) ~= "table" then return end
             diagnostic.severity = vim.diagnostic.severity.WARN
-        end
+        end,
+
+        -- Extra configuration for https://github.com/davidmh/cspell.nvim
+        config = {
+            config_file_preferred_name = 'cspell.json',
+            find_json = function(cwd)
+                return string.format([[%s%sspell%scspell.json]], _G._config_path, _G._sep, _G._sep)
+            end,
+            read_config_synchronously = true
+        }
     }
 
     -- Add new word to ignore dictionary {{{
@@ -196,13 +208,12 @@ return function()
 
     -- Auto setup by mason
     local handlerArgs = {
-        cspell           = function() null_ls.register(cspell) end,
         ["clang-format"] = function() null_ls.register(null_ls.builtins.formatting.clang_format) end,
         stylua           = function() null_ls.register(null_ls.builtins.formatting.stylua) end,
         selene           = function() null_ls.register(selene) end,
         deno             = function() null_ls.register(null_ls.builtins.formatting.deno_fmt) end,
         black            = function() null_ls.register(null_ls.builtins.formatting.black) end,
-        beautysh         = function() null_ls.register(null_ls.builtins.formatting.beautysh) end,
+        -- beautysh         = function() null_ls.register(null_ls.builtins.formatting.beautysh) end,
         ["write-good"]   = function() null_ls.register(null_ls.builtins.formatting.emacs_scheme_mode) end,
     }
 
@@ -217,8 +228,13 @@ return function()
         handlers               = handlerArgs
     }
 
+    -- Fallback setup
     null_ls.setup {
         -- diagnostics_format = "[#{c}] #{m} (#{s})",
+        sources = {
+            require("cspell").diagnostics.with(cspellConfig),
+            require("cspell").code_actions.with(cspellConfig)
+        },
         on_attach = onAttach
     }
 end
