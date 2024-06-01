@@ -1,4 +1,3 @@
--- TODO: add custom adding stubs action
 return function()
     local null_ls       = require "null-ls"
     local mason_null_ls = require "mason-null-ls"
@@ -24,7 +23,7 @@ return function()
         end
     end
 
-    --- Create Toggle Ex command for lanuage server
+    --- Create Toggle Ex command for language server
     ---@param valName string Prefix for control variable name in vim.g[] and vim.b[]
     ---@param exCmdName string Prefix for Ex command name
     ---@param initialState boolean
@@ -102,7 +101,14 @@ return function()
     } -- }}}
     toggleCmdCreator("selene", "Selene", false)
 
-    local cspell = null_ls.builtins.diagnostics.cspell.with { -- {{{
+    local cspellConfig = { -- {{{
+        --- A way to define your own logic to find the CSpell configuration file.
+        ---@params cwd The same current working directory defined in the source,
+        --             defaulting to vim.loop.cwd()
+        ---@return string|nil The path of the json file
+        find_json = function(cwd)
+            return string.format([[%s%scspell.json]], _G._config_path, _G._sep)
+        end,
         disabled_filetypes = _G._short_line_list,
         extra_args = {
             "--gitignore",
@@ -196,13 +202,13 @@ return function()
 
     -- Auto setup by mason
     local handlerArgs = {
-        cspell           = function() null_ls.register(cspell) end,
+        -- cspell           = function() null_ls.register(cspell) end,
         ["clang-format"] = function() null_ls.register(null_ls.builtins.formatting.clang_format) end,
         stylua           = function() null_ls.register(null_ls.builtins.formatting.stylua) end,
         selene           = function() null_ls.register(selene) end,
         deno             = function() null_ls.register(null_ls.builtins.formatting.deno_fmt) end,
         black            = function() null_ls.register(null_ls.builtins.formatting.black) end,
-        beautysh         = function() null_ls.register(null_ls.builtins.formatting.beautysh) end,
+        prettier         = function() null_ls.register(null_ls.builtins.formatting.prettier) end,
         ["write-good"]   = function() null_ls.register(null_ls.builtins.formatting.emacs_scheme_mode) end,
     }
     mason_null_ls.setup {
@@ -214,6 +220,10 @@ return function()
 
     null_ls.setup {
         -- diagnostics_format = "[#{c}] #{m} (#{s})",
+        sources = {
+            require("cspell").diagnostics.with(cspellConfig),
+            require("cspell").code_actions.with(cspellConfig)
+        },
         on_attach = onAttach
     }
 end

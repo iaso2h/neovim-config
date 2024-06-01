@@ -607,7 +607,8 @@ local pluginArgs = { -- {{{
         event = {"BufAdd", "BufNewFile"},
         dependencies = {
             "nvimtools/none-ls.nvim",
-            "mason.nvim"
+            "mason.nvim",
+            "davidmh/cspell.nvim",
         },
         config = require("plugins.nvim-null-ls"),
     },
@@ -871,7 +872,10 @@ local pluginArgs = { -- {{{
     },
     {
         "rcarriga/nvim-dap-ui",
-        dependencies = { "nvim-dap" },
+        dependencies = {
+            "nvim-dap",
+            "nvim-neotest/nvim-nio"
+        },
         config = require("plugins.nvim-dap-ui").config,
     },
     {
@@ -1061,7 +1065,7 @@ local pluginArgs = { -- {{{
         "gpanders/nvim-parinfer",
         ft = _G._lisp_language,
         init = function()
-            vim.g.parinfer_enabled = true
+            vim.g.parinfer_enabled = false
             vim.g.parinfer_no_maps = true
             vim.g.parinfer_mode = "smart"
         end,
@@ -1172,6 +1176,9 @@ local pluginArgs = { -- {{{
     },
     {
         "DanilaMihailov/vim-tips-wiki",
+    },
+    {
+        "vim-scripts/autolisp-help",
     },
     -- }}} Knowledge
 } -- }}}
