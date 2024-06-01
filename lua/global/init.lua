@@ -158,8 +158,6 @@ vim.g.loaded_rrhelper          = 1
 vim.g.loaded_tar               = 1
 vim.g.loaded_tarPlugin         = 1
 vim.g.loaded_tutor_mode_plugin = 1
-vim.g.loaded_vimball           = 1
-vim.g.loaded_vimballPlugin     = 1
 vim.g.loaded_zip               = 1
 vim.g.loaded_zipPlugin         = 1
 -- Toggle embed syntax
