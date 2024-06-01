@@ -92,7 +92,7 @@ M.refresh = function(forceChk, localChk) -- {{{
     local bufInWin
     for _, win in ipairs(winIds) do
         bufInWin = vim.api.nvim_win_get_buf(win)
-        if vim.api.nvim_buf_get_option(bufInWin, "buftype") == "quickfix" then
+        if vim.api.nvim_get_option_value("buftype", {buf = bufInWin}) == "quickfix" then
             quickfixVisibleTick = true
             qfWinId = win
             qfBufNr = bufInWin

@@ -15,7 +15,7 @@ return function()
                 -- item.bufnr can be nil!
                 local itemBufNr = vim.fn.bufnr(i.filename)
                 if currentBufNr ~= itemBufNr then
-                    -- local openExcmd = api.nvim_buf_get_option(i.bufnr, "buflisted") and "buffer" or "edit"
+                    -- local openExcmd = api.nvim_get_option_value("buflisted", {buf = i.bufnr}) and "buffer" or "edit"
                     local openExcmd = "edit"
                     vim.cmd(string.format("%s %s", openExcmd, i.filename))
                 end

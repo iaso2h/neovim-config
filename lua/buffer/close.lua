@@ -14,7 +14,7 @@ local M   = {}
 local function saveModified(bufNr) -- {{{
     if not vim.api.nvim_buf_is_valid(bufNr) then return false end
 
-    if not vim.api.nvim_buf_get_option(bufNr, "modified") then
+    if not vim.api.nvim_get_option_value("modified", {buf = bufNr}) then
         return true
     else
         vim.cmd "noa echohl MoreMsg"

@@ -155,7 +155,7 @@ M.refresh = function() -- {{{
     for idx, item in ipairs(qfItems) do
         if item.valid ~= 0 and item.bufnr ~= 0 and
             vim.api.nvim_buf_is_valid(item.bufnr) and
-            vim.api.nvim_buf_get_option(item.bufnr, "buflisted")
+            vim.api.nvim_get_option_value("buflisted", {buf = item.bufnr})
             then
             -- Only update listed buffer because otherwise
             -- vim.api.nvim_buf_get_lines can't get content from unlisted buffer

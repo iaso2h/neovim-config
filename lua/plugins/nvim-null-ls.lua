@@ -116,7 +116,7 @@ return function()
             string.format([[%s%sspell%scspell.json]], _G._config_path, _G._sep, _G._sep),
         },
         runtime_condition = function(params)
-            if params.bufname == "" or not vim.api.nvim_buf_get_option(params.bufnr, "buflisted") then
+            if params.bufname == "" or not vim.api.nvim_get_option_value("buflisted", {buf = params.bufnr}) then
                 return false
             end
 

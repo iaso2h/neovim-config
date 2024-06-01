@@ -32,9 +32,9 @@ local WidthExceedOffset = 6
 -- Modified options wrapped around the func
 ---@param func function Implementation of modifying the lines
 local modifyLines = function(func) -- {{{
-    vim.api.nvim_buf_set_option(M.initBuf, "modifiable", true)
+    vim.api.nvim_set_option_value("modifiable", true, {buf = M.initBuf})
     func()
-    vim.api.nvim_buf_set_option(M.initBuf, "modifiable", false)
+    vim.api.nvim_set_option_value("modifiable", false, {buf = M.initBuf})
 end -- }}} 
 --- Check whether historyStartup is loaded
 ---@return boolean
@@ -47,7 +47,7 @@ local isVisible = function() -- {{{
     local winIds = require("buffer.util").winIds(false)
     return require("util").any(function(winId)
         local bufNr    = vim.api.nvim_win_get_buf(winId)
-        local fileType = vim.api.nvim_buf_get_option(bufNr, "filetype")
+        local fileType = vim.api.nvim_get_option_value("filetype", {buf = bufNr})
         return fileType == "HistoryStartup"
     end, winIds)
 end -- }}}
@@ -118,7 +118,7 @@ local setupAutoCmd = function() -- {{{
                 local winIds = require("buffer.util").winIds(false)
                 for _, w in ipairs(winIds) do
                     local b = vim.api.nvim_win_get_buf(w)
-                    local fileType = vim.api.nvim_buf_get_option(b, "filetype")
+                    local fileType = vim.api.nvim_get_option_value("filetype", {buf = b})
                     if fileType == "HistoryStartup" then
                         winId = w
                         break
@@ -190,14 +190,14 @@ local hover = function() -- {{{
         style = "minimal",
         border = "rounded"
     })
-    vim.api.nvim_win_set_option(M.floatWinID, "signcolumn", "no")
+    vim.api.nvim_set_option_value("signcolumn", "no", {win = M.floatWinID})
 
     -- Create buf
     if not M.floatBufNr or not vim.api.nvim_buf_is_valid(M.floatBufNr) then
         M.floatBufNr = vim.api.nvim_create_buf(false, true)
     end
     vim.api.nvim_buf_set_lines(M.floatBufNr, 0, -1, false, {line})
-    vim.api.nvim_buf_set_option(M.floatBufNr, "modifiable", false)
+    vim.api.nvim_set_option_value("modifiable", false, {buf = M.floatBufNr})
     vim.api.nvim_win_set_buf(M.floatWinID, M.floatBufNr)
 
     vim.api.nvim_create_autocmd({
@@ -367,8 +367,8 @@ M.display = function(refreshChk) -- {{{
         -- Use the current buffer if it's a scratch buffer
         M.initBuf  = vim.api.nvim_get_current_buf()
         M.lastBuf = nil
-        vim.api.nvim_buf_set_option(M.initBuf, "buflisted", false)
-        vim.api.nvim_buf_set_option(M.initBuf, "buftype", "nofile")
+        vim.api.nvim_set_option_value("buflisted", false, {buf = M.initBuf})
+        vim.api.nvim_set_option_value("buftype", "nofile", {buf = M.initBuf})
     else
         if not vim.api.nvim_buf_is_valid(M.initBuf) then
             M.initBuf = vim.api.nvim_create_buf(false, true)
@@ -376,8 +376,8 @@ M.display = function(refreshChk) -- {{{
             -- Use last historyStartup buffer?
         end
     end
-    vim.api.nvim_buf_set_option(M.initBuf, "bufhidden", "wipe")
-    vim.api.nvim_buf_set_option(M.initBuf, "filetype",  "HistoryStartup")
+    vim.api.nvim_set_option_value("bufhidden", "wipe", {buf = M.initBuf})
+    vim.api.nvim_set_option_value("filetype",  "HistoryStartup", {buf = M.initBuf})
 
     -- Setting up autocmd
     setupAutoCmd()

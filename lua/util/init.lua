@@ -144,7 +144,7 @@ end -- }}}
 ---@return integer
 function M.compareDist(a, b) -- {{{
     for idx, val in ipairs({a, b}) do
-        assert(vim.tbl_islist(val), string.format("Argument %s expects list-liked table", idx))
+        assert(vim.islist(val), string.format("Argument %s expects list-liked table", idx))
     end
     return a[1] == b[1] and a[2] - b[2] or a[1] - b[1]
 end -- }}}
@@ -309,7 +309,7 @@ M.getQueryNodes = function(bufNr, query, captureId) -- {{{
         ---@diagnostic disable-next-line: redundant-return-value
         return vim.api.nvim_buf_line_count(bufNr)
     end)
-    local lang = vim.treesitter.language.get_lang(vim.api.nvim_buf_get_option(bufNr, "filetype"))
+    local lang = vim.treesitter.language.get_lang(vim.api.nvim_get_option_value("filetype", {buf = bufNr}))
     local tsParser = vim.treesitter.get_parser(bufNr, lang)
     local tsTree = tsParser:parse()[1]
     local root = tsTree:root()

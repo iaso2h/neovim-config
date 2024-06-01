@@ -67,7 +67,7 @@ M.opt.lua.configHook = { -- {{{
             --- Check modified state of specified buffer numbers and prompt for saving if
             --unsave changes found
             local changeTick = require("util").any(function(bufNr)
-                return vim.api.nvim_buf_get_option(bufNr, "modified")
+                return vim.api.nvim_get_option_value("modified", {buf = bufNr})
             end, require("buffer.util").bufNrs(true))
             local answer = -1
             -- Ask for saving, return when cancel is input

@@ -1,5 +1,4 @@
-local api = vim.api
-api.nvim_buf_set_option(0, "textwidth", 78)
-api.nvim_win_set_option(0, "foldmethod", "marker")
--- api.nvim_win_set_option(0, "foldexpr", "EnhanceFoldExpr")
+vim.api.nvim_set_option_value("textwidth", 78, {buf = 0})
+vim.api.nvim_set_option_value("foldmethod", "marker", {win = 0})
+-- vim.api.nvim_set_option_value("foldexpr", "EnhanceFoldExpr", {win = 0})
 

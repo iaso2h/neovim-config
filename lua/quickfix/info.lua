@@ -70,7 +70,7 @@ M.hover = function(printChk) -- {{{
         style = "minimal",
         border = "rounded"
     })
-    vim.api.nvim_win_set_option(M.floatWinID, "signcolumn", "no")
+    vim.api.nvim_set_option_value("signcolumn", "no", {win = M.floatWinID})
 
     -- Create buffer
     if not M.hoverBufNr or not vim.api.nvim_buf_is_valid(M.hoverBufNr) then
@@ -211,8 +211,8 @@ M.hover = function(printChk) -- {{{
                 vim.api.nvim_buf_add_highlight(M.hoverBufNr, M.ns, "Comment", lineIdx, 0, -1)
             end
         end
-        vim.api.nvim_buf_set_option(M.hoverBufNr, "modifiable", false)
-        vim.api.nvim_buf_set_option(M.hoverBufNr, "bufhidden", "wipe")
+        vim.api.nvim_set_option_value("modifiable", false, {buf = M.hoverBufNr})
+        vim.api.nvim_set_option_value("bufhidden", "wipe", {buf = M.hoverBufNr})
     end)):send()
 end -- }}}
 

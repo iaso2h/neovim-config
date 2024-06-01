@@ -7,7 +7,7 @@ M.filetypeSetup = function ()
     for _, win in ipairs(winInfo) do
         local bufNr    = win.bufnr
         local winId    = win.winid
-        local fileType = vim.api.nvim_buf_get_option(bufNr, "filetype")
+        local fileType = vim.api.nvim_get_option_value("filetype", {buf = bufNr})
 
         if vim.tbl_contains({
             "dap-repl",
@@ -18,7 +18,7 @@ M.filetypeSetup = function ()
             "dapui_scopes",
         }, fileType) then
             M.winID[fileType] = winId
-            vim.api.nvim_win_set_option(winId, "cursorline", false)
+            vim.api.nvim_set_option_value("cursorline", false, {win = winId})
 
             if fileType == "dap-repl" or fileType == "dapui_watches" then
                 vim.api.nvim_create_autocmd("BufEnter",{

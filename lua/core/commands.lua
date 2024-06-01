@@ -236,7 +236,7 @@ local purge = function(slientChk) -- {{{
     -- Delete invalid buffers
     local cond = function(bufNr)
         local bufName = nvim_buf_get_name(bufNr)
-        return vim.api.nvim_buf_get_option(bufNr, "buflisted") and
+        return vim.api.nvim_get_option_value("buflisted", {buf = bufNr}) and
             not vim.loop.fs_stat(bufName)
     end
     local inValidBufNrs = vim.tbl_filter(cond, vim.api.nvim_list_bufs())

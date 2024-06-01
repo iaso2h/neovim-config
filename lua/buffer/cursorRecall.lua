@@ -34,7 +34,7 @@ return function(args)
 
     -- Do nothing if the buffer is listed and loaded
     local bufNr = vim.api.nvim_get_current_buf()
-    if vim.api.nvim_buf_is_loaded(bufNr) and not vim.api.nvim_buf_get_option(bufNr, "bufhidden") then
+    if vim.api.nvim_buf_is_loaded(bufNr) and not vim.api.nvim_get_option_value("bufhidden", {buf = bufNr}) then
         log('DEBUGPRINT[2]: cursorRecall.lua:38 (after end)')
         return
     end

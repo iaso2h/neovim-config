@@ -19,9 +19,9 @@ end -- }}}
 M.isSpecialBuf = function(bufNr) -- {{{
     bufNr = bufNr or var.bufNr
     local specialBufType = {"nofile", "nowrite", "prompt"}
-    local bufType    = vim.api.nvim_buf_get_option(bufNr, "buftype")
-    local modifiable = vim.api.nvim_buf_get_option(bufNr, "modifiable")
-    local bufListed  = vim.api.nvim_buf_get_option(bufNr, "buflisted")
+    local bufType    = vim.api.nvim_get_option_value("buftype", {buf = bufNr})
+    local modifiable = vim.api.nvim_get_option_value("modifiable", {buf = bufNr})
+    local bufListed  = vim.api.nvim_get_option_value("buflisted", {buf = bufNr})
     return (bufType ~= "" and (not modifiable or not bufListed)) or
         vim.tbl_contains(specialBufType, bufType)
 end -- }}}
@@ -79,7 +79,7 @@ M.bufNrs = function(listedOnly, loadedOnly) -- {{{
     local rawBufNrs = vim.api.nvim_list_bufs()
     local cond = function(bufNr)
         if listedOnly then
-            return vim.api.nvim_buf_get_option(bufNr, "buflisted")
+            return vim.api.nvim_get_option_value("buflisted", {buf = bufNr})
         else
             if loadedOnly then
                 return vim.api.nvim_buf_is_loaded(bufNr)
@@ -102,7 +102,7 @@ M.bufSwitchAlter = function(winId, bufNr) -- {{{
     local altBufNr = vim.fn.bufnr("#")
     if altBufNr ~= bufNr and vim.api.nvim_buf_is_loaded(altBufNr) and
         -- Switch to alternative buffer whenever possible
-        vim.api.nvim_buf_get_option(altBufNr, "buflisted") and
+        vim.api.nvim_get_option_value("buflisted", {buf = altBufNr}) and
         not M.isSpecialBuf(altBufNr) then
 
         return vim.api.nvim_win_set_buf(winId, altBufNr)
@@ -216,7 +216,7 @@ M.winsOccur = function(winIds) -- {{{
         for _, winId in ipairs(winIds) do
             if vim.api.nvim_win_is_valid(winId) then
                 local bufNr    = vim.api.nvim_win_get_buf(winId)
-                local filetype = vim.api.nvim_buf_get_option(bufNr, "filetype")
+                local filetype = vim.api.nvim_get_option_value("filetype", {buf = bufNr})
                 if filetype == "no-neck-pain" then
                     totalWinCnts = totalWinCnts - 1
                 end
@@ -369,9 +369,9 @@ M.redirScratch = function(lines, scratchBufNr, appendChk, preHook, postHook) -- 
         scratchBufNr = vim.api.nvim_get_current_buf()
         scratchWinId = vim.api.nvim_get_current_win()
 
-        vim.api.nvim_buf_set_option(scratchBufNr, "buflisted", false)
-        vim.api.nvim_buf_set_option(scratchBufNr, "bufhidden", "wipe")
-        vim.api.nvim_buf_set_option(scratchBufNr, "buftype", "nofile")
+        vim.api.nvim_set_option_value("buflisted", false, {buf = scratchBufNr})
+        vim.api.nvim_set_option_value("bufhidden", "wipe", {buf = scratchBufNr})
+        vim.api.nvim_set_option_value("buftype", "nofile", {buf = scratchBufNr})
         vim.api.nvim_buf_set_lines(scratchBufNr, 0, -1, false, lines)
     else
         local layoutCmd = require("buffer.split").handler(false)
@@ -380,7 +380,7 @@ M.redirScratch = function(lines, scratchBufNr, appendChk, preHook, postHook) -- 
         scratchBufNr = vim.api.nvim_create_buf(false, true)
         vim.api.nvim_set_current_buf(scratchBufNr)
 
-        vim.api.nvim_buf_set_option(scratchBufNr, "bufhidden", "wipe")
+        vim.api.nvim_set_option_value("bufhidden", "wipe", {buf = scratchBufNr})
         vim.api.nvim_buf_set_lines(scratchBufNr, 0, -1, false, lines)
         vim.cmd "noa wincmd p"
     end

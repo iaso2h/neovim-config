@@ -66,7 +66,7 @@ local function setUpBuffer(input, filetype, cursorNearEnd, visualCMD, cursorRegi
     local bufNr = api.nvim_create_buf(false, true)
     local cursorRegion, lines = findCursorIndicator("^", vim.split(input, "\n"), cursorRegionChk)
 
-    api.nvim_buf_set_option(bufNr, 'filetype', filetype)
+    api.nvim_set_option_value('filetype', filetype, {buf = bufNr})
     api.nvim_win_set_buf(0, bufNr)
     api.nvim_buf_set_lines(bufNr, 0, -1, true, lines)
 

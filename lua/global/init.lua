@@ -203,7 +203,7 @@ _G.logBuf = function(...) -- {{{
 
     -- Output the result into a new scratch buffer
     _G._log_buf_nr = require("buffer.util").redirScratch(objects, _G._log_buf_nr, true)
-    vim.api.nvim_buf_set_option(_G._log_buf_nr, "filetype", "LogBuffer")
+    vim.api.nvim_set_option_value("filetype", "LogBuffer", {buf = _G._log_buf_nr})
 end -- }}}
 --- Remove value from list-liked lua table
 ---@param tbl table List-like table
@@ -216,7 +216,7 @@ end -- }}}
 --when there are more than one idx to be return. nil will be return when no idx found
 local tbl_remove = function(tbl, srcVal, removeAllChk, cnt) -- {{{
     assert(next(tbl), "Empty table is not allowed")
-    assert(vim.tbl_islist(tbl), "Expect list-liked table")
+    assert(vim.islist(tbl), "Expect list-liked table")
 
     removeAllChk = removeAllChk or false
     cnt = cnt or 1
@@ -293,7 +293,7 @@ end -- }}}
 --- @param allIdx boolean Whether to return all the indexes as a table
 --- @return integer|integer[] # Return table when `returnIdxTbl` is true
 _G.tbl_idx = function(tbl, item, allIdx) -- {{{
-    assert(vim.tbl_islist(tbl), "Expect list-liked table")
+    assert(vim.islist(tbl), "Expect list-liked table")
     assert(type(item) == "string" or type(item) == "number", "Only support indexing string or number")
     local idxTbl = {}
     for idx, i in ipairs(tbl) do

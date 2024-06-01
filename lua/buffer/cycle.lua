@@ -57,7 +57,7 @@ local fallbackCycle = function(currentBufNr, direction) -- {{{
         end
 
         bufNr = vim.api.nvim_get_current_buf()
-        local bufType = vim.api.nvim_buf_get_option(bufNr, "buftype")
+        local bufType = vim.api.nvim_get_option_value("buftype", {buf = bufNr})
         if bufType == "" or bufType == "nofile" then
             returnCode = 1
             break
@@ -82,7 +82,7 @@ local function findCandidate(bufNrs, currentBufIdx, direction) -- {{{
         if direction == -1 and candidateIdx == 0 then candidateIdx = #bufNrs end
         if direction == 1 and candidateIdx == #bufNrs + 1 then candidateIdx = 1 end
 
-        local candidateBuftype = vim.api.nvim_buf_get_option(bufNrs[candidateIdx], "buftype")
+        local candidateBuftype = vim.api.nvim_get_option_value("buftype", {buf = bufNrs[candidateIdx]})
 
         -- Filter out quickfix
         if not vim.tbl_contains(M.buftypeBlacklist, candidateBuftype) then
@@ -109,7 +109,7 @@ M.init = function(direction) -- {{{
         -- Create buffer table when data from cokeline is unavailable
         bufTbl = vim.api.nvim_list_bufs()
         local cond = function (buf)
-            return vim.api.nvim_buf_get_option(buf, "buflisted")
+            return vim.api.nvim_get_option_value("buflisted", {buf = buf})
         end
         bufTbl = vim.tbl_filter(cond, bufTbl)
     end

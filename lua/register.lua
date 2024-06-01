@@ -171,7 +171,7 @@ M.getIndent = function(regContent) -- {{{
         if tabIdx then tabCnt = tabCnt + 1 end
     until not tabIdx or tabIdx > regIndent
 
-    if tabIdx then regIndent = regIndent + tabCnt * vim.api.nvim_buf_get_option(0, "tabstop") end
+    if tabIdx then regIndent = regIndent + tabCnt * vim.api.nvim_get_option_value("tabstop", {buf = 0}) end
 
     return regIndent
 end -- }}}

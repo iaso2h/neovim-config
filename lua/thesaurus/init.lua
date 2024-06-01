@@ -61,7 +61,7 @@ else:
             end
             vim.cmd [[split]]
             M.scratchBuf = vim.api.nvim_create_buf(false, true)
-            vim.api.nvim_buf_set_option(M.scratchBuf, "bufhidden", "wipe")
+            vim.api.nvim_set_option_value("bufhidden", "wipe", {buf = M.scratchBuf})
             vim.api.nvim_set_current_buf(M.scratchBuf)
         end
 

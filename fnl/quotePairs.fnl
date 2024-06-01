@@ -11,7 +11,7 @@
   (when (and (. package.loaded "nvim-treesitter.parsers")
              ((. (require "nvim-treesitter.parsers") "has_parser")))
 
-    (local node ((. (require "nvim-treesitter.ts_utils") "get_node_at_cursor")))
+    (local node ((. vim.treesitter.get_node)))
     (when node
       (if (vim.tbl_contains atomList (node:type))
           node

@@ -109,7 +109,7 @@ local checkOtherOpenMod = function (allAbsStr, directParentTailStr) -- {{{
     local currentBufNr = vim.api.nvim_get_current_buf()
     local allValidBufNr = vim.tbl_filter(function(bufNr)
         if bufNr ~= -1 and -- What bufnr() will return for invalid path
-            bufNr ~= currentBufNr and vim.api.nvim_buf_get_option(bufNr, "modified") then
+            bufNr ~= currentBufNr and vim.api.nvim_get_option_value("modified", {buf = bufNr}) then
             return true
         else
             return false
@@ -262,7 +262,7 @@ M.loadDir = function(path, opt) -- {{{
     local directParentTailStr = util.getTail(directParentStr)
     local pathTailRootStr     = util.getTail(path.filename:sub(1, -5))
 
-    local allRelStrs = vim.tbl_flatten((getAllRelStr(directParentStr, moduleSearchPathStr)))
+    local allRelStrs = vim.iter(getAllRelStr(directParentStr, moduleSearchPathStr)):flatten():totable()
     if not next(allRelStrs) then return end
 
     local allAbsStrs = vim.tbl_map(function(relStr)

@@ -76,7 +76,7 @@ _G.initLinesCursor = function(lines, filetype, cursorIndicatorChar, visualCMD, v
     lines, cursorPos = lineFilterCursor(lines, cursorIndicatorChar, visualRegionChk)
 
     -- Setting up buffer lines
-    api.nvim_buf_set_option(bufNr, 'filetype', filetype)
+    api.nvim_set_option_value('filetype', filetype, {buf = bufNr})
     api.nvim_win_set_buf(0, bufNr)
     api.nvim_buf_set_lines(bufNr, 0, -1, true, lines)
 

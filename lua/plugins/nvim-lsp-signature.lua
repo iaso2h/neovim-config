@@ -225,7 +225,7 @@ return function()
             return {}, s, l
         end
         local off_y
-        local ft = vim.api.nvim_buf_get_option(bufnr, 'ft')
+        local ft = vim.api.nvim_get_option_value('ft', {buf = bufnr})
 
         ft = helper.ft2md(ft)
         -- handles multiple file type, we should just take the first filetype
@@ -413,7 +413,7 @@ return function()
                 _LSP_SIG_CFG.bufnr, _LSP_SIG_CFG.winnr =
                     vim.lsp.util.open_floating_preview(lines, syntax, config)
 
-                -- vim.api.nvim_buf_set_option(_LSP_SIG_CFG.bufnr, "filetype", "")
+                -- vim.api.nvim_set_option_value("filetype", "", {buf = _LSP_SIG_CFG.bufnr})
                 log('sig_cfg bufnr, winnr not valid recreate', _LSP_SIG_CFG.bufnr, _LSP_SIG_CFG.winnr)
                 _LSP_SIG_CFG.label = label
                 _LSP_SIG_CFG.client_id = client_id
@@ -425,7 +425,7 @@ return function()
             _LSP_SIG_CFG.client_id = client_id
 
 
-            -- vim.api.nvim_buf_set_option(_LSP_SIG_CFG.bufnr, "filetype", "lsp_signature")
+            -- vim.api.nvim_set_option_value("filetype", "lsp_signature", {buf = _LSP_SIG_CFG.bufnr})
         end
 
         if
@@ -434,7 +434,7 @@ return function()
             and _LSP_SIG_CFG.transparency < 100
         then
             if type(_LSP_SIG_CFG.winnr) == 'number' and vim.api.nvim_win_is_valid(_LSP_SIG_CFG.winnr) then
-                vim.api.nvim_win_set_option(_LSP_SIG_CFG.winnr, 'winblend', _LSP_SIG_CFG.transparency)
+                vim.api.nvim_set_option_value('winblend', _LSP_SIG_CFG.transparency, {win = _LSP_SIG_CFG.winnr})
             end
         end
         local sig = result.signatures

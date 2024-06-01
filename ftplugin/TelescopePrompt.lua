@@ -6,7 +6,7 @@ if not TelescopeOverrideBufMap then
         local tbl = vim.tbl_keys(TelescopeGlobalState)
         local opts = opts or {silent = true, noremap = true}
 
-        if tbl[1] == "number" then
+        if type(tbl[1]) == "number" then
             promptBufNr = tbl[1]
         else
             promptBufNr = tbl[2]

@@ -17,7 +17,7 @@ local buftypeWhitelist  = {"terminal"}
 local saveModified = function(bufNrs, saveBufNr)  -- {{{
     local changeTick = require("util").any(function(bufNr)
         if bufNr == saveBufNr then return false end
-        return vim.api.nvim_buf_get_option(bufNr, "modified")
+        return vim.api.nvim_get_option_value("modified", {buf = bufNr})
     end, bufNrs)
     local answer = -1
     -- Ask for saving, return when cancel is input
@@ -51,8 +51,8 @@ return function()
     -- Deleting other buffers
     for _, bufNr in ipairs(bufNrs) do
         if bufNr ~= saveBufNr and
-            not vim.tbl_contains(filetypeWhitelist, vim.api.nvim_buf_get_option(bufNr, "filetype")) and
-            not vim.tbl_contains(buftypeWhitelist, vim.api.nvim_buf_get_option(bufNr, "buftype")) then
+            not vim.tbl_contains(filetypeWhitelist, vim.api.nvim_get_option_value("filetype", {buf = bufNr})) and
+            not vim.tbl_contains(buftypeWhitelist, vim.api.nvim_get_option_value("buftype", {buf = bufNr})) then
             u.initBuf(bufNr)
             close.bufHandler(false, false)
         end

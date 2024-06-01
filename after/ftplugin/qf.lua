@@ -32,13 +32,13 @@ bmap(0, "x", [[d]],  [[:lua require("quickfix.modification").delete("v")<CR>]], 
 bmap(0, "n", [[dd]], [[<CMD>lua require("quickfix.modification").delete("n")<CR>]], {"silent"}, "Delete quickfix item under cursor")
 bmap(0, "n", [[u]],  [[<CMD>lua require("quickfix.modification").recovery()<CR>]],  {"silent"}, "Recovery quickfix items")
 bmap(0, "n", [[r]],  [[<CMD>lua require("quickfix.modification").refresh()<CR>]],   {"silent"}, "Refresh quickfix items")
-vim.api.nvim_win_set_option(0, "number", true)
-vim.api.nvim_win_set_option(0, "relativenumber", false)
-vim.api.nvim_win_set_option(0, "signcolumn", "no")
-vim.api.nvim_win_set_option(0, "cursorline", false)
-vim.api.nvim_win_set_option(0, "wrap", true)
-vim.api.nvim_win_set_option(0, "foldcolumn", "0")
-vim.api.nvim_buf_set_option(0, "buflisted", false)
+vim.api.nvim_set_option_value("number", true, {win = 0})
+vim.api.nvim_set_option_value("relativenumber", false, {win = 0})
+vim.api.nvim_set_option_value("signcolumn", "no", {win = 0})
+vim.api.nvim_set_option_value("cursorline", false, {win = 0})
+vim.api.nvim_set_option_value("wrap", true, {win = 0})
+vim.api.nvim_set_option_value("foldcolumn", "0", {win = 0})
+vim.api.nvim_set_option_value("buflisted", false, {buf = 0})
 
 vim.cmd [[setlocal winhighlight=Normal:PanelBackground,SignColumn:PanelBackground]]
 if vim.api.nvim_list_uis()[1].height > 42 and _G._os_uname.machine ~= "aarch64" then
