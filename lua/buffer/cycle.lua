@@ -1,8 +1,8 @@
 -- File: cycle.lua
 -- Author: iaso2h
 -- Description: Improved bp and bn
--- Version: 0.0.11
--- Last Modified: 2023-10-24
+-- Version: 0.0.12
+-- Last Modified: 2024-01-05
 
 
 local M   = {
@@ -33,9 +33,11 @@ local checkTreeSitterLoaded = function(bufNr) -- {{{
 end -- }}}
 --- Cycle through buffers until standard buffer is found
 ---@param currentBufNr integer Buffer number
----@param direction integer `1|-1` `1` indicate cycling forward
+---@param direction integer `1|-1` `1` indicates cycling forward
+---@return integer `1|-1` `1`indicates cycling to a standard buffer
 local fallbackCycle = function(currentBufNr, direction) -- {{{
     local bufNr
+    local returnCode
 
     repeat
         -- Deliberately leave track on jumplist so that you can traceback to
@@ -57,11 +59,14 @@ local fallbackCycle = function(currentBufNr, direction) -- {{{
         bufNr = vim.api.nvim_get_current_buf()
         local bufType = vim.api.nvim_buf_get_option(bufNr, "buftype")
         if bufType == "" or bufType == "nofile" then
+            returnCode = 1
             break
         end
     until bufNr == currentBufNr
 
     checkTreeSitterLoaded(bufNr)
+
+    return returnCode
 end -- }}}
 --- Find the standard buffer idx in the `bufNrs`
 ---@param bufNrs integer[] Buffer numbers
@@ -108,6 +113,9 @@ M.init = function(direction) -- {{{
         end
         bufTbl = vim.tbl_filter(cond, bufTbl)
     end
+    if #bufTbl == 1 then
+        return vim.notify("No valid buffer to cycle", vim.log.levels.INFO)
+    end
 
     local currentBufIdx = tbl_idx(bufTbl, currentBufNr, false)
     if currentBufIdx == -1 then
@@ -123,7 +131,7 @@ M.init = function(direction) -- {{{
 
     -- Use the Ex command to enter a buffer without writing jumplist
     local candidateBufNr = bufTbl[candidateIdx]
-    vim.cmd([[noa keepjump buffer ]] .. candidateBufNr)
+    vim.cmd([[keepjump noa buffer ]] .. candidateBufNr)
 
     checkTreeSitterLoaded(candidateBufNr)
     if M.registerInJumplist then
