@@ -1,8 +1,8 @@
 -- File: cycle.lua
 -- Author: iaso2h
 -- Description: Improved bp and bn
--- Version: 0.0.12
--- Last Modified: 2024-01-05
+-- Version: 0.0.13
+-- Last Modified: 2024-06-01
 
 
 local M   = {
@@ -100,25 +100,19 @@ M.init = function(direction) -- {{{
         bufTbl = vim.tbl_map(function(buffer)
             return buffer.number
         end, require("cokeline.state").visible_buffers)
-        -- Deal with non-standard buffer
-        if not vim.tbl_contains(bufTbl, currentBufNr) or
-            vim.o.buftype ~= "" or nvim_buf_get_name(0) == "" then
-            return fallbackCycle(currentBufNr, direction)
-        end
     else
         -- Create buffer table when data from cokeline is unavailable
-        bufTbl = vim.api.nvim_list_bufs()
-        local cond = function (buf)
-            return vim.api.nvim_get_option_value("buflisted", {buf = buf})
-        end
-        bufTbl = vim.tbl_filter(cond, bufTbl)
+        bufTbl = require("buffer.util").bufNrs(true)
     end
     if #bufTbl == 1 then
         return vim.notify("No valid buffer to cycle", vim.log.levels.INFO)
     end
 
-    local currentBufIdx = tbl_idx(bufTbl, currentBufNr, false)
-    if currentBufIdx == -1 then
+    -- Deal with non-standard buffer
+    if not vim.api.nvim_get_option_value("buflisted", {buf = currentBufNr}) or
+        vim.o.buftype ~= "" or
+        nvim_buf_get_name(0) == "" or
+        tbl_idx(bufTbl, currentBufNr, false) == -1 then
         -- Use fallback function if current buffer index is not found
         return fallbackCycle(currentBufNr, direction)
     end
