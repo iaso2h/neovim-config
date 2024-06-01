@@ -1,8 +1,8 @@
 -- File: trailingChar
 -- Author: iaso2h
 -- Description: Add character at the end of line
--- Version: 0.0.7
--- Last Modified: 2023-10-20
+-- Version: 0.0.8
+-- Last Modified: 2024-01-31
 local ts  = vim.treesitter
 
 --- Find if a comment node exist in a line
@@ -190,10 +190,10 @@ return function(vimMode, char) -- {{{
                 end
 
                 if botEmpty then
-                    newLine = require("register").indentCopy(endPos[1] - 1) .. commentStr .. " }}}" .. note
+                    newLine = require("register").indentCopy(endPos[1] - 1) .. commentStr .. " }}}"
                     table.insert(lines, #lines, newLine)
                 else
-                    newLine = require("register").indentCopy(endPos[1]) .. commentStr .. " }}}" .. note
+                    newLine = require("register").indentCopy(endPos[1]) .. commentStr .. " }}}"
                     lines[#lines + 1] = newLine
                 end
             else

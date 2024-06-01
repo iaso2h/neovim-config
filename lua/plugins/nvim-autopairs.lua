@@ -1,7 +1,7 @@
 return function()
     require("nvim-autopairs").setup {
         disable_filetype          = vim.list_extend(
-            { "TelescopePrompt", "dap-repl", "lua" }, _G._lisp_language),
+            { "TelescopePrompt", "dap-repl"}, _G._lisp_language),
         disable_in_macro          = true,
         disable_in_visualblock    = true,
         disable_in_replace_mode   = true,
@@ -21,9 +21,12 @@ return function()
             map = "<C-f>",
             chars = { '{', '[', '(', '"', "'" },
             pattern = [=[[%'%"%>%]%)%}%,]]=],
-            end_key = '$',
+            end_key = 'L',
+            before_key = 'h',
+            after_key = 'l',
+            cursor_pos_before = true,
             keys = 'qwertyuiopzxcvbnmasdfghjkl',
-            check_comma = true,
+            manual_position = true,
             highlight = 'Search',
             highlight_grey = 'Comment'
         },

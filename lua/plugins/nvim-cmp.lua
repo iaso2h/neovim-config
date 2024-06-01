@@ -27,6 +27,11 @@ return function()
                 return true
             end
         end,
+        view = {
+            entries = {
+                follow_cursor = true
+            },
+        },
         preselect        = cmp.PreselectMode.None,
         keyword_length   = 3,
         default_behavior = cmp.ConfirmBehavior.Insert,
@@ -37,8 +42,8 @@ return function()
         },
         window = {
             completion = cmp.config.window.bordered{
-                winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:PmenuSel',
-                col_offset   = 3,
+                winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None',
+                col_offset   = 1,
                 scrollbar    = true
             },
         },
@@ -55,6 +60,7 @@ return function()
             {name = 'conjure'},
             {name = "luasnip"},
             {name = "cmp_tabnine"},
+            {name = "codeium"},
         },
         formatting = {
             fields = {"kind", "abbr", "menu"},
@@ -75,6 +81,9 @@ return function()
                 vimItem.menu = vimItem.kind
                 if entry.source.name == "cmp_tabnine" then
                     vimItem.kind = icon.misc.Robot
+                    vimItem.kind_hl_group = "CmpItemKindTabnine"
+                elseif entry.source.name == "codeium" then
+                    vimItem.kind = "󰚩"
                     vimItem.kind_hl_group = "CmpItemKindTabnine"
                 elseif entry.source.name == "emoji" then
                     vimItem.kind = icon.misc.Smiley

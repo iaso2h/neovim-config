@@ -217,7 +217,13 @@ M.posCenter = function(exCmd, suppressMsgChk, providedPrevWinId, providedPrevBuf
     end
 
     if not ok and not suppressMsgChk then
-        vim.notify(valOrMsg, vim.log.levels.INFO)
+        if string.find(valOrMsg, "E663:", 1, true) then
+            vim.api.nvim_echo({ { "At newest change", "WarningMsg" } }, false, {})
+        elseif string.find(valOrMsg, "E662", 1, true) then
+            vim.api.nvim_echo({ { "At oldest change", "WarningMsg" } }, false, {})
+        else
+            vim.notify(valOrMsg, vim.log.levels.INFO)
+        end
     end
 
     local postBufNr = vim.api.nvim_get_current_buf()

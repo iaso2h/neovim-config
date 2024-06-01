@@ -113,21 +113,32 @@ return function()
         extra_args = {
             "--gitignore",
             "--config",
-            string.format([[%s%scspell.json]], _G._config_path, _G._sep),
+            string.format([[%s%sspell%scspell.json]], _G._config_path, _G._sep, _G._sep),
         },
         runtime_condition = function(params)
             if params.bufname == "" or not vim.api.nvim_buf_get_option(params.bufnr, "buflisted") then
                 return false
             end
+
             if vim.g._cspellEnabled and vim.b._cspellEnabled then
                 return true
             end
+
             return false
         end,
         diagnostics_postprocess = function(diagnostic)
             if type(diagnostic) ~= "table" then return end
             diagnostic.severity = vim.diagnostic.severity.WARN
-        end
+        end,
+
+        -- Extra configuration for https://github.com/davidmh/cspell.nvim
+        config = {
+            config_file_preferred_name = 'cspell.json',
+            find_json = function(cwd)
+                return string.format([[%s%sspell%scspell.json]], _G._config_path, _G._sep, _G._sep)
+            end,
+            read_config_synchronously = true
+        }
     }
 
     -- Add new word to ignore dictionary {{{
@@ -202,7 +213,6 @@ return function()
 
     -- Auto setup by mason
     local handlerArgs = {
-        -- cspell           = function() null_ls.register(cspell) end,
         ["clang-format"] = function() null_ls.register(null_ls.builtins.formatting.clang_format) end,
         stylua           = function() null_ls.register(null_ls.builtins.formatting.stylua) end,
         selene           = function() null_ls.register(selene) end,
@@ -211,6 +221,11 @@ return function()
         prettier         = function() null_ls.register(null_ls.builtins.formatting.prettier) end,
         ["write-good"]   = function() null_ls.register(null_ls.builtins.formatting.emacs_scheme_mode) end,
     }
+
+    if _G._os_uname.sysname == "Linux" and _G._os_uname.machine == "aarch64" then
+        handlerArgs.deno = nil
+        handlerArgs.selene = nil
+    end
     mason_null_ls.setup {
         ensure_installed       = vim.tbl_keys(handlerArgs),
         automatic_installation = true,
@@ -218,6 +233,7 @@ return function()
         handlers               = handlerArgs
     }
 
+    -- Fallback setup
     null_ls.setup {
         -- diagnostics_format = "[#{c}] #{m} (#{s})",
         sources = {

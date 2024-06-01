@@ -49,14 +49,18 @@ local pluginArgs = { -- {{{
     -- Dependencies {{{
     {
         "nvim-lua/plenary.nvim",
+        priority = 100,
         commit = "4cd4c29"
     },
     "inkarkat/vim-visualrepeat",
     "tpope/vim-repeat",
+    "nvim-neotest/nvim-nio",
     -- }}} Dependencies
     -- Treesitter {{{
     {
         "nvim-treesitter/nvim-treesitter",
+        lazy = false,
+        priority = 100,
         build = function() vim.cmd([[TSUpdate]]) end,
         config = require("plugins.nvim-treesitter"),
     },
@@ -151,23 +155,12 @@ local pluginArgs = { -- {{{
     -- }}} Treesitter
     -- Vim enhancement {{{
     {
-        "tpope/vim-eunuch",
+        "lambdalisue/suda.vim",
+        enabled = not (_G._os_uname.sysname == "Windows_NT"),
         cmd = {
-            "Delete",
-            "Unlink",
-            "Remove",
-            "Move",
-            "Rename",
-            "Chmod",
-            "Mkdir",
-            "Cfind",
-            "Lfind",
-            "Clocate",
-            "Llocate",
-            "SudoEdit",
-            "SudoWrite",
-            "Wall",
-        },
+            "SudaRead",
+            "SudaWrite",
+        }
     },
     {
         "skywind3000/asyncrun.vim",
@@ -470,6 +463,14 @@ local pluginArgs = { -- {{{
         lazy = true,
     },
     {
+        "2KAbhishek/nerdy.nvim",
+        cmd = "Nerdy",
+        dependencies = {
+            "dressing.nvim",
+            "telescope.nvim"
+        },
+    },
+    {
         "debugloop/telescope-undo.nvim",
         dependencies = { "telescope.nvim" },
         keys   = {[[<C-f>u]], mode = "n"},
@@ -480,7 +481,7 @@ local pluginArgs = { -- {{{
                 [[<C-f>u]],
                 [[<CMD>lua require("telescope").extensions.undo.undo()<CR>]],
                 { "silent" },
-                "Telescope undo"
+                "Undo history"
             )
         end,
     },
@@ -506,7 +507,7 @@ local pluginArgs = { -- {{{
                 [[<C-f>J]],
                 [[<CMD>Telescope changes<CR>]],
                 { "silent" },
-                "Telescope changes"
+                "Changes history"
             )
         end,
     },
@@ -606,6 +607,7 @@ local pluginArgs = { -- {{{
         cond  = true,
         event = {"BufAdd", "BufNewFile"},
         dependencies = {
+            "davidmh/cspell.nvim",
             "nvimtools/none-ls.nvim",
             "mason.nvim",
             "davidmh/cspell.nvim",
@@ -682,15 +684,16 @@ local pluginArgs = { -- {{{
         config = require("plugins.nvim-cmp"),
     },
     {
-        "Exafunction/codeium.vim",
+        "Exafunction/codeium.nvim",
         enabled = false,
-        event   = "BufModifiedSet",
-        init    = function() vim.g.codeium_disable_bindings = 1 end,
-        config  = function()
-            map("i", "<C-f>", function() return vim.fn["codeium#Accept"]() end,             { expr = true }, "Codeium accept")
-            map("i", "<C-,>", function() return vim.fn["codeium#CycleCompletions"](-1) end, { expr = true }, "Codeium previous")
-            map("i", "<C-.>", function() return vim.fn["codeium#CycleCompletions"](1) end,  { expr = true }, "Codeium next")
-            map("i", "<A-f>", function() return vim.fn["codeium#Clear"]() end,              { expr = true }, "Codeium clear")
+        dependencies = {
+            "plenary.nvim",
+            "nvim-cmp"
+        },
+        config = function()
+            require("codeium").setup {
+                detect_proxy = true
+            }
         end
     },
     {
@@ -705,6 +708,7 @@ local pluginArgs = { -- {{{
     {
         "aznhe21/actions-preview.nvim",
         keys = { { "<leader>a", mode = "n" } },
+        -- BUG:
         enabled = false,
         config = function()
             map("n", "<leader>a", require("actions-preview").code_actions, "Lsp code action")
@@ -719,7 +723,10 @@ local pluginArgs = { -- {{{
                 },
                 -- priority list of preferred backend
                 backend = { "telescope"},
-                telescope = require("telescope.themes").get_dropdown()
+                telescope = require("telescope.themes").get_dropdown(),
+                highlight_command = {
+                    require("actions-preview.highlight").delta("path/to/delta --option1 --option2"),
+                }
             }
         end,
     },
@@ -840,13 +847,21 @@ local pluginArgs = { -- {{{
             { "dv", mode = "n" },
             { "dV", mode = "n" },
         },
-        cmd = { "DeleteDebugPrints" },
+        cmd = {
+            "ToggleCommentDebugPrints",
+            "DeleteDebugPrints",
+        },
         config = function()
             require("debugprint").setup {
                 create_keymaps = false,
             }
             -- TODO: prehook buffer-wise
-            map("n", [[dp]], function() return require("debugprint").debugprint()
+            map("n", [[dp]], function()
+                if vim.wo.diff then
+                    vim.api.nvim_feedkeys("dp", "n", false)
+                else
+                    return require("debugprint").debugprint()
+                end
                 end, {"expr"}, "Debug print below")
             map("n", [[dP]], function() return require("debugprint").debugprint { above = true}
                 end, {"expr"}, "Debug print above")
@@ -874,7 +889,7 @@ local pluginArgs = { -- {{{
         "rcarriga/nvim-dap-ui",
         dependencies = {
             "nvim-dap",
-            "nvim-neotest/nvim-nio"
+            "nvim-nio"
         },
         config = require("plugins.nvim-dap-ui").config,
     },
@@ -964,6 +979,7 @@ local pluginArgs = { -- {{{
             "nvim-neotest/neotest-python",
             "antoinemadec/FixCursorHold.nvim",
             "plenary.nvim",
+            "nvim-nio",
             "nvim-treesitter",
         },
         cmd = {
@@ -1049,6 +1065,26 @@ local pluginArgs = { -- {{{
     {
         "dzeban/vim-log-syntax",
         ft = "log",
+    },
+    {
+        "HakonHarnes/img-clip.nvim",
+        ft = {
+            "log",
+            "md",
+            "tex",
+            "typst",
+            "rst",
+            "asciidoc",
+            "org",
+        },
+        opts = {
+            -- add options here
+            -- or leave it empty to use the default settings
+        },
+        keys = {
+            -- suggested keymap
+            { "<leader>p", "<cmd>PasteImage<cr>", desc = "Paste clipboard image" },
+        },
     },
     -- Fennel {{{
     {

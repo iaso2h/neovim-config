@@ -80,7 +80,6 @@
   "vim-AdvancedSorters": { "branch": "master", "commit": "079856080d42e5ea91fadabc39c2906b2d0a0a67" },
   "vim-Concealer": { "branch": "master", "commit": "2eef01e3882de868eee7d3d9379645f73429231e" },
   "vim-easy-align": { "branch": "master", "commit": "9815a55dbcd817784458df7a18acacc6f82b1241" },
-  "vim-eunuch": { "branch": "master", "commit": "8fb3904be27b6b60d086f87c2570085902414069" },
   "vim-illuminate": { "branch": "master", "commit": "5eeb7951fc630682c322e88a9bbdae5c224ff0aa" },
   "vim-ingo-library": { "branch": "master", "commit": "48ffe514bac9ddd5c7ece029a47a94f9dd31b935" },
   "vim-log-syntax": { "branch": "master", "commit": "50f8ba62128a0381d215a647768c8ad6763290cd" },

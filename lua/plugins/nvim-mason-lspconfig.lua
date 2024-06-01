@@ -1,7 +1,7 @@
 local M = {}
 
 M.serverNames = {
-    cmake    = {},
+    -- cmake    = {},
     cssls    = {},
     html     = {},
     jsonls   = {},
@@ -9,24 +9,26 @@ M.serverNames = {
     pyright  = {},
     tsserver = {},
     vimls    = {},
+    grammarly = {},
+    marksman = {},
+    yamlls = {},
+    bashls = {},
+    clangd = {},
 }
 
-if _G._os_uname.sysname == "Linux" and _G._os_uname.machine ~= "aarch64" then
-    M.serverNames.fennel_language_server = {}
+if _G._os_uname.sysname == "Linux" then
+    if _G._os_uname.machine ~= "aarch64" then
+        M.serverNames.fennel_language_server = {}
+    else
+        M.serverNames.grammarly = nil
+        M.serverNames.marksman  = nil
+        M.serverNames.yamlls    = nil
+        M.serverNames.bashls    = nil
+        M.serverNames.clangd    = nil
+    end
 elseif _G._os_uname.sysname == "Windows_NT" then
     M.serverNames.powershell_es = {}
 end
-
-if _G._os_uname.machine ~= "aarch64" then
-    M.serverNames = vim.tbl_extend("keep", M.serverNames, {
-        grammarly = {},
-        marksman = {},
-        yamlls = {},
-        bashls = {},
-        clangd = {},
-    })
-end
-
 
 
 M.config = function()

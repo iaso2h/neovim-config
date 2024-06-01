@@ -482,7 +482,6 @@ return function()
             -- Float win is not visible?
             return
         end
-
         local params = vim.lsp.util.make_position_params()
         local pos = api.nvim_win_get_cursor(0)
         local line = api.nvim_get_current_line()
