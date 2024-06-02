@@ -1,8 +1,8 @@
 -- File: trailingChar
 -- Author: iaso2h
 -- Description: Add character at the end of line
--- Version: 0.0.8
--- Last Modified: 2024-01-31
+-- Version: 0.0.9
+-- Last Modified: 2024-06-02
 local ts  = vim.treesitter
 
 --- Find if a comment node exist in a line
@@ -151,7 +151,7 @@ return function(vimMode, char) -- {{{
 
         if char == "{" or char == "}" then
             local commentStr
-            local ok, msg = pcall(string.gsub, vim.bo.commentstring, "%s+%%s$", "")
+            local ok, msg = pcall(string.gsub, vim.bo.commentstring, "%s*%%s$", "")
             if not ok then
                 vim.notify("Failed at retrieving comment string", vim.log.levels.ERROR)
                 return vim.notify(msg, vim.log.levels.ERROR)
