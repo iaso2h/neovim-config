@@ -340,5 +340,17 @@ M.any = function(func, tbl) -- {{{
     end
     return false
 end -- }}}
+--- Reverse a list-like table
+---@param t table
+---@return table
+M.tblReverse = function(t) -- {{{
+    assert(vim.islist(t), "Argument expects list-liked table")
+    local tblReversed = {}
+    local len = #t
+    for k, v in ipairs(t) do
+        tblReversed[len + 1 - k] = v
+    end
+    return tblReversed
+end -- }}}
 
 return M

@@ -1,17 +1,6 @@
 local M = {}
 
 
---- Reverse a list-like table
----@param t table
----@return table
-M.tblReverse = function(t) -- {{{
-    local tblReversed = {}
-    local len = #t
-    for k, v in ipairs(t) do
-        tblReversed[len + 1 - k] = v
-    end
-    return tblReversed
-end -- }}}
 --- Register specific line region in current buffer
 ---@param startLineNr? integer
 ---@param lastLineNr? integer
