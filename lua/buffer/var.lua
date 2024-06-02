@@ -7,5 +7,5 @@ return {
     winId    = nil,
     winIds   = nil,
 
-    lastClosedFilePath = nil
+    lastClosedFilePaths = {}
 }

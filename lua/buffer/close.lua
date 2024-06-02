@@ -1,8 +1,8 @@
 -- File: /buf/close.lua
 -- Author: iaso2h
 -- Description: Deleting buffer without changing the window layout
--- Version: 0.1.10
--- Last Modified: 2023-10-24
+-- Version: 0.1.11
+-- Last Modified: 2024-06-02
 local u   = require("buffer.util")
 local var = require("buffer.var")
 local M   = {}
@@ -83,7 +83,9 @@ M.bufHandler = function(postRearrange, isSpecial) -- {{{
             if not saveModified(var.bufNr) then return end
             u.bufClose(nil, true)
         end
-        var.lastClosedFilePath = nil
+
+        -- Deprecated beacause special files/buffers is hard to retrieve their real paths
+        -- var.lastClosedFilePath = nil
     else
         if u.isScratchBuf() then -- {{{
             -- Close NNP
@@ -109,7 +111,7 @@ M.bufHandler = function(postRearrange, isSpecial) -- {{{
 
         -- Standard buffer: buffer that has a non-empty buffer name and listed in buffer list-- {{{
         -- For future retrieving
-        var.lastClosedFilePath = var.bufName
+        table.insert(var.lastClosedFilePaths, 1, var.bufName)
 
         if not saveModified(var.bufNr) then return end
 

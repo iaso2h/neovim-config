@@ -108,12 +108,15 @@ M.init = function(direction) -- {{{
         return vim.notify("No valid buffer to cycle", vim.log.levels.INFO)
     end
 
-    -- Deal with non-standard buffer
+    -- Deal with scenarios when current buffer is a non-standard buffer
     if not vim.api.nvim_get_option_value("buflisted", {buf = currentBufNr}) or
-        vim.o.buftype ~= "" or
-        nvim_buf_get_name(0) == "" or
-        tbl_idx(bufTbl, currentBufNr, false) == -1 then
+        vim.o.buftype ~= "" or nvim_buf_get_name(0) == ""  then
         -- Use fallback function if current buffer index is not found
+        return fallbackCycle(currentBufNr, direction)
+    end
+    -- Deal with scenario when current buffer isn't listed in the buffer list
+    local currentBufIdx = tbl_idx(bufTbl, currentBufNr, false)
+    if currentBufIdx == -1 then
         return fallbackCycle(currentBufNr, direction)
     end
 

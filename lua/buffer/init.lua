@@ -1,5 +1,6 @@
-local var = require("buffer.var")
-local M   = {}
+local var  = require("buffer.var")
+local u    = require("buffer.util")
+local M    = {}
 
 
 --- Close the current window or buffer
@@ -11,8 +12,18 @@ end
 
 --- Reopen the last closed standard buffer
 M.restoreClosedBuf = function()
-    if var.lastClosedFilePath and vim.loop.fs_stat(var.lastClosedFilePath) then
-        vim.cmd(string.format("e %s", var.lastClosedFilePath))
+    if next(var.lastClosedFilePaths) then
+        local bufNrs = u.bufNrs(true)
+        for index, path in ipairs(var.lastClosedFilePaths) do
+            if vim.tbl_contains(bufNrs, vim.fn.bufnr(path)) then
+                -- Skip buffer that is already opened
+                table.remove(var.lastClosedFilePaths, index)
+            else
+                table.remove(var.lastClosedFilePaths, index)
+                vim.cmd(string.format("e %s", path))
+                return
+            end
+        end
     end
 end
 
