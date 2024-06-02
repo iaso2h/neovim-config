@@ -1,8 +1,8 @@
 ; File: quotePairs
 ; Author: iaso2h
 ; Description: Auto make "" pair up
-; Version: 0.0.2
-; Last Modified: 2023-3-23
+; Version: 0.0.3
+; Last Modified: 2024-06-01
 (local {: pp : strIdxAll} (require "fnlUtil"))
 (local atomList ["list" "sequence" "local"])
 
@@ -11,7 +11,7 @@
   (when (and (. package.loaded "nvim-treesitter.parsers")
              ((. (require "nvim-treesitter.parsers") "has_parser")))
 
-    (local node ((. vim.treesitter.get_node)))
+    (local node (vim.treesitter.get_node))
     (when node
       (if (vim.tbl_contains atomList (node:type))
           node

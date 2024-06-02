@@ -297,8 +297,8 @@ end, "Select last yank")
 -- Search & Jumping {{{
 -- In case of mistouching
 -- Inquiry word
-map("n", [[<leader>i]], [=[[I]=], "Inquiry word under cursor")
-map("x", [[<leader>i]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selection").get("string", false), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquiry selected words")
+map("n", [[<leader>I]], [=[[I]=], "Inquiry word under cursor")
+map("x", [[<leader>I]], [[:lua vim.cmd("noa g#\\V" .. string.gsub(require("selection").get("string", false), "\\", "\\\\") .. "#number")<CR>]], {"silent"}, "Inquiry selected words")
 -- Fast mark restore
 map("n", [[M]], [[<CMD>lua require("jump.util").posCenter("normal! `m", false)<CR>]], "Restore mark M")
 -- Changelist/Jumplist jumping
