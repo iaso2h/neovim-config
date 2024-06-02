@@ -40,6 +40,10 @@ return function()
             LUARUN = {
                 icon = icon.ui.Lua .. " ",
                 color = "hint"
+            },
+            VIMRUN = {
+                icon = icon.ui.Vim .. " ",
+                color = "hint"
             }
         },
         gui_style = {

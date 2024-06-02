@@ -1,8 +1,8 @@
 -- File: getLink module
 -- Author: iaso2h
 -- Description: Get url link in browser
--- Version: 0.0.15
--- Last Modified: 2023-4-26
+-- Version: 0.0.16
+-- Last Modified: 2024-06-02
 local opts = {
     ns = vim.api.nvim_create_namespace('getLink'),
     highlightTimout = 500,
@@ -53,6 +53,16 @@ local getUrl = function(bufNr, cursorPos, curLine) -- {{{
 end -- }}}
 ---@param url string The url string
 return function(url) -- {{{
+    local commentStr
+    local ok, msg = pcall(string.gsub, vim.bo.commentstring, "%s*%%s$", "")
+    if not ok then
+        return vim.notify(msg, vim.log.levels.ERROR)
+    else
+        commentStr = msg
+    end
+    local luaRunPrefixStr = [[^%s*]] .. commentStr .. [[+%s*LUARUN:]]
+    local vimRunPrefixStr = [[^%s*]] .. commentStr .. [[+%s*VIMRUN:]]
+
     if not url then
         -- Normal mode with no selected text provided
         local curBufNr  = vim.api.nvim_get_current_buf()
@@ -70,9 +80,12 @@ return function(url) -- {{{
                     vim.cmd(url)
                 end
             end
-        elseif string.match(curLine, [[^%s*--%s*LUARUN:]]) then
-            local idx = {string.find(curLine, [[^%s*--%s*LUARUN:]])}
+        elseif string.match(curLine, luaRunPrefixStr) then
+            local idx = {string.find(curLine, luaRunPrefixStr)}
             vim.cmd("lua " .. curLine:sub(idx[2] + 1, -1))
+        elseif string.match(curLine, vimRunPrefixStr) then
+            local idx = {string.find(curLine, vimRunPrefixStr)}
+            vim.cmd(curLine:sub(idx[2] + 1, -1))
         else
             -- Support for opening normal http[s] link
             url = getUrl(curBufNr, cursorPos, curLine)
