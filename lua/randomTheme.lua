@@ -1,8 +1,8 @@
 -- File: randomTheme.lua
 -- Author: iaso2h
 -- Description: Randomize all highlight groups
--- Version: 0.0.1
--- Last Modified: 2023-10-20
+-- Version: 0.0.2
+-- Last Modified: 2024-06-07
 
 local M = {
 
@@ -59,15 +59,15 @@ local randomHex = function() -- {{{
             hex = "#" .. string.rep("0", (7 - #hex)) .. string.sub(hex, 2, -1)
         end
 
-        -- TODO: a highly efficient way of checking duplicate
-        -- if tbl_idx(M.hexes, hex, false) ~= -1 then
-        --     table.insert(M.hexes, hex)
+        if not vim.tbl_contains(M.hexes, hex) then
+            table.insert(M.hexes, hex)
             return hex
-        -- end
+        end
     until false
 end -- }}}
 
 M.apply = function () -- {{{
+    M.hexes = {}
     local names = M.getHighlightName()
 
     for _, name in ipairs(names) do
