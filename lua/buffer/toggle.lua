@@ -1,8 +1,8 @@
 -- File: toggle.lua
 -- Author: iaso2h
 -- Description: Toggle terminal like VS Code does
--- Last Modified: 05/07/2023 Sun
--- Version: 0.0.6
+-- Last Modified: 2024-06-07
+-- Version: 0.0.7
 
 --- Toggle the quickfix window
 ---@param closeChk boolean Whether to close the quickfix window if it's visible
@@ -68,7 +68,11 @@ local terminal = function(closeChk) -- {{{
         vim.cmd "split"
         vim.cmd "terminal"
     else
-        vim.api.nvim_win_close(0, false)
+        if #require("buffer.util").winIds(false) == 1 then
+            vim.notify("Cannot close the last window", vim.log.levels.INFO)
+        else
+            vim.api.nvim_win_close(0, false)
+        end
     end
 end -- }}}
 
