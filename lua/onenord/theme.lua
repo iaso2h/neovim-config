@@ -166,6 +166,7 @@ theme.editor =  {
 
     MsgSeparator = {link = "FoldColumn"},
     VertSplit    = {fg = p.n3},
+    WinSeparator = {fg = p.n3, bg = p.n0},
 
 
     TabLine     = {fg = p.n4, bg = p.n0},
