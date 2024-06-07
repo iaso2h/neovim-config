@@ -156,7 +156,7 @@ local pluginArgs = { -- {{{
     -- Vim enhancement {{{
     {
         "lambdalisue/suda.vim",
-        enabled = not (_G._os_uname.sysname == "Windows_NT"),
+        conda = not (_G._os_uname.sysname == "Windows_NT"),
         cmd = {
             "SudaRead",
             "SudaWrite",
@@ -487,7 +487,7 @@ local pluginArgs = { -- {{{
     },
     {
         "prochri/telescope-all-recent.nvim",
-        enabled = not (_G._os_uname.sysname == "Windows_NT"),
+        cond = not (_G._os_uname.sysname == "Windows_NT"),
         dependencies = { "telescope.nvim", "kkharji/sqlite.lua" },
         config = function() require("telescope-all-recent").setup {} end,
     },
@@ -812,18 +812,12 @@ local pluginArgs = { -- {{{
     -- Debug {{{
     {
         "Olical/conjure",
+        cond = not (_G._os_uname.sysname == "Windows_NT"),
         dependencies = {
             {
                 "PaterJason/cmp-conjure",
                 dependencies = { "nvim-cmp" },
             },
-        },
-        keys = {
-            { "<leader>lg", mode = "n" },
-            { "<leader>le", mode = "n" },
-            { "<leader>ls", mode = "n" },
-            { "<leader>lv", mode = "n" },
-            { "<leader>lt", mode = "n" },
         },
         init = require("plugins.nvim-conjure"),
     },
@@ -1082,7 +1076,6 @@ local pluginArgs = { -- {{{
     -- Fennel {{{
     {
         "rktjmp/hotpot.nvim",
-        enabled = true,
         config = require("plugins.nvim-hotpot"),
     },
     {

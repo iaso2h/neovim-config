@@ -19,7 +19,7 @@ local function saveModified(bufNr) -- {{{
     else
         vim.cmd "noa echohl MoreMsg"
         local answer = vim.fn.confirm("Save modification?",
-            ">>> &Save\n&Unload save\n&Discard\n&Cancel", 3, "Question")
+            ">>> &Save\n&Noautocmd save\n&Discard\n&Cancel", 3, "Question")
         vim.cmd "noa echohl None"
         if answer == 1 then
             vim.cmd "update!"

@@ -315,7 +315,6 @@ end, {
     bang = true
 }) -- }}}
 
-
 vim.api.nvim_create_user_command("O", [[browse oldfiles]], { desc = "Browse the oldfiles then prompt", })
 
 vim.api.nvim_create_user_command("TrimBufferSpaces", -- {{{

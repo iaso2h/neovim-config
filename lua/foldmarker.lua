@@ -453,7 +453,8 @@ M.snap = function(exCmd, snapEnable, threshold)
         end
     end
     if not cursorRegion then
-        return vim.notify("Cannot find cursor region for snapToFold", vim.log.levels.ERROR)
+        return
+        -- return vim.notify("Cannot find cursor region for snapToFold", vim.log.levels.ERROR)
     end
 
     -- Check dist from cursor line to both region ends then snap to the closest one
