@@ -59,7 +59,6 @@ opt.ruler         = false
 opt.showtabline   = 2
 opt.showcmd       = false
 opt.showmode      = false
-opt.termguicolors = true
 
 o.shada            = "!,'100,/100,:100,<100,s100,h"
 opt.fileignorecase = true

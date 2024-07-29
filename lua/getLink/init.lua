@@ -21,11 +21,7 @@ local function openUrl(url, timeout, bufNr) -- {{{
         if timeout ~= 0 and bufNr then
             vim.api.nvim_buf_clear_namespace(bufNr, opts.ns, 0, -1)
         end
-        if vim.fn.has('win32') == 1 then
-            vim.fn.system{"explorer", url}
-        elseif vim.fn.has('unix') == 1 then
-            vim.fn.system{"xdg-open", url}
-        end
+        vim.ui.open(url)
     end, timeout)
 end -- }}}
 --- Highlight area in current line
