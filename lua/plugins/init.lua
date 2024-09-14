@@ -1136,25 +1136,6 @@ local pluginArgs = { -- {{{
         dependencies = { "plenary.nvim" },
         config = require("plugins.nvim-diffview"),
     },
-    {
-        "rhysd/git-messenger.vim",
-        keys = { { "<C-h>b", mode = "n" } },
-        init = function()
-            vim.g.git_messenger_no_default_mappings = true
-            vim.g.git_messenger_floating_win_opts   = {border = "rounded"}
-        end,
-        config = function()
-            map("n", [[<C-h>b]], [[<Plug>(git-messenger)]], "Git Messenger blame")
-            vim.api.nvim_create_autocmd("FileType",{
-                pattern  = "gitmessengerpopup",
-                desc     = "Key binding for git messenger",
-                callback = function()
-                    bmap(0, "n", [[<C-o>]], [[o]], "which_key_ignore")
-                    bmap(0, "n", [[<C-i>]], [[O]], "which_key_ignore")
-                end,
-            })
-        end,
-    },
     -- }}} Source control
     -- Knowledge {{{
     {

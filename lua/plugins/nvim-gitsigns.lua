@@ -20,6 +20,12 @@ return function()
         map("n", [[<C-h>R]], gs.reset_buffer, "Gitsigns reset buffer")
 
         map("n", [[<C-h>u]], gs.undo_stage_hunk, "Gitsigns undo stage hunk")
+        map(
+            "x",
+            [[<C-h>s]],
+            function() gs.blame_line{full=true} end,
+            "Gitsigns stage hunk"
+        )
 
         map("n", [[<C-h>p]], gs.preview_hunk, "Gitsigns preview hunk")
 
@@ -41,38 +47,6 @@ return function()
 
     require("gitsigns").setup {
         on_attach = onAttach,
-        signs = {
-            add = {
-                hl = "GitSignsAdd",
-                text = "┃",
-                numhl = "GitSignsAddNr",
-                linehl = "GitSignsAddLn",
-            },
-            change = {
-                hl = "GitSignsChange",
-                text = "┃",
-                numhl = "GitSignsChangeNr",
-                linehl = "GitSignsChangeLn",
-            },
-            delete = {
-                hl = "GitSignsDelete",
-                text = "┃",
-                numhl = "GitSignsDeleteNr",
-                linehl = "GitSignsDeleteLn",
-            },
-            topdelete = {
-                hl = "GitSignsDelete",
-                text = "┃",
-                numhl = "GitSignsDeleteNr",
-                linehl = "GitSignsDeleteLn",
-            },
-            changedelete = {
-                hl = "GitSignsDelete",
-                text = "┃",
-                numhl = "GitSignsDeleteNr",
-                linehl = "GitSignsDeleteLn",
-            },
-        },
         signcolumn = true, -- Toggle with `:Gitsigns toggle_signs`
         numhl = false, -- Toggle with `:Gitsigns toggle_numhl`
         linehl = false, -- Toggle with `:Gitsigns toggle_linehl`
@@ -82,16 +56,15 @@ return function()
             follow_files = true,
         },
         attach_to_untracked = true,
-        current_line_blame = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
+        current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
         current_line_blame_opts = {
             virt_text = true,
             virt_text_pos = "eol", -- 'eol' | 'overlay' | 'right_align'
             delay = 1000,
             ignore_whitespace = false,
+            virt_text_priority = 100
         },
-        current_line_blame_formatter_opts = {
-            relative_time = false,
-        },
+        current_line_blame_formatter = '<author>, <author_time:%R> - <summary>',
         sign_priority = 6,
         update_debounce = 100,
         status_formatter = nil, -- Use default
@@ -103,9 +76,6 @@ return function()
             relative = "cursor",
             row = 0,
             col = 1,
-        },
-        yadm = {
-            enable = false,
         },
     }
 end
