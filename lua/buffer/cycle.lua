@@ -1,8 +1,8 @@
 -- File: cycle.lua
 -- Author: iaso2h
 -- Description: Improved bp and bn
--- Version: 0.0.13
--- Last Modified: 2024-06-01
+-- Version: 0.0.14
+-- Last Modified: 2024-09-26
 
 
 local M   = {
@@ -44,16 +44,23 @@ local fallbackCycle = function(currentBufNr, direction) -- {{{
         -- the help file or other non-standard buffer via <C-o>
         if direction == 1 then
             if M.registerInJumplist then
-                vim.cmd[[keepjump bn]]
+                exCmd = [[keepjump bn]]
             else
-                vim.cmd[[noa keepjump bn]]
+                exCmd = [[noa keepjump bn]]
             end
         else
             if M.registerInJumplist then
-                vim.cmd[[keepjump bp]]
+                exCmd = [[keepjump bp]]
             else
-                vim.cmd[[noa keepjump bp]]
+                exCmd = [[noa keepjump bp]]
             end
+        end
+
+        local ok, msgOrVal = pcall(vim.api.nvim_command, exCmd)
+        if not ok and
+            not string.find(msgOrVal, "E85: ", 1, true) then
+            vim.notify(msgOrVal, vim.log.levels.ERROR)
+            return -1
         end
 
         bufNr = vim.api.nvim_get_current_buf()
