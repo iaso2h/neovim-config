@@ -14,6 +14,8 @@ local M   = {
     registerInJumplist = true
 }
 
+local u = require("buffer.util")
+
 
 --- Reload the buffer if the buffer has treesttier highlighter supported but
 --somehow the highlight hasn't been enabled yet. Especially targeting the
@@ -109,10 +111,14 @@ M.init = function(direction) -- {{{
         end, require("cokeline.state").visible_buffers)
     else
         -- Create buffer table when data from cokeline is unavailable
-        bufTbl = require("buffer.util").bufNrs(true)
+        bufTbl = u.bufNrs(true, true)
     end
     if #bufTbl == 1 then
-        return vim.notify("No valid buffer to cycle", vim.log.levels.INFO)
+        if u.isSpecialBuf(bufTbl[1]) then
+            return vim.notify("No valid buffer to cycle", vim.log.levels.INFO)
+        else
+            vim.cmd([[keepjump noa buffer ]] .. bufTbl[1])
+        end
     end
 
     -- Deal with scenarios when current buffer is a non-standard buffer
