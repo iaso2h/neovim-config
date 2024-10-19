@@ -1,8 +1,8 @@
 -- File: replace
 -- Author: iaso2h
 -- Description: Heavily inspired by Ingo Karkat's work. Replace text with register
--- Version: 0.1.15
--- Last Modified: 2023-10-22
+-- Version: 0.1.16
+-- Last Modified: 2024-10-19
 -- TODO: tests for softtab convert
 -- NOTE: break change: Dot-repeat no longer support jump to mark motion now
 -- because the new method of setting new line(or replace line) via
@@ -56,7 +56,7 @@ end -- }}}
 local saveOption = function() -- {{{
     local saveSelection
 
-    if vim.api.nvim_get_option("selection") ~= "inclusive" then
+    if vim.api.nvim_get_option_value("selection", {scope = "global"}) ~= "inclusive" then
         saveSelection = vim.o.selection
         -- Avoid clobbering the selection and clipboard registers.
         vim.opt.selection = "inclusive"
@@ -272,22 +272,30 @@ function M.operator(opInfo) -- {{{
     -- Get cursor position, motionRegion count, motionRegion region and register  {{{
     local motionRegion
     local motionDirection
+    local endLine
     if opInfo.vimMode == "n" then
         -- For Replace operator exclusively
 
         -- Saving count and register. The part of saving cursor is done inside
-        -- `expr()`
+        -- `expr()` but saving register in the `expr()` will be ignore when using dot repeat
         -- This is for normal mode. Because retrieving vim.v.count1 doesn't
         -- work in `M.expr()`. Other Replace mapping will do this saving part
-        -- before calling operator(). In addition, Saving register in the
-        -- `expr()` will be ignore when using dot repeat
+        -- before calling operator().
         M.saveCountReg()
 
         -- Saving motionRegion region
         motionRegion = op.getMotionRegion(bufNr)
+        endLine = vim.api.nvim_buf_get_lines(bufNr, motionRegion.End[1] - 1, motionRegion.End[1], false)[1]
 
+        -- Motion region fix
+        -- Avoid out of bound column index
+        if motionRegion.End[2] > #endLine then
+            motionRegion.End[2] = #endLine - 1
+        end
+
+        -- motionRegion fix
+        -- Deal with multibyte character
         if vim.deep_equal(motionRegion.Start, motionRegion.End) then
-            local endLine = vim.api.nvim_buf_get_lines(bufNr, motionRegion.End[1] - 1, motionRegion.End[1], false)[1]
             if string.len(endLine) ~= vim.fn.strchars(endLine) then
 
                 local saveCursor = vim.api.nvim_win_get_cursor(0)
@@ -358,11 +366,12 @@ function M.operator(opInfo) -- {{{
             Start = vim.api.nvim_buf_get_mark(bufNr, "<"),
             End   = vim.api.nvim_buf_get_mark(bufNr, ">")
         }
+        endLine = vim.api.nvim_buf_get_lines(bufNr, motionRegion.End[1] - 1, motionRegion.End[1], false)[1]
+        -- Motion region fix
+        -- Avoid out of bound column index
+        if motionRegion.End[2] > #endLine then motionRegion.End[2] = #endLine - 1 end
     end
 
-    -- Avoid out of bound column index
-    local endLine = vim.api.nvim_buf_get_lines(bufNr, motionRegion.End[1] - 1, motionRegion.End[1], false)[1]
-    if motionRegion.End[2] > #endLine then motionRegion.End[2] = #endLine - 1 end
 
     -- Use extmark to track the motionRegion
     local repExtmark
@@ -595,7 +604,7 @@ function M.operator(opInfo) -- {{{
         end
     end
     -- Visual repeating
-    if vim.fn.exists("g:loaded_visualrepeat") == 1 then
+    if vim.fn.exists(vim.fn["visualrepeat#set"](t"<Plug>ReplaceVisual")) == 1 then
         vim.fn["visualrepeat#set"](t"<Plug>ReplaceVisual")
     end
 
@@ -618,8 +627,10 @@ function M.expr(restoreCursorChk, highlightChangeChk) -- {{{
         -- Preserving cursor position as its position will changed once the
         -- vim.o.opfunc() being called
         M.cursorPos = vim.api.nvim_win_get_cursor(0)
+        M.placeCursor = true
     else
         M.cursorPos = nil
+        M.placeCursor = false
     end
 
     M.highlightChangeChk = highlightChangeChk

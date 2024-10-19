@@ -7,22 +7,22 @@ vim.g.mapleader = " "
 map("n", [[<C-q>d]], [[<CMD>lua require("quickfix.diagnostics").refresh(true, false)<CR>]], {"silent"}, "LSP add workspace folder")
 map("n", [[[d]], function()
     require("jump.util").posCenter(function()
-        vim.diagnostic.goto_prev { float = { border = "rounded" } }
+        vim.diagnostic.jump { count = -1, float = { border = "rounded" } }
     end, false)
 end, "Go to previous diagnostic")
 map("n", [[]d]], function()
     require("jump.util").posCenter(function()
-        vim.diagnostic.goto_next { float = { border = "rounded" } }
+        vim.diagnostic.jump { count = 1, float = { border = "rounded" } }
     end, false)
 end, "Go to next diagnostic")
 map("n", [[[e]], function()
     require("jump.util").posCenter(function()
-        vim.diagnostic.goto_prev { float = { border = "rounded" }, severity = "Error" }
+        vim.diagnostic.jump { count = -1, float = { border = "rounded" }, severity = "Error" }
     end, false)
 end, "Go to previous error")
 map("n", [[]e]], function()
     require("jump.util").posCenter(function()
-        vim.diagnostic.goto_next { float = { border = "rounded" }, severity = "Error" }
+        vim.diagnostic.jump { count = 1, float = { border = "rounded" }, severity = "Error" }
     end, false)
 end, "Go to next error")
 -- Colorcolumn

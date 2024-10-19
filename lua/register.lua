@@ -181,6 +181,12 @@ end -- }}}
 ---@field content string
 ---@field type string "v" for character-wise, "V" for line-wise, "\022<width>" for block-wise
 
+local regUnnamed = {}
+local regZero    = {}
+local regStar    = {}
+local regPlus    = {}
+local regOther   = {}
+
 --- Get register information
 ---@param name string
 ---@return RegisterInfo
@@ -192,6 +198,12 @@ local getReg = function(name)
         content = content,
         type = type
     }
+    -- local regInfo = vim.fn.getreginfo(name)
+    -- return {
+    --     name = name,
+    --     content = regInfo.regcontents,
+    --     type = regInfo.regtype
+    -- }
 end
 --- Set register information
 ---@param reg RegisterInfo
@@ -200,47 +212,52 @@ local setReg = function(reg)
 end
 --- Save the star registers, plus and unnamed registers - independently, restoreReg can be accessed after saveReg is called
 function M.saveReg() -- {{{
-    local unnamed = getReg('"')
-    local zero = getReg("0")
-
-    local star
-    local plus
+    local profile = require("profile")
+    regUnnamed = getReg('"')
+    regZero    = getReg("0")
     if _G._os_uname.machine == "aarch64" then
-        star = {}
-        plus = {}
+        regStar = {}
+        regPlus = {}
     else
-        star = getReg("*")
-        plus = getReg("+")
+        if _G._os_uname.sysname == "Windows_NT" then
+            regStar = getReg("*")
+        else
+            regStar = getReg("*")
+            regPlus = getReg("+")
+        end
     end
 
-    local specific
-    if not vim.tbl_contains({'"', "*", "+"}, vim.v.register) then
-        specific = getReg(vim.v.register)
+    if not vim.tbl_contains({'"', "*", "+", "0"}, vim.v.register) then
+        regOther = getReg(vim.v.register)
     else
-        specific = {}
-    end
-
-    M.restoreReg = function()
-        if next(specific) then
-            setReg(specific)
-        end
-
-        if next(star) then
-            setReg(star)
-        end
-
-        if next(plus) then
-            setReg(plus)
-        end
-
-        if next(unnamed) then
-            setReg(unnamed)
-            setReg(zero)
-        end
-
-        vim.defer_fn(function() M.restoreReg = nil end, 1000)
+        regOther = {}
     end
 end -- }}}
+
+M.restoreReg = function() -- {{{
+    if next(regOther) then
+        setReg(regOther)
+        regOther = {}
+    end
+
+    if next(regStar) then
+        setReg(regStar)
+        regStar = {}
+    end
+
+    if next(regPlus) then
+        setReg(regPlus)
+        regPlus = {}
+    end
+
+    if next(regUnnamed) then
+        setReg(regUnnamed) -- setting unnamed register will set zero as well
+        setReg(regZero)
+        regUnnamed = {}
+        regZero = {}
+    end
+end -- }}}
+
 --- Copy indent of specific line number in current buffer
 ---@param lineNr integer (1, 0) indexed
 ---@return string # Corresponding line indent
