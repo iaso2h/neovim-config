@@ -1,8 +1,8 @@
 -- File: replace
 -- Author: iaso2h
 -- Description: Heavily inspired by Ingo Karkat's work. Replace text with register
--- Version: 0.1.16
--- Last Modified: 2024-10-19
+-- Version: 0.1.17
+-- Last Modified: 2024-10-20
 -- TODO: tests for softtab convert
 -- NOTE: break change: Dot-repeat no longer support jump to mark motion now
 -- because the new method of setting new line(or replace line) via
@@ -113,7 +113,7 @@ end -- }}}
 ---@param vimMode string Vim mode. See: `:help mode()`
 ---@param reg RegisterInfo
 ---@return table reg The new reg table(might or might not have been modified) otherwise return false
-local matchRegType = function(motionType, motionRegion, motionDirection, vimMode, reg) -- {{{
+local formatReg = function(motionType, motionRegion, motionDirection, vimMode, reg) -- {{{
     -- NOTE:"\<C-v>" for vimMode in vimscript is evaluated as "\22" in lua, which represents blockwise motionRegion
     -- Vim mode
     --  ├── Normal mode
@@ -214,7 +214,7 @@ end -- }}}
 ---@param vimMode string Vim mode. See: `:help mode()`
 ---@param reg RegisterInfo
 ---@param bufNr integer Buffer handler(number)
----@return table {repStart = {}, repEnd = {}}
+---@return table {Start = {}, End = {}}
 local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
     -- With a put in visual mode, the previously selected text is put in the
     -- unnamed register, so we need to save and restore that.
@@ -224,16 +224,18 @@ local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
     local repEnd
 
     if vimMode ~= "n" then
+        -- Replace visually
         vim.cmd(string.format("noa norm! gv%sp", regCMD))
         repStart = vim.api.nvim_buf_get_mark(0, "[")
         repEnd   = vim.api.nvim_buf_get_mark(0, "]")
         return {Start = repStart, End = repEnd}
     else
+        -- Replace operator
         if util.compareDist(motionRegion.Start, motionRegion.End) > 0 then
             -- This's a rare scenario where Start is fall behind End
 
             -- HACK: occurred when execute [[gr"agr$]]
-            -- vim.notify("Start fall behind End", vim.log.levels.ERROR)
+            vim.notify("Start fall behind End", vim.log.levels.ERROR)
             vim.cmd(string.format("noa norm! %sP", regCMD))
             repStart = vim.api.nvim_buf_get_mark(0, "[")
             repEnd   = vim.api.nvim_buf_get_mark(0, "]")
@@ -244,17 +246,34 @@ local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
                 local End   = {motionRegion.End[1] - 1,   motionRegion.End[2]}
                 if string.find(reg.content, "\n") then
                     vim.api.nvim_buf_set_text(
-                        bufNr, Start[1], Start[2], End[1], End[2] + 1,
-                        vim.split(reg.content, "\n", {plain = true}) )
+                        bufNr,
+                        Start[1],
+                        Start[2],
+                        End[1],
+                        End[2] + 1,
+                        vim.split(reg.content, "\n", { plain = true })
+                    )
                 else
-                    vim.api.nvim_buf_set_text(bufNr, Start[1], Start[2], End[1], End[2] + 1, {reg.content})
+                    vim.api.nvim_buf_set_text(
+                        bufNr,
+                        Start[1],
+                        Start[2],
+                        End[1],
+                        End[2] + 1,
+                        {reg.content}
+                    )
                 end
             else
             -- elseif motionType == "line" then
                 local Start = {motionRegion.Start[1] - 1, motionRegion.Start[2]}
                 local End   = {motionRegion.End[1] - 1, motionRegion.End[2]}
-                vim.api.nvim_buf_set_lines(bufNr, Start[1], End[1] + 1, false,
-                vim.split(reg.content, "\n", {plain = true, trimempty = true}) )
+                vim.api.nvim_buf_set_lines(
+                    bufNr,
+                    Start[1],
+                    End[1] + 1,
+                    false,
+                    vim.split(reg.content, "\n", { plain = true, trimempty = true })
+                )
             end
 
             return {}
@@ -418,9 +437,10 @@ function M.operator(opInfo) -- {{{
 
     -- Match the motionType type with register type
     ---@diagnostic disable-next-line: cast-local-type
-    ok, msgOrVal = pcall(matchRegType, opInfo.motionType, motionRegion, motionDirection, opInfo.vimMode, reg)
+    ok, msgOrVal = pcall(formatReg, opInfo.motionType, motionRegion, motionDirection, opInfo.vimMode, reg)
     if not ok then
         ---@diagnostic disable-next-line: param-type-mismatch
+        vim.notify("Error occur during formatting register in replace", vim.log.levels.ERROR)
         return vim.notify(msgOrVal, vim.log.levels.ERROR)
     else
         reg = msgOrVal
@@ -432,12 +452,14 @@ function M.operator(opInfo) -- {{{
     ok, msgOrVal = pcall(replace, opInfo.motionType, motionRegion, opInfo.vimMode, reg, bufNr)
     if not ok then
         ---@diagnostic disable-next-line: param-type-mismatch
+        vim.notify("Error occur during placing new content in replace", vim.log.levels.ERROR)
         vim.notify(msgOrVal, vim.log.levels.ERROR)
         -- TODO: clear rep extmark?
     else
         rep = msgOrVal
     end
 
+    -- Get replaced content position for replace operator
     ---@diagnostic disable-next-line: param-type-mismatch
     -- HACK: extmark covered by nvim_buf_set_lines and nvim_buf_set_text are
     -- always reversed?
