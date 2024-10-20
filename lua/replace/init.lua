@@ -480,8 +480,16 @@ function M.operator(opInfo) -- {{{
     -- Create highlight
     -- Creates a new namespace or gets an existing one.
     if not (opInfo.vimMode == "n" and not M.highlightChangeChk) then
-        local newContentExmark = util.nvimBufAddHl(bufNr, rep.Start, rep.End,
-                reg.type, M.hlGroup, M.timeout, M.lastReplaceNs)
+        local newContentExmark = util.nvimBufAddHl(
+            bufNr,
+            rep.Start,
+            rep.End,
+            reg.type,
+            M.hlGroup,
+            M.timeout,
+            M.lastReplaceNs,
+            true
+        )
         if newContentExmark then
             M.lastReplaceExtmark = newContentExmark
         end

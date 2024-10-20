@@ -163,20 +163,19 @@ function M.withinRegion(pos, regionStart, regionEnd) -- {{{
 end -- }}}
 --- Create highlights for region in a buffer. The region is defined by two tables containing position info represent the start and the end respectively. The region can be multi-lines across in a buffer
 ---@param bufNr      integer Buffer number handler
----@param posStart   table  (1, 0)-indexed values from `vim.api.nvim_buf_get_mark()`
----@param posEnd     table  (1, 0)-indexed values from `vim.api.nvim_buf_get_mark()`
+---@param posStart   table  (1, 1)-indexed values from `vim.fn.getpos()`
+---@param posEnd     table  (1, 1)-indexed values from `vim.fn.getpos()`
 ---@param regType    string Register type from `vim.fn.getregtype()`
 ---@param hlGroup    string Highlight group name
 ---@param hlTimeout  integer Determine how long the highlight will be clear after being created
 ---@param presNS?    integer Optional ID of the preserved namespace, in which the preserved extmark will be returned to keep track of the highlighted content
----@param zeroBasedChk? boolean Set to true if the posStart and posEnd is (0, 0) based
----@return integer|boolean # Return integer or return true when successful. Integer is the ID of the preserved namespace of the content defined by. Return false when failed `posStart` and `posEnd`
-M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, presNS, zeroBasedChk) -- {{{
-    if zeroBasedChk == nil then zeroBasedChk = false end
+---@param apiMarkChk? boolean Set to true if the posStart and posEnd is retrieved from `vim.api.nvim_buf_get_mark()`
+---@return integer|nil # Return integer or return true when successful. Integer is the ID of the preserved namespace of the content defined by. Return false when failed `posStart` and `posEnd`
+M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, presNS, apiMarkChk) -- {{{
     local presExtmark
 
     -- Change to 0-based for extmark creation
-    if not zeroBasedChk then
+    if apiMarkChk then
         posStart = {posStart[1] - 1, posStart[2]}
         posEnd = {posEnd[1] - 1, posEnd[2]}
     end
@@ -189,7 +188,7 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, 
         -- End function calling if extmark is out of scope
         if not ok then
             vim.notify(msg, vim.log.levels.WARN)
-            return false
+            return nil
         else
             presExtmark = msg
         end
@@ -201,12 +200,18 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, 
     vim.api.nvim_buf_clear_namespace(bufNr, hlNS, 0, -1)
 
     -- Add highlight
-    local region = vim.region(bufNr, posStart, posEnd, regType,
-                    vim.o.selection == "inclusive" and true or false)
-    for lineNr, cols in pairs(region) do
-        vim.api.nvim_buf_add_highlight(bufNr, hlNS, hlGroup,
-                                    lineNr, cols[1], cols[2])
-    end
+    -- vim.highlight.range(bufNr, hlNS, hlGroup, )
+    vim.highlight.range(
+        bufNr,
+        hlNS,
+        hlGroup,
+        posStart,
+        posEnd,
+        {
+            regtype = regType,
+            inclusive = vim.o.selection == "inclusive" and true or false,
+        }
+    )
 
     -- Clear highlight after certain timeout
     vim.defer_fn(function()
@@ -216,11 +221,7 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, 
         end
     end, hlTimeout)
 
-    if presNS then
-        return presExtmark
-    else
-        return true
-    end
+    return presExtmark
 end -- }}}
 -- Credit: https://github.com/LunarVim/LunarVim/blob/2d373036493b3a61ef24d98efdeecbe8e74467be/lua/lvim/utils/modules.lua#L68
 --- A safer require function

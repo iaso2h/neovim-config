@@ -211,7 +211,8 @@ function M.inplaceYank(opInfo) -- {{{
             vim.fn.getregtype(),
             opts.hlGroup,
             opts.timeout,
-            M.lastYankNs)
+            M.lastYankNs,
+            true)
     else
         -- Convert into (0, 0) index
         posStart = {posStart[1] - 1, posStart[2]}
@@ -384,7 +385,8 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
             regTypeNew,
             opts.hlGroup,
             opts.timeout,
-            M.lastPutNs)
+            M.lastPutNs,
+            true)
     else
         -- Convert into (0, 0) index
         posStart = {posStart[1] - 1, posStart[2]}
