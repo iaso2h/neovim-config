@@ -51,8 +51,8 @@ return function()
     -- Deleting other buffers
     for _, bufNr in ipairs(bufNrs) do
         if bufNr ~= saveBufNr and
-            not vim.tbl_contains(filetypeWhitelist, vim.api.nvim_get_option_value("filetype", {buf = bufNr})) and
-            not vim.tbl_contains(buftypeWhitelist, vim.api.nvim_get_option_value("buftype", {buf = bufNr})) then
+            not vim.list_contains(filetypeWhitelist, vim.api.nvim_get_option_value("filetype", {buf = bufNr})) and
+            not vim.list_contains(buftypeWhitelist, vim.api.nvim_get_option_value("buftype", {buf = bufNr})) then
             u.initBuf(bufNr)
             close.bufHandler(false, false)
         end

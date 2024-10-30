@@ -360,7 +360,7 @@ return function()
         local line_to_cursor = line:sub(1, pos[2])
 
         local woff = 1
-        if config.triggered_chars and vim.tbl_contains(config.triggered_chars, '(') then
+        if config.triggered_chars and vim.list_contains(config.triggered_chars, '(') then
             woff = helper.cal_woff(line_to_cursor, label)
         end
 

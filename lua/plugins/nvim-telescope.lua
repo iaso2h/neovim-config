@@ -160,7 +160,7 @@ local helpTags = function(opts) -- {{{
     opts.fallback = vim.F.if_nil(opts.fallback, true)
     opts.file_ignore_patterns = {}
     local langs = vim.split(opts.lang, ",", true)
-    if opts.fallback and not vim.tbl_contains(langs, "en") then
+    if opts.fallback and not vim.list_contains(langs, "en") then
         table.insert(langs, "en")
     end
     local langs_map = {}

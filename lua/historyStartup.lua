@@ -65,7 +65,7 @@ local initLines = function () -- {{{
             absolutePath = string.gsub(absolutePath, "/", "\\")
         end
         -- Filter out duplicates and check validity
-        if not vim.tbl_contains(M.lines.absolute, absolutePath) and vim.loop.fs_stat(absolutePath) then
+        if not vim.list_contains(M.lines.absolute, absolutePath) and vim.loop.fs_stat(absolutePath) then
             -- Check for converting paths to relative paths
             if not M.lines.relativeTick and #absolutePath + WidthExceedOffset > vim.api.nvim_win_get_width(M.initWin) then
                 M.lines.relativeTick = true

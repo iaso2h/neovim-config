@@ -26,7 +26,7 @@ local vimModeValidate = function()
     local filterModes = {
         "i", "ic", "ix"
     }
-    if vim.tbl_contains(filterModes, vimMode) then
+    if vim.list_contains(filterModes, vimMode) then
         return false
     end
     return true

@@ -257,7 +257,7 @@ M.go = function(vimMode, isNewer, filter) -- {{{
     local cursorPos = M.opts.checkCursorRedundancy and vim.api.nvim_win_get_cursor(winId) or {}
     -- Buffer that has the filetype matching the patterns in
     -- `M.opts.fileTypeUseBuiltIn` will always execute and built-in command
-    if vim.tbl_contains(M.opts.fileTypeUseBuiltIn, vim.bo.filetype) then
+    if vim.list_contains(M.opts.fileTypeUseBuiltIn, vim.bo.filetype) then
         return execute(vimMode, isNewer, winId, cursorPos)
     end
 

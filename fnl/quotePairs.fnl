@@ -13,12 +13,12 @@
 
     (local node (vim.treesitter.get_node))
     (when node
-      (if (vim.tbl_contains atomList (node:type))
+      (if (vim.list_contains atomList (node:type))
           node
           (do
             (var parentNode (node:parent))
             (while (and parentNode
-                        (not (vim.tbl_contains atomList (parentNode:type))))
+                        (not (vim.list_contains atomList (parentNode:type))))
                 (set parentNode (parentNode:parent)))
 
             (when parentNode parentNode))))))

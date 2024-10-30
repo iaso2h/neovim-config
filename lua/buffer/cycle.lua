@@ -94,7 +94,7 @@ local function findCandidate(bufNrs, currentBufIdx, direction) -- {{{
         local candidateBuftype = vim.api.nvim_get_option_value("buftype", {buf = bufNrs[candidateIdx]})
 
         -- Filter out quickfix
-        if not vim.tbl_contains(M.buftypeBlacklist, candidateBuftype) then
+        if not vim.list_contains(M.buftypeBlacklist, candidateBuftype) then
             return candidateIdx
         end
     end

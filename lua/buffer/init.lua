@@ -15,7 +15,7 @@ M.restoreClosedBuf = function()
     if next(var.lastClosedFilePaths) then
         local bufNrs = u.bufNrs(true)
         for index, path in ipairs(var.lastClosedFilePaths) do
-            if vim.tbl_contains(bufNrs, vim.fn.bufnr(path)) then
+            if vim.list_contains(bufNrs, vim.fn.bufnr(path)) then
                 -- Skip buffer that is already opened
                 table.remove(var.lastClosedFilePaths, index)
             else

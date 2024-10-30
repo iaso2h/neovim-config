@@ -18,7 +18,7 @@ function M.convertMap(mode, lhs, rhs, optsTbl) -- {{{
                 specArg = specArg .. " <" .. val .. ">"
             end
         end
-        if vim.tbl_contains(optsTbl, "noremap") then
+        if vim.list_contains(optsTbl, "noremap") then
             noremap = "nore"
         end
         specArg = specArg:sub(2)

@@ -40,7 +40,7 @@ M.handler = function(prefixCmdChk)
         local bufNrs = u.bufNrs(true, false)
         if #bufNrs ~= 0 then
             local altBufNr = vim.fn.bufnr("#")
-            if vim.tbl_contains(bufNrs, altBufNr) then
+            if vim.list_contains(bufNrs, altBufNr) then
                 local altBufWinId = vim.fn.bufwinid(altBufNr)
                 layout = u.winLayout(altBufWinId)
                 vim.api.nvim_set_current_win(altBufWinId)

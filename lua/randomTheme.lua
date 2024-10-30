@@ -59,7 +59,7 @@ local randomHex = function() -- {{{
             hex = "#" .. string.rep("0", (7 - #hex)) .. string.sub(hex, 2, -1)
         end
 
-        if not vim.tbl_contains(M.hexes, hex) then
+        if not vim.list_contains(M.hexes, hex) then
             table.insert(M.hexes, hex)
             return hex
         end

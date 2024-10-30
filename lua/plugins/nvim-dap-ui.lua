@@ -9,7 +9,7 @@ M.filetypeSetup = function ()
         local winId    = win.winid
         local fileType = vim.api.nvim_get_option_value("filetype", {buf = bufNr})
 
-        if vim.tbl_contains({
+        if vim.list_contains({
             "dap-repl",
             "dapui_watches",
             "dapui_console",

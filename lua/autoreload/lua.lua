@@ -299,7 +299,7 @@ M.loadDir = function(path, opt) -- {{{
     -- `init.lua` file when that module isn't loaded in runtime. Doesn't worth
     -- reloading the whole directory because of it
     if pathTailRootStr ~= "init" and pathTailRootStr ~= directParentTailStr and
-        not vim.tbl_contains(allLoadedModules, allModules[tbl_idx(allAbsStrs, path.filename, false)]) then
+        not vim.list_contains(allLoadedModules, allModules[tbl_idx(allAbsStrs, path.filename, false)]) then
 
         return
     end

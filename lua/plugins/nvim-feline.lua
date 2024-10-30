@@ -182,7 +182,7 @@ return function()
                     -- is set via `after/ftplugin/qf.lua`
                     fileType = vim.b._is_local and "Location list" or "Quickfix"
                     return icon.ui.Quickfix .. padding .. fileType
-                elseif vim.tbl_contains(_G._short_line_list, fileType)then
+                elseif vim.list_contains(_G._short_line_list, fileType)then
                     local bufIcon = _G._short_line_infos[fileType].icon
                     local fileStr
                     if bufIcon then

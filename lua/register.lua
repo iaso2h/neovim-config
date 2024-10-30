@@ -227,7 +227,7 @@ function M.saveReg() -- {{{
         end
     end
 
-    if not vim.tbl_contains({'"', "*", "+", "0"}, vim.v.register) then
+    if not vim.list_contains({'"', "*", "+", "0"}, vim.v.register) then
         regOther = getReg(vim.v.register)
     else
         regOther = {}

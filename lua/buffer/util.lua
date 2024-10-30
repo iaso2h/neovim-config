@@ -23,7 +23,7 @@ M.isSpecialBuf = function(bufNr) -- {{{
     local modifiable = vim.api.nvim_get_option_value("modifiable", {buf = bufNr})
     local bufListed  = vim.api.nvim_get_option_value("buflisted", {buf = bufNr})
     return (bufType ~= "" and (not modifiable or not bufListed)) or
-        vim.tbl_contains(specialBufType, bufType)
+        vim.list_contains(specialBufType, bufType)
 end -- }}}
 --- Check if the provided buffer is a scratch buffer
 ---@param bufNr? integer If it isn't provided, the `var.bufName` will be used instead
@@ -162,7 +162,7 @@ M.bufsOccurInWins = function(bufNrs, winIds) -- {{{
     winIds = winIds or var.winIds
     local bufCnt = 0
     for _, winId in ipairs(winIds) do
-        if vim.tbl_contains(var.bufNrs, vim.api.nvim_win_get_buf(winId)) then
+        if vim.list_contains(var.bufNrs, vim.api.nvim_win_get_buf(winId)) then
             bufCnt = bufCnt + 1
         end
     end

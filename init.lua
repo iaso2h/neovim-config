@@ -1,10 +1,10 @@
 -- THE MOST IMPORTANT OPTION
 vim.opt.undofile = true
 
-if vim.fn.has("nvim-0.10.0") ~= 1 then
+if vim.fn.has("nvim-0.11.0") ~= 1 then
     vim.notify(" ", vim.log.levels.WARN)
     vim.notify(" ", vim.log.levels.WARN)
-    vim.notify("Neovim with 0.10.0 or higher build version is required", vim.log.levels.WARN)
+    vim.notify("Neovim with 0.11.0 or higher build version is required", vim.log.levels.WARN)
     vim.notify(" ", vim.log.levels.WARN)
     vim.notify(" ", vim.log.levels.WARN)
     return
