@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Derived from and simplified:
 -- Credit: https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
--- Version: 0.0.11
--- Last Modified: 2023-10-26
+-- Version: 0.0.12
+-- Last Modified: 2024-10-27
 
 local ignoreBuftype = {
         'quickfix',
@@ -68,11 +68,24 @@ return function(args)
         if winEnd == bufEnd then
             log('DEBUGPRINT[6]: cursorRecall.lua:69 (after if winend == buffend then)')
             -- Last line in buffer is also the last line visible in this window
-            vim.cmd 'normal! g`"'
+            local ok, msgOrVal = pcall(vim.api.nvim_command, "normal! g`")
+            if not ok and not string.find(msgOrVal, "E663") then
+                vim.notify(msgOrVal, vim.log.levels.ERROR)
+                vim.notify("Error occurred when executing command: " .. cmdStr, vim.log.levels.ERROR)
+            end
         elseif bufEnd - lastPos > ((winEnd - winStart) / 2) - 1 then
             log('DEBUGPRINT[7]: cursorRecall.lua:73 (after elseif buffend - lastpos > ((winend - wi…)')
-            vim.cmd 'normal! g`"zz'
+            local ok, msgOrVal = pcall(vim.api.nvim_command, 'normal! g`"zz')
+            if not ok and not string.find(msgOrVal, "E663") then
+                vim.notify(msgOrVal, vim.log.levels.ERROR)
+                vim.notify("Error occurred when executing command: " .. cmdStr, vim.log.levels.ERROR)
+            end
         else
+            local ok, msgOrVal = pcall(vim.api.nvim_command, 'normal! G`"' .. t'<c-e>')
+            if not ok and not string.find(msgOrVal, "E663") then
+                vim.notify(msgOrVal, vim.log.levels.ERROR)
+                vim.notify("Error occurred when executing command: " .. cmdStr, vim.log.levels.ERROR)
+            end
             log('DEBUGPRINT[8]: cursorRecall.lua:76 (after else)')
             -- Otherwise, show as much context as we can
             vim.cmd('normal! G`"' .. t'<c-e>')
