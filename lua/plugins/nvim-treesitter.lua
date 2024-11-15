@@ -27,9 +27,9 @@ return function()
             enable  = true,
             keymaps = {
                 init_selection    = "gnn",
-                node_incremental  = "grn",
-                node_decremental  = "grm",
-                scope_incremental = "grc",
+                node_incremental  = "gna",
+                node_decremental  = "gns",
+                scope_incremental = "gnS",
             },
         },
         matchup = {
@@ -39,8 +39,8 @@ return function()
     }
 
     map("n",        [[<A-S-a>]], [[gnn]], "Expand selection")
-    map("x",        [[<A-S-a>]], [[grc]], "Expand selection")
-    map({"n", "x"}, [[<A-S-s>]], [[grm]], "Shrink selection")
+    map("x",        [[<A-S-a>]], [[gra]], "Expand selection")
+    map({"n", "x"}, [[<A-S-s>]], [[grs]], "Shrink selection")
 
     vim.api.nvim_create_user_command("TSGetNodeAtCursor", function()
         local bufNr = vim.api.nvim_get_current_buf()

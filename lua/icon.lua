@@ -45,7 +45,7 @@ return {
         FileDeleted      = "",
         FileIgnored      = "◌",
         FileRenamed      = "",
-        FileStaged       = "S",
+        FileStaged       = "✓",
         FileUnmerged     = "",
         FileUnstaged     = "",
         FileUntracked    = "U",
