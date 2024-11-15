@@ -15,7 +15,12 @@ if not ok then
     return vim.notify(msg, vim.log.levels.ERROR)
 end
 
-require "core"
+if vim.g.vscode then
+    require "core"
+else
+    require "core.options"
+    require "core.mappings"
+end
 
 if _G._enable_plugin then
     vim.defer_fn(function()

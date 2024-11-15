@@ -55,7 +55,7 @@ end -- }}}
 ---@param mode string|table   Same as `vim.api.nvim_set_keymap()`
 ---@param lhs string          Same as `vim.api.nvim_set_keymap()`
 ---@param rhs string|function Same as `vim.api.nvim_set_keymap()`
----@param opts? table Table value contain `h:map-arguments` strings that will be convert into table then passed into `vim.api.nvim_set_keymap`
+---@param opts table Table value contain `h:map-arguments` strings that will be convert into table then passed into `vim.api.nvim_set_keymap`
 ---@param doc? string key mapping description
 ---@return table,table,string
 local argConvert = function(mode, lhs, rhs, opts, doc) -- {{{
@@ -103,7 +103,9 @@ local argConvert = function(mode, lhs, rhs, opts, doc) -- {{{
     -- Complement the optsTbl
     if opts and next(opts) then
         for _, val in ipairs(opts) do
-            optsKeyValTbl[val] = true
+            if val ~= "vscode" then
+                optsKeyValTbl[val] = true
+            end
         end
     end
 
@@ -119,6 +121,9 @@ _G.map = function(mode, lhs, rhs, ...) -- {{{
     -- https://github.com/neovim/neovim/commit/6d41f65aa45f10a93ad476db01413abaac21f27d
     -- New api.nvim_set_keymap(): https://github.com/neovim/neovim/commit/b411f436d3e2e8a902dbf879d00fc5ed0fc436d3
     local opts, doc = argCheck(lhs, rhs, {...})
+    if vim.g.vscode and not vim.list_contains(opts, "vscode") then
+        return
+    end
 
     local modeTbl, optsKeyValTbl, rhsStr = argConvert(mode, lhs, rhs, opts, doc)
 
@@ -148,6 +153,9 @@ end -- }}}
 _G.bmap = function(bufNr, mode, lhs, rhs, ...) -- {{{
     assert(type(bufNr) == "number", "#1 argument is not a valid number")
     local opts, doc = argCheck(lhs, rhs, {...})
+    if vim.g.vscode and not vim.list_contains(opts, "vscode") then
+        return
+    end
 
     local modeTbl, optsKeyValTbl, rhsStr = argConvert(mode, lhs, rhs, opts, doc)
 
