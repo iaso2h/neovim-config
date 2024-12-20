@@ -146,7 +146,7 @@ M.reindent = function(indentOffset, srcContent) -- {{{
         if srcLineCnt > 0 then
             newContent = string.gsub(newContent, "\n", "\n" .. indentCntAbs)
             -- Minus the extra spaces in the end of regConetent. e.g ".....\n    "
-            newContent = string.gsub(newContent, "\n%s*$", "")
+            newContent = string.gsub(newContent, "\n%s*$", "\n")
         end
     end
 
@@ -162,7 +162,7 @@ M.getIndent = function(regContent) -- {{{
     -- Minus the leading line breaks
     if prefixLineBreak then regIndent = regIndent - prefixLineBreak end
 
-    -- Convert tab to spaces, then update reindent count
+    -- Convert leading tabs to spaces, then update reindent count
     local tabIdx = 0
     local tabCnt = 0
     repeat
