@@ -431,10 +431,10 @@ local pluginArgs = { -- {{{
         "jeetsukumaran/vim-indentwise",
         event = {"BufAdd"},
         config = function()
-            map("", "]i", [[<Plug>(IndentWisePreviousEqualIndent)]],   "Previous Equal Indent")
-            map("", "[i", [[<Plug>(IndentWiseNextEqualIndent)]],       "Next Equal Indent")
-            map("", "]I", [[<Plug>(IndentWiseNextGreaterIndent)]],     "Next Greater Indent")
+            map("", "[i", [[<Plug>(IndentWisePreviousEqualIndent)]],   "Previous Equal Indent")
+            map("", "]i", [[<Plug>(IndentWiseNextEqualIndent)]],       "Next Equal Indent")
             map("", "[I", [[<Plug>(IndentWisePreviousGreaterIndent)]], "Previous Greater Indent")
+            map("", "]I", [[<Plug>(IndentWiseNextGreaterIndent)]],     "Next Greater Indent")
         end
     },
     -- }}} Vim enhancement
