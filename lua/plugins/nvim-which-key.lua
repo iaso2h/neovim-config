@@ -23,12 +23,13 @@ return function ()
         -- Check the docs for more info.
         ---@type wk.Spec
         triggers = {
-            "<C-f>",
-            "<C-h>",
-            "<leader>",
-            "<leader>d",
-            "<leader>e",
-            "<leader>l"
+            {"<C-f>", mode = "n"},
+            {"<C-h>", mode = "n"},
+            {"<leader>",  mode = "n"},
+            {"<leader>a", mode = "n"},
+            {"<leader>d", mode = "n"},
+            {"<leader>e", mode = "n"},
+            {"<leader>l", mode = "n"},
         },
         -- Start hidden and wait for a key to be pressed before showing the popup
         -- Only used by enabled xo mapping modes.
@@ -80,7 +81,7 @@ return function ()
         },
         keys = {
             scroll_down = "<A-d>", -- binding to scroll down inside the popup
-            scroll_up = "<A-e>", -- binding to scroll up inside the popup
+            scroll_up   = "<A-e>", -- binding to scroll up inside the popup
         },
         ---@type (string|wk.Sorter)[]
         --- Mappings are sorted using configured sorters and natural sort of the keys
@@ -136,34 +137,34 @@ return function ()
             colors = true,
             -- used by key format
             keys = {
-            Up = " ",
-            Down = " ",
-            Left = " ",
-            Right = " ",
-            C = "󰘴 ",
-            M = "󰘵 ",
-            D = "󰘳 ",
-            S = "󰘶 ",
-            CR = "󰌑 ",
-            Esc = "󱊷 ",
-            ScrollWheelDown = "󱕐 ",
-            ScrollWheelUp = "󱕑 ",
-            NL = "󰌑 ",
-            BS = "󰁮",
-            Space = "󱁐 ",
-            Tab = "󰌒 ",
-            F1 = "󱊫",
-            F2 = "󱊬",
-            F3 = "󱊭",
-            F4 = "󱊮",
-            F5 = "󱊯",
-            F6 = "󱊰",
-            F7 = "󱊱",
-            F8 = "󱊲",
-            F9 = "󱊳",
-            F10 = "󱊴",
-            F11 = "󱊵",
-            F12 = "󱊶",
+                Up = " ",
+                Down = " ",
+                Left = " ",
+                Right = " ",
+                C = "󰘴 ",
+                M = "󰘵 ",
+                D = "󰘳 ",
+                S = "󰘶 ",
+                CR = "󰌑 ",
+                Esc = "󱊷 ",
+                ScrollWheelDown = "󱕐 ",
+                ScrollWheelUp = "󱕑 ",
+                NL = "󰌑 ",
+                BS = "󰁮",
+                Space = "󱁐 ",
+                Tab = "󰌒 ",
+                F1 = "󱊫",
+                F2 = "󱊬",
+                F3 = "󱊭",
+                F4 = "󱊮",
+                F5 = "󱊯",
+                F6 = "󱊰",
+                F7 = "󱊱",
+                F8 = "󱊲",
+                F9 = "󱊳",
+                F10 = "󱊴",
+                F11 = "󱊵",
+                F12 = "󱊶",
             },
         },
         show_help = true, -- show a help message in the command line for using WhichKey
@@ -175,7 +176,13 @@ return function ()
         },
         debug = false, -- enable wk.log in the current directory
 
-        operators = { ["gc"] = "Comments" },
+        operators = {
+            ["gc"] = "Comments",
+            ["gr"] = "Replace",
+            ["gs"] = "Surround",
+            ["gx"] = "Exchange",
+            ["gz"] = "Look up"
+        },
     }
 
 

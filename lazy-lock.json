@@ -5,6 +5,7 @@
   "VimRegexTutor": { "branch": "master", "commit": "f758f13ff951a4a1774edc39d6c6a1704ccb0ba3" },
   "asyncrun.vim": { "branch": "master", "commit": "78dc9277f2b989553861ee7c35b640112d95e1b5" },
   "autolisp-help": { "branch": "master", "commit": "a089857353c9a31a5c56ba940121aa95145781e8" },
+  "avante.nvim": { "branch": "main", "commit": "ba9f014b7563760ed217ad665a6f45c051f119d7" },
   "camelcasemotion": { "branch": "master", "commit": "de439d7c06cffd0839a29045a103fe4b44b15cdc" },
   "clangd_extensions.nvim": { "branch": "main", "commit": "8f7b72100883e0e34400d9518d40a03f21e4d0a6" },
   "cmp-async-path": { "branch": "main", "commit": "9d581eec5acf812316913565c135b0d1ee2c9a71" },

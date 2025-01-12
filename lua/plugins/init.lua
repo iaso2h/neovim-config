@@ -55,6 +55,11 @@ local pluginArgs = { -- {{{
     "inkarkat/vim-visualrepeat",
     "tpope/vim-repeat",
     "nvim-neotest/nvim-nio",
+    "MunifTanjim/nui.nvim",
+    {
+        "stevearc/dressing.nvim",
+        config = require("plugins.nvim-dressing"),
+    },
     -- }}} Dependencies
     -- Treesitter {{{
     {
@@ -541,7 +546,7 @@ local pluginArgs = { -- {{{
     -- }}} Telescope
     -- UI {{{
     {
-        "kyazdani42/nvim-web-devicons",
+        "nvim-tree/nvim-web-devicons",
         priority = 100,
         config = require("plugins.nvim-web-devicons"),
     },
@@ -577,11 +582,6 @@ local pluginArgs = { -- {{{
         dependencies = { "nvim-web-devicons" },
         keys = { { "<C-w>e", mode = "n" } },
         config = require("plugins.nvim-tree"),
-    },
-    {
-        "stevearc/dressing.nvim",
-        event = { "BufAdd" },
-        config = require("plugins.nvim-dressing"),
     },
     -- }}} UI
     -- Intellisense {{{
@@ -698,17 +698,16 @@ local pluginArgs = { -- {{{
         config = require("plugins.nvim-cmp"),
     },
     {
-        "Exafunction/codeium.nvim",
-        enabled = false,
+        "yetone/avante.nvim",
+        enabled = true,
+        build = "make",
         dependencies = {
+            "nvim-treesitter",
             "plenary.nvim",
-            "nvim-cmp"
+            "nui.nvim",
+            "nvim-web-devicons",
         },
-        config = function()
-            require("codeium").setup {
-                detect_proxy = true
-            }
-        end
+        config = require("plugins.nvim-avante")
     },
     {
         "ray-x/lsp_signature.nvim",
@@ -1155,7 +1154,7 @@ local pluginArgs = { -- {{{
     {
         "Bryley/neoai.nvim",
         dependencies = {
-            "MunifTanjim/nui.nvim",
+            "nui.nvim",
         },
         cmd = {
             "NeoAI",
