@@ -567,7 +567,7 @@ local pluginArgs = { -- {{{
         config = require("plugins.nvim-cokeline"),
     },
     {
-        "NvChad/nvim-colorizer.lua",
+        "catgoose/nvim-colorizer.lua",
         event = { "BufAdd" },
         config = require("plugins.nvim-colorizer"),
     },
