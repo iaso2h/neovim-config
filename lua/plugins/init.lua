@@ -596,7 +596,7 @@ local pluginArgs = { -- {{{
                     package_uninstalled = icon.kind.Event
                 },
                 ui = {
-                    border = "rounded",
+                    border = _G._float_win_border,
                     keymaps = {
                         toggle_package_expand   = "<CR>",
                         install_package         = "i",
@@ -1202,7 +1202,8 @@ local lazyOpts = { -- {{{
     git  = { log = {"-30"} },
     install = {colorscheme = {"onenord"}},
     ui   = {
-        border = "rounded",
+        border = _G._float_win_border,
+        backdrop = 100,
         icons = {
             cmd        = icon.ui.Terminal .. trailingSpaces,
             config     = icon.ui.Tweak .. trailingSpaces,

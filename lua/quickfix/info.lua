@@ -68,7 +68,7 @@ M.hover = function(printChk) -- {{{
         row = 0,
         col = 1,
         style = "minimal",
-        border = "rounded"
+        border = _G._float_win_border
     })
     vim.api.nvim_set_option_value("signcolumn", "no", {win = M.floatWinID})
 

@@ -38,12 +38,11 @@ return function()
         local bufNr = args.buf
 
         -- Signature
-        -- vim.lsp.buf.signature_help {border = "rounded"}
         require("plugins.nvim-lsp-signature").setup(bufNr)
 
         -- Mappings
 
-        bmap(bufNr, "n", [[K]], function() vim.lsp.buf.hover {border = "rounded"} end, "Documentation")
+        bmap(bufNr, "n", [[K]], function() vim.lsp.buf.hover {border = _G._float_win_border} end, "Documentation")
         bmap(bufNr, "n", [[<C-f>O]], [[<CMD>lua require('telescope.builtin').lsp_workspace_symbols()<CR>]], {"silent"}, "LSP workspace symbols")
 
         bmap(bufNr, "n", [[gd]], function()

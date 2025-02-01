@@ -1,6 +1,6 @@
 local icon = require("icon")
 
-local init = function(initValue, cmdName, globalKey) -- {{{
+local initHelper = function(initValue, cmdName, globalKey) -- {{{
     if cmdName and globalKey then
         vim.api.nvim_create_user_command("Toggle" .. cmdName, function()
             _G[globalKey] = not _G[globalKey]
@@ -16,16 +16,17 @@ end -- }}}
 -- local nvimVersion = vim.split(vim.api.nvim_exec2("version", {output = true}).output, "\n", {trimempty = true})[1]
 -- _G._nvim_version, _G._is_nightly = select(3, string.find(nvimVersion, [[v(%d%.%d%.%d)%-(dev?)]]))
 
-_G._os_uname           = init(vim.loop.os_uname())
-_G._is_term            = init(vim.fn.has("gui_running") == 0)
-_G._sep                = init(_G._os_uname.sysname == "Windows_NT" and "\\" or "/")
-_G._config_path        = init(vim.fn.stdpath("config"))
-_G._plugin_root        = init(vim.fn.stdpath("data") .. _G._sep .. "lazy")
-_G._format_option      = init("cr/qn2mM1jpl")
-_G._trim_space_on_save = init(true, "TrimSpaceOnSave", "_trim_space_on_save")
-_G._autoreload         = init(true, "Autoreload", "_autoreload")
-_G._enable_plugin      = init(true)
-_G._lisp_language      = init {"query", "clojure", "scheme", "lisp", "racket", "hy", "fennel", "janet", "carp", "wast", "yuck"}
+_G._float_win_border   = initHelper("rounded")
+_G._os_uname           = initHelper(vim.loop.os_uname())
+_G._is_term            = initHelper(vim.fn.has("gui_running") == 0)
+_G._sep                = initHelper(_G._os_uname.sysname == "Windows_NT" and "\\" or "/")
+_G._config_path        = initHelper(vim.fn.stdpath("config"))
+_G._plugin_root        = initHelper(vim.fn.stdpath("data") .. _G._sep .. "lazy")
+_G._format_option      = initHelper("cr/qn2mM1jpl")
+_G._trim_space_on_save = initHelper(true, "TrimSpaceOnSave", "_trim_space_on_save")
+_G._autoreload         = initHelper(true, "Autoreload", "_autoreload")
+_G._enable_plugin      = initHelper(true)
+_G._lisp_language      = initHelper {"query", "clojure", "scheme", "lisp", "racket", "hy", "fennel", "janet", "carp", "wast", "yuck"}
 
 _G._treesitter_supported_languages = {} -- {{{
 -- Credit: https://github.com/spywhere/detect-language.nvim/blob/2aa314ed46b68d89fe939cf3ecb12933c71ce49f/lua/detect-language/provider/treesitter.lua#L26
@@ -123,6 +124,14 @@ _G._short_line_infos = { -- {{{
     },
     gitcommit = {
         name = "Git commit",
+        icon = icon.git.Octocat
+    },
+    ["gitsigns-blame"] = {
+        name = "Git Blame",
+        icon = icon.git.Octocat
+    },
+    git = {
+        name = "Git",
         icon = icon.git.Octocat
     },
     DiffviewFiles = {

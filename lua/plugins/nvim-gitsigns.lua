@@ -21,11 +21,12 @@ return function()
 
         map("n", [[<C-h>u]], gs.undo_stage_hunk, "Gitsigns undo stage hunk")
         map(
-            "x",
-            [[<C-h>s]],
-            function() gs.blame_line{full=true} end,
-            "Gitsigns stage hunk"
+            "n",
+            [[<C-h>b]],
+            function() gs.blame_line {full=true} end,
+            "Gitsigns blame line"
         )
+        map("n", [[<C-h>B]], [[<CMD>Gitsigns blame<CR>]], {"silent"}, "Gitsigns blame")
 
         map("n", [[<C-h>p]], gs.preview_hunk, "Gitsigns preview hunk")
 
@@ -71,7 +72,7 @@ return function()
         max_file_length = 40000,
         preview_config = {
             -- Options passed to nvim_open_win
-            border = "rounded",
+            border = _G._float_win_border,
             style = "minimal",
             relative = "cursor",
             row = 0,

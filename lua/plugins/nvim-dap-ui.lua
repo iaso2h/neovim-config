@@ -57,7 +57,7 @@ M.config = function()
         element_mappings = {},
         expand_lines = true,
         floating = {
-            border = "rounded",
+            border = _G._float_win_border,
             mappings = {
                 close = { "q", "<Esc>" }
             }

@@ -212,7 +212,6 @@ local setReg = function(reg)
 end
 --- Save the star registers, plus and unnamed registers - independently, restoreReg can be accessed after saveReg is called
 function M.saveReg() -- {{{
-    local profile = require("profile")
     regUnnamed = getReg('"')
     regZero    = getReg("0")
     if _G._os_uname.machine == "aarch64" then

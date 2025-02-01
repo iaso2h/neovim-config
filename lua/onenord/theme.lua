@@ -558,6 +558,7 @@ theme.plugins = { -- {{{
     -- LightBulbVirtualText = {link = "DiagnosticHint"},
 
     -- https://github.com/hrsh7th/nvim-cmp
+    CmpDocumentation = {bg = p.n1},
     CmpItemAbbr           = {fg = p.white},
     CmpItemAbbrDeprecated = {fg = p.white, bg = "", strikethrough = true },
     CmpItemAbbrMatch      = {fg = p.w,     bg = "", bold = true},

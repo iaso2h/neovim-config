@@ -47,13 +47,13 @@ return function ()
                 suggestions = 20, -- how many suggestions should be shown in the list?
             },
             presets = {
-                operators = true, -- adds help for operators like d, y, ...
-                motions = true, -- adds help for motions
-                text_objects = true, -- help for text objects triggered after entering an operator
-                windows = true, -- default bindings on <c-w>
-                nav = true, -- misc bindings to work with windows
-                z = true, -- bindings for folds, spelling and others prefixed with z
-                g = true, -- bindings for prefixed with g
+                operators = true,     -- adds help for operators like d, y, ...
+                motions = true,       -- adds help for motions
+                text_objects = true,  -- help for text objects triggered after entering an operator
+                windows = true,       -- default bindings on <c-w>
+                nav = true,           -- misc bindings to work with windows
+                z = true,             -- bindings for folds, spelling and others prefixed with z
+                g = false,             -- bindings for prefixed with g
             },
         },
         ---@type wk.Win.opts
@@ -61,10 +61,10 @@ return function ()
             -- don't allow the popup to overlap with the cursor
             no_overlap = true,
             -- width = 1,
-            -- height = { min = 4, max = 25 },
+            height = { min = 4, max = 25 },
             -- col = 0,
             -- row = math.huge,
-            border = "rounded",
+            border = _G._float_win_border,
             padding = { 1, 2 }, -- extra window padding [top/bottom, right/left]
             title = true,
             title_pos = "center",
@@ -103,20 +103,20 @@ return function ()
         ---@type table<string, ({[1]:string, [2]:string}|fun(str:string):string)[]>
         replace = {
             key = {
-            function(key)
-                return require("which-key.view").format(key)
-            end,
-            -- { "<Space>", "SPC" },
+                function(key)
+                    return require("which-key.view").format(key)
+                end,
+                -- { "<Space>", "SPC" },
             },
             desc = {
-            { "<Plug>%(?(.*)%)?", "%1" },
-            { "^%+", "" },
-            { "<[cC]md>", "" },
-            { "<[cC][rR]>", "" },
-            { "<[sS]ilent>", "" },
-            { "^lua%s+", "" },
-            { "^call%s+", "" },
-            { "^:%s*", "" },
+                { "<Plug>%(?(.*)%)?", "%1" },
+                { "^%+",              "" },
+                { "<[cC]md>",         "" },
+                { "<[cC][rR]>",       "" },
+                { "<[sS]ilent>",      "" },
+                { "^lua%s+",          "" },
+                { "^call%s+",         "" },
+                { "^:%s*",            "" },
             },
         },
         icons = {
@@ -142,7 +142,7 @@ return function ()
                 Left = " ",
                 Right = " ",
                 C = "󰘴 ",
-                M = "󰘵 ",
+                M = "󰘳 ",
                 D = "󰘳 ",
                 S = "󰘶 ",
                 CR = "󰌑 ",
@@ -171,18 +171,18 @@ return function ()
         show_keys = true, -- show the currently pressed key and its label as a message in the command line
         -- disable WhichKey for certain buf types and file types.
         disable = {
-            buftypes = {},
-            filetypes = {"TelescopePrompt"}
+            bt = {},
+            ft = {"TelescopePrompt"}
         },
         debug = false, -- enable wk.log in the current directory
 
-        operators = {
-            ["gc"] = "Comments",
-            ["gr"] = "Replace",
-            ["gs"] = "Surround",
-            ["gx"] = "Exchange",
-            ["gz"] = "Look up"
-        },
+        -- operators = {
+        --     ["gc"] = "Comments",
+        --     ["gr"] = "Replace",
+        --     ["gs"] = "Surround",
+        --     ["gx"] = "Exchange",
+        --     ["gz"] = "Look up"
+        -- },
     }
 
 

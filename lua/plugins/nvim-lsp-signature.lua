@@ -11,7 +11,7 @@ M.setup = function(bufNr)
             always_trigger = true,
             toggle_key = nil,
             doc_lines = 12,
-            handler_opts = { border = "rounded" }
+            handler_opts = { border = _G._float_win_border }
         },
         bufNr
     )

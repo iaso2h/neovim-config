@@ -41,11 +41,16 @@ return function()
             end,
         },
         window = {
-            completion = cmp.config.window.bordered{
+            completion = cmp.config.window.bordered {
+                border = _G._float_win_border,
                 winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None',
                 col_offset   = 1,
                 scrollbar    = true
             },
+            documnetation = cmp.config.window.bordered {
+                border = _G._float_win_border,
+                winhighlight = "Normal:Normal,FloatBorder:CmpDocumentation,CursorLine:Visual,Search:None"
+            }
         },
         mapping = {
             ["<CR>"] = cmp.mapping.confirm {
@@ -60,7 +65,6 @@ return function()
             {name = 'conjure'},
             {name = "luasnip"},
             {name = "cmp_tabnine"},
-            {name = "codeium"},
         },
         formatting = {
             fields = {"kind", "abbr", "menu"},
@@ -82,9 +86,9 @@ return function()
                 if entry.source.name == "cmp_tabnine" then
                     vimItem.kind = icon.misc.Robot
                     vimItem.kind_hl_group = "CmpItemKindTabnine"
-                elseif entry.source.name == "codeium" then
-                    vimItem.kind = "󰚩"
-                    vimItem.kind_hl_group = "CmpItemKindTabnine"
+                -- elseif entry.source.name == "codeium" then
+                --     vimItem.kind = "󰚩"
+                --     vimItem.kind_hl_group = "CmpItemKindTabnine"
                 elseif entry.source.name == "emoji" then
                     vimItem.kind = icon.misc.Smiley
                     vimItem.kind_hl_group = "CmpItemKindEmoji"

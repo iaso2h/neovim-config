@@ -101,7 +101,7 @@ return function()
                 quit_on_focus_loss = true,
                 open_win_config = {
                     relative = "editor",
-                    border   = "rounded",
+                    border   = _G._float_win_border,
                     width    = 30,
                     height   = 30,
                     row      = 1,
@@ -250,7 +250,7 @@ return function()
                     col      = 1,
                     row      = 1,
                     relative = "cursor",
-                    border   = "rounded",
+                    border   = _G._float_win_border,
                     style    = "minimal",
                 },
             },
