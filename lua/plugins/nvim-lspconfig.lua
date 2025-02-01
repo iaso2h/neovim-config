@@ -31,11 +31,19 @@ return function()
         end
     end -- }}}
 
-    ---@param client table
-    ---@param bufNr integer
-    local onAttach = function(client, bufNr) -- {{{
+    ---@param args table
+    local onAttach = function(args) -- {{{
+    -- Deprecated: local onAttach = function(client, bufNr)
+
+        local bufNr = args.buf
+
+        -- Signature
+        -- vim.lsp.buf.signature_help {border = "rounded"}
+        require("plugins.nvim-lsp-signature").setup(bufNr)
+
         -- Mappings
-        bmap(bufNr, "n", [[<C-f>o]], [[<CMD>lua require('telescope.builtin').lsp_document_symbols()<CR>]],  {"silent"}, "LSP document symbols")
+
+        bmap(bufNr, "n", [[K]], function() vim.lsp.buf.hover {border = "rounded"} end, "Documentation")
         bmap(bufNr, "n", [[<C-f>O]], [[<CMD>lua require('telescope.builtin').lsp_workspace_symbols()<CR>]], {"silent"}, "LSP workspace symbols")
 
         bmap(bufNr, "n", [[gd]], function()
@@ -63,18 +71,6 @@ return function()
         -- Bring back the gqq for formatting comments and stuff
         vim.bo.formatexpr = ""
         vim.opt.formatexpr = ""
-        bmap(bufNr, "n", [[gqq]], function()
-            if vim.bo.formatexpr ~= "" then
-                vim.bo.formatexpr = ""
-            end
-            vim.cmd [[norm! gqq]]
-        end, "which_key_ignore")
-        bmap(bufNr, "n", [[gq]], function()
-            if vim.bo.formatexpr ~= "" then
-                vim.bo.formatexpr = ""
-            end
-            vim.cmd [[norm! gq]]
-        end, "which_key_ignore")
         vim.api.nvim_create_user_command("Format", function(opts)
             if opts.range == 0 then
                 vim.lsp.buf.format { name = "null-ls",
@@ -96,6 +92,9 @@ return function()
         })
     end -- }}}
 
+    vim.api.nvim_create_autocmd('LspAttach', { callback = onAttach })
+
+
 -- LSP servers override {{{
 -- Individual configuration: https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md
 -- Python {{{
@@ -104,15 +103,10 @@ return function()
 serverNames.pyright = {
     settings  = {
         python = {
-            pythonPath = "python",
-            venvPath = "",
+            -- pythonPath = "python",
+            -- venvPath = "",
             analysis = {
-                -- autoSearchPaths = true,
-                diagnosticMode = "workspace",
-                -- diagnosticMode = "openFileOnly",
                 -- extraPaths = "",
-                typeCheckingMode = "basic",
-                useLibraryCodeForTypes = true,
             }
         },
         pyright = {
@@ -129,32 +123,19 @@ serverNames.pyright = {
 --- Get lua plugins repository directory. e.g. "/home/iaso2h/.local/share/nvim/lazy/nvim-treesitter/lua"
 ---@param plugin string
 ---@return string
-local luaGetPluginRepoDir = function(plugin, suffix)
-    return suffix and
-        _G._plugin_root .. _G._sep .. plugin .. _G._sep .. "lua" or
-        _G._plugin_root .. _G._sep .. plugin .. _G._sep
+local luaPluginDir = function(plugin)
+    return _G._plugin_root .. _G._sep .. plugin .. _G._sep .. "lua"
 end
 local luaLibrary = {
     vim.fn.expand("$VIMRUNTIME") .. _G._sep .. "lua",
     require("neodev.config").types(),
-    luaGetPluginRepoDir("nvim-treesitter", true),
-    luaGetPluginRepoDir("telescope.nvim", true),
-    luaGetPluginRepoDir("plenary.nvim", true),
-    luaGetPluginRepoDir("mason-null-ls.nvim", true),
-    luaGetPluginRepoDir("none-ls.nvim", true),
-    luaGetPluginRepoDir("LuaSnip", true),
-    luaGetPluginRepoDir("nvim-dap", true),
-}
-local fennelLibrary = {
-    vim.fn.expand("$VIMRUNTIME") .. _G._sep,
-    require("neodev.config").types(),
-    luaGetPluginRepoDir("nvim-treesitter", false),
-    luaGetPluginRepoDir("telescope.nvim", false),
-    luaGetPluginRepoDir("plenary.nvim", false),
-    luaGetPluginRepoDir("mason-null-ls.nvim", false),
-    luaGetPluginRepoDir("none-ls.nvim", false),
-    luaGetPluginRepoDir("LuaSnip", false),
-    luaGetPluginRepoDir("nvim-dap", false),
+    luaPluginDir("nvim-treesitter"),
+    luaPluginDir("telescope.nvim"),
+    luaPluginDir("plenary.nvim"),
+    luaPluginDir("mason-null-ls.nvim"),
+    luaPluginDir("none-ls.nvim"),
+    luaPluginDir("LuaSnip"),
+    luaPluginDir("nvim-dap"),
 }
 for _, dir in ipairs(luaLibrary) do
     if not vim.loop.fs_stat(dir) then
@@ -185,14 +166,9 @@ serverNames.lua_ls = { -- {{{
             -- Use stylua to format instead. Configured in
             -- `lua/plugins/nvim-null-ls`
             format = {enable = false},
-            codeLens = {enable = true},
             completion = {
                 callSnippet    = "Replace",
                 keywordSnippet = "Replace",
-                workspaceWord  = true,
-                displayContext = true,
-                showWord = "Fallback",
-                showParams = true,
             },
             diagnostics = {
                 disable = {
@@ -206,7 +182,6 @@ serverNames.lua_ls = { -- {{{
                 checkThirdParty = false,
                 useGitIgnore    = true
             },
-            telemetry = {enable = false}
         },
     },
 } -- }}}
@@ -307,20 +282,19 @@ end
         -- enable snippet support
         capabilities = capabilities,
         -- map buffer local keybindings when the language server attaches
-        on_attach    = onAttach
+        -- on_attach    = onAttach
     }
 
     for _, serverName in pairs(vim.tbl_keys(serverNames)) do
         serverNames[serverName] = vim.tbl_deep_extend("force", basicConfig, serverNames[serverName])
         if serverName ~= "clangd" then
-            lspConfig[serverName].setup(serverNames[serverName])
-        else
             serverNames[serverName].capabilities.offsetEncoding = {"utf-16"}
         end
+        lspConfig[serverName].setup(serverNames[serverName])
     end
     -- }}} Setup servers
 
--- vim.lsp and vim.diagnostic setups {{{
+-- vim.diagnostic setups {{{
 vim.diagnostic.config {
     underline        = true,
     virtual_text     = true,
@@ -335,8 +309,6 @@ sign define DiagnosticSignWarn  text= texthl=DiagnosticWarn  linehl= numhl=Diagn
 sign define DiagnosticSignInfo  text= texthl=DiagnosticInfo  linehl= numhl=DiagnosticInfo
 sign define DiagnosticSignHint  text= texthl=DiagnosticHint  linehl= numhl=DiagnosticHint
 ]]
-vim.lsp.handlers["textDocument/hover"]         = vim.lsp.with(vim.lsp.handlers.hover,          {border = "rounded"})
-vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {border = "rounded"})
--- }}} vim.lsp and vim.diagnostic setups
+-- }}}
 
 end

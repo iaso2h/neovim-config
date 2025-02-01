@@ -215,19 +215,10 @@ return function()
             if cmp.visible() then
                 require("cmp.utils.autocmd").emit("InsertLeave")
             end
-
-            -- Close lsp_signature float window at the same time
-            if _LSP_SIG_CFG then
-                if _LSP_SIG_CFG.winnr and _LSP_SIG_CFG.winnr > 0 and
-                        vim.api.nvim_win_is_valid(_LSP_SIG_CFG.winnr) then
-                    vim.api.nvim_win_close(_LSP_SIG_CFG.winnr, true)
-                    _LSP_SIG_CFG.winnr = nil
-                    _LSP_SIG_CFG.bufnr = nil
-                    if _LSP_SIG_VT_NS then
-                        vim.api.nvim_buf_clear_namespace(0, _LSP_SIG_VT_NS, 0, -1)
-                    end
-                end
-            end
+            require("plugins.nvim-lsp-signature").closeSignature()
+        end,
+        ["<A-o>"] = function()
+            require("plugins.nvim-lsp-signature").flipSignature()
         end,
     }
 

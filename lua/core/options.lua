@@ -132,7 +132,7 @@ opt.formatoptions = _G._format_option -- NOTE: Might change on loading different
 -- end -- }}}
 
 -- GUI
-vim.cmd [[colorscheme onenord]]
+vim.cmd.colorscheme("onenord")
 local guiFont
 local guiFallbackFont
 local guiFontSize

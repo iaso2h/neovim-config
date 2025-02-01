@@ -3,6 +3,19 @@
 -- First thing first
 vim.g.mapleader = " "
 
+-- Remove default neovim mapping
+-- https://github.com/neovim/neovim/blob/9cc060218b66c600f7f50ecbec5ba6f1b3a9da82/runtime/lua/vim/_defaults.lua
+pcall(function() vim.keymap.del({"n", "x"}, "gra") end)
+pcall(function() vim.keymap.del("n", "gri") end)
+pcall(function() vim.keymap.del("n", "gO") end)
+pcall(function() vim.keymap.del({"i", "s"}, "<C-s>") end)
+pcall(function() vim.keymap.del("n", "<C-w>d") end)
+pcall(function() vim.keymap.del("n", "<C-w>D") end)
+pcall(function() vim.keymap.del("n", "[t") end)
+pcall(function() vim.keymap.del("n", "]t") end)
+
+-- Comment
+map("x", [[C]], [[gc]], "Toggle comment")
 -- Diagnostic mapping
 map("n", [[<C-q>d]], [[<CMD>lua require("quickfix.diagnostics").refresh(true, false)<CR>]], {"silent"}, "LSP add workspace folder")
 map("n", [[[d]], function()
@@ -31,6 +44,7 @@ map("n", [[[C]], [[:noa windo set cc&<CR>]],   {"silent"}, "Turn off colorcolumn
 -- Quickfix
 map("n", [[<leader>q]], [[<CMD>lua require("buffer.toggle")("quickfix", false)<CR>]], {"silent"}, "Toggle quickfix")
 map("n", [[<leader>Q]], [[<CMD>lua require("buffer.toggle")("quickfix", true)<CR>]],  {"silent"}, "Close visible quickfix")
+-- DEPRECATED: use [q, ]q, [Q, ]Q instead
 map("n", [[<C-q>g]], [[<CMD>cfirst<CR>zzzv]],    {"silent"}, "Go to first item in quickfix")
 map("n", [[<C-q>G]], [[<CMD>clast<CR>zzzv]],     {"silent"}, "Go to last item in quickfix")
 map("n", [[<C-q>n]], [[<CMD>cnext<CR>zzzv]],     {"silent"}, "Go to next item in quickfix")
@@ -262,8 +276,6 @@ map("n", [[<Plug>ReplaceVisual]], function ()
     require("replace").operator(visualOpInfo)
 end, {"noremap", "silent"}, "Visual-repeat for replaced selected")
 
-pcall(function() vim.api.nvim_del_keymap("", "gra") end)
-pcall(function() vim.api.nvim_del_keymap("", "gri") end)
 map("n", [[gr]],  [[<Plug>ReplaceOperatorInplace]], "Replace operator and restore the cursor position")
 map("n", [[gru]], [[<Plug>ReplaceOperator]],        "Replace operator")
 map("n", [[grr]], [[<Plug>ReplaceCurLine]],         "Replace current line")
@@ -346,8 +358,6 @@ map("n", [[g#]], [[<CMD>lua require("jump.search").cword("#", true)<CR>]], {"nor
 -- Search visual selected
 map("x", [[/]], [[:lua require("jump.search").searchSelected("/")<CR>]], {"silent"}, "Search selected forward")
 map("x", [[?]], [[:lua require("jump.search").searchSelected("?")<CR>]], {"silent"}, "Search selected backward")
-map("x", [[*]], [[/]], "Search selected forward")
-map("x", [[#]], [[?]], "Search selected backward")
 map("n", [[<leader>/]], [[q/]], {"noremap"}, "Open search in commandline window")
 -- Regex very magic
 map("n", [[n]], [[<CMD>lua require("jump.search").cycle("n")<CR>]], {"silent"}, "Cycle through search result forward")
@@ -461,10 +471,10 @@ end, "New buffer")
 -- Window
 map("n", [[<C-w>V]], [[<CMD>wincmd o | wincmd v<CR>]], {"silent"}, "Split only current window vertically")
 map("n", [[<C-w>S]], [[<CMD>wincmd o | wincmd s<CR>]], {"silent"}, "Split only current window vertically")
-map("i", [[<C-w>k]], [[<C-\><C-n><C-w>k]], {"noremap"}, "Window above")
-map("i", [[<C-w>j]], [[<C-\><C-n><C-w>j]], {"noremap"}, "Window below")
-map("i", [[<C-w>h]], [[<C-\><C-n><C-w>h]], {"noremap"}, "Window left")
-map("i", [[<C-w>l]], [[<C-\><C-n><C-w>l]], {"noremap"}, "Window right")
+-- map("i", [[<C-w>k]], [[<C-\><C-n><C-w>k]], {"noremap"}, "Window above")
+-- map("i", [[<C-w>j]], [[<C-\><C-n><C-w>j]], {"noremap"}, "Window below")
+-- map("i", [[<C-w>h]], [[<C-\><C-n><C-w>h]], {"noremap"}, "Window left")
+-- map("i", [[<C-w>l]], [[<C-\><C-n><C-w>l]], {"noremap"}, "Window right")
 
 map("n", [[<C-w>t]], [[<C-w>T]], {"noremap"}, "Move current window to new tab")
 map("n", [[<C-w>T]], [[<C-w>t]], {"noremap"}, "Move current window to top left")
@@ -627,8 +637,6 @@ map("c", [[<C-b>]],  [[<C-Left>]],            "Move cursor to one word backward"
 map("i", [[<C-b>]],  [[<C-o>b]], {"noremap"}, "Move cursor to one word backward")
 map("!", [[<C-d>]],  [[<Del>]],               "Delete character to the right")
 map("!", [[<C-w>]],  [[<C-Right>]],           "Move cursor to one word forward")
-map("i", [[<C-w>W]], [[<C-Right>]],           "Move cursor to one WORD forward")
-map("i", [[<C-w>w]], [[<C-o>w]], {"noremap"}, "Move cursor to one word forward")
 -- Commandline
 map("c", [[<C-BS>]],  [[<C-\>e(RemoveLastPathComponent())<CR>]], "Delete word before")
 map("c", [[<C-j>]], [[<Down>]], "Move cursor down")

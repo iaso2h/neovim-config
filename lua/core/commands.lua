@@ -50,11 +50,6 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     end
 })
 
--- HACK: https://github.com/neovim/neovim/issues/2127
-vim.api.nvim_create_autocmd({"FocusGained", "WinEnter"}, {
-    desc    = "Check and file changes after regaining focus",
-    command = "checktime"
-})
 -- }}} Auto commands
 
 -- Commands {{{

@@ -336,6 +336,7 @@ local pluginArgs = { -- {{{
     },
     {
         "numToStr/Comment.nvim",
+        enabled = false,
         keys = {
             {[[gc]],  mode = "n"},
             {[[gcc]], mode = "n"},
@@ -633,6 +634,7 @@ local pluginArgs = { -- {{{
         dependencies = {
             "mason-lspconfig.nvim",
             "folke/neodev.nvim",
+            "ray-x/lsp_signature.nvim",
         },
         config = require("plugins.nvim-lspconfig"),
     },
@@ -708,11 +710,6 @@ local pluginArgs = { -- {{{
             "nvim-web-devicons",
         },
         config = require("plugins.nvim-avante")
-    },
-    {
-        "ray-x/lsp_signature.nvim",
-        dependencies = { "nvim-lspconfig" },
-        config = require("plugins.nvim-lsp-signature"),
     },
     {
         "kosayoda/nvim-lightbulb",
