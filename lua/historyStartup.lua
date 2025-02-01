@@ -1,8 +1,8 @@
 -- File: historyStartup
 -- Author: iaso2h
 -- Description: Startup page with oldfiles listed
--- Version: 0.0.26
--- Last Modified: Sat 13 May 2023
+-- Version: 0.0.27
+-- Last Modified: 2025-02-01
 -- TODO: ? to trigger menupage
 
 local M   = {
@@ -17,7 +17,7 @@ local M   = {
 
     autoresizeCmdId = -1,
 
-    ns      = vim.api.nvim_create_namespace("historyStartup"),
+    ns = vim.api.nvim_create_namespace("historyStartup"),
     lines = {
         firstline = {"< New Buffer >"},
         bufNrs   = {},
@@ -35,7 +35,7 @@ local modifyLines = function(func) -- {{{
     vim.api.nvim_set_option_value("modifiable", true, {buf = M.initBuf})
     func()
     vim.api.nvim_set_option_value("modifiable", false, {buf = M.initBuf})
-end -- }}} 
+end -- }}}
 --- Check whether historyStartup is loaded
 ---@return boolean
 local isLoaded = function() -- {{{
@@ -90,7 +90,7 @@ local strikeThroughOpened = function() -- {{{
         local bufIdx = tbl_idx(M.lines.bufNrs, buf, false) -- 1 indexed
         if bufIdx ~= -1 then
             ---@diagnostic disable-next-line: param-type-mismatch
-            vim.api.nvim_buf_add_highlight(M.initBuf, M.ns, "Comment", bufIdx, 0, -1)
+            vim.hl.range(M.initBuf, M.ns, "Comment", {bufIdx, 0}, {bufIdx, -1})
         end
     end
 end -- }}}
@@ -188,7 +188,7 @@ local hover = function() -- {{{
         row = 1,
         col = 1,
         style = "minimal",
-        border = "rounded"
+        border = _G._float_win_border,
     })
     vim.api.nvim_set_option_value("signcolumn", "no", {win = M.floatWinID})
 
@@ -243,7 +243,7 @@ local execMap = function(key) -- {{{
         else
             vim.cmd("edit " .. M.lines.absolute[lnum - 1])
             if isVisible() then
-                vim.api.nvim_buf_add_highlight(M.initBuf, M.ns, "Comment", lnum - 1, 0, -1)
+                vim.hl.range(M.initBuf, M.ns, "Comment", {lnum - 1, 0}, {lnum - 1, -1})
             end
         end -- }}}
     elseif key == "go" then -- {{{
@@ -259,7 +259,7 @@ local execMap = function(key) -- {{{
             vim.cmd("tabnew")
             vim.cmd("edit " .. M.lines.absolute[lnum - 1])
             if isVisible() then
-                vim.api.nvim_buf_add_highlight(M.initBuf, M.ns, "Comment", lnum - 1, 0, -1)
+                vim.hl.range(M.initBuf, M.ns, "Comment", {lnum - 1, 0}, {lnum - 1, -1})
             end
         end -- }}}
     elseif key == "yp" then -- {{{
@@ -295,7 +295,7 @@ local execMap = function(key) -- {{{
                         vim.api.nvim_win_set_buf(M.initWin, M.lastBuf)
                         vim.cmd("split " ..M.lines.absolute[lnum - 1])
                         if isVisible() then
-                            vim.api.nvim_buf_add_highlight(M.initBuf, M.ns, "Comment", lnum - 1, 0, -1)
+                            vim.hl.range(M.initBuf, M.ns, "Comment", {bufIdx, 0}, {bufIdx, -1})
                         end
                     else
                         vim.cmd("noa q!")
@@ -311,7 +311,7 @@ local execMap = function(key) -- {{{
                         vim.api.nvim_win_set_buf(M.initWin, M.lastBuf)
                         vim.cmd("vsplit " ..M.lines.absolute[lnum - 1])
                         if isVisible() then
-                            vim.api.nvim_buf_add_highlight(M.initBuf, M.ns, "Comment", lnum - 1, 0, -1)
+                            vim.hl.range(M.initBuf, M.ns, "Comment", {bufIdx, 0}, {bufIdx, -1})
                         end
                     else
                         vim.cmd("noa q!")
@@ -322,17 +322,23 @@ local execMap = function(key) -- {{{
             local bufsNonScratchOccurInWins = require("buffer.util").bufsNonScratchOccurInWins(
                 require("buffer.util").bufNrs(true) )
             if bufsNonScratchOccurInWins == 0 then
-                vim.cmd("noa qa!")
+                vim.defer_fn(function()
+                    vim.api.nvim_feedkeys("ZZ", "n", true)
+                end, 0)
             else
                 -- Switch to last buffer or close the current window
                 if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
                     if not lastBufVisibleTick then
                         vim.api.nvim_win_set_buf(M.initWin, M.lastBuf)
                     else
-                        vim.cmd("noa q!")
+                        vim.defer_fn(function()
+                            vim.api.nvim_feedkeys("ZZ", "n", true)
+                        end, 0)
                     end
                 else
-                    vim.cmd("noa q!")
+                    vim.defer_fn(function()
+                        vim.api.nvim_feedkeys("ZZ", "n", true)
+                    end, 0)
                 end
             end
         end -- }}}
