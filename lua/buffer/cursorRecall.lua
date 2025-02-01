@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Derived from and simplified:
 -- Credit: https://github.com/farmergreg/vim-lastplace/blob/master/plugin/vim-lastplace.vim
--- Version: 0.0.12
--- Last Modified: 2024-10-27
+-- Version: 0.0.13
+-- Last Modified: 2025-02-01
 
 local ignoreBuftype = {
         'quickfix',
@@ -70,6 +70,7 @@ return function(args)
             -- Last line in buffer is also the last line visible in this window
             local ok, msgOrVal = pcall(vim.api.nvim_command, "normal! g`")
             if not ok and not string.find(msgOrVal, "E663") then
+                vim.notify("\nnormal! g`", vim.log.levels.ERROR)
                 vim.notify(msgOrVal, vim.log.levels.ERROR)
                 vim.notify("Error occurred when executing command: " .. cmdStr, vim.log.levels.ERROR)
             end
@@ -77,18 +78,18 @@ return function(args)
             log('DEBUGPRINT[7]: cursorRecall.lua:73 (after elseif buffend - lastpos > ((winend - wi…)')
             local ok, msgOrVal = pcall(vim.api.nvim_command, 'normal! g`"zz')
             if not ok and not string.find(msgOrVal, "E663") then
+                vim.notify('\nnormal! g`"zz', vim.log.levels.ERROR)
                 vim.notify(msgOrVal, vim.log.levels.ERROR)
                 vim.notify("Error occurred when executing command: " .. cmdStr, vim.log.levels.ERROR)
             end
         else
             local ok, msgOrVal = pcall(vim.api.nvim_command, 'normal! G`"' .. t'<c-e>')
             if not ok and not string.find(msgOrVal, "E663") then
+                vim.notify('\nnormal! G`"<C-e>', vim.log.levels.ERROR)
                 vim.notify(msgOrVal, vim.log.levels.ERROR)
                 vim.notify("Error occurred when executing command: " .. cmdStr, vim.log.levels.ERROR)
             end
             log('DEBUGPRINT[8]: cursorRecall.lua:76 (after else)')
-            -- Otherwise, show as much context as we can
-            vim.cmd('normal! G`"' .. t'<c-e>')
         end
     else
         -- Jump to recent last change instead
@@ -120,10 +121,13 @@ return function(args)
                     -- change record within neovim become outdated, which will
                     -- incur problems like line number doesn't match up
                     return
+                elseif newestRecord.count == "0" then
+                    return
                 else
                     local cmdStr = string.format("norm! %s%s", newestRecord.count, "g,")
                     local ok, msgOrVal = pcall(vim.api.nvim_command, cmdStr)
                     if not ok then
+                        vim.notify(string.format("\nnorm! %s%s", newestRecord.count, "g,"), vim.log.levels.ERROR)
                         vim.notify(msgOrVal, vim.log.levels.ERROR)
                         vim.notify("Error occurred when executing command: " .. cmdStr, vim.log.levels.ERROR)
                     end
