@@ -1,7 +1,7 @@
 return function()
     local NoNeckPain = require("no-neck-pain")
 
-    NoNeckPain.setup {         -- {{{
+    NoNeckPain.setup { -- {{{
         -- The width of the focused window that will be centered. When the terminal width is less than the `width` option, the side buffers won't be created.
         --- @type integer|"textwidth"|"colorcolumn"
         width = 100,
@@ -10,15 +10,58 @@ return function()
         -- in full screen screen, width is 210, you define an NNP `width` of 100, which creates each side buffer with a width of 50. If you resize your terminal to the half of the screen, each side buffer would be of width 5 and thereforce might not be useful and/or add "noise" to your workflow.
         --- @type integer
         minSideBufferWidth = 10,
+        disableOnLastBuffer = false,
+        -- When `true`, disabling the plugin closes every other windows except the initially focused one.
+        ---@usage: this parameter will be renamed `killAllWindowsOnDisable` in the next major release (^2.x.y).
+        ---@type boolean
+        killAllBuffersOnDisable = false,
+        -- When `true`, deleting the main no-neck-pain buffer with `:bd`, `:bdelete` does not disable the plugin, it fallbacks on the newly focused window and refreshes the state by re-creating side-windows if necessary.
+        ---@type boolean
+        fallbackOnBufferDelete = true,
         autocmds = {
+            -- When `true`, enables the plugin when you start Neovim.
+            -- If the main window is  a side tree (e.g. NvimTree) or a dashboard, the command is delayed until it finds a valid window.
+            -- The command is cleaned once it has successfuly ran once.
+            ---@type boolean
             enableOnVimEnter = false,
+            -- When `true`, enables the plugin when you enter a new Tab.
+            -- note: it does not trigger if you come back to an existing tab, to prevent unwanted interfer with user's decisions.
+            ---@type boolean
             enableOnTabEnter = false,
+            -- When `true`, reloads the plugin configuration after a colorscheme change.
+            ---@type boolean
+            reloadOnColorSchemeChange = false,
+            -- When `true`, entering one of no-neck-pain side buffer will automatically skip it and go to the next available buffer.
+            ---@type boolean
+            skipEnteringNoNeckPainBuffer = true,
         },
         mappings = {
-            enabled    = true,
-            toggle     = "<Leader>z",
-            widthUp    = "<Leader>z+",
-            widthDown  = "<Leader>z-",
+            -- When `true`, creates all the mappings that are not set to `false`.
+            ---@type boolean
+            enabled = true,
+            -- Sets a global mapping to Neovim, which allows you to toggle the plugin.
+            -- When `false`, the mapping is not created.
+            ---@type string
+            toggle = "<Leader>zz",
+            -- Sets a global mapping to Neovim, which allows you to toggle the left side buffer.
+            -- When `false`, the mapping is not created.
+            ---@type string
+            toggleLeftSide = false,
+            -- Sets a global mapping to Neovim, which allows you to toggle the right side buffer.
+            -- When `false`, the mapping is not created.
+            ---@type string
+            toggleRightSide = false,
+            -- Sets a global mapping to Neovim, which allows you to increase the width (+5) of the main window.
+            -- When `false`, the mapping is not created.
+            ---@type string | { mapping: string, value: number }
+            widthUp = "<Leader>z=",
+            -- Sets a global mapping to Neovim, which allows you to decrease the width (-5) of the main window.
+            -- When `false`, the mapping is not created.
+            ---@type string | { mapping: string, value: number }
+            widthDown = "<Leader>z-",
+            -- Sets a global mapping to Neovim, which allows you to toggle the scratchPad feature.
+            -- When `false`, the mapping is not created.
+            ---@type string
             scratchPad = "<Leader>Z",
         },
         buffers = {
@@ -61,10 +104,10 @@ return function()
     NoNeckPain.bufferOptionsWo = {
         cursorline = true,
         cursorcolumn = false,
-        colorcolumn = "80",
-        number = true,
+        colorcolumn = "0",
+        number = false,
         relativenumber = false,
-        foldenable = true,
+        foldenable = false,
         list = false,
         wrap = true,
         linebreak = true,

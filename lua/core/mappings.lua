@@ -5,14 +5,16 @@ vim.g.mapleader = " "
 
 -- Remove default neovim mapping
 -- https://github.com/neovim/neovim/blob/9cc060218b66c600f7f50ecbec5ba6f1b3a9da82/runtime/lua/vim/_defaults.lua
-pcall(function() vim.keymap.del({"n", "x"}, "gra") end)
-pcall(function() vim.keymap.del("n", "gri") end)
-pcall(function() vim.keymap.del("n", "gO") end)
-pcall(function() vim.keymap.del({"i", "s"}, "<C-s>") end)
-pcall(function() vim.keymap.del("n", "<C-w>d") end)
-pcall(function() vim.keymap.del("n", "<C-w>D") end)
-pcall(function() vim.keymap.del("n", "[t") end)
-pcall(function() vim.keymap.del("n", "]t") end)
+pcall(function()
+    vim.keymap.del({"n", "x"}, "gra")
+    vim.keymap.del("n", "gri")
+    vim.keymap.del("n", "gO")
+    vim.keymap.del({"i", "s"}, "<C-s>")
+    vim.keymap.del("n", "<C-w>d")
+    vim.keymap.del("n", "<C-w>D")
+    vim.keymap.del("n", "[t")
+    vim.keymap.del("n", "]t")
+end)
 
 -- Comment
 map("x", [[C]], [[gc]], "Toggle comment")

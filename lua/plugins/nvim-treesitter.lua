@@ -32,10 +32,6 @@ return function()
                 scope_incremental = "gnS",
             },
         },
-        matchup = {
-            enable  = true,
-            disable = {"help"}
-        },
     }
 
     map("n",        [[<A-S-a>]], [[gnn]], "Expand selection")

@@ -70,47 +70,15 @@ local pluginArgs = { -- {{{
         config = require("plugins.nvim-treesitter"),
     },
     {
-        "nvim-treesitter/playground",
-        -- TODO: deprecated in Neovim 0.10+
-        commit = "934cb4c",
-        dependencies = {"nvim-treesitter"},
-        cmd    = {"TSPlaygroundToggle", "TSNodeUnderCursor" },
-        keys   = {{"gH", mode = "n"}},
-        config = function()
-            require("nvim-treesitter.configs").setup {
-                playground = {
-                    enable          = true,
-                    disable         = {},
-                    updatetime      = 25,    -- Debounced time for highlighting nodes in the playground from source code
-                    persist_queries = false, -- Whether the query persists across vim sessions
-                    keybindings     = {
-                        toggle_query_editor       = "o",
-                        toggle_hl_groups          = "i",
-                        toggle_injected_languages = "t",
-                        toggle_anonymous_nodes    = "a",
-                        toggle_language_display   = "I",
-                        focus_language            = "f",
-                        unfocus_language          = "F",
-                        update                    = "R",
-                        goto_node                 = "<CR>",
-                        show_help                 = "?",
-                    },
-                }
-            }
-            map(
-                "n",
-                [[gH]],
-                [[<CMD>TSHighlightCapturesUnderCursor<CR>]],
-                { "silent" },
-                "Show Tree sitter highlight group"
-            )
-        end,
-    },
-    {
         "romgrk/nvim-treesitter-context",
         dependencies = {"nvim-treesitter"},
         event  = {"BufAdd"},
-        config = function() require("treesitter-context").setup() end,
+        config = function()
+            require("treesitter-context").setup()
+            map("n", "[g", function()
+                 require("treesitter-context").go_to_context(vim.v.count1)
+            end, "Go to context" )
+        end,
     },
     {
         "nvim-treesitter/nvim-treesitter-textobjects",
@@ -275,7 +243,6 @@ local pluginArgs = { -- {{{
             map("", [[<leader>F]], require("hop").hint_nodes, "Hop char")
         end
     },
-    -- TODO: skip asking for input when performing a dot-repeat
     {
         "kylechui/nvim-surround",
         keys = {
@@ -386,17 +353,6 @@ local pluginArgs = { -- {{{
         config = require("plugins.vim-matchup").config,
     },
     {
-        "utilyre/sentiment.nvim",
-        event  = {"BufAdd"},
-        config = function()
-            -- local excludedFiletypes = _G._short_line_list
-            require("sentiment").setup {
-                excluded_filetypes = _G._short_line_list,
-                delay = 250,
-            }
-        end
-    },
-    {
         "szw/vim-maximizer",
         cmd  = "MaximizerToggle",
         init = function()
@@ -415,7 +371,7 @@ local pluginArgs = { -- {{{
     },
     {
         "shortcuts/no-neck-pain.nvim",
-        keys   = { { [[<leader>z]],  mode = "n" } },
+        keys   = { { [[<leader>zz]],  mode = "n" } },
         config = require("plugins.nvim-no-neck-pain")
     },
     {
@@ -437,10 +393,8 @@ local pluginArgs = { -- {{{
         "jeetsukumaran/vim-indentwise",
         event = {"BufAdd"},
         config = function()
-            map("", "[i", [[<Plug>(IndentWisePreviousEqualIndent)]],   "Previous Equal Indent")
-            map("", "]i", [[<Plug>(IndentWiseNextEqualIndent)]],       "Next Equal Indent")
-            map("", "[I", [[<Plug>(IndentWisePreviousGreaterIndent)]], "Previous Greater Indent")
-            map("", "]I", [[<Plug>(IndentWiseNextGreaterIndent)]],     "Next Greater Indent")
+            map("", "[i", [[<Plug>(IndentWiseBlockScopeBoundaryBegin)]],   "Indentwise Begin")
+            map("", "]i", [[<Plug>(IndentWiseBlockScopeBoundaryEnd)]],     "Indentwise End")
         end
     },
     -- }}} Vim enhancement
@@ -557,6 +511,7 @@ local pluginArgs = { -- {{{
         cond   = not _G._is_term,
         config = function() require("nvim-nonicons").setup() end,
     },
+    -- TODO: Depreacated
     {
         "freddiehaddad/feline.nvim",
         dependencies = { "nvim-web-devicons" },
@@ -640,6 +595,7 @@ local pluginArgs = { -- {{{
     },
     {
         "p00f/clangd_extensions.nvim",
+        ft = {"c", "cpp"},
         dependencies = {"nvim-lspconfig"},
         config = require("plugins.nvim-clangd-extensions")
     },
@@ -701,6 +657,11 @@ local pluginArgs = { -- {{{
     },
     {
         "yetone/avante.nvim",
+        cmd = { "AvanteToggle" },
+        keys = {
+            { "<leader>aa", mode = "n" },
+            { "<leader>ae", mode = "n" }
+        },
         enabled = true,
         build = "make",
         dependencies = {
@@ -874,11 +835,6 @@ local pluginArgs = { -- {{{
             map("n", [[dV]], function() return require("debugprint").debugprint { variable = true, above = true}
                 end, {"expr"}, "Debug print value above")
         end
-    },
-    {
-        "dstein64/vim-startuptime",
-        cmd = "StartupTime",
-        init = function() vim.g.startuptime_tries = 20 end,
     },
     {
         "mfussenegger/nvim-dap",
@@ -1148,30 +1104,6 @@ local pluginArgs = { -- {{{
     },
     -- }}} Source control
     -- Knowledge {{{
-    {
-        "Bryley/neoai.nvim",
-        dependencies = {
-            "nui.nvim",
-        },
-        cmd = {
-            "NeoAI",
-            "NeoAIOpen",
-            "NeoAIClose",
-            "NeoAIToggle",
-            "NeoAIContext",
-            "NeoAIContextOpen",
-            "NeoAIContextClose",
-            "NeoAIInject",
-            "NeoAIInjectCode",
-            "NeoAIInjectContext",
-            "NeoAIInjectContextCode",
-        },
-        keys = {
-            { "gas", desc = "summarize text" },
-            { "gag", desc = "generate git message" },
-        },
-        config = require("plugins.nvim-neoai"),
-    },
     {
         "RishabhRD/nvim-cheat.sh",
         cond = _G._os_uname.sysname ~= "Windows_NT",

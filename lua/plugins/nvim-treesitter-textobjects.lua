@@ -75,7 +75,6 @@ return function()
 
 
 
-    -- example: make gitsigns.nvim movement repeatable with ; and , keys.
     if package.loaded.gitsigns then
         local gs = require("gitsigns")
         -- make sure forward function comes first
