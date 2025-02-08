@@ -40,19 +40,5 @@ local pallette = {
     special_grey   = "#3B4048",
 }
 
--- Enable contrast sidebars, floating windows and popup menus
--- if vim.g.nord_contrast == true then
-    pallette.sidebar = pallette.n0
-    pallette.float = pallette.n1
--- else
-    -- pallette.sidebar = pallette.nord0_gui
-    -- pallette.float = pallette.nord0_gui
--- end
-
--- if vim.g.nord_cursorline_transparent == true then
-    -- pallette.cursorlinefg = pallette.nord0_gui
--- else
-    pallette.cursorlinefg = pallette.n1
--- end
 
 return pallette

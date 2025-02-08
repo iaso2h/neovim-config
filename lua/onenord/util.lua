@@ -18,12 +18,4 @@ M.hi = function (groupName, opts)
     end
 end
 
--- Only define onenord if it's the active colorscheme
--- function M.onColorScheme()
-    -- if vim.g.colors_name ~= "onenord" then
-        -- cmd [[autocmd! onenord]]
-        -- cmd [[augroup! onenord]]
-    -- end
--- end
-
 return M

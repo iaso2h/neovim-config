@@ -377,7 +377,7 @@ theme.plugins = { -- {{{
     -- https://github.com/folke/trouble.nvim
     LspTroubleText   = {fg = p.n4},
     LspTroubleCount  = {fg = p.n9, bg = p.n10},
-    LspTroubleNormal = {fg = p.n4, bg = p.sidebar},
+    LspTroubleNormal = {link = "Normal"},
 
     -- https://github.com/sindrets/diffview.nvim
     DiffviewFilePanelSelected = {link = "Search"},
