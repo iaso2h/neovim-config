@@ -1,8 +1,8 @@
 -- File: extraction
 -- Author: iaso2h
 -- Description: Extract selected content into new variable or new file
--- Version: 0.0.11
--- Last Modified: 2023-10-22
+-- Version: 0.0.12
+-- Last Modified: 2025-03-02
 -- TODO: Deprecated: Please use refactor.nvim instead for visual line mode
 local op       = require("operator")
 local util     = require("util")
@@ -63,7 +63,7 @@ local getSrcContent = function() -- {{{
     local posEnd
 
     if M.vimMode == "n" then
-        local motionRegion = op.getMotionRegion()
+        local motionRegion = op.getMotionRegion(M.vimMode)
         posStart = motionRegion.Start
         posEnd   = motionRegion.End
         posStart = vim.api.nvim_buf_get_mark(0, "[")

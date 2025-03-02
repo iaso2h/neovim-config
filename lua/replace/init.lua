@@ -1,8 +1,8 @@
 -- File: replace
 -- Author: iaso2h
 -- Description: Heavily inspired by Ingo Karkat's work. Replace text with register
--- Version: 0.1.17
--- Last Modified: 2024-10-20
+-- Version: 0.1.18
+-- Last Modified: 2025-03-01
 -- TODO: tests for softtab convert
 -- NOTE: break change: Dot-repeat no longer support jump to mark motion now
 -- because the new method of setting new line(or replace line) via
@@ -289,7 +289,7 @@ function M.operator(opInfo) -- {{{
     local bufNr = vim.api.nvim_get_current_buf()
 
     -- Get cursor position, motionRegion count, motionRegion region and register  {{{
-    local motionRegion
+    local motionRegion = op.getMotionRegion(opInfo.vimMode, bufNr)
     local motionDirection
     local endLine
     if opInfo.vimMode == "n" then
@@ -302,8 +302,6 @@ function M.operator(opInfo) -- {{{
         -- before calling operator().
         M.saveCountReg()
 
-        -- Saving motionRegion region
-        motionRegion = op.getMotionRegion(bufNr)
         endLine = vim.api.nvim_buf_get_lines(bufNr, motionRegion.End[1] - 1, motionRegion.End[1], false)[1]
 
         -- Motion region fix
@@ -379,16 +377,6 @@ function M.operator(opInfo) -- {{{
             vim.cmd([[noa norm! gvm`]] .. t"<Esc>")
             M.cursorPos = vim.api.nvim_buf_get_mark(bufNr, "`")
         end
-
-        -- Saving motionRegion region
-        motionRegion = {
-            Start = vim.api.nvim_buf_get_mark(bufNr, "<"),
-            End   = vim.api.nvim_buf_get_mark(bufNr, ">")
-        }
-        endLine = vim.api.nvim_buf_get_lines(bufNr, motionRegion.End[1] - 1, motionRegion.End[1], false)[1]
-        -- Motion region fix
-        -- Avoid out of bound column index
-        if motionRegion.End[2] > #endLine then motionRegion.End[2] = #endLine - 1 end
     end
 
 

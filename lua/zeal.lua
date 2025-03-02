@@ -1,8 +1,8 @@
 -- File: zeal.lua
 -- Author: iaso2h
 -- Description: Look up words in Zeal
--- Version: 0.0.7
--- Last Modified: 2023-10-22
+-- Version: 0.0.8
+-- Last Modified: 2025-03-02
 
 local M = {
     plugMap = ""
@@ -26,7 +26,7 @@ local function lookUp(opInfo) -- {{{
 
     -- Get content {{{
     if opInfo.vimMode == "n" then
-        local motionRegion = operator.getMotionRegion(bufNr)
+        local motionRegion = operator.getMotionRegion(opInfo.vimMode, bufNr)
         posStart = motionRegion.Start
         posEnd   = motionRegion.End
         vim.api.nvim_win_set_cursor(0, posStart)

@@ -1,8 +1,8 @@
 -- File: yankPut
 -- Author: iaso2h
 -- Description: VSCode like copy in visual, normal, input mode; inplace yank & put and convert put
--- Version: 0.1.25
--- Last Modified: 2024-02-13
+-- Version: 0.1.26
+-- Last Modified: 2025-03-02
 
 local util     = require("util")
 local operator = require("operator")
@@ -162,7 +162,7 @@ function M.inplaceYank(opInfo) -- {{{
     local plugMap  = operator.plugMap
     local winId = vim.api.nvim_get_current_win()
     local bufNr = vim.api.nvim_get_current_buf()
-    local motionRegion = operator.getMotionRegion(bufNr)
+    local motionRegion = operator.getMotionRegion(opInfo.vimMode, bufNr)
     local posStart = motionRegion.Start
     local posEnd   = motionRegion.End
 
@@ -234,7 +234,6 @@ function M.inplaceYank(opInfo) -- {{{
     if operator.cursorPos then
         local ok, msgOrVal = pcall(vim.api.nvim_win_set_cursor, winId, operator.cursorPos)
         if not ok then
-            print('DEBUGPRINT[1]: init.lua:230: cursorPos=' .. vim.inspect(operator.cursorPos))
             vim.notify(msgOrVal, vim.log.levels.ERROR)
         end
         -- Always clear M.cursorPos after restoration to avoid restoring
@@ -372,13 +371,14 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
 
     -- Create highlight {{{
     -- Position of new created content
-    local motionRegion = operator.getMotionRegion(bufNr)
+    local motionRegion = operator.getMotionRegion(vimMode, bufNr)
     local posStart = motionRegion.Start
     local posEnd   = motionRegion.End
+
     -- Creates a new namespace or gets an existing one.
     local newContentExmark
     if M.hlEnable then
-        newContentExmark = util.nvimBufAddHl(
+        ok, msgOrVal = pcall(util.nvimBufAddHl,
             bufNr,
             posStart,
             posEnd,
@@ -387,6 +387,12 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
             opts.timeout,
             M.lastPutNs,
             true)
+        if not ok then
+            vim.notify(msgOrVal, vim.log.levels.WARN)
+            return vim.notify(debug.traceback(), vim.log.levels.ERROR)
+        else
+            newContentExmark = msgOrVal
+        end
     else
         -- Convert into (0, 0) index
         posStart = {posStart[1] - 1, posStart[2]}
@@ -401,6 +407,7 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
                 end_col = posEnd[2]
             })
     end
+
     if newContentExmark then M.lastPutExtmark = newContentExmark end
     -- }}} Create highlight
 

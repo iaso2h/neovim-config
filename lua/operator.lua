@@ -68,25 +68,49 @@ function M.visualOpInfo(saveCursorChk) -- {{{
     return {motionType = motionType, vimMode = vimMode}
 end -- }}}
 --- Get motion region in `"[` and `"]`. Support multibyte character
+---@param vimMode string Vim mode
 ---@param bufNr? integer Retrieved by calling `vim.api.nvim_get_current_bufnr()`
 ---@retrun MotionRegion
-function M.getMotionRegion(bufNr)
+function M.getMotionRegion(vimMode, bufNr)
     bufNr = bufNr or 0
-    local region = {
-        Start = vim.api.nvim_buf_get_mark(bufNr, "["),
-        End   = vim.api.nvim_buf_get_mark(bufNr, "]")
-    }
-    local endCharToEnd = vim.api.nvim_buf_get_text(
-        0,
-        region.End[1] - 1,
-        region.End[2],
-        region.End[1] - 1,
-        -1,
-        {}
-    )[1]
-    region.End[2] = region.End[2] + vim.fn.byteidx(endCharToEnd, 1) - 1
+    if vimMode == "n" then
+        local region = {
+            Start = vim.api.nvim_buf_get_mark(bufNr, "["),
+            End   = vim.api.nvim_buf_get_mark(bufNr, "]")
+        }
 
-    return region
+        -- Avoid out of bound column index
+        if region.End[2] > 0 then
+            local endCharToEnd = vim.api.nvim_buf_get_text(
+                0,
+                region.End[1] - 1,
+                region.End[2],
+                region.End[1] - 1,
+                -1,
+                {}
+            )[1]
+            region.End[2] = region.End[2] + vim.fn.byteidx(endCharToEnd, 1) - 1
+        end
+        return region
+    else
+        region = {
+            Start = vim.api.nvim_buf_get_mark(bufNr, "<"),
+            End   = vim.api.nvim_buf_get_mark(bufNr, ">")
+        }
+        endLine = vim.api.nvim_buf_get_lines(bufNr, region.End[1] - 1, region.End[1], false)[1]
+
+        -- Avoid out of bound column index
+        if #endLine > 0 then
+            if region.End[2] > #endLine then
+                region.End[2] = #endLine - 1
+            end
+        else
+            region.End[2] = 0
+        end
+
+        return region
+    end
+
 end
 
 return M

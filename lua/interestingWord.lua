@@ -2,8 +2,8 @@
 -- Author: iaso2h
 -- Description: Highlight word in different random colors, heavily inspired
 --              by https://github.com/lfv89/vim-interestingwords/blob/master/plugin/interestingwords.vim
--- Version: 0.0.6
--- Last Modified: 2023-10-22
+-- Version: 0.0.7
+-- Last Modified: 2025-03-02
 local M   = {
     hlIds = {},
     guibgs = {},
@@ -129,7 +129,7 @@ local operator = function(opInfo) -- {{{
     local word
     -- Get content {{{
     if opInfo.vimMode == "n" then
-        local motionRegion = op.getMotionRegion(bufNr)
+        local motionRegion = op.getMotionRegion(opInfo.vimMode, bufNr)
         posStart = motionRegion.Start
         posEnd   = motionRegion.End
         vim.api.nvim_win_set_cursor(winId, posStart)
