@@ -61,6 +61,8 @@ M.opt.lua.configHook = { -- {{{
                 vim.notify(msg, vim.log.levels.ERROR)
             end
 
+            vim.notify("Stop lsp clients...")
+            vim.lsp.stop_client(vim.lsp.get_clients())
             local ok, msg = pcall(callback)
             if not ok then return err(msg) end
 
@@ -82,14 +84,8 @@ M.opt.lua.configHook = { -- {{{
                     vim.cmd "noa silent bufdo update"
                 end
             end
-
-            -- Reload server
-            vim.notify("Reloading lsp clients")
-            vim.lsp.stop_client(vim.lsp.get_active_clients())
-            vim.cmd [[bufdo e]]
-            for _, bufNr in ipairs(require("buffer.util").bufNrs(true)) do
-                vim.api.nvim_buf_call(bufNr, require("buffer.cursorRecall"))
-            end
+            vim.notify("Restart lsp clients...")
+            vim.cmd "bufdo LspRestart"
         end
     },
     {
