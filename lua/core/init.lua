@@ -4,7 +4,7 @@ if not ok then vim.notify(msg, vim.log.levels.ERROR) end
 vim.api.nvim_create_autocmd("vimEnter", {
     desc     = "Display history on startup",
     callback = function ()
-        require("historyStartup").display()
+        require("historyStartup").display(false)
     end
 })
 

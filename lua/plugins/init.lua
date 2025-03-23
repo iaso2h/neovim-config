@@ -652,6 +652,24 @@ local pluginArgs = { -- {{{
                 end,
                 dependencies = { "LuaSnip" },
             },
+            {
+                'milanglacier/minuet-ai.nvim',
+                config = function()
+                    require('minuet').setup {
+                        provider = 'openai_fim_compatible',
+                        provider_options = {
+                            openai_fim_compatible = {
+                                api_key = 'OPENAI_API_KEY',
+                                name = 'deepseek',
+                                optional = {
+                                    max_tokens = 512,
+                                    top_p = 0.9,
+                                },
+                            },
+                        },
+                    }
+            end,
+    },
         },
         config = require("plugins.nvim-cmp"),
     },

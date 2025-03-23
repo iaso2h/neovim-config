@@ -53,6 +53,7 @@ return function()
             }
         },
         mapping = {
+            ["<A-q>"] = require("minuet").make_cmp_map(),
             ["<CR>"] = cmp.mapping.confirm {
                 select   = true,
                 behavior = cmp.ConfirmBehavior.Replace,
@@ -65,6 +66,10 @@ return function()
             {name = 'conjure'},
             {name = "luasnip"},
             {name = "cmp_tabnine"},
+            {name = "minuet"},
+        },
+        performance = {
+            fetching_timeout = 2000,
         },
         formatting = {
             fields = {"kind", "abbr", "menu"},
@@ -84,6 +89,12 @@ return function()
                 end
                 vimItem.menu = vimItem.kind
                 if entry.source.name == "cmp_tabnine" then
+                    vimItem.kind = icon.misc.Robot
+                    vimItem.kind_hl_group = "CmpItemKindTabnine"
+                -- elseif entry.source.name == "codeium" then
+                --     vimItem.kind = "󰚩"
+                --     vimItem.kind_hl_group = "CmpItemKindTabnine"
+                elseif entry.source.name == "minuet" then
                     vimItem.kind = icon.misc.Robot
                     vimItem.kind_hl_group = "CmpItemKindTabnine"
                 -- elseif entry.source.name == "codeium" then
