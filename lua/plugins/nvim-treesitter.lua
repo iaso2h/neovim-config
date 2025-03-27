@@ -4,6 +4,7 @@ return function()
         -- https://github.com/nvim-treesitter/nvim-treesitter/issues/3317
         ensure_installed = {
             "c",
+            "c_sharp",
             "lua",
             "query",
             "vim",

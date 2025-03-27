@@ -2,18 +2,19 @@ local M = {}
 
 M.serverNames = {
     -- cmake    = {},
+    bashls = {},
+    clangd = {},
     cssls    = {},
+    grammarly = {},
     html     = {},
     jsonls   = {},
     lua_ls   = {},
+    marksman = {},
+    omnisharp = {},
     pyright  = {},
     ts_ls = {},
     vimls    = {},
-    grammarly = {},
-    marksman = {},
     yamlls = {},
-    bashls = {},
-    clangd = {},
 }
 
 if _G._os_uname.sysname == "Linux" then

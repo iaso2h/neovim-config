@@ -232,16 +232,6 @@ serverNames.vimls = {
 -- Clangd {{{
 if _G._os_uname.machine ~= "aarch64" then
     -- https://clangd.llvm.org/config
-    local clangdRootFiles = {
-    '.clangd',
-    '.clang-tidy',
-    '.clang-format',
-    'compile_commands.json',
-    'compile_flags.txt',
-    'configure.ac', -- AutoTools
-    'makefile',
-    'build',
-    }
     local clangdRootDir = function(fname)
       return u.root_pattern(unpack(clangdRootFiles))(fname) or u.find_git_ancestor(fname) or vim.loop.cwd()
     end
@@ -259,7 +249,6 @@ if _G._os_uname.machine ~= "aarch64" then
             "-Wno-deprecated-declarations"
             }
         },
-        root_dir = clangdRootDir
     }
 end
 -- }}} Clangd
@@ -275,7 +264,7 @@ end
 -- }}} marksman
 -- }}}
 
-    -- Setup servers {{{
+    -- Set up servers {{{
     local ok, _ = pcall(require, "cmp_nvim_lsp")
     local capabilities = ok and require("cmp_nvim_lsp").default_capabilities() or {}
     local basicConfig = {
