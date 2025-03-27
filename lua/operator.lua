@@ -73,8 +73,10 @@ end -- }}}
 ---@retrun MotionRegion
 function M.getMotionRegion(vimMode, bufNr)
     bufNr = bufNr or 0
+    local region = {}
+
     if vimMode == "n" then
-        local region = {
+        region = {
             Start = vim.api.nvim_buf_get_mark(bufNr, "["),
             End   = vim.api.nvim_buf_get_mark(bufNr, "]")
         }
@@ -91,26 +93,34 @@ function M.getMotionRegion(vimMode, bufNr)
             )[1]
             region.End[2] = region.End[2] + vim.fn.byteidx(endCharToEnd, 1) - 1
         end
-        return region
     else
         region = {
             Start = vim.api.nvim_buf_get_mark(bufNr, "<"),
             End   = vim.api.nvim_buf_get_mark(bufNr, ">")
         }
-        endLine = vim.api.nvim_buf_get_lines(bufNr, region.End[1] - 1, region.End[1], false)[1]
 
-        -- Avoid out of bound column index
-        if #endLine > 0 then
-            if region.End[2] > #endLine then
-                region.End[2] = #endLine - 1
-            end
+        if region.Start[1] == 0 and region.Start[2] == 0 and region.End[1] == 0 and region.End[2] == 0 then
+            local cursorPos = vim.api.nvim_win_get_cursor(0)
+            region = {
+                Start = {cursorPos[1], cursorPos[2]},
+                End   = {cursorPos[1], cursorPos[2]}
+            }
         else
-            region.End[2] = 0
-        end
+            local endLine = vim.api.nvim_buf_get_lines(bufNr, region.End[1] - 1, region.End[1], false)[1]
 
-        return region
+            -- Avoid out of bound column index
+            if endLine ~= nil and #endLine > 0 then
+                if region.End[2] > #endLine then
+                    region.End[2] = #endLine - 1
+                end
+            else
+                region.End[2] = 0
+            end
+
+        end
     end
 
+    return region
 end
 
 return M
