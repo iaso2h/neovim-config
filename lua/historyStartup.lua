@@ -1,8 +1,8 @@
 -- File: historyStartup
 -- Author: iaso2h
 -- Description: Startup page with oldfiles listed
--- Version: 0.0.27
--- Last Modified: 2025-02-01
+-- Version: 0.0.28
+-- Last Modified: 2025-03-27
 -- TODO: ? to trigger menupage
 
 local M   = {
@@ -237,11 +237,12 @@ end -- }}}
 ---@param key string Left-Hand side key mappings
 local execMap = function(key) -- {{{
     local lnum = vim.api.nvim_win_get_cursor(0)[1]
+    local pathTarget = vim.fn.escape(M.lines.absolute[lnum - 1], [[ #"]])
     if key == "o" or key == "<CR>" or key == "<2-LeftMouse>" then -- {{{
         if lnum == 1 then
             vim.cmd("enew")
         else
-            vim.cmd("edit " .. M.lines.absolute[lnum - 1])
+            vim.cmd("edit " .. pathTarget)
             if isVisible() then
                 vim.hl.range(M.initBuf, M.ns, "Comment", {lnum - 1, 0}, {lnum - 1, -1})
             end
@@ -250,14 +251,14 @@ local execMap = function(key) -- {{{
         if lnum == 1 then
             vim.cmd("noa enew")
         else
-            vim.cmd("noa edit " .. M.lines.absolute[lnum - 1])
+            vim.cmd("noa edit " .. pathTarget)
         end -- }}}
     elseif key == "<C-t>" then -- {{{
         if lnum == 1 then
             vim.cmd("tabnew")
         else
             vim.cmd("tabnew")
-            vim.cmd("edit " .. M.lines.absolute[lnum - 1])
+            vim.cmd("edit " .. pathTarget)
             if isVisible() then
                 vim.hl.range(M.initBuf, M.ns, "Comment", {lnum - 1, 0}, {lnum - 1, -1})
             end
@@ -293,7 +294,7 @@ local execMap = function(key) -- {{{
                 if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
                     if not lastBufVisibleTick then
                         vim.api.nvim_win_set_buf(M.initWin, M.lastBuf)
-                        vim.cmd("split " ..M.lines.absolute[lnum - 1])
+                        vim.cmd("split " .. pathTarget)
                         if isVisible() then
                             vim.hl.range(M.initBuf, M.ns, "Comment", {bufIdx, 0}, {bufIdx, -1})
                         end
@@ -309,7 +310,7 @@ local execMap = function(key) -- {{{
                 if M.lastBuf and vim.api.nvim_buf_is_valid(M.lastBuf) then
                     if not lastBufVisibleTick then
                         vim.api.nvim_win_set_buf(M.initWin, M.lastBuf)
-                        vim.cmd("vsplit " ..M.lines.absolute[lnum - 1])
+                        vim.cmd("vsplit " .. pathTarget)
                         if isVisible() then
                             vim.hl.range(M.initBuf, M.ns, "Comment", {bufIdx, 0}, {bufIdx, -1})
                         end
