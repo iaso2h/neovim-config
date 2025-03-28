@@ -72,7 +72,7 @@ local pluginArgs = { -- {{{
     {
         "romgrk/nvim-treesitter-context",
         dependencies = {"nvim-treesitter"},
-        event  = {"BufAdd"},
+        event = "VeryLazy",
         config = function()
             require("treesitter-context").setup()
             map("n", "[g", function()
@@ -201,7 +201,7 @@ local pluginArgs = { -- {{{
     },
     {
         "bkad/camelcasemotion",
-        event = {"BufAdd"},
+        event = "VeryLazy",
         init  = function() vim.g.camelcasemotion_key = "," end
     },
     {
@@ -284,7 +284,7 @@ local pluginArgs = { -- {{{
     },
     {
         "airblade/vim-rooter",
-        event = {"BufAdd"},
+        event = "VeryLazy",
         init  = function()
             vim.g.rooter_cd_cmd        = "cd"
             vim.g.rooter_silent_chdir  = 1
@@ -324,7 +324,7 @@ local pluginArgs = { -- {{{
     {
         "lukas-reineke/indent-blankline.nvim",
         dependencies = { "nvim-treesitter" },
-        event = { "BufAdd" },
+        event = "VeryLazy",
         -- TODO: support dapui_watches filetype
         config = function()
             local ftExclude = vim.deepcopy(_G._short_line_list)
@@ -387,11 +387,11 @@ local pluginArgs = { -- {{{
     },
     {
         "michaeljsmith/vim-indent-object",
-        event = {"BufAdd"},
+        event = "VeryLazy",
     },
     {
         "jeetsukumaran/vim-indentwise",
-        event = {"BufAdd"},
+        event = "VeryLazy",
         config = function()
             map("", "[i", [[<Plug>(IndentWiseBlockScopeBoundaryBegin)]],   "Indentwise Begin")
             map("", "]i", [[<Plug>(IndentWiseBlockScopeBoundaryEnd)]],     "Indentwise End")
@@ -524,13 +524,13 @@ local pluginArgs = { -- {{{
     },
     {
         "catgoose/nvim-colorizer.lua",
-        event = { "BufAdd" },
+        event = "VeryLazy",
         config = require("plugins.nvim-colorizer"),
     },
     {
         "folke/todo-comments.nvim",
         dependencies = { "nvim-web-devicons" },
-        event = { "BufAdd" },
+        event = "VeryLazy",
         config = require("plugins.nvim-todo-comments"),
     },
     {
@@ -575,7 +575,7 @@ local pluginArgs = { -- {{{
     {
         "jay-babu/mason-null-ls.nvim",
         cond  = true,
-        event = {"BufAdd", "BufNewFile"},
+        event = "VeryLazy",
         dependencies = {
             "davidmh/cspell.nvim",
             "nvimtools/none-ls.nvim",
@@ -610,13 +610,13 @@ local pluginArgs = { -- {{{
         pin = true,
         dependencies = { "rafamadriz/friendly-snippets", },
         build  = "make install_jsregexp",
-        event  = {"BufAdd"},
+        event = "VeryLazy",
         config = require("plugins.nvim-luasnip")
     },
     {
         "windwp/nvim-autopairs",
         dependencies = { "nvim-treesitter" },
-        event  = {"BufAdd"},
+        event = "VeryLazy",
         config = require("plugins.nvim-autopairs")
     },
     {
@@ -676,6 +676,7 @@ local pluginArgs = { -- {{{
     },
     {
         "yetone/avante.nvim",
+        event = "VeryLazy",
         cmd = { "AvanteToggle" },
         keys = {
             { "<leader>aa", mode = "n" },
@@ -1103,7 +1104,7 @@ local pluginArgs = { -- {{{
     -- Source control {{{
     {
         "lewis6991/gitsigns.nvim",
-        event = { "BufAdd" },
+        event = "VeryLazy",
         config = require("plugins.nvim-gitsigns"),
     },
     {
