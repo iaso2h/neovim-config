@@ -52,7 +52,7 @@ return function(url) -- {{{
     local commentStr
     local ok, msg = pcall(string.gsub, vim.bo.commentstring, "%s*%%s$", "")
     if not ok then
-        return vim.notify(msg, vim.log.levels.ERROR)
+        return vim.api.nvim_echo( { { msg} }, true, {err = true} )
     else
         commentStr = msg
     end

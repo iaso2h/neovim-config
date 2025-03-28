@@ -147,7 +147,7 @@ M.config = function()
                 if vim.api.nvim_win_is_valid(winid) then
                     vim.api.nvim_set_current_win(winid)
                 else
-                    vim.notify(string.format("The %s window is no longer valid", filetype), vim.log.levels.INFO)
+                    vim.api.nvim_echo({{string.format("The %s window is no longer valid", filetype)}}, true)
                 end
             end
         else
@@ -156,7 +156,7 @@ M.config = function()
                 if vim.api.nvim_win_is_valid(winid) then
                     vim.api.nvim_set_current_win(winid)
                 else
-                    vim.notify(string.format("The %s window is no longer valid", filetype), vim.log.levels.INFO)
+                    vim.api.nvim_echo({{string.format("The %s window is no longer valid", filetype)}}, true)
                 end
             end
         end

@@ -31,7 +31,7 @@ M.terminal = function(_, _, command) -- {{{
     local file = io.popen(command, "r")
     local res = {}
     if not file then
-        vim.notify("No output", vim.log.levels.WARN)
+        vim.api.nvim_echo({ { "No output", "WarningMsg" } }, true, {})
     end
     for line in file:lines() do
         table.insert(res, line)

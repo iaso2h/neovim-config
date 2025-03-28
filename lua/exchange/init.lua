@@ -24,7 +24,7 @@ local M = {
 ---@return: return true when buffer is readonly
 local warnRead = function() -- {{{
     if not vim.o.modifiable or vim.o.readonly then
-        vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
+        vim.api.nvim_echo({{"E21: Cannot make changes",}}, true, {err=true})
         return false
     end
     return true
@@ -53,7 +53,7 @@ local swap = function(motionType, bufNr) -- {{{
             (r2.Start[2] < r1.Start[2] and r2.End[2] > r1.Start[2]) or
             r1.End[2] == r2.End[2] ) then
             -- Overlapping in the same line
-            vim.notify("Doesn't support overlapping exchange in the same line", vim.log.levels.WARN)
+            vim.api.nvim_echo({ { "Doesn't support overlapping exchange in the same line", "WarningMsg" } }, true, {})
             return false
         elseif (r1.Start[1] < r2.Start[1] and
                     ((r1.End[1] == r2.Start[1] and r1.End[2] > r2.Start[2]) or
@@ -64,7 +64,7 @@ local swap = function(motionType, bufNr) -- {{{
                     (r2.End[1] > r1.Start[1]))
                 ) then
             -- Overlapping in the same line
-            vim.notify("Doesn't support overlapping exchange across lines", vim.log.levels.WARN)
+            vim.api.nvim_echo({ { "Doesn't support overlapping exchange across lines", "WarningMsg" } }, true, {})
             return false
         end
 
@@ -175,7 +175,7 @@ function M.operator(opInfo) -- {{{
         regionMotion.Start[1], regionMotion.Start[2], {end_line = regionMotion.End[1], end_col = regionMotion.End[2]})
     -- End function calling if extmark is out of scope
     if not ok then
-        vim.notify(valOrMsg, vim.log.levels.WARN)
+        vim.api.nvim_echo(valOrMsg, vim.log.levels.WARN)
         return
     else
         M.srcExtmark[#M.srcExtmark+1] = valOrMsg
@@ -193,7 +193,7 @@ function M.operator(opInfo) -- {{{
     if #M.srcExtmark == 2 then
         ok, valOrMsg = pcall(swap, opInfo.motionType, bufNr)
         if not ok then
-            vim.notify(valOrMsg, vim.log.levels.ERROR)
+            vim.api.nvim_echo({{valOrMsg,}}, true, {err=true})
         end
 
         if M.highlightChangeChk then

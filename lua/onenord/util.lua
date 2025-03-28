@@ -13,8 +13,8 @@ M.hi = function (groupName, opts)
     opts.default = false
     local ok, msgOrVal = pcall(vim.api.nvim_set_hl, 0, groupName, opts)
     if not ok then
-        vim.notify("Error detected while setting highlight for " .. groupName, vim.log.levels.ERROR)
-        vim.notify(msgOrVal, vim.log.levels.ERROR)
+        vim.api.nvim_echo({{"Error detected while setting highlight for " .. groupName,}}, true, {err=true})
+        vim.api.nvim_echo({{msgOrVal,}}, true, {err=true})
     end
 end
 

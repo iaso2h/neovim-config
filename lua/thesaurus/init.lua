@@ -4,8 +4,11 @@ local M = {
 
 -- Python environment setup
 if vim.fn.has("python3") == 0 then
-    vim.notify("Python3 use is forced by configuration, yet your Vim does not appear to have Python3 support",
-        vim.log.levels.ERROR)
+    vim.api.nvim_echo(
+        { { "Python3 use is forced by configuration, yet your Vim does not appear to have Python3 support" } },
+        true,
+        { err = true }
+    )
     return
 end
 vim.g.thesaurusRoot = _G._config_path .. pathStr "/lua/thesaurus/python"
@@ -82,7 +85,7 @@ cb[0] = None # delete the first empty line
         vim.bo.modifiable = false
         vim.bo.filetype = "thesaurus"
     else
-        vim.notify([[No result for "]] .. vim.g.thesaurusWord .. [["]])
+        vim.api.nvim_echo({{[[No result for "]] .. vim.g.thesaurusWord .. [["]]}}, true)
     end
 end
 

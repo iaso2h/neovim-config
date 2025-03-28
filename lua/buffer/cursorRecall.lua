@@ -70,24 +70,24 @@ return function(args)
             -- Last line in buffer is also the last line visible in this window
             local ok, msgOrVal = pcall(vim.api.nvim_command, "normal! g`")
             if not ok and not string.find(msgOrVal, "E663") then
-                vim.notify("\nnormal! g`", vim.log.levels.ERROR)
-                vim.notify(msgOrVal, vim.log.levels.ERROR)
-                vim.notify("Error occurred when executing command: " .. cmdStr, vim.log.levels.ERROR)
+                vim.api.nvim_echo( { { "\nnormal! g`"} }, true, {err = true} )
+                vim.api.nvim_echo( { { msgOrVal} }, true, {err = true} )
+                vim.api.nvim_echo( { { "Error occurred when executing command: " .. cmdStr} }, true, {err = true} )
             end
         elseif bufEnd - lastPos > ((winEnd - winStart) / 2) - 1 then
             log('DEBUGPRINT[7]: cursorRecall.lua:73 (after elseif buffend - lastpos > ((winend - wi…)')
             local ok, msgOrVal = pcall(vim.api.nvim_command, 'normal! g`"zz')
             if not ok and not string.find(msgOrVal, "E663") then
-                vim.notify('\nnormal! g`"zz', vim.log.levels.ERROR)
-                vim.notify(msgOrVal, vim.log.levels.ERROR)
-                vim.notify("Error occurred when executing command: " .. cmdStr, vim.log.levels.ERROR)
+                vim.api.nvim_echo( { { '\nnormal! g`"zz'} }, true, {err = true} )
+                vim.api.nvim_echo( { { msgOrVal} }, true, {err = true} )
+                vim.api.nvim_echo( { { "Error occurred when executing command: " .. cmdStr} }, true, {err = true} )
             end
         else
             local ok, msgOrVal = pcall(vim.api.nvim_command, 'normal! G`"' .. t'<c-e>')
             if not ok and not string.find(msgOrVal, "E663") then
-                vim.notify('\nnormal! G`"<C-e>', vim.log.levels.ERROR)
-                vim.notify(msgOrVal, vim.log.levels.ERROR)
-                vim.notify("Error occurred when executing command: " .. cmdStr, vim.log.levels.ERROR)
+                vim.api.nvim_echo( { { '\nnormal! G`"<C-e>'} }, true, {err = true} )
+                vim.api.nvim_echo( { { msgOrVal} }, true, {err = true} )
+                vim.api.nvim_echo( { { "Error occurred when executing command: " .. cmdStr} }, true, {err = true} )
             end
             log('DEBUGPRINT[8]: cursorRecall.lua:76 (after else)')
         end
@@ -127,9 +127,9 @@ return function(args)
                     local cmdStr = string.format("norm! %s%s", newestRecord.count, "g,")
                     local ok, msgOrVal = pcall(vim.api.nvim_command, cmdStr)
                     if not ok then
-                        vim.notify(string.format("\nnorm! %s%s", newestRecord.count, "g,"), vim.log.levels.ERROR)
-                        vim.notify(msgOrVal, vim.log.levels.ERROR)
-                        vim.notify("Error occurred when executing command: " .. cmdStr, vim.log.levels.ERROR)
+                        vim.api.nvim_echo( { { string.format("\nnorm! %s%s", newestRecord.count, "g,")} }, true, {err = true} )
+                        vim.api.nvim_echo( { { msgOrVal} }, true, {err = true} )
+                        vim.api.nvim_echo( { { "Error occurred when executing command: " .. cmdStr} }, true, {err = true} )
                     end
                 end
             end

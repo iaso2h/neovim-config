@@ -102,7 +102,7 @@ M.recovery = function() -- {{{
             end
 
             if M.lastIdx == 0 then
-                return vim.notify("There is no older quickfix in history", vim.log.levels.INFO)
+                return vim.api.nvim_echo({{"There is no older quickfix in history"}}, true)
             end
 
             vim.fn.setqflist({}, "r", {items = M.history[M.lastIdx], title = M.lastTitle})
@@ -118,14 +118,14 @@ M.recovery = function() -- {{{
             end
 
             if M.lastIdx == 0 then
-                return vim.notify("There is no older quickfix in history", vim.log.levels.INFO)
+                return vim.api.nvim_echo({{"There is no older quickfix in history"}}, true)
             end
 
             vim.fn.setloclist(0, {}, "r", {items = M.history[M.lastIdx], title = M.lastTitle})
             highlight.refreshHighlight(qfBufNr, M.history[M.lastIdx], qfTitle)
             M.lastIdx = M.lastIdx - 1
         else
-            vim.notify("Wrong quickfix type")
+            vim.api.nvim_echo({{"Wrong quickfix type"}}, true)
         end
     else
         return init()

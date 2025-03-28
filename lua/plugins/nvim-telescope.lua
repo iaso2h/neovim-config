@@ -3,7 +3,7 @@ return function()
 local actions = require("telescope.actions")
 
 if not require("util").ex("rg") then
-    vim.notify([["rg" is not an executable]], vim.log.levels.WARN)
+    vim.api.nvim_echo({{[["rg" is not an executable]], "WarningMsg"}}, true, {})
 end
 
 -- Gloabl customization
@@ -258,7 +258,7 @@ local helpTags = function(opts) -- {{{
             end,
         })
         :find()
-end -- }}} 
+end -- }}}
 
 
 -- Mappings

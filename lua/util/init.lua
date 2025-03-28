@@ -187,7 +187,7 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, 
             posStart[1], posStart[2], {end_line = posEnd[1], end_col = posEnd[2]})
         -- End function calling if extmark is out of scope
         if not ok then
-            vim.notify(msg, vim.log.levels.WARN)
+            vim.api.nvim_echo(msg, vim.log.levels.WARN)
             return nil
         else
             presExtmark = msg
@@ -196,12 +196,9 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, 
 
     -- Creates a new namespace or gets an existing one.
     local hlNS = vim.api.nvim_create_namespace('myHighlight')
-    -- Always clear all namespaced objects
-    vim.api.nvim_buf_clear_namespace(bufNr, hlNS, 0, -1)
 
     -- Add highlight
-    -- vim.highlight.range(bufNr, hlNS, hlGroup, )
-    vim.highlight.range(
+    vim.hl.range(
         bufNr,
         hlNS,
         hlGroup,
@@ -210,17 +207,9 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, 
         {
             regtype = regType,
             inclusive = vim.o.selection == "inclusive" and true or false,
+            timeout = hlTimeout
         }
     )
-
-    -- Clear highlight after certain timeout
-    vim.defer_fn(function()
-        -- In case of buffer being deleted
-        if vim.api.nvim_buf_is_valid(bufNr) then
-            pcall(vim.api.nvim_buf_clear_namespace, bufNr, hlNS, 0, -1)
-        end
-    end, hlTimeout)
-
     return presExtmark
 end -- }}}
 -- Credit: https://github.com/LunarVim/LunarVim/blob/2d373036493b3a61ef24d98efdeecbe8e74467be/lua/lvim/utils/modules.lua#L68
@@ -234,7 +223,7 @@ M.requireSafe = function(mod) -- {{{
         local shorterSrc = trace.short_src
         local lineInfo = shorterSrc .. ":" .. (trace.currentline or trace.linedefined)
         local msg = string.format("%s : skipped loading [%s]", lineInfo, mod)
-        vim.notify(msg, vim.log.levels.WARN)
+        vim.api.nvim_echo(msg, vim.log.levels.WARN)
         return false
     else
         return module

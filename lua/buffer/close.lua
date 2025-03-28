@@ -131,9 +131,11 @@ M.bufHandler = function(postRearrange, isSpecial) -- {{{
                 if u.isScratchBuf(postBufNr) then
                     return require("historyStartup").display(true)
                 else
-                    return vim.notify(
-                        "Unabled to enter the historyStartup correctly for the last scratch file",
-                        vim.log.levels.ERROR)
+                    return vim.api.nvim_echo(
+                        { { "Unabled to enter the historyStartup correctly for the last scratch file" } },
+                        true,
+                        { err = true }
+                    )
                 end
             else
                 -- Use the existing historyStartup as the only buffer in one window

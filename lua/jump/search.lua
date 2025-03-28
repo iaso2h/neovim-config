@@ -30,7 +30,7 @@ M.cycle = function(exCmd) -- {{{
             vim.api.nvim_echo({{"Pattern not found: " .. vim.fn.histget("search")}}, false, {})
             return
         else
-            return vim.notify(msg, vim.log.levels.ERROR)
+            return vim.api.nvim_echo({{msg,}}, true, {err=true})
         end
     end
 

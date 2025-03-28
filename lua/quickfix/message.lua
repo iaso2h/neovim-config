@@ -12,7 +12,7 @@ local getMsg = function()
     local msgOutput = vim.api.nvim_exec2("messages", {output = true}).output
     local msgs = vim.split(msgOutput, "\n", {plain = true})
     if not next(msgs) then
-        return vim.notify("No messages", vim.log.levels.INFO)
+        return vim.api.nvim_echo({{"No messages"}}, true)
     end
 
     -- Refine and format
@@ -72,7 +72,7 @@ end
 return function(des) -- {{{
     local msgRefined, errorLineNrs = getMsg()
     if not next(msgRefined) then
-        return vim.notify("No messages", vim.log.levels.INFO)
+        return vim.api.nvim_echo({{"No messages"}}, true)
     end
 
     if des == "quickfix" then
@@ -105,7 +105,7 @@ return function(des) -- {{{
             _G._message_scratch_buf
         )
     else
-        vim.notify("Doesn't support redirect into " .. des, vim.log.levels.ERROR)
+        vim.api.nvim_echo({{"Doesn't support redirect into " .. des,}}, true, {err=true})
     end
 
 end -- }}}

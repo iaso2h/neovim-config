@@ -27,7 +27,7 @@ local M = {
 ---@param direction string "up" or "down". Determine wether the lines to go up or down
 function M.VSCodeLineMove(vimMode, direction) -- {{{
     if not vim.bo.modifiable then
-        return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
+        return vim.api.nvim_echo({{"E21: Cannot make changes, 'modifiable' is off"}}, true, {err=true})
     end
     if vimMode == "n"  then
         ---@diagnostic disable-next-line: param-type-mismatch
@@ -75,7 +75,7 @@ end -- }}}
 ---@param direction string "up" or "down". Determine wether the new lines to go up or down
 function M.VSCodeLineYank(vimMode, direction) -- {{{
     if not vim.bo.modifiable then
-        return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
+        return vim.api.nvim_echo({{"E21: Cannot make changes, 'modifiable' is off"}}, true, {err=true})
     end
 
     if vimMode == "v" then
@@ -234,7 +234,7 @@ function M.inplaceYank(opInfo) -- {{{
     if operator.cursorPos then
         local ok, msgOrVal = pcall(vim.api.nvim_win_set_cursor, winId, operator.cursorPos)
         if not ok then
-            vim.notify(msgOrVal, vim.log.levels.ERROR)
+            vim.api.nvim_echo({{msgOrVal,}}, true, {err=true})
         end
         -- Always clear M.cursorPos after restoration to avoid restoring
         -- cursor in after repeat command is performed
@@ -271,7 +271,7 @@ end -- }}}
 ---@param opts       table
 function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     if not vim.bo.modifiable then
-        return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
+        return vim.api.nvim_echo({{"E21: Cannot make changes, 'modifiable' is off"}}, true, {err=true})
     end
 
     local bufNr = vim.api.nvim_get_current_buf()
@@ -388,8 +388,9 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
             M.lastPutNs,
             true)
         if not ok then
-            vim.notify(msgOrVal, vim.log.levels.WARN)
-            return vim.notify(debug.traceback(), vim.log.levels.ERROR)
+            vim.api.nvim_echo(msgOrVal, vim.log.levels.WARN)
+            vim.api.nvim_echo(debug.traceback(), vim.log.levels.ERROR)
+            return
         else
             newContentExmark = msgOrVal
         end

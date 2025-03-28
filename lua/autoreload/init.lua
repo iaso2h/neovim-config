@@ -56,12 +56,11 @@ M.opt.lua.configHook = { -- {{{
         pathPat         =  M.opt.lua.moduleSearchPath:joinpath("plugins", "nvim-lspconfig.lua").filename,
         callbackHandler = function(path, callback)
             local err = function(msg)
-                vim.notify("Error detect while calling callback function at: " .. path.filename,
-                    vim.log.levels.ERROR)
-                vim.notify(msg, vim.log.levels.ERROR)
+                vim.api.nvim_echo( { { "Error detect while calling callback function at: " .. path.filename} }, true, {err = true} )
+                vim.api.nvim_echo( { { msg} }, true, {err = true} )
             end
 
-            vim.notify("Stop lsp clients...")
+            vim.api.nvim_echo({{"Stop lsp clients..."}}, true)
             vim.lsp.stop_client(vim.lsp.get_clients())
             local ok, msg = pcall(callback)
             if not ok then return err(msg) end
@@ -84,7 +83,7 @@ M.opt.lua.configHook = { -- {{{
                     vim.cmd "noa silent bufdo update"
                 end
             end
-            vim.notify("Restart lsp clients...")
+            vim.api.nvim_echo({{"Restart lsp clients..."}}, true)
             vim.cmd "bufdo LspRestart"
         end
     },
@@ -93,9 +92,16 @@ M.opt.lua.configHook = { -- {{{
         pathPat         = M.opt.lua.moduleSearchPath:joinpath("plugins").filename,
         callbackHandler = function(path, callback)
             local err = function(msg)
-                vim.notify("Error detect while calling callback function at: " .. path.filename,
-                    vim.log.levels.ERROR)
-                vim.notify(msg, vim.log.levels.ERROR)
+                vim.api.nvim_echo(
+                    {
+                        {
+                            "Error detect while calling callback function at: " .. path.filename
+                        }
+                    },
+                    true,
+                    {err = true}
+                )
+                vim.api.nvim_echo( { { msg} }, true, {err = true} )
             end
 
             local ok, msg

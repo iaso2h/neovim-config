@@ -74,7 +74,7 @@ opt.winheight   = 3
 o.winhighlight  = "NormalNC:WinNormalNC"
 opt.splitbelow  = true
 opt.splitright  = true
-opt.splitkeep   = "screen"
+opt.splitkeep   = "cursor"
 opt.switchbuf   = "uselast"
 
 if _G._os_uname.machine ~= "aarch64" then
@@ -98,7 +98,7 @@ opt.formatoptions = _G._format_option -- NOTE: Might change on loading different
 --                 end
 --             elseif event == "exit" then
 --                 if ex(vim.g.python3_host_prog) then
---                     return vim.notify("Python binary path not found", vim.log.levels.WARN)
+--                     return vim.api.nvim_echo({ { "Python binary path not found", "WarningMsg" } }, true, {})
 --                 end
 --                 vim.fn.jobstop(jobId)
 --             end
@@ -117,7 +117,7 @@ opt.formatoptions = _G._format_option -- NOTE: Might change on loading different
 --                     end
 --                 elseif event == "exit" then
 --                     if not pynvimFoundTick then
---                         vim.notify("Package pynvim isn't found", vim.log.levels.WARN)
+                        -- vim.api.nvim_echo({ { "Package pynvim isn't found", "WarningMsg" } }, true, {})
 --                     end
 --                     vim.fn.jobstop(jobId)
 --                 end

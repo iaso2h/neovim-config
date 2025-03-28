@@ -6,7 +6,6 @@ vim.api.nvim_create_autocmd("TermOpen", {
     desc     = "Minimal filetype settings for terminal",
     callback = function()
         vim.opt_local.buflisted = false
-        vim.opt_local.number = false
         vim.cmd[[startinsert]]
     end
 })
@@ -105,7 +104,7 @@ end, {
 vim.api.nvim_create_user_command("Reverse", function(opts) -- {{{
     if opts.range == 0 then return end
     if vim.fn.visualmode() == "V" then
-        return vim.notify("Not support visual line mode", vim.log.levels.WARN)
+        return vim.api.nvim_echo({ { "Not support visual line mode", "WarningMsg" } }, true, {})
     end
     vim.cmd("norm! gvd")
     local keyStr = "i" .. string.reverse(vim.fn.getreg("-", 1)) .. t"<ESC>"
@@ -128,12 +127,12 @@ vim.api.nvim_create_user_command("RunCode", -- {{{
 
 vim.api.nvim_create_user_command("RunSelection", function() -- {{{
     if vim.bo.filetype ~= "lua" then
-       return vim.notify("Only support in Lua file", vim.log.levels.WARN)
+       return vim.api.nvim_echo({ { "Only support in Lua file", "WarningMsg" } }, true, {})
     end
 
     local vimMode = vim.fn.visualmode()
     if vimMode == "\22" then
-        return vim.notify("Blockwise visual mode is not supported", vim.log.levels.WARN)
+        return vim.api.nvim_echo({ { "Blockwise visual mode is not supported", "WarningMsg" } }, true, {})
     end
 
     local lineStr = require("selection").get("string", false)
@@ -237,7 +236,7 @@ local purge = function(slientChk) -- {{{
     local inValidBufNrs = vim.tbl_filter(cond, vim.api.nvim_list_bufs())
     if not next(inValidBufNrs) then
         if not slientChk then
-            return vim.notify("No buffer has been purged", vim.log.levels.INFO)
+            return vim.api.nvim_echo({ { "No buffer has been purged", "WarningMsg" } }, true, {})
         else
             return
         end
@@ -257,15 +256,18 @@ vim.api.nvim_create_user_command("Purge", function() purge(false) end, { -- {{{
 vim.api.nvim_create_user_command("Se", function (opts) -- {{{
     local sessionName = opts.args == "" and "01.vim" or opts.args
     local sessionPath = sessionDir .. sessionName
-    if not vim.loop.fs_stat(sessionPath) then return vim.notify("Session file doesn't exist.", vim.log.levels.WARN) end
+    if not vim.loop.fs_stat(sessionPath) then return vim.api.nvim_echo({ { "Session file doesn't exist.", "WarningMsg" } }, true, {}) end
 
     local ok, msgOrVal = pcall(vim.cmd, "source " .. sessionPath)
     if not ok and
         -- not string.find(msgOrVal, "E592: ", 1, true) and
         not string.find(msgOrVal, "E490: ", 1, true) then
 
-        vim.notify("Error occurred while soucing " .. sessionPath)
-        vim.notify(msgOrVal, vim.log.levels.ERROR)
+        vim.api.nvim_echo(
+            {{"Error occurred while soucing " .. sessionPath}},
+            true
+        )
+        vim.api.nvim_echo({{msgOrVal,}}, true, {err=true})
     end
     -- purge(true)
 end, {

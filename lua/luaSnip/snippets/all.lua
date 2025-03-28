@@ -34,8 +34,8 @@ local getCommentStr = function()
 
     local ok, msgOrVal = pcall(string.gsub, vim.bo.commentstring, "%s*%%s$", "")
     if not ok then
-        vim.notify("Failed at retrieving comment string", vim.log.levels.ERROR)
-        vim.notify(msgOrVal, vim.log.levels.ERROR)
+        vim.api.nvim_echo({{"Failed at retrieving comment string",}}, true, {err=true})
+        vim.api.nvim_echo({{msgOrVal,}}, true, {err=true})
         return ""
     else
         return msgOrVal .. " "

@@ -20,8 +20,8 @@ local lazyPath = _G._plugin_root .. "/lazy.nvim"
 if not vim.loop.fs_stat(lazyPath) then
     vim.o.cmdheight = 10
     if not require("util").ex("git") then
-        vim.notify("Can't find git executable", vim.log.levels.WARN)
-        vim.notify("Loading Plug-ins settings abort", vim.log.levels.WARN)
+        vim.api.nvim_echo({ { "Can't find git executable", "WarningMsg" } }, true, {})
+        vim.api.nvim_echo({ { "Loading Plug-ins settings abort", "WarningMsg" } }, true, {})
         return
     end
     vim.fn.system {
@@ -1192,7 +1192,7 @@ local lazyOpts = { -- {{{
 
 vim.api.nvim_create_user_command("CDPlugin", function()
     vim.cmd("cd " .. _G._plugin_root)
-    vim.notify("Change directory to Lazy plug-ins path", vim.log.levels.INFO)
+    vim.api.nvim_echo({{"Change directory to Lazy plug-ins path"}}, true)
 end, { desc = "Change directory to lazy plug-ins path" })
 
 require("lazy").setup(pluginArgs, lazyOpts)

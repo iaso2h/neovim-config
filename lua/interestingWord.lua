@@ -35,7 +35,7 @@ local opts = {}
 ---@param direction integer Previous by -1, Next by 1
 M.colorNav = function(direction) -- {{{
     if type(direction) ~= "number" and math.abs(direction) ~= 1 then
-        vim.notify("Expected -1 or 1 for the argument of colorNav()", vim.log.levels.ERROR)
+        vim.api.nvim_echo( { { "Expected -1 or 1 for the argument of colorNav()"} }, true, {err = true} )
     end
 end -- }}}
 ---Generate guifg and guibg in hexadecimal string
@@ -117,7 +117,11 @@ end -- }}}
 local operator = function(opInfo) -- {{{
     -- Only support characterwise
     if opInfo.motionType == "block" or opInfo.motionType == "line" then
-        return vim.notify(string.format("%swise is not supported", opInfo.motionType), vim.log.levels.WARN)
+        return vim.api.nvim_echo(
+            { {string.format("%swise is not supported", opInfo.motionType), "WarningMsg" } },
+            true,
+            {}
+        )
     end
 
     local op = require("operator")
@@ -185,7 +189,7 @@ end -- }}}
 M.reapplyColor = function(opts) -- {{{
     local curWinID = vim.api.nvim_get_current_win()
     local lastWord = M.lastWord[curWinID]
-    if not lastWord then return vim.notify("No interesting highlighted word in this window yet", vim.log.levels.WARN) end
+    if not lastWord then return vim.api.nvim_echo({ { "No interesting highlighted word in this window yet", "WarningMsg" } }, true, {}) end
 
     opts = opts or defaultOpts
     local hlGroup = M.hlIds[curWinID][lastWord]["hlGroup"]
@@ -222,7 +226,7 @@ end -- }}}
 ---Only restorable when you called clear in current window
 ---@param opts table Table value contain option configurations
 M.restoreColor = function(opts) -- {{{
-    if next(M.hlIds) then return vim.notify("Interesting highlighted words in this window need to be clear before restoration", vim.log.levels.WARN) end
+    if next(M.hlIds) then return vim.api.nvim_echo({ { "Interesting highlighted words in this window need to be clear before restoration", "WarningMsg" } }, true, {}) end
 
     opts = opts or defaultOpts
 
@@ -241,7 +245,7 @@ M.restoreColor = function(opts) -- {{{
     local pattern
     local hlID
 
-    if not M.hlIds[curWinID] then return vim.notify("No interesting highlighted words to be recolored in this window", vim.log.levels.WARN) end
+    if not M.hlIds[curWinID] then return vim.api.nvim_echo({ { "No interesting highlighted words to be recolored in this window", "WarningMsg" } }, true, {}) end
     for _, word in ipairs(vim.tbl_keys(M.hlIds[curWinID])) do
         hlGroup = M.hlIds[curWinID][word]["hlGroup"]
         hlID    = M.hlIds[curWinID][word]["hlID"]

@@ -271,7 +271,7 @@ _G.tbl_replace = function(tbl, repVal, srcVal, repAllChk, cnt, alertOnFail) -- {
     local idx = tbl_remove(tbl, srcVal, repAllChk, cnt)
     if not idx then
         if alertOnFail then
-            return vim.notify("Source value instance not found", vim.log.levels.WARN)
+            return vim.api.nvim_echo({ { "Source value instance not found", "WarningMsg" } }, true, {})
         else
             return
         end

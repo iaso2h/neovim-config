@@ -38,7 +38,7 @@ local M = {
 ---@return boolean Return true when buffer is readonly
 local warnRead = function() -- {{{
     if not vim.o.modifiable or vim.o.readonly then
-        vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
+        vim.api.nvim_echo({{"E21: Cannot make changes, 'modifiable' is off"}}, true, {err=true})
         return false
     end
     return true
@@ -235,7 +235,7 @@ local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
             -- This's a rare scenario where Start is fall behind End
 
             -- HACK: occurred when execute [[gr"agr$]]
-            vim.notify("Start fall behind End", vim.log.levels.ERROR)
+            vim.api.nvim_echo({{"Start fall behind End",}}, true, {err=true})
             vim.cmd(string.format("noa norm! %sP", regCMD))
             repStart = vim.api.nvim_buf_get_mark(0, "[")
             repEnd   = vim.api.nvim_buf_get_mark(0, "]")
@@ -390,8 +390,8 @@ function M.operator(opInfo) -- {{{
     -- End function calling if extmark is out of scope
     if not ok then
         ---@diagnostic disable-next-line: param-type-mismatch
-        vim.notify(msgOrVal, vim.log.levels.WARN)
-        return vim.notify(debug.traceback(), vim.log.levels.ERROR)
+        vim.api.nvim_echo(msgOrVal, vim.log.levels.WARN)
+        return vim.api.nvim_echo({{debug.traceback(),}}, true, {err=true})
     else
         repExtmark = msgOrVal
     end
@@ -428,8 +428,8 @@ function M.operator(opInfo) -- {{{
     ok, msgOrVal = pcall(formatReg, opInfo.motionType, motionRegion, motionDirection, opInfo.vimMode, reg)
     if not ok then
         ---@diagnostic disable-next-line: param-type-mismatch
-        vim.notify("Error occur during formatting register in replace", vim.log.levels.ERROR)
-        return vim.notify(msgOrVal, vim.log.levels.ERROR)
+        vim.api.nvim_echo({{"Error occur during formatting register in replace",}}, true, {err=true})
+        return vim.api.nvim_echo({{msgOrVal,}}, true, {err=true})
     else
         reg = msgOrVal
     end
@@ -440,8 +440,8 @@ function M.operator(opInfo) -- {{{
     ok, msgOrVal = pcall(replace, opInfo.motionType, motionRegion, opInfo.vimMode, reg, bufNr)
     if not ok then
         ---@diagnostic disable-next-line: param-type-mismatch
-        vim.notify("Error occur during placing new content in replace", vim.log.levels.ERROR)
-        vim.notify(msgOrVal, vim.log.levels.ERROR)
+        vim.api.nvim_echo({{"Error occur during placing new content in replace",}}, true, {err=true})
+        vim.api.nvim_echo({{msgOrVal,}}, true, {err=true})
         -- TODO: clear rep extmark?
     else
         rep = msgOrVal
@@ -519,7 +519,7 @@ function M.operator(opInfo) -- {{{
             local repReport = srcLinesCnt == repLineCnt and '' or
                 string.format(" with %d line%s", repLineCnt, repLineCnt == 1 and "" or "s")
 
-            vim.notify(srcReport .. repReport, vim.log.levels.INFO)
+            vim.api.nvim_echo({{srcReport .. repReport}}, true)
         end
     end
 

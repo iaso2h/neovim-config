@@ -45,13 +45,13 @@ local getFoldmarkers = function(bufNr) -- {{{
 
     if next(nodesStart) then
         if #nodesStart ~= #nodesEnd then
-            vim.notify("Fold marker aren't symmetrical")
+            vim.api.nvim_echo({{"Fold marker aren't symmetrical"}}, true)
             return {}
         else
             return {Start = nodesStart, End = nodesEnd}
         end
     else
-        vim.notify("Can't get fold markers from queries")
+        vim.api.nvim_echo({{"Can't get fold markers from queries"}}, true)
         return {}
     end
 end -- }}}
@@ -92,7 +92,7 @@ local getCurrentMarkers = function(cursorPos, bufNr) -- {{{
     end
 
     if not nodeStart or not nodeEnd then
-        vim.notify("Can't find foldmarker region that contains the cursor", vim.log.levels.INFO)
+        vim.api.nvim_echo({{"Can't find foldmarker region that contains the cursor"}}, true)
         return {}
     end
 
@@ -131,7 +131,7 @@ M.highlightCurrentMarkerRegion = function() -- {{{
 
     local cursorPos = vim.api.nvim_win_get_cursor(0)
     if vim.fn.foldlevel(cursorPos[1]) == 0 then
-        vim.notify("Not inside any foldmarker region", vim.log.levels.INFO)
+        vim.api.nvim_echo({{"Not inside any foldmarker region"}}, true)
         return
     end
 
@@ -190,7 +190,7 @@ M.modifyCurrentMarkerRegion = function(preserveHeadCommentChk, changeChk)
 
     local cursorPos = vim.api.nvim_win_get_cursor(0)
     if vim.fn.foldlevel(cursorPos[1]) == 0 then
-        vim.notify("Not inside any foldmarker region", vim.log.levels.INFO)
+        vim.api.nvim_echo({{"Not inside any foldmarker region"}}, true)
         return
     end
 
@@ -214,7 +214,7 @@ M.modifyCurrentMarkerRegion = function(preserveHeadCommentChk, changeChk)
 
         local matchStrIdx = {regex:match_str(nodeText)}
         if not next(matchStrIdx) then
-            vim.notify("Can't find comment text", vim.log.levels.ERROR)
+            vim.api.nvim_echo( { { "Can't find comment text"} }, true, {err = true} )
             return
         else
             M.commentText = string.sub(nodeText, matchStrIdx[1] + 1, matchStrIdx[2])
@@ -371,7 +371,7 @@ local function exeCommand(exCmd)
         if not ok and
             not string.find(msgOrVal, "E490: ", 1, true) then -- No fold found
 
-            vim.notify(msgOrVal, vim.log.levels.ERROR)
+            vim.api.nvim_echo( { { msgOrVal} }, true, {err = true} )
         end
     elseif type(exCmd) == "function" then
         exCmd()
@@ -454,8 +454,8 @@ M.snap = function(exCmd, snapEnable, threshold)
     end
     if not cursorRegion then
         return
-        -- return vim.notify("Cannot find cursor region for snapToFold", vim.log.levels.ERROR)
-    end
+        -- return vim.api.nvim_echo( { { "Cannot find cursor region for snapToFold",} }, true, {err = true} )
+end
 
     -- Check dist from cursor line to both region ends then snap to the closest one
     -- Make sure topLineNr and botLineNr do not fall out of region

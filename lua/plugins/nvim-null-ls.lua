@@ -82,7 +82,7 @@ return function()
             if type(diagnostic) == "string" then
                 -- HACK: https://bbs.archlinux.org/viewtopic.php?id=274705
                 if not string.match(diagnostic, "GLIBC") then
-                    vim.notify(diagnostic, vim.log.levels.ERROR)
+                    vim.api.nvim_echo({{diagnostic,}}, true, {err=true})
                 end
                 return false
             end
@@ -151,7 +151,7 @@ return function()
 
         local filePath = _G._config_path .. pathStr[[/data/dict/cspell/cspell.txt]]
         io.popen(string.format("echo %s >> %s", word, filePath))
-        vim.notify(string.format([["%s" is appended to user dictionary.]], word), vim.log.levels.INFO)
+        vim.api.nvim_echo({{string.format([["%s" is appended to user dictionary.]], word)}}, true)
 
         if vim.o.modifiable then
             vim.api.nvim_set_current_line(vim.api.nvim_get_current_line())

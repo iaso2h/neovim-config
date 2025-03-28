@@ -32,7 +32,7 @@ end -- }}}
 function M.expr(func, checkModifiable, plugMap) -- {{{
     if checkModifiable then
         if not vim.o.modifiable or vim.o.readonly then
-            vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
+            vim.api.nvim_echo({{"E21: Cannot make changes"}}, true, {err=true})
             return ""
         end
     end

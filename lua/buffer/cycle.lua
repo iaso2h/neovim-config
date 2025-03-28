@@ -61,7 +61,7 @@ local fallbackCycle = function(currentBufNr, direction) -- {{{
         local ok, msgOrVal = pcall(vim.api.nvim_command, exCmd)
         if not ok and
             not string.find(msgOrVal, "E85: ", 1, true) then
-            vim.notify(msgOrVal, vim.log.levels.ERROR)
+            vim.api.nvim_echo( { { msgOrVal} }, true, {err = true} )
             return -1
         end
 
@@ -115,7 +115,7 @@ M.init = function(direction) -- {{{
     end
     if #bufTbl == 1 then
         if u.isSpecialBuf(bufTbl[1]) then
-            return vim.notify("No valid buffer to cycle", vim.log.levels.INFO)
+            return vim.api.nvim_echo({{"No valid buffer to cycle"}}, true)
         else
             vim.cmd([[keepjump noa buffer ]] .. bufTbl[1])
         end
@@ -136,7 +136,7 @@ M.init = function(direction) -- {{{
     -- Find the valid candidate
     local candidateIdx = findCandidate(bufTbl, currentBufIdx, direction)
     if candidateIdx == 0 then
-        return vim.notify("No valid buffer to cycle", vim.log.levels.INFO)
+        return vim.api.nvim_echo({{"No valid buffer to cycle"}}, true)
     end
 
     -- Use the Ex command to enter a buffer without writing jumplist

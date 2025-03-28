@@ -77,13 +77,13 @@ end -- }}}
 ---@return string|string[] # Decided by returnType
 M.get = function(returnType, exitToNormal) -- {{{
     if returnType ~= "list" and returnType ~= "string" then
-        vim.notify("Not a supported string value", vim.log.levels.ERROR)
+        vim.api.nvim_echo({{"Not a supported string value",}}, true, {err=true})
         return ""
     end
     -- Not support blockwise visual mode
     local mode = vim.fn.visualmode()
     if mode == "\22" then
-        vim.notify("Blockwise visual mode is not supported", vim.log.levels.WARN)
+        vim.api.nvim_echo({ { "Blockwise visual mode is not supported", "WarningMsg" } }, true, {})
         return ""
     end
 
@@ -133,7 +133,7 @@ function M.extmarkSelect(ns, extmark, linewise) -- {{{
 
     -- Validate extmark
     if not next(extmarkPos) then
-        return vim.notify("No record found on current buffer", vim.log.levels.WARN)
+        return vimapi.nvim_echonotify({ { "No record found on current buffer", "WarningMsg" } }, true, {})
     end
     local selectStart = {extmarkPos[1] + 1, extmarkPos[2]}
     local selectEnd   = {extmarkPos[3]["end_row"] + 1, extmarkPos[3]["end_col"]}

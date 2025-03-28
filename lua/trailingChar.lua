@@ -36,7 +36,7 @@ local function findCommentNode(cursorPos, cursorNode, cursorLineLen) -- {{{
         -- Break condition 2
         local node = ts.get_node {0, cursorPos[1], i}
         if not node then
-            vim.notify("Failed to get treesitter node", vim.log.levels.WARN)
+            vim.api.nvim_echo({ { "Failed to get treesitter node", "WarningMsg" } }, true, {})
             return -1
         end
 
@@ -60,7 +60,7 @@ local function findCommentNode(cursorPos, cursorNode, cursorLineLen) -- {{{
         -- Break condition 4
         cnt = cnt + 1
         if cnt > 20 then
-            vim.notify("Loop too many times", vim.log.levels.WARN)
+            vim.api.nvim_echo({ { "Loop too many times", "WarningMsg" } }, true, {})
             return -1
         end
     until false
@@ -75,8 +75,8 @@ local trailingMarker = function(cursorPos, line, char)
     local commentStr
     local ok, msg = pcall(string.gsub, vim.bo.commentstring, "%s+%%s$", "")
     if not ok then
-        vim.notify("Failed at retrieving comment string", vim.log.levels.ERROR)
-        return vim.notify(msg, vim.log.levels.ERROR)
+        vim.api.nvim_echo({{"Failed at retrieving comment string",}}, true, {err=true})
+        return vim.api.nvim_echo({{msg,}}, true, {err=true})
     else
         commentStr = msg
     end
@@ -91,11 +91,12 @@ local trailingMarker = function(cursorPos, line, char)
     -- Use treesitter to find comment node
     local cursorNode = ts.get_node {0, cursorIdx[1], 1}
     if not cursorNode then
-        vim.notify("Failed to get treesitter node. Using fallback func", vim.log.levels.WARN)
+        vim.api.nvim_echo({ { "Failed to get treesitter node. Using fallback func", "WarningMsg" } }, true, {})
         return trailingMarkerFallback(commentStr, char, line)
     end
     if cursorNode:has_error() then
-        return vim.notify("Fix the syntax error first", vim.log.levels.WARN)
+        return
+        vim.api.nvim_echo({ { "Fix the syntax error first", "WarningMsg" } }, true, {})
     end
 
     local commentNodeStartColumn = findCommentNode(cursorIdx, cursorNode, lineLen)
@@ -108,7 +109,7 @@ local trailingMarker = function(cursorPos, line, char)
         else
             local commentStrIdx = { string.find(line, commentStr, commentNodeStartColumn, true) }
             if not next(commentStrIdx) then
-                return vim.notify("Failed to index comment string in: " .. line, vim.log.levels.ERROR)
+                return vim.api.nvim_echo({{"Failed to index comment string in: " .. line,}}, true, {err=true})
             end
 
             if commentStrIdx[1] == 1 then
@@ -153,8 +154,8 @@ return function(vimMode, char) -- {{{
             local commentStr
             local ok, msg = pcall(string.gsub, vim.bo.commentstring, "%s*%%s$", "")
             if not ok then
-                vim.notify("Failed at retrieving comment string", vim.log.levels.ERROR)
-                return vim.notify(msg, vim.log.levels.ERROR)
+                vim.api.nvim_echo({{"Failed at retrieving comment string",}}, true, {err=true})
+                return vim.api.nvim_echo({{msg,}}, true, {err=true})
             else
                 commentStr = msg
             end
@@ -168,7 +169,7 @@ return function(vimMode, char) -- {{{
                 if string.find(msg, "Keyboard interrupt") then
                     note = ""
                 else
-                    return vim.notify(msg, vim.log.levels.ERROR)
+                    return vim.api.nvim_echo({{msg,}}, true, {err=true})
                 end
             else
                 note = msg

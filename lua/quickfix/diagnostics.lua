@@ -106,7 +106,7 @@ M.refresh = function(forceChk, localChk) -- {{{
     local qfItems     = vim.diagnostic.toqflist(diagnostics)
     -- Don't auto-open quickfix when there's no diagnostics
     if not next(qfItems) then
-        return vim.notify("No available diagnostics")
+        return vim.api.nvim_echo({{"No available diagnostics"}}, true)
     end
 
     -- Get window id and buffer number of quickfix

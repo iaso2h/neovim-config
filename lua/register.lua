@@ -42,7 +42,7 @@ M.insertPrompt = function(vimMode) -- {{{
             if string.find(msg, "Keyboard interrupt") then
                 return
             else
-                return vim.notify("\n" .. msg, vim.log.levels.ERROR)
+                return vim.api.nvim_echo({{"\n" .. msg,}}, true, {err=true})
             end
         else
             input = msg
@@ -72,7 +72,16 @@ M.insertPrompt = function(vimMode) -- {{{
                             vim.cmd("noh")
                         end ,0)
                     else
-                        vim.notify("\nRegister" .. regName .. " isn't a characterwise register for editing macro", vim.log.levels.WARN)
+                        vim.api.nvim_echo(
+                            {
+                                {
+                                    "\nRegister" .. regName .. " isn't a characterwise register for editing macro",
+                                    "WarningMsg"
+                                }
+                            },
+                            true,
+                            {}
+                        )
                     end
                 elseif exCmd:lower() == "r" then
                     -- Suport replace target register(macro) content with the text of current line
@@ -81,14 +90,14 @@ M.insertPrompt = function(vimMode) -- {{{
                     if regexWritable:match_str(regName) then
                         local curLine = vim.api.nvim_get_current_line()
                         if string.find(curLine, "^%s*$") then
-                            vim.notify("\nCurrent line isn't a invalid register content", vim.log.levels.WARN)
+                            vim.api.nvim_echo({ { "\nCurrent line isn't a invalid register content", "WarningMsg" } }, true, {})
                         else
                             ---@diagnostic disable-next-line: param-type-mismatch
                             vim.fn.setreg(regName, curLine, "c")
                             return vim.cmd([[norm! "_dd]])
                         end
                     else
-                        vim.notify("\nRegister" .. regName .. " isn't a writable register", vim.log.levels.WARN)
+                        vim.api.nvim_echo({ { "\nRegister", "WarningMsg" } } .. regName .. " isn't a writable register", true, {})
                     end
                 end
             end
@@ -107,7 +116,7 @@ M.insertPrompt = function(vimMode) -- {{{
                     return vim.api.nvim_put({regContent}, "c", true, false)
                 end
             else
-                vim.notify("\nInvalid register name", vim.log.levels.WARN)
+                vim.api.nvim_echo({ { "\nInvalid register name", "WarningMsg" } }, true, {})
             end
         end
     until false -- Infinite loop with multiple break points nested

@@ -124,7 +124,7 @@ local selectCandidate = function(direction) -- {{{
         -- can get new parent node on the fly
         if lastCandidate.type == "textobject" then
             -- Do not generate any more candidates when reach maximum index
-            vim.notify("No more textobject candidates", vim.log.levels.INFO)
+            vim.api.nvim_echo({{"No more textobject candidates"}}, true)
 
             -- Always reset the index to the length of the candidates table
             M.candidateIdx = #M.candidates
@@ -140,7 +140,7 @@ local selectCandidate = function(direction) -- {{{
                 table.insert(M.candidates, parentCandidate)
                 selectRegion(M.candidates[M.candidateIdx])
             else
-                vim.notify("No more wider treesitter candidates", vim.log.levels.INFO)
+                vim.api.nvim_echo({{"No more wider treesitter candidates"}}, true)
 
                 -- Always reset the index to the length of the candidates table
                 M.candidateIdx = #M.candidates
@@ -162,7 +162,7 @@ local selectCandidate = function(direction) -- {{{
                 table.insert(M.candidates, 1, childCandidate)
                 selectRegion(M.candidates[1])
             else
-                vim.notify("No more narrower treesitter candidates", vim.log.levels.INFO)
+                vim.api.nvim_echo({{"No more narrower treesitter candidates"}}, true)
 
                 -- Always reset the index to 1 to refer to the first candidate
                 M.candidateIdx = 1
@@ -238,7 +238,7 @@ M.expandShrink = function(vimMode, direction, opts) -- {{{
 
                 if not next(candidate) then
                     local descStr = direction == 1 and "wider" or "narrower"
-                    vim.notify("Can't find treesitter node that has a " .. descStr .. " region than the current visual selection", vim.log.levels.INFO)
+                    vim.api.nvim_echo({{"Can't find treesitter node that has a " .. descStr .. " region than the current visual selection"}}, true)
                 else
                     initExpand()
                     M.candidates = {candidate}
@@ -252,7 +252,7 @@ M.expandShrink = function(vimMode, direction, opts) -- {{{
             else
                 -- saveOption()
                 local descStr = direction == 1 and "wider" or "narrower"
-                vim.notify("Can't find textobject that has a " .. descStr .. " region than the current visual selection", vim.log.levels.INFO)
+                vim.api.nvim_echo({{"Can't find textobject that has a " .. descStr .. " region than the current visual selection"}}, true)
             end
         end
     elseif vimMode == "n" then
@@ -261,14 +261,14 @@ M.expandShrink = function(vimMode, direction, opts) -- {{{
 
         local ok, msgOrVal = pcall(generateCandidates)
         if not ok then
-            vim.notify(msgOrVal, vim.log.levels.ERROR)
+            vim.api.nvim_echo( { { msgOrVal} }, true, {err = true} )
         end
 
         -- Select candidate
         if next(M.candidates) then
             selectCandidate(direction)
         else
-            vim.notify("No candidates", vim.log.levels.INFO)
+            vim.api.nvim_echo({{"No candidates"}}, true)
         end
 
         -- Restore vim options

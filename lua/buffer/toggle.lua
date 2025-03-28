@@ -69,7 +69,7 @@ local terminal = function(closeChk) -- {{{
         vim.cmd "terminal"
     else
         if #require("buffer.util").winIds(false) == 1 then
-            vim.notify("Cannot close the last window", vim.log.levels.INFO)
+            vim.api.nvim_echo({{"Cannot close the last window"}}, true)
         else
             vim.api.nvim_win_close(0, false)
         end

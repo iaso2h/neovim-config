@@ -74,7 +74,7 @@ local getSrcContent = function() -- {{{
 
         -- Abort when selection is invalid
         if posStart[1] == posEnd[1] and posStart[2] == posEnd[2] then
-            vim.notify("Too small selection", vim.log.levels.ERROR)
+            vim.api.nvim_echo( { { "Too small selection"} }, true, {err = true} )
             return {}
         end
     end
@@ -204,15 +204,15 @@ M.newFile = function(filePath) -- {{{
     -- Writing file
     local f, err = io.open(filePath, "w")
     if not f then
-        vim.notify("Unable to create file: " .. filePath, vim.log.levels.ERROR)
-        vim.notify(err, vim.log.levels.ERROR)
+        vim.api.nvim_echo( { { "Unable to create file: " .. filePath} }, true, {err = true} )
+        vim.api.nvim_echo( { { err} }, true, {err = true} )
         return
     end
 
     f:write(unpack(getSrcContent()))
     f:close()
 
-    vim.notify("File created: " .. filePath, vim.log.levels.INFO)
+    vim.api.nvim_echo({{"File created: " .. filePath}}, true)
 
     -- Delete selection code
     register.saveReg()
@@ -242,11 +242,11 @@ function M.operator(opInfo) -- {{{
     M.argPath = opInfo.path
     if not vim.o.modifiable or vim.o.readonly then
         reset()
-        return vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
+        return vim.api.nvim_echo({{"E21: Cannot make changes, 'modifiable' is off"}}, true, {err=true})
     end
     if M.vimMode == "\22" then
         reset()
-        return vim.notify("Visual block mode is not supported", vim.log.levels.WARN)
+        r
     end
 
     -- opts = opts or {hlGroup="Search", timeout=500}
@@ -273,7 +273,7 @@ function M.operator(opInfo) -- {{{
             M.newFile(M.argPath)
         end
     else
-        return vim.notify("Not support in current mode", vim.log.levels.WARN)
+        return vim.api.nvim_echo({ { "Not support in current mode", "WarningMsg" } }, true, {})
     end
 
     reset()

@@ -122,7 +122,7 @@ augroup _fileType " {{{
 augroup END " }}}
 " augroup highlightYank " {{{
 " autocmd!
-" autocmd TextYankPost * silent! lua vim.highlight.on_yank {on_visual=false, higroup="Search", timeout=500}
+" autocmd TextYankPost * silent! lua vim.hl.on_yank {on_visual=false, higroup="Search", timeout=500}
 " augroup END " }}}
 augroup checkBufChanged " {{{
     autocmd!

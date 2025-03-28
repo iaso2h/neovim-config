@@ -13,7 +13,7 @@ local M = {
 ---@return boolean # Return true when buffer is readonly
 local warnRead = function() -- {{{
     if not vim.o.modifiable or vim.o.readonly then
-        vim.notify("E21: Cannot make changes, 'modifiable' is off", vim.log.levels.ERROR)
+        vim.api.nvim_echo({{"E21: Cannot make changes",}}, true, {err=true})
         return false
     end
     return true

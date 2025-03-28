@@ -14,7 +14,7 @@ local zealGlobalChk
 local function lookUp(opInfo) -- {{{
     local operator = require("operator")
     if opInfo.motionType == "block" or opInfo.motionType == "line" then
-        return vim.notify("Blockwise or linewise is not supported", vim.log.levels.WARN)
+        return vim.api.nvim_echo({ { "Blockwise or linewise is not supported", "WarningMsg" } }, true, {})
     end
 
     local command
@@ -48,13 +48,13 @@ local function lookUp(opInfo) -- {{{
 
     if answer == 1 then
         if vim.fn.executable("zeal") ~= 1 then
-            return vim.notify("Zeal not found on environment", vim.log.levels.ERROR)
+            return vim.api.nvim_echo({{"Zeal not found on environment",}}, true, {err=true})
         end
         command = zealGlobalChk and "zeal " or string.format("zeal %s:", vim.bo.filetype)
         vim.fn.jobstart(command .. content)
     elseif answer == 2 then
         if vim.fn.executable("goldendict") ~= 1 then
-            return vim.notify("Goldentdict not found on environment", vim.log.levels.ERROR)
+            return vim.api.nvim_echo({{"Goldentdict not found on environment",}}, true, {err=true})
         end
         command = "goldendict "
         vim.fn.jobstart(command .. content)

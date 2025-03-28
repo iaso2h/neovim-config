@@ -173,9 +173,16 @@ local hook = function(hookTbl, path, reloadCallback) -- {{{
             if type(currentHook.callbackHandler) == "function" then
                 local ok, msg = pcall(currentHook.callbackHandler, path, reloadCallback)
                 if not ok then
-                    vim.notify("Error occurs while calling callback function from reloading " .. filename,
-                        vim.log.levels.ERROR)
-                    vim.notify(msg, vim.log.levels.ERROR)
+                    vim.api.nvim_echo(
+                        {
+                            {
+                                "Error occurs while calling callback function from reloading " .. filename
+                            }
+                        },
+                        true,
+                        {err = true}
+                    )
+                    vim.api.nvim_echo({{msg,}}, true, {err=true})
                 end
             end
 
@@ -231,19 +238,40 @@ M.loadFile = function(path, parentPath, opt) -- {{{
     -- Capture callback from module loading
     local ok, reloadCallback = pcall(require, module)
     if not ok then
-        vim.notify(
-            string.format("Error detected while reloading lua package[%s] at: %s", module, path.filename),
-            vim.log.levels.ERROR)
-        vim.notify(" ", vim.log.levels.INFO)
-        vim.notify(reloadCallback, vim.log.levels.ERROR)
-        vim.notify(" ", vim.log.levels.INFO)
-        vim.notify(
-            string.format("Lua package[%s] has been unloaded", module),
-            vim.log.levels.INFO)
+        vim.api.nvim_echo(
+            {
+                {
+                    string.format(
+                        "Error detected while reloading lua package[%s] at: %s",
+                        module,
+                        path.filename
+                    )
+                }
+            },
+            true,
+            { err = true }
+        )
+
+        vim.api.nvim_echo({{" "}}, true)
+        vim.api.nvim_echo( { { reloadCallback} }, true, {err = true} )
+        vim.api.nvim_echo({{" "}}, true)
+        vim.api.nvim_echo(
+            {
+                {
+                    string.format("Lua package[%s] has been unloaded", module)
+                }
+            },
+            true
+        )
     else
-        vim.notify(
-            string.format("Reloading lua package[%s] at: %s", module, path.filename),
-            vim.log.levels.INFO)
+        vim.api.nvim_echo(
+            {
+                {
+                    string.format("Reloading lua package[%s] at: %s", module, path.filename)
+                }
+            },
+            true
+        )
 
         -- Load configuration AFTER reloading for specific module match the given path
         hook(opt.configHook, path, reloadCallback)
@@ -343,26 +371,49 @@ M.loadDir = function(path, opt) -- {{{
 
             local ok, msg = require(module)
             if not ok then
-                vim.notify(
-                    string.format("Error detected while reloading lua module[%s]%s: %s", module, fileChkStr, absStr),
-                    vim.log.levels.ERROR)
-                vim.notify(" ", vim.log.levels.INFO)
-                vim.notify(msg, vim.log.levels.ERROR)
-                vim.notify(" ", vim.log.levels.INFO)
+                vim.api.nvim_echo(
+                    {
+                        {
+                            string.format("Error detected while reloading lua module[%s]%s: %s", module, fileChkStr, absStr)
+                        }
+                    },
+                    true,
+                    { err = true }
+                )
+                vim.api.nvim_echo({{" "}}, true)
+                vim.api.nvim_echo( { { msg} }, true, {err = true} )
+                vim.api.nvim_echo({{" "}}, true)
                 for j = idx, #allLoadedModules, 1 do
-                    vim.notify(
-                        string.format("Lua module[%s] has been unloaded", allLoadedModules[j]),
-                        vim.log.levels.INFO)
+                    vim.api.nvim_echo(
+                        {
+                            {
+                                string.format("Lua module[%s] has been unloaded", allLoadedModules[j])
+                            }
+                        },
+                        true
+                    )
                 end
             else
-                vim.notify(string.format([[Reloading lua module[%s]%s: %s]],
-                    module, fileChkStr, moduleSearchPathStr .. util.sep .. relStr),
-                    vim.log.levels.INFO)
+                vim.api.nvim_echo(
+                    {
+                        {
+                            string.format([[Reloading lua module[%s]%s: %s]], module, fileChkStr, moduleSearchPathStr .. util.sep .. relStr)
+                        }
+                    },
+                    true,
+                    { err = true }
+                )
             end
         else
-            vim.notify(string.format([[             require[%s]%s: %s]],
-                module, fileChkStr, moduleSearchPathStr .. util.sep .. relStr),
-                vim.log.levels.INFO)
+            vim.api.nvim_echo(
+                {
+                    {
+                        string.format([[             require[%s]%s: %s]], module, fileChkStr, moduleSearchPathStr .. util.sep .. relStr),
+                    }
+                },
+                true,
+                { err = true }
+            )
         end
 
         -- Load configuration AFTER reloading for specific module match the given path

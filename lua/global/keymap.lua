@@ -14,29 +14,49 @@ local argCheck = function (lhs, rhs, arg) -- {{{
             elseif type(arg[1]) == "table" then
                 opts = arg[1]
             else
-                vim.notify(
-                    string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhs),
-                    vim.log.levels.ERROR)
-                vim.notify([=[Incorrect parameters passed]=], vim.log.levels.ERROR)
-                return vim.notify(debug.traceback(), vim.log.levels.ERROR)
+                vim.api.nvim_echo(
+                    {
+                        {
+                            string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhs)
+                        }
+                    },
+                    true,
+                    { err = true }
+                )
+                vim.api.nvim_echo( { { [=[Incorrect parameters passed]=]} }, true, {err = true} )
+                return vim.api.nvim_echo( { { debug.tracebac(),} }, true, {err = true} )
             end
         elseif #arg == 2 then
             opts = arg[1]
             doc  = arg[2]
             if type(opts) ~= "table" or type(doc) ~= "string" then
-                vim.notify(
-                    string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhs),
-                    vim.log.levels.ERROR)
-                vim.notify([=[Incorrect parameters passed]=], vim.log.levels.ERROR)
-                return vim.notify(debug.traceback(), vim.log.levels.ERROR)
+                vim.api.nvim_echo(
+                    {
+                        {
+                            string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhs)
+                        }
+                    },
+                    true,
+                    { err = true }
+                )
+                vim.api.nvim_echo( { { [=[Incorrect parameters passed]=]} }, true, {err = true} )
+                return vim.api.nvim_echo( { { debug.tracebac(),} }, true, {err = true} )
             end
         else
             if type(opts) ~= "table" or type(doc) ~= "string" then
-                vim.notify(
-                    string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhs),
-                    vim.log.levels.ERROR)
-                vim.notify([=[Incorrect parameters passed]=], vim.log.levels.ERROR)
-                return vim.notify(debug.traceback(), vim.log.levels.ERROR)
+                vim.api.nvim_echo(
+                    {
+                        {
+                            string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhs)
+                        }
+                    },
+                    true,
+                    {
+                        err = true
+                    }
+                )
+                vim.api.nvim_echo( { { [=[Incorrect parameters passed]=]} }, true, {err = true} )
+                return vim.api.nvim_echo( { { debug.tracebac(),} }, true, {err = true} )
             end
         end
     end
@@ -44,9 +64,17 @@ local argCheck = function (lhs, rhs, arg) -- {{{
     -- Warn the lack of desc
     assert(type(rhs) == "function" or type(rhs) == "string", "rhs argument must be a function or a string")
     if type(rhs) == "string" and string.upper(rhs) ~= "<NOP>"  and not doc then
-        vim.notify(
-            string.format([=[Lack of desc in mapping: [[%s]] for [[%s]]]=], lhs, rhs),
-            vim.log.levels.WARN)
+        vim.api.nvim_echo(
+            {
+                {
+                    string.format([=[Lack of desc in mapping: [[%s]] for [[%s]]]=], lhs, rhs)
+                }
+            },
+            true,
+            {
+                err=true
+            }
+        )
     end
 
     return opts, doc
@@ -77,10 +105,16 @@ local argConvert = function(mode, lhs, rhs, opts, doc) -- {{{
     -- Do not use "v" to map select mode Inexplicitly
     for _, modeStr in ipairs(modeTbl) do
         if modeStr == "v" then
-            vim.notify(
-                string.format([=[Please use "x" to map [[%s]] for [[%s]] instead]=], lhs, rhs),
-                vim.log.levels.WARN)
-            vim.notify(debug.traceback(), lhs, rhs, vim.log.levels.WARN)
+            vim.api.nvim_echo(
+                {
+                    {
+                        string.format([=[Please use "x" to map [[%s]] for [[%s]] instead]=], lhs, rhs),
+                        "WarningMsg"
+                    }
+                },
+                true,
+                {}
+            )
             table[modeStr] = nil
             table.insert(modeTbl, "x")
         end
@@ -124,11 +158,19 @@ _G.map = function(mode, lhs, rhs, ...) -- {{{
     for _, m in ipairs(modeTbl) do
         local ok, msg = pcall(vim.api.nvim_set_keymap, m, lhs, rhsStr, optsKeyValTbl)
         if not ok then
-            vim.notify(
-                string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhsStr),
-                vim.log.levels.ERROR)
-            vim.notify(msg, vim.log.levels.ERROR)
-            return vim.notify(debug.traceback(), vim.log.levels.ERROR)
+            vim.api.nvim_echo(
+                {
+                    {
+                        string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhsStr)
+                    }
+                },
+                true,
+                {
+                    err = true
+                }
+            )
+            vim.api.nvim_echo( { { msg} }, true, {err = true} )
+            return vim.api.nvim_echo( { { debug.tracebac(),} }, true, {err = true} )
         end
     end
 
@@ -152,11 +194,17 @@ _G.bmap = function(bufNr, mode, lhs, rhs, ...) -- {{{
     for _, m in ipairs(modeTbl) do
         local ok, msg = pcall(vim.api.nvim_buf_set_keymap, bufNr, m, lhs, rhsStr, optsKeyValTbl)
         if not ok then
-            vim.notify(
-                string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhsStr),
-                vim.log.levels.ERROR)
-            vim.notify(msg, vim.log.levels.ERROR)
-            return vim.notify(debug.traceback(), vim.log.levels.ERROR)
+            vim.api.nvim_echo(
+                {
+                    {
+                        string.format([=[Error occurs while mapping [[%s]] for [[%s]]]=], lhs, rhsStr)
+                    }
+                },
+                true,
+                { err = true }
+            )
+            vim.api.nvim_echo( { { msg} }, true, {err = true} )
+            return vim.api.nvim_echo( { { debug.tracebac(),} }, true, {err = true} )
         end
     end
 

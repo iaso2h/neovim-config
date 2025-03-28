@@ -29,9 +29,18 @@ local M = {
 ---@param filter string "local"|"buffer"
 local overJumpInfo = function(isNewer, filter) -- {{{
     local directionStr = isNewer and "newer" or "older"
-    vim.notify(
-        string.format("Cannot jump to any %s place in the %s jumplist",
-            directionStr, filter), vim.log.levels.INFO)
+    vim.api.nvim_echo(
+        {
+            {
+                string.format(
+                    "Cannot jump to any %s place in the %s jumplist",
+                    directionStr,
+                    filter
+                )
+            }
+        },
+        true
+    )
 end -- }}}
 ---@param isNewer boolean Whether jump to newer position
 ---@param filter string "local"|"buffer"
@@ -112,7 +121,7 @@ local getJumpsSliced = function(isNewer, filter, CmdIdx, jumpsCmdRaw, jumpIdx, j
     end
 
     if not next(jumpsSliced) then
-        vim.notify("Failed to get the sliced jumps", vim.log.levels.ERROR)
+        vim.api.nvim_echo({{"Failed to get the sliced jumps",}}, true, {err=true})
     end
 
     return jumpsSliced
@@ -127,7 +136,7 @@ local getJumps = function(isNewer, winId, filter) -- {{{
     local jumps, jumpIdx = unpack(vim.fn.getjumplist(winId))
     local jumpsSliced = {}
     if #jumps == 0 then
-        vim.notify("Jumplist is empty", vim.log.levels.INFO)
+        vim.api.nvim_echo({{"Jumplist is empty"}}, true)
         return jumpsSliced
     end
 
@@ -136,7 +145,7 @@ local getJumps = function(isNewer, winId, filter) -- {{{
 
     local CmdIdx = jumpUtil.getJumpCmdIdx(jumpsCmdRaw)
     if CmdIdx == 0 then
-        vim.notify("Can't find current index", vim.log.levels.ERROR)
+        vim.api.nvim_echo({{"Can't find current index",}}, true, {err=true})
         return jumpsSliced
     end
 
@@ -285,7 +294,7 @@ M.go = function(vimMode, isNewer, filter) -- {{{
     if filter == "local" then
         local posBufNr = vim.api.nvim_get_current_buf()
         if posBufNr ~= bufNr then
-            vim.notify("Failed to perform a correct local jump", vim.log.levels.ERROR)
+            vim.api.nvim_echo({{"Failed to perform a correct local jump",}}, true, {err=true})
             vim.print(jumpsSliced[targetCount])
         end
     end

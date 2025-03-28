@@ -51,7 +51,7 @@ M.bufClose = function(bufNr, switchBeforeClose, scheduleWrap) -- {{{
                 end
             end
         else
-            return vim.notify([[`require("buffer.var").winIds` isn't initialized]], vim.log.levels.ERROR)
+            return vim.api.nvim_echo( { { [[`require("buffer.var").winIds` isn't initialized]]} }, true, {err = true} )
         end
     end
     if scheduleWrap then
@@ -62,7 +62,7 @@ M.bufClose = function(bufNr, switchBeforeClose, scheduleWrap) -- {{{
         local ok, msgOrVal = pcall(vim.api.nvim_command, "bdelete! " .. bufNr)
         if not ok then
             if not string.match(msgOrVal, "E516") then
-                vim.notify(msgOrVal, vim.log.levels.ERROR)
+                vim.api.nvim_echo( { { msgOrVal} }, true, {err = true} )
             end
         end
     end
@@ -126,7 +126,7 @@ M.bufSwitchAlter = function(winId, bufNr) -- {{{
                     end
                 end
             end
-            vim.notify(string.format("Failed to switch alternative buffer for the buffer %d in Windows: %d", bufNr, winId), vim.log.ERROR)
+            vim.api.nvim_echo({{string.format("Failed to switch alternative buffer for the buffer %d in Windows: %d", bufNr, winId)}}, true, {err=true})
         else
             -- Do nothing
         end
@@ -202,7 +202,6 @@ M.winIdPrev = function() -- {{{
     vim.cmd [[noa wincmd p]]
     local winId  = vim.api.nvim_get_current_win()
     vim.cmd [[noa wincmd p]]
-    return winId
 end -- }}}
 -- Return window occurrences in Neovim
 ---@param winIds? integer[] If it isn't provided, the `var.winIds` will be used instead
@@ -240,7 +239,7 @@ M.winClose = function(winId, scheduleWrap) -- {{{
         end)()
     else
         local ok, msg = pcall(vim.api.nvim_win_close, winId, false)
-        if not ok then vim.notify(msg, vim.log.levels.ERROR) end
+        if not ok then vim.api.nvim_echo( { { msg} }, true, {err = true} ) end
     end
 end -- }}}
 --- Get the layout in which the target window nested in
@@ -351,7 +350,7 @@ M.redirScratch = function(lines, scratchBufNr, appendChk, preHook, postHook) -- 
 
                 vim.api.nvim_buf_set_lines(scratchBufNr, startLine, -1, false, lines)
                 visibleTick = true
-                vim.notify("Scratch buffer refreshed")
+                vim.api.nvim_echo({{"Scratch buffer refreshed"}}, true)
                 break
             end
         end

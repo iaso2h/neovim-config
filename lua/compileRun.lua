@@ -21,7 +21,7 @@ function M.compileCode(useAsyncRun) -- {{{
         elseif util.ex("gcc") then
             prog = "gcc"
         else
-            return vim.notify("No compiler found", vim.log.levels.ERROR)
+            return vim.api.nvim_echo({ { "No compiler found" } }, true, { err=true })
         end
         local compileCMD = string.format("%s %s %s -o %s%s", prog, M.flags.c, srcPath, srcNoExt, ext)
         vim.g.asyncrun_status = 0

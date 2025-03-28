@@ -68,16 +68,6 @@ return {
             }
         )
     ), -- }}}
-    s({ trig = "vnot", dscr = "Vim notify"}, -- {{{
-        fmt(
-            [[
-            vim.notify("{}", vim.log.levels.INFO)
-            ]],
-            {
-                i(1, "msg"),
-            }
-        )
-    ), -- }}}
     s({ trig = "vin", dscr = "Vim input"}, -- {{{
         fmta(
             [[
@@ -91,44 +81,44 @@ return {
             }
         )
     ), -- }}}
-    s({ trig = "pc", dscr = "Protect call"}, -- {{{
-        fmt(
-            [[
-            local ok, {1} = pcall({2}, {3})
-            if not ok then
-                {4}
-                {5}
-            else
-                {}
-            end
-            ]],
-            {
-                ch(1, {
-                    i(nil, "msgOrVal"),
-                    t "_"
-                }),
-                i(2, "func"),
-                i(3, "args"),
-                dy(4, function (nodeRefText, _, _, _)
-                    if nodeRefText[1][1] == "_" then
-                        return sn(nil, t "")
-                    else
-                        return sn(nil, {
-                            t "vim.notify(msgOrVal, vim.log.levels.",
-                            ch(1, {
-                                i(nil, "ERROR"),
-                                i(nil, "WARN"),
-                                i(nil, "INFO"),
-                            }),
-                            t ")"
-                        })
-                    end
-                end, {1}),
-                i(5),
-                i(0)
-            }
-        )
-    ), -- }}}
+    -- s({ trig = "pc", dscr = "Protect call"}, -- {{{
+    --     fmt(
+    --         [[
+    --         local ok, {1} = pcall({2}, {3})
+    --         if not ok then
+    --             {4}
+    --             {5}
+    --         else
+    --             {}
+    --         end
+    --         ]],
+    --         {
+    --             ch(1, {
+    --                 i(nil, "msgOrVal"),
+    --                 t "_"
+    --             }),
+    --             i(2, "func"),
+    --             i(3, "args"),
+    --             dy(4, function (nodeRefText, _, _, _)
+    --                 if nodeRefText[1][1] == "_" then
+    --                     return sn(nil, t "")
+    --                 else
+    --                     return sn(nil, {
+    --                         t "vim.notify(msgOrVal, vim.log.levels.",
+    --                         ch(1, {
+    --                             i(nil, "ERROR"),
+    --                             i(nil, "WARN"),
+    --                             i(nil, "INFO"),
+    --                         }),
+    --                         t ")"
+    --                     })
+    --                 end
+    --             end, {1}),
+    --             i(5),
+    --             i(0)
+    --         }
+    --     )
+    -- ), -- }}}
     s({ trig = "ll", dscr = "Local variable assignment"}, -- {{{
         {
             t"local ",
