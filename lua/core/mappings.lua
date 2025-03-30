@@ -46,11 +46,10 @@ map("n", [[[C]], [[:noa windo set cc&<CR>]],   {"silent"}, "Turn off colorcolumn
 -- Quickfix
 map("n", [[<leader>q]], [[<CMD>lua require("buffer.toggle")("quickfix", false)<CR>]], {"silent"}, "Toggle quickfix")
 map("n", [[<leader>Q]], [[<CMD>lua require("buffer.toggle")("quickfix", true)<CR>]],  {"silent"}, "Close visible quickfix")
--- DEPRECATED: use [q, ]q, [Q, ]Q instead
-map("n", [[<C-q>g]], [[<CMD>cfirst<CR>zzzv]],    {"silent"}, "Go to first item in quickfix")
-map("n", [[<C-q>G]], [[<CMD>clast<CR>zzzv]],     {"silent"}, "Go to last item in quickfix")
-map("n", [[<C-q>n]], [[<CMD>cnext<CR>zzzv]],     {"silent"}, "Go to next item in quickfix")
-map("n", [[<C-q>N]], [[<CMD>cprevious<CR>zzzv]], {"silent"}, "Go to previous item in quickfix")
+map("n", [=[[Q]=], [[<CMD>cfirst<CR>zzzv]],    {"silent"}, "Go to first item in quickfix")
+map("n", [=[]Q]=], [[<CMD>clast<CR>zzzv]],     {"silent"}, "Go to last item in quickfix")
+map("n", [=[[q]=], [[<CMD>cnext<CR>zzzv]],     {"silent"}, "Go to next item in quickfix")
+map("n", [=[]q]=], [[<CMD>cprevious<CR>zzzv]], {"silent"}, "Go to previous item in quickfix")
 map("n", [[<C-q>l]], [[<CMD>lua require("quickfix.modification").interConvert()<CR>]], {"silent"}, "Convert a quickfix into a location list, and vice versa")
 map("n", [[<C-q>m]], [[<CMD>lua require("quickfix.message")("scratch")<CR>]], {"silent"}, "Show messages in quickfix")
 -- Expand region
@@ -489,8 +488,8 @@ map({"n", "x"}, [[<A-->]],  [[<CMD>wincmd -<CR>]],       {"silent"}, "Decrease w
 map("i",        [[<A-->]],  [[<C-\><C-O>:wincmd -<CR>]], {"silent"}, "Decrease window size")
 -- Buffers
 map("n", [[<C-w>O]], [[<CMD>lua require("buffer.closeOther")()<CR>]],   {"silent"}, "Delete other buffers")
-map("n", [[<A-,>]],  [[<CMD>lua require("buffer.cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
-map("n", [[<A-.>]],  [[<CMD>lua require("buffer.cycle").init(1)<CR>]],  {"silent"}, "Next buffer")
+map("n", [=[[b]=],  [[<CMD>lua require("buffer.cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
+map("n", [=[]b]=],  [[<CMD>lua require("buffer.cycle").init(1)<CR>]],  {"silent"}, "Next buffer")
 -- Tab
 map("n", [[<C-t>,]], [[<CMD>tabp | echo "tabpage " . tabpagenr()<CR>]], {"silent"}, "Previous tab")
 map("n", [[<C-t>.]], [[<CMD>tabn | echo "tabpage " . tabpagenr()<CR>]], {"silent"}, "Next tab")

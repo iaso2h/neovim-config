@@ -24,7 +24,7 @@ _G._config_path        = initHelper(vim.fn.stdpath("config"))
 _G._plugin_root        = initHelper(vim.fn.stdpath("data") .. _G._sep .. "lazy")
 _G._format_option      = initHelper("cr/qn2mM1jpl")
 _G._trim_space_on_save = initHelper(true, "TrimSpaceOnSave", "_trim_space_on_save")
-_G._autoreload         = initHelper(true, "Autoreload", "_autoreload")
+_G._autoreload         = initHelper(false, "Autoreload", "_autoreload")
 _G._enable_plugin      = initHelper(true)
 _G._lisp_language      = initHelper {"query", "clojure", "scheme", "lisp", "racket", "hy", "fennel", "janet", "carp", "wast", "yuck"}
 

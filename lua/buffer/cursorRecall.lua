@@ -26,35 +26,25 @@ end
 --- Recall the cursor position
 ---@param args table Argument from calling a Neovim command
 return function(args)
-    -- Only handle valid file
-    if not args or args.file == "*" then
-        log('DEBUGPRINT[1]: cursorRecall.lua:31 (after end)')
-        return
-    end
-
     -- Do nothing if the buffer is listed and loaded
     local bufNr = vim.api.nvim_get_current_buf()
     if vim.api.nvim_buf_is_loaded(bufNr) and not vim.api.nvim_get_option_value("bufhidden", {buf = bufNr}) then
-        log('DEBUGPRINT[2]: cursorRecall.lua:38 (after end)')
-        return
-    end
-
-    -- Only deal with situation where curpos is placed at {1, 0}
-    local cursorPos = vim.api.nvim_win_get_cursor(0)
-    if cursorPos[1] ~= 1 then
-        log('DEBUGPRINT[3]: cursorRecall.lua:45 (after end)')
-        return
-    end
-
-    -- Check filetype and buftype against ignore lists
-    if vim.tbl_contains(ignoreBuftype, vim.bo.buftype) or vim.tbl_contains(ignoreFiletype, vim.bo.filetype) then
-        log('DEBUGPRINT[4]: cursorRecall.lua:51 (after end)')
         return
     end
 
     -- Do nothing if file does not exist on disk
     if not vim.loop.fs_stat(vim.api.nvim_buf_get_name(bufNr)) then
-        log('DEBUGPRINT[5]: cursorRecall.lua:57 (after end)')
+        return
+    end
+
+    -- Only deal with situation where cursor is placed at {1, 0}
+    local cursorPos = vim.api.nvim_win_get_cursor(0)
+    if cursorPos[1] ~= 1 then
+        return
+    end
+
+    -- Check filetype and buftype against ignore lists
+    if vim.tbl_contains(ignoreBuftype, vim.bo.buftype) or vim.tbl_contains(ignoreFiletype, vim.bo.filetype) then
         return
     end
 
@@ -66,7 +56,6 @@ return function(args)
         local winStart = vim.fn.line('w0')
         -- Last edit pos is set and is less than the number of lines in this buffer
         if winEnd == bufEnd then
-            log('DEBUGPRINT[6]: cursorRecall.lua:69 (after if winend == buffend then)')
             -- Last line in buffer is also the last line visible in this window
             local ok, msgOrVal = pcall(vim.api.nvim_command, "normal! g`")
             if not ok and not string.find(msgOrVal, "E663") then
@@ -75,7 +64,6 @@ return function(args)
                 vim.api.nvim_echo( { { "Error occurred when executing command: " .. cmdStr} }, true, {err = true} )
             end
         elseif bufEnd - lastPos > ((winEnd - winStart) / 2) - 1 then
-            log('DEBUGPRINT[7]: cursorRecall.lua:73 (after elseif buffend - lastpos > ((winend - wi…)')
             local ok, msgOrVal = pcall(vim.api.nvim_command, 'normal! g`"zz')
             if not ok and not string.find(msgOrVal, "E663") then
                 vim.api.nvim_echo( { { '\nnormal! g`"zz'} }, true, {err = true} )
@@ -89,7 +77,6 @@ return function(args)
                 vim.api.nvim_echo( { { msgOrVal} }, true, {err = true} )
                 vim.api.nvim_echo( { { "Error occurred when executing command: " .. cmdStr} }, true, {err = true} )
             end
-            log('DEBUGPRINT[8]: cursorRecall.lua:76 (after else)')
         end
     else
         -- Jump to recent last change instead
@@ -137,7 +124,6 @@ return function(args)
     end
 
     if vim.fn.foldclosed('.') ~= -1 then
-        log("DEBUGPRINT[11]: cursorRecall.lua:93 (after if not ok then)")
         -- Cursor was inside a fold; open it
         -- Sometime execute 'normal! zv' inside a fold will sometime incur error
         pcall(vim.api.nvim_command, "normal! zv")

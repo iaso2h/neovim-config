@@ -1,8 +1,8 @@
 -- File: historyStartup
 -- Author: iaso2h
 -- Description: Startup page with oldfiles listed
--- Version: 0.0.28
--- Last Modified: 2025-03-27
+-- Version: 0.0.29
+-- Last Modified: 2025-03-30
 -- TODO: ? to trigger menupage
 
 local M   = {
@@ -349,7 +349,7 @@ end -- }}}
 --- @param refreshChk boolean Set it true to refresh the history files everytime
 M.display = function(refreshChk) -- {{{
     -- For VimEnter autocmd
-    if not refreshChk and vim.fn.argc() > 0 or #vim.v.oldfiles == 1 then
+    if not refreshChk and vim.fn.argc() > 0 or #vim.v.oldfiles == 0 then
         return
     end
     if vim.bo.filetype == "HistoryStartup" then return end
