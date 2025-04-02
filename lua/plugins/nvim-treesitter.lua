@@ -9,6 +9,7 @@ return function()
             "query",
             "vim",
             "vimdoc",
+            "markdown",
         },
         auto_install = true,
         sync_install = true,

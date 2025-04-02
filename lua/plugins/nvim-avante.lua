@@ -1,14 +1,22 @@
 return function()
     require("avante").setup {
-        provider = "openai",
-        auto_suggestions_provider = "openai",
+        provider = "deepseek",
+        auto_suggestions_provider = "deepseek",
         openai = {
             endpoint = "https://api.deepseek.com/v1",
             model = "deepseek-chat",
             timeout = 30000, -- Timeout in milliseconds
             temperature = 0,
-            max_tokens = 4096,
-    },
+            max_tokens = 8192,
+        },
+        vendors = {
+            deepseek = {
+                __inherited_from = "openai",
+                api_key_name = "DEEPSEEK_API_KEY",
+                endpoint = "https://api.deepseek.com",
+                model = "deepseek-coder",
+            },
+        },
     behaviour = {
         auto_suggestions = false, -- Experimental stage
         auto_set_highlight_group = true,

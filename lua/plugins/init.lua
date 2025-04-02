@@ -513,7 +513,7 @@ local pluginArgs = { -- {{{
     },
     -- TODO: Depreacated
     {
-        "freddiehaddad/feline.nvim",
+        "famiu/feline.nvim",
         dependencies = { "nvim-web-devicons" },
         config = require("plugins.nvim-feline")
     },
