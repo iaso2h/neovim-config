@@ -405,7 +405,7 @@ map("", [[H]], [[^]], "Start of line(non-blank)")
 map("", [[L]], [[$]], "End of line")
 -- Non-blank last character
 map("", [[g$]], [[g_]], {"noremap"}, "End of line(non-blank)")
--- Trailing character {{{
+-- Trailing symbols {{{
 map("n", [[g.]], [[<CMD>lua require("trailingChar")("n", ".")<CR>]],  {"silent"}, "Add trailing .")
 map("x", [[g.]], [[:lua require("trailingChar")("v", ".")<CR>]],      {"silent"}, "Add trailing .")
 map("n", [[g,]], [[<CMD>lua require("trailingChar")("n", ",")<CR>]],  {"silent"}, "Add trailing ,")
@@ -423,8 +423,9 @@ map("x", [[g(]], [[:lua require("trailingChar")("v", "(")<CR>]],      {"silent"}
 map("n", [[g)]], [[<CMD>lua require("trailingChar")("n", ")")<CR>]],  {"silent"}, "Add trailing )")
 map("x", [[g)]], [[:lua require("trailingChar")("v", ")")<CR>]],      {"silent"}, "Add trailing )")
 map("n", [[g>]], [[<CMD>lua require("trailingChar")("n", ">")<CR>]],  {"silent"}, "Add trailing >")
-map("n", [[g<C-CR>]], [[<CMD>call append(line("."),   repeat([""], v:count1))<CR>]], {"silent"}, "Add new line below")
-map("n", [[g<S-CR>]], [[<CMD>call append(line(".")-1, repeat([""], v:count1))<CR>]], {"silent"}, "Add new line above")
+map("x", [[g>]], [[:lua require("trailingChar")("v", ">")<CR>]],      {"silent"}, "Add trailing >")
+map("n", [[g<]], [[<CMD>lua require("trailingChar")("n", ">")<CR>]],  {"silent"}, "Add trailing <")
+map("x", [[g<]], [[:lua require("trailingChar")("v", ">")<CR>]],      {"silent"}, "Add trailing <")
 map("n", [[g<CR>]], function()
     local cursorPos  = vim.api.nvim_win_get_cursor(0)
     local cursorChar = vim.api.nvim_buf_get_text(0, cursorPos[1] - 1, cursorPos[2], cursorPos[1] - 1, cursorPos[2] + 1, {})
@@ -446,12 +447,12 @@ map({"n", "x"}, [[<A-e>]], [[<PageUp>]],      "Scroll one window up")
 map({"n", "x"}, [[<A-d>]], [[<PageDown>]],    "Scroll one window down")
 map("t", [[<A-e>]], [[<C-\><C-n><PageUp>]],   "Scroll one window up")
 map("t", [[<A-d>]], [[<C-\><C-n><PageDown>]], "Scroll one window down")
+map("n", [[gm]], [[M]], {"noremap"}, "Recent messages")
 
 -- Macro
 map("n", [[<A-q>]], [[q]], {"noremap"}, "Macro")
 
 -- Messages
-map("n", [[gm]], [[g<]], {"noremap"}, "Recent messages")
 map("n", [[gM]], [[<CMD>messages<CR>]], {"silent"}, "All messages")
 map("n", [[<leader>m]], [[<CMD>execute 'messages clear<Bar>echohl Moremsg<Bar>echo "Message clear"<Bar>echohl None'<CR>]], "Clear messages")
 

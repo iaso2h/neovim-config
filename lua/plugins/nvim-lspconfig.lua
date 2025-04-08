@@ -60,7 +60,8 @@ return function()
         end, "LSP implementation")
 
         bmap(bufNr, {"x", "n"}, [[ga]],  vim.lsp.buf.code_action,    "LSP code action")
-        bmap(bufNr, "n", [[<leader>rn]], vim.lsp.buf.rename,         "LSP rename")
+        bmap(bufNr, "n", [[<leader>rn]], vim.lsp.buf.rename, "LSP rename")
+        bmap(bufNr, "n", [[<F2>]],       vim.lsp.buf.rename, "LSP rename")
         bmap(bufNr, "n", [[<C-p>]],      vim.lsp.buf.signature_help, "LSP signature help")
 
         bmap(bufNr, "n", [[<C-q>r]], [[<CMD>lua vim.lsp.buf.references{includeDeclaration=true}<CR>]], {"silent"}, "LSP references")
