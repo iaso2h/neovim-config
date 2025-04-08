@@ -85,7 +85,7 @@ cb[0] = None # delete the first empty line
         vim.bo.modifiable = false
         vim.bo.filetype = "thesaurus"
     else
-        vim.api.nvim_echo({{[[No result for "]] .. vim.g.thesaurusWord .. [["]]}}, true)
+        vim.api.nvim_echo({{[[No result for "]] .. vim.g.thesaurusWord .. [["]]}}, true, {})
     end
 end
 

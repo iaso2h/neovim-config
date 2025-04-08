@@ -12,7 +12,7 @@ local getMsg = function()
     local msgOutput = vim.api.nvim_exec2("messages", {output = true}).output
     local msgs = vim.split(msgOutput, "\n", {plain = true})
     if not next(msgs) then
-        return vim.api.nvim_echo({{"No messages"}}, true)
+        return vim.api.nvim_echo({{"No messages", "Normal"}}, true, {})
     end
 
     -- Refine and format
@@ -72,7 +72,7 @@ end
 return function(des) -- {{{
     local msgRefined, errorLineNrs = getMsg()
     if not next(msgRefined) then
-        return vim.api.nvim_echo({{"No messages"}}, true)
+        return vim.api.nvim_echo({{"No messages", "Normal"}}, true, {})
     end
 
     if des == "quickfix" then

@@ -60,7 +60,7 @@ M.opt.lua.configHook = { -- {{{
                 vim.api.nvim_echo( { { msg} }, true, {err = true} )
             end
 
-            vim.api.nvim_echo({{"Stop lsp clients..."}}, true)
+            vim.api.nvim_echo({{"Stop lsp clients..."}}, true, {})
             vim.lsp.stop_client(vim.lsp.get_clients())
             local ok, msg = pcall(callback)
             if not ok then return err(msg) end
@@ -83,7 +83,7 @@ M.opt.lua.configHook = { -- {{{
                     vim.cmd "noa silent bufdo update"
                 end
             end
-            vim.api.nvim_echo({{"Restart lsp clients..."}}, true)
+            vim.api.nvim_echo({{"Restart lsp clients..."}}, true, {})
             vim.cmd "bufdo LspRestart"
         end
     },

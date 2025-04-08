@@ -25,7 +25,7 @@ local function getPluginInfo(bufNr, nodes) -- {{{
             local stringNode = node:named_child(0):named_child(0)
             if not stringNode then
                 vim.api.nvim_echo( { { "Plugin specs doesn't follow the correct structure: https://github.com/folke/lazy.nvim#-plugin-spec"} }, true, {err = true} )
-                vim.api.nvim_echo( { {string.format("Error node index: (%d, %d)", specRange[1], specRange[2])} }, true)
+                vim.api.nvim_echo( { {string.format("Error node index: (%d, %d)", specRange[1], specRange[2])} }, true, {})
                 return {}
             end
             repoRange = { stringNode:range() }

@@ -114,8 +114,8 @@ M.init = function(direction) -- {{{
         bufTbl = u.bufNrs(true, true)
     end
     if #bufTbl == 1 then
-        if u.isSpecialBuf(bufTbl[1]) then
             return vim.api.nvim_echo({{"No valid buffer to cycle"}}, true)
+        if u.isSpecialBuf(bufTbl[1]) or bufTbl[1] == currentBufNr then
         else
             vim.cmd([[keepjump noa buffer ]] .. bufTbl[1])
         end
@@ -132,11 +132,10 @@ M.init = function(direction) -- {{{
     if currentBufIdx == -1 then
         return fallbackCycle(currentBufNr, direction)
     end
-
     -- Find the valid candidate
     local candidateIdx = findCandidate(bufTbl, currentBufIdx, direction)
     if candidateIdx == 0 then
-        return vim.api.nvim_echo({{"No valid buffer to cycle"}}, true)
+        return vim.api.nvim_echo({{"No valid buffer to cycle"}}, true, {})
     end
 
     -- Use the Ex command to enter a buffer without writing jumplist

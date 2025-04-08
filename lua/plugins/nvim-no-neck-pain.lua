@@ -42,7 +42,7 @@ return function()
             -- Sets a global mapping to Neovim, which allows you to toggle the plugin.
             -- When `false`, the mapping is not created.
             ---@type string
-            toggle = "<Leader>zz",
+            toggle = "g<C-j>",
             -- Sets a global mapping to Neovim, which allows you to toggle the left side buffer.
             -- When `false`, the mapping is not created.
             ---@type string

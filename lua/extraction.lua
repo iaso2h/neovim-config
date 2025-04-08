@@ -212,7 +212,7 @@ M.newFile = function(filePath) -- {{{
     f:write(unpack(getSrcContent()))
     f:close()
 
-    vim.api.nvim_echo({{"File created: " .. filePath}}, true)
+    vim.api.nvim_echo({{"File created: " .. filePath}}, true, {})
 
     -- Delete selection code
     register.saveReg()
@@ -242,11 +242,10 @@ function M.operator(opInfo) -- {{{
     M.argPath = opInfo.path
     if not vim.o.modifiable or vim.o.readonly then
         reset()
-        return vim.api.nvim_echo({{"E21: Cannot make changes, 'modifiable' is off"}}, true, {err=true})
+        return vim.api.nvim_echo({{"E21: Cannot make changes, 'modifiable' is off", "Normal"}}, true, {err=true})
     end
     if M.vimMode == "\22" then
         reset()
-        r
     end
 
     -- opts = opts or {hlGroup="Search", timeout=500}

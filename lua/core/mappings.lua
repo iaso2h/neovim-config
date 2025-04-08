@@ -48,8 +48,8 @@ map("n", [[<leader>q]], [[<CMD>lua require("buffer.toggle")("quickfix", false)<C
 map("n", [[<leader>Q]], [[<CMD>lua require("buffer.toggle")("quickfix", true)<CR>]],  {"silent"}, "Close visible quickfix")
 map("n", [=[[Q]=], [[<CMD>cfirst<CR>zzzv]],    {"silent"}, "Go to first item in quickfix")
 map("n", [=[]Q]=], [[<CMD>clast<CR>zzzv]],     {"silent"}, "Go to last item in quickfix")
-map("n", [=[[q]=], [[<CMD>cnext<CR>zzzv]],     {"silent"}, "Go to next item in quickfix")
-map("n", [=[]q]=], [[<CMD>cprevious<CR>zzzv]], {"silent"}, "Go to previous item in quickfix")
+map("n", [=[[q]=], [[<CMD>cprevious<CR>zzzv]], {"silent"}, "Go to previous item in quickfix")
+map("n", [=[]q]=], [[<CMD>cnext<CR>zzzv]],     {"silent"}, "Go to next item in quickfix")
 map("n", [[<C-q>l]], [[<CMD>lua require("quickfix.modification").interConvert()<CR>]], {"silent"}, "Convert a quickfix into a location list, and vice versa")
 map("n", [[<C-q>m]], [[<CMD>lua require("quickfix.message")("scratch")<CR>]], {"silent"}, "Show messages in quickfix")
 -- Expand region

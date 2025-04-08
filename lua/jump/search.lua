@@ -17,7 +17,7 @@ local echo = function() -- {{{
         -- When search reaches the end
         vim.api.nvim_echo({{echoStr, "TelescopePromptCounter"}}, false, {})
     else
-        vim.api.nvim_echo({{echoStr}}, false, {})
+        vim.api.nvim_echo({{echoStr, "Normal"}}, false, {})
     end
 end -- }}}
 --- Search func wraps around the native n/N exCmd

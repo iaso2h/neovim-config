@@ -273,7 +273,7 @@ local execMap = function(key) -- {{{
             line = M.floatLine
         end
         vim.fn.setreg(vim.v.register, line, "v")
-        vim.api.nvim_echo({{"File path copied"}}, true) -- }}}
+        vim.api.nvim_echo({{"File path copied", "Normal"}}, true, {}) -- }}}
     elseif key == "K" then
         hover()
     else

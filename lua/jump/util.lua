@@ -171,7 +171,7 @@ M.jumplistRegisterLinesToTbl = function(returnJumpsChk, startLineNr, lastLineNr,
             return string.find(j, "^", 1, true)
         end, jumpsTbl)
         if not specialCharTick then
-            vim.api.nvim_echo({{"No special characters found"}}, true)
+            vim.api.nvim_echo({{"No special characters found", "Normal"}}, true, {})
             return
         end
     end
@@ -211,7 +211,7 @@ M.posCenter = function(exCmd, suppressMsgChk, providedPrevWinId, providedPrevBuf
         elseif string.find(valOrMsg, "E662", 1, true) then
             vim.api.nvim_echo({ { "At oldest change", "WarningMsg" } }, false, {})
         else
-            vim.api.nvim_echo({{valOrMsg}, "WarningMsg"}, true)
+            vim.api.nvim_echo({{valOrMsg}, "WarningMsg"}, true, {})
         end
     end
 

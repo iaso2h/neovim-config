@@ -136,7 +136,7 @@ local getJumps = function(isNewer, winId, filter) -- {{{
     local jumps, jumpIdx = unpack(vim.fn.getjumplist(winId))
     local jumpsSliced = {}
     if #jumps == 0 then
-        vim.api.nvim_echo({{"Jumplist is empty"}}, true)
+        vim.api.nvim_echo({{"Jumplist is empty", "Normal"}}, true, {})
         return jumpsSliced
     end
 

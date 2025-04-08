@@ -175,7 +175,7 @@ function M.operator(opInfo) -- {{{
         regionMotion.Start[1], regionMotion.Start[2], {end_line = regionMotion.End[1], end_col = regionMotion.End[2]})
     -- End function calling if extmark is out of scope
     if not ok then
-        vim.api.nvim_echo(valOrMsg, vim.log.levels.WARN)
+        vim.api.nvim_echo({{valOrMsg, "WarningMsg"}}, true, {err=true})
         return
     else
         M.srcExtmark[#M.srcExtmark+1] = valOrMsg

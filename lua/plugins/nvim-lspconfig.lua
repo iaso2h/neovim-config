@@ -140,8 +140,14 @@ local luaLibrary = {
 }
 for _, dir in ipairs(luaLibrary) do
     if not vim.loop.fs_stat(dir) then
-        vim.api.nvim_echo(debug.traceback(), vim.log.levels.WARN)
-        vim.api.nvim_echo({{"Path doesn't exist: " .. dir}}, true)
+        vim.api.nvim_echo(
+            {
+                {debug.traceback(), "WarningMsg"},
+                {"Path doesn't exist: " .. dir}
+            },
+            true,
+            {}
+        )
     end
 end
 serverNames.lua_ls = { -- {{{

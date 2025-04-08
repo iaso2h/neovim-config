@@ -252,16 +252,17 @@ M.loadFile = function(path, parentPath, opt) -- {{{
             { err = true }
         )
 
-        vim.api.nvim_echo({{" "}}, true)
+        vim.api.nvim_echo({{" ", "Normal"}}, true, {})
         vim.api.nvim_echo( { { reloadCallback} }, true, {err = true} )
-        vim.api.nvim_echo({{" "}}, true)
+        vim.api.nvim_echo({{" ", "Normal"}}, true, {})
         vim.api.nvim_echo(
             {
                 {
                     string.format("Lua package[%s] has been unloaded", module)
                 }
             },
-            true
+            true,
+            {}
         )
     else
         vim.api.nvim_echo(
@@ -270,7 +271,8 @@ M.loadFile = function(path, parentPath, opt) -- {{{
                     string.format("Reloading lua package[%s] at: %s", module, path.filename)
                 }
             },
-            true
+            true,
+            {}
         )
 
         -- Load configuration AFTER reloading for specific module match the given path
@@ -380,9 +382,9 @@ M.loadDir = function(path, opt) -- {{{
                     true,
                     { err = true }
                 )
-                vim.api.nvim_echo({{" "}}, true)
-                vim.api.nvim_echo( { { msg} }, true, {err = true} )
-                vim.api.nvim_echo({{" "}}, true)
+                vim.api.nvim_echo({{" ", "Normal"}}, true, {})
+                vim.api.nvim_echo( { { msg} }, true, {err = true}, {})
+                vim.api.nvim_echo({{" ", "Normal"}}, true, {})
                 for j = idx, #allLoadedModules, 1 do
                     vim.api.nvim_echo(
                         {
@@ -390,7 +392,8 @@ M.loadDir = function(path, opt) -- {{{
                                 string.format("Lua module[%s] has been unloaded", allLoadedModules[j])
                             }
                         },
-                        true
+                        true,
+                        {}
                     )
                 end
             else
@@ -401,7 +404,8 @@ M.loadDir = function(path, opt) -- {{{
                         }
                     },
                     true,
-                    { err = true }
+                    { err = true },
+                    {}
                 )
             end
         else
