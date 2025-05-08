@@ -371,7 +371,7 @@ local pluginArgs = { -- {{{
     },
     {
         "shortcuts/no-neck-pain.nvim",
-        keys   = { { [[<leader>zz]],  mode = "n" } },
+        keys   = { { [[g<C-j>]],  mode = "n" } },
         config = require("plugins.nvim-no-neck-pain")
     },
     {
@@ -1192,7 +1192,7 @@ local lazyOpts = { -- {{{
 
 vim.api.nvim_create_user_command("CDPlugin", function()
     vim.cmd("cd " .. _G._plugin_root)
-    vim.api.nvim_echo({{"Change directory to Lazy plug-ins path"}}, true)
+    vim.api.nvim_echo({{"Change directory to Lazy plug-ins path", "Normal"}}, true, {})
 end, { desc = "Change directory to lazy plug-ins path" })
 
 require("lazy").setup(pluginArgs, lazyOpts)

@@ -140,11 +140,11 @@ return function(vimMode, char) -- {{{
     if vimMode == "n" then
         lines = vim.api.nvim_buf_get_lines(0, cursorPos[1] - 1, cursorPos[1], false)[1]
 
-        if char == "{" or char == "}" then
-            trailingMarker(cursorPos, lines, char)
-        else
+        -- if char == "{" or char == "}" then
+        --     trailingMarker(cursorPos, lines, char)
+        -- else
             vim.api.nvim_set_current_line(lines .. char)
-        end
+        -- end
     else
         local startPos = vim.api.nvim_buf_get_mark(0, "<")
         local endPos   = vim.api.nvim_buf_get_mark(0, ">")

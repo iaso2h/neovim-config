@@ -24,14 +24,14 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 onoremap <silent> <Plug>(textObjInsideAll) :<C-U>call <SID>inside()<CR>
-omap <silent> ig <Plug>(textObjInsideAll)
+omap <silent> ie <Plug>(textObjInsideAll)
 xnoremap <silent> <Plug>(textObjInsideAll) :<C-U>call <SID>inside()<CR>
-xmap <silent> ig <Plug>(textObjInsideAll)
+xmap <silent> ie <Plug>(textObjInsideAll)
 
 onoremap <silent> <Plug>(textObjectAroundAll) :<C-U>call <SID>around()<CR>
-omap <silent> ag <Plug>(textObjectAroundAll)
+omap <silent> ae <Plug>(textObjectAroundAll)
 xnoremap <silent> <Plug>(textObjectAroundAll) :<C-U>call <SID>around()<CR>
-xmap <silent> ag <Plug>(textObjectAroundAll)
+xmap <silent> ae <Plug>(textObjectAroundAll)
 
 
 let &cpo = s:save_cpo

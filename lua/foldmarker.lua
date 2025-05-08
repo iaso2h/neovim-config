@@ -45,13 +45,13 @@ local getFoldmarkers = function(bufNr) -- {{{
 
     if next(nodesStart) then
         if #nodesStart ~= #nodesEnd then
-            vim.api.nvim_echo({{"Fold marker aren't symmetrical"}}, true)
+            vim.api.nvim_echo({{"Fold marker aren't symmetrical", "Normal"}}, true, {})
             return {}
         else
             return {Start = nodesStart, End = nodesEnd}
         end
     else
-        vim.api.nvim_echo({{"Can't get fold markers from queries"}}, true)
+        vim.api.nvim_echo({{"Can't get fold markers from queries", "Normal"}}, true, {})
         return {}
     end
 end -- }}}
@@ -92,7 +92,7 @@ local getCurrentMarkers = function(cursorPos, bufNr) -- {{{
     end
 
     if not nodeStart or not nodeEnd then
-        vim.api.nvim_echo({{"Can't find foldmarker region that contains the cursor"}}, true)
+        vim.api.nvim_echo({{"Can't find foldmarker region that contains the cursor", "Normal"}}, true, {})
         return {}
     end
 
@@ -131,7 +131,7 @@ M.highlightCurrentMarkerRegion = function() -- {{{
 
     local cursorPos = vim.api.nvim_win_get_cursor(0)
     if vim.fn.foldlevel(cursorPos[1]) == 0 then
-        vim.api.nvim_echo({{"Not inside any foldmarker region"}}, true)
+        vim.api.nvim_echo({{"Not inside any foldmarker region", "Normal"}}, true, {})
         return
     end
 
@@ -190,7 +190,7 @@ M.modifyCurrentMarkerRegion = function(preserveHeadCommentChk, changeChk)
 
     local cursorPos = vim.api.nvim_win_get_cursor(0)
     if vim.fn.foldlevel(cursorPos[1]) == 0 then
-        vim.api.nvim_echo({{"Not inside any foldmarker region"}}, true)
+        vim.api.nvim_echo({{"Not inside any foldmarker region", "Normal"}}, true, {})
         return
     end
 

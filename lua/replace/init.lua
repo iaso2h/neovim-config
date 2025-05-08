@@ -38,7 +38,7 @@ local M = {
 ---@return boolean Return true when buffer is readonly
 local warnRead = function() -- {{{
     if not vim.o.modifiable or vim.o.readonly then
-        vim.api.nvim_echo({{"E21: Cannot make changes, 'modifiable' is off"}}, true, {err=true})
+        vim.api.nvim_echo({{"E21: Cannot make changes, 'modifiable' is off", "Normal"}}, true, {err=true})
         return false
     end
     return true
@@ -235,7 +235,7 @@ local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
             -- This's a rare scenario where Start is fall behind End
 
             -- HACK: occurred when execute [[gr"agr$]]
-            vim.api.nvim_echo({{"Start fall behind End",}}, true, {err=true})
+            vim.api.nvim_echo({{"Start fall behind End",}}, true, {err=true}, {})
             vim.cmd(string.format("noa norm! %sP", regCMD))
             repStart = vim.api.nvim_buf_get_mark(0, "[")
             repEnd   = vim.api.nvim_buf_get_mark(0, "]")
@@ -390,7 +390,7 @@ function M.operator(opInfo) -- {{{
     -- End function calling if extmark is out of scope
     if not ok then
         ---@diagnostic disable-next-line: param-type-mismatch
-        vim.api.nvim_echo(msgOrVal, vim.log.levels.WARN)
+        vim.api.nvim_echo({{msgOrVal, "WarningMsg"}}, true, {})
         return vim.api.nvim_echo({{debug.traceback(),}}, true, {err=true})
     else
         repExtmark = msgOrVal
@@ -519,7 +519,7 @@ function M.operator(opInfo) -- {{{
             local repReport = srcLinesCnt == repLineCnt and '' or
                 string.format(" with %d line%s", repLineCnt, repLineCnt == 1 and "" or "s")
 
-            vim.api.nvim_echo({{srcReport .. repReport}}, true)
+            vim.api.nvim_echo({{srcReport .. repReport}}, true, {})
         end
     end
 

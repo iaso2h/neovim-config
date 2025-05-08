@@ -78,7 +78,7 @@ return function(qfChk, pat, bang)
         -- Store the previous item list
         require("quickfix.modification").infoCheck(items, title)
     else
-        return vim.api.nvim_echo({{"No items was filtered"}}, true)
+        return vim.api.nvim_echo({{"No items was filtered", "Normal"}}, true, {})
     end
     -- Populate new items
     if qfChk then

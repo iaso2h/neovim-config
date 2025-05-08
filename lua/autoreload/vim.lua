@@ -9,6 +9,6 @@ return function(path, configPath)
             p:new(path.filename):make_relative(colorDirPath.filename),
             1, -5)
         vim.cmd("noa silent! colorscheme " .. colorRel)
-        vim.api.nvim_echo({{string.format("Colorscheme: %s", colorRel)}}, true)
+        vim.api.nvim_echo({{string.format("Colorscheme: %s", colorRel)}}, true, {})
     end
 end

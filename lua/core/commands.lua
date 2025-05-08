@@ -265,7 +265,8 @@ vim.api.nvim_create_user_command("Se", function (opts) -- {{{
 
         vim.api.nvim_echo(
             {{"Error occurred while soucing " .. sessionPath}},
-            true
+            true,
+            {}
         )
         vim.api.nvim_echo({{msgOrVal,}}, true, {err=true})
     end

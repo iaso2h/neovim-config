@@ -60,7 +60,8 @@ return function()
         end, "LSP implementation")
 
         bmap(bufNr, {"x", "n"}, [[ga]],  vim.lsp.buf.code_action,    "LSP code action")
-        bmap(bufNr, "n", [[<leader>rn]], vim.lsp.buf.rename,         "LSP rename")
+        bmap(bufNr, "n", [[<leader>rn]], vim.lsp.buf.rename, "LSP rename")
+        bmap(bufNr, "n", [[<F2>]],       vim.lsp.buf.rename, "LSP rename")
         bmap(bufNr, "n", [[<C-p>]],      vim.lsp.buf.signature_help, "LSP signature help")
 
         bmap(bufNr, "n", [[<C-q>r]], [[<CMD>lua vim.lsp.buf.references{includeDeclaration=true}<CR>]], {"silent"}, "LSP references")
@@ -139,8 +140,14 @@ local luaLibrary = {
 }
 for _, dir in ipairs(luaLibrary) do
     if not vim.loop.fs_stat(dir) then
-        vim.api.nvim_echo(debug.traceback(), vim.log.levels.WARN)
-        vim.api.nvim_echo({{"Path doesn't exist: " .. dir}}, true)
+        vim.api.nvim_echo(
+            {
+                {debug.traceback(), "WarningMsg"},
+                {"Path doesn't exist: " .. dir}
+            },
+            true,
+            {}
+        )
     end
 end
 serverNames.lua_ls = { -- {{{

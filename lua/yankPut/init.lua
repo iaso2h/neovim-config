@@ -27,7 +27,7 @@ local M = {
 ---@param direction string "up" or "down". Determine wether the lines to go up or down
 function M.VSCodeLineMove(vimMode, direction) -- {{{
     if not vim.bo.modifiable then
-        return vim.api.nvim_echo({{"E21: Cannot make changes, 'modifiable' is off"}}, true, {err=true})
+        return vim.api.nvim_echo({{"E21: Cannot make changes, 'modifiable' is off", "Normal"}}, true, {err=true})
     end
     if vimMode == "n"  then
         ---@diagnostic disable-next-line: param-type-mismatch
@@ -75,7 +75,7 @@ end -- }}}
 ---@param direction string "up" or "down". Determine wether the new lines to go up or down
 function M.VSCodeLineYank(vimMode, direction) -- {{{
     if not vim.bo.modifiable then
-        return vim.api.nvim_echo({{"E21: Cannot make changes, 'modifiable' is off"}}, true, {err=true})
+        return vim.api.nvim_echo({{"E21: Cannot make changes, 'modifiable' is off", "Normal"}}, true, {err=true})
     end
 
     if vimMode == "v" then
@@ -271,7 +271,7 @@ end -- }}}
 ---@param opts       table
 function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
     if not vim.bo.modifiable then
-        return vim.api.nvim_echo({{"E21: Cannot make changes, 'modifiable' is off"}}, true, {err=true})
+        return vim.api.nvim_echo({{"E21: Cannot make changes, 'modifiable' is off", "Normal"}}, true, {err=true})
     end
 
     local bufNr = vim.api.nvim_get_current_buf()
@@ -388,8 +388,14 @@ function M.inplacePut(vimMode, pasteCMD, convertPut, opts) -- {{{
             M.lastPutNs,
             true)
         if not ok then
-            vim.api.nvim_echo(msgOrVal, vim.log.levels.WARN)
-            vim.api.nvim_echo(debug.traceback(), vim.log.levels.ERROR)
+            vim.api.nvim_echo(
+                {
+                    {msgOrVal, "WarningMsg"},
+                    {debug.traceback(), "ErrorMsg"}
+                },
+                true,
+                {}
+            )
             return
         else
             newContentExmark = msgOrVal

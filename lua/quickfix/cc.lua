@@ -12,12 +12,12 @@ local setCurrentWin = function(closeQfChk, qfWinId, targetCursorPos) -- {{{
     if not closeQfChk then
         local ok, msg = pcall(vim.api.nvim_set_current_win, qfWinId)
         if not ok then
-            vim.api.nvim_echo(msg, vim.log.levels.WARN)
+            vim.api.nvim_echo({{msg, "WarningMsg"}}, true, {})
             vim.cmd[[wincmd p]]
         end
         ok, msg = pcall(vim.api.nvim_win_set_cursor, qfWinId, targetCursorPos)
         if not ok then
-            vim.api.nvim_echo(msg, vim.log.levels.WARN)
+            vim.api.nvim_echo({{msg, "WarningMsg"}}, true, {})
         end
     else
         vim.api.nvim_win_close(qfWinId, false)
@@ -54,7 +54,7 @@ return function(closeQfChk, offset) -- {{{
     local u = require("quickfix.util")
     local qfItems = u.getlist()
     if not next(qfItems) then
-        return vim.api.nvim_echo({{"No quickfix items available"}}, true)
+        return vim.api.nvim_echo({{"No quickfix items available", "Normal"}}, true, {})
     end
 
     local qfWinId     = vim.api.nvim_get_current_win()
@@ -109,9 +109,9 @@ return function(closeQfChk, offset) -- {{{
             "Comment",
             ns
         )
-        return vim.api.nvim_echo({{"This item is no longer valid"}}, true)
+        return vim.api.nvim_echo({{"This item is no longer valid", "Normal"}}, true, {})
     elseif targetItem.valid == 0 then
-        return vim.api.nvim_echo({{"Cannot open this item"}}, true)
+        return vim.api.nvim_echo({{"Cannot open this item", "Normal"}}, true, {})
     end
 
     -- User the built-in `:cc` command to open quickfix item

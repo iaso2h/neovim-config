@@ -350,7 +350,7 @@ M.redirScratch = function(lines, scratchBufNr, appendChk, preHook, postHook) -- 
 
                 vim.api.nvim_buf_set_lines(scratchBufNr, startLine, -1, false, lines)
                 visibleTick = true
-                vim.api.nvim_echo({{"Scratch buffer refreshed"}}, true)
+                vim.api.nvim_echo({{"Scratch buffer refreshed", "Normal"}}, true, {})
                 break
             end
         end

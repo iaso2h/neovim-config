@@ -187,7 +187,7 @@ M.nvimBufAddHl = function(bufNr, posStart, posEnd, regType, hlGroup, hlTimeout, 
             posStart[1], posStart[2], {end_line = posEnd[1], end_col = posEnd[2]})
         -- End function calling if extmark is out of scope
         if not ok then
-            vim.api.nvim_echo(msg, vim.log.levels.WARN)
+            vim.api.nvim_echo({{msg, "WarningMsg"}}, true, {})
             return nil
         else
             presExtmark = msg
@@ -223,7 +223,7 @@ M.requireSafe = function(mod) -- {{{
         local shorterSrc = trace.short_src
         local lineInfo = shorterSrc .. ":" .. (trace.currentline or trace.linedefined)
         local msg = string.format("%s : skipped loading [%s]", lineInfo, mod)
-        vim.api.nvim_echo(msg, vim.log.levels.WARN)
+        vim.api.nvim_echo({{msg, "WarningMsg"}}, true, {})
         return false
     else
         return module

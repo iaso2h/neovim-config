@@ -151,7 +151,7 @@ return function()
 
         local filePath = _G._config_path .. pathStr[[/data/dict/cspell/cspell.txt]]
         io.popen(string.format("echo %s >> %s", word, filePath))
-        vim.api.nvim_echo({{string.format([["%s" is appended to user dictionary.]], word)}}, true)
+        vim.api.nvim_echo({{string.format([["%s" is appended to user dictionary.]], word)}}, true, {})
 
         if vim.o.modifiable then
             vim.api.nvim_set_current_line(vim.api.nvim_get_current_line())

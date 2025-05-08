@@ -1,8 +1,8 @@
 -- File: cycle.lua
 -- Author: iaso2h
 -- Description: Improved bp and bn
--- Version: 0.0.14
--- Last Modified: 2024-09-26
+-- Version: 0.0.15
+-- Last Modified: 2025-04-08
 
 
 local M   = {
@@ -114,10 +114,10 @@ M.init = function(direction) -- {{{
         bufTbl = u.bufNrs(true, true)
     end
     if #bufTbl == 1 then
-        if u.isSpecialBuf(bufTbl[1]) then
-            return vim.api.nvim_echo({{"No valid buffer to cycle"}}, true)
+        if u.isSpecialBuf(bufTbl[1]) or bufTbl[1] == currentBufNr then
+            return vim.api.nvim_echo({{"No valid buffer to cycle", "Normal"}}, true, {})
         else
-            vim.cmd([[keepjump noa buffer ]] .. bufTbl[1])
+            return vim.cmd([[keepjump noa buffer ]] .. bufTbl[1])
         end
     end
 
@@ -132,11 +132,10 @@ M.init = function(direction) -- {{{
     if currentBufIdx == -1 then
         return fallbackCycle(currentBufNr, direction)
     end
-
     -- Find the valid candidate
     local candidateIdx = findCandidate(bufTbl, currentBufIdx, direction)
     if candidateIdx == 0 then
-        return vim.api.nvim_echo({{"No valid buffer to cycle"}}, true)
+        return vim.api.nvim_echo({{"No valid buffer to cycle"}}, true, {})
     end
 
     -- Use the Ex command to enter a buffer without writing jumplist
