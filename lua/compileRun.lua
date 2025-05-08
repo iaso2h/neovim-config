@@ -91,6 +91,8 @@ function M.runCode() -- {{{
         vim.cmd [[AsyncRun lua %]]
     elseif vim.bo.filetype == "python" then
         vim.cmd(vim.fn.has("win32") == 1 and "AsyncRun python %" or "AsyncRun python3 %")
+    elseif vim.bo.filetype == "cs" then
+        vim.cmd [[AsyncRun dotnet run]]
     end
 end -- }}}
 
