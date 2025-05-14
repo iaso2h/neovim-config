@@ -28,11 +28,6 @@ return function()
             end,
             additional_vim_regex_highlighting = false
         },
-        -- BUG:
-        indent = {
-            enable = true,
-            disable = {"python"},
-        },
         incremental_selection = {
             enable  = true,
             keymaps = {
@@ -42,6 +37,11 @@ return function()
                 scope_incremental = "gnS",
             },
         },
+        -- BUG:
+        indent = {
+            enable = false,
+            disable = {"python"}
+        }
     }
 
     map("n",        [[<A-S-a>]], [[gnn]], "Expand selection")
