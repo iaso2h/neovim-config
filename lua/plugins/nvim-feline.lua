@@ -344,7 +344,7 @@ return function()
                 bg = colors.bg
             },
         }, -- }}}
-        diagnosticHints = { -- {{{
+        diagnosticHint = { -- {{{
             provider = function()
                 return getDiagnostics(vim.diagnostic.severity.HINT), padding .. icon.diagnostics.Hint .. padding
             end,
@@ -355,24 +355,24 @@ return function()
         }, -- }}}
         diagnosticInfo = { -- {{{
             provider = function()
-                return getDiagnostics(vim.diagnostic.severity.INFO), padding .. icon.diagnostics.InformationBold .. padding
+                return getDiagnostics(vim.diagnostic.severity.INFO), padding .. icon.diagnostics.Information .. padding
             end,
             hl = {
                 fg = colors.blue,
             },
         }, -- }}}
-        diagnosticWarnings = { -- {{{
+        diagnosticWarning = { -- {{{
             provider = function()
-                return getDiagnostics(vim.diagnostic.severity.WARN), padding .. icon.diagnostics.WarningBold .. padding
+                return getDiagnostics(vim.diagnostic.severity.WARN), padding .. icon.diagnostics.Warning .. padding
             end,
             hl = {
                 fg = colors.yellow,
             },
             truncate_hide = true,
         }, -- }}}
-        diagnosticErrors = { -- {{{
+        diagnosticError = { -- {{{
             provider = function()
-                return getDiagnostics(vim.diagnostic.severity.ERROR), padding .. icon.diagnostics.ErrorBold .. padding
+                return getDiagnostics(vim.diagnostic.severity.ERROR), padding .. icon.diagnostics.Error .. padding
             end,
             hl = {
                 fg = colors.red,
@@ -426,9 +426,9 @@ return function()
                     components.gitDiffRemoved,
                     components.gitSeparatorRight,
                     components.diagnosticInfo,
-                    components.diagnosticHints,
-                    components.diagnosticWarnings,
-                    components.diagnosticErrors
+                    components.diagnosticHint,
+                    components.diagnosticWarning,
+                    components.diagnosticError
                 },
                 {},
                 {

@@ -1,4 +1,3 @@
--- https://github.com/iaso2h/nvim-cokeline/tree/master
 return function()
     local getHighlightAttr = require("cokeline.hlgroups").get_hl_attr
     local icon   = require("icon")

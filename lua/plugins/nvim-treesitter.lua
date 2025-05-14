@@ -6,6 +6,7 @@ return function()
             "c",
             "c_sharp",
             "lua",
+            "python",
             "query",
             "vim",
             "vimdoc",
@@ -17,6 +18,8 @@ return function()
             enable = true,
             disable = function(lang, buf)
                 -- Filetype Exclude
+                -- if lang == "python" then return true end
+
                 local max_filesize = 100 * 1024 -- 100 KB
                 local ok, stats = pcall(vim.loop.fs_stat, nvim_buf_get_name(buf))
                 if ok and stats and stats.size > max_filesize then
@@ -24,6 +27,11 @@ return function()
                 end
             end,
             additional_vim_regex_highlighting = false
+        },
+        -- BUG:
+        indent = {
+            enable = true,
+            disable = {"python"},
         },
         incremental_selection = {
             enable  = true,

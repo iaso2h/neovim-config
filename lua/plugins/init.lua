@@ -540,7 +540,7 @@ local pluginArgs = { -- {{{
         config = require("plugins.nvim-tree"),
     },
     -- }}} UI
-    -- Intellisense {{{
+    -- IntelliSense {{{
     {
         "williamboman/mason.nvim",
         config = function()
@@ -799,7 +799,7 @@ local pluginArgs = { -- {{{
             map("n", [[gfc]], [[<CMD>lua require("refactoring").debug.cleanup()<CR>]],                {"silent"}, "Debug clean up")
         end,
     },
-    -- }}} Intellisense
+    -- }}} IntelliSense
     -- Debug {{{
     {
         "Olical/conjure",

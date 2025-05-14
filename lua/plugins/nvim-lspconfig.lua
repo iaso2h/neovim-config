@@ -1,9 +1,10 @@
 -- https://github.com/neovim/nvim-lspconfig
 
 return function()
-    local lspConfig   = require("lspconfig")
-    local u           = require("lspconfig.util")
-    local serverNames = require("plugins.nvim-mason-lspconfig").serverNames
+    local lspConfig = require("lspconfig")
+    local u         = require("lspconfig.util")
+    local icon      = require("icon")
+    local serverConfigs = vim.deepcopy(require("plugins.nvim-mason-lspconfig").serverNames, true)
 
     local conciseQuifix = function(tbl) -- {{{
         if tbl then
@@ -101,19 +102,24 @@ return function()
 -- Python {{{
 -- https://github.com/microsoft/pyright
 -- https://github.com/microsoft/pyright/blob/master/docs/configuration.md
-serverNames.pyright = {
+-- serverConfigs.pyright = {
+--     settings  = {
+--         python = {
+--             -- pythonPath = "python",
+--             -- venvPath = "",
+--             analysis = {
+--                 -- extraPaths = "",
+--             }
+--         },
+--         pyright = {
+--             verboseOutput = true,
+--             reportMissingImports = true,
+--         }
+--     }
+-- }
+
+serverConfigs.ruff = {
     settings  = {
-        python = {
-            -- pythonPath = "python",
-            -- venvPath = "",
-            analysis = {
-                -- extraPaths = "",
-            }
-        },
-        pyright = {
-            verboseOutput = true,
-            reportMissingImports = true,
-        }
     }
 }
 -- }}} Python
@@ -150,7 +156,7 @@ for _, dir in ipairs(luaLibrary) do
         )
     end
 end
-serverNames.lua_ls = { -- {{{
+serverConfigs.lua_ls = { -- {{{
     settings = {
         Lua = {
             -- https://luals.github.io/wiki/settings/
@@ -205,7 +211,7 @@ if _G._os_uname.sysname == "Linux" and _G._os_uname.machine ~= "aarch64" then
     --                                     _G._sep,
     --                                     _G._sep,
     --                                     _G._sep and "nightly" or "stable"))
-    serverNames.fennel_language_server = {
+    serverConfigs.fennel_language_server = {
         settings = {
             fennel = {
                 workspace = {
@@ -224,7 +230,7 @@ vim.g.markdown_fenced_languages = {
     'vim',
     'help'
 }
-serverNames.vimls = {
+serverConfigs.vimls = {
     init_options = {
         isNeovim    = true,
         runtimepath = "",
@@ -242,7 +248,7 @@ if _G._os_uname.machine ~= "aarch64" then
     local clangdRootDir = function(fname)
       return u.root_pattern(unpack(clangdRootFiles))(fname) or u.find_git_ancestor(fname) or vim.loop.cwd()
     end
-    serverNames.clangd = {
+    serverConfigs.clangd = {
         init_options = {
             -- capabilities         = {},
             clangdFileStatus     = true,
@@ -261,7 +267,7 @@ end
 -- }}} Clangd
 -- marksman {{{
 if _G._os_uname.sysname == "Windows_NT" then
-    serverNames.marksman = {
+    serverConfigs.marksman = {
         cmd = {
             [[C:\Users\Hashub\AppData\Local\nvim-data\mason\packages\marksman\marksman.exe]],
             "server"
@@ -274,19 +280,16 @@ end
     -- Set up servers {{{
     local ok, _ = pcall(require, "cmp_nvim_lsp")
     local capabilities = ok and require("cmp_nvim_lsp").default_capabilities() or {}
-    local basicConfig = {
-        -- enable snippet support
-        capabilities = capabilities,
-        -- map buffer local keybindings when the language server attaches
-        -- on_attach    = onAttach
-    }
+    local basicConfig = { capabilities = capabilities, }
 
-    for _, serverName in pairs(vim.tbl_keys(serverNames)) do
-        serverNames[serverName] = vim.tbl_deep_extend("force", basicConfig, serverNames[serverName])
-        if serverName ~= "clangd" then
-            serverNames[serverName].capabilities.offsetEncoding = {"utf-16"}
+    for name, config in pairs(serverConfigs) do
+        config = vim.tbl_deep_extend("force", basicConfig, config)
+        if name ~= "clangd" then
+            config.capabilities.offsetEncoding = {"utf-16"}
         end
-        lspConfig[serverName].setup(serverNames[serverName])
+        -- vim.lsp.config(name, config)
+        -- vim.lsp.enable(name)
+        lspConfig[name].setup(config)
     end
 
     if require("util").ex("omnisharp") then
@@ -319,21 +322,35 @@ end
     end
     -- }}} Setup servers
 
--- vim.diagnostic setups {{{
-vim.diagnostic.config {
-    underline        = true,
-    virtual_text     = true,
-    signs            = true,
-    update_in_insert = false,
-    severity_sort    = true,
-}
+    -- vim.diagnostic setups {{{
+    vim.diagnostic.config {
+        underline        = true,
+        virtual_text     = true,
+        update_in_insert = false,
+        severity_sort    = true,
+        signs = {
+            severity = { min = vim.diagnostic.severity.WARN},
+            text = {
+                [vim.diagnostic.severity.WARN]  = icon.diagnostics.Warning,
+                [vim.diagnostic.severity.INFO]  = icon.diagnostics.Information,
+                [vim.diagnostic.severity.HINT]  = icon.diagnostics.Hint,
+                [vim.diagnostic.severity.ERROR] = icon.diagnostics.Error,
+            },
+            linehl = {
+                [vim.diagnostic.severity.WARN]  = 'DiagnosticSignWarnLine',
+                [vim.diagnostic.severity.INFO]  = 'DiagnosticSignInfoLine',
+                [vim.diagnostic.severity.HINT]  = 'DiagnosticSignHintLine',
+                [vim.diagnostic.severity.ERROR] = 'DiagnosticSignErrorLine',
+            },
+        }
+    }
 
-vim.cmd [[
-sign define DiagnosticSignError text= texthl=DiagnosticError linehl= numhl=DiagnosticError
-sign define DiagnosticSignWarn  text= texthl=DiagnosticWarn  linehl= numhl=DiagnosticWarn
-sign define DiagnosticSignInfo  text= texthl=DiagnosticInfo  linehl= numhl=DiagnosticInfo
-sign define DiagnosticSignHint  text= texthl=DiagnosticHint  linehl= numhl=DiagnosticHint
-]]
--- }}}
+    vim.cmd [[
+    sign define DiagnosticSignError text= texthl=DiagnosticError linehl= numhl=DiagnosticError
+    sign define DiagnosticSignWarn  text= texthl=DiagnosticWarn  linehl= numhl=DiagnosticWarn
+    sign define DiagnosticSignInfo  text= texthl=DiagnosticInfo  linehl= numhl=DiagnosticInfo
+    sign define DiagnosticSignHint  text= texthl=DiagnosticHint  linehl= numhl=DiagnosticHint
+    ]]
+    -- }}}
 
 end
