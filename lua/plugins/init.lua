@@ -349,6 +349,7 @@ local pluginArgs = { -- {{{
     },
     {
         "andymass/vim-matchup",
+        enabled = false,
         init   = require("plugins.vim-matchup").setup,
         config = require("plugins.vim-matchup").config,
     },

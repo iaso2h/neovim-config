@@ -102,26 +102,26 @@ return function()
 -- Python {{{
 -- https://github.com/microsoft/pyright
 -- https://github.com/microsoft/pyright/blob/master/docs/configuration.md
--- serverConfigs.pyright = {
---     settings  = {
---         python = {
---             -- pythonPath = "python",
---             -- venvPath = "",
---             analysis = {
---                 -- extraPaths = "",
---             }
---         },
---         pyright = {
---             verboseOutput = true,
---             reportMissingImports = true,
---         }
---     }
--- }
-
-serverConfigs.ruff = {
+serverConfigs.pyright = {
     settings  = {
+        python = {
+            -- pythonPath = "python",
+            -- venvPath = "",
+            analysis = {
+                -- extraPaths = "",
+            }
+        },
+        pyright = {
+            verboseOutput = true,
+            reportMissingImports = true,
+        }
     }
 }
+
+-- serverConfigs.ruff = {
+--     settings  = {
+--     }
+-- }
 -- }}} Python
 -- Lua {{{
 -- https://github.com/LuaLS/lua-language-server
