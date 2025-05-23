@@ -77,7 +77,7 @@ return {
             show_condition = isFirstLine,
         }
     ), -- }}}
-    s({ trig = "ml", dscr = "Add modeline", -- {{{
+    s({ trig = "model", dscr = "Add modeline", -- {{{
         },
         fmt (
             [[

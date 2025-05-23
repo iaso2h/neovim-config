@@ -1,3 +1,4 @@
+-- https://github.com/willothy/nvim-cokeline
 return function()
     local getHighlightAttr = require("cokeline.hlgroups").get_hl_attr
     local icon   = require("icon")
@@ -99,5 +100,6 @@ return function()
     }
     map("n", [[g<A-,>]],  [[<Plug>(cokeline-switch-prev)]], "Cokeline switch previous")
     map("n", [[g<A-.>]],  [[<Plug>(cokeline-switch-next)]], "Cokeline switch next")
+    -- BUG:
     map("n", "<leader>b", [[<Plug>(cokeline-pick-focus)]],  "Cokeline focus")
 end
