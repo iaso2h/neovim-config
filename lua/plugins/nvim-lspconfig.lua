@@ -44,8 +44,9 @@ return function()
         -- Mappings
 
         bmap(bufNr, "n", [[K]], function() vim.lsp.buf.hover {border = _G._float_win_border} end, "Documentation")
-        bmap(bufNr, "n", [[<C-f>o]], [[<CMD>lua require('telescope.builtin').lsp_workspace_symbols()<CR>]], {"silent"}, "LSP workspace symbols")
-        bmap(bufNr, "n", [[<C-f><C-o>]], [[<CMD>lua require('telescope.builtin').lsp_workspace_symbols()<CR>]], {"silent"}, "LSP workspace symbols")
+        bmap(bufNr, "n", [[<C-f>o]],     [[<CMD>lua require('telescope.builtin').lsp_document_symbols()<CR>]], {"silent"}, "LSP workspace symbols")
+        bmap(bufNr, "n", [[<C-f><C-o>]], [[<CMD>lua require('telescope.builtin').lsp_document_symbols()<CR>]], {"silent"}, "LSP workspace symbols")
+        bmap(bufNr, "n", [[<C-f>O]],     [[<CMD>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<CR>]], {"silent"}, "LSP workspace symbols")
 
         bmap(bufNr, "n", [[gd]], function()
             vim.lsp.buf.definition { on_list = conciseQuifix }

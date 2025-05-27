@@ -839,7 +839,32 @@ local pluginArgs = { -- {{{
         },
         config = function()
             require("debugprint").setup {
-                create_keymaps = false,
+                keymaps = {
+                    normal = {
+                        plain_below = "dpj",
+                        plain_above = "dpk",
+                        variable_below = "dvj",
+                        variable_above = "dvk",
+                        variable_below_alwaysprompt = "",
+                        variable_above_alwaysprompt = "",
+                        surround_plain = "",
+                        surround_variable = "",
+                        surround_variable_alwaysprompt = "",
+                        textobj_below = "",
+                        textobj_above = "",
+                        textobj_surround = "",
+                        toggle_comment_debug_prints = "",
+                        delete_debug_prints = "",
+                    },
+                    insert = {
+                        plain = "",
+                        variable = "",
+                    },
+                    visual = {
+                        variable_below = "",
+                        variable_above = "",
+                    },
+                },
             }
             -- TODO: prehook buffer-wise
             map("n", [[dp]], function()

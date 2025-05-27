@@ -253,7 +253,7 @@ M.loadFile = function(path, parentPath, opt) -- {{{
         )
 
         vim.api.nvim_echo({{" ", "Normal"}}, true, {})
-        vim.api.nvim_echo( { { reloadCallback} }, true, {err = true} )
+        vim.api.nvim_echo( { { reloadCallback} }, true, {} )
         vim.api.nvim_echo({{" ", "Normal"}}, true, {})
         vim.api.nvim_echo(
             {
@@ -404,7 +404,6 @@ M.loadDir = function(path, opt) -- {{{
                         }
                     },
                     true,
-                    { err = true },
                     {}
                 )
             end
@@ -416,7 +415,7 @@ M.loadDir = function(path, opt) -- {{{
                     }
                 },
                 true,
-                { err = true }
+                {}
             )
         end
 

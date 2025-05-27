@@ -233,9 +233,8 @@ local replace = function(motionType, motionRegion, vimMode, reg, bufNr) -- {{{
         -- Replace operator
         if util.compareDist(motionRegion.Start, motionRegion.End) > 0 then
             -- This's a rare scenario where Start is fall behind End
-
-            -- HACK: occurred when execute [[gr"agr$]]
-            vim.api.nvim_echo({{"Start fall behind End",}}, true, {err=true}, {})
+            -- HACK: occurred when execute [[y$gr$]]
+            -- vim.api.nvim_echo({{"Start fall behind End", "WarningMsg"}}, true, {})
             vim.cmd(string.format("noa norm! %sP", regCMD))
             repStart = vim.api.nvim_buf_get_mark(0, "[")
             repEnd   = vim.api.nvim_buf_get_mark(0, "]")
