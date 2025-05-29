@@ -1,8 +1,10 @@
+-- https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md
 local luasnip = require("luasnip")
 local u       = require("luaSnip.util")
 
 local s             = luasnip.snippet
 local sn            = luasnip.snippet_node
+local isn           = luasnip.indent_snippet_node
 local t             = luasnip.text_node
 local i             = luasnip.insert_node
 local fn            = luasnip.function_node
@@ -46,9 +48,6 @@ end
 return {
     s({ trig = "date", dscr = "Put the date in (d/m/Y) format"}, -- {{{
         partial(os.date, "%d/%m/%Y")
-    ), -- }}}
-    s({ trig = "dateb", dscr = "Put the date in (b d, Y) format"}, -- {{{
-        partial(os.date, "%b %d, %Y")
     ), -- }}}
     s({ trig = "fi", dscr = "File information"}, -- {{{
         fmt (

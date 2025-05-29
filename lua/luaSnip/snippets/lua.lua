@@ -1,8 +1,10 @@
+-- https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md
 local luasnip = require("luasnip")
 local u       = require("luaSnip.util")
 
 local s             = luasnip.snippet
 local sn            = luasnip.snippet_node
+local isn           = luasnip.indent_snippet_node
 local ms            = luasnip.multi_snippet
 local t             = luasnip.text_node
 local i             = luasnip.insert_node

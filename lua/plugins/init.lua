@@ -45,7 +45,7 @@ vim.opt.rtp:prepend(lazyPath)
 -- Plug-ins configuration
 local icon = require("icon")
 local pluginArgs = { -- {{{
-    -- https://github.com/folke/lazy.nvim#-plugin-spec
+    -- https://lazy.folke.io/spec
     -- Dependencies {{{
     {
         "nvim-lua/plenary.nvim",
@@ -608,8 +608,7 @@ local pluginArgs = { -- {{{
     },
     {
         "L3MON4D3/LuaSnip",
-        pin = true,
-        dependencies = { "rafamadriz/friendly-snippets", },
+        -- dependencies = { "rafamadriz/friendly-snippets", },
         build  = "make install_jsregexp",
         event = "VeryLazy",
         config = require("plugins.nvim-luasnip")
