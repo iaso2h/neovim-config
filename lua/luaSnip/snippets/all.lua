@@ -47,7 +47,7 @@ end
 
 return {
     s({ trig = "date", dscr = "Put the date in (d/m/Y) format"}, -- {{{
-        partial(os.date, "%d/%m/%Y")
+        partial(os.date, "%Y-%m-%d")
     ), -- }}}
     s({ trig = "fi", dscr = "File information"}, -- {{{
         fmt (
