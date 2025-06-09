@@ -587,6 +587,7 @@ local pluginArgs = { -- {{{
     },
     {
         "neovim/nvim-lspconfig",
+        commit = "b8e7957bde4cbb3cb25a13a62548f7c273b026e9",
         dependencies = {
             "mason-lspconfig.nvim",
             "folke/neodev.nvim",
