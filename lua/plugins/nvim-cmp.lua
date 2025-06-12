@@ -209,6 +209,7 @@ return function()
             end
         end, {"i", "s"}},
         ["<Tab>"] = {function()
+            local fittencode = require("fittencode.engines.inline")
             if luasnip.expand_or_locally_jumpable() then
             -- if luasnip.expand_or_jumpable() then
             -- if (luasnip.jumpable(1) and cursorWithinSnippet()) or
@@ -216,15 +217,20 @@ return function()
                 luasnip.expand_or_jump()
             elseif package.loaded["neogen"] and require("neogen").jumpable() then
                 require("neogen").jump_next()
+            elseif fittencode.is_inline_enabled() and fittencode.has_suggestions() then
+                fittencode.accept_line()
             else
                 vim.api.nvim_feedkeys(t"<Tab>", "n", false)
             end
         end, {"i", "s"}},
         ["<S-Tab>"] = {function()
+            local fittencode = require("fittencode.engines.inline")
             if luasnip.jumpable(-1) then
                 luasnip.jump(-1)
             elseif package.loaded["neogen"] and require("neogen").jumpable() then
                 require("neogen").jump_prev()
+            elseif fittencode.is_inline_enabled() then
+                fittencode.revoke_line()
             else
                 vim.cmd("norm! " .. t("<S-Tab>"))
             end

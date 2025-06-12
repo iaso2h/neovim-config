@@ -107,14 +107,12 @@ return {
         }
     },
     -- Enable/Disable the default keymaps in inline completion.
-    use_default_keymaps = true,
+    use_default_keymaps = false,
     -- Default keymaps
     keymaps = {
         inline = {
             ['<TAB>']   = 'accept_all_suggestions',
-            ['<A-f>']   = 'accept_line',
-            ['<A-w']    = 'accept_word',
-            ['<A-s-f>'] = 'revoke_line',
+            ['<A-w>']   = 'accept_word',
             ['<A-b>']   = 'revoke_word',
             ['<A-\\>']  = 'triggering_completion',
         },

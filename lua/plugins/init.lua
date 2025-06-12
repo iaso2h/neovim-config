@@ -50,7 +50,7 @@ local pluginArgs = { -- {{{
     {
         "nvim-lua/plenary.nvim",
         priority = 100,
-        commit = "4cd4c29"
+        -- commit = "4cd4c29"
     },
     "inkarkat/vim-visualrepeat",
     "tpope/vim-repeat",
@@ -587,7 +587,6 @@ local pluginArgs = { -- {{{
     },
     {
         "neovim/nvim-lspconfig",
-        commit = "b8e7957bde4cbb3cb25a13a62548f7c273b026e9",
         dependencies = {
             "mason-lspconfig.nvim",
             "ray-x/lsp_signature.nvim",
@@ -628,6 +627,7 @@ local pluginArgs = { -- {{{
         dependencies = {
             "nvim-autopairs",
             "nvim-lspconfig",
+            "fittencode.nvim",
             {
                 "folke/lazydev.nvim",
                 config = function()
@@ -698,7 +698,7 @@ local pluginArgs = { -- {{{
             { "<leader>ae", mode = "n" }
         },
         enabled = true,
-        build = "make",
+        build = _G._os_uname.sysname ~= "Windows_NT" and "make" or "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false",
         dependencies = {
             "nvim-treesitter",
             "plenary.nvim",
