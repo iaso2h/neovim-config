@@ -1,52 +1,25 @@
 local M = {}
 
 M.serverNames = {
-    -- cmake    = {},
-    bashls    = {},
-    clangd    = {},
-    cssls     = {},
-    harper_ls = {},
-    html      = {},
-    jsonls    = {},
-    lua_ls    = {},
-    marksman  = {},
-    pyright   = {},
-    ts_ls     = {},
-    vimls     = {},
-    yamlls    = {},
+    "clangd",
+    "cssls",
+    "harper_ls",
+    "html",
+    "jsonls",
+    "lua_ls",
+    "pyright",
+    "vimls",
+    "yamlls",
 }
 
-if _G._os_uname.sysname == "Linux" then
-    if _G._os_uname.machine ~= "aarch64" then
-        M.serverNames.fennel_language_server = {}
-    else
-        M.serverNames.grammarly = nil
-        M.serverNames.marksman  = nil
-        M.serverNames.yamlls    = nil
-        M.serverNames.bashls    = nil
-        M.serverNames.clangd    = nil
-    end
-elseif _G._os_uname.sysname == "Windows_NT" then
-    M.serverNames.powershell_es = {}
+if _G._os_uname.sysname == "Windows_NT" then
+    table.insert(M.serverNames, "powershell_es")
 end
 
 
 M.config = function()
     require("mason-lspconfig").setup {
-        -- A list of servers to automatically install if they're not already
-        -- installed. Example: { "rust_analyzer@nightly", "lua_ls" }
-        -- This setting has no relation with the `automatic_installation` setting.
-        ensure_installed = vim.tbl_keys(require("plugins.nvim-mason-lspconfig").serverNames),
-        -- Whether servers that are set up (via lspconfig) should be automatically
-        -- installed if they're not already installed.
-        -- This setting has no relation with the `ensure_installed` setting.
-        -- Can either be:
-        --   - false: Servers are not automatically installed.
-        --   - true: All servers set up via lspconfig are automatically installed.
-        --   - { exclude: string[] }: All servers set up via lspconfig, except the
-        --   ones provided in the list, are automatically installed.
-        --       Example: automatic_installation = { exclude = { "rust_analyzer",
-        --       "solargraph" } }
+        ensure_installed = require("plugins.nvim-mason-lspconfig").serverNames,
         automatic_installation = true
     }
 end
