@@ -133,7 +133,7 @@ function M.extmarkSelect(ns, extmark, linewise) -- {{{
 
     -- Validate extmark
     if not next(extmarkPos) then
-        return vimapi.nvim_echonotify({ { "No record found on current buffer", "WarningMsg" } }, true, {})
+        return vim.api.nvim_echo({ { "No record found on current buffer", "WarningMsg" } }, true, {})
     end
     local selectStart = {extmarkPos[1] + 1, extmarkPos[2]}
     local selectEnd   = {extmarkPos[3]["end_row"] + 1, extmarkPos[3]["end_col"]}
