@@ -590,7 +590,6 @@ local pluginArgs = { -- {{{
         commit = "b8e7957bde4cbb3cb25a13a62548f7c273b026e9",
         dependencies = {
             "mason-lspconfig.nvim",
-            "folke/neodev.nvim",
             "ray-x/lsp_signature.nvim",
         },
         config = require("plugins.nvim-lspconfig"),
@@ -621,10 +620,25 @@ local pluginArgs = { -- {{{
         config = require("plugins.nvim-autopairs")
     },
     {
+        "luozhiya/fittencode.nvim",
+        config = require("plugins.nvim-fittencode")
+    },
+    {
         "hrsh7th/nvim-cmp",
         dependencies = {
             "nvim-autopairs",
             "nvim-lspconfig",
+            {
+                "folke/lazydev.nvim",
+                config = function()
+                    require("lazydev").setup{
+                        library = {
+                            -- Load luvit types when the `vim.uv` word is found
+                            { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+                        },
+                    }
+                end
+            },
             {
                 "hrsh7th/cmp-nvim-lsp",
                 dependencies = { "nvim-lspconfig" }

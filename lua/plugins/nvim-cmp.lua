@@ -60,6 +60,8 @@ return function()
             }
         },
         sources = {
+            {name = "lazydev",    group_index = 1},
+            {name = "fittencode", group_index = 2},
             {name = "nvim_lsp"},
             {name = "buffer"},
             {name = "async_path"},
@@ -88,18 +90,9 @@ return function()
                     vimItem.abbr = string.sub(vimItem.abbr, 1, maxWidth - 1) .. icon.ui.Ellipsis
                 end
                 vimItem.menu = vimItem.kind
-                if entry.source.name == "cmp_tabnine" then
+                if entry.source.name == "FittenCode" then
                     vimItem.kind = icon.misc.Robot
-                    vimItem.kind_hl_group = "CmpItemKindTabnine"
-                -- elseif entry.source.name == "codeium" then
-                --     vimItem.kind = "󰚩"
-                --     vimItem.kind_hl_group = "CmpItemKindTabnine"
-                -- elseif entry.source.name == "minuet" then
-                --     vimItem.kind = icon.misc.Robot
-                --     vimItem.kind_hl_group = "CmpItemKindTabnine"
-                -- elseif entry.source.name == "codeium" then
-                --     vimItem.kind = "󰚩"
-                --     vimItem.kind_hl_group = "CmpItemKindTabnine"
+                    vimItem.kind_hl_group = "CmpItemKindFittenCode"
                 elseif entry.source.name == "emoji" then
                     vimItem.kind = icon.misc.Smiley
                     vimItem.kind_hl_group = "CmpItemKindEmoji"
@@ -163,8 +156,16 @@ return function()
 
 
     local mapArgs = {
-        ["<A-e>"] = cmp.mapping.scroll_docs(-4),
-        ["<A-d>"] = cmp.mapping.scroll_docs(4),
+        ["<A-e>"] = {function ()
+            if cmp.visible() then
+                cmp.mapping.scroll_docs(-4)
+            end
+        end, {"i", "s"}},
+        ["<A-d>"] = {function ()
+            if cmp.visible() then
+                cmp.mapping.scroll_docs(4)
+            end
+        end, {"i", "s"}},
         ["<A-p>"] = {function ()
             if luasnip.choice_active() then
                 vim.api.nvim_feedkeys(t"<Plug>luasnip-prev-choice", "m", false)
@@ -175,6 +176,14 @@ return function()
                 vim.api.nvim_feedkeys(t"<Plug>luasnip-next-choice", "m", false)
             end
         end, {"i", "s", "n"}},
+        ["<C-y>"] = {function ()
+            if cmp.visible() then
+                cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = false })
+            else
+                vim.api.nvim_feedkeys(t"<C-e>", "n", false)
+                vim.api.nvim_feedkeys(t"<C-y>", "n", false)
+            end
+        end, {"i", "s"}},
         ["<Down>"] = {function ()
             if cmp.visible() then
                 cmp.select_next_item()

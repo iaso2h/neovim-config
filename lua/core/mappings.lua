@@ -623,7 +623,6 @@ map("i", [[<C-CR>]],  [[pumvisible() ? "\<C-e>\<CR>" : "\<CR>"]],     {"noremap"
 map("i", [[<S-CR>]],  [[<ESC>O]], "Add new line above")
 map("i", [[<C-.>]],   [[<C-a>]], {"noremap"}, "Insert previous insert character")
 map("i", [[<C-BS>]],  [[<C-w>]], {"noremap"}, "Delete word before")
-map("i", [[<C-y>]],   [[pumvisible() ? "\<C-e>\<C-y>" : "\<C-y>"]], {"noremap", "expr"}, "Insert character from above")
 map("i", [[<A-y>]],   [[<C-x><C-l>]], {"noremap"}, "Insert from sentence")
 map("i", [[,]], [[,<C-g>u]], {"noremap"}, "which_key_ignore")
 map("i", [[.]], [[.<C-g>u]], {"noremap"}, "which_key_ignore")

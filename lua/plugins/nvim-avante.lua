@@ -1,17 +1,16 @@
 return function()
     require("avante").setup {
-        provider = "deepseek",
-        auto_suggestions_provider = "deepseek",
-        openai = {
+        deepseek = {
             endpoint = "https://api.deepseek.com/v1",
             model = "deepseek-chat",
             timeout = 30000, -- Timeout in milliseconds
             temperature = 0,
             max_tokens = 8192,
-        },
-        vendors = {
-            deepseek = {
-                __inherited_from = "openai",
+            extra_request_body = {
+                max_completion_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
+                reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
+            },
+            vendors = {
                 api_key_name = "DEEPSEEK_API_KEY",
                 endpoint = "https://api.deepseek.com",
                 model = "deepseek-coder",
