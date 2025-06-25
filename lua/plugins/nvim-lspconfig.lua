@@ -60,7 +60,7 @@ return function()
             vim.lsp.buf.implementation { on_list = conciseQuifix }
         end, "LSP implementation")
 
-        bmap(bufNr, {"x", "n"}, [[ga]],  vim.lsp.buf.code_action,    "LSP code action")
+        -- bmap(bufNr, {"x", "n"}, [[ga]],  vim.lsp.buf.code_action,    "LSP code action")
         bmap(bufNr, "n", [[<leader>rn]], vim.lsp.buf.rename, "LSP rename")
         bmap(bufNr, "n", [[<F2>]],       vim.lsp.buf.rename, "LSP rename")
         bmap(bufNr, "n", [[<C-p>]],      vim.lsp.buf.signature_help, "LSP signature help")
@@ -116,10 +116,6 @@ return function()
         capabilities = capabilities,
         root_markers = { '.git' },
     })
-
-    for _, server in ipairs(require("plugins.nvim-mason-lspconfig").serverNames) do
-        vim.lsp.enable(server)
-    end
     -- }}} Setup servers
 
     -- vim.diagnostic setups {{{

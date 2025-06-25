@@ -20,7 +20,7 @@ end
 M.config = function()
     require("mason-lspconfig").setup {
         ensure_installed = require("plugins.nvim-mason-lspconfig").serverNames,
-        automatic_installation = true
+        automatic_enable = true
     }
 end
 

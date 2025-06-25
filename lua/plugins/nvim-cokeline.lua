@@ -98,8 +98,8 @@ return function()
             }
         },
     }
-    map("n", [[g<A-,>]],  [[<Plug>(cokeline-switch-prev)]], "Cokeline switch previous")
-    map("n", [[g<A-.>]],  [[<Plug>(cokeline-switch-next)]], "Cokeline switch next")
+    map("n", [=[g[b]=],  [[<Plug>(cokeline-switch-prev)]], "Cokeline switch previous")
+    map("n", [=[g]b]=],  [[<Plug>(cokeline-switch-next)]], "Cokeline switch next")
     -- BUG:
-    map("n", "<leader>b", [[<Plug>(cokeline-pick-focus)]],  "Cokeline focus")
+    map("n", "<leader>b", [[<CMD>lua require"cokeline.mappings".pick("focus")<CR>]],  "Cokeline focus")
 end

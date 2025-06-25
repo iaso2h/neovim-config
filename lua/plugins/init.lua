@@ -667,25 +667,6 @@ local pluginArgs = { -- {{{
                 end,
                 dependencies = { "LuaSnip" },
             },
-            {
-                'milanglacier/minuet-ai.nvim',
-                enabled = false,
-                config = function()
-                    require('minuet').setup {
-                        provider = 'openai_fim_compatible',
-                        provider_options = {
-                            openai_fim_compatible = {
-                                api_key = 'OPENAI_API_KEY',
-                                name = 'deepseek',
-                                optional = {
-                                    max_tokens = 512,
-                                    top_p = 0.9,
-                                },
-                            },
-                        },
-                    }
-            end,
-    },
         },
         config = require("plugins.nvim-cmp"),
     },
@@ -713,26 +694,19 @@ local pluginArgs = { -- {{{
     },
     {
         "aznhe21/actions-preview.nvim",
-        keys = { { "<leader>a", mode = "n" } },
-        -- BUG:
-        enabled = false,
+        keys = { { "ga", mode = "n" } },
         config = function()
-            map("n", "<leader>a", require("actions-preview").code_actions, "Lsp code action")
+            map("n", "ga", require("actions-preview").code_actions, "Lsp code action")
 
             require("actions-preview").setup {
                 -- options for vim.diff(): https://neovim.io/doc/user/lua.html#vim.diff()
                 diff = {
-                    algorithm         = "histogram",
-                    ignore_whitespace = true,
-                    ctxlen            = 3,
-                    filler            = true
+                    algorithm = "histogram",
+                    ctxlen    = 3,
                 },
                 -- priority list of preferred backend
-                backend = { "telescope"},
-                telescope = require("telescope.themes").get_dropdown(),
-                highlight_command = {
-                    require("actions-preview.highlight").delta("path/to/delta --option1 --option2"),
-                }
+                backend = {"telescope"},
+                telescope = require("telescope.themes").get_dropdown()
             }
         end,
     },
@@ -1058,21 +1032,6 @@ local pluginArgs = { -- {{{
             }
         end,
     },
-    {
-        "michaelb/sniprun",
-        cond  = _G._os_uname.sysname ~= "Windows_NT",
-        build = "bash ./install.sh",
-        cmd   = {
-            "SnipRun",
-            "SnipReset",
-            "SnipReplMemoryClean",
-            "SnipTerminate",
-            "SnipInfo",
-            "SnipClose",
-        },
-        config = require("plugins.nvim-sniprun"),
-    },
-    -- "CRAG666/code_runner.nvim"
     -- }}} Debug
     -- Language {{{
     {
@@ -1148,15 +1107,6 @@ local pluginArgs = { -- {{{
         config = require("plugins.nvim-gitsigns"),
     },
     {
-        "rhysd/conflict-marker.vim",
-        cond   = not require("util").ex("lazygit"),
-        init   = function() vim.g.conflict_marker_enable_mappings = 0; vim.g.conflict_marker_enable_highlight = 1 end,
-        config = function()
-            map("x", "]x", [[<Plug>(conflict-marker-next-hunk)]], "Next conflict marker")
-            map("x", "[x", [[<Plug>(conflict-marker-prev-hunk)]], "Previous conflict marker")
-        end
-    },
-    {
         "sindrets/diffview.nvim",
         cmd = { "DiffviewOpen", "DiffviewFileHistory" },
         dependencies = { "plenary.nvim" },
@@ -1164,17 +1114,6 @@ local pluginArgs = { -- {{{
     },
     -- }}} Source control
     -- Knowledge {{{
-    {
-        "RishabhRD/nvim-cheat.sh",
-        cond = _G._os_uname.sysname ~= "Windows_NT",
-        cmd = {
-            "Cheat",
-            "CheatList",
-            "CheatListWithoutComments",
-            "CheatWithoutComments",
-        },
-        dependencies = { "RishabhRD/popfix" },
-    },
     {
         "dahu/VimRegexTutor",
         cmd = "VimRegexTutor",
