@@ -1,21 +1,21 @@
  -- TODO: supoort multiple actions
 
-if not TelescopeOverrideBufMap then
-    TelescopeOverrideBufMap = function(mode, lhs, rhs, opts)
-        local promptBufNr
-        local tbl = vim.tbl_keys(TelescopeGlobalState)
-        local opts = opts or {silent = true, noremap = true}
+local promptBufNr
+local tbl = vim.tbl_keys(TelescopeGlobalState)
 
-        if type(tbl[1]) == "number" then
-            promptBufNr = tbl[1]
-        else
-            promptBufNr = tbl[2]
-        end
-
-        vim.api.nvim_buf_set_keymap(promptBufNr, mode, lhs, rhs, opts)
-    end
+if type(tbl[1]) == "number" then
+    promptBufNr = tbl[1]
+else
+    promptBufNr = tbl[2]
 end
 
+if not vim.api.nvim_buf_is_valid(promptBufNr) then return end
 
 -- TODO: Open in floating win or newtab
-TelescopeOverrideBufMap("n", [[?]], [[:<C-u>Redir lua Print(require("telescope.actions.state").get_selected_entry())<CR>]])
+vim.api.nvim_buf_set_keymap(
+    promptBufNr,
+    "n",
+    [[?]],
+    [[:<C-u>Redir lua Print(require("telescope.actions.state").get_selected_entry())<CR>]],
+    {silent = true, noremap = true}
+)
