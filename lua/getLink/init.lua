@@ -90,12 +90,12 @@ return function(url) -- {{{
     else
         -- Visual mode with selected text provided
         if _G._os_uname.sysname == "Windows_NT" then
-            vim.fn.system{"explorer", url}
+            vim.system({"explorer", url}, {}, function() end)
         elseif _G._os_uname.sysname == "Linux" then
             if vim.fn.expand("%:p") == vim.fn.stdpath("config") .. "/lua/plugins/init.lua" then
                 url = "https://github.com/" .. url
             end
-                vim.fn.system{"xdg-open", url}
+                vim.system({"xdg-open", url}, {}, function() end)
         end
     end
 end -- }}}

@@ -24,14 +24,14 @@ if not vim.loop.fs_stat(lazyPath) then
         vim.api.nvim_echo({ { "Loading Plug-ins settings abort", "WarningMsg" } }, true, {})
         return
     end
-    vim.fn.system {
+    vim.system({
         "git",
         "clone",
         "--filter=blob:none",
         "https://github.com/folke/lazy.nvim.git",
         "--branch=stable", -- latest stable release
         lazyPath,
-    }
+    }, {}):wait()
     promptOnMove(
         os.date("%Y-%m-%d %H:%M  ")
             .. "Cloning lazy.nvim complete. Please restart Neovim"
@@ -645,17 +645,6 @@ local pluginArgs = { -- {{{
             },
             "hrsh7th/cmp-buffer",
             "FelipeLema/cmp-async-path",
-            {
-                "tzachar/cmp-tabnine",
-                cond = _G._os_uname.machine ~= "aarch64",
-                build = function()
-                    if _G._os_uname.sysname == "Windows_NT" then
-                        vim.cmd("!powershell ./install.ps1")
-                    elseif _G._os_uname.sysname == "Linux" then
-                        vim.cmd("!./install.sh")
-                    end
-                end,
-            },
             {
                 "saadparwaiz1/cmp_luasnip",
                 build = function()

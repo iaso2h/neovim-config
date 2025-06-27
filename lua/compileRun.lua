@@ -28,7 +28,7 @@ function M.compileCode(useAsyncRun) -- {{{
         if useAsyncRun then
             vim.cmd("AsyncRun " .. compileCMD)
         else
-            vim.fn.system(compileCMD)
+            vim.system({compileCMD}, {}, function() end)
         end
         return srcNoExt .. ext
     elseif fileType == "cpp" then
@@ -48,20 +48,20 @@ function M.compileCode(useAsyncRun) -- {{{
         if useAsyncRun then
             vim.cmd("AsyncRun " .. compileCMD)
         else
-            vim.fn.system(compileCMD)
+            vim.system({compileCMD}, {}, function() end)
         end
         return srcNoExt .. ext
     elseif vim.bo.filetype == "lua" then
         if useAsyncRun then
             vim.cmd [[AsyncRun lua %]]
         else
-            vim.fn.system("lua" .. vim.fn.expand("%:p"))
+            vim.system({"lua" .. vim.fn.expand("%:p")}, {}, function() end)
         end
     elseif vim.bo.filetype == "python" then
         if useAsyncRun then
             vim.cmd(vim.fn.has("win32") == 1 and "AsyncRun python %" or "AsyncRun python3 %")
         else
-            vim.fn.system(vim.fn.has("win32") == 1 and "python " .. vim.fn.expand("%:p") or "python3" .. vim.fn.expand("%:p"))
+            vim.system({vim.fn.has("win32") == 1 and "python " .. vim.fn.expand("%:p") or "python3" .. vim.fn.expand("%:p")}, {}, function() end)
         end
     end
 end -- }}}

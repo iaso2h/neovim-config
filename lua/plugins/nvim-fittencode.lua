@@ -1,35 +1,35 @@
 return {
     action = {
         document_code = {
-        -- Show "Fitten Code - Document Code" in the editor context menu, when you right-click on the code.
-        show_in_editor_context_menu = true,
+            -- Show "Fitten Code - Document Code" in the editor context menu, when you right-click on the code.
+            show_in_editor_context_menu = true,
         },
         edit_code = {
-        -- Show "Fitten Code - Edit Code" in the editor context menu, when you right-click on the code.
-        show_in_editor_context_menu = true,
+            -- Show "Fitten Code - Edit Code" in the editor context menu, when you right-click on the code.
+            show_in_editor_context_menu = true,
         },
         explain_code = {
-        -- Show "Fitten Code - Explain Code" in the editor context menu, when you right-click on the code.
-        show_in_editor_context_menu = true,
+            -- Show "Fitten Code - Explain Code" in the editor context menu, when you right-click on the code.
+            show_in_editor_context_menu = true,
         },
         find_bugs = {
-        -- Show "Fitten Code - Find Bugs" in the editor context menu, when you right-click on the code.
-        show_in_editor_context_menu = true,
+            -- Show "Fitten Code - Find Bugs" in the editor context menu, when you right-click on the code.
+            show_in_editor_context_menu = true,
         },
         generate_unit_test = {
-        -- Show "Fitten Code - Generate UnitTest" in the editor context menu, when you right-click on the code.
-        show_in_editor_context_menu = true,
+            -- Show "Fitten Code - Generate UnitTest" in the editor context menu, when you right-click on the code.
+            show_in_editor_context_menu = true,
         },
         start_chat = {
-        -- Show "Fitten Code - Start Chat" in the editor context menu, when you right-click on the code.
-        show_in_editor_context_menu = true,
+            -- Show "Fitten Code - Start Chat" in the editor context menu, when you right-click on the code.
+            show_in_editor_context_menu = true,
         },
         identify_programming_language = {
-        -- Identify programming language of the current buffer
-        -- * Unnamed buffer
-        -- * Buffer without file extension
-        -- * Buffer no filetype detected
-        identify_buffer = true,
+            -- Identify programming language of the current buffer
+            -- * Unnamed buffer
+            -- * Buffer without file extension
+            -- * Buffer no filetype detected
+            identify_buffer = true,
         }
     },
     disable_specific_inline_completion = {
@@ -88,22 +88,22 @@ return {
         -- * `floating` (Floating style)
         style = 'sidebar',
         sidebar = {
-        -- Width of the sidebar in characters.
-        width = 42,
-        -- Position of the sidebar.
-        -- Available options:
-        -- * `left`
-        -- * `right`
-        position = 'left',
+            -- Width of the sidebar in characters.
+            width = 42,
+            -- Position of the sidebar.
+            -- Available options:
+            -- * `left`
+            -- * `right`
+            position = 'left',
         },
         floating = {
-        -- Border style of the floating window.
-        -- Same border values as `nvim_open_win`.
-        border = 'rounded',
-        -- Size of the floating window.
-        -- <= 1: percentage of the screen size
-        -- >  1: number of lines/columns
-        size = { width = 0.8, height = 0.8 },
+            -- Border style of the floating window.
+            -- Same border values as `nvim_open_win`.
+            border = 'rounded',
+            -- Size of the floating window.
+            -- <= 1: percentage of the screen size
+            -- >  1: number of lines/columns
+            size = { width = 0.8, height = 0.8 },
         }
     },
     -- Enable/Disable the default keymaps in inline completion.
