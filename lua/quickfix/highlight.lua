@@ -17,7 +17,7 @@ M.addLines = function(lineTbl, hlGroup, ns, bufNr) -- {{{
     bufNr = bufNr or vim.api.nvim_get_current_buf()
 
     for _, line in ipairs(lineTbl) do
-        vim.api.nvim_buf_add_highlight(bufNr, ns, hlGroup, line - 1, 0, -1) -- (0, 0) indexed
+        vim.hl.range(bufNr, ns, hlGroup, {line - 1, 0}, {line - 1, -1}) -- (0, 0) indexed
     end
 end -- }}}
 --- Add missing highlight for warning, note, info in error column
@@ -51,13 +51,7 @@ M.diagnosticsComplement = function(qfItems, qfBufNr) -- {{{
                 end
                 errorStartIdx = vBarIdx - errorText:len() -- 1 based index
                 -- HACK: Can't put the new highlight on the stack of the "QuickFixLine" highlight group
-                vim.api.nvim_buf_add_highlight(qfBufNr, ns,diagnosticsHighlightGroup, qfLineNr - 1, errorStartIdx - 1, vBarIdx - 1)
-                -- vim.api.nvim_buf_set_extmark(qfBufNr, ns, qfLineNr - 1, errorStartIdx - 1, {
-                --     end_row = qfLineNr - 1,
-                --     end_col = vBarIdx - 1,
-                --     hl_group = "Search",
-                --     hl_mode = "replace",
-                -- })
+                vim.hl.range(qfBufNr, ns,diagnosticsHighlightGroup, {qfLineNr - 1, errorStartIdx - 1}, {qfLineNr - 1, vBarIdx})
             end
         end
     end

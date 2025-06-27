@@ -10,9 +10,10 @@ local opts = {
 }
 
 --- Open the url link
----@param url string
----@param timeout integer
----@param bufNr integer
+---@param url string The URL to open.
+---@param timeout integer? The delay in milliseconds before opening the URL. Defaults to 0.
+---@param bufNr integer? The buffer number where the URL is located. If provided, clears the highlight after `timeout`.
+---@return nil
 local function openUrl(url, timeout, bufNr) -- {{{
     timeout = timeout or 0
 
@@ -24,20 +25,21 @@ local function openUrl(url, timeout, bufNr) -- {{{
         vim.ui.open(url)
     end, timeout)
 end -- }}}
---- Highlight area in current line
----@param bufNr integer
----@param lnum integer
----@param colStart integer
----@param colEnd integer
+--- Highlight a specific area in the current line.
+---@param bufNr integer The buffer number where the highlight should be applied.
+---@param lnum integer The line number (1-based) to highlight.
+---@param colStart integer The starting column (0-based) of the highlight.
+---@param colEnd integer The ending column (0-based) of the highlight.
+---@return nil
 local function highlight(bufNr, lnum, colStart, colEnd) -- {{{
     vim.api.nvim_buf_clear_namespace(bufNr, opts.ns, 0, -1)
-    vim.api.nvim_buf_add_highlight(bufNr, opts.ns, opts.highlightGroup, lnum - 1, colStart, colEnd)
+    vim.hl.range(bufNr, opts.ns, opts.highlightGroup, {lnum - 1, colStart}, {lnum - 1, colEnd+1})
 end -- }}}
---- Get the url link
----@param bufNr integer
----@param cursorPos table (1, 0) based
----@param curLine string Current line
----@return string # Return empty string if failed to retrieve one at the cursor location
+--- Get the URL link from the current line at the cursor position.
+---@param bufNr integer The buffer number where the URL is located.
+---@param cursorPos table The cursor position (1-based line, 0-based column).
+---@param curLine string The current line content.
+---@return string The extracted URL, or an empty string if no URL is found.
 local getUrl = function(bufNr, cursorPos, curLine) -- {{{
     local urlStart, urlEnd = vim.regex[=[[a-z]*:\/\/[^ >,;]*]=]:match_str(curLine)
     if urlStart then

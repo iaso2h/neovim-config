@@ -114,12 +114,12 @@ local addHighlight = function(bufNr, markerNodes, highlightGroup, markerOnlyChk)
         local range = {n:range()}
         if markerOnlyChk then
             if i == 1 then -- Start node {{{
-                vim.api.nvim_buf_add_highlight(bufNr, M.ns, highlightGroup, range[1], range[2], range[4])
+                vim.hl.range(bufNr, M.ns, highlightGroup, {range[1], range[2]}, {range[1], range[4] + 1})
             else
                 -- End node }}}
             end
         else
-            vim.api.nvim_buf_add_highlight(bufNr, M.ns, highlightGroup, range[1], range[2], range[4])
+            vim.hl.range(bufNr, M.ns, highlightGroup, {range[1], range[2]}, {range[1], range[4] + 1})
         end
     end
     -- Clear highlight after certain timeout

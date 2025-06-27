@@ -107,42 +107,42 @@ M.hover = function(printChk) -- {{{
             if key == "bufnr" then
                 lines[3] = {
                     text = string.format("%s%s: %s", padding, key, itemInfo[key]),
-                    colonIdx = paddingNr + string.len(key),
+                    colIdx = paddingNr + string.len(key),
                     keyHighlight = "quickfixHoverKey",
                     valueHighlight = "Constant"
                 }
             elseif key == "col" then
                 lines[4] = {
                     text = string.format("%s%s: %s", padding, key, itemInfo[key]),
-                    colonIdx = paddingNr + string.len(key),
+                    colIdx = paddingNr + string.len(key),
                     keyHighlight = "quickfixHoverKey",
                     valueHighlight = "Constant"
                 }
             elseif key == "lnum" then
                 lines[5] = {
                     text = string.format("%s%s: %s", padding, key, itemInfo[key]),
-                    colonIdx = paddingNr + string.len(key),
+                    colIdx = paddingNr + string.len(key),
                     keyHighlight = "quickfixHoverKey",
                     valueHighlight = "Constant"
                 }
             elseif key == "end_col" then
                 lines[6] = {
                     text = string.format("%s%s: %s", padding, key, itemInfo[key]),
-                    colonIdx = paddingNr + string.len(key),
+                    colIdx = paddingNr + string.len(key),
                     keyHighlight = "quickfixHoverKey",
                     valueHighlight = "Constant"
                 }
             elseif key == "end_lnum" then
                 lines[7] = {
                     text = string.format("%s%s: %s", padding, key, itemInfo[key]),
-                    colonIdx = paddingNr + string.len(key),
+                    colIdx = paddingNr + string.len(key),
                     keyHighlight = "quickfixHoverKey",
                     valueHighlight = "Constant"
                 }
             elseif key == "valid" then
                 lines[8] = {
                     text = string.format("%s%s: %s", padding, key, itemInfo[key]),
-                    colonIdx = paddingNr + string.len(key),
+                    colIdx = paddingNr + string.len(key),
                     keyHighlight = "quickfixHoverKey",
                     valueHighlight = "Constant"
                 }
@@ -150,7 +150,7 @@ M.hover = function(printChk) -- {{{
                 local text = itemInfo[key]
                 lines[9] = {
                     text = string.format("%s%s: %s", padding, key, vim.inspect(text)),
-                    colonIdx = paddingNr + string.len(key),
+                    colIdx = paddingNr + string.len(key),
                     keyHighlight = "quickfixHoverKey",
                     valueHighlight = text == "" and "Comment" or "String"
                 }
@@ -158,35 +158,35 @@ M.hover = function(printChk) -- {{{
                 local text = itemInfo[key]
                 lines[10] = {
                     text = string.format("%s%s: %s", padding, key, vim.inspect(text)),
-                    colonIdx = paddingNr + string.len(key),
+                    colIdx = paddingNr + string.len(key),
                     keyHighlight = "quickfixHoverKey",
                     valueHighlight = text == "" and "Comment" or "String"
                 }
             elseif key == "module" then
                 lines[11] = {
                     text = string.format("%s%s: %s", padding, key, vim.inspect(itemInfo[key])),
-                    colonIdx = paddingNr + string.len(key),
+                    colIdx = paddingNr + string.len(key),
                     keyHighlight = "Comment",
                     valueHighlight = "Comment"
                 }
             elseif key == "pattern" then
                 lines[12] = {
                     text = string.format("%s%s: %s", padding, key, vim.inspect(itemInfo[key])),
-                    colonIdx = paddingNr + string.len(key),
+                    colIdx = paddingNr + string.len(key),
                     keyHighlight = "Comment",
                     valueHighlight = "Comment"
                 }
             elseif key == "nr" then
                 lines[13] = {
                     text = string.format("%s%s: %s", padding, key, itemInfo[key]),
-                    colonIdx = paddingNr + string.len(key),
+                    colIdx = paddingNr + string.len(key),
                     keyHighlight = "Comment",
                     valueHighlight = "Comment"
                 }
             elseif key == "vcol" then
                 lines[14] = {
                     text = string.format("%s%s: %s", padding, key, itemInfo[key]),
-                    colonIdx = paddingNr + string.len(key),
+                    colIdx = paddingNr + string.len(key),
                     keyHighlight = "Comment",
                     valueHighlight = "Comment"
                 }
@@ -198,17 +198,14 @@ M.hover = function(printChk) -- {{{
             vim.api.nvim_buf_set_lines(M.hoverBufNr, lineIdx, lineNr, false, { line.text })
             if lineNr > 2 then
                 if line.keyHighlight == "Comment" then
-                    vim.api.nvim_buf_add_highlight(M.hoverBufNr, M.ns, "Comment", lineIdx, 0, -1)
+                    vim.hl.range(M.hoverBufNr, M.ns, "Comment", {lineIdx, 0}, {lineIdx, -1}) -- (0, 0) indexed
                 else
-                    vim.api.nvim_buf_add_highlight(M.hoverBufNr, M.ns, line.keyHighlight, lineIdx, paddingNr,
-                    line.colonIdx)
-                    vim.api.nvim_buf_add_highlight(M.hoverBufNr, M.ns, "Identifier", lineIdx, line.colonIdx,
-                    line.colonIdx + 1)
-                    vim.api.nvim_buf_add_highlight(M.hoverBufNr, M.ns, line.valueHighlight, lineIdx, line.colonIdx + 2,
-                    -1)
+                    vim.hl.range(M.hoverBufNr, M.ns, line.keyHighlight, {lineIdx, paddingNr}, {lineIdx, line.colIdx + 1})  -- (0, 0) indexed
+                    vim.hl.range(M.hoverBufNr, M.ns, "Identifier", {lineIdx, line.colIdx}, {lineIdx, line.colIdx + 2})     -- (0, 0) indexed
+                    vim.hl.range(M.hoverBufNr, M.ns, line.valueHighlight, {lineIdx, line.colIdx + 2}, {lineIdx, -1})       -- (0, 0) indexed
                 end
             elseif lineNr == 2 then
-                vim.api.nvim_buf_add_highlight(M.hoverBufNr, M.ns, "Comment", lineIdx, 0, -1)
+                vim.hl.range(M.hoverBufNr, M.ns, "Comment",  {lineIdx, 0}, {lineIdx, -1})       -- (0, 0) indexed
             end
         end
         vim.api.nvim_set_option_value("modifiable", false, {buf = M.hoverBufNr})

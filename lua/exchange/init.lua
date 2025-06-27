@@ -183,11 +183,16 @@ function M.operator(opInfo) -- {{{
 
     -- Add highlight
     if M.highlightChangeChk then
-        local region = vim.region(bufNr, regionMotion.Start, regionMotion.End, regionRegType,
-                vim.o.selection == "inclusive" and true or false)
-        for lineNr, cols in pairs(region) do
-            vim.api.nvim_buf_add_highlight(bufNr, M.ns, M.option.RegionHighlightGroup, lineNr, cols[1], cols[2])
-        end
+        vim.hl.range(
+            bufNr,
+            M.ns,
+            M.option.RegionHighlightGroup,
+            regionMotion.Start,
+            {
+                regionMotion.End[1],
+                regionMotion.End[2] + 1
+            }
+        )
     end
 
     if #M.srcExtmark == 2 then

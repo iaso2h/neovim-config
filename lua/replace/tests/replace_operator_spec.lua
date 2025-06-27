@@ -1021,15 +1021,15 @@ while true
 
         it([[Replace with i[ motion, charwise]], function() -- {{{
             initLines = [[
-api.nvim_buf_add_highlight(curBufNr, repHLNS, opts["hlGroup"], lineNr, cols[1], cols[2])
+vim.hl.range(curBufNr, repHLNS, opts["hlGroup"], {lineNr, cols[1]}, {lineNr, cols[2] + 1})
                                                      ^
             ]]
             expectedLines = [[
-api.nvim_buf_add_highlight(curBufNr, repHLNS, opts[myHighlightGroup], lineNr, cols[1], cols[2])
+vim.hl.range(curBufNr, repHLNS, opts[myHighlightGroup], {lineNr, cols[1]}, {lineNr, cols[2] + 1})
                                                      ^
             ]]
             expectedDotLines = [[
-api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols[2])
+vim.hl.range(curBufNr, repHLNS, opts['foo'], {lineNr, cols[1]}, {lineNr, cols[2] + 1})
             ]]
             initLines        = vim.split(initLines, "\n")
             expectedLines    = vim.split(expectedLines, "\n")
@@ -2167,15 +2167,15 @@ while true
 
         it([[Replace with i[ motion, charwise]], function() -- {{{
             initLines = [[
-    api.nvim_buf_add_highlight(curBufNr, repHLNS, opts["hlGroup"], lineNr, cols[1], cols[2])
+    vim.hl.range(curBufNr, repHLNS, opts["hlGroup"], {lineNr, cols[1]}, {lineNr, cols[2] + 1})
                                                 ^
         ]]
             expectedLines = [[
-    api.nvim_buf_add_highlight(curBufNr, repHLNS, opts[myHighlightGroup], lineNr, cols[1], cols[2])
+    vim.hl.range(curBufNr, repHLNS, opts[myHighlightGroup], {lineNr, cols[1]}, {lineNr, cols[2] + 1})
                                                 ^
         ]]
             expectedDotLines = [[
-    api.nvim_buf_add_highlight(curBufNr, repHLNS, opts['foo'], lineNr, cols[1], cols[2])
+    vim.hl.range(curBufNr, repHLNS, opts['foo'], {lineNr, cols[1]}, {lineNr, cols[2] + 1})
         ]]
             initLines        = vim.split(initLines, "\n")
             expectedLines    = vim.split(expectedLines, "\n")
