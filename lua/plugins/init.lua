@@ -240,7 +240,7 @@ local pluginArgs = { -- {{{
                 create_hl_autocmd = create_hl_autocmd
             }
             map("", [[<leader>f]], require("hop").hint_char1, "Hop char")
-            map("", [[<leader>F]], require("hop").hint_nodes, "Hop char")
+            map("", [[<leader>F]], require("hop-treesitter").hint_nodes, "Hop nodes")
         end
     },
     {
@@ -578,9 +578,8 @@ local pluginArgs = { -- {{{
         cond  = true,
         event = "VeryLazy",
         dependencies = {
-            "davidmh/cspell.nvim",
-            "nvimtools/none-ls.nvim",
             "mason.nvim",
+            "nvimtools/none-ls.nvim",
             "davidmh/cspell.nvim",
         },
         config = require("plugins.nvim-null-ls"),
@@ -608,8 +607,8 @@ local pluginArgs = { -- {{{
     {
         "L3MON4D3/LuaSnip",
         -- dependencies = { "rafamadriz/friendly-snippets", },
+        version = "v2.4.1",
         build  = "make install_jsregexp",
-        event = "VeryLazy",
         config = require("plugins.nvim-luasnip")
     },
     {

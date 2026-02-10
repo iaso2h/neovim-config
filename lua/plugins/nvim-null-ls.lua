@@ -230,7 +230,7 @@ return function()
         ensure_installed       = vim.tbl_keys(handlerArgs),
         automatic_installation = true,
         automatic_setup        = false,
-        handlers               = handlerArgs
+        handlers               = table.insert(handlerArgs, 0, function() end)
     }
 
     -- Fallback setup

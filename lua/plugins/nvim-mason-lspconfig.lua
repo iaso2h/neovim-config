@@ -10,6 +10,7 @@ M.serverNames = {
     "pyright",
     "vimls",
     "yamlls",
+    "omnisharp",
 }
 
 if _G._os_uname.sysname == "Windows_NT" then

@@ -11,9 +11,7 @@ return {
                     "lua/?/init.lua",
                 },
             },
-            -- -- Use stylua to format instead. Configured in
-            -- -- `lua/plugins/nvim-null-ls`
-            format = {enable = false},
+            format = {enable = true},
             completion = {
                 callSnippet    = "Replace",
                 keywordSnippet = "Replace",
