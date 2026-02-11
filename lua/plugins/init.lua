@@ -658,24 +658,6 @@ local pluginArgs = { -- {{{
         config = require("plugins.nvim-cmp"),
     },
     {
-        "yetone/avante.nvim",
-        event = "VeryLazy",
-        cmd = { "AvanteToggle" },
-        keys = {
-            { "<leader>aa", mode = "n" },
-            { "<leader>ae", mode = "n" }
-        },
-        enabled = true,
-        build = _G._os_uname.sysname ~= "Windows_NT" and "make" or "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false",
-        dependencies = {
-            "nvim-treesitter",
-            "plenary.nvim",
-            "nui.nvim",
-            "nvim-web-devicons",
-        },
-        config = require("plugins.nvim-avante")
-    },
-    {
         "kosayoda/nvim-lightbulb",
         config = require("plugins.nvim-lightbulb")
     },

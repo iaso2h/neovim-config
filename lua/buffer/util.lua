@@ -126,7 +126,6 @@ M.bufSwitchAlter = function(winId, bufNr) -- {{{
                     end
                 end
             end
-            vim.api.nvim_echo({{string.format("Failed to switch alternative buffer for the buffer %d in Windows: %d", bufNr, winId)}}, true, {err=true})
         else
             -- Do nothing
         end
