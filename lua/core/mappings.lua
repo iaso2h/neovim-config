@@ -489,8 +489,8 @@ map({"n", "x"}, [[<A-->]],  [[<CMD>wincmd -<CR>]],       {"silent"}, "Decrease w
 map("i",        [[<A-->]],  [[<C-\><C-O>:wincmd -<CR>]], {"silent"}, "Decrease window size")
 -- Buffers
 map("n", [[<C-w>O]], [[<CMD>lua require("buffer.closeOther")()<CR>]],   {"silent"}, "Delete other buffers")
-map("n", [=[[b]=],  [[<CMD>lua require("buffer.cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
-map("n", [=[]b]=],  [[<CMD>lua require("buffer.cycle").init(1)<CR>]],  {"silent"}, "Next buffer")
+map({"n", "x"}, [=[[b]=],  [[<CMD>lua require("buffer.cycle").init(-1)<CR>]], {"silent"}, "Previous buffer")
+map({"n", "x"}, [=[]b]=],  [[<CMD>lua require("buffer.cycle").init(1)<CR>]],  {"silent"}, "Next buffer")
 -- Tab
 map("n", [[<C-t>,]], [[<CMD>tabp | echo "tabpage " . tabpagenr()<CR>]], {"silent"}, "Previous tab")
 map("n", [[<C-t>.]], [[<CMD>tabn | echo "tabpage " . tabpagenr()<CR>]], {"silent"}, "Next tab")

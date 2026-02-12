@@ -78,31 +78,18 @@ return function()
         -- Bring back the gqq for formatting comments and stuff
         vim.bo.formatexpr = ""
         vim.opt.formatexpr = ""
-        vim.api.nvim_create_user_command("Format", function()
-            local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
-
-            if not client:supports_method('textDocument/willSaveWaitUntil')
-                and client:supports_method('textDocument/formatting') then
-                vim.lsp.buf.format {
-                    bufnr = args.buf,
-                    id = client.id, timeout_ms = 1000,
-                    async = true
-                }
-            else
-                vim.lsp.buf.format {
-                    bufnr = args.buf,
-                    id = client.id, timeout_ms = 1000,
-                    async = true,
-                    range = {
-                        ["start"] = { opts.line1, 0 },
-                        ["end"] = { opts.line2, 0 }
-                    }
-                }
-            end
-        end, {
-            desc  = "Format buffer or selected range",
-            range = true
-        })
+        bmap(bufNr, "n", [[<A-f>]], function()
+            vim.lsp.buf.format()
+        end, "Format document")
+        bmap(bufNr, "x", [[<A-f>]], function()
+            vim.cmd([[noa norm! ]] .. t("<Esc>"))
+            vim.lsp.buf.format({
+                range = {
+                    ["start"] = vim.api.nvim_buf_get_mark(bufNr, "<"),
+                    ["end"] = vim.api.nvim_buf_get_mark(bufNr, ">"),
+                },
+            })
+        end, "Format visual selection")
     end -- }}}
 
     vim.api.nvim_create_autocmd('LspAttach', { callback = onAttach })

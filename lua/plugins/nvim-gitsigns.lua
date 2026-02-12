@@ -1,6 +1,6 @@
 return function()
     local onAttach = function()
-        local gs = package.loaded.gitsigns
+        local gs = require("gitsigns")
         map("n", [[<C-h>s]], gs.stage_hunk, "Gitsigns stage hunk")
         map(
             "x",
@@ -19,7 +19,7 @@ return function()
         )
         map("n", [[<C-h>R]], gs.reset_buffer, "Gitsigns reset buffer")
 
-        map("n", [[<C-h>u]], gs.undo_stage_hunk, "Gitsigns undo stage hunk")
+        map("n", [[<C-h>u]], gs.stage_hunk, "Gitsigns undo stage hunk")
         map(
             "n",
             [[<C-h>b]],

@@ -211,7 +211,7 @@ M.posCenter = function(exCmd, suppressMsgChk, providedPrevWinId, providedPrevBuf
         elseif string.find(valOrMsg, "E662", 1, true) then
             vim.api.nvim_echo({ { "At oldest change", "WarningMsg" } }, false, {})
         else
-            vim.api.nvim_echo({{valOrMsg}, "WarningMsg"}, true, {})
+            vim.api.nvim_echo({{valOrMsg, "WarningMsg"}}, true, {})
         end
     end
 
