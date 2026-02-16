@@ -1,8 +1,6 @@
--- https://github.com/neovim/nvim-lspconfig
 
 return function()
     local lspConfig     = require("lspconfig")
-    local u             = require("lspconfig.util")
     local icon          = require("icon")
 
     local conciseQuifix = function(tbl) -- {{{
